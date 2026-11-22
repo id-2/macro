@@ -5,7 +5,7 @@ use std::sync::Arc;
 use async_graphql::async_trait::async_trait;
 use chrono::{TimeZone, Utc};
 use graphql_soup::{FoldersQueryError, FoldersQueryReader};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::project::Project;
 use models_soup::project::SoupProject;
 use projects_hex::domain::ports::ProjectService;
@@ -21,7 +21,7 @@ pub(crate) struct DssFoldersQueryReader(pub Arc<DssProjectService>);
 impl FoldersQueryReader for DssFoldersQueryReader {
     async fn list_folders<'a>(
         &'a self,
-        user_id: &'a MacroUserIdStr<'static>,
+        user_id: &'a RoxUserIdStr<'static>,
     ) -> Result<Vec<SoupProject<()>>, FoldersQueryError> {
         let projects = self
             .0

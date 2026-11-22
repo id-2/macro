@@ -5,7 +5,7 @@ use chrono::{TimeDelta, Utc};
 
 const MEETING_RING_DURATION: TimeDelta = TimeDelta::seconds(30);
 
-fn may_invite(meeting: &Meeting, actor: &MacroUserIdStr<'_>) -> bool {
+fn may_invite(meeting: &Meeting, actor: &RoxUserIdStr<'_>) -> bool {
     meeting.channel_id.is_none() && meeting.user_id == actor.as_ref()
 }
 
@@ -20,12 +20,12 @@ where
     Sm: CallSummarizer + Clone,
     V: VoipPushSender,
     Vr: VoiceRepository + Clone,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 {
     #[tracing::instrument(err, skip_all)]
     pub(super) async fn meeting_invite_permissions(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         token: MeetingToken,
     ) -> Result<MeetingInvitePermissions, CallError> {
         let meeting = self.resolve_invitation(&token).await?;
@@ -37,7 +37,7 @@ where
     #[tracing::instrument(err, skip_all)]
     pub(super) async fn ring_meeting_invitation(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         token: MeetingToken,
         request: InviteMeetingUsersRequest,
     ) -> Result<(), CallError> {
@@ -122,7 +122,7 @@ where
         &self,
         meeting_id: Uuid,
         call_id: Uuid,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
     ) {
         let mut metadata = CallNotificationMetadata::new(call_id, None);
         metadata.user_id = Some(actor.to_string());

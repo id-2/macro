@@ -166,7 +166,7 @@ async fn conflict_lookup_failure_retains_legacy_context_without_publishing() {
     };
     let link = Link {
         id: Uuid::from_u128(1),
-        macro_id: "macro|owner@example.com".to_owned().try_into().unwrap(),
+        rox_id: "macro|owner@example.com".to_owned().try_into().unwrap(),
         fusionauth_user_id: "fusion-owner".into(),
         email_address: "inbox@example.com".to_owned().try_into().unwrap(),
         provider: UserProvider::Gmail,

@@ -3,7 +3,7 @@ import type {
   WebFetch,
   WebSearch,
 } from '../../../generated/cognition/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { WebNamespace } from './namespace';
 
 describe('web', () => {
@@ -27,7 +27,7 @@ describe('web', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const found = await new WebNamespace(client).search('tokio release', {
       domains: ['tokio.rs'],
@@ -74,7 +74,7 @@ describe('web', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const page = await new WebNamespace(client).fetch('https://example.com/', {
       maxChars: 500,
@@ -99,7 +99,7 @@ describe('web', () => {
           response: new Response(null, { status: 422 }),
         }),
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     await expect(
       new WebNamespace(client).fetch('https://example.com/members-only'),

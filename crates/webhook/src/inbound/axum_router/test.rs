@@ -10,11 +10,11 @@ use axum::{
     body::{Body, to_bytes},
     http::{Request, StatusCode, header},
 };
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rate_limit::{RateLimitConfig, RateLimitKey, RateLimitService};
 use rootcause::Report;
@@ -35,12 +35,12 @@ struct FakeService {
 
 #[derive(Debug)]
 enum ServiceCall {
-    Create(MacroUserIdStr<'static>, CreateWebhookRequest),
-    Get(MacroUserIdStr<'static>, WebhookId),
-    List(MacroUserIdStr<'static>),
-    Patch(MacroUserIdStr<'static>, WebhookId, PatchWebhookRequest),
-    Validate(MacroUserIdStr<'static>, WebhookId),
-    Delete(MacroUserIdStr<'static>, WebhookId),
+    Create(RoxUserIdStr<'static>, CreateWebhookRequest),
+    Get(RoxUserIdStr<'static>, WebhookId),
+    List(RoxUserIdStr<'static>),
+    Patch(RoxUserIdStr<'static>, WebhookId, PatchWebhookRequest),
+    Validate(RoxUserIdStr<'static>, WebhookId),
+    Delete(RoxUserIdStr<'static>, WebhookId),
 }
 
 #[allow(
@@ -89,11 +89,11 @@ impl FakeAuthorizationService {
     }
 }
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         self.calls.fetch_add(1, Ordering::SeqCst);
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(UserContext {
@@ -105,31 +105,31 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_bot(
         &self,
         bot_token: &str,
-        bot_scope: macro_authorization::BotScope,
-        acting_user: Option<macro_authorization::BotActingUserClaims>,
-    ) -> Result<macro_authorization::BotAuthentication, Report<MacroAuthorizationError>> {
+        bot_scope: rox_authorization::BotScope,
+        acting_user: Option<rox_authorization::BotActingUserClaims>,
+    ) -> Result<rox_authorization::BotAuthentication, Report<RoxAuthorizationError>> {
         if bot_token != "mbot_feed_test" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         let acting_user = acting_user
             .and_then(|claims| claims.user_id)
-            .map(|user_id| macro_authorization::MacroUserAuthentication {
-                origin: macro_authorization::CredentialOrigin::Bot,
+            .map(|user_id| rox_authorization::RoxUserAuthentication {
+                origin: rox_authorization::CredentialOrigin::Bot,
                 agent_id: None,
                 agent_via: None,
-                macro_user_id: MacroUserIdStr::try_from(user_id).unwrap(),
+                rox_user_id: RoxUserIdStr::try_from(user_id).unwrap(),
                 user_context: UserContext::default(),
             });
-        Ok(macro_authorization::BotAuthentication {
+        Ok(rox_authorization::BotAuthentication {
             bot_id: bot_id::BotId::TEST_A,
             token_id: uuid::Uuid::new_v4(),
             bot_scope,
@@ -142,9 +142,9 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != VALID_INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(claims.user_id.map(|user_id| UserContext {
@@ -159,7 +159,7 @@ impl MacroAuthorizationService for FakeAuthorizationService {
 impl WebhookService for FakeService {
     async fn create_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         request: CreateWebhookRequest,
     ) -> Result<Webhook, WebhookError> {
         self.calls
@@ -180,7 +180,7 @@ impl WebhookService for FakeService {
 
     async fn get_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> Result<Webhook, WebhookError> {
         self.calls
@@ -201,7 +201,7 @@ impl WebhookService for FakeService {
 
     async fn list_webhooks(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<ListWebhooksResponse, WebhookError> {
         self.calls.lock().unwrap().push(ServiceCall::List(caller));
         match self.response.lock().unwrap().take().unwrap_or_else(|| {
@@ -216,7 +216,7 @@ impl WebhookService for FakeService {
 
     async fn patch_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
         request: PatchWebhookRequest,
     ) -> Result<Webhook, WebhookError> {
@@ -238,7 +238,7 @@ impl WebhookService for FakeService {
 
     async fn validate_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> Result<ValidateWebhookResponse, WebhookError> {
         self.calls
@@ -259,7 +259,7 @@ impl WebhookService for FakeService {
 
     async fn delete_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> Result<(), WebhookError> {
         self.calls
@@ -646,7 +646,7 @@ async fn send_request(
     uri: &str,
     body: serde_json::Value,
 ) -> axum::response::Response {
-    let authorization_state = MacroAuthorizationState::new(Arc::new(authorization));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(authorization));
     let router = webhook_router::<_, _, _, ()>(WebhookRouterState::new(
         service,
         limiter,

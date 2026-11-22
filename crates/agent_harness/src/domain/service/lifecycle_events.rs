@@ -8,8 +8,8 @@ use agent_session::domain::lifecycle::session_identity;
 
 use crate::domain::model::{ReplyPersona, is_coding_agent};
 use crate::domain::notifications::plan;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::*;
 
@@ -158,7 +158,7 @@ where
         &self,
         session_id: AgentSessionId,
         action_id: AgentActionId,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
         prompt_markdown: &str,
         origin_message_id: Option<Uuid>,
     ) {

@@ -364,7 +364,7 @@ describe('markdownToEmbeddingText', () => {
 
   it('unwraps email thread embeds and resolves mentions inside them', () => {
     const input =
-      '<m-email-thread-embed>{"tag":"div","classes":["macro_quote"]}From <m-contact-mention>{"name":"Ness Chu"}</m-contact-mention>:\\nplease fix</m-email-thread-embed>';
+      '<m-email-thread-embed>{"tag":"div","classes":["rox_quote"]}From <m-contact-mention>{"name":"Ness Chu"}</m-contact-mention>:\\nplease fix</m-email-thread-embed>';
     expect(markdownToEmbeddingText(input)).toBe('From Ness Chu:\nplease fix');
   });
 

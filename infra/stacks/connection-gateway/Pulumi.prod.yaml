@@ -6,4 +6,4 @@ config:
   connection-gateway:internal_auth_key: document-storage-service-auth-key-prod
   connection-gateway:jwt_secret_key: fusionauth-jwt-secret-prod
   connection-gateway:legacy_jwt_secret_key: jwt-secret-prod
-  connection-gateway:macro_db_secret_key: macro-db-prod
+  connection-gateway:rox_db_secret_key: macro-db-prod

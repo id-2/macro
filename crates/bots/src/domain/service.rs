@@ -22,8 +22,8 @@ use entity_access::domain::models::{
     MemberParticipantRole, ParticipantRole,
 };
 use harnesses::domain::ports::HarnessTeamAgents;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Bot service implementation.
@@ -258,7 +258,7 @@ struct ValidatedBotToken {
 impl<R, B, T, C> BotServiceImpl<R, B, T, C>
 where
     R: BotRepo,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     T: HarnessTeamAgents,
 {
     fn publish_bot_event(&self, event: &BotMacroEvent) {
@@ -269,7 +269,7 @@ where
 
     async fn owner_for_request(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Option<Uuid>,
     ) -> Result<BotOwner, BotError> {
         if let Some(team_id) = team_id {
@@ -291,7 +291,7 @@ where
 
     async fn agent_owner_for_request(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Option<Uuid>,
     ) -> Result<BotOwner, BotError> {
         if let Some(team_id) = team_id {
@@ -368,7 +368,7 @@ where
 
     async fn owner_for_agent_update(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         current: &Bot,
         requested_team_id: Option<Uuid>,
     ) -> Result<BotOwner, BotError> {
@@ -397,7 +397,7 @@ where
 
     async fn ensure_manageable(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<Bot, BotError> {
         let bot = self
@@ -434,7 +434,7 @@ where
     /// the bot [`Self::ensure_manageable`] returned for it.
     async fn replace_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         current: &Bot,
         req: UpdateAgentRequest,
     ) -> Result<Agent, BotError> {
@@ -511,13 +511,13 @@ where
 impl<R, B, T, C> BotService for BotServiceImpl<R, B, T, C>
 where
     R: BotRepo,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
     T: HarnessTeamAgents,
     C: McpAppCatalog,
 {
     async fn create_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         req: CreateAgentRequest,
     ) -> Result<Agent, BotError> {
         validate_agent_request(&req)?;
@@ -575,7 +575,7 @@ where
 
     async fn update_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: UpdateAgentRequest,
     ) -> Result<Agent, BotError> {
@@ -594,7 +594,7 @@ where
 
     async fn manageable_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<Agent, BotError> {
         self.ensure_manageable(caller, bot_id).await?;
@@ -607,7 +607,7 @@ where
 
     async fn patch_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: PatchAgentRequest,
     ) -> Result<Agent, BotError> {
@@ -627,7 +627,7 @@ where
         self.replace_agent(caller, &current, update).await
     }
 
-    async fn list_agents(&self, caller: MacroUserIdStr<'static>) -> Result<Vec<Agent>, BotError> {
+    async fn list_agents(&self, caller: RoxUserIdStr<'static>) -> Result<Vec<Agent>, BotError> {
         self.repo
             .list_manageable_agents(caller)
             .await
@@ -636,7 +636,7 @@ where
 
     async fn create_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         req: CreateBotRequest,
     ) -> Result<Bot, BotError> {
         validate_handle(&req.handle)?;
@@ -667,7 +667,7 @@ where
 
     async fn create_channel_scoped_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_id: Uuid,
         req: CreateChannelScopedBotRequest,
     ) -> Result<CreateChannelScopedBotResponse, BotError> {
@@ -708,7 +708,7 @@ where
         })
     }
 
-    async fn list_bots(&self, caller: MacroUserIdStr<'static>) -> Result<Vec<Bot>, BotError> {
+    async fn list_bots(&self, caller: RoxUserIdStr<'static>) -> Result<Vec<Bot>, BotError> {
         self.repo
             .list_manageable_bots(caller)
             .await
@@ -717,7 +717,7 @@ where
 
     async fn get_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<Bot, BotError> {
         self.ensure_manageable(caller, bot_id).await
@@ -757,7 +757,7 @@ where
 
     async fn patch_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: PatchBotRequest,
     ) -> Result<Bot, BotError> {
@@ -792,7 +792,7 @@ where
 
     async fn delete_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<(), BotError> {
         let bot = self.ensure_manageable(caller.clone(), bot_id).await?;
@@ -854,7 +854,7 @@ where
 
     async fn remove_bot_from_channel(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_id: Uuid,
         bot_id: BotId,
     ) -> Result<(), BotError> {
@@ -901,7 +901,7 @@ where
 
     async fn create_token(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: CreateBotTokenRequest,
     ) -> Result<super::models::CreateBotTokenResponse, BotError> {
@@ -921,7 +921,7 @@ where
 
     async fn list_tokens(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<Vec<BotToken>, BotError> {
         self.ensure_manageable(caller, bot_id).await?;
@@ -933,7 +933,7 @@ where
 
     async fn revoke_token(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         token_id: Uuid,
     ) -> Result<(), BotError> {

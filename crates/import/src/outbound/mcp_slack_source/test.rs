@@ -6,8 +6,8 @@ use std::collections::VecDeque;
 use std::pin::Pin;
 use std::sync::Mutex;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|import@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|import@example.com").unwrap()
 }
 
 #[derive(Default)]
@@ -568,13 +568,13 @@ fn rate_limit_status_requires_a_standalone_token() {
 
 struct NoConnector;
 impl ConnectorSelect for NoConnector {
-    async fn user_toolset(&self, _: &MacroUserIdStr<'static>) -> UserMcpTools {
+    async fn user_toolset(&self, _: &RoxUserIdStr<'static>) -> UserMcpTools {
         panic!("must request only the Slack connector")
     }
 
     async fn connector_toolset(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         connector: ConnectorRef<'_>,
     ) -> anyhow::Result<Option<UserMcpTools>> {
         assert_eq!(caller, &user());
@@ -586,7 +586,7 @@ impl ConnectorSelect for NoConnector {
 
     async fn connector_connected(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: ConnectorRef<'_>,
     ) -> anyhow::Result<bool> {
         panic!("opening a session must load its toolset directly")

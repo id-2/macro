@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO macro_user_info (macro_user_id, first_name, last_name) VALUES ('00000000-0000-4000-8000-000000000001', 'Grace', 'Hopper')",
+  "query": "INSERT INTO rox_user_info (rox_user_id, first_name, last_name) VALUES ('00000000-0000-4000-8000-000000000001', 'Grace', 'Hopper')",
   "describe": {
     "columns": [],
     "parameters": {

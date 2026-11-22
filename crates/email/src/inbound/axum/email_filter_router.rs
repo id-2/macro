@@ -7,7 +7,7 @@ use axum::{
 };
 use axum_extra::extract::Cached;
 use chrono::{DateTime, Utc};
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use thiserror::Error;
 use uuid::Uuid;
@@ -121,9 +121,9 @@ pub fn email_filter_router<S, T, Auth>() -> Router<S>
 where
     S: Send + Sync + Clone + 'static,
     T: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     EmailRouterState<T>: axum::extract::FromRef<S>,
-    MacroAuthorizationState<Auth>: axum::extract::FromRef<S>,
+    RoxAuthorizationState<Auth>: axum::extract::FromRef<S>,
 {
     Router::new()
         .route("/", put(upsert_email_filter_handler::<T, Auth>))
@@ -148,7 +148,7 @@ where
     )
 )]
 #[tracing::instrument(err, skip(state, link, body))]
-pub async fn upsert_email_filter_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn upsert_email_filter_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<T, Auth>>,
     Json(body): Json<UpsertEmailFilterRequest>,
@@ -183,7 +183,7 @@ pub async fn upsert_email_filter_handler<T: EmailService, Auth: MacroAuthorizati
     )
 )]
 #[tracing::instrument(err, skip(state, link))]
-pub async fn delete_email_filter_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn delete_email_filter_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<T, Auth>>,
     Path(filter_id): Path<Uuid>,
@@ -212,7 +212,7 @@ pub async fn delete_email_filter_handler<T: EmailService, Auth: MacroAuthorizati
     )
 )]
 #[tracing::instrument(err, skip_all)]
-pub async fn list_email_filters_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn list_email_filters_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<T, Auth>>,
 ) -> Result<Json<ListEmailFiltersResponse>, EmailFilterError> {

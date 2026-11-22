@@ -1,4 +1,4 @@
-use crate::{SearchServiceClient, constants::INTERNAL_MACRO_USER_ID_HEADER};
+use crate::{SearchServiceClient, constants::INTERNAL_ROX_USER_ID_HEADER};
 
 impl SearchServiceClient {
     pub async fn search_unified(
@@ -18,7 +18,7 @@ impl SearchServiceClient {
         let res = self
             .with_trace_headers(self.client.post(url))
             .query(&query_params)
-            .header(INTERNAL_MACRO_USER_ID_HEADER, user_id)
+            .header(INTERNAL_ROX_USER_ID_HEADER, user_id)
             .json(&body)
             .send()
             .await?;

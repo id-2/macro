@@ -8,9 +8,9 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroWebhooksTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxWebhooksTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use super::models::{WebhookFilters, WebhookStatus};
@@ -30,7 +30,7 @@ pub struct WebhookCreatedMetadata {
     #[serde(default)]
     pub namespace: String,
     /// Authenticated user who created the webhook.
-    pub created_by_user_id: MacroUserIdStr<'static>,
+    pub created_by_user_id: RoxUserIdStr<'static>,
     /// Display name of the webhook.
     pub name: String,
     /// URL that receives webhook deliveries.
@@ -55,7 +55,7 @@ pub struct WebhookUpdatedMetadata {
     /// Identifier of the workspace that owns the webhook.
     pub workspace_id: String,
     /// Authenticated user who updated the webhook.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
     /// Requested display name, or `None` when the PATCH omitted it.
     pub name: Option<String>,
     /// Requested endpoint URL, or `None` when the PATCH omitted it.
@@ -82,7 +82,7 @@ pub struct WebhookDeletedMetadata {
     /// Identifier of the workspace that owned the webhook.
     pub workspace_id: String,
     /// Authenticated user who deleted the webhook.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
 }
 
 /// Metadata for [`WebhookTopicEvent::Validated`].
@@ -93,7 +93,7 @@ pub struct WebhookValidatedMetadata {
     /// Identifier of the workspace that owns the webhook.
     pub workspace_id: String,
     /// Authenticated user who requested validation.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
     /// Persisted endpoint validation outcome.
     pub is_valid: bool,
     /// HTTP status returned by the endpoint, when it responded.
@@ -102,7 +102,7 @@ pub struct WebhookValidatedMetadata {
     pub message: Option<String>,
 }
 
-/// Lifecycle events published to [`MacroWebhooksTopic`].
+/// Lifecycle events published to [`RoxWebhooksTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum WebhookTopicEvent {
@@ -121,12 +121,12 @@ pub enum WebhookTopicEvent {
 }
 
 impl TopicEvent for WebhookTopicEvent {
-    type Topic = MacroWebhooksTopic;
+    type Topic = RoxWebhooksTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable lifecycle event for [`MacroWebhooksTopic`], keyed by webhook id.
+/// Publishable lifecycle event for [`RoxWebhooksTopic`], keyed by webhook id.
 pub struct WebhookMacroEvent {
     key: String,
     event: Event<WebhookTopicEvent>,
@@ -167,7 +167,7 @@ impl WebhookMacroEvent {
     }
 }
 
-impl MacroEvent for WebhookMacroEvent {
+impl RoxEvent for WebhookMacroEvent {
     type EventPayload = WebhookTopicEvent;
 
     fn key(&self) -> &str {

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::Language;
 
 use super::UserLanguageServiceImpl;
@@ -11,8 +11,8 @@ use crate::domain::ports::{UserLanguageRepo, UserLanguageService};
 const USER: &str = "macro|user@rox.one";
 const MISSING_USER: &str = "macro|missing@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -41,7 +41,7 @@ impl UserLanguageRepo for FakeUserLanguageRepo {
 
     async fn get_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<Option<Language>>, Self::Err> {
         if self.fail {
             return Err(FakeRepoError);
@@ -56,7 +56,7 @@ impl UserLanguageRepo for FakeUserLanguageRepo {
 
     async fn set_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         language: Option<Language>,
     ) -> Result<bool, Self::Err> {
         if self.fail {

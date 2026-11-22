@@ -4,7 +4,7 @@
 use std::sync::Arc;
 
 use entity_access::domain::ports::{AccessibleDatabases, EntityAccessService};
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use properties::outbound::properties_pg_repo::PropertiesPgRepo;
 use sqlx::PgPool;
 
@@ -35,7 +35,7 @@ pub fn build_service<Events, Broker, EntityAccess>(
 ) -> PgDatabasesService<Events, Broker, EntityAccess>
 where
     Events: TableEventPublisher,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     EntityAccess: EntityAccessService + AccessibleDatabases,
 {
     DatabasesServiceImpl::new(

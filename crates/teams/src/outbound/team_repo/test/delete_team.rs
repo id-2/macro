@@ -4,7 +4,7 @@ use uuid::Uuid;
 use super::*;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("teams", "team_grants"))
 )]
 async fn delete_team_sweeps_the_grants_of_the_team_and_its_bots_only(

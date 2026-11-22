@@ -14,7 +14,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     let builder = Builder::new("notifications");
     #[cfg(target_os = "ios")]
     let builder = builder
-        .js_init_script("window.__MACRO_IOS_NOTIFICATION_LAUNCH__ = true;")
+        .js_init_script("window.__ROX_IOS_NOTIFICATION_LAUNCH__ = true;")
         .invoke_handler(tauri::generate_handler![
             ios::check_permissions,
             ios::request_permissions,

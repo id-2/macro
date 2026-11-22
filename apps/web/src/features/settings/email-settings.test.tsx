@@ -52,7 +52,7 @@ vi.mock('./SignatureSection', () => ({
 
 const link = {
   id: 'link-1',
-  macro_id: 'macro|owner@example.com',
+  rox_id: 'macro|owner@example.com',
   email_address: 'owner@example.com',
   settings: { read_receipts_enabled: true },
 };
@@ -106,7 +106,7 @@ describe('EmailSignatures', () => {
           link,
           {
             id: 'link-2',
-            macro_id: 'macro|helpdesk@example.com',
+            rox_id: 'macro|helpdesk@example.com',
             email_address: 'helpdesk@example.com',
             settings: { read_receipts_enabled: true },
           },

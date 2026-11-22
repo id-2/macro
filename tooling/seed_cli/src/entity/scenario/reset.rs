@@ -64,7 +64,7 @@ DELETE FROM "SharePermission" WHERE id IN (SELECT id FROM sp_ids)"#
         // Participants, messages, attachments, and reactions cascade with
         // the channel.
         format!("DELETE FROM comms_channels WHERE id::text LIKE '{m}'"),
-        // Threads, messages, labels, contacts, and macro_user_links cascade
+        // Threads, messages, labels, contacts, and rox_user_links cascade
         // with the link.
         format!("DELETE FROM email_links WHERE id::text LIKE '{m}'"),
         format!("DELETE FROM \"Document\" WHERE id LIKE '{m}'"),
@@ -75,11 +75,11 @@ DELETE FROM "SharePermission" WHERE id IN (SELECT id FROM sp_ids)"#
         // team_crm_settings cascades with the team.
         format!("DELETE FROM team WHERE id::text LIKE '{m}'"),
         format!(
-            r#"DELETE FROM "RolesOnUsers" WHERE "userId" IN (SELECT id FROM "User" WHERE "macro_user_id"::text LIKE '{m}')"#
+            r#"DELETE FROM "RolesOnUsers" WHERE "userId" IN (SELECT id FROM "User" WHERE "rox_user_id"::text LIKE '{m}')"#
         ),
-        format!("DELETE FROM macro_user_email_verification WHERE macro_user_id::text LIKE '{m}'"),
-        format!("DELETE FROM macro_user_info WHERE macro_user_id::text LIKE '{m}'"),
-        format!(r#"DELETE FROM "User" WHERE "macro_user_id"::text LIKE '{m}'"#),
+        format!("DELETE FROM rox_user_email_verification WHERE rox_user_id::text LIKE '{m}'"),
+        format!("DELETE FROM rox_user_info WHERE rox_user_id::text LIKE '{m}'"),
+        format!(r#"DELETE FROM "User" WHERE "rox_user_id"::text LIKE '{m}'"#),
         format!("DELETE FROM macro_user WHERE id::text LIKE '{m}'"),
     ]
 }
@@ -111,8 +111,8 @@ pub fn reset_user_statements(emails: &[String]) -> Vec<String> {
         format!(
             "DELETE FROM contacts_connections WHERE user1 IN ({user_ids}) OR user2 IN ({user_ids})"
         ),
-        format!("DELETE FROM macro_user_email_verification WHERE email IN ({emails})"),
-        format!("DELETE FROM macro_user_info WHERE macro_user_id IN ({macro_user_ids})"),
+        format!("DELETE FROM rox_user_email_verification WHERE email IN ({emails})"),
+        format!("DELETE FROM rox_user_info WHERE rox_user_id IN ({macro_user_ids})"),
         format!(r#"DELETE FROM "User" WHERE email IN ({emails})"#),
         format!("DELETE FROM macro_user WHERE email IN ({emails})"),
     ]

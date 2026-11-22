@@ -1,6 +1,6 @@
 ---
 name: database-core
-description: Use when building a feature on reusable database storage or UI, such as CRM, or deciding whether it needs a Macro database entity. Covers shared storage, a host-independent database UI and API contract, ownership, authorization, and the _entities naming convention.
+description: Use when building a feature on reusable database storage or UI, such as CRM, or deciding whether it needs a Rox database entity. Covers shared storage, a host-independent database UI and API contract, ownership, authorization, and the _entities naming convention.
 ---
 
 # Database core
@@ -14,7 +14,7 @@ lifecycle.
 - **Building a feature such as CRM:** reference `databases.id` from that
   feature's domain model. Use the `DatabaseStorage` port to `create_storage`,
   `apply_storage_writes`, and `delete_storage`.
-- **Working on the Macro database app:** use `DatabasesService`. Its repository
+- **Working on the Rox database app:** use `DatabasesService`. Its repository
   creates the app entity and owner grant together; `CellStore` enforces the
   entity's lifecycle during writes.
 
@@ -27,7 +27,7 @@ it in Soup.
 ## Keep product metadata on the entity
 
 `databases` holds the core resource identity. An optional `database_entities` row
-holds the Macro app's name, owner (`user_id`), lifecycle timestamps, and trash
+holds the Rox app's name, owner (`user_id`), lifecycle timestamps, and trash
 state. Its `database_id` is both its primary key and a foreign key to the resource.
 
 Use this pattern for new entities: a plural `<kind>_entities` table owns product
@@ -37,14 +37,14 @@ Rust type names stay singular.
 
 ## Build one database UI for multiple hosts
 
-The Macro database app, CRM pipelines, and other consumers are hosts of the same
+The Rox database app, CRM pipelines, and other consumers are hosts of the same
 editor. A host supplies an authorized API and its capabilities; it should not
 reimplement database editing, pagination, option creation, or refresh behavior.
 Follow the [frontend architecture](../../../docs/architecture/frontend-features.md).
 
 ### Target ownership
 
-Use `apps/web/src/features/database/` for reusable database behavior and UI. Keep `features/block-database/` as the Macro app composition and
+Use `apps/web/src/features/database/` for reusable database behavior and UI. Keep `features/block-database/` as the Rox app composition and
 `features/crm/` as the CRM composition. Move code with its dependencies and migrate
 its callers; a directory rename alone does not establish the boundary.
 
@@ -66,7 +66,7 @@ Preserve the existing `DatabaseOp` / `OpBatch` semantics instead of defining a
 CRM-specific mutation language. Keep generated HTTP DTOs and route choices in
 transport adapters; shared rendering consumes feature models.
 
-Build the rows source and schema/view actions once from this contract. A Macro
+Build the rows source and schema/view actions once from this contract. A Rox
 adapter can call the database routes and a pipeline adapter can call CRM routes;
 neither should duplicate cell-to-op conversion, option-label handling, batch
 submission, or committed-write refresh semantics. Keep transport errors distinct
@@ -102,7 +102,7 @@ and [DatabaseRowsSource](../../../apps/web/src/features/database/context/table-s
 capabilities. `DatabaseRecords` wires the standard schema controls once. Read the
 [API contract](../../../apps/web/src/features/database/core/api.ts) and
 [provider](../../../apps/web/src/features/database/context/database.tsx) when adding
-a host. `DatabaseGrid` composes the Macro app with its SQL cache and inference
+a host. `DatabaseGrid` composes the Rox app with its SQL cache and inference
 source; ordinary API hosts use the provider's paginated source. Keep host-specific
 optimizations behind the same data-source contract. CRM uses `createPipelineApi`
 in `features/crm/queries/pipeline-data.ts` with the same provider and controller.
@@ -110,7 +110,7 @@ Its adapter converts transport values and calls pipeline-authorized endpoints;
 it does not own pagination or mutation planning.
 
 Verify the same editor against a small fake API without app providers, then test
-the Macro and CRM adapters against the same behavioral contract. Cover a failed
+the Rox and CRM adapters against the same behavioral contract. Cover a failed
 batch, a successful write followed by failed refresh, version conflicts, and
 unsupported capabilities. Exercise changed interactions in both hosts in a browser.
 

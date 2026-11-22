@@ -1,8 +1,8 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_insert_and_get_mobile_welcome_email(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let email = "Test@Example.com";
 

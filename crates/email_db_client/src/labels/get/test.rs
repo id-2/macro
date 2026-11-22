@@ -1,18 +1,18 @@
 use crate::labels::get::{fetch_message_labels_in_bulk, messages_changing_label};
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::db::label::{LabelListVisibility, LabelType, MessageListVisibility};
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_message_labels_in_bulk"))
 )]
 async fn fetch_message_labels_in_bulk_returns_labels_grouped_by_message_id(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let message_id_1 = Uuid::parse_str("00000000-0000-0000-0000-000000008501")?;
     let message_id_2 = Uuid::parse_str("00000000-0000-0000-0000-000000008502")?;
@@ -33,7 +33,7 @@ async fn fetch_message_labels_in_bulk_returns_labels_grouped_by_message_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_message_labels_in_bulk"))
 )]
 async fn fetch_message_labels_in_bulk_returns_correct_label_data(
@@ -69,7 +69,7 @@ async fn fetch_message_labels_in_bulk_returns_correct_label_data(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_message_labels_in_bulk"))
 )]
 async fn fetch_message_labels_in_bulk_returns_user_labels(pool: Pool<Postgres>) -> Result<()> {
@@ -89,7 +89,7 @@ async fn fetch_message_labels_in_bulk_returns_user_labels(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_message_labels_in_bulk"))
 )]
 async fn fetch_message_labels_in_bulk_excludes_messages_without_labels(
@@ -110,7 +110,7 @@ async fn fetch_message_labels_in_bulk_excludes_messages_without_labels(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_message_labels_in_bulk"))
 )]
 async fn fetch_message_labels_in_bulk_returns_empty_for_empty_input(
@@ -124,7 +124,7 @@ async fn fetch_message_labels_in_bulk_returns_empty_for_empty_input(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_message_labels_in_bulk"))
 )]
 async fn fetch_message_labels_in_bulk_returns_empty_for_nonexistent_messages(
@@ -140,7 +140,7 @@ async fn fetch_message_labels_in_bulk_returns_empty_for_nonexistent_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_message_labels_in_bulk"))
 )]
 async fn messages_changing_label_skips_messages_already_in_the_requested_state(

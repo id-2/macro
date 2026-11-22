@@ -10,8 +10,8 @@ use crate::domain::models::{
 };
 use chrono::{DateTime, Utc};
 use cowlike::CowLike;
-use macro_user_id::email::EmailStr;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::email::EmailStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use rate_limit::RateLimitExceeded;
 use rootcause::Report;
@@ -44,7 +44,7 @@ pub struct APNSTargets<T> {
     /// The APNS message attributes.
     pub attributes: MessageAttributes,
     /// Per-user iOS/Android endpoints and one shared fallback decision.
-    pub ios_device_endpoints: HashMap<MacroUserIdStr<'static>, UserApnsEndpoints>,
+    pub ios_device_endpoints: HashMap<RoxUserIdStr<'static>, UserApnsEndpoints>,
 }
 
 /// Email notification payload.
@@ -61,7 +61,7 @@ pub struct EmailContent {
     #[serde(default)]
     pub text: Option<String>,
     /// The person the email is sent on behalf of. The sender shows it as the From display
-    /// name, marked as sent via Macro, while the address stays Macro's.
+    /// name, marked as sent via Rox, while the address stays Rox's.
     #[serde(default)]
     pub from_name: Option<String>,
     /// The address replies go to instead of Rox's no-reply sender.
@@ -86,7 +86,7 @@ impl EmailContent {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EmailNotification<'a> {
     /// The recipient email/user ID.
-    pub(crate) to: MacroUserIdStr<'a>,
+    pub(crate) to: RoxUserIdStr<'a>,
     /// The email content (subject and body).
     pub content: EmailContent,
 
@@ -99,7 +99,7 @@ pub struct EmailNotification<'a> {
 pub(crate) struct EmailCreateBundle {
     /// A connected address verified by the producing domain, for a single recipient.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    destination: Option<MacroUserIdStr<'static>>,
+    destination: Option<RoxUserIdStr<'static>>,
     /// The email content (subject and body).
     content: EmailContent,
 
@@ -123,12 +123,12 @@ impl EmailCreateBundle {
         }
     }
 
-    pub(crate) fn with_destination(mut self, destination: MacroUserIdStr<'static>) -> Self {
+    pub(crate) fn with_destination(mut self, destination: RoxUserIdStr<'static>) -> Self {
         self.destination = Some(destination);
         self
     }
 
-    pub(crate) fn with_recipient<'a>(self, to: MacroUserIdStr<'a>) -> EmailNotification<'a> {
+    pub(crate) fn with_recipient<'a>(self, to: RoxUserIdStr<'a>) -> EmailNotification<'a> {
         let EmailCreateBundle {
             destination,
             content,
@@ -146,7 +146,7 @@ impl EmailCreateBundle {
 
 impl<'a> EmailNotification<'a> {
     /// return the value of the recipient of the email
-    pub fn to(&'a self) -> MacroUserIdStr<'a> {
+    pub fn to(&'a self) -> RoxUserIdStr<'a> {
         self.to.copied()
     }
 }
@@ -178,7 +178,7 @@ pub struct RealtimeNotif<T> {
     /// Deserialized notification metadata.
     pub notification_metadata: T,
     /// The user who triggered the notification.
-    pub sender_id: Option<MacroUserIdStr<'static>>,
+    pub sender_id: Option<RoxUserIdStr<'static>>,
 }
 
 /// Concrete schema type for [`RealtimeNotif`] with `serde_json::Value` metadata.
@@ -197,7 +197,7 @@ pub(crate) struct ConnGatewayNotification<'a, T> {
     /// The notification payload to send.
     pub(crate) notif: RealtimeNotif<TaggedContent<T>>,
     /// The recipients to deliver to.
-    pub(crate) recipients: Vec<MacroUserIdStr<'a>>,
+    pub(crate) recipients: Vec<RoxUserIdStr<'a>>,
 }
 
 impl<'a, T: Clone> ConnGatewayNotification<'a, T> {
@@ -409,7 +409,7 @@ impl<'a, T, U> QueueMessageNeedsStateMachine<'a, T, U> {
     ) -> impl Iterator<Item = QueueMessage<'a, T, U>> {
         // Collect indeterminate decisions keyed by owner_id
         let indeterminates: HashMap<
-            MacroUserIdStr<'static>,
+            RoxUserIdStr<'static>,
             Box<BatchSend<PushNotificationsEnabled>>,
         > = states
             .into_iter()

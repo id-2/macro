@@ -16,7 +16,7 @@ use axum::{
     http::StatusCode,
 };
 use entity_registry::{OwnedPurgeOutcome, Owner, PurgeOwnedEntity, RegisteredEntityType};
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use uuid::Uuid;
 
 use crate::api::context::AuthorizationService;
@@ -65,7 +65,7 @@ pub(super) struct OwnerQuery {
 #[tracing::instrument(skip(state, _auth, owner), fields(owner.kind = ?owner.owner_type()))]
 pub(super) async fn handler<D, C, P>(
     State(state): State<OwnedPurgeState<D, C, P>>,
-    _auth: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _auth: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path((entity_type, entity_id)): Path<(RegisteredEntityType, Uuid)>,
     Query(OwnerQuery { owner }): Query<OwnerQuery>,
 ) -> StatusCode

@@ -182,7 +182,7 @@ it('copies/cuts/pastes native events, offsets repeated pastes, and undoes the wh
   const { editor, data, event } = setup();
   editor.select('welcome-rectangle');
   expect(event('copy').defaultPrevented).toBe(true);
-  expect(data.get('application/x-macro-graphics')).toBe(data.get('text/plain'));
+  expect(data.get('application/x-rox-graphics')).toBe(data.get('text/plain'));
   expect(event('paste').defaultPrevented).toBe(true);
   const first = editor.document.items[editor.getSession().selectedIds[0]!]!;
   event('paste');

@@ -38,7 +38,7 @@ import {
   EmailScheduleBar,
   EmailScheduleSummary,
 } from '../components/email-schedule-summary';
-import { MacroSignatureButton } from '../components/macro-signature-button';
+import { RoxSignatureButton } from '../components/macro-signature-button';
 import { MobileReplyToolbar } from '../components/mobile-reply-toolbar';
 import { SignaturePreview } from '../components/signature-preview';
 import type { EmailComposeContext } from '../context/compose-capabilities';
@@ -720,7 +720,7 @@ function LoadedReplyInputView(props: ReplyInputViewProps) {
                 'ph-no-capture cursor-text wrap-break-word text-base text-ink h-auto overflow-visible shrink-0',
                 // Quoted thread collapses behind the "⋯" pill below
                 // (rule lives in LexicalMarkdown/styles.css — Tailwind arbitrary
-                // variants turn the underscore in .macro_quote into a space)
+                // variants turn the underscore in .rox_quote into a space)
                 quoteCollapsed() && 'quote-collapsed',
                 isDragging() && 'blur'
               )}
@@ -736,7 +736,7 @@ function LoadedReplyInputView(props: ReplyInputViewProps) {
             />
             <Show when={!hasPaidAccess()}>
               <div class="text-ink/50 mt-[1lh]" data-watermark>
-                <MacroSignatureButton
+                <RoxSignatureButton
                   visible={
                     !composeContext.presentation.viewerLoading() &&
                     !composeContext.hasPaidAccess()

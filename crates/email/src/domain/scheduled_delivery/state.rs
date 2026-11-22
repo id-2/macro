@@ -163,11 +163,11 @@ pub async fn claim_delivery(
             format!(
                 "{}.{}@send.rox.one",
                 message_id,
-                macro_uuid::generate_uuid_v7()
+                rox_uuid::generate_uuid_v7()
             )
         })
     });
-    let token = DeliveryClaimToken(macro_uuid::generate_uuid_v7());
+    let token = DeliveryClaimToken(rox_uuid::generate_uuid_v7());
     tx.acquire(
         link_id,
         message_id,

@@ -80,7 +80,7 @@ There is no implicit fetch client or native-platform detection in this package.
   literally with preserved line breaks when using this package directly. The
   application's plaintext fallback retains its existing Markdown renderer.
 - Prefer supplied replyless HTML. If absent/empty, derive it by removing the
-  first recognized `.macro_quote`; otherwise show the full body. Missing
+  first recognized `.rox_quote`; otherwise show the full body. Missing
   generated replyless data must never blank a valid HTML message.
 - Collapse recognized Gmail and Rox signatures and trailing breaks by default.
   `showQuotedContent` restores the original body, signature, and trailing breaks.
@@ -127,7 +127,7 @@ There is no implicit fetch client or native-platform detection in this package.
   not an iframe security boundary; sanitization remains essential.
 - The app decides when to adapt colors and normalize fonts. Its current policy
   adapts personal/table-less email and preserves designed newsletters on a white
-  background. Sender classification and Macro-specific rendering stay in the app.
+  background. Sender classification and Rox-specific rendering stay in the app.
 
 The app sends ordinary HTML through this package. Plaintext and Rox Markdown
 retain the app's existing Markdown renderer, including document mentions and

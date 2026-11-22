@@ -1,7 +1,7 @@
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
     ('50000000-0000-0000-0000-000000000001', 'owner@example.com', 'owner@example.com', 'cus_owner'),
     ('50000000-0000-0000-0000-000000000002', 'other@example.com', 'other@example.com', 'cus_other');
-INSERT INTO "User" (id, email, name, macro_user_id) VALUES
+INSERT INTO "User" (id, email, name, rox_user_id) VALUES
     ('macro|owner@example.com', 'owner@example.com', 'Owner', '50000000-0000-0000-0000-000000000001'),
     ('macro|other@example.com', 'other@example.com', 'Other', '50000000-0000-0000-0000-000000000002');
 INSERT INTO team (id, name, owner_id, seat_count) VALUES
@@ -23,7 +23,7 @@ INSERT INTO initiative (id, name, owner_user_id, share_permission_id) VALUES
 INSERT INTO "ProjectPermission" ("projectId", "sharePermissionId") VALUES ('20000000-0000-0000-0000-000000000001', 'project');
 INSERT INTO "DocumentPermission" ("documentId", "sharePermissionId") VALUES ('20000000-0000-0000-0000-000000000002', 'document');
 INSERT INTO "ChatPermission" ("chatId", "sharePermissionId") VALUES ('20000000-0000-0000-0000-000000000003', 'chat');
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider) VALUES
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider) VALUES
     ('30000000-0000-0000-0000-000000000001', 'macro|owner@example.com', 'fusionauth', 'alias@example.com', 'GMAIL');
 INSERT INTO email_threads (id, link_id) VALUES
     ('20000000-0000-0000-0000-000000000004', '30000000-0000-0000-0000-000000000001');

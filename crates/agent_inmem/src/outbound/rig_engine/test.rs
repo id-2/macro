@@ -168,7 +168,7 @@ async fn shared_definitions_keep_the_callers_context_and_check_each_sessions_gat
         let result = tools
             .dispatch_tool_call(
                 label.to_owned(),
-                RequestContext::new(MacroUserIdStr::try_from(user.to_owned()).unwrap()),
+                RequestContext::new(RoxUserIdStr::try_from(user.to_owned()).unwrap()),
                 "ReadTurnContext",
                 &serde_json::json!({"acting_as":"owner"}),
             )
@@ -233,7 +233,7 @@ fn an_unseen_turn_reads_its_own_short_prompt() {
     };
     let prompt = system_prompt(
         &TOOLS,
-        "<macro_sdk>routines</macro_sdk>",
+        "<rox_sdk>routines</rox_sdk>",
         session,
         ReplyDelivery::Unseen,
         Some(&identity),
@@ -250,7 +250,7 @@ fn an_unseen_turn_reads_its_own_short_prompt() {
     assert!(text.contains(&prompt::agent_identity::render("Grunk", "grunk")));
     assert!(text.contains("<session_instructions>\nbe terse\n</session_instructions>"));
     assert!(text.contains("<user_memory>\nprefers Rust\n</user_memory>"));
-    assert!(text.ends_with("<macro_sdk>routines</macro_sdk>"));
+    assert!(text.ends_with("<rox_sdk>routines</rox_sdk>"));
 }
 
 /// Every session one background opener starts gets the same instructions,
@@ -398,7 +398,7 @@ fn sessions_share_everything_before_their_identity() {
     };
     let first = system_prompt(
         &TOOLS,
-        "<macro_sdk>documents</macro_sdk>",
+        "<rox_sdk>documents</rox_sdk>",
         session,
         ReplyDelivery::Streamed,
         Some(&identity),
@@ -427,7 +427,7 @@ fn sessions_share_everything_before_their_identity() {
     assert_eq!(
         first.rest(),
         format!(
-            "\n{}\n<session_instructions>\ntask A\n</session_instructions>{agent_session}\n<user_memory>\nprefers Rust\n</user_memory><macro_sdk>documents</macro_sdk>",
+            "\n{}\n<session_instructions>\ntask A\n</session_instructions>{agent_session}\n<user_memory>\nprefers Rust\n</user_memory><rox_sdk>documents</rox_sdk>",
             prompt::agent_identity::render("Grunk", "grunk"),
         )
     );
@@ -574,7 +574,7 @@ fn opening_transcript_leaves_out_the_hidden_agent_context() {
     );
 }
 
-struct SelectedActor(MacroUserIdStr<'static>);
+struct SelectedActor(RoxUserIdStr<'static>);
 impl NativeToolGate for SelectedActor {
     fn check<'a>(
         &'a self,
@@ -588,7 +588,7 @@ impl NativeToolGate for SelectedActor {
 
 #[tokio::test]
 async fn native_dispatch_uses_the_resolved_account_and_strips_routing_arguments() {
-    let requester = MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+    let requester = RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     let tools = GatedToolSet {
         tools: Arc::new(AsyncToolCollection::<String>::new().add_tool::<ReadTurnContext, String>()),
         gate: Arc::new(SelectedActor(requester.clone())),
@@ -599,7 +599,7 @@ async fn native_dispatch_uses_the_resolved_account_and_strips_routing_arguments(
     let result = tools
         .dispatch_tool_call(
             "context".into(),
-            RequestContext::new(MacroUserIdStr::try_from_email("owner@example.com").unwrap()),
+            RequestContext::new(RoxUserIdStr::try_from_email("owner@example.com").unwrap()),
             "ReadTurnContext",
             &serde_json::json!({"acting_as":"requester"}),
         )
@@ -651,7 +651,7 @@ async fn cancelling_the_turn_ends_a_call_held_for_the_owner_and_a_later_approval
         awaiting: Arc::default(),
         reviewed_tools: Vec::new(),
     });
-    let request = RequestContext::new(MacroUserIdStr::try_from_email("owner@example.com").unwrap());
+    let request = RequestContext::new(RoxUserIdStr::try_from_email("owner@example.com").unwrap());
     let cancel = request.cancel.clone();
     let call = tokio::spawn({
         let tools = Arc::clone(&tools);
@@ -679,7 +679,7 @@ async fn cancelling_the_turn_ends_a_call_held_for_the_owner_and_a_later_approval
     assert!(
         approve
             .send(NativeToolVerdict::RunAs(
-                MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+                RoxUserIdStr::try_from_email("owner@example.com").unwrap()
             ))
             .is_err(),
         "nobody is left waiting to act on a later approval"

@@ -12,7 +12,7 @@ use entity_access::inbound::axum_extractors::{
     DocumentAccessExtractor, OptionalMacroUserTeamExtractorV2,
 };
 use lexical_client::LexicalClient;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model::document::DocumentBasic;
 use model::response::GenericSuccessResponse;
 use models_permissions::share_permission::access_level::{OwnerAccessLevel, ViewAccessLevel};
@@ -74,7 +74,7 @@ pub struct TaskSimilaritySearchResponse {
 pub async fn get_task_duplicates_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -104,14 +104,14 @@ pub async fn get_task_duplicates_handler<
         (status = 500, body = model_error_response::ErrorResponse),
     )
 )]
-#[tracing::instrument(skip(state, user, optional_team, request), fields(user_id=?user.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(state, user, optional_team, request), fields(user_id=?user.authorization.user.rox_user_id), err)]
 pub async fn task_similarity_search_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     optional_team: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Svc, Auth>,
     Json(request): Json<TaskSimilaritySearchRequest>,
 ) -> Result<Json<TaskSimilaritySearchResponse>, DocumentError> {
@@ -120,7 +120,7 @@ pub async fn task_similarity_search_handler<
     // back to owner-only scope.
     let team_id = optional_team
         .entity_access_receipt
-        .map(|team| macro_uuid::string_to_uuid(&team.entity().entity_id).unwrap());
+        .map(|team| rox_uuid::string_to_uuid(&team.entity().entity_id).unwrap());
     // The composer renders the draft body with lexical-core's
     // `markdownToEmbeddingText`, so we trust it as embedding-format here rather
     // than round-tripping through lexical-service on this latency-sensitive path.
@@ -129,7 +129,7 @@ pub async fn task_similarity_search_handler<
     let results = state
         .task_dedup_service
         .similarity_search(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             team_id,
             &request.task_name,
             &markdown,
@@ -145,11 +145,11 @@ pub async fn task_similarity_search_handler<
 pub async fn dismiss_task_duplicates_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(Params { document_id }): Path<Params>,
     Json(request): Json<DismissTaskDuplicatesRequest>,
 ) -> Result<Json<GenericSuccessResponse>, DocumentError> {
@@ -158,7 +158,7 @@ pub async fn dismiss_task_duplicates_handler<
         .dismiss_matches(
             &document_id,
             &request.match_ids,
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
         )
         .await
         .map_err(task_dedup_error)?;
@@ -171,7 +171,7 @@ pub async fn dismiss_task_duplicates_handler<
 pub async fn delete_this_duplicate_task_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<OwnerAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

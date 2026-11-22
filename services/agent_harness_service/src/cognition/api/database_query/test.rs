@@ -3,7 +3,7 @@ use crate::cognition::api::context::test::{
     TestAdmission, admission_errors, authorized_request, test_api_context,
 };
 use axum::{Router, routing::post};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use tower::ServiceExt;
 
@@ -16,7 +16,7 @@ fn question_agents_can_only_discover_schemas() {
     assert!(tools.user_tools.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_rejects_before_database_discovery_or_model_calls(pool: sqlx::PgPool) {
     let ctx = test_api_context(pool).await;
     for error in admission_errors() {

@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 use crate::test_support::FakeKms;
@@ -43,7 +43,7 @@ async fn client_expires_at(pool: &PgPool, client_id: &str) -> DateTime<Utc> {
     .expect("registration row")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_registration_is_found_until_it_expires(pool: PgPool) {
     let store = store(pool);
     store
@@ -75,7 +75,7 @@ async fn a_registration_is_found_until_it_expires(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn finding_a_registration_extends_it(pool: PgPool) {
     let store = store(pool.clone());
     store
@@ -97,7 +97,7 @@ async fn finding_a_registration_extends_it(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_import_never_replaces_an_existing_row(pool: PgPool) {
     let store = store(pool);
     store
@@ -120,7 +120,7 @@ async fn an_import_never_replaces_an_existing_row(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_binding_follows_bind_rebind_and_unbind(pool: PgPool) {
     let store = store(pool);
     store
@@ -146,7 +146,7 @@ async fn a_binding_follows_bind_rebind_and_unbind(pool: PgPool) {
     assert!(store.binding("lapsed").await.expect("lookup").is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_revoked_grant_stays_revoked_until_it_expires(pool: PgPool) {
     let store = store(pool);
     assert!(!store.is_grant_revoked("grant").await.expect("lookup"));
@@ -163,7 +163,7 @@ async fn a_revoked_grant_stays_revoked_until_it_expires(pool: PgPool) {
     assert!(!store.is_grant_revoked("lapsed").await.expect("lookup"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_pending_authorization_is_taken_once(pool: PgPool) {
     let store = store(pool);
     store
@@ -202,7 +202,7 @@ async fn a_pending_authorization_is_taken_once(pool: PgPool) {
     assert!(store.take_pending("session").await.expect("take").is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_issued_code_redeems_once_for_its_tokens(pool: PgPool) {
     let store = store(pool);
     store
@@ -232,7 +232,7 @@ async fn an_issued_code_redeems_once_for_its_tokens(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_issued_code_row_holds_neither_the_code_nor_the_tokens(pool: PgPool) {
     let store = store(pool.clone());
     store
@@ -251,7 +251,7 @@ async fn an_issued_code_row_holds_neither_the_code_nor_the_tokens(pool: PgPool) 
     assert!(!ciphertext.contains("upstream-refresh-token"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn tokens_moved_to_another_client_do_not_decrypt(pool: PgPool) {
     let store = store(pool.clone());
     store
@@ -266,7 +266,7 @@ async fn tokens_moved_to_another_client_do_not_decrypt(pool: PgPool) {
     assert!(store.take_issued("broker-code").await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cleanup_deletes_only_expired_rows(pool: PgPool) {
     let store = store(pool.clone());
     store

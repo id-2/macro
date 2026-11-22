@@ -4,10 +4,10 @@ use models_properties::EntityType;
 
 use super::*;
 use crate::domain::model::{PropertyRow, SystemPropertyKey};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn initiative_initialization_preserves_values_and_folder_namespace(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -107,7 +107,7 @@ async fn get_task_property_values(
 // bulk_upsert_properties tests
 // ============================================================================
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_bulk_upsert_properties_insert(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = PgSystemPropertiesRepository::new(pool.clone());
 
@@ -134,7 +134,7 @@ async fn test_bulk_upsert_properties_insert(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("system_properties"))
 )]
 async fn test_bulk_upsert_properties_update(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -165,7 +165,7 @@ async fn test_bulk_upsert_properties_update(pool: Pool<Postgres>) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_bulk_upsert_properties_empty(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = PgSystemPropertiesRepository::new(pool.clone());
 
@@ -175,7 +175,7 @@ async fn test_bulk_upsert_properties_empty(pool: Pool<Postgres>) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_bulk_upsert_properties_multiple_entities(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = PgSystemPropertiesRepository::new(pool.clone());
 
@@ -199,7 +199,7 @@ async fn test_bulk_upsert_properties_multiple_entities(pool: Pool<Postgres>) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_bulk_insert_properties_if_absent_keeps_first_write(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -246,7 +246,7 @@ async fn test_bulk_insert_properties_if_absent_keeps_first_write(
 // copy_task_properties tests
 // ============================================================================
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_copy_task_properties_empty_source(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = PgSystemPropertiesRepository::new(pool.clone());
 
@@ -270,7 +270,7 @@ async fn test_copy_task_properties_empty_source(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("system_properties"))
 )]
 async fn test_copy_task_properties_with_existing_properties(
@@ -320,7 +320,7 @@ async fn test_copy_task_properties_with_existing_properties(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("system_properties"))
 )]
 async fn test_copy_task_properties_copies_custom_properties(
@@ -364,7 +364,7 @@ async fn test_copy_task_properties_copies_custom_properties(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("system_properties"))
 )]
 async fn test_copy_task_properties_does_not_join_the_project(
@@ -402,7 +402,7 @@ async fn test_copy_task_properties_does_not_join_the_project(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("system_properties"))
 )]
 async fn test_copy_task_properties_overwrites_existing(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -428,7 +428,7 @@ async fn test_copy_task_properties_overwrites_existing(pool: Pool<Postgres>) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_copy_task_properties_idempotent(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = PgSystemPropertiesRepository::new(pool.clone());
 
@@ -486,7 +486,7 @@ async fn set_task_reference(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn project_membership_reads_the_project_property(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = PgSystemPropertiesRepository::new(pool.clone());
     let first = Uuid::now_v7();

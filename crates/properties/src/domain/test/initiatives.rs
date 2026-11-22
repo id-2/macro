@@ -14,7 +14,7 @@ impl InitiativeAssigneeService for InitiativeSharing {
     fn grant_assignees<'a>(
         &'a self,
         access: &'a EditReceipt,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> Pin<Box<dyn Future<Output = Result<(), PropertiesErr>> + Send + 'a>> {
         Box::pin(async move {
             assert_eq!(access.entity_type(), AccessEntityType::Initiative);

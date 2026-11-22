@@ -10,7 +10,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use connection_gateway_client::ConnectionGatewayClient;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::{
     annotations::{
         AnnotationIncrementalUpdate,
@@ -35,13 +35,13 @@ use model::{
 pub async fn delete_anchor_handler(
     State(service): State<Arc<DssAnnotationService>>,
     State(conn_gateway_client): State<Arc<ConnectionGatewayClient>>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(req): Json<DeleteUnthreadedAnchorRequest>,
 ) -> Result<Response, Response> {
-    let user_id = user.authorization.user.macro_user_id.as_ref();
+    let user_id = user.authorization.user.rox_user_id.as_ref();
     match service
         .delete(
-            &user.authorization.user.macro_user_id,
+            &user.authorization.user.rox_user_id,
             user.authorization
                 .user
                 .user_context

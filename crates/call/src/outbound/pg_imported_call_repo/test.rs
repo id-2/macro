@@ -1,10 +1,10 @@
 use super::*;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|{email}@test.com"))
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|{email}@test.com"))
         .unwrap()
         .into_owned()
 }
@@ -14,7 +14,7 @@ fn snapshot(owner: &str, revision: chrono::DateTime<Utc>) -> ImportedCall {
         started_at: None,
         ended_at: None,
         participants: vec![CallParticipant {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             user_id: None,
             display_name: Some("Guest".into()),
             email: Some("guest@test.com".into()),
@@ -23,7 +23,7 @@ fn snapshot(owner: &str, revision: chrono::DateTime<Utc>) -> ImportedCall {
             attendance: vec![],
         }],
         transcript: Some(CallTranscript {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             recording_id: None,
             language: None,
             provider: Some(CallProvider::Granola),
@@ -55,13 +55,13 @@ fn snapshot(owner: &str, revision: chrono::DateTime<Utc>) -> ImportedCall {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("import_users"))
 )]
 async fn imports_are_private_idempotent_owner_scoped_and_revision_ordered(pool: PgPool) {
     let service = CallImportServiceImpl(
         PgImportedCallRepository::new(pool.clone()),
-        macro_event_broker::NoopMacroEventBroker,
+        rox_event_broker::NoopMacroEventBroker,
     );
     let now = Utc::now();
     let id = service.ingest(snapshot("import-a", now)).await.unwrap();
@@ -101,13 +101,13 @@ async fn imports_are_private_idempotent_owner_scoped_and_revision_ordered(pool: 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("import_users"))
 )]
 async fn imports_require_a_complete_source_identity(pool: PgPool) {
     let service = CallImportServiceImpl(
         PgImportedCallRepository::new(pool),
-        macro_event_broker::NoopMacroEventBroker,
+        rox_event_broker::NoopMacroEventBroker,
     );
     let mut call = snapshot("import-a", Utc::now());
     call.source.external_id = ExternalCallId(String::new());
@@ -118,13 +118,13 @@ async fn imports_require_a_complete_source_identity(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("import_users"))
 )]
 async fn source_records_list_one_providers_calls_for_their_owner_latest_first(pool: PgPool) {
     let service = CallImportServiceImpl(
         PgImportedCallRepository::new(pool),
-        macro_event_broker::NoopMacroEventBroker,
+        rox_event_broker::NoopMacroEventBroker,
     );
     let revision = "2026-11-01T12:00:00Z"
         .parse::<chrono::DateTime<Utc>>()
@@ -144,7 +144,7 @@ async fn source_records_list_one_providers_calls_for_their_owner_latest_first(po
     earlier.source.external_url = Some("https://notes.granola.ai/d/not_earlier".into());
     earlier.participants = vec![
         CallParticipant {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             user_id: None,
             display_name: Some("Grace".into()),
             email: Some("grace@example.com".into()),
@@ -153,7 +153,7 @@ async fn source_records_list_one_providers_calls_for_their_owner_latest_first(po
             attendance: vec![],
         },
         CallParticipant {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             user_id: None,
             display_name: None,
             email: Some("anonymous@example.com".into()),
@@ -162,7 +162,7 @@ async fn source_records_list_one_providers_calls_for_their_owner_latest_first(po
             attendance: vec![],
         },
         CallParticipant {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             user_id: None,
             display_name: Some("Ada".into()),
             email: Some("ada@example.com".into()),
@@ -186,10 +186,10 @@ async fn source_records_list_one_providers_calls_for_their_owner_latest_first(po
     untimed.source.external_id = ExternalCallId("not_untimed".into());
     let untimed_id = service.ingest(untimed).await.unwrap();
 
-    let mut macro_provider = snapshot("import-a", revision);
-    macro_provider.source.provider = CallProvider::Macro;
-    macro_provider.source.external_id = ExternalCallId("macro_call".into());
-    let macro_provider_id = service.ingest(macro_provider).await.unwrap();
+    let mut rox_provider = snapshot("import-a", revision);
+    rox_provider.source.provider = CallProvider::Macro;
+    rox_provider.source.external_id = ExternalCallId("rox_call".into());
+    let rox_provider_id = service.ingest(rox_provider).await.unwrap();
 
     let mut other_owner = snapshot("import-b", revision);
     other_owner.started_at = Some(afternoon);
@@ -230,10 +230,10 @@ async fn source_records_list_one_providers_calls_for_their_owner_latest_first(po
     assert_eq!(records[2].started_at, None);
     assert_eq!(records[2].attendees, vec!["Guest".to_string()]);
 
-    let macro_records = service
+    let rox_records = service
         .list_source_records(&user("import-a"), CallProvider::Macro)
         .await
         .unwrap();
-    let macro_ids: Vec<Uuid> = macro_records.iter().map(|r| r.id).collect();
-    assert_eq!(macro_ids, vec![macro_provider_id]);
+    let rox_ids: Vec<Uuid> = rox_records.iter().map(|r| r.id).collect();
+    assert_eq!(rox_ids, vec![rox_provider_id]);
 }

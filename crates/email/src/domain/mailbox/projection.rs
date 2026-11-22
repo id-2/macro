@@ -7,7 +7,7 @@ use super::{MailboxError, MailboxKey};
 use crate::domain::events::*;
 use crate::domain::models::calendar_invitation::CalendarInvitation;
 use email_api_client::domain::models::CalendarPart;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{link::Link, message::Message};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, future::Future, time::Instant};
@@ -33,7 +33,7 @@ pub enum ProjectionEvent {
         #[serde(default)]
         agent_correlation_id: Option<Uuid>,
         #[serde(default)]
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
         message_id: Uuid,
         thread_id: Uuid,
         provider_id: String,
@@ -57,7 +57,7 @@ pub enum ProjectionEvent {
         agent_correlation_id: Option<Uuid>,
         thread_id: Uuid,
         #[serde(default)]
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
         #[serde(default)]
         action: Option<crate::domain::models::mailbox_action::MailboxAction>,
     },
@@ -107,14 +107,14 @@ pub struct ProjectedMessage {
 pub struct ProjectionContext {
     pub link: Link,
     pub message: Option<ProjectedMessage>,
-    pub viewers: HashSet<MacroUserIdStr<'static>>,
+    pub viewers: HashSet<RoxUserIdStr<'static>>,
 }
 
 pub struct MailboxNotification {
     pub id: Uuid,
-    pub recipients: HashSet<MacroUserIdStr<'static>>,
+    pub recipients: HashSet<RoxUserIdStr<'static>>,
     pub sender: Option<String>,
-    pub sender_id: Option<MacroUserIdStr<'static>>,
+    pub sender_id: Option<RoxUserIdStr<'static>>,
     pub to_email: String,
     pub subject: String,
     pub snippet: String,
@@ -131,10 +131,10 @@ pub struct CorrespondenceContact {
 
 pub struct CorrespondenceProjection {
     pub link_id: Uuid,
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     pub is_sent: bool,
     pub contacts: Vec<CorrespondenceContact>,
-    pub connections: Vec<MacroUserIdStr<'static>>,
+    pub connections: Vec<RoxUserIdStr<'static>>,
 }
 
 pub trait MailboxProjectionRepository: Send + Sync + 'static {
@@ -172,7 +172,7 @@ pub trait MailboxProjectionEffects: Send + Sync + 'static {
     fn photo_refresh(
         &self,
         link_id: Uuid,
-        viewers: &HashSet<MacroUserIdStr<'static>>,
+        viewers: &HashSet<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), MailboxError>> + Send {
         self.refresh(link_id, viewers)
     }
@@ -183,7 +183,7 @@ pub trait MailboxProjectionEffects: Send + Sync + 'static {
     fn refresh(
         &self,
         link_id: Uuid,
-        viewers: &HashSet<MacroUserIdStr<'static>>,
+        viewers: &HashSet<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), MailboxError>> + Send;
     fn notify(
         &self,
@@ -229,7 +229,7 @@ impl<R: MailboxProjectionRepository, E: MailboxProjectionEffects> MailboxProject
     pub async fn project_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repo
-            .claim_projection(macro_uuid::generate_uuid_v7())
+            .claim_projection(rox_uuid::generate_uuid_v7())
             .await
             .map_err(|error| claim_failed("project", error))?
         else {
@@ -309,7 +309,7 @@ impl<R: MailboxProjectionRepository, E: MailboxProjectionEffects> MailboxProject
                         .publish(
                             EmailMacroEvent::link_reauth_required(LinkReauthRequiredMetadata {
                                 link_id: context.link.id,
-                                owner: context.link.macro_id.clone(),
+                                owner: context.link.rox_id.clone(),
                                 email_address: context.link.email_address.0.as_ref().into(),
                                 observed_at: context
                                     .link
@@ -331,7 +331,7 @@ impl<R: MailboxProjectionRepository, E: MailboxProjectionEffects> MailboxProject
                             EmailMacroEvent::threads_reindex_requested(
                                 ThreadsReindexRequestedMetadata {
                                     link_id: context.link.id,
-                                    owner: context.link.macro_id.clone(),
+                                    owner: context.link.rox_id.clone(),
                                     thread_ids: thread_ids.clone(),
                                     reason: ThreadsReindexReason::ContactsChanged,
                                 },
@@ -354,7 +354,7 @@ impl<R: MailboxProjectionRepository, E: MailboxProjectionEffects> MailboxProject
                         .publish(
                             EmailMacroEvent::link_connected(LinkConnectedMetadata {
                                 link_id: context.link.id,
-                                owner: context.link.macro_id.clone(),
+                                owner: context.link.rox_id.clone(),
                                 email_address: context.link.email_address.0.as_ref().to_owned(),
                                 provider: context.link.provider.as_str().into(),
                                 is_primary: context.link.is_primary,
@@ -472,7 +472,7 @@ impl<R: MailboxProjectionRepository, E: MailboxProjectionEffects> MailboxProject
             .publish(EmailMacroEvent::threads_reindex_requested(
                 ThreadsReindexRequestedMetadata {
                     link_id: link.id,
-                    owner: link.macro_id.clone(),
+                    owner: link.rox_id.clone(),
                     thread_ids: vec![thread],
                     reason: ThreadsReindexReason::ProviderChanged,
                 },
@@ -537,7 +537,7 @@ fn live_event(
     is_new: bool,
     is_new_thread: bool,
     was_draft: bool,
-    actor: Option<MacroUserIdStr<'static>>,
+    actor: Option<RoxUserIdStr<'static>>,
 ) -> Option<EmailMacroEvent> {
     let current = context.message.as_ref()?;
     let message = &current.message;
@@ -548,7 +548,7 @@ fn live_event(
         return Some(EmailMacroEvent::message_draft_synced(
             MessageDraftSyncedMetadata {
                 link_id: link.id,
-                owner: link.macro_id.clone(),
+                owner: link.rox_id.clone(),
                 message_id: message.db_id,
                 provider_message_id,
                 thread_id: message.thread_db_id,
@@ -568,7 +568,7 @@ fn live_event(
         };
         Some(EmailMacroEvent::message_sent(MessageSentMetadata {
             link_id: link.id,
-            owner: link.macro_id.clone(),
+            owner: link.rox_id.clone(),
             actor,
             message_id: message.db_id,
             provider_message_id,
@@ -586,7 +586,7 @@ fn live_event(
     } else {
         Some(EmailMacroEvent::message_received(MessageReceivedMetadata {
             link_id: link.id,
-            owner: link.macro_id.clone(),
+            owner: link.rox_id.clone(),
             message_id: message.db_id,
             provider_message_id,
             thread_id: message.thread_db_id,
@@ -617,13 +617,13 @@ fn should_notify(import: bool, is_new: bool, current: &ProjectedMessage) -> bool
         && !message
             .from
             .as_ref()
-            .is_some_and(|c| email_utils::is_macro_notification_sender(&c.email))
+            .is_some_and(|c| email_utils::is_rox_notification_sender(&c.email))
 }
 
 fn correspondence(context: &ProjectionContext) -> CorrespondenceProjection {
     let mut result = CorrespondenceProjection {
         link_id: context.link.id,
-        owner: context.link.macro_id.clone(),
+        owner: context.link.rox_id.clone(),
         is_sent: false,
         contacts: Vec::new(),
         connections: Vec::new(),
@@ -654,7 +654,7 @@ fn correspondence(context: &ProjectionContext) -> CorrespondenceProjection {
         {
             continue;
         }
-        let Ok(person) = MacroUserIdStr::try_from_email(&address) else {
+        let Ok(person) = RoxUserIdStr::try_from_email(&address) else {
             continue;
         };
         if !email_utils::is_generic_email(&address) {
@@ -679,8 +679,8 @@ fn notifications(lease: &ProjectionLease, context: &ProjectionContext) -> Vec<Ma
         let recipients: HashSet<_> = context
             .viewers
             .iter()
-            .filter(|id| id.is_macro_staff() == staff)
-            .filter(|_| current.is_signal || context.link.macro_id.is_macro_staff())
+            .filter(|id| id.is_rox_staff() == staff)
+            .filter(|_| current.is_signal || context.link.rox_id.is_rox_staff())
             .cloned()
             .collect();
         if recipients.is_empty() {
@@ -696,7 +696,7 @@ fn notifications(lease: &ProjectionLease, context: &ProjectionContext) -> Vec<Ma
             sender_id: message
                 .from
                 .as_ref()
-                .and_then(|c| MacroUserIdStr::try_from_email(&c.email).ok()),
+                .and_then(|c| RoxUserIdStr::try_from_email(&c.email).ok()),
             to_email: context.link.email_address.0.as_ref().to_owned(),
             subject: message.subject.clone().unwrap_or_default(),
             snippet: message.snippet.clone().unwrap_or_default(),
@@ -711,12 +711,12 @@ fn notifications(lease: &ProjectionLease, context: &ProjectionContext) -> Vec<Ma
 fn organization_event(
     link: &Link,
     thread_id: Uuid,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
     action: &crate::domain::models::mailbox_action::MailboxAction,
 ) -> EmailMacroEvent {
     use crate::domain::models::mailbox_action::MailboxAction;
     let link_id = link.id;
-    let owner = link.macro_id.clone();
+    let owner = link.rox_id.clone();
     let actor = Some(actor);
     let origin = EmailEventOrigin::UserAction;
     match action {

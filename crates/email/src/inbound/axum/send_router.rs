@@ -6,8 +6,8 @@ use axum::{
     routing::post,
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
     UserOrInternal, is_agent_run,
 };
 use model_error_response::ErrorResponse;
@@ -26,9 +26,9 @@ pub fn send_router<S, T, Auth>() -> Router<S>
 where
     S: Send + Sync + Clone + 'static,
     T: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     EmailRouterState<T>: axum::extract::FromRef<S>,
-    MacroAuthorizationState<Auth>: axum::extract::FromRef<S>,
+    RoxAuthorizationState<Auth>: axum::extract::FromRef<S>,
 {
     Router::new().route("/", post(send_message_handler::<T, Auth>))
 }
@@ -135,13 +135,13 @@ impl From<EmailErr> for SendMessageError {
     err,
     skip(state, headers, link, accessible_inboxes, authorization, body)
 )]
-pub async fn send_message_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn send_message_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<T, Auth>>,
     Cached(MultiEmailLinkExtractor(accessible_inboxes, _)): Cached<
         MultiEmailLinkExtractor<T, Auth>,
     >,
-    Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     headers: HeaderMap,
     Json(body): Json<SendMessageRequest>,
 ) -> Result<impl IntoResponse, SendMessageError> {
@@ -153,7 +153,7 @@ pub async fn send_message_handler<T: EmailService, Auth: MacroAuthorizationServi
     let mut input = body.into_domain()?;
     // Attribute the send to the authenticated caller, who is not necessarily
     // the link owner (delegated inboxes).
-    input.actor = Some(authorization.authorization.user.macro_user_id.clone());
+    input.actor = Some(authorization.authorization.user.rox_user_id.clone());
     let created = state
         .inner
         .send_message(&link, &accessible_inboxes, input)

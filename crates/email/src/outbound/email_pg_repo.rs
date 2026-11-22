@@ -11,7 +11,7 @@ use crate::domain::{
         DraftAttachmentRepo, EmailRepo, EmailUserRepo, LinkEmailSettings, RecipientsByMessageId,
     },
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -84,9 +84,9 @@ impl EmailUserRepo for EmailPgRepo {
     }
     async fn user_accessible_inboxes(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        rox_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<Link>, EmailErr> {
-        link::inboxes_for_macro_id(&self.pool, macro_id)
+        link::inboxes_for_rox_id(&self.pool, rox_id)
             .await
             .map_err(|error| EmailErr::RepoErr(error.into()))
     }
@@ -99,9 +99,9 @@ impl EmailUserRepo for EmailPgRepo {
 
     async fn user_inbox_details(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        rox_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<EmailInboxDetails>, EmailErr> {
-        link::inbox_details_for_macro_id(&self.pool, &macro_id)
+        link::inbox_details_for_rox_id(&self.pool, &rox_id)
             .await
             .map_err(|error| EmailErr::RepoErr(error.into()))
     }
@@ -118,7 +118,7 @@ impl EmailRepo for EmailPgRepo {
 
     async fn commit_sender_policy(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         sender: &str,
         blocked: bool,
@@ -129,7 +129,7 @@ impl EmailRepo for EmailPgRepo {
 
     async fn commit_message_resolution(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         plan: crate::domain::models::mailbox_operation::MessageResolutionPlan,
     ) -> Result<Uuid, EmailErr> {
         draft_resolution::commit(&self.pool, actor, plan).await
@@ -160,7 +160,7 @@ impl EmailRepo for EmailPgRepo {
     async fn enqueue_mailbox_action(
         &self,
         link_id: Uuid,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         action: &crate::domain::models::mailbox_action::MailboxAction,
         targets: &[crate::domain::models::mailbox_action::MailboxActionTarget],
     ) -> Result<Uuid, Self::Err> {
@@ -177,7 +177,7 @@ impl EmailRepo for EmailPgRepo {
     async fn previews_for_view_cursor(
         &self,
         query: PreviewCursorQuery,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<EmailThreadPreview>, Self::Err> {
         preview::previews_for_view_cursor(&self.pool, query, user_id).await
     }
@@ -197,29 +197,29 @@ impl EmailRepo for EmailPgRepo {
         preview::labels_by_thread_ids(&self.pool, thread_ids).await
     }
 
-    async fn link_by_fusionauth_and_macro_id(
+    async fn link_by_fusionauth_and_rox_id(
         &self,
         fusionauth_user_id: &str,
-        macro_id: MacroUserIdStr<'_>,
+        rox_id: RoxUserIdStr<'_>,
         provider: UserProvider,
     ) -> Result<Option<Link>, Self::Err> {
-        link::link_by_fusionauth_and_macro_id(&self.pool, fusionauth_user_id, macro_id, provider)
+        link::link_by_fusionauth_and_rox_id(&self.pool, fusionauth_user_id, rox_id, provider)
             .await
     }
 
     async fn owned_link_for_thread(
         &self,
         thread_id: Uuid,
-        macro_id: MacroUserIdStr<'_>,
+        rox_id: RoxUserIdStr<'_>,
     ) -> Result<Option<Link>, Self::Err> {
-        link::owned_link_for_thread(&self.pool, thread_id, macro_id).await
+        link::owned_link_for_thread(&self.pool, thread_id, rox_id).await
     }
 
-    async fn inboxes_for_macro_id(
+    async fn inboxes_for_rox_id(
         &self,
-        macro_id: MacroUserIdStr<'_>,
+        rox_id: RoxUserIdStr<'_>,
     ) -> Result<Vec<Link>, Self::Err> {
-        link::inboxes_for_macro_id(&self.pool, macro_id).await
+        link::inboxes_for_rox_id(&self.pool, rox_id).await
     }
 
     async fn thread_by_id(&self, thread_id: Uuid) -> Result<Option<ThreadRow>, Self::Err> {
@@ -235,7 +235,7 @@ impl EmailRepo for EmailPgRepo {
 
     async fn thread_mail_projections_by_ids(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         thread_ids: &[Uuid],
     ) -> Result<Vec<EmailThreadMailProjection>, Self::Err> {
         thread::thread_mail_projections_by_ids(&self.pool, viewer, thread_ids).await

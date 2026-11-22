@@ -16,7 +16,7 @@ fn named(jid: &str, name: &str, members: &[&str]) -> GroupInfo {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn disappearing_and_community_groups_are_added_like_any_other(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);

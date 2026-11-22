@@ -33,7 +33,7 @@ database. Nothing talks to WhatsApp or AWS (the KMS is
   quote, view-once media imported and downloaded like any media; mentions and
   forwards, polls with a vote and a changed vote, places, contact cards,
   events, pins and call logs as structured content; a mention sent from
-  Macro; group changes made by a member (added, left, renamed) as system
+  Rox; group changes made by a member (added, left, renamed) as system
   lines once with two observing accounts, never unread or notified.
 - Group kinds (`src/test/group_kinds.rs`): a disappearing group is added, an
   ephemeral-wrapped phone message is kept, Rox's sends carry the timer
@@ -56,7 +56,7 @@ database. Nothing talks to WhatsApp or AWS (the KMS is
   pointing at a migrated RoxDB (the query macros check against it; each test
   gets its own database on that server). If the shared `macrodb` is stale,
   create and migrate your own `macrodb_<name>` with
-  `sqlx migrate run --source crates/macro_db_client/migrations`.
+  `sqlx migrate run --source crates/rox_db_client/migrations`.
 
 ## Gotchas
 

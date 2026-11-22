@@ -64,12 +64,12 @@ CROSS JOIN LATERAL (
             -- The attachment's thread and inbox, by primary keys.
             SELECT
                 t.id AS thread_id,
-                l.macro_id = $3
+                l.rox_id = $3
                   OR EXISTS (
                       SELECT 1
-                      FROM macro_user_links mul
+                      FROM rox_user_links mul
                       WHERE mul.link_id = l.id
-                        AND mul.primary_macro_id = $3
+                        AND mul.primary_rox_id = $3
                   ) AS owned
             FROM email_attachments ea
             JOIN email_messages em ON em.id = ea.message_id

@@ -2,18 +2,18 @@ use crate::attachments::provider::{
     LinkedAttachmentDocument, fetch_db_attachments_in_bulk, get_document_by_att_id,
 };
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_db_attachments_in_bulk"))
 )]
 async fn fetch_db_attachments_in_bulk_returns_attachments_grouped_by_message_id(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let message_id_1 = Uuid::parse_str("00000000-0000-0000-0000-00000000a501")?;
     let message_id_2 = Uuid::parse_str("00000000-0000-0000-0000-00000000a502")?;
@@ -34,7 +34,7 @@ async fn fetch_db_attachments_in_bulk_returns_attachments_grouped_by_message_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_db_attachments_in_bulk"))
 )]
 async fn fetch_db_attachments_in_bulk_orders_by_message_id_and_filename_nulls_last(
@@ -65,7 +65,7 @@ async fn fetch_db_attachments_in_bulk_orders_by_message_id_and_filename_nulls_la
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_db_attachments_in_bulk"))
 )]
 async fn fetch_db_attachments_in_bulk_nulls_last_ordering(pool: Pool<Postgres>) -> Result<()> {
@@ -87,7 +87,7 @@ async fn fetch_db_attachments_in_bulk_nulls_last_ordering(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_db_attachments_in_bulk"))
 )]
 async fn fetch_db_attachments_in_bulk_includes_sfs_mappings(pool: Pool<Postgres>) -> Result<()> {
@@ -118,7 +118,7 @@ async fn fetch_db_attachments_in_bulk_includes_sfs_mappings(pool: Pool<Postgres>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_db_attachments_in_bulk"))
 )]
 async fn fetch_db_attachments_in_bulk_returns_correct_fields(pool: Pool<Postgres>) -> Result<()> {
@@ -149,7 +149,7 @@ async fn fetch_db_attachments_in_bulk_returns_correct_fields(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_db_attachments_in_bulk"))
 )]
 async fn fetch_db_attachments_in_bulk_excludes_messages_without_attachments(
@@ -173,7 +173,7 @@ async fn fetch_db_attachments_in_bulk_excludes_messages_without_attachments(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_db_attachments_in_bulk"))
 )]
 async fn fetch_db_attachments_in_bulk_returns_empty_for_empty_input(
@@ -187,7 +187,7 @@ async fn fetch_db_attachments_in_bulk_returns_empty_for_empty_input(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_db_attachments_in_bulk"))
 )]
 async fn fetch_db_attachments_in_bulk_returns_empty_for_nonexistent_messages(
@@ -230,7 +230,7 @@ fn service_attachment(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_calendar_flag"))
 )]
 async fn insert_attachments_sets_then_clears_calendar_flag(pool: Pool<Postgres>) -> Result<()> {
@@ -264,7 +264,7 @@ async fn insert_attachments_sets_then_clears_calendar_flag(pool: Pool<Postgres>)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_calendar_flag"))
 )]
 async fn insert_attachments_maintains_attachment_kind_flags(pool: Pool<Postgres>) -> Result<()> {
@@ -301,7 +301,7 @@ async fn insert_attachments_maintains_attachment_kind_flags(pool: Pool<Postgres>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("get_document_by_att_id"))
 )]
 async fn get_document_by_att_id_reports_documents_awaiting_their_upload(

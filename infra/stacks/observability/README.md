@@ -153,7 +153,7 @@ quantile_over_time(0.9, {service_name="local-telemetry"} | event="step" | kind="
   | unwrap seconds | __error__="" [7d]) by (step)
 ```
 
-`nixos/local-report.json` holds the queries for the `Macro run_local` dashboard
+`nixos/local-report.json` holds the queries for the `Rox run_local` dashboard
 (`/d/macro-run-local`) and for `scripts/ci-report.ts --spec local`. Both
 dashboards build their Loki panels with `nixos/loki-report-panels.nix`. Every
 filter names the machine (`machine`, else `host_name`, else `host`, for events
@@ -189,8 +189,8 @@ and tags resources and metric datapoints with `host.name` (the machine's name)
 and `deployment.environment="local"`; services add `macro.local.instance`,
 which the forwarder copies onto metric datapoints. Dev
 dashboards and alerts select `dev`/`development`, so this data stays out of
-them. In Loki, `host_name` and `macro_local_instance` are structured metadata,
-under `deployment_environment="local"`. The `Macro run_local` dashboard's last row
+them. In Loki, `host_name` and `rox_local_instance` are structured metadata,
+under `deployment_environment="local"`. The `Rox run_local` dashboard's last row
 (`nixos/local-dashboard.nix`, not the shared report spec) shows bring-ups,
 stacks, sampled traces, error logs and logs by machine.
 
@@ -242,7 +242,7 @@ packages, configuration, service users, resource limits and startup dependencies
 - `nixos/cloudwatch.nix`: independent disk and memory health metrics.
 - `nixos/proxy.nix`: native nginx virtual hosts and query-only backend gateway.
 - `nixos/goalert.nix` and `nixos/goalert/`: GoAlert, its Postgres, backups and
-  the Macro Alerts relay (see [On-call paging](#on-call-paging-goalert)).
+  the Rox Alerts relay (see [On-call paging](#on-call-paging-goalert)).
 - `nixos/alerting.nix`: Grafana alert rules, contact points and routing.
 - `nixos/prod-alerts.nix`: prod alert queries and thresholds, shared by the
   rules and `nixos/prod-alerts-dashboard.nix`.
@@ -319,7 +319,7 @@ Unix permissions restrict writes to its own retained directory.
 
 CloudWatch Agent runs as a separate unprivileged NixOS service, independent of
 the data mount and the application stack. It sends only root/data-disk utilization and memory
-utilization to the `Macro/Observability` namespace using the instance role.
+utilization to the `Rox/Observability` namespace using the instance role.
 Alarms identify the current EC2 instance: either ext4 disk above 80% or memory
 above 90% over two five-minute periods notifies the configured SNS topic.
 Missing data breaches the alarm, including when the data volume is not mounted.
@@ -686,7 +686,7 @@ Datadog dashboard/monitor migration remain separate coverage work.
 
 ### Provisioned dashboards and alerts
 
-Nix provisions the `Macro` dashboard folder, a dev telemetry dashboard, and a
+Nix provisions the `Rox` dashboard folder, a dev telemetry dashboard, and a
 CloudWatch database/Lambda dashboard. CloudWatch reads native metrics in Virginia;
 it does not replicate their history to Ohio, so these panels depend on Virginia
 remaining available. These are not a replacement for Datadog database query monitoring, RUM, or anomaly
@@ -710,7 +710,7 @@ windows in sync by hand. Forecasts, anomalies, Database Monitoring, APM and log
 rules are Datadog-only.
 
 Every prod alert goes to GoAlert over loopback, and GoAlert alone posts to the
-Macro Alerts channel. Critical alerts of rules with `pages = true` go to the
+Rox Alerts channel. Critical alerts of rules with `pages = true` go to the
 `GoAlert` contact point (the paging `Grafana critical` service); every other prod
 alert, warnings and non-paging criticals, goes to `GoAlert notify` (the `Notify`
 service), which is also the default receiver. Grafana repeats critical alerts
@@ -721,7 +721,7 @@ alert's labels and annotations (summary, description, runbook, panel) and its
 Grafana source link. Paging rules' Datadog copies only notify, so an incident
 pages once.
 
-The dev rules below keep their own route to `Macro team email`.
+The dev rules below keep their own route to `Rox team email`.
 
 The three dev monitors declared in the monitoring stack: DSS errors (1013923), channel-invite spam (4876245), and document text
 extractor failure ratio (1291772). Warning and critical rules are separate and
@@ -738,7 +738,7 @@ needs reconciliation against live logs. Paused rules do not imply healthy covera
 Production telemetry monitors remain in Datadog. Complete the live dashboard and
 monitor inventory before claiming parity; repository definitions may have drifted.
 
-The `Macro team email` contact point publishes through SNS using the host role,
+The `Rox team email` contact point publishes through SNS using the host role,
 without SMTP credentials. The configured topic already has wolf@rox.one and
 teo@rox.one subscriptions; each recipient must confirm their SNS subscription.
 Test the contact point and verify receipt before relying on notifications.
@@ -748,11 +748,11 @@ reads it; a schema-5 image cannot boot schema-6 user data.
 
 ## On-call paging (GoAlert)
 
-GoAlert is the source of truth for open alerts and the only sender to the Macro
+GoAlert is the source of truth for open alerts and the only sender to the Rox
 Alerts channel: Grafana sends it every prod alert, and on-call engineers acknowledge or close them in its UI at
 `https://oncall.macro-internal.com`, signing in with Google. It runs on this host
-so paging keeps working while production, its database or Macro itself is down.
-Today it pages by posting to the Macro Alerts channel; phone paging (Twilio) and
+so paging keeps working while production, its database or Rox itself is down.
+Today it pages by posting to the Rox Alerts channel; phone paging (Twilio) and
 a rotation are follow-ups. Coding agents reach it through the `goalert` MCP
 server; see [MCP servers](../../../docs/development/mcp-servers.md#goalert).
 
@@ -770,16 +770,16 @@ server; see [MCP servers](../../../docs/development/mcp-servers.md#goalert).
   per weekday. The dump goes to a file first, so a failed dump never replaces a
   good backup.
 - GoAlert's escalation steps post to `services/bots/goalert-bot`, a Cloudflare
-  Worker that posts each alert to Macro Alerts and threads acknowledgements,
+  Worker that posts each alert to Rox Alerts and threads acknowledgements,
   closes and reminders under it. GoAlert's webhook allow-list
   (`goalert.nix`) permits its URL; the secret path segment lives only in the
   escalation step. The loopback relay below stays allowed as a fallback target.
-- `macro-alerts-relay` on `127.0.0.1:8090` turns GoAlert webhooks into Macro
+- `macro-alerts-relay` on `127.0.0.1:8090` turns GoAlert webhooks into Rox
   channel posts and adds the channel's bot token; GoAlert webhooks cannot set
   headers. Each post starts with `---`, then the page or notify marker and the
   title without Datadog's bracketed tags, the state, a one-sentence description,
   and `Acknowledge · Graph · Runbook` links. Status changes are one line.
-  `goalert/test_macro_alerts_relay.py` pins the format.
+  `goalert/test_rox_alerts_relay.py` pins the format.
 - nginx serves `oncall.macro-internal.com` from a runtime server block. Only
   `/health`, `/api/v2/generic/incoming` and `/api/v2/heartbeat/` are reachable
   without a session (GoAlert checks the integration key); other inbound
@@ -800,8 +800,8 @@ server; see [MCP servers](../../../docs/development/mcp-servers.md#goalert).
 Doppler `observability/prd` is the source of truth; copy the values into the
 us-east-2 Secrets Manager secret the host reads, under the lowercase names:
 `goalert_encryption_key` (≥32 random characters), `goalert_admin_password`
-(≥32 random characters, the `admin` login), `macro_alerts_webhook_url` (HTTPS)
-and `macro_alerts_bot_token` (the Alerts channel's webhook and bot token).
+(≥32 random characters, the `admin` login), `rox_alerts_webhook_url` (HTTPS)
+and `rox_alerts_bot_token` (the Alerts channel's webhook and bot token).
 `goalert_grafana_integration_key` (the `Grafana critical` Grafana key) and
 `goalert_grafana_notify_integration_key` (the `Notify` Grafana key) are optional
 until GoAlert has created them; without one, GoAlert rejects that contact
@@ -822,14 +822,14 @@ point's alerts with 401 and Grafana shows it as failing.
 ### Escalation
 
 Both policies have one step, webhook `http://127.0.0.1:8090/goalert`. The
-channel sees every new alert, acknowledgement and close. `Macro prod` repeats
+channel sees every new alert, acknowledgement and close. `Rox prod` repeats
 its step 5 times every 60 minutes, so an unacknowledged page is posted again
-hourly; `Macro notify` posts once, so warnings stay quiet after their first
+hourly; `Rox notify` posts once, so warnings stay quiet after their first
 post.
 
-- Escalation policy `Macro prod` pages: services `Grafana critical` (Grafana's
+- Escalation policy `Rox prod` pages: services `Grafana critical` (Grafana's
   paging criticals) and `Datadog critical`.
-- Escalation policy `Macro notify` only posts to the channel: service `Notify`
+- Escalation policy `Rox notify` only posts to the channel: service `Notify`
   (Grafana warnings and non-paging criticals).
 - Acknowledge an alert to stop its escalation, close it when handled; Grafana
   closes it on recovery. To silence a whole service for a while, use its

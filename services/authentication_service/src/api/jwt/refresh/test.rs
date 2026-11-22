@@ -12,7 +12,7 @@ use axum::{
 };
 use fusionauth::FusionAuthClient;
 use jsonwebtoken::{Algorithm, EncodingKey, Header, encode};
-use macro_auth::{constant::MACRO_REFRESH_TOKEN_HEADER, middleware::decode_jwt::JwtValidationArgs};
+use rox_auth::{constant::ROX_REFRESH_TOKEN_HEADER, middleware::decode_jwt::JwtValidationArgs};
 use model::response::UserTokensResponse;
 use tower::{ServiceBuilder, ServiceExt};
 use tower_cookies::CookieManagerLayer;
@@ -43,18 +43,18 @@ fn now() -> u64 {
 
 /// What FusionAuth issues for `JwtValidationArgs::new_testing()` when the JWT populate lambda
 /// fails.
-fn claims_without_macro_claims(issued_at: u64) -> serde_json::Value {
+fn claims_without_rox_claims(issued_at: u64) -> serde_json::Value {
     serde_json::json!({
         "aud": "", "exp": issued_at + 3600, "iat": issued_at, "iss": "", "sub": "fusion-user",
         "tid": "tenant", "applicationId": "", "roles": [],
     })
 }
 
-fn claims_with_macro_claims(issued_at: u64) -> serde_json::Value {
-    let mut claims = claims_without_macro_claims(issued_at);
+fn claims_with_rox_claims(issued_at: u64) -> serde_json::Value {
+    let mut claims = claims_without_rox_claims(issued_at);
     claims["email"] = "user@example.com".into();
     claims["fusion_user_id"] = "fusion-user".into();
-    claims["macro_user_id"] = "macro|user@example.com".into();
+    claims["rox_user_id"] = "macro|user@example.com".into();
     claims
 }
 
@@ -112,7 +112,7 @@ async fn post_refresh(fusionauth: &MockServer, access_token: &str) -> (StatusCod
                 .method("POST")
                 .uri("/jwt/refresh")
                 .header(AUTHORIZATION, format!("Bearer {access_token}"))
-                .header(MACRO_REFRESH_TOKEN_HEADER, REFRESH_TOKEN)
+                .header(ROX_REFRESH_TOKEN_HEADER, REFRESH_TOKEN)
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -124,12 +124,12 @@ async fn post_refresh(fusionauth: &MockServer, access_token: &str) -> (StatusCod
 }
 
 #[tokio::test]
-async fn token_without_macro_claims_is_refreshed() {
+async fn token_without_rox_claims_is_refreshed() {
     let fusionauth = fusionauth(refreshed(), 3).await;
     let issued_ats = [now() - 45, now() - TEN_MINUTES, now() - TWO_HOURS];
 
     for issued_at in issued_ats {
-        let access_token = sign(b"", &claims_without_macro_claims(issued_at));
+        let access_token = sign(b"", &claims_without_rox_claims(issued_at));
         let (status, body) = post_refresh(&fusionauth, &access_token).await;
 
         assert_eq!(status, StatusCode::OK, "issued at {issued_at}");
@@ -140,13 +140,13 @@ async fn token_without_macro_claims_is_refreshed() {
 }
 
 #[tokio::test]
-async fn token_without_macro_claims_is_not_refreshed_within_the_cooldown() {
+async fn token_without_rox_claims_is_not_refreshed_within_the_cooldown() {
     let fusionauth = fusionauth(refreshed(), 0).await;
     // The last one was issued by a FusionAuth whose clock is ahead of ours.
     let issued_ats = [now(), now() - 15, now() + 60];
 
     for issued_at in issued_ats {
-        let access_token = sign(b"", &claims_without_macro_claims(issued_at));
+        let access_token = sign(b"", &claims_without_rox_claims(issued_at));
 
         assert_eq!(
             post_refresh(&fusionauth, &access_token).await,
@@ -163,22 +163,22 @@ async fn token_without_macro_claims_is_not_refreshed_within_the_cooldown() {
 async fn token_not_issued_for_this_application_is_rejected_without_calling_fusionauth() {
     let fusionauth = fusionauth(refreshed(), 0).await;
     let issued_at = now() - TEN_MINUTES;
-    let mut other_audience = claims_without_macro_claims(issued_at);
+    let mut other_audience = claims_without_rox_claims(issued_at);
     other_audience["aud"] = "other-app".into();
-    let mut other_issuer = claims_without_macro_claims(issued_at);
+    let mut other_issuer = claims_without_rox_claims(issued_at);
     other_issuer["iss"] = "other.issuer.test".into();
     let cases = [
         (
             "signed with another secret",
-            sign(b"other-secret", &claims_without_macro_claims(issued_at)),
+            sign(b"other-secret", &claims_without_rox_claims(issued_at)),
         ),
         (
             "signed with another secret within the cooldown",
-            sign(b"other-secret", &claims_without_macro_claims(now())),
+            sign(b"other-secret", &claims_without_rox_claims(now())),
         ),
         (
             "signed with another secret with the macro claims",
-            sign(b"other-secret", &claims_with_macro_claims(issued_at)),
+            sign(b"other-secret", &claims_with_rox_claims(issued_at)),
         ),
         ("another audience", sign(b"", &other_audience)),
         ("another issuer", sign(b"", &other_issuer)),
@@ -197,7 +197,7 @@ async fn token_not_issued_for_this_application_is_rejected_without_calling_fusio
 #[tokio::test]
 async fn valid_token_is_returned_without_calling_fusionauth() {
     let fusionauth = fusionauth(refreshed(), 0).await;
-    let access_token = sign(b"", &claims_with_macro_claims(now() - TEN_MINUTES));
+    let access_token = sign(b"", &claims_with_rox_claims(now() - TEN_MINUTES));
 
     let (status, body) = post_refresh(&fusionauth, &access_token).await;
 
@@ -210,7 +210,7 @@ async fn valid_token_is_returned_without_calling_fusionauth() {
 #[tokio::test]
 async fn expired_token_is_refreshed() {
     let fusionauth = fusionauth(refreshed(), 1).await;
-    let access_token = sign(b"", &claims_with_macro_claims(now() - TWO_HOURS));
+    let access_token = sign(b"", &claims_with_rox_claims(now() - TWO_HOURS));
 
     let (status, body) = post_refresh(&fusionauth, &access_token).await;
 
@@ -220,8 +220,8 @@ async fn expired_token_is_refreshed() {
 }
 
 #[tokio::test]
-async fn fusionauth_failures_on_refreshing_a_token_without_macro_claims_are_reported() {
-    let access_token = sign(b"", &claims_without_macro_claims(now() - TEN_MINUTES));
+async fn fusionauth_failures_on_refreshing_a_token_without_rox_claims_are_reported() {
+    let access_token = sign(b"", &claims_without_rox_claims(now() - TEN_MINUTES));
     let refresh_token_rejected = fusionauth(
         ResponseTemplate::new(400)
             .set_body_string("The refresh token was not found or has expired."),

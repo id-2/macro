@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use async_graphql::dataloader::{DataLoader, Loader};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_notifications::NotifEvent;
 use notification::domain::models::{UserNotificationRow, entity_query::EntityNotificationQuery};
 use rootcause::markers::{Cloneable, Dynamic};
@@ -16,7 +16,7 @@ pub trait SoupNotificationEdgeReader: Send + Sync + 'static {
     /// Load matching notifications, applying the limit separately per entity.
     fn get_notifications<'a>(
         &'a self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         keys: Vec<model_entity::Entity<'static>>,
         query: EntityNotificationQuery,
     ) -> impl Future<
@@ -34,7 +34,7 @@ where
 {
     fn get_notifications(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         keys: Vec<model_entity::Entity<'static>>,
         query: EntityNotificationQuery,
     ) -> impl Future<
@@ -54,7 +54,7 @@ pub struct NoOpSoupNotificationEdgeReader;
 impl SoupNotificationEdgeReader for NoOpSoupNotificationEdgeReader {
     async fn get_notifications(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         keys: Vec<model_entity::Entity<'static>>,
         _query: EntityNotificationQuery,
     ) -> Result<
@@ -77,14 +77,14 @@ pub struct EntityNotificationsKey {
 /// DataLoader for entity notification edges.
 pub struct EntityNotificationsLoader<R> {
     /// User whose notifications are loaded.
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     /// Notification reader used to fulfill batches.
     reader: R,
 }
 
 impl<R> EntityNotificationsLoader<R> {
     /// Create a new entity notifications DataLoader.
-    pub fn new(user_id: MacroUserIdStr<'static>, reader: R) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>, reader: R) -> Self {
         Self { user_id, reader }
     }
 }
@@ -130,7 +130,7 @@ where
 
 /// Build a DataLoader for entity notification edges.
 pub fn entity_notifications_loader<R>(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     reader: R,
 ) -> DataLoader<EntityNotificationsLoader<R>>
 where

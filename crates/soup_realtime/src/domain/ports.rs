@@ -2,7 +2,7 @@
 
 use std::future::Future;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use rootcause::Report;
 
@@ -34,7 +34,7 @@ pub trait SoupRealtimeSubscriptionService: Send + Sync + 'static {
     /// Subscribes to entity patches addressed to `user_id`.
     fn subscribe(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> tokio::sync::mpsc::Receiver<Patch<Entity<'static>>>;
 }
 
@@ -44,7 +44,7 @@ where
 {
     fn subscribe(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> tokio::sync::mpsc::Receiver<Patch<Entity<'static>>> {
         self.as_ref().subscribe(user_id)
     }
@@ -57,7 +57,7 @@ pub struct NoOpSoupRealtimeSubscriptionService;
 impl SoupRealtimeSubscriptionService for NoOpSoupRealtimeSubscriptionService {
     fn subscribe(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> tokio::sync::mpsc::Receiver<Patch<Entity<'static>>> {
         let (_sender, receiver) = tokio::sync::mpsc::channel(1);
         receiver

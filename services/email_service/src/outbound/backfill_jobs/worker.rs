@@ -50,7 +50,7 @@ pub(crate) struct BackfillWorkerEffects {
             system_properties::PgSystemPropertiesRepository,
         >,
     >,
-    pub macro_event_broker: crate::composition::workers::PubSubEventBroker,
+    pub rox_event_broker: crate::composition::workers::PubSubEventBroker,
 }
 pub(crate) struct BackfillWorkerCrm(pub crate::composition::workers::CrmServiceType);
 

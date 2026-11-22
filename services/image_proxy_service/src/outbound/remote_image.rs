@@ -21,7 +21,7 @@ const CONNECT_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
 /// and some origins (strict WAFs, bare nginx) 403 requests with no User-Agent;
 /// a browser-like string clears those rules. Shaped like Gmail's image proxy —
 /// a real browser string plus a proxy identifier.
-const UPSTREAM_USER_AGENT: &str = "Mozilla/5.0 (compatible; MacroImageProxy/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+const UPSTREAM_USER_AGENT: &str = "Mozilla/5.0 (compatible; RoxImageProxy/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 /// Build the HTTP client used to fetch upstream images.
 ///
@@ -206,7 +206,7 @@ async fn send_request(
     send_user_agent: bool,
 ) -> Result<reqwest::Response, ProxyError> {
     let mut headers = reqwest::header::HeaderMap::new();
-    macro_tower_layers::inject_trace_headers(&mut headers);
+    rox_tower_layers::inject_trace_headers(&mut headers);
     let mut request = http_client.get(url.as_str()).headers(headers);
     if send_user_agent {
         request = request.header(reqwest::header::USER_AGENT, UPSTREAM_USER_AGENT);

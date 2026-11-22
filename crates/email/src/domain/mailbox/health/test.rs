@@ -1,6 +1,6 @@
 use super::*;
 use email_api_client::domain::models::RateLimitOrigin;
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 use std::sync::{Arc, Mutex};
 
 const LINK_ID: Uuid = Uuid::from_u128(1);
@@ -41,7 +41,7 @@ impl Mailbox {
 struct Fake(Arc<Mutex<Mailbox>>);
 
 impl InboxHealthRepository for Fake {
-    async fn accessible(&self, _actor: &MacroUserIdStr<'_>) -> Result<Vec<Link>, MailboxError> {
+    async fn accessible(&self, _actor: &RoxUserIdStr<'_>) -> Result<Vec<Link>, MailboxError> {
         unreachable!("probes never list inboxes")
     }
     async fn binding(&self, link: Uuid) -> Result<Option<InboxHealthBinding>, MailboxError> {
@@ -49,7 +49,7 @@ impl InboxHealthRepository for Fake {
         Ok(Some(InboxHealthBinding {
             link: Link {
                 id: link,
-                macro_id: MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+                rox_id: RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
                 fusionauth_user_id: "fa-user".to_string(),
                 email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
                 provider: mailbox.provider,

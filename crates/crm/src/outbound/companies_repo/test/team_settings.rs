@@ -2,12 +2,12 @@ use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::domain::model::{CrmPermissionRole, CrmTeamSettingsPatch};
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_team_settings_missing_row_returns_defaults(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;
@@ -25,7 +25,7 @@ async fn get_team_settings_missing_row_returns_defaults(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_settings_round_trips_legacy_stage_ids(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;
@@ -61,7 +61,7 @@ async fn update_team_settings_round_trips_legacy_stage_ids(pool: PgPool) -> anyh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_team_settings_row_from_enable_flow_returns_defaults(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -84,7 +84,7 @@ async fn get_team_settings_row_from_enable_flow_returns_defaults(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_settings_inserts_and_preserves_crm_enabled(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -111,7 +111,7 @@ async fn update_team_settings_inserts_and_preserves_crm_enabled(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_settings_partial_changes_only_provided_fields(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -155,7 +155,7 @@ async fn update_team_settings_partial_changes_only_provided_fields(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_settings_tristate_clears_nullable_fields(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;
@@ -187,7 +187,7 @@ async fn update_team_settings_tristate_clears_nullable_fields(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_settings_replaces_team_views_whole(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;

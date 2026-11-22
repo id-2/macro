@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { Macro } from '../src/macro';
-import { MacroApiError, MacroError, MacroNotFoundError } from '../src/utils';
+import { RoxApiError, RoxError, RoxNotFoundError } from '../src/utils';
 
 const TEAM_ID = '0198a4cc-e138-7670-a308-a6b766602700';
 const OTHER_TEAM_ID = '0198a4cc-e138-7670-a308-a6b766602701';
@@ -77,7 +77,7 @@ describe('Team.invite', () => {
       ],
       team_id: TEAM_ID,
     });
-    expect(requests[0]?.headers.get('x-macro-user-api-key')).toBe('mak_test');
+    expect(requests[0]?.headers.get('x-rox-user-api-key')).toBe('mak_test');
   });
 
   test('sends a repeated address once, whatever its letter case', async () => {
@@ -137,8 +137,8 @@ describe('Team.invite', () => {
       .teams.byId(OTHER_TEAM_ID)
       .invite('someone@example.com')
       .catch((caught: unknown) => caught);
-    expect(error).toBeInstanceOf(MacroApiError);
-    expect((error as MacroApiError).status).toBe(409);
+    expect(error).toBeInstanceOf(RoxApiError);
+    expect((error as RoxApiError).status).toBe(409);
     expect(requests).toHaveLength(1);
     expect(await requests[0]?.json()).toMatchObject({ team_id: OTHER_TEAM_ID });
   });
@@ -147,7 +147,7 @@ describe('Team.invite', () => {
     const requests = serve({});
     await expect(
       macro().teams.byId(TEAM_ID).invite(['  ', '']),
-    ).rejects.toBeInstanceOf(MacroError);
+    ).rejects.toBeInstanceOf(RoxError);
     expect(requests).toHaveLength(0);
   });
 
@@ -163,9 +163,9 @@ describe('Team.invite', () => {
       .teams.byId(TEAM_ID)
       .invite('someone@example.com')
       .catch((caught: unknown) => caught);
-    expect(error).toBeInstanceOf(MacroApiError);
-    expect((error as MacroApiError).status).toBe(403);
-    expect((error as MacroApiError).message).toContain('only admins');
+    expect(error).toBeInstanceOf(RoxApiError);
+    expect((error as RoxApiError).status).toBe(403);
+    expect((error as RoxApiError).message).toContain('only admins');
   });
 });
 
@@ -173,7 +173,7 @@ describe('Team.current', () => {
   test('reports a caller without a team as not found', async () => {
     serve({ 'GET /team': () => new Response(null, { status: 204 }) });
     await expect(macro().teams.current()).rejects.toBeInstanceOf(
-      MacroNotFoundError,
+      RoxNotFoundError,
     );
   });
 });
@@ -216,11 +216,11 @@ describe('Team.invites', () => {
         (request) => `${request.method} ${new URL(request.url).pathname}`,
       ),
     ).toEqual(['GET /team/invites', `DELETE /team/invite/${INVITE_ID}`]);
-    await expect(pending?.email()).rejects.toBeInstanceOf(MacroNotFoundError);
+    await expect(pending?.email()).rejects.toBeInstanceOf(RoxNotFoundError);
   });
 });
 
-describe('macro.referrals', () => {
+describe('rox.referrals', () => {
   test('builds the referral signup link from the caller code', async () => {
     serve({ 'GET /referral/code': () => Response.json('CODE+42') });
     expect(await macro().referrals.link()).toEqual({
@@ -245,12 +245,12 @@ describe('macro.referrals', () => {
         Response.json({ message: 'rate limit exceeded' }, { status: 429 }),
     });
     await expect(macro().referrals.invite('   ')).rejects.toBeInstanceOf(
-      MacroError,
+      RoxError,
     );
     const error = await macro()
       .referrals.invite('friend@example.com')
       .catch((caught: unknown) => caught);
-    expect(error).toBeInstanceOf(MacroApiError);
-    expect((error as MacroApiError).status).toBe(429);
+    expect(error).toBeInstanceOf(RoxApiError);
+    expect((error as RoxApiError).status).toBe(429);
   });
 });

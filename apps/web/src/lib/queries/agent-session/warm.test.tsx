@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { MACRO_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
 import { agentHarnessServiceClient } from '@service-agent-harness/client';
 import type { WarmAgentSessionResponse } from '@service-agent-harness/generated/schemas';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
@@ -38,7 +38,7 @@ function prepared(id: string) {
       id,
       model: 'model-a',
       instructions: null,
-      botId: MACRO_NEW_BOT_ID,
+      botId: ROX_NEW_BOT_ID,
       canEdit: true,
       createdAt: '2026-10-06T00:00:00Z',
       modifiedAt: '2026-10-06T00:00:00Z',
@@ -133,7 +133,7 @@ it('deduplicates page mounts and preserves a reservation for the matching owner 
   replenish();
   await settled();
   expect(warm).toHaveBeenCalledTimes(1);
-  expect(claim({ botId: MACRO_NEW_BOT_ID, modelOverride: 'model-a' })).toEqual({
+  expect(claim({ botId: ROX_NEW_BOT_ID, modelOverride: 'model-a' })).toEqual({
     id: 'warm-id',
     claim: 'hit',
   });

@@ -2,7 +2,7 @@ import * as aws from '@pulumi/aws';
 import type * as pulumi from '@pulumi/pulumi';
 import type { Output } from '@pulumi/pulumi';
 import { DEFAULT_TARGET_GROUP_HEALTH_CHECK } from '../../../packages/resources';
-import { MACRO_SUBDOMAIN_CERT, stack } from './shared';
+import { ROX_SUBDOMAIN_CERT, stack } from './shared';
 
 export function serviceLoadBalancer(
   parent: pulumi.ComponentResource,
@@ -82,7 +82,7 @@ export function serviceLoadBalancer(
       port: 443,
       protocol: 'HTTPS',
       sslPolicy: 'ELBSecurityPolicy-TLS13-1-2-2021-06',
-      certificateArn: MACRO_SUBDOMAIN_CERT,
+      certificateArn: ROX_SUBDOMAIN_CERT,
       tags,
       defaultActions: [
         {

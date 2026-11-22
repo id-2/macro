@@ -547,8 +547,8 @@ impl PasswordService {
                 GranteeKind::Team if grant.id != team.0.to_string() => return Err(Error::Invalid),
                 GranteeKind::User => {
                     let recipient = Actor {
-                        user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(&grant.id)
-                            .map(macro_user_id::cowlike::CowLike::into_owned)
+                        user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(&grant.id)
+                            .map(rox_user_id::cowlike::CowLike::into_owned)
                             .map_err(|_| Error::Invalid)?,
                     };
                     if !self.repository.is_human(&recipient.user_id).await?

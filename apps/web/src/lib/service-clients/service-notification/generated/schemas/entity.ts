@@ -7,7 +7,7 @@
 import type { EntityType } from './entityType';
 
 /**
- * The Entity describes the minimum amount of information required to describe a unique thing in Macro
+ * The Entity describes the minimum amount of information required to describe a unique thing in Rox
 This contains the type of the entity [EntityType] and the string id of that entity
  */
 export interface Entity {

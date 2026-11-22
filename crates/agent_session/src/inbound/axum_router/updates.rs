@@ -8,7 +8,7 @@ use axum::{
     routing::get,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService};
+use rox_authorization::{ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService};
 
 use super::AgentSessionRouterState;
 use crate::domain::{
@@ -23,7 +23,7 @@ pub fn agent_session_updates_router<T, Access, Auth, S>(
 where
     T: CodingAgentUpdatesRepo,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -51,15 +51,15 @@ where
 pub async fn list_agent_session_updates<
     T: CodingAgentUpdatesRepo,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
 ) -> Result<Json<AgentUpdates>, UpdatesApiError> {
     Ok(Json(
         list_updates(
             state.service.as_ref(),
-            caller.authorization.user.macro_user_id,
+            caller.authorization.user.rox_user_id,
         )
         .await?,
     ))

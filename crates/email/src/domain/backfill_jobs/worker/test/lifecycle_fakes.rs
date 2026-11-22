@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::mailbox::inbox_sync::{InboxSyncAttachmentRecipients, LabelCatalogRepository};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::link::Link;
 use models_email::service::{attachment::AttachmentUploadMetadata, label::Label};
 use tokio::sync::oneshot;
@@ -23,7 +23,7 @@ pub(super) struct LifecycleState {
     pub media: Vec<AttachmentUploadMetadata>,
     pub recipients: InboxSyncAttachmentRecipients,
     pub emails: Vec<String>,
-    pub connections: Vec<MacroUserIdStr<'static>>,
+    pub connections: Vec<RoxUserIdStr<'static>>,
     pub refreshes: Vec<(Uuid, BackfillProgress)>,
     pub contact_gate: Option<(oneshot::Sender<()>, oneshot::Receiver<()>)>,
 }
@@ -212,7 +212,7 @@ impl BackfillLifecycleEffects for Fake {
     }
     async fn refresh_progress(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         link_id: Uuid,
         progress: BackfillProgress,
     ) {
@@ -226,8 +226,8 @@ impl BackfillLifecycleEffects for Fake {
     }
     async fn connect_contacts(
         &self,
-        _: &MacroUserIdStr<'static>,
-        contacts: Vec<MacroUserIdStr<'static>>,
+        _: &RoxUserIdStr<'static>,
+        contacts: Vec<RoxUserIdStr<'static>>,
     ) -> Result<(), rootcause::Report> {
         self.lifecycle_call("connect_contacts")
             .map_err(|e| rootcause::report!("{e}"))?;

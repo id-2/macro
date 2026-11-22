@@ -19,7 +19,7 @@ pub trait SessionCodeMode: Send + Sync + 'static {
         session: &AgentSession,
         execution: ExecutionId,
         acting_as: ai_toolset::actor::ToolActor,
-        turn: macro_uuid::Uuid,
+        turn: rox_uuid::Uuid,
         request: ExecuteRequest,
         cancel: CancellationToken,
     ) -> Result<ExecutionReceipt, CodeModeError>;
@@ -300,7 +300,7 @@ pub fn covered_by_code_sdk(name: &str, user_tool: bool) -> bool {
                 | "ReadSkill"
                 | "Decide"
                 | "GenerateObject"
-                // macro.documents.upload(), which sends the bytes through Macro.
+                // macro.documents.upload(), which sends the bytes through Rox.
                 | "UploadFile"
                 // macro.search, macro.workspace and macro.chats.
                 | "ContentSearch"
@@ -425,7 +425,7 @@ impl SessionCodeMode for CodeModeService {
         session: &AgentSession,
         execution: ExecutionId,
         acting_as: ai_toolset::actor::ToolActor,
-        turn: macro_uuid::Uuid,
+        turn: rox_uuid::Uuid,
         request: ExecuteRequest,
         cancel: CancellationToken,
     ) -> Result<ExecutionReceipt, CodeModeError> {

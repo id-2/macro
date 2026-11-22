@@ -12,10 +12,10 @@ use serde::Deserialize;
 use super::{
     AttendeeInput, CalendarLabels, CalendarToolContext, CopyChange, EventRemindersInput,
     EventTimeInput, OutOfOfficeInput, ToolCalendarEvent, confirm_copy,
-    macro_call_update_tool_error, mutation_tool_error,
+    rox_call_update_tool_error, mutation_tool_error,
 };
 use crate::domain::{
-    meeting_links::first_macro_call_url,
+    meeting_links::first_rox_call_url,
     models::{AttendeeResponseStatus, CalendarEventPatch, ConferenceChange, GuestPolicy},
     ports::{
         CalendarMacroCallService, CalendarMutationService, CalendarOccurrenceService,
@@ -247,7 +247,7 @@ pub struct UpdateCalendarEvent {
                        exclusive with `conference`."
     )]
     #[serde(default)]
-    pub add_macro_call: bool,
+    pub add_rox_call: bool,
 
     /// Replacement reminder configuration.
     #[schemars(
@@ -316,11 +316,11 @@ where
             attendee_count=?self.attendees.as_ref().map(Vec::len),
             rsvp=?self.rsvp,
             inbox_confirmed=self.inbox.is_some(),
-            add_macro_call=self.add_macro_call,
+            add_rox_call=self.add_rox_call,
             "Update calendar event"
         );
 
-        if self.add_macro_call && self.conference.is_some() {
+        if self.add_rox_call && self.conference.is_some() {
             return Err(ToolCallError {
                 description: "`addMacroCall` and `conference` are mutually exclusive; pick one."
                     .to_string(),
@@ -383,7 +383,7 @@ where
         // Reminders and the user's own answer belong to one copy; anything
         // else reaches the meeting, so the agent must have chosen the copy
         // when the meeting is on several of the user's inboxes.
-        if patch.reaches_meeting() || self.add_macro_call || self.inbox.is_some() {
+        if patch.reaches_meeting() || self.add_rox_call || self.inbox.is_some() {
             confirm_copy(
                 &*service_context.occurrences,
                 &requester_id,
@@ -399,11 +399,11 @@ where
         // An RSVP is its own provider call, so a call carrying only one runs
         // only that half. Answering after the patch keeps a replaced attendee
         // list from discarding the response that was just recorded.
-        let patched = if self.add_macro_call {
+        let patched = if self.add_rox_call {
             Some(
                 service_context
                     .mutations
-                    .update_event_with_macro_call(
+                    .update_event_with_rox_call(
                         &requester_id,
                         self.event_id,
                         self.calendar_id,
@@ -411,7 +411,7 @@ where
                         scope.clone(),
                     )
                     .await
-                    .map_err(macro_call_update_tool_error)?,
+                    .map_err(rox_call_update_tool_error)?,
             )
         } else if patch.is_empty() {
             None
@@ -470,13 +470,13 @@ where
         };
 
         let labels = CalendarLabels::load(&*service_context.mutations, &requester_id).await;
-        let macro_call_url = if self.add_macro_call {
-            first_macro_call_url(event.location.as_deref(), event.description.as_deref())
+        let rox_call_url = if self.add_rox_call {
+            first_rox_call_url(event.location.as_deref(), event.description.as_deref())
         } else {
             None
         };
         Ok(ToolCalendarEvent {
-            macro_call_url,
+            rox_call_url,
             ..ToolCalendarEvent::from_event(&event, &labels)
         })
     }

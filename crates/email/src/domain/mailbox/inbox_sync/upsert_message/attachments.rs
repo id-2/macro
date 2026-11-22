@@ -13,7 +13,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     if !ctx.features.attachment_upload {
         return Ok(None);

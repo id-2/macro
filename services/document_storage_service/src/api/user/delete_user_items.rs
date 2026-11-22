@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::{EmptyResponse, GenericErrorResponse};
 
 #[derive(serde::Deserialize)]
@@ -29,7 +29,7 @@ pub struct Params {
 #[tracing::instrument(skip(ctx, _auth))]
 pub async fn delete_user_items_handler(
     State(ctx): State<ApiContext>,
-    _auth: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _auth: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path(Params { user_id }): Path<Params>,
 ) -> Result<Response, Response> {
     tracing::info!("deleting user dss items");
@@ -39,7 +39,7 @@ pub async fn delete_user_items_handler(
     })?;
 
     let document_ids =
-        macro_db_client::user::delete_user_dss_items::delete_documents::delete_user_documents(
+        rox_db_client::user::delete_user_dss_items::delete_documents::delete_user_documents(
             &mut transaction,
             &user_id,
         )
@@ -49,7 +49,7 @@ pub async fn delete_user_items_handler(
             (StatusCode::INTERNAL_SERVER_ERROR).into_response()
         })?;
 
-    macro_db_client::user::delete_user_dss_items::delete_chats::delete_user_chats(
+    rox_db_client::user::delete_user_dss_items::delete_chats::delete_user_chats(
         &mut transaction,
         &user_id,
     )
@@ -59,7 +59,7 @@ pub async fn delete_user_items_handler(
         (StatusCode::INTERNAL_SERVER_ERROR).into_response()
     })?;
 
-    macro_db_client::user::delete_user_dss_items::delete_projects::delete_user_projects(
+    rox_db_client::user::delete_user_dss_items::delete_projects::delete_user_projects(
         &mut transaction,
         &user_id,
     )

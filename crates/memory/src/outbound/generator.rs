@@ -5,7 +5,7 @@ use agent::{
     types::{ChatMessage, ChatMessageContent, Role},
 };
 use futures::StreamExt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 /// A model adapter whose tool context is supplied at the composition root.
@@ -19,7 +19,7 @@ pub struct AgentMemoryGenerator<C> {
 #[async_trait::async_trait]
 impl<C: Clone + Send + Sync + 'static> MemoryGenerator for AgentMemoryGenerator<C> {
     #[tracing::instrument(skip_all, err)]
-    async fn research(&self, user: MacroUserIdStr<'static>, instructions: &str) -> Result<String> {
+    async fn research(&self, user: RoxUserIdStr<'static>, instructions: &str) -> Result<String> {
         let identity = format!(
             "Research subject: {user}. Current UTC time: {}.",
             chrono::Utc::now()
@@ -66,7 +66,7 @@ impl<C: Clone + Send + Sync + 'static> MemoryGenerator for AgentMemoryGenerator<
     #[tracing::instrument(skip_all, err)]
     async fn summarize(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         instructions: &str,
         sources: &str,
     ) -> Result<String> {
@@ -83,7 +83,7 @@ impl<C: Clone + Send + Sync + 'static> MemoryGenerator for AgentMemoryGenerator<
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn judge(&self, user: MacroUserIdStr<'static>, content: &str) -> Result<()> {
+    async fn judge(&self, user: RoxUserIdStr<'static>, content: &str) -> Result<()> {
         let instructions = include_str!("generator/judge.md");
         let system = prompt::compose(&[&prompt::privacy::PROMPT, &instructions]);
         let response = agent::complete(

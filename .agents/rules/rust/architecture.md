@@ -12,7 +12,7 @@ alwaysApply: false
 
 Boundaries between crates and layers in the Rust backend.
 
-- **CS-23** Do not grow `macro_db_client` — new domain logic gets a new crate;
+- **CS-23** Do not grow `rox_db_client` — new domain logic gets a new crate;
   the catch-all crates must shrink, not accumulate.
 - **CS-25** `mod.rs` declares submodules; it doesn't host logic — prefer the
   `foo.rs` + `foo/` file-and-directory style for modules with logic. Enforced by

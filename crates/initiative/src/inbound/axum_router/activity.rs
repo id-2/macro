@@ -12,7 +12,7 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::ViewAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::InitiativeAccessExtractor;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -30,7 +30,7 @@ use crate::domain::{
 pub struct InitiativeActivityRouterState<R, Eas, Auth> {
     history: Arc<InitiativeHistory<R, Eas>>,
     entity_access_service: Arc<Eas>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<R, Eas, Auth> Clone for InitiativeActivityRouterState<R, Eas, Auth> {
@@ -48,7 +48,7 @@ impl<R, Eas, Auth> InitiativeActivityRouterState<R, Eas, Auth> {
     pub fn new(
         history: Arc<InitiativeHistory<R, Eas>>,
         entity_access_service: Arc<Eas>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             history,
@@ -65,7 +65,7 @@ impl<R, Eas, Auth> FromRef<InitiativeActivityRouterState<R, Eas, Auth>> for Arc<
 }
 
 impl<R, Eas, Auth> FromRef<InitiativeActivityRouterState<R, Eas, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &InitiativeActivityRouterState<R, Eas, Auth>) -> Self {
         state.authorization_state.clone()
@@ -80,7 +80,7 @@ pub fn initiative_activity_router<R, Eas, Auth, T>(
 where
     R: EntityActivityReads,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -137,7 +137,7 @@ pub async fn get_initiative_activity_handler<R, Eas, Auth>(
 where
     R: EntityActivityReads,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let cursor = match (params.cursor_occurred_at, params.cursor_id) {
         (Some(occurred_at), Some(id)) => Some(InitiativeActivityCursor { occurred_at, id }),

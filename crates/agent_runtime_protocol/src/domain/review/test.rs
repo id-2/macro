@@ -1,7 +1,7 @@
 use super::*;
 
 #[test]
-fn a_review_update_is_logged_as_a_macro_extension_notification_with_only_its_identity() {
+fn a_review_update_is_logged_as_a_rox_extension_notification_with_only_its_identity() {
     let update = ReviewUpdatedNotification {
         review_id: "0192f7a0-0000-7000-8000-000000000001".parse().unwrap(),
         revision: 3,

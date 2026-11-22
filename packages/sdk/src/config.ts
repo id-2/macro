@@ -94,45 +94,45 @@ export type BotScope = 'user' | 'team';
  * - `token`: a bearer token, or a `mak_` API key. The SDK picks the header
  *   from the prefix at send time.
  * - `apiKey`: a Settings → API Keys key, always sent as
- *   `x-macro-user-api-key`. Not prefix-checked, so keys that predate the
+ *   `x-rox-user-api-key`. Not prefix-checked, so keys that predate the
  *   `mak_` prefix work here.
  *
- * A bot uses an `mbot_` token as `x-macro-bot-token` plus
- * `x-macro-bot-scope`, defaulting to `user` when `requestedAs` is set and
+ * A bot uses an `mbot_` token as `x-rox-bot-token` plus
+ * `x-rox-bot-scope`, defaulting to `user` when `requestedAs` is set and
  * `team` otherwise.
  */
-export type MacroAuth =
+export type RoxAuth =
   | { type: 'user'; token: TokenSource; apiKey?: never }
   | { type: 'user'; apiKey: string; token?: never }
   | { type: 'bot'; token: TokenSource; scope?: BotScope };
 
-/** Options passed to `new Rox(opts)` and stored on `MacroClient`. */
-export interface MacroOpts {
+/** Options passed to `new Rox(opts)` and stored on `RoxClient`. */
+export interface RoxOpts {
   /** Optional generated API operation events; excludes arguments, URLs and response data. */
   onRequest?: (event: import('./utils/activity').RequestActivity) => void;
   /** How to authenticate. Takes precedence over `token`. Falls back to
-   * `MACRO_API_KEY` (a user API key or bearer token) or `MACRO_BOT_TOKEN`
+   * `ROX_API_KEY` (a user API key or bearer token) or `ROX_BOT_TOKEN`
    * (bot). */
-  auth?: MacroAuth;
+  auth?: RoxAuth;
   /** Shorthand for `auth: { type: 'user', token }`. Accepts a Settings API
    * key (`mak_…`) or a bearer token. */
   token?: TokenSource;
-  /** Which Macro environment to talk to. Falls back to the MACRO_ENV env
+  /** Which Rox environment to talk to. Falls back to the ROX_ENV env
    * var, then `'prod'`. */
   env?: Env;
   /** Override individual service hosts (e.g. point one at localhost). */
   hosts?: Partial<Record<ServiceName, string>>;
-  /** Override the web app base URL (e.g. for local frontend dev). Also reads MACRO_WEB_URL. */
+  /** Override the web app base URL (e.g. for local frontend dev). Also reads ROX_WEB_URL. */
   webAppUrl?: string;
   /**
    * Signing secret for verifying incoming persisted-webhook deliveries.
    * Required only for `macro.events.webhook()` / `macro.events.handle()`.
    * SSE via `macro.events.listen()` uses the API token and does not need
-   * this. Falls back to MACRO_WEBHOOK_SECRET.
+   * this. Falls back to ROX_WEBHOOK_SECRET.
    */
   webhookSecret?: string;
   wsVerify?: string;
-  /** User id the bot acts for, sent as `x-macro-bot-for-macro-user-id` on
+  /** User id the bot acts for, sent as `x-rox-bot-for-macro-user-id` on
    * every request. Bot auth only. Set via `macro.requestedAs(user)` rather
    * than directly. */
   requestedAs?: string;

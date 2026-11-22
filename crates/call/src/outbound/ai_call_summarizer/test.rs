@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{
@@ -165,7 +165,7 @@ fn parse_custom_speaker_results_filters_unknown_invalid_and_duplicate_entries() 
 fn parse_custom_speaker_results_normalizes_candidate_user_ids() {
     let transcript_id = Uuid::from_u128(0xeeeeeeee_eeee_eeee_eeee_eeeeeeeeeeee);
     let valid_transcript_ids = HashSet::from([transcript_id]);
-    let candidate = MacroUserIdStr::parse_from_str("macro|dana@example.com").unwrap();
+    let candidate = RoxUserIdStr::parse_from_str("macro|dana@example.com").unwrap();
     let candidate_user_ids = HashSet::from([candidate.as_ref().to_string()]);
 
     let results = parse_custom_speaker_results(

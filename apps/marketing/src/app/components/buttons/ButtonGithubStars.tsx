@@ -6,7 +6,7 @@ import {
   githubStars,
 } from '../../utils/utilGithubStars';
 
-const MACRO_REPO_URL = 'https://github.com/macro-inc/macro';
+const ROX_REPO_URL = 'https://github.com/macro-inc/macro';
 
 export function ButtonGithubStars(props: {
   mobile?: boolean;
@@ -23,7 +23,7 @@ export function ButtonGithubStars(props: {
 
   return (
     <a
-      href={MACRO_REPO_URL}
+      href={ROX_REPO_URL}
       target="_blank"
       rel="noreferrer"
       class={props.class}

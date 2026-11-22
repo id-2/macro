@@ -22,7 +22,7 @@ use crate::domain::meetings::GuestId;
 /// A person connected to an RTC room.
 pub(super) enum RoomParticipant<'a> {
     /// A Rox user.
-    User(MacroUserIdStr<'a>),
+    User(RoxUserIdStr<'a>),
     /// A non-account meeting guest.
     Guest(GuestId),
     /// An authenticated bot.
@@ -51,7 +51,7 @@ where
     Sm: CallSummarizer + Clone,
     V: VoipPushSender,
     Vr: VoiceRepository + Clone,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 {
     /// The archived call a room without an active call belongs to.
     async fn archived_call_for_room(&self, room_name: &str) -> Result<Option<Uuid>, CallError> {
@@ -189,7 +189,7 @@ where
     pub(super) async fn leave_archived_channel_room(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) {
         let filter = Some(Arc::new(Expr::Literal(CallLiteral::ChannelId(*channel_id))));
         let latest = match self

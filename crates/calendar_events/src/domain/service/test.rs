@@ -17,7 +17,7 @@ use crate::domain::{
     },
 };
 use chrono::{Duration, TimeZone, Utc};
-use macro_event_broker::NoopMacroEventBroker;
+use rox_event_broker::NoopMacroEventBroker;
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Default)]
@@ -1264,13 +1264,13 @@ struct RecordingEventBroker {
     published: Arc<Mutex<Vec<(String, serde_json::Value)>>>,
 }
 
-impl macro_event_broker::MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: macro_event_broker::MacroEvent + ?Sized>(
+impl rox_event_broker::RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: rox_event_broker::RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<
-        tokio::task::JoinHandle<Result<(), macro_event_broker::EventBrokerError>>,
-        macro_event_broker::EventBrokerError,
+        tokio::task::JoinHandle<Result<(), rox_event_broker::EventBrokerError>>,
+        rox_event_broker::EventBrokerError,
     > {
         self.published.lock().unwrap().push((
             event.key().to_string(),

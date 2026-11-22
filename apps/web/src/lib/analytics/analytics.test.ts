@@ -73,7 +73,7 @@ beforeEach(() => {
 afterEach(() => {
   document.head.replaceChildren();
   document.cookie =
-    'macro_mobile_email_attribution=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+    'rox_mobile_email_attribution=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
   window.history.replaceState({}, '', '/');
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
@@ -139,7 +139,7 @@ describe('Meta pixel platform support', () => {
         'track',
         'Lead',
         expect.objectContaining({
-          macro_device: touch ? 'mobile-web' : 'desktop-web',
+          rox_device: touch ? 'mobile-web' : 'desktop-web',
         }),
         { eventID: 'test-lead' }
       );

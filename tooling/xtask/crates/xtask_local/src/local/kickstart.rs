@@ -347,7 +347,7 @@ pub fn build(
                 },
             }}
         }),
-        // 5. Macro application. `tenantId` sets the X-FusionAuth-TenantId header
+        // 5. Rox application. `tenantId` sets the X-FusionAuth-TenantId header
         // (required for tenant-scoped ops once a second tenant exists).
         json!({
             "method": "POST",
@@ -494,7 +494,7 @@ pub fn build(
     // out, like the Google providers above - FusionAuth has no GitHub provider
     // type at all (it rejects one with `[invalidJSON]`, listing the types it
     // does accept), and GitHub publishes no discovery document to point at.
-    // Nothing drives this provider's own OAuth flow: Macro builds the
+    // Nothing drives this provider's own OAuth flow: Rox builds the
     // authorization URL and only uses FusionAuth to record the resulting link,
     // so these endpoints exist to make the provider well-formed rather than to
     // be dialled.
@@ -502,7 +502,7 @@ pub fn build(
     // The name is fixed and the id is the service's own `GITHUB_IDP_ID`.
     // `authentication_service` resolves this provider by name to start a link,
     // then addresses it by that id for the link itself, so one provider has to
-    // answer to both. Macro builds the authorization URL itself and only uses
+    // answer to both. Rox builds the authorization URL itself and only uses
     // FusionAuth to record the link, which is why the client here must be the
     // same one the service holds.
     if let Some(github) = github {

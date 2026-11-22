@@ -35,7 +35,7 @@ async fn synced_at(pool: &PgPool, calendar_id: Uuid) -> DateTime<Utc> {
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sync_health_reads_each_calendar_and_account_state(pool: PgPool) {
     let owner_id = "macro|calendar-sync-health@example.com";
     let link_id = insert_link(&pool, owner_id).await;

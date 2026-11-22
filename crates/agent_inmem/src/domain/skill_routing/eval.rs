@@ -15,7 +15,7 @@ use cognition::domain::{
     RoutingRequest,
 };
 use jev::domain::{JevProvider as _, YesNoQuestion};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use skills::domain::model::{SkillContent, SkillError, SkillMatchType, SkillSummary};
 use skills::domain::ports::SkillService;
@@ -161,7 +161,7 @@ struct EvalSkills(Vec<SkillSummary>);
 impl SkillService for EvalSkills {
     async fn read_skill(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         document_id: Uuid,
     ) -> Result<SkillContent, SkillError> {
         let skill = self
@@ -178,20 +178,20 @@ impl SkillService for EvalSkills {
 
     async fn search_skills(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: &str,
         _: SkillMatchType,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         Ok(Vec::new())
     }
 
-    async fn list_skills(&self, _: &MacroUserIdStr<'_>) -> Result<Vec<SkillSummary>, SkillError> {
+    async fn list_skills(&self, _: &RoxUserIdStr<'_>) -> Result<Vec<SkillSummary>, SkillError> {
         Ok(self.0.clone())
     }
 
     async fn list_routable_skills(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         Ok(self.0.clone())
     }
@@ -207,7 +207,7 @@ struct RecordingJev {
 impl Cognition for RecordingJev {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         Err(rootcause::report!("the evaluation only classifies"))
@@ -215,7 +215,7 @@ impl Cognition for RecordingJev {
 
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         let mut keys = Vec::new();
@@ -257,7 +257,7 @@ async fn route_evaluation() {
         .iter()
         .map(|skill| (skill.document_id.to_string(), skill.name.clone()))
         .collect();
-    let owner = MacroUserIdStr::parse_from_str("macro|eval@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|eval@example.com").unwrap();
 
     let mut shipped_exact = 0usize;
     let mut exact = [0usize; THRESHOLDS.len()];

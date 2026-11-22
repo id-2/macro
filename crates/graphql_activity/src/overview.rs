@@ -3,7 +3,7 @@ use async_graphql::{Context, ID, InputObject, SimpleObject};
 use chrono::Utc;
 use chrono_tz::Tz;
 use graphql_common::GraphqlEntityType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::loaders::ActivityFeedReader;
 
@@ -128,7 +128,7 @@ fn parse_time_zone(time_zone: Option<String>) -> async_graphql::Result<Tz> {
 /// Resolve the authenticated user's activity overview.
 pub async fn resolve_activity_overview<R>(
     ctx: &Context<'_>,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     input: ActivityOverviewInput,
 ) -> async_graphql::Result<GraphqlActivityOverview>
 where

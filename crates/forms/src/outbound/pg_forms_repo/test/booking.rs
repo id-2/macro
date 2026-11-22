@@ -6,7 +6,7 @@ use models_forms::{BookingEventTypeId, BookingProfileId, BookingTarget};
 
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_booking_step_reads_back_with_its_target_in_its_own_column(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -85,7 +85,7 @@ async fn a_booking_step_reads_back_with_its_target_in_its_own_column(pool: PgPoo
     assert_eq!(others, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stored_booking_target_of_the_wrong_shape_is_corrupt(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());

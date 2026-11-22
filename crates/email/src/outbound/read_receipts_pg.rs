@@ -1,7 +1,7 @@
 //! Postgres persistence for message open tracking.
 use crate::domain::read_receipts::{MessageReadReceipt, ReadReceiptRepository, ReadReceiptToken};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::{Report, prelude::IntoRootcause};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -74,9 +74,9 @@ impl ReadReceiptRepository for ReadReceiptPgRepository {
     }
 
     #[tracing::instrument(skip(self, user), err)]
-    async fn accessible_inboxes(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<Uuid>, Report> {
+    async fn accessible_inboxes(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<Uuid>, Report> {
         Ok(
-            email_db_client::links::get::fetch_inboxes_for_macro_id(&self.0, user.as_ref())
+            email_db_client::links::get::fetch_inboxes_for_rox_id(&self.0, user.as_ref())
                 .await
                 .into_rootcause()?
                 .into_iter()

@@ -3,7 +3,7 @@ use crate::domain::model::ReplyOutcome;
 use agent_fold::domain::ports::FoldedMessageRepo as _;
 use agent_runtime_protocol::domain::notification::{NotificationEvent, input_from_runtime};
 use agent_session::domain::notifications::*;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 #[derive(Default)]
@@ -51,7 +51,7 @@ impl NotificationStore for Outbox {
             if self.expired.swap(false, Ordering::SeqCst)
                 && let Some(batch) = claimed.as_mut()
             {
-                batch.lease_id = macro_uuid::generate_uuid_v7();
+                batch.lease_id = rox_uuid::generate_uuid_v7();
                 return Ok(Some(batch.clone()));
             }
             if claimed.is_some() {
@@ -69,7 +69,7 @@ impl NotificationStore for Outbox {
                 return Ok(None);
             }
             let batch = NotificationBatch {
-                lease_id: macro_uuid::generate_uuid_v7(),
+                lease_id: rox_uuid::generate_uuid_v7(),
                 action_id: AgentActionId::mint(),
                 wake: selected.iter().any(|row| row.wake),
                 notifications: selected.into_iter().map(|row| row.notification).collect(),

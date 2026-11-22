@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use chrono::{TimeZone, Utc};
-use import_notion::domain::macro_cells::Person;
+use import_notion::domain::rox_cells::Person;
 use import_notion::domain::model::{NotionId, NotionParent};
 
 use super::*;

@@ -60,7 +60,7 @@ async function fixture(page: Page, multipleTables = false) {
   await page.route(/^http:\/\/localhost:\d+\//, async (route) => {
     await route.fulfill({ response: await route.fetch({ maxRetries: 2 }) });
   });
-  await page.route('**/__macro_dev/**', async (route) => {
+  await page.route('**/__rox_dev/**', async (route) => {
     const request = route.request();
     const url = new URL(request.url());
     if (url.pathname.endsWith('/items/soup/graphql')) {

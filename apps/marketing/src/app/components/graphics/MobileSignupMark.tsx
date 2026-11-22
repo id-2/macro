@@ -1,4 +1,4 @@
-import { MacroMarkIcon } from './MacroMarkIcon';
+import { RoxMarkIcon } from './RoxMarkIcon';
 
 /**
  * The Rox mark on a rounded tile, linking home. Heads the phone signup
@@ -32,7 +32,7 @@ export function MobileSignupMark() {
         class="mobile-signup-mark"
         aria-label="Rox home"
       >
-        <MacroMarkIcon style={{ height: '22px', width: '32px' }} />
+        <RoxMarkIcon style={{ height: '22px', width: '32px' }} />
       </a>
     </>
   );

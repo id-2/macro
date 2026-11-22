@@ -13,13 +13,13 @@ use std::{
 use agent::structured_output::{DynamicSchema, dynamic_structured_completion};
 use agent::{Message, PredefinedModel};
 use agent_code_mode::domain::symbol_reference;
-use agent_egress::outbound::macro_mcp::MacroApiTokenSigner;
+use agent_egress::outbound::rox_mcp::RoxApiTokenSigner;
 use code_execution::domain::{
     CheckError, ExecuteRequest, Outcome, ProgramChecker, ProgramExecutor, RunEnvironment,
     SdkEndpoints, SourceFile, Unattended, operations, sdk_declaration_files, sdk_declarations,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use routine_program::{
     CallRecord, CallStatus, CodeIdentity, CodeStep, MAX_OUTPUT_BYTES, RoutineProgram, STEP_CONTEXT,
     SdkFingerprint, code_version,
@@ -73,16 +73,16 @@ pub trait RoutineCredentials: Send + Sync + 'static {
     /// attributed as `acts_as` says, for a run of `routine_id`.
     fn mint(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         acts_as: CodeIdentity,
         routine_id: Uuid,
     ) -> impl std::future::Future<Output = anyhow::Result<String>> + Send;
 }
 
-impl RoutineCredentials for MacroApiTokenSigner {
+impl RoutineCredentials for RoxApiTokenSigner {
     async fn mint(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         acts_as: CodeIdentity,
         routine_id: Uuid,
     ) -> anyhow::Result<String> {
@@ -92,7 +92,7 @@ impl RoutineCredentials for MacroApiTokenSigner {
         // token marks the events its writes produce, so they never start a
         // routine, this one included.
         let agent_id = match acts_as {
-            CodeIdentity::Agent => Some(bot_id::MACRO_NEW_BOT_ID.as_uuid()),
+            CodeIdentity::Agent => Some(bot_id::ROX_NEW_BOT_ID.as_uuid()),
             CodeIdentity::Owner => None,
         };
         Ok(self
@@ -106,7 +106,7 @@ impl RoutineCredentials for MacroApiTokenSigner {
 #[async_trait::async_trait]
 pub trait OwnerTimeZones: Send + Sync + 'static {
     /// The IANA zone of `owner`'s primary calendar, when they have one.
-    async fn time_zone(&self, owner: &MacroUserIdStr<'static>) -> Option<String>;
+    async fn time_zone(&self, owner: &RoxUserIdStr<'static>) -> Option<String>;
 }
 
 /// Owners' zones from their primary calendars.
@@ -117,7 +117,7 @@ impl<Calendars> OwnerTimeZones for CalendarTimeZones<Calendars>
 where
     Calendars: calendar_events::domain::ports::CalendarOccurrenceService,
 {
-    async fn time_zone(&self, owner: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn time_zone(&self, owner: &RoxUserIdStr<'static>) -> Option<String> {
         self.0
             .primary_time_zone(owner.as_ref())
             .await
@@ -128,7 +128,7 @@ where
 }
 
 /// Routine code over the harness's own executor and type checker.
-pub struct SdkRoutineCode<Credentials = MacroApiTokenSigner> {
+pub struct SdkRoutineCode<Credentials = RoxApiTokenSigner> {
     executor: Arc<dyn ProgramExecutor>,
     checker: Arc<dyn ProgramChecker>,
     credentials: Credentials,
@@ -235,7 +235,7 @@ impl<Credentials: RoutineCredentials> RoutineCode for SdkRoutineCode<Credentials
         Ok(failing)
     }
 
-    async fn owner_time_zone(&self, owner: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn owner_time_zone(&self, owner: &RoxUserIdStr<'static>) -> Option<String> {
         self.time_zones.time_zone(owner).await
     }
 
@@ -247,7 +247,7 @@ impl<Credentials: RoutineCredentials> RoutineCode for SdkRoutineCode<Credentials
         waited_ms = tracing::field::Empty,
         outcome = tracing::field::Empty,
     ))]
-    async fn run(&self, owner: &MacroUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
+    async fn run(&self, owner: &RoxUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
         // Tokio's clock, so the wait follows the runtime's time.
         let queued = tokio::time::Instant::now();
         let slot = tokio::time::timeout(SLOT_WAIT, self.slots.acquire())
@@ -349,7 +349,7 @@ impl<Credentials: RoutineCredentials> RoutineCode for SdkRoutineCode<Credentials
     ))]
     async fn reference(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         task: &str,
     ) -> Result<String, CodeUnavailable> {
         let documentation = agent_code_mode::domain::documentation_for_task(
@@ -400,7 +400,7 @@ impl<Credentials: RoutineCredentials> RoutineCode for SdkRoutineCode<Credentials
 
     async fn rewrite(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         step: &CodeStep,
         steps: &str,
         problems: &[String],
@@ -416,7 +416,7 @@ impl<Credentials> SdkRoutineCode<Credentials> {
     #[tracing::instrument(name = "routine.code_rewrite", skip_all, err)]
     async fn rewrite_source(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         step: &CodeStep,
         steps: &str,
         problems: &[String],
@@ -782,7 +782,7 @@ fn backticked(reference: &str) -> impl Iterator<Item = &str> {
 }
 
 /// The identifiers type-checker messages quote, such as `'TaskNamespace'`
-/// or the `Macro` of `'Macro<MacroOpts>'`, in order and once each.
+/// or the `Rox` of `'Rox<RoxOpts>'`, in order and once each.
 fn quoted_names(problems: &[String]) -> Vec<String> {
     let mut names = Vec::new();
     for problem in problems {

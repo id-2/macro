@@ -3,7 +3,7 @@ pub mod response;
 #[cfg(test)]
 mod test;
 use document_sub_type::DocumentSubType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use schemars::JsonSchema;
 use utoipa::ToSchema;
@@ -30,7 +30,7 @@ pub const MAX_DOCUMENT_NAME_GRAPHEMES: usize = 200;
 pub struct DocumentPermissionsToken {
     /// The users id if present
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<MacroUserIdStr<'static>>,
+    pub user_id: Option<RoxUserIdStr<'static>>,
     /// The document id
     pub document_id: String,
     /// The access level of the user for the document

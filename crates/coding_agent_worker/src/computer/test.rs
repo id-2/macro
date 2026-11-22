@@ -13,7 +13,7 @@ fn session_new() -> Value {
                 { "type": "http", "name": "github", "url": "https://example.test/mcp", "headers": [] },
                 {
                     "type": "http",
-                    "name": "macro_internal",
+                    "name": "rox_internal",
                     "url": "https://dev-gateway.rox.one/agent-harness-egress/mcp/internal",
                     "headers": [{ "name": "Authorization", "value": "Bearer egress-token" }]
                 }

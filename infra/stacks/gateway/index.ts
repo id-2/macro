@@ -1,6 +1,6 @@
 import { stack } from '../../packages/shared';
 import { get_coparse_api_vpc } from '../../packages/vpc';
-import { MacroApplicationLoadBalancer } from '../../packages/resources';
+import { RoxApplicationLoadBalancer } from '../../packages/resources';
 
 const tags = {
   environment: stack,
@@ -10,7 +10,7 @@ const tags = {
 
 const vpc = get_coparse_api_vpc();
 
-const gatewayApplicationLoadBalancer = new MacroApplicationLoadBalancer(
+const gatewayApplicationLoadBalancer = new RoxApplicationLoadBalancer(
   `${stack}-gateway`,
   {
     // We want `gateway.rox.one` for prod and `${stack}-gateway` for all non-prod environments

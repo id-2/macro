@@ -1,8 +1,8 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_enable_and_disable_abort_before_purge_with_or_without_settings(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -20,7 +20,7 @@ async fn legacy_enable_and_disable_abort_before_purge_with_or_without_settings(
     .execute(&pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         user,
         macro_user
     )

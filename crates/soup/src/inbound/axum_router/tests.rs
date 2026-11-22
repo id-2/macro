@@ -10,11 +10,11 @@ use email::domain::{
 use entity_access::domain::models::{BotAccessScope, BotId, EntityAccessReceipt, ViewAccessLevel};
 use http_body_util::BodyExt;
 use item_filters::EntityFilters;
-use macro_authorization::{
-    INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    INTERNAL_API_KEY_HEADER, INTERNAL_ROX_USER_ID_HEADER, InternalIdentityClaims,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
 };
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use model_user::UserContext;
 use models_pagination::{
     CursorVal, CursorWithValAndFilter, Frecency, FrecencyValue, Identify, PaginateOn, Query,
@@ -235,7 +235,7 @@ impl SoupService for MockSoup {
 
     async fn group_labels<'a>(
         &'a self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
         _group_by: &'a crate::domain::models::grouping::GroupByField,
         _keys: &'a [String],
     ) -> Result<crate::domain::models::grouping::GroupLabels, SoupErr> {
@@ -244,7 +244,7 @@ impl SoupService for MockSoup {
 
     async fn caller_tag_sets<'a>(
         &self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
     ) -> Result<
         Vec<models_properties::service::property_definition_with_options::PropertyDefinitionWithOptions>,
         SoupErr,
@@ -258,7 +258,7 @@ struct MockEmail;
 impl EmailService for MockEmail {
     async fn resolve_thread_read_id(
         &self,
-        _macro_id: MacroUserIdStr<'_>,
+        _rox_id: RoxUserIdStr<'_>,
         thread_id: Uuid,
     ) -> Result<Uuid, EmailErr> {
         Ok(thread_id)
@@ -266,7 +266,7 @@ impl EmailService for MockEmail {
 
     async fn resolve_message_operation(
         &self,
-        _actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        _actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         _request: email::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> Result<Uuid, EmailErr> {
         Err(EmailErr::RepoErr(anyhow::anyhow!("unused test capability")))
@@ -274,7 +274,7 @@ impl EmailService for MockEmail {
 
     async fn send_message_for_user(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _link: Option<uuid::Uuid>,
         _input: email::domain::models::CreateDraftInput,
     ) -> Result<email::domain::models::CreatedDraft, EmailErr> {
@@ -283,7 +283,7 @@ impl EmailService for MockEmail {
 
     async fn set_thread_archived(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _id: uuid::Uuid,
         _archived: bool,
     ) -> Result<(), EmailErr> {
@@ -292,7 +292,7 @@ impl EmailService for MockEmail {
 
     async fn mark_thread_unread(
         &self,
-        _macro_id: MacroUserIdStr<'static>,
+        _rox_id: RoxUserIdStr<'static>,
         _thread_id: uuid::Uuid,
     ) -> Result<(), EmailErr> {
         Err(EmailErr::RepoErr(anyhow::anyhow!("Not implemented")))
@@ -313,14 +313,14 @@ impl EmailService for MockEmail {
         Err(EmailErr::RepoErr(anyhow::anyhow!("Not implemented")))
     }
 
-    async fn get_link_by_auth_id_and_macro_id(
+    async fn get_link_by_auth_id_and_rox_id(
         &self,
         _auth_id: &str,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Option<email::domain::models::Link>, email::domain::models::EmailErr> {
         Ok(Some(email::domain::models::Link {
             id: Uuid::new_v4(),
-            macro_id: MacroUserIdStr::parse_from_str("macro|example@test.com").unwrap(),
+            rox_id: RoxUserIdStr::parse_from_str("macro|example@test.com").unwrap(),
             fusionauth_user_id: String::new(),
             email_address: EmailStr::try_from("example@test.com".to_string()).unwrap(),
             provider: UserProvider::Gmail,
@@ -333,22 +333,22 @@ impl EmailService for MockEmail {
 
     async fn resolve_sending_inbox(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         _request: email::domain::models::SendingInboxRequest<'_>,
     ) -> Result<email::domain::models::ResolvedSendingInbox, email::domain::models::EmailErr> {
         Err(EmailErr::RepoErr(anyhow::anyhow!("Not implemented")))
     }
 
-    async fn get_inboxes_for_macro_id(
+    async fn get_inboxes_for_rox_id(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Vec<email::domain::models::Link>, email::domain::models::EmailErr> {
         Ok(Vec::new())
     }
 
     async fn get_owned_link_for_thread(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         _thread_id: uuid::Uuid,
     ) -> Result<Option<email::domain::models::Link>, email::domain::models::EmailErr> {
         Ok(None)
@@ -383,7 +383,7 @@ impl EmailService for MockEmail {
 
     async fn save_draft_for_user(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         _link_id: Option<uuid::Uuid>,
         _input: email::domain::models::CreateDraftInput,
     ) -> Result<email::domain::models::SavedUserDraft, EmailErr> {
@@ -392,7 +392,7 @@ impl EmailService for MockEmail {
 
     async fn delete_draft_for_user(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         _draft_id: uuid::Uuid,
         _expected_generation: i32,
     ) -> Result<email::domain::models::DeletedUserDraft, EmailErr> {
@@ -445,7 +445,7 @@ impl EmailService for MockEmail {
 
     async fn set_sender_policy(
         &self,
-        _actor: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _actor: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _link: &email::domain::models::Link,
         _sender_email: &str,
         _policy: email::domain::models::SenderPolicy,
@@ -477,7 +477,7 @@ impl entity_access::domain::ports::EntityAccessService for MockEntityAccess {
         T: entity_access::domain::models::RequiredPermission,
     >(
         &self,
-        _user_id: &macro_user_id::user_id::MacroUserId<macro_user_id::lowercased::Lowercase<'_>>,
+        _user_id: &rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: entity_access::domain::models::EntityType,
@@ -506,7 +506,7 @@ impl entity_access::domain::ports::EntityAccessService for MockEntityAccess {
     async fn get_access_level(
         &self,
         _user_id: Option<
-            &macro_user_id::user_id::MacroUserId<macro_user_id::lowercased::Lowercase<'_>>,
+            &rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'_>>,
         >,
         _entity_id: &str,
         _entity_type: entity_access::domain::models::EntityType,
@@ -520,7 +520,7 @@ impl entity_access::domain::ports::EntityAccessService for MockEntityAccess {
     async fn check_access(
         &self,
         _user_id: Option<
-            &macro_user_id::user_id::MacroUserId<macro_user_id::lowercased::Lowercase<'_>>,
+            &rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'_>>,
         >,
         _entity_id: &str,
         _entity_type: entity_access::domain::models::EntityType,
@@ -547,7 +547,7 @@ impl entity_access::domain::ports::EntityAccessService for MockEntityAccess {
     async fn get_entity_permission(
         &self,
         _user_id: Option<
-            &macro_user_id::user_id::MacroUserId<macro_user_id::lowercased::Lowercase<'_>>,
+            &rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'_>>,
         >,
         _entity_id: &str,
         _entity_type: entity_access::domain::models::EntityType,
@@ -562,7 +562,7 @@ impl entity_access::domain::ports::EntityAccessService for MockEntityAccess {
     async fn get_crm_entity_permission_with_team(
         &self,
         _user_id: Option<
-            &macro_user_id::user_id::MacroUserId<macro_user_id::lowercased::Lowercase<'_>>,
+            &rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'_>>,
         >,
         _entity_id: &str,
         _entity_type: entity_access::domain::models::EntityType,
@@ -581,7 +581,7 @@ impl entity_access::domain::ports::EntityAccessService for MockEntityAccess {
         &self,
         _entity_id: &str,
         _entity_type: entity_access::domain::models::EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, entity_access::domain::models::AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, entity_access::domain::models::AccessError> {
         unimplemented!()
     }
 
@@ -607,7 +607,7 @@ impl entity_access::domain::ports::EntityAccessService for MockEntityAccess {
 
     async fn get_user_team(
         &self,
-        _user_id: &macro_user_id::user_id::MacroUserId<macro_user_id::lowercased::Lowercase<'_>>,
+        _user_id: &rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'_>>,
     ) -> Result<
         Option<entity_access::domain::models::UserTeamInfo>,
         entity_access::domain::models::AccessError,
@@ -619,31 +619,31 @@ impl entity_access::domain::ports::EntityAccessService for MockEntityAccess {
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             "valid" => Ok(user_context(USER_ID)),
-            "expired" => Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            "expired" => Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != VALID_INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(claims.user_id.map(|user_id| user_context(&user_id)))
@@ -670,7 +670,7 @@ where
         service,
         email,
         Arc::new(MockEntityAccess),
-        MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     )
 }
 
@@ -747,7 +747,7 @@ async fn internal_credentials_use_the_acting_user() {
     let calls = soup.called.clone();
     let request = Request::get(format!("/soup?cursor={CURSOR}"))
         .header(INTERNAL_API_KEY_HEADER, VALID_INTERNAL_KEY)
-        .header(INTERNAL_MACRO_USER_ID_HEADER, INTERNAL_USER_ID)
+        .header(INTERNAL_ROX_USER_ID_HEADER, INTERNAL_USER_ID)
         .body(axum::body::Body::empty())
         .unwrap();
 
@@ -771,7 +771,7 @@ struct MockEmailLinkResult {
 impl EmailService for MockEmailLinkResult {
     async fn resolve_thread_read_id(
         &self,
-        _macro_id: MacroUserIdStr<'_>,
+        _rox_id: RoxUserIdStr<'_>,
         thread_id: Uuid,
     ) -> Result<Uuid, EmailErr> {
         Ok(thread_id)
@@ -779,7 +779,7 @@ impl EmailService for MockEmailLinkResult {
 
     async fn resolve_message_operation(
         &self,
-        _actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        _actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         _request: email::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> Result<Uuid, EmailErr> {
         Err(EmailErr::RepoErr(anyhow::anyhow!("unused test capability")))
@@ -787,7 +787,7 @@ impl EmailService for MockEmailLinkResult {
 
     async fn send_message_for_user(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _link: Option<uuid::Uuid>,
         _input: email::domain::models::CreateDraftInput,
     ) -> Result<email::domain::models::CreatedDraft, EmailErr> {
@@ -796,7 +796,7 @@ impl EmailService for MockEmailLinkResult {
 
     async fn set_thread_archived(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _id: uuid::Uuid,
         _archived: bool,
     ) -> Result<(), EmailErr> {
@@ -805,7 +805,7 @@ impl EmailService for MockEmailLinkResult {
 
     async fn mark_thread_unread(
         &self,
-        _macro_id: MacroUserIdStr<'static>,
+        _rox_id: RoxUserIdStr<'static>,
         _thread_id: uuid::Uuid,
     ) -> Result<(), EmailErr> {
         Err(EmailErr::RepoErr(anyhow::anyhow!("Not implemented")))
@@ -826,32 +826,32 @@ impl EmailService for MockEmailLinkResult {
         Err(EmailErr::RepoErr(anyhow::anyhow!("Not implemented")))
     }
 
-    async fn get_link_by_auth_id_and_macro_id(
+    async fn get_link_by_auth_id_and_rox_id(
         &self,
         _auth_id: &str,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Option<email::domain::models::Link>, email::domain::models::EmailErr> {
         (self.get_link_result)()
     }
 
     async fn resolve_sending_inbox(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         _request: email::domain::models::SendingInboxRequest<'_>,
     ) -> Result<email::domain::models::ResolvedSendingInbox, email::domain::models::EmailErr> {
         Err(EmailErr::RepoErr(anyhow::anyhow!("Not implemented")))
     }
 
-    async fn get_inboxes_for_macro_id(
+    async fn get_inboxes_for_rox_id(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Vec<email::domain::models::Link>, email::domain::models::EmailErr> {
         (self.get_link_result)().map(|opt| opt.into_iter().collect())
     }
 
     async fn get_owned_link_for_thread(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         _thread_id: uuid::Uuid,
     ) -> Result<Option<email::domain::models::Link>, email::domain::models::EmailErr> {
         (self.get_link_result)()
@@ -886,7 +886,7 @@ impl EmailService for MockEmailLinkResult {
 
     async fn save_draft_for_user(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         _link_id: Option<uuid::Uuid>,
         _input: email::domain::models::CreateDraftInput,
     ) -> Result<email::domain::models::SavedUserDraft, EmailErr> {
@@ -895,7 +895,7 @@ impl EmailService for MockEmailLinkResult {
 
     async fn delete_draft_for_user(
         &self,
-        _macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         _draft_id: uuid::Uuid,
         _expected_generation: i32,
     ) -> Result<email::domain::models::DeletedUserDraft, EmailErr> {
@@ -948,7 +948,7 @@ impl EmailService for MockEmailLinkResult {
 
     async fn set_sender_policy(
         &self,
-        _actor: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _actor: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _link: &email::domain::models::Link,
         _sender_email: &str,
         _policy: email::domain::models::SenderPolicy,
@@ -1861,7 +1861,7 @@ fn ast_endpoint_email_crm_domains_stamps_scope_and_ands_into_tree() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -1890,7 +1890,7 @@ fn ast_endpoint_email_crm_addresses_stamps_scope() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -1919,7 +1919,7 @@ fn ast_endpoint_email_crm_both_lists_rejected() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -1941,7 +1941,7 @@ fn ast_endpoint_empty_crm_lists_leaves_scope_none() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -1976,7 +1976,7 @@ fn ast_endpoint_crm_ands_with_existing_freeform_ef() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };
@@ -2053,7 +2053,7 @@ fn ast_endpoint_crm_domains_are_lowercased_in_scope() {
             SimpleSortMethod::ViewedAt,
             api,
         ))),
-        user: MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap(),
         email_preview_view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
         link_ids: vec![],
     };

@@ -12,7 +12,7 @@ use crate::config::{Config, HarnessCredentials};
 mod test;
 
 mod environment {
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct DevMode;
     }
 }

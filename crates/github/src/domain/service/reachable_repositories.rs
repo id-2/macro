@@ -21,7 +21,7 @@ use std::time::{Duration, Instant};
 
 use cowlike::CowLike;
 use lru::LruCache;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::{GithubError, GithubRepository, app_jwt};
 use crate::domain::ports::{GithubRepositoryClient, GithubSyncRepo};
@@ -49,7 +49,7 @@ pub struct ReachableRepositoriesService<Installations, Client> {
     config: InstallationTokenConfig,
     installations: Installations,
     client: Client,
-    cached: Mutex<LruCache<MacroUserIdStr<'static>, CachedListing>>,
+    cached: Mutex<LruCache<RoxUserIdStr<'static>, CachedListing>>,
 }
 
 struct CachedListing {
@@ -79,23 +79,23 @@ where
         }
     }
 
-    /// Every repository under an installation `macro_user_id`, or a team they
+    /// Every repository under an installation `rox_user_id`, or a team they
     /// belong to, installed our App on - deduplicated by `owner/name` and
     /// sorted.
     ///
     /// A user who reaches nothing gets an empty list.
-    #[tracing::instrument(skip(self), err, fields(%macro_user_id))]
+    #[tracing::instrument(skip(self), err, fields(%rox_user_id))]
     pub async fn for_user(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        rox_user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<GithubRepository>, GithubError> {
-        if let Some(cached) = self.cached_listing(macro_user_id) {
+        if let Some(cached) = self.cached_listing(rox_user_id) {
             return Ok(cached);
         }
 
         let teams = self
             .installations
-            .get_user_team_ids(macro_user_id.as_ref())
+            .get_user_team_ids(rox_user_id.as_ref())
             .await
             .map_err(|error| {
                 GithubError::Internal(anyhow::anyhow!("could not read user teams: {error:?}"))
@@ -103,7 +103,7 @@ where
 
         let installation_ids = self
             .installations
-            .get_installation_ids_for_sources(macro_user_id.as_ref(), &teams)
+            .get_installation_ids_for_sources(rox_user_id.as_ref(), &teams)
             .await
             .map_err(|error| {
                 GithubError::Internal(anyhow::anyhow!(
@@ -116,7 +116,7 @@ where
         // Retry unavailable installations on the next request, not in ten minutes.
         if complete {
             self.cached.lock().expect("listing cache poisoned").put(
-                macro_user_id.clone().into_owned(),
+                rox_user_id.clone().into_owned(),
                 CachedListing {
                     repositories: repositories.clone(),
                     fetched_at: Instant::now(),
@@ -128,8 +128,8 @@ where
     }
 
     /// The user's listing, if one was fetched recently enough to still stand.
-    fn cached_listing(&self, macro_user_id: &MacroUserIdStr<'_>) -> Option<Vec<GithubRepository>> {
-        let key = macro_user_id.clone().into_owned();
+    fn cached_listing(&self, rox_user_id: &RoxUserIdStr<'_>) -> Option<Vec<GithubRepository>> {
+        let key = rox_user_id.clone().into_owned();
         let mut cached = self.cached.lock().expect("listing cache poisoned");
 
         match cached.get(&key) {

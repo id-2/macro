@@ -86,7 +86,7 @@ async fn attachment_shapes(
     .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn media_keeps_its_shape_and_a_media_reply_keeps_its_quote(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -410,7 +410,7 @@ async fn media_keeps_its_shape_and_a_media_reply_keeps_its_quote(pool: PgPool) {
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn polls_places_cards_events_mentions_pins_and_calls_arrive_structured(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -834,7 +834,7 @@ impl ChatPublisher for Published {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn group_changes_land_once_as_system_lines_that_never_notify(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;

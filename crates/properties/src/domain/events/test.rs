@@ -1,5 +1,5 @@
-use macro_event_broker::{Event, MacroEvent};
-use macro_event_topics::{MacroPropertiesTopic, Topic};
+use rox_event_broker::{Event, RoxEvent};
+use rox_event_topics::{RoxPropertiesTopic, Topic};
 use serde_json::{Value, json};
 
 use super::*;
@@ -21,12 +21,12 @@ fn timestamp(value: &str) -> DateTime<Utc> {
     value.parse().expect("valid timestamp")
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn topic_events(
-    actor_user_id: Option<MacroUserIdStr<'static>>,
+    actor_user_id: Option<RoxUserIdStr<'static>>,
 ) -> Vec<(PropertyTopicEvent, Value)> {
     let actor_json = serde_json::to_value(&actor_user_id).expect("serializable actor");
 
@@ -226,7 +226,7 @@ fn topic_events(
     ]
 }
 
-fn macro_events() -> Vec<(PropertyMacroEvent, &'static str)> {
+fn rox_events() -> Vec<(PropertyMacroEvent, &'static str)> {
     topic_events(Some(user_id("macro|editor@acme.com")))
         .into_iter()
         .map(|(event, _)| match event {
@@ -286,23 +286,23 @@ fn every_variant_has_exact_json_envelope() {
 
 #[test]
 fn every_variant_round_trips() {
-    for (original, expected_key) in macro_events() {
+    for (original, expected_key) in rox_events() {
         let payload = serde_json::to_vec(original.event()).expect("serializable event");
         let decoded =
             PropertyMacroEvent::decode(original.key(), &payload).expect("decodable event");
 
         assert_eq!(decoded.key(), expected_key);
         assert_eq!(decoded.event(), original.event());
-        assert_eq!(decoded.topic(), MacroPropertiesTopic::TOPIC_STR);
-        assert_eq!(decoded.topic(), "macro.properties");
+        assert_eq!(decoded.topic(), RoxPropertiesTopic::TOPIC_STR);
+        assert_eq!(decoded.topic(), "rox.properties");
     }
 }
 
 #[test]
 fn constructors_use_exact_bare_keys_topic_and_schema_version() {
-    for (event, expected_key) in macro_events() {
+    for (event, expected_key) in rox_events() {
         assert_eq!(event.key(), expected_key);
-        assert_eq!(event.topic(), "macro.properties");
+        assert_eq!(event.topic(), "rox.properties");
         assert_eq!(event.event().schema_version, 1);
     }
 }

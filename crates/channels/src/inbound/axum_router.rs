@@ -41,10 +41,10 @@ use entity_access::{
     },
     inbound::axum_extractors::ChannelAccessLevelExtractor,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 use models_pagination::{
     CreatedAt, CursorOptionExt, CursorWithValAndFilter, PaginatedOpaqueCursor, TypeEraseCursor,
@@ -57,7 +57,7 @@ use uuid::Uuid;
 pub struct ChannelsRouterState<S, Svc, Auth> {
     service: Arc<S>,
     access_service: Arc<Svc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Svc, Auth> Clone for ChannelsRouterState<S, Svc, Auth> {
@@ -76,7 +76,7 @@ impl<S: ChannelService, Svc: EntityAccessService, Auth> ChannelsRouterState<S, S
     pub fn new(
         service: S,
         access_service: Svc,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service: Arc::new(service),
@@ -92,7 +92,7 @@ impl<S: ChannelService, Svc: EntityAccessService, Auth> ChannelsRouterState<S, S
     pub fn from_arc(
         service: Arc<S>,
         access_service: Svc,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -108,7 +108,7 @@ impl<S, Svc, Auth> FromRef<ChannelsRouterState<S, Svc, Auth>> for Arc<Svc> {
     }
 }
 
-impl<S, Svc, Auth> FromRef<ChannelsRouterState<S, Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Svc, Auth> FromRef<ChannelsRouterState<S, Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ChannelsRouterState<S, Svc, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -145,7 +145,7 @@ pub fn channel_mutation_router<S, Svc, Auth>() -> Router<ChannelsRouterState<S, 
 where
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         .route("/", post(create_channel_handler::<S, Svc, Auth>))
@@ -205,7 +205,7 @@ pub fn channels_router<S, Svc, Auth, T>(state: ChannelsRouterState<S, Svc, Auth>
 where
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync,
 {
     channel_mutation_router::<S, Svc, Auth>()
@@ -256,17 +256,17 @@ where
 pub async fn create_channel_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<CreateChannelRequest>,
 ) -> Result<(StatusCode, Json<CreateChannelResponse>), ChannelsHandlerErr> {
     let user = &user.authorization.user;
     let res = state
         .service
         .create_channel(
-            Sender::new_from_user(user.macro_user_id.clone()),
+            Sender::new_from_user(user.rox_user_id.clone()),
             user.user_context.organization_id.map(i64::from),
             req,
         )
@@ -293,16 +293,16 @@ pub async fn create_channel_handler<
 pub async fn get_or_create_dm_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<GetOrCreateDmRequest>,
 ) -> Result<(StatusCode, Json<GetOrCreateChannelResponse>), ChannelsHandlerErr> {
     let user = &user.authorization.user;
     let res = state
         .service
-        .get_or_create_dm(Sender::new_from_user(user.macro_user_id.clone()), req)
+        .get_or_create_dm(Sender::new_from_user(user.rox_user_id.clone()), req)
         .await?;
     Ok((StatusCode::OK, Json(res)))
 }
@@ -326,16 +326,16 @@ pub async fn get_or_create_dm_handler<
 pub async fn get_or_create_private_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<GetOrCreatePrivateRequest>,
 ) -> Result<(StatusCode, Json<GetOrCreateChannelResponse>), ChannelsHandlerErr> {
     let user = &user.authorization.user;
     let res = state
         .service
-        .get_or_create_private(Sender::new_from_user(user.macro_user_id.clone()), req)
+        .get_or_create_private(Sender::new_from_user(user.rox_user_id.clone()), req)
         .await?;
     Ok((StatusCode::OK, Json(res)))
 }
@@ -363,7 +363,7 @@ pub async fn get_or_create_private_handler<
 pub async fn patch_channel_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -398,7 +398,7 @@ pub async fn patch_channel_handler<
 pub async fn delete_channel_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<ViewOnly, Svc, Auth>,
@@ -432,7 +432,7 @@ pub async fn delete_channel_handler<
 pub async fn add_participants_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -479,7 +479,7 @@ pub async fn add_participants_handler<
 pub async fn share_with_channel_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -529,7 +529,7 @@ pub async fn share_with_channel_handler<
 pub async fn remove_participants_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -566,7 +566,7 @@ pub async fn remove_participants_handler<
 pub async fn get_channel_join_link_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -598,16 +598,16 @@ pub async fn get_channel_join_link_handler<
 pub async fn join_channel_by_code_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     Path(join_code): Path<Uuid>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<StatusCode, ChannelsHandlerErr> {
     let user = &user.authorization.user;
     state
         .service
-        .join_channel_by_code(Sender::new_from_user(user.macro_user_id.clone()), join_code)
+        .join_channel_by_code(Sender::new_from_user(user.rox_user_id.clone()), join_code)
         .await?;
     Ok(StatusCode::OK)
 }
@@ -633,7 +633,7 @@ pub async fn join_channel_by_code_handler<
 pub async fn join_channel_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<ViewOnly, Svc, Auth>,
@@ -667,7 +667,7 @@ pub async fn join_channel_handler<
 pub async fn leave_channel_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -680,7 +680,7 @@ pub async fn leave_channel_handler<
 
 async fn require_document_edit_access<Svc: EntityAccessService>(
     access_service: &Svc,
-    actor: &MacroUserIdStr<'static>,
+    actor: &RoxUserIdStr<'static>,
     source_entity_type: &str,
     source_entity_id: &str,
 ) -> Result<(), ChannelsHandlerErr> {
@@ -731,16 +731,16 @@ fn map_access_error(err: AccessError) -> ChannelsHandlerErr {
 pub async fn create_mention_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    macro_user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    macro_user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<CreateEntityMentionRequest>,
 ) -> Result<(StatusCode, Json<CreateEntityMentionResponse>), ChannelsHandlerErr> {
     let macro_user = &macro_user.authorization.user;
     require_document_edit_access(
         state.access_service.as_ref(),
-        &macro_user.macro_user_id,
+        &macro_user.rox_user_id,
         &req.source_entity_type,
         &req.source_entity_id,
     )
@@ -792,10 +792,10 @@ pub async fn create_mention_handler<
 pub async fn delete_mention_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    macro_user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    macro_user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(mention_id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<DeleteEntityMentionResponse>), ChannelsHandlerErr> {
     let macro_user = &macro_user.authorization.user;
@@ -807,7 +807,7 @@ pub async fn delete_mention_handler<
 
     require_document_edit_access(
         state.access_service.as_ref(),
-        &macro_user.macro_user_id,
+        &macro_user.rox_user_id,
         &mention.source_entity_type,
         &mention.source_entity_id,
     )
@@ -866,7 +866,7 @@ pub struct AttachmentsParams {
 pub async fn get_channel_attachments_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -928,7 +928,7 @@ pub struct ApiChannelDetail {
 pub async fn get_channel_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -977,7 +977,7 @@ pub async fn get_channel_handler<
 pub async fn get_channel_participants_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -1012,17 +1012,17 @@ pub async fn get_channel_participants_handler<
 pub async fn get_batch_channel_preview_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<GetBatchChannelPreviewRequest>,
 ) -> Result<Json<GetBatchChannelPreviewResponse>, ChannelsHandlerErr> {
     let user = &user.authorization.user;
     let org_id = user.user_context.organization_id.map(i64::from);
     let previews = state
         .service
-        .batch_get_channel_previews(user.macro_user_id.clone(), org_id, req.channel_ids)
+        .batch_get_channel_previews(user.rox_user_id.clone(), org_id, req.channel_ids)
         .await?;
     Ok(Json(GetBatchChannelPreviewResponse { previews }))
 }
@@ -1054,10 +1054,10 @@ pub async fn get_batch_channel_preview_handler<
 pub async fn get_attachment_references_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<AttachmentReferencesPath>,
 ) -> Result<Json<GetAttachmentReferencesResponse>, ChannelsHandlerErr> {
     let user = &user.authorization.user;
@@ -1070,7 +1070,7 @@ pub async fn get_attachment_references_handler<
         .get_attachment_references(
             path.entity_type,
             path.entity_id,
-            user.macro_user_id.to_string(),
+            user.rox_user_id.to_string(),
         )
         .await?;
 
@@ -1099,15 +1099,15 @@ pub async fn get_attachment_references_handler<
 pub async fn get_activity_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<ApiActivity>>, ChannelsHandlerErr> {
     let user = &user.authorization.user;
     let activities = state
         .service
-        .get_activities(user.macro_user_id.to_string())
+        .get_activities(user.rox_user_id.to_string())
         .await?;
     Ok(Json(
         activities.into_iter().map(ApiActivity::from).collect(),
@@ -1133,10 +1133,10 @@ pub async fn get_activity_handler<
 pub async fn post_activity_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<PostActivityRequest>,
 ) -> Result<(StatusCode, Json<ApiActivity>), ChannelsHandlerErr> {
     let user = &user.authorization.user;
@@ -1145,7 +1145,7 @@ pub async fn post_activity_handler<
     let access = state
         .access_service
         .generate_entity_access_receipt::<MemberParticipantRole>(
-            &user.macro_user_id,
+            &user.rox_user_id,
             user.user_context.organization_id.map(i64::from),
             &channel_id.to_string(),
             EntityType::Channel,

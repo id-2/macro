@@ -582,9 +582,9 @@ A frontend dev server runs against the **dev** backend, so this needs no local s
 cd apps/web && PORT=3003 bun run dev   # any free port in 3000-3009
 ```
 
-`import.meta.env.MODE === 'development'` resolves the service clients to `https://dev.rox.one` through Vite’s same-origin development proxy. Sign in on the development hostname; existing `.rox.one` cookies are separate. Vite prints `https://<hostname>:<port>/app/`; `https://localhost:<port>/app/` also works. Trust `infra/local/certs/ca.pem` once in the visiting browser (see `infra/local/certs/README.md`). `MACRO_DEV_HTTPS=false` restores HTTP for workflows that require it. Notes:
+`import.meta.env.MODE === 'development'` resolves the service clients to `https://dev.rox.one` through Vite’s same-origin development proxy. Sign in on the development hostname; existing `.rox.one` cookies are separate. Vite prints `https://<hostname>:<port>/app/`; `https://localhost:<port>/app/` also works. Trust `infra/local/certs/ca.pem` once in the visiting browser (see `infra/local/certs/README.md`). `ROX_DEV_HTTPS=false` restores HTTP for workflows that require it. Notes:
 
-- On a remote devbox, open `https://<hostname>:<port>/app/` directly. The dev server serves HTTP/2, gzips modules and links source maps instead of inlining them, so a cold load of the ~7k dev modules moves ~13 MB instead of ~100 MB. Trust the CA on the visiting machine: Chrome caches nothing from a site whose certificate warning was clicked through, so every reload re-downloads every module. Tailscale Serve is an alternative that needs no CA: `sudo tailscale serve --bg --https=443 https+insecure://localhost:<port>`, then open `https://<devbox>.<tailnet>.ts.net/app/` and sign in again there (Serve offers HTTPS ports 443, 8443, and 10000). `MACRO_DEV_COMPRESSION=false` and `MACRO_DEV_INLINE_SOURCEMAPS=true` restore Vite's defaults.
+- On a remote devbox, open `https://<hostname>:<port>/app/` directly. The dev server serves HTTP/2, gzips modules and links source maps instead of inlining them, so a cold load of the ~7k dev modules moves ~13 MB instead of ~100 MB. Trust the CA on the visiting machine: Chrome caches nothing from a site whose certificate warning was clicked through, so every reload re-downloads every module. Tailscale Serve is an alternative that needs no CA: `sudo tailscale serve --bg --https=443 https+insecure://localhost:<port>`, then open `https://<devbox>.<tailnet>.ts.net/app/` and sign in again there (Serve offers HTTPS ports 443, 8443, and 10000). `ROX_DEV_COMPRESSION=false` and `ROX_DEV_INLINE_SOURCEMAPS=true` restore Vite's defaults.
 - Never assume port 3000 or 3002 is yours. Check with `lsof -nP -iTCP:<port> -sTCP:LISTEN -t` and confirm the owner's worktree via `lsof -p <pid> | awk '$4=="cwd"'`. Take a free port instead of killing another session's server, and reuse one only if its cwd is this worktree.
 - The `.cursor/*.sh` scripts and the `run-app` skill are **Cursor Cloud** entry points. On a local machine they prompt for sudo and are the wrong tool. Only backend (Rust) changes need the local stack.
 
@@ -672,7 +672,7 @@ reference bookkeeping is excluded from scene undo. Run the feature tests and
 `bunx playwright test --config src/features/block-canvas/browser-test/playwright.config.ts`
 for multiplayer changes.
 
-Canvas **Ask Macro**, including the Drive detail header, attaches the current canvas to the existing agent composer
+Canvas **Ask Rox**, including the Drive detail header, attaches the current canvas to the existing agent composer
 on desktop and mobile. Tool results render through
 `lib/core/component/AI/component/tool/Canvas.tsx`; edits arrive through live sync.
 The shared plain-text Lexical codec is `packages/lexical-core/canvas-text.ts`.
@@ -757,8 +757,8 @@ plugin redirects external popups and breaks the embedded iframe's return path.
 `pipedream-connect.html` is a separate Vite entry, served at
 `/app/pipedream-connect.html`, without a Rox browser login. The Connect token
 and one-time state travel only in its URL fragment, which the page removes on
-load. When Connect finishes it opens the `macro://` callback itself, keeping
-**Return to Macro** as a fallback link; the Tauri navigation bridge consumes it
+load. When Connect finishes it opens the `rox://` callback itself, keeping
+**Return to Rox** as a fallback link; the Tauri navigation bridge consumes it
 without changing the active route. Backend registration still verifies account
 ownership. Done, logout, and the ten-minute timeout retire pending callbacks.
 
@@ -874,7 +874,7 @@ resolved session ID; keep the existing `AgentSessionProvider` subscription to
 - Keep personal accounts, team imports and agent tool connections together in
   Settings → Integrations: one searchable list row per integration, styled like
   the Drive/Tasks lists, custom MCP servers then connected ones first,
-  described by what each does in Macro; preserve `agent-connections` and `team-connections` as aliases for existing links.
+  described by what each does in Rox; preserve `agent-connections` and `team-connections` as aliases for existing links.
 - Keep Rox computers (`features/settings/computers`) team-only. Gate purchase
   and Claude account surfaces with `enableMacroComputers`
   (`enable-macro-computers`); keep existing lists in Runtimes and Billing and
@@ -1091,9 +1091,9 @@ resolved session ID; keep the existing `AgentSessionProvider` subscription to
 - Keep `CallWaveform` static except for the current call's desktop chat-sidebar row, channel-header duration pill and app-rail item; pass `live` and the matching room identity only there. Live marks follow speech and reduced motion; phones stay static. Preserve AvatarGroup separator rings with inset speaking outlines and keep phone icons for call actions.
 - Keep call full screen scoped to its call root; mount call menus locally and keep tooltips in their owning fullscreen element.
 - Diagnose the GraphQL mutation queue with `graphql.mutation_queue.*` spans and logs keyed by `mutation_queue.item_id`; route queue telemetry through `mutation-queue-telemetry.ts`, which dedupes per item and failure class and turns repeats into the periodic summary. Never add per-attempt `console.*` lines or record variables, draft content, or emails.
-- Keep desktop OAuth consent in the system browser with a `macro://` return:
-  `macro:///inbox-link-callback` for Gmail and Outlook inboxes,
-  `macro:///github-link-callback` for GitHub (consumed by the navigation
+- Keep desktop OAuth consent in the system browser with a `rox://` return:
+  `rox:///inbox-link-callback` for Gmail and Outlook inboxes,
+  `rox:///github-link-callback` for GitHub (consumed by the navigation
   bridge without changing the route). Webview origins are not desktop
   callbacks. Settings → Integrations refetches connection status on window
   `focus`, because returning from the browser does not change page visibility.
@@ -1518,7 +1518,7 @@ as `ActionLine` rows in the agent reply (`TaskNotificationPart`).
 The backend-free desktop/mobile check is
 `bunx playwright test --config src/features/block-agent/browser-test/playwright.config.ts`.
 The same suite covers stopping and reloading an agent reply inside a mention:
-keep incomplete trailing Macro XML hidden in settled agent prose, preserve
+keep incomplete trailing Rox XML hidden in settled agent prose, preserve
 completed chips and literal tag examples in Markdown code, and leave user prompts
 unchanged.
 Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when using the Nix Chrome binary.
@@ -1536,7 +1536,7 @@ Cognition, routines, preview control, and MCP share `agent_harness_service`.
 Agent replies can use the existing `m-document-mention` format with
 `blockName: "routine"`; the `@` menu offers routines only to their owner in
 channel composers, where picking one shares it as a template.
-Macro `/app` links in agent replies (transcripts and agent channel messages)
+Rox `/app` links in agent replies (transcripts and agent channel messages)
 open in a new split like mention chips: `AgentReplyLinks` provides the opener
 that `LinkWithPreview` consults before `openExternalUrl`; keep other surfaces'
 links on `openExternalUrl`. Covered by

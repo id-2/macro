@@ -9,7 +9,7 @@ use agent_session::domain::model::{
     SessionStatus, ThreadSession,
 };
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::{Arc, Mutex};
 use tokio::sync::mpsc;
 
@@ -60,7 +60,7 @@ impl ContainerManager for TaggedManager {
     async fn preflight(
         &self,
         _kind: AgentKind,
-        _owner: &MacroUserIdStr<'_>,
+        _owner: &RoxUserIdStr<'_>,
     ) -> Result<Option<SessionBlocker>> {
         self.record("preflight");
         Ok(None)
@@ -137,7 +137,7 @@ impl AgentSessionRepo for FixedBotSessions {
 
     async fn preview(
         &self,
-        _viewer: &MacroUserIdStr<'static>,
+        _viewer: &RoxUserIdStr<'static>,
         _ids: &[AgentSessionId],
     ) -> SessionResult<Vec<agent_session::domain::model::SessionPreviewCandidate>> {
         unimplemented!("the router never previews sessions")
@@ -162,7 +162,7 @@ impl AgentSessionRepo for FixedBotSessions {
             task_id: None,
             id,
             owner_id: model_owner::Owner::User(
-                MacroUserIdStr::try_from("macro|owner@rox.one".to_owned())
+                RoxUserIdStr::try_from("macro|owner@rox.one".to_owned())
                     .expect("valid user id"),
             ),
             thread_id: None,
@@ -190,7 +190,7 @@ impl AgentSessionRepo for FixedBotSessions {
 
     async fn find_for_thread(
         &self,
-        _thread_id: Option<macro_uuid::Uuid>,
+        _thread_id: Option<rox_uuid::Uuid>,
         _bot_id: Option<BotId>,
     ) -> SessionResult<ThreadSession> {
         unimplemented!("the router never routes channel events")
@@ -198,7 +198,7 @@ impl AgentSessionRepo for FixedBotSessions {
 
     async fn recent_for_owner(
         &self,
-        _owner: &MacroUserIdStr<'_>,
+        _owner: &RoxUserIdStr<'_>,
         _limit: std::num::NonZeroUsize,
     ) -> SessionResult<Vec<agent_session::domain::model::AgentSession>> {
         unimplemented!("the router never summarizes an owner's recent sessions")
@@ -206,7 +206,7 @@ impl AgentSessionRepo for FixedBotSessions {
 
     async fn find_all_for_thread(
         &self,
-        _thread_id: macro_uuid::Uuid,
+        _thread_id: rox_uuid::Uuid,
     ) -> SessionResult<Vec<AgentSession>> {
         unimplemented!("the router never lists thread sessions")
     }
@@ -251,7 +251,7 @@ impl AgentSessionRepo for FixedBotSessions {
     async fn add_follower(
         &self,
         _id: AgentSessionId,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
     ) -> SessionResult<()> {
         unimplemented!("this adapter does not dispatch turns")
     }
@@ -310,14 +310,14 @@ impl AgentSessionRepo for FixedBotSessions {
 
     async fn user_sandbox_size(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
     ) -> SessionResult<SandboxSize> {
         unimplemented!("resizing is the harness service's job")
     }
 
     async fn set_user_sandbox_size(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _size: SandboxSize,
     ) -> SessionResult<()> {
         unimplemented!("resizing is the harness service's job")
@@ -325,14 +325,14 @@ impl AgentSessionRepo for FixedBotSessions {
 
     async fn user_coding_preferences(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
     ) -> SessionResult<CodingPreferences> {
         unimplemented!("coding preferences are read when a session opens")
     }
 
     async fn set_user_coding_preferences(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _preferences: CodingPreferences,
     ) -> SessionResult<()> {
         unimplemented!("coding preferences are read when a session opens")
@@ -401,7 +401,7 @@ async fn preflight_routes_by_kind_before_any_session_exists() {
         codex.clone(),
         FixedBotSessions(bot_id::CURSOR_BOT_ID, "cursor"),
     );
-    let owner = MacroUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
+    let owner = RoxUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
 
     assert_eq!(
         router.preflight(AgentKind::Cursor, &owner).await.unwrap(),

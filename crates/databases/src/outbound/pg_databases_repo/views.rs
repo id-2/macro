@@ -10,7 +10,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::views::LaneKey;
 use sqlx::PgExecutor;
 use uuid::Uuid;
@@ -40,7 +40,7 @@ fn lane_of(stored: &str) -> Result<LaneKey, PgDatabasesRepoError> {
         return Ok(LaneKey::None);
     }
     if let Some(user) = stored.strip_prefix(USER_LANE_PREFIX) {
-        return MacroUserIdStr::try_from(user.to_string())
+        return RoxUserIdStr::try_from(user.to_string())
             .map(LaneKey::User)
             .map_err(|_| corrupt());
     }

@@ -13,7 +13,7 @@
       "status": "open",
       "billing_reason": "manual",
       "parent": null,
-      "metadata": {"macro_purpose": "ai_overage"},
+      "metadata": {"rox_purpose": "ai_overage"},
       "lines": {"object": "list", "has_more": false, "data": []}
     }
   }

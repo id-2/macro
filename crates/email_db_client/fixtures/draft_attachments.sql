@@ -5,12 +5,12 @@
 -- User Link
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000d01', 'macro|draft_user@example.com', '00000000-0000-0000-0000-000000000d01',
         'draft_user@example.com', 'GMAIL', true, NOW(), NOW());
 
 -- Second link for testing cross-link access prevention
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000d02', 'macro|other_user@example.com', '00000000-0000-0000-0000-000000000d02',
         'other_user@example.com', 'GMAIL', true, NOW(), NOW());
 

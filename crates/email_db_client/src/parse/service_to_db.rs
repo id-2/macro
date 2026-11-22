@@ -27,7 +27,7 @@ fn map_contact_to_db(contact: &service::address::ContactInfo) -> Option<address:
     }
 
     Some(address::EmailAddress {
-        id: macro_uuid::generate_uuid_v7(), // this value doesn't actually matter as we will be setting it later again
+        id: rox_uuid::generate_uuid_v7(), // this value doesn't actually matter as we will be setting it later again
         email_address: contact.email.clone(),
         name: column_limits::clamp_opt(
             contact.name.clone(),
@@ -112,7 +112,7 @@ pub fn map_service_message_to_db(
         // these values can be large - move instead of clone
         body_text: mem::take(&mut service_msg.body_text),
         body_html_sanitized: mem::take(&mut service_msg.body_html_sanitized),
-        body_macro: mem::take(&mut service_msg.body_macro),
+        body_rox: mem::take(&mut service_msg.body_rox),
         headers_jsonb: service_msg.headers_json.clone(),
         created_at: service_msg.created_at,
         updated_at: service_msg.updated_at,

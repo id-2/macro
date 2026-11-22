@@ -250,19 +250,19 @@ async fn recover(pool: PgPool, boundary: &str) {
 }
 
 #[ignore = "requires local PostgreSQL and preloaded localstack/localstack:4"]
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn process_death_after_lease(pool: PgPool) {
     recover(pool, "kill-after-lease").await;
 }
 
 #[ignore = "requires local PostgreSQL and preloaded localstack/localstack:4"]
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn process_death_after_committed_batch(pool: PgPool) {
     recover(pool, "kill-after-batch").await;
 }
 
 #[ignore = "requires local PostgreSQL and preloaded localstack/localstack:4"]
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn process_death_after_queue_publication(pool: PgPool) {
     recover(pool, "kill-after-publication").await;
 }

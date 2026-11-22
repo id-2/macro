@@ -2,8 +2,8 @@
 
 use bot_id::BotId;
 use chrono_tz::Tz;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use routine_program::Surface;
 use serde::Serialize;
 use suggestions::domain::model::GenerationTrigger;
@@ -106,7 +106,7 @@ pub struct StaleSession {
     /// The agent session.
     pub session: Uuid,
     /// Whose it is.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// The agent it runs as.
     pub agent: BotId,
     /// How its turn ended.
@@ -121,7 +121,7 @@ pub struct LostGeneration {
     /// The generation.
     pub generation: Uuid,
     /// Whose it was.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// What started it.
     pub trigger: GenerationTrigger,
 }
@@ -141,7 +141,7 @@ pub struct NewGeneration {
     /// Its id, new for every attempt.
     pub id: Uuid,
     /// Whose it is.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// What started it.
     pub trigger: GenerationTrigger,
     /// Which attempt it is, from 1.
@@ -157,7 +157,7 @@ pub struct NewGeneration {
 #[derive(Debug, Clone, PartialEq)]
 pub struct AudienceMember {
     /// Who.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// The zone their browser last reported.
     pub timezone: Tz,
     /// When they last loaded the app with suggestions on.

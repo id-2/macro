@@ -36,7 +36,7 @@ import { match, P } from 'ts-pattern';
  */
 
 const RING_CHANNEL = 'macro-call-ring';
-const RING_STORAGE_KEY = 'macro.call-ring';
+const RING_STORAGE_KEY = 'rox.call-ring';
 
 /** How often the audible tab re-publishes (heartbeats) its claim. */
 const CLAIM_HEARTBEAT_INTERVAL_MS = 1_000;

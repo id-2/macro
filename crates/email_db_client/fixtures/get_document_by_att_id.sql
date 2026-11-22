@@ -1,7 +1,7 @@
 -- SQL fixture for get_document_by_att_id tests
 -- One attachment per document state the attachment opener distinguishes.
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-00000000b001', 'macro|user@example.com', '00000000-0000-0000-0000-00000000b001',
         'user@example.com', 'GMAIL', true, NOW(), NOW());
 
@@ -34,13 +34,13 @@ VALUES ('00000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-0000000
        ('00000000-0000-0000-0000-00000000a004', '00000000-0000-0000-0000-00000000b004', 'att-deleted', 'deleted.pdf', 'application/pdf', NOW()),
        ('00000000-0000-0000-0000-00000000a005', '00000000-0000-0000-0000-00000000b004', 'att-unlinked', 'unlinked.pdf', 'application/pdf', NOW());
 
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES ('00000000-0000-0000-0000-00000000b001',
         'user',
         'user@example.com',
         'cus_test123');
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES ('00000000-0000-0000-0000-00000000b001',
         'user@example.com',
         'User',

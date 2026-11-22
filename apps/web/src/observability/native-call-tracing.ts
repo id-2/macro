@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 
 declare global {
   interface Window {
-    __MACRO_ANDROID_CALL_TRACING__?: boolean;
+    __ROX_ANDROID_CALL_TRACING__?: boolean;
   }
 }
 
@@ -13,7 +13,7 @@ export async function configureNativeCallTracing(config: {
   environment: string;
 }): Promise<void> {
   // New web bundles also run on installed binaries that predate this command.
-  if (window.__MACRO_ANDROID_CALL_TRACING__ !== true) return;
+  if (window.__ROX_ANDROID_CALL_TRACING__ !== true) return;
   await invoke('plugin:call-kit|configure_tracing', {
     tracesUrl: config.enabled ? (config.tracesUrl ?? null) : null,
     environment: config.environment,

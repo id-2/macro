@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -43,7 +43,7 @@ pub struct Connection {
     pub id: Uuid,
     /// Stable import namespace, retained when credentials or webhooks change.
     pub namespace: Uuid,
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     pub account_id: String,
     pub scope: Scope,
     pub enabled: bool,
@@ -121,7 +121,7 @@ pub enum SyncIssue {
 /// Reconciliation view of a connection row.
 pub struct SyncState {
     pub id: Uuid,
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     pub account_id: String,
     pub scope: Scope,
     pub enabled: bool,

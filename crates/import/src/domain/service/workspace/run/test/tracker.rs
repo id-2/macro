@@ -37,7 +37,7 @@ fn snapshot() -> Inventory {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_relationships_are_reported_and_retry_reuses_the_created_task(pool: PgPool) {
     let owner = teammate(&pool, "tracker-links", Uuid::now_v7()).await;
     let tracker = TaskTracker::new();
@@ -152,7 +152,7 @@ async fn failed_relationships_are_reported_and_retry_reuses_the_created_task(poo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn linking_a_teammates_copy_never_rewrites_its_relationships(pool: PgPool) {
     let team = Uuid::now_v7();
     let alice = teammate(&pool, "tracker-alice", team).await;
@@ -227,7 +227,7 @@ async fn linking_a_teammates_copy_never_rewrites_its_relationships(pool: PgPool)
     assert_eq!(a.entity_id, b.entity_id);
     assert_eq!(b.team_id, None);
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_projects_keep_child_relationships_retryable(pool: PgPool) {
     let owner = user("tracker-projects");
     let tracker = TaskTracker::new();

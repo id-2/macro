@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::{LoginAttempt, LoginStatus};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 use uuid::Uuid;
@@ -39,7 +39,7 @@ impl StateCipher for Cipher {
 async fn user(pool: &PgPool, id: &str) {
     let uuid = Uuid::now_v7();
     let email = format!("{uuid}@example.com");
-    sqlx::query!(r#"WITH created AS (INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$3) RETURNING id) INSERT INTO "User" ("id", "email", "macro_user_id") SELECT $4,$2,id FROM created"#,uuid,email,format!("stripe_{uuid}"),id).execute(pool).await.unwrap();
+    sqlx::query!(r#"WITH created AS (INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$3) RETURNING id) INSERT INTO "User" ("id", "email", "rox_user_id") SELECT $4,$2,id FROM created"#,uuid,email,format!("stripe_{uuid}"),id).execute(pool).await.unwrap();
 }
 fn attempt() -> LoginAttempt {
     LoginAttempt {
@@ -51,7 +51,7 @@ fn attempt() -> LoginAttempt {
         device: None,
     }
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_transactions_serialize_and_preserve_isolation(pool: PgPool) {
     user(&pool, "owner-a").await;
     user(&pool, "owner-b").await;
@@ -86,7 +86,7 @@ async fn owner_transactions_serialize_and_preserve_isolation(pool: PgPool) {
     let mut fetched = repository.lock("owner-a").await.unwrap();
     assert!(fetched.state().attempt.is_none());
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn dropped_transaction_does_not_publish_state(pool: PgPool) {
     user(&pool, "owner-a").await;
     let repository = PostgresRepository::new(pool, Arc::new(Cipher::default()));
@@ -133,7 +133,7 @@ fn credentials(expires_at: u64) -> codex_cloud_agents::domain::Credentials {
         account_id: "account-a".into(),
     }
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn separate_service_replicas_rotate_one_owner_token_once(pool: PgPool) {
     use crate::domain::{ConnectionService, ConnectionServiceImpl, StoredConnection};
     let owner = "macro|owner@example.com";

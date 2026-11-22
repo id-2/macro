@@ -27,7 +27,7 @@ vi.mock('@core/auth', () => ({ updateUserAuth: vi.fn() }));
 vi.mock('@core/auth/native-auth', () => ({
   openDesktopAuthSession: mocks.openDesktop,
   createNativeAuthSession: () => ({
-    callbackUrl: 'macro://android-auth/test-attempt',
+    callbackUrl: 'rox://android-auth/test-attempt',
     authenticate: mocks.authenticate,
   }),
 }));
@@ -125,7 +125,7 @@ describe('desktop account linking', () => {
         emailAddress: 'second@example.com',
       });
       expect(mocks.start).toHaveBeenCalledExactlyOnceWith({
-        originalUrl: 'macro:///inbox-link-callback',
+        originalUrl: 'rox:///inbox-link-callback',
         scopes,
       });
       expect(mocks.openDesktop).toHaveBeenCalledExactlyOnceWith(
@@ -161,7 +161,7 @@ describe('desktop account linking', () => {
       });
       expect(mocks.start).not.toHaveBeenCalled();
       expect(mocks.startOutlook).toHaveBeenCalledExactlyOnceWith({
-        originalUrl: 'macro:///inbox-link-callback',
+        originalUrl: 'rox:///inbox-link-callback',
         calendar: scopes !== 'gmail',
         reconnectLinkId: 'existing-outlook-link',
       });
@@ -246,7 +246,7 @@ describe('native account linking', () => {
     async (scopes) => {
       await useAddInboxFlow()({ scopes, provider: 'GMAIL' });
       expect(mocks.start).toHaveBeenCalledWith({
-        originalUrl: 'macro://android-auth/test-attempt',
+        originalUrl: 'rox://android-auth/test-attempt',
         scopes,
       });
       expect(mocks.authenticate).toHaveBeenCalledWith(
@@ -275,7 +275,7 @@ describe('native account linking', () => {
       await useAddInboxFlow()({ scopes, provider: 'OUTLOOK' });
       expect(mocks.start).not.toHaveBeenCalled();
       expect(mocks.startOutlook).toHaveBeenCalledWith({
-        originalUrl: 'macro://android-auth/test-attempt',
+        originalUrl: 'rox://android-auth/test-attempt',
         calendar: scopes === 'calendar',
       });
       expect(mocks.provision).toHaveBeenCalledWith({

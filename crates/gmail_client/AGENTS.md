@@ -25,12 +25,12 @@ contacts, watch) behind a single public facade; most modules are
 ## Scope
 
 - Owns: typed request/response calls against the Gmail REST API.
-- Not here: Macro's email domain model or sync orchestration →
+- Not here: Rox's email domain model or sync orchestration →
   `models_email` (the wire types this crate returns), `email_service`.
 
 ## Boundaries
 
-- Depends on: `models_email` (response/request types), `macro_service_urls`.
+- Depends on: `models_email` (response/request types), `rox_service_urls`.
 - Used by: `email_service`, `email_api_client`.
 
 ## Recipes

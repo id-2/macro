@@ -10,7 +10,7 @@ for (const format of ['plain', 'html', 'lexical'] as const) {
         const url = new URL(route.request().url());
         if (
           url.hostname === 'localhost' &&
-          !url.pathname.includes('/__macro_dev/')
+          !url.pathname.includes('/__rox_dev/')
         ) {
           await route.continue();
         } else {
@@ -126,7 +126,7 @@ test('quoting a backward selection includes the first paragraph', async ({
     const url = new URL(route.request().url());
     if (
       url.hostname === 'localhost' &&
-      !url.pathname.includes('/__macro_dev/')
+      !url.pathname.includes('/__rox_dev/')
     ) {
       await route.continue();
     } else {
@@ -203,7 +203,7 @@ for (const { name, markdown, quoteCount } of [
       const url = new URL(route.request().url());
       if (
         url.hostname === 'localhost' &&
-        !url.pathname.includes('/__macro_dev/')
+        !url.pathname.includes('/__rox_dev/')
       ) {
         await route.continue();
       } else {

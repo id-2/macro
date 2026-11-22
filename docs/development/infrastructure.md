@@ -103,12 +103,12 @@ specifically:
   service with `lcl`, `dev`, and `prd` environments, synced to Secrets Manager at
   `/doppler-sync/<project>/<dev|prod>`. Add the service to `SERVICE_NAMES`, using
   the Pulumi project name.
-- **`MacroConfig` reads only `APP_SECRETS_JSON` in ECS.** A plain container
+- **`RoxConfig` reads only `APP_SECRETS_JSON` in ECS.** A plain container
   `environment:` entry is invisible to it. Put values that infra produces (ARNs,
   endpoints) into Doppler with a Pulumi `doppler.Secret`, as
   `infra/stacks/agent-harness-service` does; that stack then needs
   `doppler:dopplerToken` as `secure:` config. Plain `environment:` is for `ENVIRONMENT`,
-  `DD_*`, and values read through `macro_env_var` or `OVERRIDE_*`.
+  `DD_*`, and values read through `rox_env_var` or `OVERRIDE_*`.
 - **Secrets go in Doppler, not Secrets Manager.** Add the value to the service's
   Doppler project; it reaches the task through `DopplerEcsEnvironment` and the
   `/doppler-sync/` sync. Creating standalone Secrets Manager secrets, putting their
@@ -133,8 +133,8 @@ Run it locally with `nix build --no-link .#code-mode-assets`.
 
 | Need | Use | Example |
 | --- | --- | --- |
-| SQS queue + DLQ + alarms | `Queue` (`packages/resources`) named to match the `macro_queues` constant | `calendar-service/index.ts` |
-| Kafka topic | Add to `crates/macro_event_topics`, run `cargo x kafka-topics`; never hand-edit `.github/kafka-cluster-topics.json` | `kafka-cluster/topics.ts` |
+| SQS queue + DLQ + alarms | `Queue` (`packages/resources`) named to match the `rox_queues` constant | `calendar-service/index.ts` |
+| Kafka topic | Add to `crates/rox_event_topics`, run `cargo x kafka-topics`; never hand-edit `.github/kafka-cluster-topics.json` | `kafka-cluster/topics.ts` |
 | Kafka access | `getKafkaClusterPolicy()` on the task role, brokers from `bootstrapBrokersSaslIam` | `calendar-service/service.ts` |
 | Lambda | `Lambda` (`packages/lambda`), binary listed under `deploy_lambdas` | `deleted-item-poller/lambda.ts` |
 | Redis | `Redis` (`packages/resources`) | `calendar-service/index.ts` |

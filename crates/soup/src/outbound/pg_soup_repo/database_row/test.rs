@@ -15,8 +15,8 @@ use item_filters::ast::{
     project::ProjectLiteral,
     properties::{PropertiesLiteral, PropertyMatchValue},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::{GroupByField, GroupingConfig};
 use models_pagination::{
     Cursor, CursorVal, CursorWithValAndFilter, Identify, Query, SimpleSortMethod,
@@ -37,12 +37,12 @@ const DEAL_2: Uuid = Uuid::from_u128(0x70000000_0000_0000_0000_000000000002);
 const DEAL_3: Uuid = Uuid::from_u128(0x70000000_0000_0000_0000_000000000003);
 const NOTE: Uuid = Uuid::from_u128(0x70000000_0000_0000_0000_000000000005);
 
-fn viewer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap()
+fn viewer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap()
 }
 
-fn stranger() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|stranger@databases.test").unwrap()
+fn stranger() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|stranger@databases.test").unwrap()
 }
 
 /// Rows only: every other kind the dynamic query reads is ruled out the way
@@ -60,7 +60,7 @@ fn rows_of(row_filter: Option<Expr<DatabaseRowLiteral>>) -> EntityFilterAst {
 
 async fn page(
     pool: &PgPool,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     filter: EntityFilterAst,
 ) -> Vec<SoupItem<()>> {
     expanded_dynamic_cursor_soup(
@@ -76,12 +76,12 @@ async fn page(
     .unwrap()
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn a_viewer_reads_the_won_deals_of_one_table(pool: PgPool) {
     let items = expanded_dynamic_cursor_soup(
         &pool,
         ExpandedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap(),
+            user_id: RoxUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap(),
             limit: 20,
             cursor: Query::Sort(
                 SimpleSortMethod::CreatedAt.into(),
@@ -145,7 +145,7 @@ async fn a_viewer_reads_the_won_deals_of_one_table(pool: PgPool) {
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn naming_a_table_reads_only_that_tables_rows(pool: PgPool) {
     let items = page(
         &pool,
@@ -160,7 +160,7 @@ async fn naming_a_table_reads_only_that_tables_rows(pool: PgPool) {
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn rows_stay_out_of_queries_that_name_no_table(pool: PgPool) {
     assert!(page(&pool, viewer(), rows_of(None)).await.is_empty());
     assert!(
@@ -185,7 +185,7 @@ async fn rows_stay_out_of_queries_that_name_no_table(pool: PgPool) {
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn include_reads_all_accessible_tables_but_not_private_rows(pool: PgPool) {
     let include = Some(Expr::val(DatabaseRowLiteral::Include));
     assert_eq!(
@@ -226,7 +226,7 @@ async fn include_reads_all_accessible_tables_but_not_private_rows(pool: PgPool) 
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stranger_reads_no_rows_of_a_database_not_shared_with_them(pool: PgPool) {
     assert!(
         page(
@@ -251,7 +251,7 @@ async fn a_stranger_reads_no_rows_of_a_database_not_shared_with_them(pool: PgPoo
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn deals_grouped_by_stage_count_each_option(pool: PgPool) {
     let groups = expanded_dynamic_cursor_soup_grouped(
         &pool,
@@ -289,7 +289,7 @@ async fn deals_grouped_by_stage_count_each_option(pool: PgPool) {
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn hydrating_by_id_keeps_the_database_access_rule(pool: PgPool) {
     let entities =
         [DEAL_1, NOTE].map(|id| EntityType::DatabaseRow.with_entity_string(id.to_string()));
@@ -312,7 +312,7 @@ async fn hydrating_by_id_keeps_the_database_access_rule(pool: PgPool) {
 
 /// A row's cells are properties of database-owned definitions, which are
 /// neither system properties nor the viewer's tags: a row carries them all.
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn a_row_carries_every_cell_as_a_property(pool: PgPool) {
     let items = page(
         &pool,
@@ -340,7 +340,7 @@ async fn a_row_carries_every_cell_as_a_property(pool: PgPool) {
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_joins_accept_mixed_soup_ids(pool: PgPool) {
     for detail in [
         include_str!("../expanded/dynamic/database_row_detail.sql"),
@@ -361,7 +361,7 @@ async fn detail_joins_accept_mixed_soup_ids(pool: PgPool) {
     }
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn created_cursor_pages_equal_timestamps_without_skipping_rows(pool: PgPool) {
     sqlx::query!(
         "UPDATE database_rows SET created_at = '2026-01-03T00:00:00Z' WHERE table_id = $1",
@@ -412,7 +412,7 @@ async fn created_cursor_pages_equal_timestamps_without_skipping_rows(pool: PgPoo
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn core_rows_stay_out_of_soup_even_with_a_stray_database_grant(pool: PgPool) {
     let database = Uuid::now_v7();
     let table = Uuid::now_v7();
@@ -522,7 +522,7 @@ async fn stranger_reads(pool: &PgPool) -> (Vec<Uuid>, Vec<Uuid>) {
     (listed, hydrated)
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn a_form_editor_reads_the_rows_of_the_forms_database(pool: PgPool) {
     grant_the_stranger_a_crm_form(&pool, "edit", false, false).await;
 
@@ -532,14 +532,14 @@ async fn a_form_editor_reads_the_rows_of_the_forms_database(pool: PgPool) {
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn a_form_respondent_reads_no_rows(pool: PgPool) {
     grant_the_stranger_a_crm_form(&pool, "view", false, false).await;
 
     assert_eq!(stranger_reads(&pool).await, (Vec::new(), Vec::new()));
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn a_respondent_of_a_form_that_shares_responses_reads_its_rows(pool: PgPool) {
     grant_the_stranger_a_crm_form(&pool, "view", false, true).await;
 
@@ -549,7 +549,7 @@ async fn a_respondent_of_a_form_that_shares_responses_reads_its_rows(pool: PgPoo
     );
 }
 
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn a_trashed_form_owner_reads_no_rows(pool: PgPool) {
     grant_the_stranger_a_crm_form(&pool, "owner", true, false).await;
 
@@ -558,7 +558,7 @@ async fn a_trashed_form_owner_reads_no_rows(pool: PgPool) {
 
 /// Rows have no name of their own, so a name-sorted page keeps every one of
 /// them in the missing-name tail and still pages through it exactly once.
-#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/database_rows.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn unnamed_rows_page_through_the_missing_name_tail(pool: PgPool) {
     let sort = DynamicSort::name(SoupSortDirection::Asc);
     let mut cursor = Query::Sort(

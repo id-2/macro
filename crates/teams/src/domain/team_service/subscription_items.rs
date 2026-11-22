@@ -2,7 +2,7 @@
 //! subscription and serializes item changes with seat changes.
 
 use channels::domain::ports::ChannelService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use notification::domain::service::NotificationIngress;
 use roles_and_permissions::domain::port::UserRolesAndPermissionsService;
 
@@ -35,7 +35,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker,
+    EB: RoxEventBroker,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -66,7 +66,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker + Clone,
+    EB: RoxEventBroker + Clone,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {

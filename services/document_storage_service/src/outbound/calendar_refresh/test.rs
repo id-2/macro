@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_sdk::trace::{InMemorySpanExporter, SdkTracerProvider, SpanData};
 use serde_json::{Value, json};
@@ -21,22 +21,22 @@ const OTHER_DELEGATE: &str = "macro|refresh-other-delegate@example.com";
 const REQUESTER: &str = "macro|refresh-requester@example.com";
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
-        macro_user_id,
+        rox_user_id,
         id,
         id,
-        format!("cus_{macro_user_id}"),
+        format!("cus_{rox_user_id}"),
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         id,
         id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -47,7 +47,7 @@ async fn insert_link(pool: &PgPool, owner_id: &str) -> Uuid {
     let id = Uuid::now_v7();
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         id,
@@ -138,7 +138,7 @@ async fn refreshes(server: &MockServer) -> Vec<(String, Value)> {
     sent
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_inbox_refresh_reaches_its_owner_and_each_delegate_once(pool: PgPool) {
     for user in [OWNER, DELEGATE, MAILBOX, OTHER_DELEGATE] {
         insert_user(&pool, user).await;
@@ -148,11 +148,11 @@ async fn an_inbox_refresh_reaches_its_owner_and_each_delegate_once(pool: PgPool)
     // A promoted shared mailbox: the edges name the mailbox as their child
     // while its older events still carry the owner, who is a delegate too.
     for primary in [OWNER, DELEGATE] {
-        macro_db_client::macro_user_links::insert_edge(&pool, primary, MAILBOX, link)
+        rox_db_client::rox_user_links::insert_edge(&pool, primary, MAILBOX, link)
             .await
             .unwrap();
     }
-    macro_db_client::macro_user_links::insert_edge(&pool, OTHER_DELEGATE, MAILBOX, other_link)
+    rox_db_client::rox_user_links::insert_edge(&pool, OTHER_DELEGATE, MAILBOX, other_link)
         .await
         .unwrap();
     let (server, client) = gateway().await;
@@ -173,7 +173,7 @@ async fn an_inbox_refresh_reaches_its_owner_and_each_delegate_once(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_owner_still_hears_when_delegates_cannot_be_resolved(pool: PgPool) {
     let link = Uuid::now_v7();
     let (server, client) = gateway().await;
@@ -197,14 +197,14 @@ async fn the_owner_still_hears_when_delegates_cannot_be_resolved(pool: PgPool) {
     assert_eq!(attribute(&span, "outcome"), "partial");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_send_shows_on_the_span_and_the_rest_still_go_out(pool: PgPool) {
     for user in [OWNER, DELEGATE, MAILBOX] {
         insert_user(&pool, user).await;
     }
     let link = insert_link(&pool, MAILBOX).await;
     for primary in [OWNER, DELEGATE] {
-        macro_db_client::macro_user_links::insert_edge(&pool, primary, MAILBOX, link)
+        rox_db_client::rox_user_links::insert_edge(&pool, primary, MAILBOX, link)
             .await
             .unwrap();
     }
@@ -225,7 +225,7 @@ async fn a_failed_send_shows_on_the_span_and_the_rest_still_go_out(pool: PgPool)
     assert_eq!(attribute(&span, "outcome"), "partial");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_clean_refresh_shows_on_the_span(pool: PgPool) {
     let (server, client) = gateway().await;
     let (refresh, _) = adapter(client, pool);
@@ -243,7 +243,7 @@ async fn a_clean_refresh_shows_on_the_span(pool: PgPool) {
     assert_eq!(attribute(&span, "outcome"), "refreshed");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_answer_names_the_event_and_never_the_inbox(pool: PgPool) {
     let event_id = Uuid::now_v7();
     let (server, client) = gateway().await;
@@ -262,7 +262,7 @@ async fn an_answer_names_the_event_and_never_the_inbox(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_answer_refresh_shows_on_the_span(pool: PgPool) {
     let event_id = Uuid::now_v7();
     let (server, client) = gateway().await;

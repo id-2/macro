@@ -9,7 +9,7 @@ export const definition = defineBlock({
   name: 'spreadsheet',
   description: 'Calculate, organize, and collaborate in a spreadsheet',
   defaultFilename: 'New Spreadsheet',
-  accepted: { spreadsheet: 'application/x-macro-spreadsheet' },
+  accepted: { spreadsheet: 'application/x-rox-spreadsheet' },
   component: lazy(() => import('./SpreadsheetBlock')),
   liveTrackingEnabled: true,
   syncServiceEnabled: true,

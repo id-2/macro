@@ -75,7 +75,7 @@ pub struct EmailReminderQuery {
 /// Caller identity is reused across authorization and email reads for a page.
 pub struct EmailReminderViewer {
     /// Authenticated private reminder owner.
-    pub user_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub user_id: rox_user_id::user_id::RoxUserIdStr<'static>,
     /// Organization context used to mint email view receipts.
     pub org_id: Option<i64>,
 }

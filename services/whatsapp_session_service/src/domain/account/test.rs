@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use tokio::sync::mpsc;
 use tokio_util::sync::CancellationToken;
@@ -272,7 +272,7 @@ async fn insert_pairing_account(pool: &PgPool) -> (Uuid, Uuid) {
             VALUES (gen_random_uuid(), $2, $2, 'stripe_owner')
             RETURNING id
         )
-        INSERT INTO "User" ("id", "email", "macro_user_id")
+        INSERT INTO "User" ("id", "email", "rox_user_id")
         SELECT $1, $2, new_macro_user.id FROM new_macro_user
         "#,
         user_id,
@@ -407,7 +407,7 @@ fn event_sender(whatsapp: &FakeWhatsApp) -> mpsc::UnboundedSender<SessionEvent> 
     whatsapp.events.lock().unwrap().clone().unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pairing_records_the_qr_and_identity_then_refreshes_groups(pool: PgPool) {
     let (account, pairing) = insert_pairing_account(&pool).await;
     let (runner, whatsapp, mut calls) = runner(&pool);
@@ -460,7 +460,7 @@ async fn pairing_records_the_qr_and_identity_then_refreshes_groups(pool: PgPool)
     assert_eq!(roster, vec![GROUP.to_owned()]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn running_out_of_qr_codes_expires_the_pairing_instead_of_failing_it(pool: PgPool) {
     let (account, pairing) = insert_pairing_account(&pool).await;
     let (runner, whatsapp, mut calls) = runner(&pool);
@@ -497,7 +497,7 @@ async fn running_out_of_qr_codes_expires_the_pairing_instead_of_failing_it(pool:
     assert_eq!(state, "disconnected");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_replica_whose_epoch_was_taken_over_cannot_write_and_stops(pool: PgPool) {
     let (account, pairing) = insert_pairing_account(&pool).await;
     let (runner, whatsapp, mut calls) = runner(&pool);
@@ -527,7 +527,7 @@ async fn a_replica_whose_epoch_was_taken_over_cannot_write_and_stops(pool: PgPoo
     assert_eq!(qr_code, None, "the fenced replica's write never landed");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_owner_who_disconnects_gets_the_device_unlinked(pool: PgPool) {
     let (account, _pairing) = insert_pairing_account(&pool).await;
     sqlx::query!(
@@ -572,7 +572,7 @@ async fn an_owner_who_disconnects_gets_the_device_unlinked(pool: PgPool) {
     assert_eq!(started.running.await.unwrap(), AccountExit::Idle);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn passkey_pairing_shows_the_challenge_forwards_the_assertion_once_and_confirms(
     pool: PgPool,
 ) {
@@ -671,7 +671,7 @@ fn group_text(event: u128) -> InboundEvent {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_gate_acks_unadopted_traffic_unstored_and_refuses_once_fenced(pool: PgPool) {
     let (account, _pairing) = insert_pairing_account(&pool).await;
     let sessions = SessionService::new(Arc::new(PgWhatsAppRepository::new(pool.clone())));
@@ -700,7 +700,7 @@ async fn the_gate_acks_unadopted_traffic_unstored_and_refuses_once_fenced(pool: 
     assert!(fenced.fenced.is_cancelled(), "and stops the account");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_passkey_answer_is_forwarded_on_the_tick_without_a_signal(pool: PgPool) {
     let (account, pairing) = insert_pairing_account(&pool).await;
     let (runner, whatsapp, mut calls) = runner_ticking(Duration::from_millis(50), &pool);
@@ -774,7 +774,7 @@ async fn connected(
     (account, whatsapp, calls, started)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn requested_group_refreshes_are_rate_limited_per_account(pool: PgPool) {
     let (_, _, mut calls, started) = connected(&pool, Duration::from_secs(3600)).await;
     // Opening the page right after connecting does not read the groups again;
@@ -799,7 +799,7 @@ async fn requested_group_refreshes_are_rate_limited_per_account(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn requested_group_refreshes_run_once_the_interval_passed(pool: PgPool) {
     let (_, _, mut calls, started) = connected(&pool, Duration::ZERO).await;
     started
@@ -812,7 +812,7 @@ async fn requested_group_refreshes_run_once_the_interval_passed(pool: PgPool) {
     assert_eq!(started.running.await.unwrap(), AccountExit::Released);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn live_group_events_update_the_one_group(pool: PgPool) {
     const OTHER: &str = "120363000000000002@g.us";
     let mut listener = sqlx::postgres::PgListener::connect_with(&pool)
@@ -912,7 +912,7 @@ async fn account_state(pool: &PgPool, account: Uuid) -> String {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pairing_replaces_a_device_kms_can_no_longer_read_once(pool: PgPool) {
     let (account, _pairing) = insert_pairing_account(&pool).await;
     make_connected(&pool, account, true).await;
@@ -933,7 +933,7 @@ async fn pairing_replaces_a_device_kms_can_no_longer_read_once(pool: PgPool) {
     assert_eq!(started.running.await.unwrap(), AccountExit::Released);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pairing_gives_up_when_even_a_fresh_device_cannot_be_opened(pool: PgPool) {
     let (account, _pairing) = insert_pairing_account(&pool).await;
     let (runner, whatsapp, mut calls) = runner(&pool);
@@ -950,7 +950,7 @@ async fn pairing_gives_up_when_even_a_fresh_device_cannot_be_opened(pool: PgPool
     assert_eq!(account_state(&pool, account).await, "pairing");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_connected_account_whose_device_cannot_be_read_is_asked_to_reconnect(pool: PgPool) {
     let (account, _pairing) = insert_pairing_account(&pool).await;
     make_connected(&pool, account, false).await;
@@ -970,7 +970,7 @@ async fn a_connected_account_whose_device_cannot_be_read_is_asked_to_reconnect(p
     assert_eq!(account_state(&pool, account).await, "logged_out");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_kms_outage_leaves_a_connected_account_and_its_device_alone(pool: PgPool) {
     let (account, _pairing) = insert_pairing_account(&pool).await;
     make_connected(&pool, account, false).await;

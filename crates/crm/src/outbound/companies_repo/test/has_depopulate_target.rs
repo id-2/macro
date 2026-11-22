@@ -1,12 +1,12 @@
 use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::time::Duration;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn true_only_for_a_contact_on_a_tracked_domain(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@owner.test";
@@ -47,7 +47,7 @@ async fn true_only_for_a_contact_on_a_tracked_domain(pool: PgPool) -> anyhow::Re
 
 /// A contact no link sources is still a target: `depopulate_contact`
 /// deletes it as an orphan even when the calling link never contributed it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn agrees_with_depopulate_contact(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@owner.test";
@@ -82,7 +82,7 @@ async fn agrees_with_depopulate_contact(pool: PgPool) -> anyhow::Result<()> {
 /// Without the domain lock the check would read past a populate's
 /// uncommitted contact and report `false`, where `depopulate_contact`
 /// would wait for the commit and tear the contact down.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn waits_for_an_in_flight_populate(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@owner.test").await?;

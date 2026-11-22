@@ -143,7 +143,7 @@ const teamMembers = [
   },
 ];
 
-export function MacroTextLogo() {
+export function RoxTextLogo() {
   return (
     <svg
       aria-label="Rox"
@@ -1245,7 +1245,7 @@ export function OpenSourceBento() {
             'max-width': '520px',
           }}
         >
-          Read the code, file issues, and help shape where <MacroTextLogo />{' '}
+          Read the code, file issues, and help shape where <RoxTextLogo />{' '}
           goes. Star us on GitHub.
         </p>
         <div style={{ 'margin-top': mobile() ? '4px' : '8px' }}>
@@ -1588,7 +1588,7 @@ export function SectionFeatureGrid(
               'text-align': 'left',
             }}
           >
-            <MacroTextLogo /> is not just software, it&apos;s an operating
+            <RoxTextLogo /> is not just software, it&apos;s an operating
             philosophy for you to fork and modify.
           </h2>
         </div>
@@ -1948,7 +1948,7 @@ export function SectionFeatureGrid(
                 'text-align': 'center',
               }}
             >
-              <MacroTextLogo /> unifies your work into one app with shared
+              <RoxTextLogo /> unifies your work into one app with shared
               memory. Email, messages, docs, tasks, code, agents, calls, and
               CRM.
             </p>

@@ -53,7 +53,7 @@ pub(in crate::api) async fn lookup(
         return Err(text(StatusCode::BAD_REQUEST, "email is required"));
     }
 
-    let stored = match ctx.macro_cache_client.get_passkey(&req.email).await {
+    let stored = match ctx.rox_cache_client.get_passkey(&req.email).await {
         Ok(value) => value.is_some(),
         Err(_) => {
             tracing::error!("unable to read passkey");
@@ -92,7 +92,7 @@ pub(in crate::api) async fn challenge(
     let challenge = URL_SAFE_NO_PAD.encode(bytes);
 
     if ctx
-        .macro_cache_client
+        .rox_cache_client
         .set_passkey_challenge(&req.email, &challenge)
         .await
         .is_err()
@@ -128,7 +128,7 @@ pub(in crate::api) async fn register_passkey(
     extract::Json(req): extract::Json<RegisterPasskeyRequest>,
 ) -> Result<Response, Response> {
     let expected = match ctx
-        .macro_cache_client
+        .rox_cache_client
         .take_passkey_challenge(&req.email)
         .await
     {
@@ -154,7 +154,7 @@ pub(in crate::api) async fn register_passkey(
     });
     // attestation signature is not checked.
     if ctx
-        .macro_cache_client
+        .rox_cache_client
         .set_passkey(&req.email, &stored.to_string())
         .await
         .is_err()
@@ -187,7 +187,7 @@ pub(in crate::api) async fn assert_passkey(
     extract::Json(req): extract::Json<AssertPasskeyRequest>,
 ) -> Result<Response, Response> {
     let expected = match ctx
-        .macro_cache_client
+        .rox_cache_client
         .take_passkey_challenge(&req.email)
         .await
     {
@@ -202,7 +202,7 @@ pub(in crate::api) async fn assert_passkey(
         }
     };
 
-    let stored = match ctx.macro_cache_client.get_passkey(&req.email).await {
+    let stored = match ctx.rox_cache_client.get_passkey(&req.email).await {
         Ok(Some(value)) => value,
         Ok(None) => return Err(text(StatusCode::NOT_FOUND, "no passkey")),
         Err(_) => {

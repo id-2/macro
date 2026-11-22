@@ -19,12 +19,12 @@ use rootcause::prelude::ResultExt as _;
 use serde::de::DeserializeOwned;
 use webhook::domain::models::{WebhookFilter, WebhookScope};
 
-use crate::config::{HarnessCredentials, MacroApi};
+use crate::config::{HarnessCredentials, RoxApi};
 
 #[cfg(test)]
 mod test;
 
-const HARNESS_TOKEN_HEADER: &str = "x-macro-harness-token";
+const HARNESS_TOKEN_HEADER: &str = "x-rox-harness-token";
 
 /// Set on the presence request alone: a timeout on the client would also end the
 /// long-lived event stream.
@@ -48,7 +48,7 @@ pub struct EventStreamClient {
 
 impl EventStreamClient {
     /// Build a client from the daemon's config and paired credentials.
-    pub fn new(config: &MacroApi, credentials: &HarnessCredentials) -> Self {
+    pub fn new(config: &RoxApi, credentials: &HarnessCredentials) -> Self {
         Self {
             http: reqwest::Client::new(),
             base: config.storage_url.trim_end_matches('/').to_owned(),

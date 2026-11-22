@@ -1,7 +1,7 @@
 ---
 name: run-app
 description: >-
-  Run the Macro app on Cursor Cloud and pick up edits. Use when asked to run
+  Run the Rox app on Cursor Cloud and pick up edits. Use when asked to run
   the app, open it in the browser, test a frontend or backend change, hot
   reload, or before touching stack.sh, rebuild.sh, frontend.sh, or just stack.
 ---

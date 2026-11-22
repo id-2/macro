@@ -19,7 +19,7 @@ pub async fn column_casts_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service
@@ -58,7 +58,7 @@ pub async fn column_conversion_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service

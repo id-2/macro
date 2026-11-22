@@ -7,7 +7,7 @@ test('create a generic pipeline that tracks no company or contact', async ({
 }) => {
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.goto(fixture, { waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: 'New pipeline', exact: true }).click();
   const dialog = page.getByRole('dialog');
@@ -50,7 +50,7 @@ test('create a private company pipeline and customize a column', async ({
 }) => {
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.goto(fixture, { waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: 'New pipeline', exact: true }).click();
   const dialog = page.getByRole('dialog');
@@ -93,7 +93,7 @@ test('contact pipeline preserves choices after a failed create', async ({
 }) => {
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.goto(fixture, { waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: 'Fail next create' }).click();
   await page.getByRole('button', { name: 'New pipeline', exact: true }).click();
@@ -128,7 +128,7 @@ test('contact pipeline preserves choices after a failed create', async ({
 test('export a pipeline and import a CSV into it', async ({ page }) => {
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.goto(fixture, { waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: 'New pipeline', exact: true }).click();
   const dialog = page.getByRole('dialog');

@@ -7,16 +7,16 @@ use sqlx::{Connection, PgPool};
 const EMPTY_PUBLIC_SCHEMA: &str = "DROP SCHEMA public CASCADE; CREATE SCHEMA public;";
 
 const LEGACY_SCHEMA: &str = include_str!(
-    "../../../../macro_db_client/migrations/20260126170641_create_notification_tables.sql"
+    "../../../../rox_db_client/migrations/20260126170641_create_notification_tables.sql"
 );
 const LEGACY_INDEXES: &str = include_str!(
-    "../../../../macro_db_client/migrations/20260225154836_notification_filter_indexes.sql"
+    "../../../../rox_db_client/migrations/20260225154836_notification_filter_indexes.sql"
 );
 const UP: &str = include_str!(
-    "../../../../macro_db_client/migrations/20260909141557_user_notification_state.up.sql"
+    "../../../../rox_db_client/migrations/20260909141557_user_notification_state.up.sql"
 );
 const DOWN: &str = include_str!(
-    "../../../../macro_db_client/migrations/20260909141557_user_notification_state.down.sql"
+    "../../../../rox_db_client/migrations/20260909141557_user_notification_state.down.sql"
 );
 
 #[sqlx::test(migrations = false)]

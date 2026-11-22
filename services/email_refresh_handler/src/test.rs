@@ -1,15 +1,15 @@
 use crate::outbound::postgres::{fetch_inactive_link_ids, fetch_unused_link_ids};
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("fetch_inactive_links"))
 )]
 async fn fetch_inactive_link_ids_returns_unused_links(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Link created 40 days ago with no history should be returned (threshold: 30 days)
     let result = fetch_unused_link_ids(&pool, 30).await?;
@@ -24,7 +24,7 @@ async fn fetch_inactive_link_ids_returns_unused_links(pool: Pool<Postgres>) -> R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("fetch_inactive_links"))
 )]
 async fn fetch_inactive_link_ids_returns_stale_history_links(pool: Pool<Postgres>) -> Result<()> {
@@ -41,7 +41,7 @@ async fn fetch_inactive_link_ids_returns_stale_history_links(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("fetch_inactive_links"))
 )]
 async fn fetch_inactive_link_ids_excludes_active_links(pool: Pool<Postgres>) -> Result<()> {
@@ -66,14 +66,14 @@ async fn fetch_inactive_link_ids_excludes_active_links(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("fetch_inactive_links"))
 )]
-async fn fetch_inactive_link_ids_excludes_macro_internal_links(pool: Pool<Postgres>) -> Result<()> {
+async fn fetch_inactive_link_ids_excludes_rox_internal_links(pool: Pool<Postgres>) -> Result<()> {
     let unused_result = fetch_unused_link_ids(&pool, 30).await?;
     let inactive_result = fetch_inactive_link_ids(&pool, 60).await?;
 
-    // Links with @rox.one in macro_id should never be deleted
+    // Links with @rox.one in rox_id should never be deleted
     let internal_link_id = Uuid::parse_str("00000000-0000-0000-0000-000000000005")?;
     assert!(
         !unused_result.contains(&internal_link_id) && !inactive_result.contains(&internal_link_id),
@@ -84,7 +84,7 @@ async fn fetch_inactive_link_ids_excludes_macro_internal_links(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("fetch_inactive_links"))
 )]
 async fn fetch_inactive_link_ids_respects_threshold_parameters(pool: Pool<Postgres>) -> Result<()> {

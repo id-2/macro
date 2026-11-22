@@ -70,19 +70,19 @@ async function register(): Promise<void> {
   console.log(`
 Webhook registered.
 
-MACRO_WEBHOOK_ID=${webhook.id}
-MACRO_WEBHOOK_SECRET="${secret}"
+ROX_WEBHOOK_ID=${webhook.id}
+ROX_WEBHOOK_SECRET="${secret}"
 
 Start the event printer and validation receiver:
-MACRO_WEBHOOK_SECRET="${secret}" bun run webhook receive ${webhook.id} --env ${env}${userId ? ` --user-id "${userId}"` : ''}
+ROX_WEBHOOK_SECRET="${secret}" bun run webhook receive ${webhook.id} --env ${env}${userId ? ` --user-id "${userId}"` : ''}
 `);
 }
 
 async function receive(id: string): Promise<void> {
   const env = parseEnv(values.env) ?? fail('--env is required');
   const secret =
-    process.env.MACRO_WEBHOOK_SECRET ??
-    fail('MACRO_WEBHOOK_SECRET is required');
+    process.env.ROX_WEBHOOK_SECRET ??
+    fail('ROX_WEBHOOK_SECRET is required');
   const port = Number(
     values.port ?? resolveLocalPortmap()?.sdkWebhookHostReceiverPort ?? 8787,
   );
@@ -101,7 +101,7 @@ async function receive(id: string): Promise<void> {
       const bodyPromise = request.clone().text();
       try {
         const response = await receiver(request);
-        const event = request.headers.get('x-macro-event') ?? 'unknown';
+        const event = request.headers.get('x-rox-event') ?? 'unknown';
         console.log(`[${event}] ${await bodyPromise}`);
         return response;
       } catch (error) {
@@ -135,7 +135,7 @@ Register a webhook or receive and print its events.
                    [--port <port>] [--user-id <macro-user-id>]
 
 For just run_local, use ${localEndpoint} for --url. Run receive on the host
-with MACRO_WEBHOOK_SECRET set to the value printed by register.
+with ROX_WEBHOOK_SECRET set to the value printed by register.
 `);
 }
 

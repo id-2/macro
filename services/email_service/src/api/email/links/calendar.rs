@@ -4,7 +4,7 @@ use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use email::domain::mailbox::calendar_disconnect::InboxCalendarError;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use uuid::Uuid;
 
@@ -36,12 +36,12 @@ use uuid::Uuid;
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id), err)]
 pub async fn disable_link_calendar_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(link_id): Path<Uuid>,
 ) -> Result<Response, InboxActionError> {
-    let macro_user_id = &authorization.authorization.user.macro_user_id;
+    let rox_user_id = &authorization.authorization.user.rox_user_id;
     ctx.calendar_disconnect
-        .disconnect(macro_user_id.as_ref(), link_id)
+        .disconnect(rox_user_id.as_ref(), link_id)
         .await
         .map_err(|error| match error {
             InboxCalendarError::Access(error) => InboxActionError::from(error),

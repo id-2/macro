@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 #[derive(Clone)]
 struct Grants(VerifiedMailboxGrant);
@@ -16,13 +16,13 @@ impl CompletedMailboxGrantSource for Grants {
     }
 }
 
-async fn actor(db: &PgPool, email: &str) -> (Uuid, MacroUserIdStr<'static>) {
-    let id = macro_uuid::generate_uuid_v7();
-    let macro_id = MacroUserIdStr::try_from(format!("macro|{email}")).unwrap();
+async fn actor(db: &PgPool, email: &str) -> (Uuid, RoxUserIdStr<'static>) {
+    let id = rox_uuid::generate_uuid_v7();
+    let rox_id = RoxUserIdStr::try_from(format!("macro|{email}")).unwrap();
     sqlx::query!(
         "INSERT INTO macro_user (id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
         id,
-        macro_id.as_ref(),
+        rox_id.as_ref(),
         email,
         format!("cus_{id}")
     )
@@ -30,20 +30,20 @@ async fn actor(db: &PgPool, email: &str) -> (Uuid, MacroUserIdStr<'static>) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id,email,macro_user_id) VALUES ($1,$2,$3)"#,
-        macro_id.as_ref(),
+        r#"INSERT INTO "User" (id,email,rox_user_id) VALUES ($1,$2,$3)"#,
+        rox_id.as_ref(),
         email,
         id
     )
     .execute(db)
     .await
     .unwrap();
-    (id, macro_id)
+    (id, rox_id)
 }
 
-async fn attempt(db: &PgPool, actor: (Uuid, MacroUserIdStr<'static>)) -> InitializeMailbox {
-    let id = macro_uuid::generate_uuid_v7();
-    sqlx::query!("INSERT INTO in_progress_user_link (id,macro_user_id,email_provider,linked_email) VALUES ($1,$2,'OUTLOOK','mailbox@example.com')",id,actor.0)
+async fn attempt(db: &PgPool, actor: (Uuid, RoxUserIdStr<'static>)) -> InitializeMailbox {
+    let id = rox_uuid::generate_uuid_v7();
+    sqlx::query!("INSERT INTO in_progress_user_link (id,rox_user_id,email_provider,linked_email) VALUES ($1,$2,'OUTLOOK','mailbox@example.com')",id,actor.0)
         .execute(db).await.unwrap();
     InitializeMailbox {
         attempt: id,
@@ -61,7 +61,7 @@ fn grant(owner: Uuid) -> VerifiedMailboxGrant {
             "Mail.Send".into(),
         ],
         calendar_requested: false,
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         generation: 1,
         owner,
         email: "mailbox@example.com".into(),
@@ -70,7 +70,7 @@ fn grant(owner: Uuid) -> VerifiedMailboxGrant {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn initialization_is_atomic_idempotent_and_seeds_independent_provider_streams(db: PgPool) {
     let actor = actor(&db, "owner@example.com").await;
     let request = attempt(&db, actor.clone()).await;
@@ -121,7 +121,7 @@ async fn initialization_is_atomic_idempotent_and_seeds_independent_provider_stre
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn shared_promotion_keeps_one_inbox_and_both_scoped_access_edges(db: PgPool) {
     let first = actor(&db, "first@example.com").await;
     let second = actor(&db, "second@example.com").await;
@@ -145,13 +145,13 @@ async fn shared_promotion_keeps_one_inbox_and_both_scoped_access_edges(db: PgPoo
     request.force_share = true;
     assert_eq!(service.initialize(request).await.unwrap(), link);
     let row = sqlx::query!(
-        "SELECT macro_id,fusionauth_user_id,sync_generation FROM email_links WHERE id = $1",
+        "SELECT rox_id,fusionauth_user_id,sync_generation FROM email_links WHERE id = $1",
         link
     )
     .fetch_one(&db)
     .await
     .unwrap();
-    assert_eq!(row.macro_id, "macro|mailbox@example.com");
+    assert_eq!(row.rox_id, "macro|mailbox@example.com");
     assert_eq!(row.fusionauth_user_id, second.0.to_string());
     assert_eq!(row.sync_generation, 2);
     assert_eq!(
@@ -163,7 +163,7 @@ async fn shared_promotion_keeps_one_inbox_and_both_scoped_access_edges(db: PgPoo
     );
     assert_eq!(
         sqlx::query_scalar!(
-            "SELECT count(*) FROM macro_user_links WHERE link_id = $1",
+            "SELECT count(*) FROM rox_user_links WHERE link_id = $1",
             link
         )
         .fetch_one(&db)
@@ -173,7 +173,7 @@ async fn shared_promotion_keeps_one_inbox_and_both_scoped_access_edges(db: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn wrong_actor_and_changed_snapshot_cannot_consume_an_attempt(db: PgPool) {
     let owner = actor(&db, "owner@example.com").await;
     let other = actor(&db, "other@example.com").await;
@@ -214,7 +214,7 @@ async fn wrong_actor_and_changed_snapshot_cannot_consume_an_attempt(db: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mixed_provider_connection_limit_is_rechecked_without_blocking_reconnect(db: PgPool) {
     let owner = actor(&db, "limit@example.com").await;
     let req = attempt(&db, owner.clone()).await;
@@ -224,7 +224,7 @@ async fn mixed_provider_connection_limit_is_rechecked_without_blocking_reconnect
     );
     let outlook = service.initialize(req.clone()).await.unwrap();
     let gmail = Uuid::now_v7();
-    sqlx::query!("INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider) VALUES($1,$2,$3,'other@example.com','GMAIL')",gmail,owner.1.as_ref(),owner.0.to_string()).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES($1,$2,$3,'other@example.com','GMAIL')",gmail,owner.1.as_ref(),owner.0.to_string()).execute(&db).await.unwrap();
     let reconnect = attempt(&db, owner.clone()).await;
     assert_eq!(service.initialize(reconnect).await.unwrap(), outlook);
     let req = attempt(&db, owner.clone()).await;
@@ -239,14 +239,14 @@ async fn mixed_provider_connection_limit_is_rechecked_without_blocking_reconnect
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn gmail_reservation_counts_outlook_and_allows_only_verified_reconnect(db: PgPool) {
     let owner = actor(&db, "gmail-limit@example.com").await;
     for (address, provider) in [
         ("gmail@example.com", "GMAIL"),
         ("outlook@example.com", "OUTLOOK"),
     ] {
-        sqlx::query!("INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider) VALUES($1,$2,$3,$4,$5::text::email_user_provider_enum)",Uuid::now_v7(),owner.1.as_ref(),owner.0.to_string(),address,provider).execute(&db).await.unwrap();
+        sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES($1,$2,$3,$4,$5::text::email_user_provider_enum)",Uuid::now_v7(),owner.1.as_ref(),owner.0.to_string(),address,provider).execute(&db).await.unwrap();
     }
     let admission = email::domain::inbox_entitlement::InboxConnectionService(
         email::outbound::EmailPgRepo::new(db.clone()),
@@ -303,7 +303,7 @@ async fn gmail_reservation_counts_outlook_and_allows_only_verified_reconnect(db:
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_pause_rejects_new_mailbox_but_preserves_reconnect(db: PgPool) {
     let owner = actor(&db, "pause@example.com").await;
     let request = attempt(&db, owner.clone()).await;
@@ -330,7 +330,7 @@ async fn admission_pause_rejects_new_mailbox_but_preserves_reconnect(db: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconnect_resumes_organization_commands_under_the_new_grant(db: PgPool) {
     use email::domain::{
         mailbox::commands::MailboxCommandRepository,
@@ -471,7 +471,7 @@ async fn reconnect_resumes_organization_commands_under_the_new_grant(db: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconnect_deletes_the_superseded_generations_sync_work(db: PgPool) {
     let owner = actor(&db, "superseded@example.com").await;
     let link = MailboxInitializationService::new(
@@ -533,10 +533,10 @@ async fn reconnect_deletes_the_superseded_generations_sync_work(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_gmail_and_outlook_connections_share_one_remaining_free_slot(db: PgPool) {
     let owner = actor(&db, "concurrent-limit@example.com").await;
-    sqlx::query!("INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider) VALUES($1,$2,$3,'first@gmail.example','GMAIL')",Uuid::new_v4(),owner.1.as_ref(),owner.0.to_string()).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES($1,$2,$3,'first@gmail.example','GMAIL')",Uuid::new_v4(),owner.1.as_ref(),owner.0.to_string()).execute(&db).await.unwrap();
     let request = attempt(&db, owner.clone()).await;
     let service = MailboxInitializationService::new(
         PgMailboxInitialization(db.clone()),
@@ -546,7 +546,7 @@ async fn concurrent_gmail_and_outlook_connections_share_one_remaining_free_slot(
         let mut tx = db.begin().await.map_err(unavailable)?;
         lock_gmail_connection(&mut tx, owner.1.as_ref(), "second@gmail.example").await?;
         let id = Uuid::new_v4();
-        sqlx::query!("INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider) VALUES($1,$2,$3,'second@gmail.example','GMAIL')",id,owner.1.as_ref(),owner.0.to_string()).execute(&mut *tx).await.map_err(unavailable)?;
+        sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES($1,$2,$3,'second@gmail.example','GMAIL')",id,owner.1.as_ref(),owner.0.to_string()).execute(&mut *tx).await.map_err(unavailable)?;
         tx.commit().await.map_err(unavailable)?;
         Ok::<_, InitializationError>(id)
     };
@@ -554,22 +554,22 @@ async fn concurrent_gmail_and_outlook_connections_share_one_remaining_free_slot(
     assert_ne!(gmail.is_ok(), outlook.is_ok());
     let failure = gmail.err().or(outlook.err()).unwrap();
     assert!(matches!(failure, InitializationError::PaymentRequired));
-    let count=sqlx::query_scalar!("SELECT count(*) FROM email_links l WHERE l.macro_id=$1 OR EXISTS(SELECT 1 FROM macro_user_links a WHERE a.link_id=l.id AND a.primary_macro_id=$1)",owner.1.as_ref()).fetch_one(&db).await.unwrap();
+    let count=sqlx::query_scalar!("SELECT count(*) FROM email_links l WHERE l.rox_id=$1 OR EXISTS(SELECT 1 FROM rox_user_links a WHERE a.link_id=l.id AND a.primary_rox_id=$1)",owner.1.as_ref()).fetch_one(&db).await.unwrap();
     assert_eq!(count, Some(2));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
     let owner = actor(&db, "legacy@example.com").await;
     assert_eq!(
-        macro_db_client::macro_user::get_macro_user(&db, &owner.0.to_string())
+        rox_db_client::macro_user::get_macro_user(&db, &owner.0.to_string())
             .await
             .unwrap()
             .username,
         "macro|legacy@example.com"
     );
     assert_eq!(
-        macro_db_client::user::get::get_user_id_by_email(db.clone(), "legacy@example.com")
+        rox_db_client::user::get::get_user_id_by_email(db.clone(), "legacy@example.com")
             .await
             .unwrap(),
         owner.1.as_ref(),
@@ -584,7 +584,7 @@ async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
 
     let gmail = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider,is_primary) VALUES($1,$2,$3,'legacy@example.com','GMAIL',true)",
+        "INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,is_primary) VALUES($1,$2,$3,'legacy@example.com','GMAIL',true)",
         gmail,
         owner.1.as_ref(),
         owner.0.to_string()
@@ -604,7 +604,7 @@ async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
         .await
         .unwrap()
         .unwrap();
-    let expected_address = format!("ada@{}", macro_user_id::handle::ROX_MAIL_DOMAIN);
+    let expected_address = format!("ada@{}", rox_user_id::handle::ROX_MAIL_DOMAIN);
     assert_eq!(link.email_address.0.as_ref(), expected_address);
     assert_eq!(
         link.provider,
@@ -667,7 +667,7 @@ async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rox_writer_gate_enforces_reader_only_rollout(db: PgPool) {
     let owner = actor(&db, "reader-rollout@example.com").await;
     sqlx::query!(
@@ -723,7 +723,7 @@ async fn rox_writer_gate_enforces_reader_only_rollout(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn gmail_connected_after_rox_stays_non_primary(db: PgPool) {
     let owner = actor(&db, "owner@example.com").await;
     sqlx::query!(
@@ -738,10 +738,10 @@ async fn gmail_connected_after_rox_stays_non_primary(db: PgPool) {
         .unwrap();
 
     let email_address =
-        macro_user_id::email::EmailStr::try_from("owner@gmail.example".to_owned()).unwrap();
+        rox_user_id::email::EmailStr::try_from("owner@gmail.example".to_owned()).unwrap();
     let gmail = models_email::email::service::link::Link {
         id: Uuid::now_v7(),
-        macro_id: owner.1.clone(),
+        rox_id: owner.1.clone(),
         fusionauth_user_id: owner.0.to_string(),
         email_address,
         provider: models_email::email::service::link::UserProvider::Gmail,
@@ -763,7 +763,7 @@ async fn gmail_connected_after_rox_stays_non_primary(db: PgPool) {
     assert!(!gmail.is_primary);
     assert!(
         sqlx::query_scalar!(
-            "SELECT is_primary FROM email_links WHERE macro_id = $1 AND provider = 'ROX'",
+            "SELECT is_primary FROM email_links WHERE rox_id = $1 AND provider = 'ROX'",
             owner.1.as_ref()
         )
         .fetch_one(&db)

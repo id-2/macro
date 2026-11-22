@@ -36,7 +36,7 @@ macro_rules! form_id {
         impl $name {
             /// A fresh, time-ordered (UUIDv7) id.
             pub fn new() -> Self {
-                Self(macro_uuid::generate_uuid_v7())
+                Self(rox_uuid::generate_uuid_v7())
             }
 
             /// The id a stored or received UUID names.

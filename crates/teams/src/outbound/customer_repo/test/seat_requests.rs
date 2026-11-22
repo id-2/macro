@@ -47,7 +47,7 @@ fn pairs(fields: &[(&str, &str)]) -> Vec<(String, String)> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn adding_a_seat_to_an_existing_plan_sends_mains_request(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -78,7 +78,7 @@ async fn adding_a_seat_to_an_existing_plan_sends_mains_request(pool: sqlx::PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn adding_the_first_seat_on_a_plan_sends_mains_request(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -110,7 +110,7 @@ async fn adding_the_first_seat_on_a_plan_sends_mains_request(pool: sqlx::PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_seats_sends_mains_requests(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -160,7 +160,7 @@ async fn removing_seats_sends_mains_requests(pool: sqlx::PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_the_last_seat_sends_nothing(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -175,7 +175,7 @@ async fn removing_the_last_seat_sends_nothing(pool: sqlx::PgPool) {
     assert_eq!(sent(&server).await, vec![get_subscription()]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn moving_a_seat_sends_mains_request(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -208,7 +208,7 @@ async fn moving_a_seat_sends_mains_request(pool: sqlx::PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_trial_gaining_its_first_max_seat_sends_mains_request(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -247,12 +247,12 @@ async fn a_trial_gaining_its_first_max_seat_sends_mains_request(pool: sqlx::PgPo
 
 /// With downgrades scheduled for renewal, a seat change rewrites both schedule
 /// phases. The schedule metadata is a map, so its fields are compared unordered.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_seat_change_with_scheduled_downgrades_sends_mains_schedule_update(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
     let mut sched = schedule();
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
     let members = json!({"macro|one@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
@@ -305,19 +305,19 @@ async fn a_seat_change_with_scheduled_downgrades_sends_mains_schedule_update(poo
     assert!(!idempotent);
     let mut fields: std::collections::BTreeMap<String, String> = fields.into_iter().collect();
     // Each write stores its renewal record under a fresh id.
-    let record = fields["metadata[macro_pending_seats]"].clone();
+    let record = fields["metadata[rox_pending_seats]"].clone();
     assert_ne!(record, id.to_string());
     assert_eq!(
-        fields.remove("phases[1][metadata][macro_renewed_seats]"),
+        fields.remove("phases[1][metadata][rox_renewed_seats]"),
         Some(record.clone())
     );
-    assert_eq!(fields.remove("metadata[macro_pending_seats]"), Some(record));
+    assert_eq!(fields.remove("metadata[rox_pending_seats]"), Some(record));
     assert_eq!(
         fields,
         std::collections::BTreeMap::from(
             [
                 ("end_behavior", "release"),
-                ("metadata[macro_plan_schedule]", "1"),
+                ("metadata[rox_plan_schedule]", "1"),
                 ("phases[0][coupon]", "coupon_existing"),
                 ("phases[0][currency]", "usd"),
                 ("phases[0][default_payment_method]", "pm_existing"),

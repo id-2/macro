@@ -9,7 +9,7 @@ use hosted_runtimes::domain::{
     ports::{Billing, CompPolicy, ComputerRepo, FleetAttachmentSource},
     service::{Clock, ComputerError, ComputerService},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{ComputerId, ComputerPurchase, ComputerState, TeamAgentError};
@@ -144,7 +144,7 @@ where
     async fn computer_for_agent(
         &self,
         team_id: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Option<ComputerId>, TeamAgentError> {
         self.agents
             .computer_for_agent(team_id, agent)
@@ -155,7 +155,7 @@ where
     async fn agent_of(
         &self,
         computer_id: ComputerId,
-    ) -> Result<Option<MacroUserIdStr<'static>>, TeamAgentError> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, TeamAgentError> {
         self.agents
             .agent_of(computer_id)
             .await

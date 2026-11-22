@@ -1,11 +1,11 @@
 import { type as osType } from '@tauri-apps/plugin-os';
 
-type MacroPlatform = 'web' | 'desktop' | 'ios' | 'android';
-type NativeMobilePlatform = Extract<MacroPlatform, 'ios' | 'android'>;
+type RoxPlatform = 'web' | 'desktop' | 'ios' | 'android';
+type NativeMobilePlatform = Extract<RoxPlatform, 'ios' | 'android'>;
 
-let cached: MacroPlatform | undefined;
+let cached: RoxPlatform | undefined;
 
-function detectPlatform(): MacroPlatform {
+function detectPlatform(): RoxPlatform {
   if (!isTauri()) return 'web';
   const os = osType();
   if (os === 'ios') return 'ios';
@@ -13,12 +13,12 @@ function detectPlatform(): MacroPlatform {
   return 'desktop';
 }
 
-export function getPlatform(): MacroPlatform {
+export function getPlatform(): RoxPlatform {
   if (cached === undefined) cached = detectPlatform();
   return cached;
 }
 
-export function isPlatform(target: MacroPlatform | MacroPlatform[]): boolean {
+export function isPlatform(target: RoxPlatform | RoxPlatform[]): boolean {
   const platform = getPlatform();
   return Array.isArray(target)
     ? target.includes(platform)
@@ -27,9 +27,9 @@ export function isPlatform(target: MacroPlatform | MacroPlatform[]): boolean {
 
 function isMobilePlatform(): boolean;
 function isMobilePlatform(
-  platform: MacroPlatform
+  platform: RoxPlatform
 ): platform is NativeMobilePlatform;
-function isMobilePlatform(platform: MacroPlatform = getPlatform()): boolean {
+function isMobilePlatform(platform: RoxPlatform = getPlatform()): boolean {
   return platform === 'ios' || platform === 'android';
 }
 

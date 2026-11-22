@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::{Map, json};
 use strum::VariantArray;
 
@@ -10,8 +10,8 @@ use crate::outbound::pg_scheduled_action_repo::test::{
     USER_A, USER_B, insert_user, sample_action, test_repo, user_owner,
 };
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 fn catalog(key: &str) -> CheckedSuggestion {
@@ -88,7 +88,7 @@ async fn generation(pool: &PgPool, user: &str) -> Uuid {
     id
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_counts_what_it_kept_and_every_keep_and_retire_is_logged(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let generation = generation(&pool, USER_A).await;
@@ -154,7 +154,7 @@ async fn a_session_counts_what_it_kept_and_every_keep_and_retire_is_logged(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn suggestions_round_trip_and_dismissals_and_saves_are_the_persons(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -219,7 +219,7 @@ async fn suggestions_round_trip_and_dismissals_and_saves_are_the_persons(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_drafted_suggestion_and_its_card_are_kept_and_closed_together(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let generation = generation(&pool, USER_A).await;
@@ -288,7 +288,7 @@ async fn a_drafted_suggestion_and_its_card_are_kept_and_closed_together(pool: Pg
     assert_eq!(logged, ["created", "created", "created", "retired"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_drafted_suggestion_past_the_suggestions_limit_keeps_nothing(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = PgSuggestionRepo::new(pool.clone());
@@ -316,7 +316,7 @@ async fn a_drafted_suggestion_past_the_suggestions_limit_keeps_nothing(pool: PgP
 
 /// A drafted suggestion with no suggestion (one the previous release drafted
 /// during a deploy) is still retired and dismissed.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_drafted_suggestion_without_its_card_still_closes(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let generation = generation(&pool, USER_A).await;
@@ -412,7 +412,7 @@ async fn stored_suggestion(repo: &PgSuggestionRepo, id: Uuid) -> StoredSuggestio
 
 /// Each event in each state moves the stored suggestion and its card where
 /// the domain's transition says, and leaves them where they are otherwise.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn every_event_moves_a_suggestion_and_its_card_as_the_domain_says(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = PgSuggestionRepo::new(pool.clone());
@@ -486,7 +486,7 @@ async fn every_event_moves_a_suggestion_and_its_card_as_the_domain_says(pool: Pg
 
 /// Saving a routine from someone else's suggestion, or from a template,
 /// leaves the suggestion where it is.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_owner_saving_a_routine_saves_the_suggestion(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -513,7 +513,7 @@ async fn only_the_owner_saving_a_routine_saves_the_suggestion(pool: PgPool) {
 }
 
 /// Sessions keeping the same catalog routine at once keep it once.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_sessions_keep_one_pick_of_a_catalog_routine(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let generation = generation(&pool, USER_A).await;
@@ -552,7 +552,7 @@ async fn concurrent_sessions_keep_one_pick_of_a_catalog_routine(pool: PgPool) {
 }
 
 /// A session keeping many at once keeps no more than its limit.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_keeping_at_once_keeps_at_most_its_limit(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let generation = generation(&pool, USER_A).await;
@@ -622,7 +622,7 @@ async fn insert_pick<'e>(
 /// A catalog pick the previous release keeps meanwhile, without the lock,
 /// is the one kept: the open catalog key index refuses a second. Whether
 /// the keep checks before or after that pick commits, it is refused.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_pick_kept_meanwhile_without_the_lock_is_not_kept_twice(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let generation = generation(&pool, USER_A).await;
@@ -658,7 +658,7 @@ async fn a_pick_kept_meanwhile_without_the_lock_is_not_kept_twice(pool: PgPool) 
 /// The state backfill derives each suggestion's state as readers did before
 /// it was stored, leaves one open pick per catalog key, and moves each card
 /// to its suggestion's state.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_state_backfill_derives_what_readers_derived(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -762,13 +762,13 @@ async fn the_state_backfill_derives_what_readers_derived(pool: PgPool) {
     }
 
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20261113042517_backfill_routine_suggestion_state.sql"
+        "../../../../rox_db_client/migrations/20261113042517_backfill_routine_suggestion_state.sql"
     ))
     .execute(&pool)
     .await
     .unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20261113042518_routine_suggestion_open_catalog_key_concurrently.sql"
+        "../../../../rox_db_client/migrations/20261113042518_routine_suggestion_open_catalog_key_concurrently.sql"
     ))
     .execute(&pool)
     .await

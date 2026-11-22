@@ -19,11 +19,11 @@ use entity_access::domain::models::{
     EntityPermission, EntityType as AccessEntityType, RequiredPermission, ViewAccessLevel,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationRejection, MacroAuthorizationService,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationRejection, RoxAuthorizationService,
     OptionalMacroAuthorizationExtractor, UserOrInternal, UserOrInternalService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::api::PropertyTargetEntityType;
 
 use super::{PropertiesRouterState, properties_err_status};
@@ -57,8 +57,8 @@ pub enum ReceiptRejection {
     Properties(#[from] PropertiesErr),
 }
 
-impl From<MacroAuthorizationRejection> for ReceiptRejection {
-    fn from(MacroAuthorizationRejection { status, message }: MacroAuthorizationRejection) -> Self {
+impl From<RoxAuthorizationRejection> for ReceiptRejection {
+    fn from(RoxAuthorizationRejection { status, message }: RoxAuthorizationRejection) -> Self {
         Self::Authorization { status, message }
     }
 }
@@ -101,7 +101,7 @@ pub(crate) fn target_entity_type(entity_type: PropertyTargetEntityType) -> Acces
 
 pub(crate) async fn mint_authenticated_receipt<T, A>(
     entity_access_service: &A,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     entity_id: &str,
     entity_type: AccessEntityType,
 ) -> Result<EntityAccessReceipt<T>, PropertiesErr>
@@ -119,7 +119,7 @@ where
 
 pub(crate) async fn mint_view_receipt<A>(
     entity_access_service: &A,
-    user_id: Option<&MacroUserIdStr<'_>>,
+    user_id: Option<&RoxUserIdStr<'_>>,
     entity_id: &str,
     entity_type: AccessEntityType,
 ) -> Result<ViewReceipt, PropertiesErr>
@@ -168,7 +168,7 @@ impl<S, A, Auth> FromRequestParts<PropertiesRouterState<S, A, Auth>> for ViewRec
 where
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     type Rejection = ReceiptRejection;
 
@@ -190,7 +190,7 @@ where
             .authorization
             .as_ref()
             .and_then(|authorization| authorization.acting_user())
-            .map(|user| user.macro_user_id.clone());
+            .map(|user| user.rox_user_id.clone());
 
         let receipt = mint_view_receipt(
             state.entity_access_service.as_ref(),
@@ -212,7 +212,7 @@ impl<S, A, Auth> FromRequestParts<PropertiesRouterState<S, A, Auth>> for EditRec
 where
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     type Rejection = ReceiptRejection;
 
@@ -224,7 +224,7 @@ where
         let params = entity_path_params(parts).await?;
 
         let authorization = parts
-            .extract_with_state::<MacroAuthorizationExtractor<Auth, UserOrInternal>, _>(state)
+            .extract_with_state::<RoxAuthorizationExtractor<Auth, UserOrInternal>, _>(state)
             .await
             .map_err(ReceiptRejection::from)?;
 
@@ -237,7 +237,7 @@ where
                 .entity_access_service
                 .generate_bot_entity_access_receipt::<EditAccessLevel>(
                     agent,
-                    BotAccessScope::user(user.macro_user_id),
+                    BotAccessScope::user(user.rox_user_id),
                     &params.entity_id,
                     entity_type,
                 )
@@ -246,7 +246,7 @@ where
             None => {
                 mint_authenticated_receipt::<EditAccessLevel, A>(
                     state.entity_access_service.as_ref(),
-                    &user.macro_user_id,
+                    &user.rox_user_id,
                     &params.entity_id,
                     entity_type,
                 )

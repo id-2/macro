@@ -22,7 +22,7 @@ async fn fetch(
     Ok(expanded_dynamic_cursor_soup_grouped(
         pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
             limit,
             cursor: DynamicSort::from_timestamp_query(cursor),
             exclude_frecency: false,
@@ -52,11 +52,11 @@ fn cursor_from(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
     fixtures(path = ".", scripts("access", "sorting")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn all_sorts_preserve_history_dates_and_real_cursors(
     pool: Pool<Postgres>,
@@ -214,11 +214,11 @@ async fn all_sorts_preserve_history_dates_and_real_cursors(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
     fixtures(path = ".", scripts("access")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn calendar_sorts_preserve_reminders_and_linked_account_cursors(
     pool: Pool<Postgres>,

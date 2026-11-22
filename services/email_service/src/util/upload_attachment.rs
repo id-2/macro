@@ -4,8 +4,8 @@ use base64::engine::general_purpose::STANDARD;
 use document_storage_service_client::DocumentStorageServiceClient;
 use document_storage_service_client::document::CreateDocumentInternalError;
 use email_api_client::domain::models::EmailApiError;
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
 use model::document::MAX_DOCUMENT_NAME_GRAPHEMES;
 use model::document::response::{CreateDocumentRequest, CreateDocumentResponse};
 use models_email::service::attachment::{
@@ -147,7 +147,7 @@ async fn upload_media_attachment(
         .map_err(|e| UploadAttachmentError::SfsUploadFailed(e.to_string()))?;
 
     // Store metadata in email_attachments_sfs table
-    let attachment_sfs_id = macro_uuid::generate_uuid_v7();
+    let attachment_sfs_id = rox_uuid::generate_uuid_v7();
     let sfs_id = Uuid::parse_str(&sfs_response.id).map_err(|e| {
         UploadAttachmentError::ParseError(format!("Failed to parse SFS ID as UUID: {}", e))
     })?;
@@ -336,7 +336,7 @@ async fn create_dss_document_record(
     };
 
     dss_client
-        .create_document_internal(request, link.macro_id.0.as_ref())
+        .create_document_internal(request, link.rox_id.0.as_ref())
         .await
         .map_err(|e| match e {
             CreateDocumentInternalError::EmailAttachmentNotFound => {
@@ -419,19 +419,19 @@ fn email_attachment_property(p: &AttachmentUploadArgs) -> EmailAttachmentPropert
             .attachment_metadata
             .sender_email
             .as_deref()
-            .and_then(|email| macro_user_id(p, email)),
+            .and_then(|email| rox_user_id(p, email)),
         recipients: Some(
             p.recipient_emails
                 .iter()
-                .filter_map(|email| macro_user_id(p, email))
+                .filter_map(|email| rox_user_id(p, email))
                 .collect(),
         ),
         subject: p.attachment_metadata.subject.clone(),
     }
 }
 
-fn macro_user_id(p: &AttachmentUploadArgs, email: &str) -> Option<MacroUserId<Lowercase<'static>>> {
-    match MacroUserIdStr::try_from_email(email) {
+fn rox_user_id(p: &AttachmentUploadArgs, email: &str) -> Option<RoxUserId<Lowercase<'static>>> {
+    match RoxUserIdStr::try_from_email(email) {
         Ok(id) => Some(id.0),
         // The parse error echoes the address, so it stays out of the log.
         Err(_) => {

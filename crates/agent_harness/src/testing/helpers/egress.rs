@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 
 use agent_egress::domain::model::McpServerSlug;
 use agent_session::domain::model::{AgentMcpServers, AgentSessionId};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::error::Result;
 use crate::domain::model::{ProvisionedEgress, SandboxEgress};
@@ -66,7 +66,7 @@ impl SandboxEgressProvisioner for EgressProvisionerMock {
     async fn provision(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         selection: &AgentMcpServers,
     ) -> Result<ProvisionedEgress> {
         self.provisioned
@@ -82,7 +82,7 @@ impl SandboxEgressProvisioner for EgressProvisionerMock {
 
     async fn restore(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         session_token: String,
         _selection: &AgentMcpServers,
     ) -> Result<SandboxEgress> {

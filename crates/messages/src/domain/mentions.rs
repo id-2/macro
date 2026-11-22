@@ -28,7 +28,7 @@ pub fn bot_mention_ids(mentions: &[SimpleMention]) -> Vec<BotId> {
             "user" => BotIdStr::parse_from_str(&mention.entity_id)
                 .ok()
                 .map(|id| id.bot_id())
-                .filter(|id| *id == bot_id::MACRO_AI_BOT_ID),
+                .filter(|id| *id == bot_id::ROX_AI_BOT_ID),
             _ => None,
         })
         .filter(|id| seen.insert(*id))

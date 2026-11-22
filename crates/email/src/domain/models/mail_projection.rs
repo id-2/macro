@@ -71,7 +71,7 @@ pub struct EmailDraftEntry {
     /// Global message identity.
     pub id: uuid::Uuid,
     /// Whether edits contribute their update time to Mail recency.
-    pub macro_draft: bool,
+    pub rox_draft: bool,
     /// This draft's contribution to thread metadata.
     pub facts: EmailDraftAggregate,
 }

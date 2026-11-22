@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 
 use ::email::domain::events::{EmailMacroEvent, EmailTopicEvent};
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 use opensearch_client::OpensearchClient;
 use sqlx::PgPool;
 use uuid::Uuid;

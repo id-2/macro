@@ -12,7 +12,7 @@ use entity_access::{
     domain::{models::ViewAccessLevel, ports::EntityAccessService},
     inbound::axum_extractors::AgentSessionAccessLevelExtractor,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use serde::Deserialize;
 use std::{num::NonZeroU32, sync::Arc};
 use utoipa::IntoParams;
@@ -22,7 +22,7 @@ use uuid::Uuid;
 pub struct AgentActivityState<R, Access, Auth> {
     repository: Arc<R>,
     access: Arc<Access>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<R, Access, Auth> AgentActivityState<R, Access, Auth> {
@@ -30,7 +30,7 @@ impl<R, Access, Auth> AgentActivityState<R, Access, Auth> {
     pub fn new(
         repository: R,
         access: Arc<Access>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             repository: Arc::new(repository),
@@ -57,7 +57,7 @@ impl<R, Access, Auth> FromRef<AgentActivityState<R, Access, Auth>> for Arc<Acces
 }
 
 impl<R, Access, Auth> FromRef<AgentActivityState<R, Access, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &AgentActivityState<R, Access, Auth>) -> Self {
         state.authorization.clone()
@@ -85,7 +85,7 @@ pub struct AgentActivityQuery {
 pub fn router<
     R: AgentActivityReads,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     state: AgentActivityState<R, Access, Auth>,
 ) -> Router {
@@ -104,7 +104,7 @@ pub fn router<
 pub async fn get_agent_session_activity<
     R: AgentActivityReads,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentActivityState<R, Access, Auth>>,

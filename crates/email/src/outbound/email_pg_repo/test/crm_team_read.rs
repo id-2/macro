@@ -9,7 +9,7 @@
 use super::*;
 use crate::outbound::email_pg_repo::db_types::ThreadPreviewCursorDbRow;
 use crate::outbound::email_pg_repo::dynamic::TeamReadTuning;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 const TEAM_GAMMA_ID: &str = "e0000003-0000-0000-0000-000000000003";
 const TEAM_DELTA_ID: &str = "e0000004-0000-0000-0000-000000000004";
@@ -177,7 +177,7 @@ async fn assert_parity(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn company_pages_match_for_every_caller(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -206,7 +206,7 @@ async fn company_pages_match_for_every_caller(pool: Pool<Postgres>) -> anyhow::R
 /// addresses in a primary inbox (u9's link 10, in Team Delta). Gamma never
 /// reads it, whichever stream a page comes from, while Delta's read does.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn another_teams_mail_never_shows(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -244,7 +244,7 @@ async fn another_teams_mail_never_shows(pool: Pool<Postgres>) -> anyhow::Result<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn rare_and_old_companies_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -261,7 +261,7 @@ async fn rare_and_old_companies_match(pool: Pool<Postgres>) -> anyhow::Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn blocked_domains_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -290,7 +290,7 @@ async fn blocked_domains_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn contact_pages_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -303,7 +303,7 @@ async fn contact_pages_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn signal_and_me_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -345,7 +345,7 @@ async fn signal_and_me_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 /// contacts of the inboxes it reads: one inbox under Me, none when the
 /// address lives only in an inbox that doesn't contribute.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn contacts_outside_the_inboxes_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -406,7 +406,7 @@ async fn contacts_outside_the_inboxes_match(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn a_copy_keyed_by_a_thread_id_dedupes(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -441,14 +441,14 @@ async fn a_copy_keyed_by_a_thread_id_dedupes(pool: Pool<Postgres>) -> anyhow::Re
 /// The user who owns `link`, read from the fixture.
 async fn owner_of(pool: &Pool<Postgres>, link: Uuid) -> anyhow::Result<String> {
     Ok(
-        sqlx::query_scalar!("SELECT macro_id FROM email_links WHERE id = $1", link)
+        sqlx::query_scalar!("SELECT rox_id FROM email_links WHERE id = $1", link)
             .fetch_one(pool)
             .await?,
     )
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts(
@@ -475,7 +475,7 @@ async fn dedupe_fixture_pages_match(pool: Pool<Postgres>) -> anyhow::Result<()> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")

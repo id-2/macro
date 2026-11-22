@@ -222,7 +222,7 @@ impl DeploymentSource for ServiceDeployment {
 }
 
 fn resolve_deployment() -> anyhow::Result<Deployment> {
-    use macro_service_urls::{
+    use rox_service_urls::{
         AgentHarnessEgressUrl, AgentHarnessServiceUrl, AppServiceUrl, DocumentStorageServiceUrl,
     };
     Ok(Deployment {

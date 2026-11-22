@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 async fn setup(db: &PgPool) -> (PgMailboxSync, Uuid) {
     let (repo, link) = super::super::test::fixture(db).await;
@@ -16,7 +16,7 @@ async fn setup(db: &PgPool) -> (PgMailboxSync, Uuid) {
     .unwrap();
     (repo, link)
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_advancement_and_child_work_commit_atomically_and_reject_stale_replay(db: PgPool) {
     let (repo, link) = setup(&db).await;
     let work = [
@@ -49,7 +49,7 @@ async fn history_advancement_and_child_work_commit_atomically_and_reject_stale_r
     .unwrap();
     assert_eq!(count, Some(2));
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_cursor_commit_rolls_back_every_journaled_child(db: PgPool) {
     let (repo, link) = setup(&db).await;
     sqlx::raw_sql("CREATE FUNCTION reject_cursor() RETURNS trigger LANGUAGE plpgsql AS $$BEGIN RAISE EXCEPTION 'test commit failure';END;$$; CREATE TRIGGER reject_cursor BEFORE UPDATE ON email_gmail_histories FOR EACH ROW EXECUTE FUNCTION reject_cursor();").execute(&db).await.unwrap();

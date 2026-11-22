@@ -43,8 +43,8 @@ Put the handler in the owning crate's `src/inbound/axum_router.rs`. Some older
 services (notification, auth) keep handlers in `services/<svc>/src/api/`; extend
 those in place, but new routers live in the crate.
 
-- **Authentication:** `MacroAuthorizationExtractor<Auth, Policy>` with the
-  narrowest policy in `crates/macro_authorization/src/inbound/axum/policy.rs`
+- **Authentication:** `RoxAuthorizationExtractor<Auth, Policy>` with the
+  narrowest policy in `crates/rox_authorization/src/inbound/axum/policy.rs`
   (`UserOnly`, `UserOrInternal`, `InternalOnly`, `UserOrBot`, ...).
   Use `AccountHolderOrInternal` for a route that mints a credential outliving its
   request, changes who can sign in, or deletes the account: it refuses an account

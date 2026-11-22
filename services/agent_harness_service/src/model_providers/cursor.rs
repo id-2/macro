@@ -8,7 +8,7 @@ use cursor_cloud_agents::api::{ApiKey, CursorClient, CursorConfig};
 use cursor_cloud_agents::domain::error::CredentialRejected;
 use cursor_cloud_agents::domain::model_options::cursor_model_config_options;
 use cursor_cloud_agents::domain::ports::CursorAgents;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -45,7 +45,7 @@ where
 {
     async fn probe(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
     ) -> Result<RawModelProbe, ModelProbeError> {
         let config = self
             .keys
@@ -82,7 +82,7 @@ where
 impl<Keys: CursorApiKeys> agent_harness::domain::capability_discovery::CapabilityProbe
     for CursorModels<Keys>
 {
-    type Target = MacroUserIdStr<'static>;
+    type Target = RoxUserIdStr<'static>;
     async fn probe(
         &self,
         caller: &Self::Target,

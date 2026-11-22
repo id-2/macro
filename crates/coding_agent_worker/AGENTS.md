@@ -61,7 +61,7 @@ the local ACP process (Claude Code, Codex, ...), and drives native
   config) for the guest's `macro-agent.service`; one without removes it.
 - `src/computer.rs`: the one Rox-computer hook in sessions. On an enrolled Rox
   computer only (the marker exists), each Claude Code session's env: `ANTHROPIC_BASE_URL` (the
-  session's `macro_internal` MCP URL with `/mcp/internal` → `/anthropic`),
+  session's `rox_internal` MCP URL with `/mcp/internal` → `/anthropic`),
   `ANTHROPIC_AUTH_TOKEN` (its bearer) and
   `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` go to `session/new|load|resume`
   as `_meta.claudeCode.options.env`, always. It calls nothing in Claude and

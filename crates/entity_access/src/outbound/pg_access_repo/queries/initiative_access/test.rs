@@ -1,7 +1,7 @@
 use super::*;
 use crate::outbound::pg_access_repo::queries::get_user_source_ids;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ impl LinkShare {
 }
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     let email = user_id.trim_start_matches("macro|");
 
     sqlx::query!(
@@ -38,7 +38,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $2)
         "#,
-        macro_user_id,
+        rox_user_id,
         user_id,
         email,
     )
@@ -46,10 +46,10 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     .await?;
 
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await?;
@@ -171,11 +171,11 @@ fn anonymous() -> SourceIds {
 }
 
 #[cfg(feature = "explain_binary")]
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_row_grants_owner(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let initiative_id = insert_initiative(&pool, OWNER, LinkShare::Off).await?;
@@ -190,7 +190,7 @@ async fn owner_row_grants_owner(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_column_is_not_a_grant(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let initiative_id = insert_initiative(&pool, OWNER, LinkShare::Off).await?;
@@ -200,7 +200,7 @@ async fn owner_column_is_not_a_grant(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn initiative_member_is_not_a_grant(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     insert_user(&pool, GRANTEE).await?;
@@ -222,7 +222,7 @@ async fn initiative_member_is_not_a_grant(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn direct_user_grant_is_returned(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let initiative_id = insert_initiative(&pool, OWNER, LinkShare::Off).await?;
@@ -236,7 +236,7 @@ async fn direct_user_grant_is_returned(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_grant_reaches_team_members(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let initiative_id = insert_initiative(&pool, OWNER, LinkShare::Off).await?;
@@ -262,7 +262,7 @@ async fn team_grant_reaches_team_members(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_grant_resolves_through_user_source_ids(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     insert_user(&pool, GRANTEE).await?;
@@ -278,7 +278,7 @@ async fn team_grant_resolves_through_user_source_ids(pool: PgPool) -> anyhow::Re
     )
     .await?;
 
-    let requester = MacroUserIdStr::parse_from_str(GRANTEE).expect("valid requester id");
+    let requester = RoxUserIdStr::parse_from_str(GRANTEE).expect("valid requester id");
     let source_ids = get_user_source_ids(&pool, Some(&*requester)).await?;
     let access = get_initiative_access(&pool, &initiative_id, &source_ids).await?;
 
@@ -286,7 +286,7 @@ async fn team_grant_resolves_through_user_source_ids(pool: PgPool) -> anyhow::Re
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_grants_owner_team_members(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     insert_team(&pool, OWNER_TEAM, OWNER).await?;
@@ -313,7 +313,7 @@ async fn team_link_grants_owner_team_members(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn public_link_grants_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let initiative_id =
@@ -327,7 +327,7 @@ async fn public_link_grants_anonymous_access(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn no_grant_and_no_link_denies(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let initiative_id = insert_initiative(&pool, OWNER, LinkShare::Off).await?;
@@ -342,7 +342,7 @@ async fn no_grant_and_no_link_denies(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn highest_level_across_arms_wins(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let public_higher =
@@ -361,7 +361,7 @@ async fn highest_level_across_arms_wins(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_when_owner_has_no_team(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let initiative_id = insert_initiative(&pool, OWNER, LinkShare::Team(AccessLevel::Edit)).await?;
@@ -378,7 +378,7 @@ async fn team_link_denies_when_owner_has_no_team(pool: PgPool) -> anyhow::Result
 }
 
 #[cfg(feature = "explain_binary")]
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explain_agrees_with_access_level(pool: PgPool) -> anyhow::Result<()> {
     use crate::domain::models::{AccessExplanation, AccessGrant, Entity, EntityType};
 

@@ -1,4 +1,4 @@
-import { isMacroAgentId, MACRO_AGENT_NAME } from '@core/constant/macroAgent';
+import { isMacroAgentId, ROX_AGENT_NAME } from '@core/constant/macroAgent';
 import { macroIdToEmail, tryMacroId } from '@core/user';
 import { getHashedPaletteColor } from '@ui/utils/palette';
 
@@ -25,10 +25,10 @@ export function aiAuthorOnBehalfOf(authorId: string): string | undefined {
 
 export function userLabel(userId: string): string {
   if (userId === 'unknown') return 'Unknown';
-  if (userId === SYSTEM_AUTHOR_ID) return MACRO_AGENT_NAME;
+  if (userId === SYSTEM_AUTHOR_ID) return ROX_AGENT_NAME;
   const onBehalfOf = aiAuthorOnBehalfOf(userId);
   if (onBehalfOf !== undefined) return `${userLabel(onBehalfOf)} (AI)`;
-  if (isMacroAgentId(userId)) return `${MACRO_AGENT_NAME} (AI)`;
+  if (isMacroAgentId(userId)) return `${ROX_AGENT_NAME} (AI)`;
   const id = tryMacroId(userId);
   return id ? macroIdToEmail(id) : userId;
 }

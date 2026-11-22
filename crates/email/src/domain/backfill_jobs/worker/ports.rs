@@ -13,8 +13,8 @@ use crm::domain::{
 };
 use email_api_client::domain::models::{EmailApiError, MessageWithCalendarParts};
 use futures::future::BoxFuture;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{backfill::*, link::Link, pubsub::ProcessingError};
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -190,7 +190,7 @@ pub trait BackfillWritePermit: Send {
 
 /// Existing progress, upload and publication effects.
 pub trait BackfillEffects:
-    BackfillImportEffects + BackfillLifecycleEffects + MacroEventBroker + Send + Sync + 'static
+    BackfillImportEffects + BackfillLifecycleEffects + RoxEventBroker + Send + Sync + 'static
 {
     /// CRM write admission lease.
     type Permit: BackfillWritePermit;
@@ -207,7 +207,7 @@ pub trait BackfillEffects:
     /// Enqueue the existing two-user contact set.
     fn connect(
         &self,
-        users: HashSet<MacroUserIdStr<'static>>,
+        users: HashSet<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), rootcause::Report>> + Send;
     /// Acquire a team's existing CRM write lease.
     fn acquire_crm(

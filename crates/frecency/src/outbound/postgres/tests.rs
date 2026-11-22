@@ -5,12 +5,12 @@ use crate::domain::models::{
 use super::*;
 use chrono::Utc;
 use item_filters::ChatFilters;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use std::collections::VecDeque;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_set_event(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
     let test_user_id = "test_user_set_event";
@@ -52,10 +52,10 @@ async fn test_set_event(pool: PgPool) {
     assert!(!row.was_processed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_set_and_get_aggregate(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Create a test aggregate
     let mut recent_events = VecDeque::new();
@@ -101,10 +101,10 @@ async fn test_set_and_get_aggregate(pool: PgPool) {
     assert_eq!(retrieved.data.recent_events.len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_update_aggregate(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Create initial aggregate
     let aggregate1 = AggregateFrecency {
@@ -163,10 +163,10 @@ async fn test_update_aggregate(pool: PgPool) {
     assert_eq!(retrieved.data.recent_events.len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_top_entities(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Create multiple aggregates with different scores
     let entities = vec![
@@ -213,10 +213,10 @@ async fn test_get_top_entities(pool: PgPool) {
     assert_eq!(top_entities[2].data.frecency_score, 85.0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_aggregate_for_user_entities(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Create multiple aggregates
     let aggregates = vec![
@@ -262,11 +262,11 @@ async fn test_get_aggregate_for_user_entities(pool: PgPool) {
     assert_eq!(results[1].data.frecency_score, 80.0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_top_entities_empty(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
     let test_user_id =
-        MacroUserIdStr::parse_from_str("macro|test-user-nonexistent@example.com").unwrap();
+        RoxUserIdStr::parse_from_str("macro|test-user-nonexistent@example.com").unwrap();
 
     // Get top entities for user with no data
     let top_entities = storage
@@ -282,10 +282,10 @@ async fn test_get_top_entities_empty(pool: PgPool) {
     assert_eq!(top_entities.len(), 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_aggregate_for_empty_entities_list(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Query with empty entities list
     let results = storage
@@ -298,10 +298,10 @@ async fn test_get_aggregate_for_empty_entities_list(pool: PgPool) {
 
 // Tests for FrecencyPgProcessor
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_top_entities_with_from_score(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Create multiple aggregates with different scores
     let entities = vec![
@@ -420,10 +420,10 @@ async fn test_get_top_entities_with_from_score(pool: PgPool) {
     assert_eq!(all_with_high_score.len(), 5);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_processor_get_unprocessed_events(pool: PgPool) {
     let processor = FrecencyPgProcessor::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Insert some unprocessed events directly
     for i in 0..3 {
@@ -493,7 +493,7 @@ async fn test_processor_get_unprocessed_events(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_processor_mark_processed(pool: PgPool) {
     let processor = FrecencyPgProcessor::new(pool.clone());
     let test_user_id = "test_processor_mark";
@@ -551,11 +551,11 @@ async fn test_processor_mark_processed(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_processor_get_aggregates_for_users_entities(pool: PgPool) {
     let processor = FrecencyPgProcessor::new(pool.clone());
-    let test_user_id: MacroUserIdStr<'static> =
-        MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id: RoxUserIdStr<'static> =
+        RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Insert some aggregates directly
     let aggregates_data = vec![
@@ -626,10 +626,10 @@ async fn test_processor_get_aggregates_for_users_entities(pool: PgPool) {
     assert_eq!(chat_agg.unwrap().data.frecency_score, 80.0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_processor_set_aggregates(pool: PgPool) {
     let processor = FrecencyPgProcessor::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Start a transaction
     let _ = processor.get_unprocessed_events().await.unwrap();
@@ -708,10 +708,10 @@ async fn test_processor_set_aggregates(pool: PgPool) {
     assert_eq!(chat_result.frecency_score, 65.0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_processor_set_aggregates_update_existing(pool: PgPool) {
     let processor = FrecencyPgProcessor::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Insert initial aggregate
     sqlx::query!(
@@ -781,7 +781,7 @@ async fn test_processor_set_aggregates_update_existing(pool: PgPool) {
     assert_eq!(result.frecency_score, 95.0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_processor_set_aggregates_empty_list(pool: PgPool) {
     let processor = FrecencyPgProcessor::new(pool.clone());
 
@@ -793,10 +793,10 @@ async fn test_processor_set_aggregates_empty_list(pool: PgPool) {
     assert!(result.is_ok());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_processor_claim_aggregate_lifecycle(pool: PgPool) {
     let processor = FrecencyPgProcessor::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Insert an unprocessed event
     let event_id = sqlx::query_scalar!(
@@ -881,7 +881,7 @@ async fn test_processor_claim_aggregate_lifecycle(pool: PgPool) {
 /// so it has to be closed out by mark_processed like any other. Otherwise the
 /// lock would sit held until the next tick cleaned it up -- once per poll, on
 /// every replica, for as long as the queue stays empty.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_empty_batch_still_releases_the_aggregation_lock(pool: PgPool) {
     let first = FrecencyPgProcessor::new(pool.clone());
     let second = FrecencyPgProcessor::new(pool);
@@ -903,7 +903,7 @@ async fn an_empty_batch_still_releases_the_aggregation_lock(pool: PgPool) {
 /// The aggregate lookup renders its filter with `push_tuples`, which emits a
 /// bare `IN ()` for an empty batch. Callers should short-circuit before here,
 /// but the method must not turn "nothing to look up" into a syntax error.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn empty_aggregate_lookup_returns_empty_rather_than_failing(pool: PgPool) {
     let processor = FrecencyPgProcessor::new(pool);
     let res = processor
@@ -919,7 +919,7 @@ async fn empty_aggregate_lookup_returns_empty_rather_than_failing(pool: PgPool) 
 /// set_aggregates blind-overwrites that row, so two concurrent passes would
 /// lose one of their contributions. The second poller must be turned away
 /// while the first holds the lock, and admitted once it releases.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_second_poller_is_locked_out_until_the_first_finishes(pool: PgPool) {
     let test_user_id = "test_processor_claim_is_exclusive";
     // Insert an unprocessed event
@@ -979,12 +979,12 @@ async fn a_second_poller_is_locked_out_until_the_first_finishes(pool: PgPool) {
 /// Tests that mixing supported (chat_id) and unsupported (role) filters
 /// does not produce malformed SQL. Role filters don't apply to frecency
 /// aggregates and should be ignored without breaking the query.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_top_entities_mixed_supported_and_unsupported_chat_filters(pool: PgPool) {
     use item_filters::{EntityFilters, ast::EntityFilterAst};
 
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Create a chat aggregate
     let chat_id = "11111111-1111-1111-1111-111111111111";

@@ -172,7 +172,7 @@ async fn bootstrap_uses_the_child_credential_owner_and_starts_one_backfill() {
         ]
     );
     let watched = data.watched.as_ref().unwrap();
-    assert_eq!(watched.macro_id.as_ref(), "macro|child@example.com");
+    assert_eq!(watched.rox_id.as_ref(), "macro|child@example.com");
     assert_eq!(watched.fusionauth_user_id, Uuid::from_u128(5).to_string());
 }
 

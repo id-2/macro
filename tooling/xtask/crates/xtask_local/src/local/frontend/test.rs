@@ -15,7 +15,7 @@ fn stack_frontend_uses_same_origin_with_an_instance_specific_server_target() {
                 .into_iter()
                 .collect();
             assert_eq!(
-                env["MACRO_LOCAL_HOSTNAME"],
+                env["ROX_LOCAL_HOSTNAME"],
                 super::super::tls::hostname().unwrap()
             );
             assert_eq!(env["VITE_LOCAL_BACKEND_ORIGIN"], "same-origin");
@@ -23,9 +23,9 @@ fn stack_frontend_uses_same_origin_with_an_instance_specific_server_target() {
                 env["NODE_EXTRA_CA_CERTS"],
                 proxy::ca_pem().display().to_string()
             );
-            assert_eq!(env["MACRO_LOCAL_BACKEND_PROXY"], proxy::url(&instance));
+            assert_eq!(env["ROX_LOCAL_BACKEND_PROXY"], proxy::url(&instance));
             assert_eq!(
-                env["MACRO_LOCAL_BACKEND_ROUTES"],
+                env["ROX_LOCAL_BACKEND_ROUTES"],
                 proxy::frontend_path_prefixes().join(",")
             );
             assert_eq!(env["VITE_OTEL_EXPORTER_URL"], "/i/otlp/v1/traces");

@@ -39,8 +39,8 @@ describe('BotsNamespace', () => {
 
     await expect(macro.bots.me()).resolves.toEqual(bot);
     expect(request?.url).toBe('https://storage.example.test/bots/me');
-    expect(request?.headers.get('x-macro-bot-token')).toBe('mbot_team_owned');
-    expect(request?.headers.get('x-macro-bot-scope')).toBe('team');
-    expect(request?.headers.has('x-macro-bot-for-macro-user-id')).toBe(false);
+    expect(request?.headers.get('x-rox-bot-token')).toBe('mbot_team_owned');
+    expect(request?.headers.get('x-rox-bot-scope')).toBe('team');
+    expect(request?.headers.has('x-rox-bot-for-macro-user-id')).toBe(false);
   });
 });

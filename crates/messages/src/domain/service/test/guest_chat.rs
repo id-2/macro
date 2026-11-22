@@ -287,7 +287,7 @@ fn guest_quotes_require_a_verified_target_and_sender() {
     let guest = ChannelSender::new_from_guest(Uuid::now_v7())
         .as_ref()
         .to_owned();
-    let bot = ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID)
+    let bot = ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID)
         .as_ref()
         .to_owned();
     let senders = HashMap::from([

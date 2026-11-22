@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT r.link_id FROM email_link_initializations r JOIN email_links l ON l.id = r.link_id\n            WHERE r.attempt_id = $1 AND r.actor_id = $2 AND (l.macro_id = $2 OR EXISTS (\n                SELECT 1 FROM macro_user_links e WHERE e.link_id = l.id\n                    AND e.primary_macro_id = $2 AND e.child_macro_id = l.macro_id))\n        ",
+  "query": "\n            SELECT r.link_id FROM email_link_initializations r JOIN email_links l ON l.id = r.link_id\n            WHERE r.attempt_id = $1 AND r.actor_id = $2 AND (l.rox_id = $2 OR EXISTS (\n                SELECT 1 FROM rox_user_links e WHERE e.link_id = l.id\n                    AND e.primary_rox_id = $2 AND e.child_rox_id = l.rox_id))\n        ",
   "describe": {
     "columns": [
       {

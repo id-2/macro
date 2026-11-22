@@ -6,7 +6,7 @@ version = "0.1.0"
 
 [dependencies]
 agent_correlation = { path = "../agent_correlation" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 model_file_type = { path = "../model_file_type" }
 model_owner = { path = "../model_owner" }

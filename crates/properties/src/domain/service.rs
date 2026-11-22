@@ -11,7 +11,7 @@
 use std::collections::HashMap;
 
 use entity_access::domain::models::{EntityAccessReceipt, MemberTeamRole};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::EntityType;
 use models_properties::api::requests::SetPropertyValue;
 use models_properties::api::{
@@ -135,7 +135,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     fn get_property_definition(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> impl Future<Output = Result<PropertyDefinition, PropertiesErr>> + Send;
 
@@ -181,7 +181,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     fn list_property_definitions(
         &self,
         team: Option<&TeamReceipt>,
-        user_id: Option<&MacroUserIdStr<'_>>,
+        user_id: Option<&RoxUserIdStr<'_>>,
         include_system: bool,
         for_entity_type: Option<EntityType>,
     ) -> impl Future<Output = Result<Vec<PropertyDefinition>, PropertiesErr>> + Send;
@@ -191,7 +191,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     fn list_property_definitions_with_options(
         &self,
         team: Option<&TeamReceipt>,
-        user_id: Option<&MacroUserIdStr<'_>>,
+        user_id: Option<&RoxUserIdStr<'_>>,
         include_system: bool,
         for_entity_type: Option<EntityType>,
     ) -> impl Future<Output = Result<Vec<PropertyDefinitionWithOptions>, PropertiesErr>> + Send;
@@ -202,7 +202,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// Validates the request and creates any select options atomically.
     fn create_property_definition(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         request: &CreatePropertyDefinitionRequest,
     ) -> impl Future<Output = Result<PropertyDefinition, PropertiesErr>> + Send;
@@ -215,7 +215,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     fn delete_property_definition(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> impl Future<Output = Result<(), PropertiesErr>> + Send;
 
@@ -223,7 +223,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     fn get_property_options(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> impl Future<Output = Result<Vec<PropertyOption>, PropertiesErr>> + Send;
 
@@ -232,7 +232,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     fn get_property_options_batch(
         &self,
         property_definition_ids: &[Uuid],
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> impl Future<Output = Result<HashMap<Uuid, Vec<PropertyOption>>, PropertiesErr>> + Send;
 
@@ -241,7 +241,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// tag color rules.
     fn add_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         request: &AddPropertyOptionRequest,
@@ -251,7 +251,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// Preserves existing option metadata and tolerates concurrent creation.
     fn get_or_create_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         request: &AddPropertyOptionRequest,
@@ -262,7 +262,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// is reflected on every entity that references it.
     fn update_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         option_id: Uuid,
@@ -276,7 +276,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// two options would share a value; neither partially applies.
     fn replace_property_options(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         plan: PropertyOptionReplacePlan,
@@ -286,7 +286,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// its id from every entity value that references it.
     fn delete_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         option_id: Uuid,
@@ -297,7 +297,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// returns an empty set.
     fn list_tag_sets(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> impl Future<Output = Result<Vec<TagSet>, PropertiesErr>> + Send;
 
@@ -306,7 +306,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// without a team.
     fn ensure_tag_set(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         scope: TagScope,
     ) -> impl Future<Output = Result<TagSet, PropertiesErr>> + Send;
@@ -322,7 +322,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// to be a label in the caller's own tag set and the caller to be on a team.
     fn promote_tag_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         option_id: Uuid,
     ) -> impl Future<Output = Result<PropertyOption, PropertiesErr>> + Send;
@@ -336,7 +336,7 @@ pub trait PropertiesService: Send + Sync + 'static {
     /// team's tag set.
     fn merge_tag_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         option_id: Uuid,
         target_option_id: Uuid,

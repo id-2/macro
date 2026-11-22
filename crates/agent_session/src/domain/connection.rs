@@ -809,7 +809,7 @@ const MAX_SESSION_LIST_PAGES: usize = 100;
 fn connection_request_id() -> RequestId {
     RequestId::Str(format!(
         "macro-connection-{}",
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     ))
 }
 

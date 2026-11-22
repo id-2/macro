@@ -3,8 +3,8 @@ import type {
   FavoriteEntityRef,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import type { FavoritableEntity, MacroEntityType } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import type { FavoritableEntity, RoxEntityType } from '../entity';
 
 export type { Favorite, FavoriteEntityRef };
 
@@ -17,7 +17,7 @@ export type { Favorite, FavoriteEntityRef };
  * list constrains nothing, which is why the default lists the whole collection.
  */
 export type FavoritesFilter = {
-  entityTypes?: MacroEntityType[];
+  entityTypes?: RoxEntityType[];
   entityIds?: string[];
 };
 
@@ -27,7 +27,7 @@ export type FavoritesFilter = {
  * @routing Use when adding or removing the user's favorites; not pins (`macro.pins`).
  */
 export class FavoritesNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * The user's favorites, in manual order.

@@ -1,14 +1,14 @@
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
-fn user(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|{name}@test.com"))
+fn user(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|{name}@test.com"))
         .unwrap()
         .into_owned()
 }
 fn state(name: &str, account: &str) -> SyncState {
     SyncState {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         user_id: user(name),
         account_id: account.into(),
         scope: Scope::All,

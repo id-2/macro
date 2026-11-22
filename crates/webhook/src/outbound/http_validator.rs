@@ -27,8 +27,8 @@ pub(super) const EVENT_HEADER: &str = "x-rox-event";
 pub(super) const EVENT_ID_HEADER: &str = "x-rox-event-id";
 /// Event headers earlier deliveries sent; still emitted so an endpoint that
 /// only knows the pre-rename names keeps receiving them.
-pub(super) const LEGACY_EVENT_HEADER: &str = "x-macro-event";
-pub(super) const LEGACY_EVENT_ID_HEADER: &str = "x-macro-event-id";
+pub(super) const LEGACY_EVENT_HEADER: &str = "x-rox-event";
+pub(super) const LEGACY_EVENT_ID_HEADER: &str = "x-rox-event-id";
 pub(super) const REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// Reqwest-backed implementation of [`WebhookValidationClient`].
@@ -152,7 +152,7 @@ impl WebhookValidationClient for ReqwestWebhookValidationClient {
 }
 
 fn new_validation_event_id() -> String {
-    format!("evt_{}", macro_uuid::generate_uuid_v7())
+    format!("evt_{}", rox_uuid::generate_uuid_v7())
 }
 
 fn validation_body(webhook_id: &str, event_id: &str) -> Result<Vec<u8>, serde_json::Error> {
@@ -275,10 +275,10 @@ pub(super) fn is_reserved_header(name: &str) -> bool {
             | "x-rox-event-id"
             | "x-rox-timestamp"
             | "x-rox-signature"
-            | "x-macro-event"
-            | "x-macro-event-id"
-            | "x-macro-timestamp"
-            | "x-macro-signature"
+            | "x-rox-event"
+            | "x-rox-event-id"
+            | "x-rox-timestamp"
+            | "x-rox-signature"
     )
 }
 

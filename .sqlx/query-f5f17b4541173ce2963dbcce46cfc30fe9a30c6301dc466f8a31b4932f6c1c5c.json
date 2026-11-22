@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT l.macro_id AS \"macro_id!\"\n        FROM email_threads et\n        JOIN email_links l ON et.link_id = l.id\n        WHERE et.id = $1\n        UNION\n        SELECT mul.primary_macro_id\n        FROM email_threads et\n        JOIN email_links l ON et.link_id = l.id\n        JOIN macro_user_links mul ON mul.link_id = l.id\n        WHERE et.id = $1\n        ",
+  "query": "\n        SELECT l.rox_id AS \"rox_id!\"\n        FROM email_threads et\n        JOIN email_links l ON et.link_id = l.id\n        WHERE et.id = $1\n        UNION\n        SELECT mul.primary_rox_id\n        FROM email_threads et\n        JOIN email_links l ON et.link_id = l.id\n        JOIN rox_user_links mul ON mul.link_id = l.id\n        WHERE et.id = $1\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "macro_id!",
+        "name": "rox_id!",
         "type_info": "Text"
       }
     ],

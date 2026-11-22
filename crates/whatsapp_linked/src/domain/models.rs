@@ -204,7 +204,7 @@ pub struct GroupInfo {
     pub participants: Vec<Participant>,
     /// Only admins may post.
     pub announce: bool,
-    /// Disappearing-messages timer in seconds while it is on. Macro keeps the
+    /// Disappearing-messages timer in seconds while it is on. Rox keeps the
     /// messages; its sends carry the timer so phones treat them like their own.
     #[serde(default)]
     pub disappearing_seconds: Option<u32>,
@@ -333,7 +333,7 @@ pub struct Chat {
     /// Someone else's external chat for this chat shared with the caller,
     /// when the caller has not added their own.
     pub shared: Option<SharedChatReference>,
-    /// "Add to Macro" works now.
+    /// "Add to Rox" works now.
     pub can_add: bool,
     /// Why it can't be added, when it is neither added, shared nor addable.
     pub cannot_add_reason: Option<CannotAdd>,

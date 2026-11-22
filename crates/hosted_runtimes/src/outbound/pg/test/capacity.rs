@@ -1,6 +1,6 @@
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn offers_use_free_sold_units_per_size(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -20,7 +20,7 @@ async fn offers_use_free_sold_units_per_size(pool: PgPool) {
     assert_eq!(sold_out(&repo).await, vec![ComputerSize::Xl]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reserve_skips_hosts_too_small_to_wake_the_size(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -43,7 +43,7 @@ async fn reserve_skips_hosts_too_small_to_wake_the_size(pool: PgPool) {
     assert_ne!(small.id, large.id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_purchases_share_the_sold_unit_limit(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -80,7 +80,7 @@ async fn concurrent_purchases_share_the_sold_unit_limit(pool: PgPool) {
     assert_eq!(accepted, 3);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn allocation_counts_what_reserve_counts(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -118,7 +118,7 @@ async fn allocation_counts_what_reserve_counts(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_pending_reservation_counts_toward_allocation(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());

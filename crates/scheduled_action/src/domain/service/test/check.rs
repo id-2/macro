@@ -6,7 +6,7 @@ use agent_session::domain::routines::{
     RoutinePromptAccepted, RoutineSessionAction, RoutineSessions, ValidateRoutineSession,
     ValidatedRoutineSession,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -122,13 +122,13 @@ struct PanickingHandBacks;
 
 #[async_trait::async_trait]
 impl DraftHandBacks for PanickingHandBacks {
-    async fn begin(&self, _: Uuid, _: &MacroUserIdStr<'static>, _: bot_id::BotId) -> Result<()> {
+    async fn begin(&self, _: Uuid, _: &RoxUserIdStr<'static>, _: bot_id::BotId) -> Result<()> {
         unreachable!()
     }
     async fn record(
         &self,
         _: Uuid,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &crate::domain::models::RoutineCheck,
         _: &[crate::domain::models::CreatedItem],
     ) -> Result<bool> {
@@ -149,14 +149,14 @@ impl DraftHandBacks for PanickingHandBacks {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_a_draft_sessions_own_check_is_kept_as_its_answer(pool: PgPool) {
     let hand_backs = Arc::new(PgDraftHandBacks::new(pool));
     let invocations = Arc::new(Invocations::default());
     let svc = checking_service(hand_backs.clone(), invocations.clone());
     let (session, correlation) = (generate_uuid_v7(), generate_uuid_v7());
     hand_backs
-        .begin(session, &user(), bot_id::MACRO_NEW_BOT_ID)
+        .begin(session, &user(), bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap();
     invocations.0.lock().unwrap().insert(correlation, session);
@@ -167,7 +167,7 @@ async fn only_a_draft_sessions_own_check_is_kept_as_its_answer(pool: PgPool) {
 
     // Someone else's program can't answer this draft...
     let stranger = CreationPrincipal::User(
-        MacroUserIdStr::try_from("macro|stranger@rox.one".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|stranger@rox.one".to_owned()).unwrap(),
     );
     svc.check_action(&stranger, config.clone(), Vec::new(), Some(correlation))
         .await
@@ -266,7 +266,7 @@ impl<Check: ScheduledActionService> RoutineSessions for SessionOnAnotherReplica<
 /// The drafter and the session's check run in different processes: each
 /// replica has its own service and its own store over one database, and
 /// nothing in memory passes between them.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_check_made_on_one_replica_answers_a_draft_waiting_on_another(pool: PgPool) {
     let invocations = Arc::new(Invocations::default());
     // Replica B serves the check route the session's program calls.
@@ -285,7 +285,7 @@ async fn a_check_made_on_one_replica_answers_a_draft_waiting_on_another(pool: Pg
         Arc::clone(&sessions),
         Arc::new(PgDraftHandBacks::new(pool.clone())) as Arc<dyn DraftHandBacks>,
         DraftAgent {
-            bot: bot_id::MACRO_NEW_BOT_ID,
+            bot: bot_id::ROX_NEW_BOT_ID,
             guide: "",
         },
     );

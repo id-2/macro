@@ -8,7 +8,7 @@ use ai_toolset::{
     AsyncToolCollection, RequestContext, RequestSchema, SearchableTool, ToolInfo, ToolResult,
     ToolSet, ToolSetError,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::domain::ports::McpServerStore;
 use mcp_client::domain::service::McpToolSet;
 use mcp_client::outbound::guarded_http::McpHttp;
@@ -182,14 +182,14 @@ pub trait ConnectorSelect: Send + Sync + 'static {
     /// Load the user's full MCP toolset (all enabled providers, across both stacks).
     fn user_toolset(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = UserMcpTools> + Send;
 
     /// Load the toolset for one connector. `Ok(None)` when the user has it
     /// connected on neither stack.
     fn connector_toolset(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         connector: ConnectorRef<'_>,
     ) -> impl Future<Output = anyhow::Result<Option<UserMcpTools>>> + Send;
 
@@ -197,7 +197,7 @@ pub trait ConnectorSelect: Send + Sync + 'static {
     /// selection rule picks for them.
     fn connector_connected(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         connector: ConnectorRef<'_>,
     ) -> impl Future<Output = anyhow::Result<bool>> + Send;
 }
@@ -248,7 +248,7 @@ where
     /// (an error must degrade to the native stack, not kill the request).
     async fn pipedream_connections(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Vec<pipedream_mcp::domain::models::PipedreamConnection> {
         if !self.pipedream_connection.is_configured() {
             return Vec::new();
@@ -268,7 +268,7 @@ where
     C: McpConnection,
 {
     #[tracing::instrument(skip_all)]
-    async fn user_toolset(&self, user: &MacroUserIdStr<'static>) -> UserMcpTools {
+    async fn user_toolset(&self, user: &RoxUserIdStr<'static>) -> UserMcpTools {
         let pipedream = self.pipedream_connections(user).await;
         let native = self
             .native_store
@@ -297,7 +297,7 @@ where
     #[tracing::instrument(skip(self, user), err)]
     async fn connector_toolset(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         connector: ConnectorRef<'_>,
     ) -> anyhow::Result<Option<UserMcpTools>> {
         let native = self
@@ -335,7 +335,7 @@ where
     #[tracing::instrument(skip(self, user), err)]
     async fn connector_connected(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         connector: ConnectorRef<'_>,
     ) -> anyhow::Result<bool> {
         let native = self

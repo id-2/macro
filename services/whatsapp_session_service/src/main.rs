@@ -5,8 +5,8 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use macro_entrypoint::{MacroEntrypoint, shutdown_signal};
-use macro_env::Environment;
+use rox_entrypoint::{RoxEntrypoint, shutdown_signal};
+use rox_env::Environment;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use tokio_util::sync::CancellationToken;
 use whatsapp_session_service::config::{Config, SessionKmsKey};
@@ -27,7 +27,7 @@ const DRAIN_BATCH: u32 = 20;
 
 #[tokio::main]
 async fn main() -> Result<(), rootcause::Report> {
-    let entrypoint = MacroEntrypoint::default().init();
+    let entrypoint = RoxEntrypoint::default().init();
     let result = run().await;
     entrypoint.shutdown();
     result
@@ -36,7 +36,7 @@ async fn main() -> Result<(), rootcause::Report> {
 async fn run() -> Result<(), rootcause::Report> {
     // whatsmeow dials wss:// with rustls directly.
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
-    let config = macro_config::ConfigLoader::load::<Config>()?;
+    let config = rox_config::ConfigLoader::load::<Config>()?;
     let environment = Environment::new_from_env()?;
     let pool = PgPoolOptions::new()
         .max_connections(20)
@@ -45,12 +45,12 @@ async fn run() -> Result<(), rootcause::Report> {
         .await?;
     let lock_options: PgConnectOptions = config.database_url.as_ref().parse()?;
     let dialer: Arc<dyn Dialer> =
-        match macro_service_urls::read_override_env(WEBSOCKET_URL_OVERRIDE)? {
+        match rox_service_urls::read_override_env(WEBSOCKET_URL_OVERRIDE)? {
             Some(url) => Arc::new(WebSocketDialer { url }),
             None => Arc::new(WebSocketDialer::default()),
         };
     let kms = AwsWhatsAppKms::new(
-        aws_sdk_kms::Client::new(&macro_aws_config::get_macro_aws_config().await),
+        aws_sdk_kms::Client::new(&rox_aws_config::get_rox_aws_config().await),
         SessionKmsKey::for_environment(environment).to_owned(),
     );
 
@@ -81,7 +81,7 @@ async fn run() -> Result<(), rootcause::Report> {
             kms,
             signal: whatsmeow_signal::libsignal(),
             dialer,
-            media_base_url: macro_service_urls::read_override_env(MEDIA_HOST_OVERRIDE)?,
+            media_base_url: rox_service_urls::read_override_env(MEDIA_HOST_OVERRIDE)?,
             max_accounts: MAX_ACCOUNTS,
             drain_batch: DRAIN_BATCH,
             timings: Timings::production(),

@@ -1,10 +1,10 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use whatsmeow::store::{AppStateMutationMac, AppStateStore, AppStateSyncKey, AppStateSyncKeyStore};
 
 use crate::store::test::open_new_store;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sync_keys_are_only_replaced_by_newer_ones(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     assert_eq!(
@@ -78,7 +78,7 @@ async fn sync_keys_are_only_replaced_by_newer_ones(pool: Pool<Postgres>) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn app_state_versions_start_at_zero(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     assert_eq!(
@@ -113,7 +113,7 @@ async fn app_state_versions_start_at_zero(pool: Pool<Postgres>) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_newest_mutation_mac_wins_and_deletes_go_by_index(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let mutations: Vec<AppStateMutationMac> = (0..1000u16)

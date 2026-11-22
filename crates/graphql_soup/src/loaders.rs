@@ -44,7 +44,7 @@ use item_filters::ast::{
     initiative::InitiativeLiteral,
     project::ProjectLiteral,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use models_pagination::SimpleSortMethod;
 use models_soup::{email_thread::SoupEnrichedEmailThreadPreview, item::SoupItem};
@@ -63,7 +63,7 @@ use uuid::Uuid;
 const MAX_BATCH_SIZE: usize = 500;
 
 /// Key used to hydrate one Soup item for one viewer.
-pub type SoupItemLoaderKey = (MacroUserIdStr<'static>, Entity<'static>);
+pub type SoupItemLoaderKey = (RoxUserIdStr<'static>, Entity<'static>);
 
 /// Cloneable error returned by the realtime Soup item loader.
 pub type SoupItemLoaderError = Report<Dynamic, Cloneable>;
@@ -74,7 +74,7 @@ pub trait SoupEmailThreadReader: Send + Sync + 'static {
     /// A thread the viewer cannot read, or that does not exist, is absent.
     fn read_threads(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> impl Future<Output = Result<Vec<SoupEnrichedEmailThreadPreview<()>>, SoupItemLoaderError>> + Send;
 }
@@ -110,7 +110,7 @@ where
     )]
     async fn read_threads(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> Result<Vec<SoupEnrichedEmailThreadPreview<()>>, SoupItemLoaderError> {
         let ids = thread_ids.iter().map(Uuid::to_string).collect::<Vec<_>>();
@@ -152,7 +152,7 @@ pub trait SoupTeamReader: Send + Sync + 'static {
     /// Recheck membership on each batch, so a long-lived socket cannot retain removed access.
     fn team_receipt(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> BoxFuture<'_, Result<Option<EntityAccessReceipt<MemberTeamRole>>, SoupItemLoaderError>>;
 }
 
@@ -161,7 +161,7 @@ struct EntityAccessTeamReader<A>(A);
 impl<A: EntityAccessService> SoupTeamReader for EntityAccessTeamReader<A> {
     fn team_receipt(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> BoxFuture<'_, Result<Option<EntityAccessReceipt<MemberTeamRole>>, SoupItemLoaderError>>
     {
         Box::pin(async move {
@@ -218,7 +218,7 @@ where
     /// Hydrate one user's portion of a batch.
     async fn load_user(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> Result<HashMap<SoupItemLoaderKey, SoupProjectionHydration>, SoupItemLoaderError> {
         let requested = entities.iter().cloned().collect::<HashSet<_>>();
@@ -284,7 +284,7 @@ where
     /// Execute one filtered Soup request for the non-email entities of a batch.
     async fn load_soup_items(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> Result<Vec<SoupProjectionHydration>, SoupItemLoaderError> {
         if entities.is_empty() {
@@ -340,7 +340,7 @@ where
         &self,
         keys: Vec<SoupItemLoaderKey>,
     ) -> Result<HashMap<SoupItemLoaderKey, SoupProjectionHydration>, SoupItemLoaderError> {
-        let mut entities_by_user = HashMap::<MacroUserIdStr<'static>, Vec<Entity<'static>>>::new();
+        let mut entities_by_user = HashMap::<RoxUserIdStr<'static>, Vec<Entity<'static>>>::new();
         for (user_id, entity) in keys {
             entities_by_user.entry(user_id).or_default().push(entity);
         }
@@ -373,7 +373,7 @@ where
 #[derive(Clone, Hash, PartialEq, Eq)]
 struct OwnedSoupItemLoaderKey {
     /// User whose Soup visibility applies.
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     /// Entity to hydrate.
     entity: Entity<'static>,
 }

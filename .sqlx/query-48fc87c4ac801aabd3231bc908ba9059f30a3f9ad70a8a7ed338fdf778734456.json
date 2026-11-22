@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO stripe_audit_mismatch (id, run_id, kind, object_id, stripe_value, macro_value)\n            SELECT finding.id, $2, finding.kind::stripe_audit_mismatch_kind, finding.object_id,\n                NULLIF(finding.stripe_value, 'null'::jsonb), NULLIF(finding.macro_value, 'null'::jsonb)\n            FROM UNNEST($1::uuid[], $3::text[], $4::text[], $5::jsonb[], $6::jsonb[])\n                AS finding(id, kind, object_id, stripe_value, macro_value)\n            ",
+  "query": "\n            INSERT INTO stripe_audit_mismatch (id, run_id, kind, object_id, stripe_value, rox_value)\n            SELECT finding.id, $2, finding.kind::stripe_audit_mismatch_kind, finding.object_id,\n                NULLIF(finding.stripe_value, 'null'::jsonb), NULLIF(finding.rox_value, 'null'::jsonb)\n            FROM UNNEST($1::uuid[], $3::text[], $4::text[], $5::jsonb[], $6::jsonb[])\n                AS finding(id, kind, object_id, stripe_value, rox_value)\n            ",
   "describe": {
     "columns": [],
     "parameters": {

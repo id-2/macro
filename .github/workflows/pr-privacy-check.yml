@@ -30,7 +30,7 @@ jobs:
         # support-channel details. The rule lives in the git skill
         # (.agents/skills/git/SKILL.md, "Privacy"); this catches the patterns a
         # regex can see: emails, phone numbers, @mentions, chat-channel names, and
-        # links into support tools or Macro workspace content. Names of people and
+        # links into support tools or Rox workspace content. Names of people and
         # customers can't be matched mechanically; reviewers own those.
         #
         # CI: PR_TITLE, PR_BODY, PR_NUMBER, GH_REPO, GH_TOKEN; commits come from the

@@ -15,7 +15,7 @@ ai_tool = [
 ]
 axum = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:model_user",
   "dep:serde_with",
@@ -27,9 +27,9 @@ default = ["kafka"]
 docs = ["dep:aquamarine"]
 # The Kafka publishers and consumer. Off for crates that only need the
 # notification ports, so librdkafka stays out of the self-hosted `roxd`.
-kafka = ["dep:kafka_util", "dep:rdkafka", "macro_event_broker/outbound"]
+kafka = ["dep:kafka_util", "dep:rdkafka", "rox_event_broker/outbound"]
 redis-tests = []
-schema = ["dep:utoipa", "macro_user_id/schema", "notification_state/schema"]
+schema = ["dep:utoipa", "rox_user_id/schema", "notification_state/schema"]
 
 [dependencies]
 ai_toolset = { path = "../ai_toolset", optional = true }
@@ -50,14 +50,14 @@ hmac = { workspace = true }
 itertools = { workspace = true }
 kafka_util = { path = "../kafka_util", optional = true }
 last_online_tracker = { path = "../last_online_tracker" }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", default-features = false, features = [
   "axum",
 ], optional = true }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
-macro_service_urls = { path = "../macro_service_urls" }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid" }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
+rox_service_urls = { path = "../rox_service_urls" }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid" }
 model-entity = { path = "../model-entity" }
 model-error-response = { path = "../model-error-response", optional = true }
 model_user = { path = "../model_user", optional = true }
@@ -95,7 +95,7 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 opentelemetry_sdk = { workspace = true, features = ["trace", "testing"] }
 tracing-subscriber = { workspace = true }
 http-body-util = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 rate_limit = { path = "../rate_limit", features = ["testing"] }
 tokio = { workspace = true, features = ["macros", "rt", "test-util"] }
 tower = { workspace = true }

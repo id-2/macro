@@ -20,7 +20,7 @@ describe('agent session search projection', () => {
         {
           goto: null,
           score: null,
-          highlight: { name: '<macro_em>Investigation</macro_em>' },
+          highlight: { name: '<rox_em>Investigation</rox_em>' },
         },
       ],
     });
@@ -31,7 +31,7 @@ describe('agent session search projection', () => {
       ownerId: 'owner',
     });
     expect(result.search.nameHighlight).toBe(
-      '<macro_em>Investigation</macro_em>'
+      '<rox_em>Investigation</rox_em>'
     );
     expect(result.search.contentHitData).toBeNull();
   });
@@ -45,20 +45,20 @@ describe('agent session search projection', () => {
           score: 2,
           highlight: {
             content: [
-              'Find <macro_em>quokka</macro_em>',
-              'Another <macro_em>quokka</macro_em>',
+              'Find <rox_em>quokka</rox_em>',
+              'Another <rox_em>quokka</rox_em>',
             ],
           },
         },
         {
           goto: { message_turn: 0, author: 'agent' },
           score: 1,
-          highlight: { content: ['Found <macro_em>quokka</macro_em>'] },
+          highlight: { content: ['Found <rox_em>quokka</rox_em>'] },
         },
         {
           goto: { message_turn: 7, author: 'agent' },
           score: null,
-          highlight: { content: ['Later <macro_em>quokka</macro_em>'] },
+          highlight: { content: ['Later <rox_em>quokka</rox_em>'] },
         },
       ],
     });
@@ -69,7 +69,7 @@ describe('agent session search projection', () => {
       { type: 'agent', messageTurn: 7, author: 'agent' },
     ]);
     expect(result.search.contentHitData?.[0].content).toBe(
-      'Find <macro_em>quokka</macro_em>'
+      'Find <rox_em>quokka</rox_em>'
     );
     expect(result.search.source).toBe('service');
   });

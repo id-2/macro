@@ -21,7 +21,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     /// Read the change, what came after it and what the table holds now,
     /// guard its inverse, and apply what is left as a batch based on the

@@ -9,7 +9,7 @@ pub struct ColleagueJoinedMacro {
     /// The team the recipient joins automatically when they sign up.
     pub team_name: String,
     /// The colleague who joined Rox.
-    pub joined_by: MacroUserIdStr<'static>,
+    pub joined_by: RoxUserIdStr<'static>,
     /// The colleague's display name from an untrusted source. It is shown on one line, capped,
     /// and escaped.
     pub joined_name: Option<String>,

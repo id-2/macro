@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 
@@ -62,7 +62,7 @@ async fn email_thread(pool: &PgPool, link: Uuid) -> Uuid {
 async fn email_link(pool: &PgPool) -> Uuid {
     let id = Uuid::now_v7();
     sqlx::query(
-        "INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
          VALUES ($1, 'macro|parts@rox.one', 'fa', 'parts@rox.one', 'GMAIL')",
     )
     .bind(id)
@@ -73,7 +73,7 @@ async fn email_link(pool: &PgPool) -> Uuid {
 }
 
 /// A suggestion names a part only together with the item it belongs to.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_part_counts_only_with_its_own_item(pool: PgPool) {
     let (channel, other_channel) = (channel(&pool).await, Uuid::now_v7());
     let message = channel_message(&pool, channel).await;

@@ -1,7 +1,7 @@
 //! Isolated surface transport and persisted lifecycle. No document API fallback.
 
 use bebop::Record;
-use macro_sync_service_jwt::session::{SessionIdentity, SessionKind};
+use rox_sync_service_jwt::session::{SessionIdentity, SessionKind};
 use serde::{Deserialize, Serialize};
 use worker::{Date, Method, Request, Response, Result, WebSocket};
 

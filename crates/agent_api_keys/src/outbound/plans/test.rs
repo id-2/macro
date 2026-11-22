@@ -1,6 +1,6 @@
 use ai_billing::domain::{BillingError, Entitlement, PlanTier};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::*;
 
@@ -16,12 +16,12 @@ struct Plans {
 impl EntitlementSource for Plans {
     async fn entitlement(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> std::result::Result<Entitlement, BillingError> {
         Ok(Entitlement {
             unlimited: self.unlimited,
             ..Entitlement::personal(
-                MacroUserIdStr::try_from(user.as_ref().to_owned()).expect("user id"),
+                RoxUserIdStr::try_from(user.as_ref().to_owned()).expect("user id"),
                 self.tier,
             )
         })
@@ -29,7 +29,7 @@ impl EntitlementSource for Plans {
 
     async fn stripe_customer_id(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
     ) -> std::result::Result<Option<String>, BillingError> {
         Ok(None)
     }
@@ -37,16 +37,16 @@ impl EntitlementSource for Plans {
     async fn team_payer(
         &self,
         _team_id: Uuid,
-    ) -> std::result::Result<Option<MacroUserIdStr<'static>>, BillingError> {
+    ) -> std::result::Result<Option<RoxUserIdStr<'static>>, BillingError> {
         Ok(self
             .team_has_payer
-            .then(|| MacroUserIdStr::try_from(OWNER.to_owned()).expect("user id")))
+            .then(|| RoxUserIdStr::try_from(OWNER.to_owned()).expect("user id")))
     }
 }
 
 #[tokio::test]
 async fn only_paid_and_enterprise_plans_include_agent_keys() {
-    let person = AgentOwner::User(MacroUserIdStr::try_from(OWNER.to_owned()).expect("user id"));
+    let person = AgentOwner::User(RoxUserIdStr::try_from(OWNER.to_owned()).expect("user id"));
     let team = AgentOwner::Team(Uuid::nil());
     for (tier, unlimited, allowed) in [
         (PlanTier::Free, false, false),

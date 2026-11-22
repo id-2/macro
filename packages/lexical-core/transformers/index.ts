@@ -3,7 +3,7 @@ import { I_AGENT_ACTIVITY } from './agentActivity';
 import { I_AGENT_CONTEXT } from './agentContext';
 import { AUTO_LINK, ESCAPED_AUTO_LINK } from './auto-link';
 import { I_AWAIT_NODE } from './await';
-import { HTML_BLOCKQUOTE, I_MACRO_QUOTE } from './classedBlock';
+import { HTML_BLOCKQUOTE, I_ROX_QUOTE } from './classedBlock';
 import { I_CURSOR_SYSTEM_NOTIFICATION } from './cursorSystemNotification';
 import { CUSTOM_TRANSFORMERS } from './customTransformers';
 import { I_DATABASE_QUERY, I_DATABASE_QUERY_BLOCK } from './databaseQuery';
@@ -105,7 +105,7 @@ export const INTERNAL_TRANSFORMERS: Transformer[] = [
   I_AGENT_CONTEXT,
   I_TABLE_NODE,
   HTML_BLOCKQUOTE,
-  I_MACRO_QUOTE,
+  I_ROX_QUOTE,
   I_EQUATION_NODE,
   I_THEME_MENTION,
   I_TAG_MENTION,
@@ -217,7 +217,7 @@ export const ALL_TRANSFORMERS: Transformer[] = [
   I_AGENT_ACTIVITY,
   I_REPLY_TARGET_NODE,
   I_AGENT_CONTEXT,
-  I_MACRO_QUOTE,
+  I_ROX_QUOTE,
   I_EQUATION_NODE,
   I_THEME_MENTION,
   I_TAG_MENTION,

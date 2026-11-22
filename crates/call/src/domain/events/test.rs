@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent};
-use macro_event_topics::{MacroCallsTopic, Topic};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent};
+use rox_event_topics::{RoxCallsTopic, Topic};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -15,8 +15,8 @@ fn uuid(value: &str) -> Uuid {
     Uuid::parse_str(value).expect("valid uuid")
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn timestamp(value: &str) -> DateTime<Utc> {
@@ -158,7 +158,7 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
     ]
 }
 
-fn macro_events() -> Vec<CallMacroEvent> {
+fn rox_events() -> Vec<CallMacroEvent> {
     topic_events()
         .into_iter()
         .map(|(event, _)| match event {
@@ -195,23 +195,23 @@ fn every_variant_has_exact_json_envelope() {
 
 #[test]
 fn every_variant_round_trips() {
-    for original in macro_events() {
+    for original in rox_events() {
         let payload = serde_json::to_vec(original.event()).expect("serializable event");
         let decoded = CallMacroEvent::decode(original.key(), &payload).expect("decodable event");
 
         assert_eq!(decoded.key(), CALL_ID);
         assert_eq!(decoded.event(), original.event());
-        assert_eq!(decoded.topic(), MacroCallsTopic::TOPIC_STR);
-        assert_eq!(decoded.topic(), "macro.calls");
+        assert_eq!(decoded.topic(), RoxCallsTopic::TOPIC_STR);
+        assert_eq!(decoded.topic(), "rox.calls");
     }
 }
 
 #[test]
 fn constructors_use_calls_topic_bare_call_id_key_and_schema_version_one() {
-    for event in macro_events() {
+    for event in rox_events() {
         assert_eq!(event.key(), CALL_ID);
         assert!(!event.key().starts_with("call|"));
-        assert_eq!(event.topic(), "macro.calls");
+        assert_eq!(event.topic(), "rox.calls");
         assert_eq!(event.event().schema_version, 1);
     }
 }
@@ -268,7 +268,7 @@ fn metadata_excludes_private_call_content_and_locations() {
         "share_permission",
     ];
 
-    for event in macro_events() {
+    for event in rox_events() {
         let value = serde_json::to_value(event.event()).expect("serializable event");
         let metadata = &value["metadata"];
 

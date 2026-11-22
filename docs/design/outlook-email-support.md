@@ -159,7 +159,7 @@ This provider-level permission model is separate from sharing an already-linked
 inbox or thread inside Rox; preserve Rox's existing collaboration behavior.
 Application-wide tenant access, on-premises Exchange, sovereign clouds, and
 separate online archive mailboxes remain outside the proposed account scope.
-Microsoft sign-in as a new Macro login method is separate from connecting a mailbox.
+Microsoft sign-in as a new Rox login method is separate from connecting a mailbox.
 
 Folders and categories need explicit semantics for the organization controls
 Rox actually exposes. Do not declare parity by hiding a Gmail feature for
@@ -499,7 +499,7 @@ and leaves resolution to the server. Generalize remaining actions in that direct
 [refresh events](../../apps/web/src/lib/queries/email/sync.ts) need a progress unit,
 optional total, and trustworthy completion/error semantics.
 
-The architectural target is one frontend email experience: Macro-owned message
+The architectural target is one frontend email experience: Rox-owned message
 state and folder/category roles on reads; intent-based commands such as archive,
 trash, set-read, and flag on writes; provider identity mainly for connection,
 account branding, and opening the original. Keep raw provider history/delta
@@ -899,7 +899,7 @@ the blocking session or resource load before retrying. The limits do not promise
 zero interruption, and validation/index scans still consume CPU and disk I/O.
 
 The seven indexes on shared message, link, draft-attachment, event-source, and
-reminder tables, and the follow-up `User` indexes on `macro_user_id` and
+reminder tables, and the follow-up `User` indexes on `rox_user_id` and
 `lower(email)` that Outlook connection looks users up by, are built with
 `CONCURRENTLY`, each in a single-statement
 `-- no-transaction` migration. Column additions commit before those builds. The

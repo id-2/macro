@@ -1,7 +1,7 @@
 use super::models::*;
 use async_trait::async_trait;
 use call::domain::imports::ImportedCall;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 pub type Result<T> = std::result::Result<T, rootcause::Report>;
@@ -9,7 +9,7 @@ pub type Result<T> = std::result::Result<T, rootcause::Report>;
 /// Storage owns atomic registration, durable delivery deduplication, and leases.
 #[async_trait]
 pub trait SyncRepository: Send + Sync {
-    async fn by_user(&self, user: &MacroUserIdStr<'static>) -> Result<Option<Connection>>;
+    async fn by_user(&self, user: &RoxUserIdStr<'static>) -> Result<Option<Connection>>;
     async fn by_id(&self, id: Uuid) -> Result<Option<Connection>>;
     /// Every user's sync state, without signing secrets.
     async fn states(&self) -> Result<Vec<SyncState>>;
@@ -39,9 +39,9 @@ pub trait Granola: Send + Sync {
 /// A credential connection is rechecked before ingesting, including after fetch.
 #[async_trait]
 pub trait Accounts: Send + Sync {
-    async fn account(&self, user: &MacroUserIdStr<'static>) -> Result<Option<String>>;
+    async fn account(&self, user: &RoxUserIdStr<'static>) -> Result<Option<String>>;
     /// Every user with an enabled Granola account, with that account ID.
-    async fn connected(&self) -> Result<Vec<(MacroUserIdStr<'static>, String)>>;
+    async fn connected(&self) -> Result<Vec<(RoxUserIdStr<'static>, String)>>;
 }
 
 pub trait DeliveryVerifier: Send + Sync {

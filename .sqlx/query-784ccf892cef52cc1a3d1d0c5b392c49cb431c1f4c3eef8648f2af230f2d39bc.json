@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT primary_macro_id\n            FROM macro_user_links\n            WHERE child_macro_id = $1\n              AND link_id = $2\n        ",
+  "query": "\n            SELECT primary_rox_id\n            FROM rox_user_links\n            WHERE child_rox_id = $1\n              AND link_id = $2\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "primary_macro_id",
+        "name": "primary_rox_id",
         "type_info": "Text"
       }
     ],

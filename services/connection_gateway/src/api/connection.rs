@@ -24,8 +24,8 @@ use futures::{
     sink::SinkExt,
     stream::{SplitSink, StreamExt},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::handle_websocket_stream;
 use model::user::UserContext;
 use model_entity::EntityType;
@@ -47,15 +47,15 @@ pub fn router() -> Router<AppState> {
 )]
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     State(ctx): State<ApiContext>,
     State(config): State<Arc<Config>>,
 ) -> impl IntoResponse {
-    let macro_user_id = authorization.authorization.user.macro_user_id.clone();
+    let rox_user_id = authorization.authorization.user.rox_user_id.clone();
     let user_context = authorization.authorization.user.user_context.clone();
 
     ws.on_upgrade(move |socket| {
-        handle_websocket_connection(socket, ctx, config, macro_user_id, user_context)
+        handle_websocket_connection(socket, ctx, config, rox_user_id, user_context)
     })
 }
 
@@ -63,12 +63,12 @@ pub async fn ws_handler(
 /// Should create a new connection in the connection manager,
 /// and spawn tasks for both forwarding of messages, and reading incoming messages from the client.
 /// If any part of forwarding or reading fails, then the connection should be removed from the connection manager.
-#[tracing::instrument(skip(socket, ctx, config, macro_user_id, user_context), fields(user_id=?macro_user_id))]
+#[tracing::instrument(skip(socket, ctx, config, rox_user_id, user_context), fields(user_id=?rox_user_id))]
 async fn handle_websocket_connection(
     socket: WebSocket,
     ctx: ApiContext,
     config: Arc<Config>,
-    macro_user_id: MacroUserIdStr<'static>,
+    rox_user_id: RoxUserIdStr<'static>,
     user_context: UserContext,
 ) {
     let (sink, stream) = socket.split();
@@ -76,7 +76,7 @@ async fn handle_websocket_connection(
     let connection_id = uuid::Uuid::new_v4().to_string();
 
     // Create guard that records last online time when websocket connection closes
-    let last_online_guard = ctx.last_online_worker.new_guard(macro_user_id.clone());
+    let last_online_guard = ctx.last_online_worker.new_guard(rox_user_id.clone());
 
     let sender_connection_id = connection_id.clone();
     let sender_task = tokio::spawn(forwarder(sink, receiver, sender_connection_id));
@@ -85,9 +85,9 @@ async fn handle_websocket_connection(
         .connection_manager
         .add_connection(
             EntityType::User
-                .with_entity_str(macro_user_id.as_ref())
+                .with_entity_str(rox_user_id.as_ref())
                 .with_connection_str(&connection_id)
-                .with_user_str(macro_user_id.as_ref()),
+                .with_user_str(rox_user_id.as_ref()),
             sender.clone(),
             sender_task.abort_handle(),
         )
@@ -104,10 +104,10 @@ async fn handle_websocket_connection(
         connection_id: &connection_id,
     };
 
-    crate::service::fanout::connected(&connection_context, &macro_user_id).await;
+    crate::service::fanout::connected(&connection_context, &rox_user_id).await;
 
     let grants = EntityGrants::new(
-        macro_user_id.clone(),
+        rox_user_id.clone(),
         user_context.organization_id.map(i64::from),
     );
     let receiver_task =

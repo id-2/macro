@@ -99,15 +99,15 @@ pub async fn get_all_channel_ids_paginated(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
     use sqlx::{Pool, Postgres};
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("mentions"))
     )]
     async fn test_check_channels_for_user(pool: Pool<Postgres>) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
         let channels: Vec<Uuid> = vec![
             "11111111-1111-1111-1111-111111111111".parse().unwrap(),
             "22222222-2222-2222-2222-222222222222".parse().unwrap(),

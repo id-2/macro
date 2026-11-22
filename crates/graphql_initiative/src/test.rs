@@ -5,7 +5,7 @@ use entity_access::domain::models::{EntityAccessReceipt, EntityType};
 use graphql_common::require_authenticated_user;
 use graphql_soup::{GraphqlSoupInitiative, SoupEntityEdges};
 use initiative::domain::{models::*, reads::*};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use models_permissions::share_permission::{
     LinkShareState, SharePermissionV2, access_level::AccessLevel,
@@ -161,7 +161,7 @@ impl SoupEntityEdges for TestSoupEdges {
 }
 
 struct Query;
-struct Viewer(MacroUserIdStr<'static>);
+struct Viewer(RoxUserIdStr<'static>);
 
 #[Object]
 impl Query {
@@ -186,8 +186,8 @@ impl Viewer {
 
 const PROJECT_ID: &str = "00000000-0000-4000-8000-000000000001";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("viewer@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("viewer@example.com").unwrap()
 }
 
 fn detail() -> InitiativeDetail {
@@ -228,7 +228,7 @@ struct RecordingApi {
     denied: bool,
     fail: bool,
     name: Mutex<Option<String>>,
-    members: Mutex<Vec<MacroUserIdStr<'static>>>,
+    members: Mutex<Vec<RoxUserIdStr<'static>>>,
     viewers: Mutex<Vec<String>>,
     denied_ids: Mutex<Vec<Uuid>>,
     task_count: Mutex<Option<u32>>,
@@ -246,7 +246,7 @@ impl RecordingApi {
         current
     }
 
-    fn record(&self, user: &MacroUserIdStr<'static>, call: &str) -> Result<(), InitiativeError> {
+    fn record(&self, user: &RoxUserIdStr<'static>, call: &str) -> Result<(), InitiativeError> {
         self.viewers.lock().unwrap().push(user.to_string());
         self.calls.lock().unwrap().push(call.to_string());
         if self.denied {
@@ -262,7 +262,7 @@ impl RecordingApi {
 }
 
 impl InitiativeApi for RecordingApi {
-    fn read(&self, user: MacroUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, InitiativeRead> {
+    fn read(&self, user: RoxUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, InitiativeRead> {
         Box::pin(async move {
             self.read_spans
                 .lock()
@@ -286,7 +286,7 @@ impl InitiativeApi for RecordingApi {
     }
     fn ensure_description_surface(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         _id: Uuid,
     ) -> ApiFuture<'_, ()> {
         Box::pin(async move {
@@ -306,7 +306,7 @@ impl InitiativeApi for RecordingApi {
     }
     fn update(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         _id: Uuid,
         input: UpdateInitiativeRequest,
     ) -> ApiFuture<'_, InitiativeDetail> {
@@ -318,7 +318,7 @@ impl InitiativeApi for RecordingApi {
             if let Some(members) = &input.member_ids {
                 *self.members.lock().unwrap() = members
                     .iter()
-                    .map(|id| MacroUserIdStr::try_from(id.clone()).unwrap())
+                    .map(|id| RoxUserIdStr::try_from(id.clone()).unwrap())
                     .collect();
             }
             self.updates.lock().unwrap().push(input);
@@ -327,7 +327,7 @@ impl InitiativeApi for RecordingApi {
     }
     fn create(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         input: CreateInitiativeRequest,
     ) -> ApiFuture<'_, InitiativeDetail> {
         Box::pin(async move {
@@ -338,7 +338,7 @@ impl InitiativeApi for RecordingApi {
     }
     fn tasks(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         _id: Uuid,
         _input: InitiativeTasksRequest,
     ) -> ApiFuture<'_, InitiativeTasksPage> {
@@ -351,7 +351,7 @@ impl InitiativeApi for RecordingApi {
             })
         })
     }
-    fn delete(&self, user: MacroUserIdStr<'static>, _id: Uuid) -> ApiFuture<'_, ()> {
+    fn delete(&self, user: RoxUserIdStr<'static>, _id: Uuid) -> ApiFuture<'_, ()> {
         Box::pin(async move { self.record(&user, "delete") })
     }
 }
@@ -655,7 +655,7 @@ async fn detail_loaders_isolate_viewers_failures_and_subsequent_reads() {
     let project = Uuid::parse_str(PROJECT_ID).unwrap();
     let hidden = Uuid::from_u128(99);
     api.denied_ids.lock().unwrap().push(hidden);
-    let other = MacroUserIdStr::try_from_email("other@example.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@example.com").unwrap();
     let context = InitiativeGraphqlContext(api.clone());
     let viewer_loader = initiative_loader(context.clone(), user());
     let other_loader = initiative_loader(context, other);

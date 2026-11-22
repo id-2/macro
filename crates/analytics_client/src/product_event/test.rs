@@ -16,7 +16,7 @@ fn team_member_events_carry_environment_and_team_group() {
         json!({
             "provider": "linear",
             "env": "PROD",
-            "macro_environment": "prod",
+            "rox_environment": "prod",
             "team_id": "7f9c2b1e-3d4a-4c5b-8e6f-1a2b3c4d5e6f",
             "$groups": { "team": "7f9c2b1e-3d4a-4c5b-8e6f-1a2b3c4d5e6f" },
         })
@@ -30,6 +30,6 @@ fn events_without_a_team_omit_the_group() {
 
     assert_eq!(
         serde_json::to_value(properties).unwrap(),
-        json!({ "provider": "linear", "env": "DEV", "macro_environment": "dev" })
+        json!({ "provider": "linear", "env": "DEV", "rox_environment": "dev" })
     );
 }

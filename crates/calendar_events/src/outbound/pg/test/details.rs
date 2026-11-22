@@ -26,7 +26,7 @@ fn moved_override(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn event_details_read_the_series_or_one_occurrence(pool: PgPool) {
     let owner_id = "macro|calendar-details@example.com";
     let link_id = insert_link(&pool, owner_id).await;

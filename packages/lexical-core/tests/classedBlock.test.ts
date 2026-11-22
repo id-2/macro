@@ -21,8 +21,8 @@ import {
   INTERNAL_TRANSFORMERS,
 } from '../transformers';
 
-describe('ClassedBlockNode - macro_quote transformer', () => {
-  it('serializes and deserializes a simple macro_quote block', async () => {
+describe('ClassedBlockNode - rox_quote transformer', () => {
+  it('serializes and deserializes a simple rox_quote block', async () => {
     const editor = createEditor({
       nodes: SupportedNodeTypes,
       onError: console.error,
@@ -34,7 +34,7 @@ describe('ClassedBlockNode - macro_quote transformer', () => {
           const root = $getRoot();
           const macroQuote = $createClassedBlockNode({
             tag: 'div',
-            classes: ['macro_quote', 'gmail_quote'],
+            classes: ['rox_quote', 'gmail_quote'],
           });
 
           const paragraph = $createParagraphNode();
@@ -56,7 +56,7 @@ describe('ClassedBlockNode - macro_quote transformer', () => {
     expect(markdown).toContain('<m-email-thread-embed>');
     expect(markdown).toContain('</m-email-thread-embed>');
     expect(markdown).toContain('"tag":"div"');
-    expect(markdown).toContain('"classes":["macro_quote","gmail_quote"]');
+    expect(markdown).toContain('"classes":["rox_quote","gmail_quote"]');
     expect(markdown).toContain('This is a quoted email');
 
     // Now convert back to editor state
@@ -79,7 +79,7 @@ describe('ClassedBlockNode - macro_quote transformer', () => {
       expect($isClassedBlockNode(firstChild)).toBe(true);
       if ($isClassedBlockNode(firstChild)) {
         expect(firstChild.__tag).toBe('div');
-        expect(firstChild.__classes).toEqual(['macro_quote', 'gmail_quote']);
+        expect(firstChild.__classes).toEqual(['rox_quote', 'gmail_quote']);
 
         const paragraph = firstChild.getFirstChild();
         expect(paragraph?.getType()).toBe('paragraph');
@@ -88,7 +88,7 @@ describe('ClassedBlockNode - macro_quote transformer', () => {
     });
   });
 
-  it('handles macro_quote with nested content', async () => {
+  it('handles rox_quote with nested content', async () => {
     const editor = createEditor({
       nodes: SupportedNodeTypes,
       onError: console.error,
@@ -100,7 +100,7 @@ describe('ClassedBlockNode - macro_quote transformer', () => {
           const root = $getRoot();
           const macroQuote = $createClassedBlockNode({
             tag: 'div',
-            classes: ['macro_quote', 'gmail_quote'],
+            classes: ['rox_quote', 'gmail_quote'],
           });
 
           const p1 = $createParagraphNode();
@@ -148,7 +148,7 @@ describe('ClassedBlockNode - macro_quote transformer', () => {
     });
   });
 
-  it('does not serialize ClassedBlockNode without macro_quote class', async () => {
+  it('does not serialize ClassedBlockNode without rox_quote class', async () => {
     const editor = createEditor({
       nodes: SupportedNodeTypes,
       onError: console.error,
@@ -183,7 +183,7 @@ describe('ClassedBlockNode - macro_quote transformer', () => {
     expect(markdown).toContain('Not a macro quote');
   });
 
-  it('preserves line breaks in macro_quote content', async () => {
+  it('preserves line breaks in rox_quote content', async () => {
     const editor = createEditor({
       nodes: SupportedNodeTypes,
       onError: console.error,
@@ -195,7 +195,7 @@ describe('ClassedBlockNode - macro_quote transformer', () => {
           const root = $getRoot();
           const macroQuote = $createClassedBlockNode({
             tag: 'div',
-            classes: ['macro_quote'],
+            classes: ['rox_quote'],
           });
 
           const p1 = $createParagraphNode();

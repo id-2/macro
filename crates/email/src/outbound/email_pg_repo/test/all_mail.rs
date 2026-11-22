@@ -1,7 +1,7 @@
 use super::*;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_outlook_threads", "email_all_mail")
@@ -11,7 +11,7 @@ async fn all_mail_excludes_spam_and_trash_before_pagination(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
-    let viewer = MacroUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
     for (link, mixed, archived) in [
         (
             uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
@@ -78,7 +78,7 @@ async fn all_mail_excludes_spam_and_trash_before_pagination(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_outlook_threads", "email_all_mail")
@@ -88,7 +88,7 @@ async fn all_mail_cache_and_draft_baselines_exclude_spam_and_trash(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
-    let viewer = MacroUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
     let mixed = [
         uuid::uuid!("0b000000-0000-0000-0000-000000000102"),
         uuid::uuid!("0b000000-0000-0000-0000-000000000202"),
@@ -121,7 +121,7 @@ async fn all_mail_cache_and_draft_baselines_exclude_spam_and_trash(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_outlook_threads", "email_all_mail")
@@ -155,7 +155,7 @@ async fn all_mail_keeps_provider_drafts_without_received_or_sent_dates(
     .await?;
     assert_eq!(timestamp, Some(created_at));
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = MacroUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
     let projections = repo
         .thread_mail_projections_by_ids(viewer.clone(), &[thread])
         .await?;
@@ -206,13 +206,13 @@ async fn all_mail_keeps_provider_drafts_without_received_or_sent_dates(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_outlook_threads", "email_all_mail")
     )
 )]
-async fn all_mail_excludes_synced_macro_drafts_in_junk_and_trash(
+async fn all_mail_excludes_synced_rox_drafts_in_junk_and_trash(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let message = uuid::uuid!("0a000000-0000-0000-0000-0000000000b1");
@@ -234,7 +234,7 @@ async fn all_mail_excludes_synced_macro_drafts_in_junk_and_trash(
     .execute(&pool)
     .await?;
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = MacroUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
     for mailbox_state in [
         serde_json::json!({"in_junk": true}),
         serde_json::json!({"in_trash": true}),
@@ -261,7 +261,7 @@ async fn all_mail_excludes_synced_macro_drafts_in_junk_and_trash(
             .await?;
         assert!(projections[0].previews.all.is_none());
         let draft = &projections[0].draft_state.as_ref().unwrap().drafts[0];
-        assert!(draft.macro_draft, "synced drafts retain Rox ownership");
+        assert!(draft.rox_draft, "synced drafts retain Rox ownership");
         assert!(draft.facts.latest_non_spam_message_ts.is_none());
 
         let clean = Uuid::now_v7();

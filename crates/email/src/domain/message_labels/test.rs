@@ -1,6 +1,6 @@
 use super::*;
-use macro_event_broker::{EventBrokerError, MacroEvent};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent};
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 
 #[derive(Clone, Copy, Debug, thiserror::Error)]
@@ -148,8 +148,8 @@ struct Broker {
     events: Mutex<Vec<serde_json::Value>>,
 }
 
-impl MacroEventBroker for Broker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for Broker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -170,7 +170,7 @@ fn service() -> MessageLabelService<Repository, Enqueuer, Broker> {
             calls: calls.clone(),
             inbox: Some(MessageLabelInbox {
                 id: Uuid::from_u128(1),
-                macro_id: MacroUserIdStr::try_from("macro|owner@example.com").unwrap(),
+                rox_id: RoxUserIdStr::try_from("macro|owner@example.com").unwrap(),
             }),
             label: Some(MessageLabelDefinition {
                 id: Some(Uuid::from_u128(2)),
@@ -204,7 +204,7 @@ fn message(id: u128, thread: u128) -> MessageLabelTarget {
 
 fn request(message_ids: Vec<Uuid>) -> MessageLabelChange {
     MessageLabelChange {
-        caller_macro_id: "macro|caller@example.com".into(),
+        caller_rox_id: "macro|caller@example.com".into(),
         caller_fusionauth_user_id: "caller-auth".into(),
         message_ids,
         label_id: Uuid::from_u128(2),

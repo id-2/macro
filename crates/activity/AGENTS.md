@@ -36,12 +36,12 @@ distribution.
 
 ## Boundaries
 
-- Depends on: `macro_event_broker`, `macro_event_topics`, `channel_sender`,
+- Depends on: `rox_event_broker`, `rox_event_topics`, `channel_sender`,
   `model-entity`, `model_owner`.
 - `teammate_feed` (`src/outbound/pg_activity_repo/team_feed.sql`) reads other
   domains' tables to decide in SQL which teammate rows the viewer may see:
   `team_user`, `entity_access`, `comms_channel_participants`, `email_links`,
-  `macro_user_links`, `email_threads`, and `call_entities`. It mirrors
+  `rox_user_links`, `email_threads`, and `call_entities`. It mirrors
   `EntityAccessService::get_users_by_entity`; change both together.
 - Used by: most domain crates with activity surfaces (`documents`, `forms`,
   `databases`, `initiative`, `messages`, `channels`, `soup`, `call`, `chat`,

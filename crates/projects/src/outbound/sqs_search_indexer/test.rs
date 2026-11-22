@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -42,8 +42,8 @@ impl RecordingEventBroker {
     }
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -100,7 +100,7 @@ async fn document_removals_publish_separately_keyed_purged_event_envelopes() {
     assert_eq!(published.len(), document_ids.len());
 
     for (event, document_id) in published.iter().zip(document_ids) {
-        assert_eq!(event.topic, "macro.documents");
+        assert_eq!(event.topic, "rox.documents");
         assert_eq!(event.key, document_id);
 
         let event_id = event.envelope["event_id"].clone();

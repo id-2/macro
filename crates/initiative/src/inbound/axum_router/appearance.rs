@@ -3,7 +3,7 @@
 use axum::{Json, extract::State};
 use entity_access::domain::{models::EditAccessLevel, ports::EntityAccessService};
 use entity_access::inbound::axum_extractors::InitiativeAccessExtractor;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_entity::EntityAppearance;
 
 use super::{InitiativeIdParams, InitiativeRouterState};
@@ -23,7 +23,7 @@ pub async fn set_initiative_appearance<S, Eas, Auth>(
 where
     S: InitiativeService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state

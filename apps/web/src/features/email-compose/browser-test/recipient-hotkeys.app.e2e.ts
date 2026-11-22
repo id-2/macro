@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.beforeEach(async ({ page }) => {
   // The fixture's providers would otherwise reach the hosted dev backend.
   await page.routeWebSocket('**', (socket) => socket.close());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.route('https://**', (route) => route.abort());
 });
 

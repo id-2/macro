@@ -1,5 +1,5 @@
-pub use macro_env::Environment;
-use macro_env_var::env_var;
+pub use rox_env::Environment;
+use rox_env_var::env_var;
 
 pub struct Config {
     pub enable_ai_usage_enforcement: ai_usage::AiUsageEnforcement,

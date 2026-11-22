@@ -7,7 +7,7 @@
 -- The user label view sorts threads by their labeled messages' dates.
 UPDATE email_messages SET internal_date_ts = created_at WHERE link_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb', 'macro2', 'user2', 'user2@test.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_mailbox_settings_work (id, link_id, kind, resource_key, revision, completed_revision)

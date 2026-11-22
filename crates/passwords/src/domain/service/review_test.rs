@@ -1,6 +1,6 @@
 use super::test::fakes::*;
 use super::*;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::sync::atomic::Ordering;
 
 #[tokio::test]
@@ -12,12 +12,12 @@ async fn sharing_canonicalizes_recipient_identity_before_grants_are_persisted() 
         availability: Arc::new(FakeAvailability),
     };
     let owner = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
             .unwrap()
             .into_owned(),
     };
     let viewer = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|viewer@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|viewer@example.test")
             .unwrap()
             .into_owned(),
     };
@@ -109,7 +109,7 @@ async fn disabled_and_nonmember_calls_never_acquire_vault_lease_admission() {
             },
         };
         let actor = Actor {
-            user_id: MacroUserIdStr::parse_from_str("macro|member@example.test")
+            user_id: RoxUserIdStr::parse_from_str("macro|member@example.test")
                 .unwrap()
                 .into_owned(),
         };
@@ -229,17 +229,17 @@ async fn team_default_private_admin_and_departure_preserve_creator_and_values() 
         availability: Arc::new(FakeAvailability),
     };
     let creator = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|creator@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|creator@example.com")
             .unwrap()
             .into_owned(),
     };
     let admin = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|admin@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|admin@example.com")
             .unwrap()
             .into_owned(),
     };
     let member = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|member@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|member@example.com")
             .unwrap()
             .into_owned(),
     };
@@ -422,7 +422,7 @@ async fn canonical_agent_recipient_is_rejected_before_persisting_grants() {
         availability: Arc::new(FakeAvailability),
     };
     let actor = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|creator@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|creator@example.com")
             .unwrap()
             .into_owned(),
     };
@@ -491,7 +491,7 @@ async fn canonical_agent_recipient_is_rejected_before_persisting_grants() {
 async fn omitted_private_choice_defaults_to_team_edit_sharing() {
     let repository = Arc::new(FakeRepository::new());
     let actor = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|creator@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|creator@example.com")
             .unwrap()
             .into_owned(),
     };
@@ -529,12 +529,12 @@ async fn can_edit_reflects_current_grants_without_grant_management() {
         availability: Arc::new(FakeAvailability),
     };
     let creator = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|creator@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|creator@example.com")
             .unwrap()
             .into_owned(),
     };
     let recipient = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|recipient@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|recipient@example.com")
             .unwrap()
             .into_owned(),
     };

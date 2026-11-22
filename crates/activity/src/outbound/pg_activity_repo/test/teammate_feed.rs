@@ -8,19 +8,19 @@ const OUTSIDER: &str = "macro|outsider@example.com";
 const LONER: &str = "macro|loner@example.com";
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         id,
     )
     .execute(pool)
     .await
     .expect("macro_user should insert");
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -110,7 +110,7 @@ async fn insert_inbox(pool: &PgPool, owner: &str) -> Uuid {
     let link_id = Uuid::now_v7();
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2::text, $2::text, $2::text, 'GMAIL')
         "#,
         link_id,
@@ -188,7 +188,7 @@ fn entity_ids(page: &ActivityFeedPage) -> Vec<String> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn teammate_feed_shows_teammates_rows_on_entities_shared_with_the_viewer(pool: PgPool) {
     use model_entity::EntityType as E;
 
@@ -302,7 +302,7 @@ async fn teammate_feed_shows_teammates_rows_on_entities_shared_with_the_viewer(p
     assert_eq!(teamless.next, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn teammate_feed_pages_past_capped_scans_without_skipping_rows(pool: PgPool) {
     for id in [VIEWER, ALICE, BOB] {
         insert_user(&pool, id).await;

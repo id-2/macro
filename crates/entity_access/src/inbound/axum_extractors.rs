@@ -46,7 +46,7 @@ pub use principal::{message_sender_entity_access_receipt, principal_entity_acces
 pub use project::{ProjectAccessLevelExtractor, ProjectBodyAccessLevelExtractorV2};
 pub use reminder::ReminderAccessExtractor;
 pub use scheduled_action::ScheduledActionAccessExtractor;
-pub use team::{MacroUserTeamExtractorV2, OptionalMacroUserTeamExtractorV2, user_team_receipt};
+pub use team::{RoxUserTeamExtractorV2, OptionalMacroUserTeamExtractorV2, user_team_receipt};
 pub use thread::ThreadAccessLevelExtractor;
 
 use std::borrow::Cow;
@@ -57,7 +57,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::MacroAuthorizationRejection;
+use rox_authorization::RoxAuthorizationRejection;
 use model_error_response::ErrorResponse;
 
 pub use crate::domain::models::RequiredPermission;
@@ -114,8 +114,8 @@ impl From<AccessError> for ExtractorError {
     }
 }
 
-impl From<MacroAuthorizationRejection> for ExtractorError {
-    fn from(MacroAuthorizationRejection { status, message }: MacroAuthorizationRejection) -> Self {
+impl From<RoxAuthorizationRejection> for ExtractorError {
+    fn from(RoxAuthorizationRejection { status, message }: RoxAuthorizationRejection) -> Self {
         Self::Authorization { status, message }
     }
 }

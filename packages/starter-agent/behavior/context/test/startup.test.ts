@@ -75,7 +75,7 @@ describe('startup', () => {
           AGENT_WORKSPACE: '/w',
           MUPPET_RELAY_URL: 'http://127.0.0.1:4000',
           MUPPET_RELAY_TOKEN: 'capability',
-          MUPPET_CREDENTIAL_NAMES: 'MACRO_API_KEY,OTHER',
+          MUPPET_CREDENTIAL_NAMES: 'ROX_API_KEY,OTHER',
         },
         reserved
       )
@@ -86,7 +86,7 @@ describe('startup', () => {
           kind: 'relayed',
           url: 'http://127.0.0.1:4000',
           token: 'capability',
-          names: ['MACRO_API_KEY', 'OTHER'],
+          names: ['ROX_API_KEY', 'OTHER'],
         },
       },
     });
@@ -228,8 +228,8 @@ describe('runFiles', () => {
 
 describe('addresses', () => {
   const enrolled = {
-    MACRO_API_KEY: 'mak_secret',
-    MACRO_GATEWAY: 'https://dev-gateway.rox.one',
+    ROX_API_KEY: 'mak_secret',
+    ROX_GATEWAY: 'https://dev-gateway.rox.one',
     OVERRIDE_DOCUMENT_STORAGE_SERVICE_URL: 'https://storage.internal/dss',
     OVERRIDE_AUTH_SERVICE_URL: 'https://auth.internal',
     OVERRIDE_DOCUMENT_COGNITION_SERVICE_URL: 'https://cognition.internal',
@@ -267,7 +267,7 @@ describe('addresses', () => {
 
   test('with only the gateway, every service is on its route there', () => {
     expect(
-      addresses({ MACRO_GATEWAY: 'https://gateway.rox.one/' })
+      addresses({ ROX_GATEWAY: 'https://gateway.rox.one/' })
     ).toMatchObject({
       kind: 'configured',
       value: {
@@ -283,11 +283,11 @@ describe('addresses', () => {
     });
   });
 
-  test("a call's speech goes where enrollment says (MACRO_SPEECH_URL), not via the gateway", () => {
+  test("a call's speech goes where enrollment says (ROX_SPEECH_URL), not via the gateway", () => {
     expect(
       addresses({
-        MACRO_GATEWAY: 'http://proxy:21233',
-        MACRO_SPEECH_URL: 'http://agent-harness-service:8102/brain/inference/',
+        ROX_GATEWAY: 'http://proxy:21233',
+        ROX_SPEECH_URL: 'http://agent-harness-service:8102/brain/inference/',
       })
     ).toMatchObject({
       kind: 'configured',
@@ -295,16 +295,16 @@ describe('addresses', () => {
     });
     expect(
       addresses({
-        MACRO_GATEWAY: 'https://g.example',
-        MACRO_SPEECH_URL: 'not a url',
+        ROX_GATEWAY: 'https://g.example',
+        ROX_SPEECH_URL: 'not a url',
       })
     ).toMatchObject({ kind: 'invalid' });
   });
 
   test('needs the gateway, and URLs that parse, naming the key and never a value', () => {
-    expect(addresses({ MACRO_API_KEY: 'mak_secret' })).toEqual({
+    expect(addresses({ ROX_API_KEY: 'mak_secret' })).toEqual({
       kind: 'invalid',
-      message: 'MACRO_GATEWAY is not in the credentials',
+      message: 'ROX_GATEWAY is not in the credentials',
     });
     const bad = addresses({
       ...enrolled,

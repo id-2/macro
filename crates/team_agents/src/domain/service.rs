@@ -10,8 +10,8 @@ use hosted_runtimes::domain::{
     agent::{AgentEnrollment, AgentEnrollmentError, AgentEnv, AgentEnvKey},
     enrollment::EnrollmentGeneration,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::models::{
@@ -36,19 +36,19 @@ pub use agent_credentials::AGENT_TEAMMATES_FLAG;
 /// [`EnrollmentEnvironment`] supplies.
 pub mod env_keys {
     /// The agent's Rox API key: the credential every Rox call uses.
-    pub const API_KEY: &str = "MACRO_API_KEY";
+    pub const API_KEY: &str = "ROX_API_KEY";
     /// The agent's Rox user id.
-    pub const AGENT_USER_ID: &str = "MACRO_AGENT_USER_ID";
+    pub const AGENT_USER_ID: &str = "ROX_AGENT_USER_ID";
     /// The agent's display name; its workspace commits carry it.
-    pub const AGENT_NAME: &str = "MACRO_AGENT_NAME";
+    pub const AGENT_NAME: &str = "ROX_AGENT_NAME";
     /// The agent's team.
-    pub const TEAM_ID: &str = "MACRO_TEAM_ID";
+    pub const TEAM_ID: &str = "ROX_TEAM_ID";
     /// The computer the brain runs on.
-    pub const COMPUTER_ID: &str = "MACRO_COMPUTER_ID";
+    pub const COMPUTER_ID: &str = "ROX_COMPUTER_ID";
     /// The workspace repository's clone URL, without credentials.
-    pub const REPO_URL: &str = "MACRO_REPO_URL";
+    pub const REPO_URL: &str = "ROX_REPO_URL";
     /// The workspace repository token (HTTP Basic password).
-    pub const REPO_TOKEN: &str = "MACRO_REPO_TOKEN";
+    pub const REPO_TOKEN: &str = "ROX_REPO_TOKEN";
     /// The token Claude calls through Rox's Anthropic gateway with: the
     /// agent's API key, so usage is attributed to it.
     pub const ANTHROPIC_AUTH_TOKEN: &str = "ANTHROPIC_AUTH_TOKEN";
@@ -156,7 +156,7 @@ fn team_id<Permission: RequiredPermission>(
 
 fn acting_user<Permission: RequiredPermission>(
     receipt: &EntityAccessReceipt<Permission>,
-) -> Result<MacroUserIdStr<'static>, TeamAgentError> {
+) -> Result<RoxUserIdStr<'static>, TeamAgentError> {
     receipt
         .acting_user_id()
         .cloned()
@@ -167,7 +167,7 @@ fn acting_user<Permission: RequiredPermission>(
 /// a failed load or the flag off all refuse.
 pub(crate) async fn ensure_enabled<Flags: FeatureFlags>(
     flags: Option<&Flags>,
-    caller: &MacroUserIdStr<'_>,
+    caller: &RoxUserIdStr<'_>,
 ) -> Result<(), TeamAgentError> {
     let Some(flags) = flags else {
         return Err(TeamAgentError::NotEnabled);
@@ -199,7 +199,7 @@ fn env_entry(
 /// What a failed invite must take back, newest first.
 #[derive(Default)]
 struct Undo {
-    account: Option<MacroUserIdStr<'static>>,
+    account: Option<RoxUserIdStr<'static>>,
     joined_team: bool,
     repo: bool,
 }
@@ -215,7 +215,7 @@ where
     Creators: agent_credentials::AgentCreators + 'static,
     Flags: FeatureFlags + 'static,
 {
-    async fn ensure_enabled(&self, caller: &MacroUserIdStr<'_>) -> Result<(), TeamAgentError> {
+    async fn ensure_enabled(&self, caller: &RoxUserIdStr<'_>) -> Result<(), TeamAgentError> {
         ensure_enabled(self.flags.as_ref(), caller).await
     }
 
@@ -223,7 +223,7 @@ where
     async fn team_record(
         &self,
         receipt: &EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<TeamAgentRecord, TeamAgentError> {
         let team_id = team_id(receipt)?;
         self.repository
@@ -265,10 +265,10 @@ where
     async fn prepare(
         &self,
         receipt: &EntityAccessReceipt<AdminTeamRole>,
-        created_by: &MacroUserIdStr<'static>,
+        created_by: &RoxUserIdStr<'static>,
         request: &CreateTeamAgent,
         undo: &mut Undo,
-    ) -> Result<(MacroUserIdStr<'static>, PersonaSeed), TeamAgentError> {
+    ) -> Result<(RoxUserIdStr<'static>, PersonaSeed), TeamAgentError> {
         let team_id = team_id(receipt)?;
         // A short suffix keeps two agents with the same name apart.
         let suffix: String = Uuid::now_v7()
@@ -279,7 +279,7 @@ where
             .take(6)
             .collect();
         let email = format!("{}-{suffix}@{AGENT_EMAIL_DOMAIN}", slug(&request.name));
-        let user_id = MacroUserIdStr::parse_from_str(&format!("macro|{email}"))
+        let user_id = RoxUserIdStr::parse_from_str(&format!("macro|{email}"))
             .map_err(|_| TeamAgentError::InvalidName)?
             .into_owned();
         tracing::Span::current().record(
@@ -443,7 +443,7 @@ where
     async fn delete(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<(), TeamAgentError> {
         // Not gated: an admin can always remove an agent, so its computer
         // stops billing even after the rollout is turned off.
@@ -486,7 +486,7 @@ where
     async fn voice(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<AgentVoice, TeamAgentError> {
         self.ensure_enabled(&acting_user(&receipt)?).await?;
         let record = self.team_record(&receipt, agent).await?;
@@ -507,7 +507,7 @@ where
     async fn set_voice(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         voice: AgentVoice,
     ) -> Result<AgentVoice, TeamAgentError> {
         self.ensure_enabled(&acting_user(&receipt)?).await?;

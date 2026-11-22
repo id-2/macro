@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use entity_access::domain::ports::ScheduledActionGrants;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 use super::models::ScheduledAction;
@@ -26,7 +26,7 @@ where
 {
     async fn list_accessible(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<ScheduledAction>, Report> {
         list_accessible_actions(self.repo.as_ref(), self.grants.as_ref(), &user_id)
             .await

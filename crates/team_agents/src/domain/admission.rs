@@ -12,8 +12,8 @@
 //! service composes it without the computer service.
 
 use hosted_runtimes::domain::agent::ComputerAgents;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::ports::AgentAccounts;
@@ -32,7 +32,7 @@ pub struct AgentAccountFacts {
     /// Whether it is still a member of that team.
     pub member: bool,
     /// Who created it, if that account still exists.
-    pub created_by: Option<MacroUserIdStr<'static>>,
+    pub created_by: Option<RoxUserIdStr<'static>>,
     /// Whether the creator's account is itself an agent.
     pub created_by_is_agent: bool,
 }
@@ -41,12 +41,12 @@ pub struct AgentAccountFacts {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AdmittedAgent {
     /// The agent's Rox user id.
-    pub agent_user_id: MacroUserIdStr<'static>,
+    pub agent_user_id: RoxUserIdStr<'static>,
     /// The team it is admitted to.
     pub team_id: Uuid,
     /// The human who created it (`team_agents.created_by`). Not a grant of
     /// anything: only who answers for the agent.
-    pub responsible_human_user_id: MacroUserIdStr<'static>,
+    pub responsible_human_user_id: RoxUserIdStr<'static>,
 }
 
 /// Why an account is not an admitted agent of a team.
@@ -83,7 +83,7 @@ pub enum AdmissionError {
 
 /// The pure decision, over facts already read.
 pub fn decide(
-    agent_user_id: &MacroUserIdStr<'_>,
+    agent_user_id: &RoxUserIdStr<'_>,
     team_id: Uuid,
     account: Option<AgentAccountFacts>,
     live_computer: bool,
@@ -140,7 +140,7 @@ impl<Accounts: AgentAccounts, Computers: ComputerAgents> AgentAdmission<Accounts
     )]
     pub async fn admit(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> Result<AdmittedAgent, AdmissionError> {
         let result = self.read_and_decide(agent_user_id, team_id).await;
@@ -159,7 +159,7 @@ impl<Accounts: AgentAccounts, Computers: ComputerAgents> AgentAdmission<Accounts
     /// compares the team itself.
     pub async fn resolve(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<AdmittedAgent>, AdmissionError> {
         let Some(account) = self.account(agent_user_id).await? else {
             return Ok(None);
@@ -173,7 +173,7 @@ impl<Accounts: AgentAccounts, Computers: ComputerAgents> AgentAdmission<Accounts
 
     async fn account(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<AgentAccountFacts>, AdmissionError> {
         self.accounts
             .account_facts(agent_user_id)
@@ -186,7 +186,7 @@ impl<Accounts: AgentAccounts, Computers: ComputerAgents> AgentAdmission<Accounts
 
     async fn read_and_decide(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> Result<AdmittedAgent, AdmissionError> {
         let account = self.account(agent_user_id).await?;

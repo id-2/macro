@@ -5,7 +5,7 @@ use crate::domain::{
     contact_listing::CrmContactListScope,
 };
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_properties::EntityType;
 use serde_json::{Value, json};
 use sqlx::PgPool;
@@ -347,7 +347,7 @@ async fn add_items(pool: &PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn edges_match_the_scope_ids_and_containment(pool: PgPool) {
@@ -448,7 +448,7 @@ async fn edges_match_the_scope_ids_and_containment(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn no_item_kinds_run_no_query(pool: PgPool) {
@@ -467,7 +467,7 @@ async fn no_item_kinds_run_no_query(pool: PgPool) {
 /// the primary is closed, on a read-only connection, while the scope read,
 /// which stays on the primary, fails.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn a_replica_serves_the_edges_and_nothing_else(pool: PgPool) {

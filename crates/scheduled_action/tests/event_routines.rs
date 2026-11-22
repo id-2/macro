@@ -22,13 +22,13 @@ use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model::user::UserContext;
 use rootcause::Report;
 use scheduled_action::{
@@ -79,10 +79,10 @@ fn page() -> PageSize {
 
 #[derive(Clone)]
 struct FakeAuth;
-impl MacroAuthorizationService for FakeAuth {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuth {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "owner" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: USER.into(),
@@ -93,17 +93,17 @@ impl MacroAuthorizationService for FakeAuth {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
     async fn authorize_internal(
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -111,7 +111,7 @@ struct FakeAccess;
 impl CurrentOwnerAccess for FakeAccess {
     async fn authorize(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         event: &EventReference,
     ) -> Result<Option<EventAccessCapability>, Report> {
         // The event actor is intentionally different from the routine owner.
@@ -238,7 +238,7 @@ type Dispatch = EventDispatchService<PgEventRunRepo, FakeAccess, Executor, Every
 #[derive(Clone, Copy)]
 struct Everyone;
 impl scheduled_action::domain::event_rollout::EventRoutineRollout for Everyone {
-    async fn enabled_for(&self, _: &MacroUserIdStr<'_>) -> Result<bool, rootcause::Report> {
+    async fn enabled_for(&self, _: &RoxUserIdStr<'_>) -> Result<bool, rootcause::Report> {
         Ok(true)
     }
 }
@@ -262,7 +262,7 @@ impl Harness {
             user_id, USER,
         ).execute(&pool).await.unwrap();
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, macro_user_id)
+            r#"INSERT INTO "User" (id, email, rox_user_id)
            SELECT $1, $1, id FROM macro_user WHERE email = $1 ON CONFLICT DO NOTHING"#,
             USER,
         )
@@ -293,7 +293,7 @@ impl Harness {
         let app = scheduled_action_router(ScheduledActionRouterState {
             service: Arc::new(service),
             access_service: access,
-            authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuth)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuth)),
         });
         Self {
             pool,
@@ -480,7 +480,7 @@ fn incoming(name: &str, actor: &str) -> IncomingEvent {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cron_and_event_routines_share_crud_and_manual_execution(pool: PgPool) {
     let h = Harness::new(pool, FakeRunner::default()).await;
     let cron = h.create(cron_action()).await;
@@ -534,7 +534,7 @@ async fn cron_and_event_routines_share_crud_and_manual_execution(pool: PgPool) {
     assert!(calls.iter().all(|(_, context)| context.is_none()));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_worker_replicas_queue_two_arrivals_while_active_without_rerunning_failure(
     pool: PgPool,
 ) {
@@ -612,7 +612,7 @@ async fn two_worker_replicas_queue_two_arrivals_while_active_without_rerunning_f
     assert!(h.dispatch().pending(page()).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn overlapping_filters_and_multiple_routines_deduplicate_concurrent_redelivery(pool: PgPool) {
     let h = Harness::new(pool, FakeRunner::default()).await;
     let mut input = event_action();
@@ -661,7 +661,7 @@ async fn overlapping_filters_and_multiple_routines_deduplicate_concurrent_redeli
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn crash_before_admission_commit_and_after_admission_before_offset_commit(pool: PgPool) {
     let h = Harness::new(pool, FakeRunner::default()).await;
     let id = action_id(&h.create(event_action()).await);
@@ -694,7 +694,7 @@ async fn crash_before_admission_commit_and_after_admission_before_offset_commit(
     assert_eq!(h.event_calls(), vec![key(id, &event)]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn crashes_after_start_and_after_side_effects_are_interrupted_without_reexecution(
     pool: PgPool,
 ) {
@@ -772,7 +772,7 @@ async fn crashes_after_start_and_after_side_effects_are_interrupted_without_reex
     assert!(h.dispatch().pending(page()).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn simulated_bot_document_and_channel_outputs_cannot_start_a_routine_loop(pool: PgPool) {
     let h = Harness::new(
         pool,

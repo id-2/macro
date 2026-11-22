@@ -6,8 +6,8 @@ pub mod drafts;
 
 pub use super::service::signature::SignaturePreparation;
 use chrono::{DateTime, Utc};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{
@@ -39,7 +39,7 @@ pub trait EmailSchedulingRepo: Send + Sync {
         &self,
         link_id: Uuid,
         message_id: Uuid,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         change: ScheduleChange,
         signature: Option<&SignaturePreparation>,
 
@@ -52,7 +52,7 @@ pub trait EmailSchedulingService: Send + Sync {
     /// Authorize the actor's selected inbox and apply a guarded transition.
     fn change_schedule(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         message_id: Uuid,
         change: ScheduleChange,
@@ -69,12 +69,12 @@ where
     E: Send + Sync,
     CS: Send + Sync,
     Eam: Send + Sync,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
 {
     async fn change_schedule(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         message_id: Uuid,
         change: ScheduleChange,
@@ -84,7 +84,7 @@ where
     ) -> Result<(), EmailErr> {
         let link = self
             .email_repo
-            .inboxes_for_macro_id(actor.clone())
+            .inboxes_for_rox_id(actor.clone())
             .await
             .map_err(anyhow::Error::from)?
             .into_iter()
@@ -120,7 +120,7 @@ where
             ScheduleChange::Set(send_time) => {
                 EmailMacroEvent::message_send_queued(MessageSendQueuedMetadata {
                     link_id,
-                    owner: link.macro_id,
+                    owner: link.rox_id,
                     actor: Some(actor),
                     message_id,
                     thread_id,
@@ -131,7 +131,7 @@ where
             ScheduleChange::Cancel => {
                 EmailMacroEvent::message_send_cancelled(MessageSendCancelledMetadata {
                     link_id,
-                    owner: link.macro_id,
+                    owner: link.rox_id,
                     actor: Some(actor),
                     message_id,
                     thread_id,

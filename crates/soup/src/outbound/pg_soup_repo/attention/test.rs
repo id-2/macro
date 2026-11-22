@@ -5,8 +5,8 @@ use document_sub_type::DocumentSubType;
 use filter_ast::Expr;
 use foreign_entity::domain::models::SourceId;
 use item_filters::ast::{EntityFilterAst, document::DocumentLiteral};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use sqlx::{Pool, Postgres};
 use std::sync::Arc;
@@ -66,7 +66,7 @@ fn req<'a>(
     sources: &'a [SourceId],
 ) -> AttentionCandidateRequest<'a> {
     AttentionCandidateRequest {
-        user_id: MacroUserIdStr::parse_from_str(USER_1).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER_1).unwrap(),
         limit: 50,
         own_work,
         keying: AttentionKeying::ThreadScoped,
@@ -123,7 +123,7 @@ fn work_feed_order() -> Vec<(EntityType, String)> {
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("work_feed")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn work_mode_merges_attention_and_own_work(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -163,7 +163,7 @@ async fn work_mode_merges_attention_and_own_work(pool: Pool<Postgres>) -> anyhow
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("work_feed")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attention_mode_ignores_own_work(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -192,7 +192,7 @@ async fn attention_mode_ignores_own_work(pool: Pool<Postgres>) -> anyhow::Result
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("work_feed")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn keyset_paginates_across_both_streams(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -228,7 +228,7 @@ async fn keyset_paginates_across_both_streams(pool: Pool<Postgres>) -> anyhow::R
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("work_feed")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn every_page_size_matches_the_whole_feed(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -249,7 +249,7 @@ async fn every_page_size_matches_the_whole_feed(pool: Pool<Postgres>) -> anyhow:
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("work_feed")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn only_restricts_to_known_items(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -277,7 +277,7 @@ async fn only_restricts_to_known_items(pool: Pool<Postgres>) -> anyhow::Result<(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("work_feed")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn types_narrow_both_streams(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -300,7 +300,7 @@ async fn types_narrow_both_streams(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("work_feed")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn task_subtype_narrows_documents_in_both_streams(
     pool: Pool<Postgres>,
@@ -351,7 +351,7 @@ async fn task_subtype_narrows_documents_in_both_streams(
         path = "../../../../fixtures",
         scripts("work_feed", "attention_discussions")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn discussions_on_visible_projects_and_crm_records_are_candidates(
     pool: Pool<Postgres>,
@@ -438,7 +438,7 @@ const CHANNEL_TYPES: &[EntityType] = &[EntityType::Channel, EntityType::ChannelM
         path = "../../../../fixtures",
         scripts("work_feed", "attention_channel_keying")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_scoped_keying_places_channel_notifications_on_their_threads(
     pool: Pool<Postgres>,
@@ -467,7 +467,7 @@ async fn thread_scoped_keying_places_channel_notifications_on_their_threads(
         path = "../../../../fixtures",
         scripts("work_feed", "attention_channel_keying")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn filed_entity_keying_places_a_channel_and_its_threads_together(
     pool: Pool<Postgres>,
@@ -515,7 +515,7 @@ async fn filed_entity_keying_places_a_channel_and_its_threads_together(
         path = "../../../../fixtures",
         scripts("work_feed", "attention_harnesses")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn runtime_access_notifications_are_candidates(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];

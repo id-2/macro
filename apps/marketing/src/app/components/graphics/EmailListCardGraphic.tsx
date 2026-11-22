@@ -24,7 +24,7 @@ export const INK = {
   unreadDot: '#ff8f00',
 };
 
-function MacroLogoIcon(props: { size?: number; color?: string }) {
+function RoxLogoIcon(props: { size?: number; color?: string }) {
   const s = props.size ?? 18;
   return (
     <svg
@@ -701,7 +701,7 @@ export function EmailListCardGraphic(props: {
         }}
       >
         <div style={{ 'align-items': 'center', display: 'flex', gap: '20px' }}>
-          <MacroLogoIcon />
+          <RoxLogoIcon />
           <TabSwitcher selected={props.selectedTab} />
           <span
             style={{
@@ -806,7 +806,7 @@ export function EmailListCardGraphic(props: {
             >
               Powered by Rox
             </span>
-            <MacroLogoIcon size={12} color={INK.textDim} />
+            <RoxLogoIcon size={12} color={INK.textDim} />
           </div>
         </Show>
       </div>

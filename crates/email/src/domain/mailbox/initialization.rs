@@ -1,6 +1,6 @@
 //! Verified-grant adoption and Rox sharing policy, separate from provider sync.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::future::Future;
 use uuid::Uuid;
 
@@ -42,7 +42,7 @@ pub struct VerifiedMailboxGrant {
 #[derive(Debug, Clone)]
 pub struct InitializeMailbox {
     pub attempt: Uuid,
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
     pub actor_fusion_id: Uuid,
     pub force_share: bool,
 }
@@ -51,7 +51,7 @@ pub struct InitializeMailbox {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExistingMailbox {
     pub id: Uuid,
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     pub grant_id: Option<Uuid>,
     pub grant_generation: i64,
     pub sync_generation: i64,
@@ -63,12 +63,12 @@ pub struct ExistingMailbox {
 pub struct InitializationSnapshot {
     pub entitlement: crate::domain::inbox_entitlement::InboxConnectionFacts,
     pub existing: Option<ExistingMailbox>,
-    pub account_for_email: Option<MacroUserIdStr<'static>>,
+    pub account_for_email: Option<RoxUserIdStr<'static>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InitializationDecision {
-    Create { owner: MacroUserIdStr<'static> },
+    Create { owner: RoxUserIdStr<'static> },
     Reconnect,
     Delegate,
     Promote,
@@ -153,7 +153,7 @@ impl<R: MailboxInitializationRepository, G: CompletedMailboxGrantSource>
             || grant.generation < 1
             || grant.tenant_id.is_empty()
             || grant.mailbox_id.is_empty()
-            || macro_user_id::email::EmailStr::try_from(grant.email.clone()).is_err()
+            || rox_user_id::email::EmailStr::try_from(grant.email.clone()).is_err()
         {
             return Err(InitializationError::InvalidAttempt);
         }

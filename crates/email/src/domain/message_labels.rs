@@ -2,8 +2,8 @@
 
 use super::events::{EmailEventOrigin, EmailMacroEvent, LabelRef};
 use super::ports::EmailMessageEnqueuer;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Provider settlement and retry policy for queued Gmail label writes.
@@ -22,7 +22,7 @@ pub const MAX_MESSAGE_LABEL_BATCH: usize = 10;
 /// An authenticated caller's requested label change.
 pub struct MessageLabelChange {
     /// Caller whose own and delegated inboxes may resolve the first message.
-    pub caller_macro_id: String,
+    pub caller_rox_id: String,
     /// Authentication identity used by the existing message lookup scope.
     pub caller_fusionauth_user_id: String,
     /// Message ids in request order, including any duplicates.
@@ -93,7 +93,7 @@ pub struct MessageLabelInbox {
     /// Database identifier of the inbox.
     pub id: Uuid,
     /// Inbox owner attributed in label-change events.
-    pub macro_id: MacroUserIdStr<'static>,
+    pub rox_id: RoxUserIdStr<'static>,
 }
 
 /// The label definition needed to stage a batch and publish its events.
@@ -143,7 +143,7 @@ pub trait MessageLabelRepository: Send + Sync + 'static {
     /// Resolve the first message through the caller's own and delegated inboxes.
     fn inbox_for_message(
         &self,
-        caller_macro_id: &str,
+        caller_rox_id: &str,
         message_id: Uuid,
     ) -> impl Future<Output = Result<Option<MessageLabelInbox>, Self::Err>> + Send;
 
@@ -192,7 +192,7 @@ where
     R: MessageLabelRepository,
     Q: EmailMessageEnqueuer,
     Q::Err: std::fmt::Debug,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// Stage a label batch, publish its events, and queue or compensate the provider write.
     pub async fn change(
@@ -209,7 +209,7 @@ where
             .ok_or(MessageLabelError::BatchSize)?;
         let link = self
             .repository
-            .inbox_for_message(&request.caller_macro_id, first_id)
+            .inbox_for_message(&request.caller_rox_id, first_id)
             .await
             .map_err(MessageLabelError::InboxLookup)?
             .ok_or(MessageLabelError::MessageNotFound)?;
@@ -237,7 +237,7 @@ where
         let mut thread_ids: Vec<Uuid> = db_messages.iter().map(|m| m.thread_db_id).collect();
         thread_ids.sort_unstable();
         thread_ids.dedup();
-        let pending_write_id = macro_uuid::generate_uuid_v7();
+        let pending_write_id = rox_uuid::generate_uuid_v7();
         let provider_label_id = label.provider_label_id.clone();
         let is_adding = request.add;
         let provider_messages = self
@@ -252,11 +252,11 @@ where
             })
             .await?;
 
-        let actor = Some(link.macro_id.clone());
+        let actor = Some(link.rox_id.clone());
         for thread_id in &thread_ids {
             let event = EmailMacroEvent::thread_label_change(
                 link.id,
-                link.macro_id.clone(),
+                link.rox_id.clone(),
                 actor.clone(),
                 *thread_id,
                 LabelRef {

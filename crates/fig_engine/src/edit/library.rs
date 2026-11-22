@@ -42,7 +42,7 @@ impl Txn<'_> {
                 let json = serde_json::to_string(libraries).unwrap_or_else(|_| "[]".into());
                 let value = (!libraries.is_empty()).then_some(json);
                 let root = self.doc.root;
-                self.set_macro_value(root, LIBRARIES_KEY, value.as_deref());
+                self.set_rox_value(root, LIBRARIES_KEY, value.as_deref());
                 Ok(())
             }
             _ => Ok(()),
@@ -50,11 +50,11 @@ impl Txn<'_> {
     }
 
     /// Sets (or removes) one of Rox's values on node `i`.
-    pub(super) fn set_macro_value(&mut self, i: NodeIdx, key: &str, value: Option<&str>) {
-        let current = self.doc.props(i).macro_data.clone();
+    pub(super) fn set_rox_value(&mut self, i: NodeIdx, key: &str, value: Option<&str>) {
+        let current = self.doc.props(i).rox_data.clone();
         let next = with_value(current.as_deref(), key, value);
         if next != current {
-            self.edit(i, flags::LIBRARY).macro_data = next;
+            self.edit(i, flags::LIBRARY).rox_data = next;
         }
     }
 
@@ -112,7 +112,7 @@ impl Txn<'_> {
         }
         let json = serde_json::to_string(&manifest).unwrap_or_default();
         let root = self.doc.root;
-        self.set_macro_value(root, PUBLISHED_KEY, Some(&json));
+        self.set_rox_value(root, PUBLISHED_KEY, Some(&json));
         Ok(())
     }
 }

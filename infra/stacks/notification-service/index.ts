@@ -66,7 +66,7 @@ export const coparse_api_vpc = get_coparse_api_vpc();
 
 // Fetch as a secret Pulumi output; never export the database URL.
 const retentionDatabaseUrl = aws.secretsmanager
-  .getSecretVersionOutput({ secretId: config.require('macro_db_secret_key') })
+  .getSecretVersionOutput({ secretId: config.require('rox_db_secret_key') })
   .apply((secret) => pulumi.secret(secret.secretString));
 
 new NotificationRetention('notification-retention', {
@@ -162,7 +162,7 @@ export const notificationSnsPlatformArns = [
 ];
 export const notificationApnsVoipPlatformArn = notificationApnsVoipPlatform.arn;
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
 new NotificationService('notification-service', {
   vpc: coparse_api_vpc,
@@ -171,7 +171,7 @@ new NotificationService('notification-service', {
   cloudStorageClusterName,
   secretKeyArns: [
     jwtSecretKeyArn,
-    MACRO_API_TOKENS.macroApiTokenPublicKeyArn,
+    ROX_API_TOKENS.macroApiTokenPublicKeyArn,
     authenticationServiceInternalApiKeyArn,
     unsubscribeHmacSecretArn,
   ],

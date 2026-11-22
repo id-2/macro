@@ -4,23 +4,23 @@ use super::properties_pg_repo::PropertiesPgRepo;
 use super::property_definition_queries;
 use crate::domain::model::PropertyDefinitionOwner;
 use crate::domain::ports::PropertiesRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::property_option::{PropertyOption, PropertyOptionValue};
 use models_properties::{DataType, EntityType};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
-fn user_1() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn user_1() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 
-fn user_2() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user2@test.com").unwrap()
+fn user_2() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user2@test.com").unwrap()
 }
 
-fn user_3() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user3@test.com").unwrap()
+fn user_3() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user3@test.com").unwrap()
 }
 
 fn team_1() -> Uuid {
@@ -44,7 +44,7 @@ fn new_option(display_order: i32, value: PropertyOptionValue) -> PropertyOption 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn option_batches_filter_requested_ids_and_caller_visibility(
@@ -94,7 +94,7 @@ async fn option_batches_filter_requested_ids_and_caller_visibility(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn list_property_definitions_by_team(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -122,7 +122,7 @@ async fn list_property_definitions_by_team(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn list_property_definitions_by_user(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -140,7 +140,7 @@ async fn list_property_definitions_by_user(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn get_property_definition_with_owner_checks_ownership(
@@ -195,7 +195,7 @@ async fn get_property_definition_with_owner_checks_ownership(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn list_property_definitions_with_options(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -265,7 +265,7 @@ async fn list_property_definitions_with_options(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_definition_simple(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -291,7 +291,7 @@ async fn create_property_definition_simple(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_definition_user_owned(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -315,7 +315,7 @@ async fn create_property_definition_user_owned(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_definition_duplicate_name_fails(
@@ -341,7 +341,7 @@ async fn create_property_definition_duplicate_name_fails(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_definition_with_options(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -375,7 +375,7 @@ async fn create_property_definition_with_options(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_definition_specific_entity(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -398,7 +398,7 @@ async fn create_property_definition_specific_entity(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn delete_property_definition_removes_definition(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -421,7 +421,7 @@ async fn delete_property_definition_removes_definition(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn delete_property_definition_cascades(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -471,7 +471,7 @@ async fn delete_property_definition_cascades(pool: Pool<Postgres>) -> anyhow::Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn delete_nonexistent_property_definition_is_noop(
@@ -490,7 +490,7 @@ async fn delete_nonexistent_property_definition_is_noop(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn get_caller_tag_definitions_with_options(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -541,13 +541,13 @@ async fn get_caller_tag_definitions_with_options(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_database_property_definition_preserves_type_and_isolates_ownership(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let database_id = macro_uuid::generate_uuid_v7();
+    let database_id = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO databases (id) VALUES ($1)", database_id)
         .execute(&pool)
         .await?;
@@ -585,14 +585,14 @@ async fn create_database_property_definition_preserves_type_and_isolates_ownersh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_database_property_definition_rejects_missing_database(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = PropertiesPgRepo::new(pool);
     let result = repo
         .create_database_property_definition(
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             "Missing database",
             DataType::String,
             false,
@@ -604,7 +604,7 @@ async fn create_database_property_definition_rejects_missing_database(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn a_database_binds_system_own_team_and_its_own_definitions_only(
@@ -654,7 +654,7 @@ async fn a_database_binds_system_own_team_and_its_own_definitions_only(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn definitions_by_id_include_database_owned_ones_with_their_options(

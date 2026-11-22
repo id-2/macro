@@ -5,7 +5,7 @@ import {
   Macro,
   RevisionConflictError,
 } from '../src/macro';
-import { MacroApiError } from '../src/utils';
+import { RoxApiError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -210,7 +210,7 @@ test('an invalid batch is an API error, not an unknown outcome', async () => {
       expectedRevision: 'r1',
     });
 
-  await expect(edit).rejects.toBeInstanceOf(MacroApiError);
+  await expect(edit).rejects.toBeInstanceOf(RoxApiError);
   await expect(edit).rejects.not.toBeInstanceOf(EditOutcomeUnknownError);
   await expect(edit).rejects.toThrow('Unknown sheet Forecast.');
 });

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            DELETE FROM macro_user_links\n            WHERE primary_macro_id = $1\n              AND child_macro_id = $2\n              AND link_id = $3\n        ",
+  "query": "\n            DELETE FROM rox_user_links\n            WHERE primary_rox_id = $1\n              AND child_rox_id = $2\n              AND link_id = $3\n        ",
   "describe": {
     "columns": [],
     "parameters": {

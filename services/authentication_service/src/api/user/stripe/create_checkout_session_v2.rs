@@ -3,7 +3,7 @@ use axum::{Json, extract::State};
 use entity_access::domain::models::OwnerTeamRole;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::OptionalMacroUserTeamExtractorV2;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -68,10 +68,10 @@ pub struct CheckoutSessionV2Response {
         (status = 500, body = ErrorResponse),
     )
 )]
-#[tracing::instrument(skip(ctx, user, optional_team), err, fields(user_id = %user.authorization.user.macro_user_id))]
+#[tracing::instrument(skip(ctx, user, optional_team), err, fields(user_id = %user.authorization.user.rox_user_id))]
 pub async fn create_checkout_session<Eas: EntityAccessService>(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     optional_team: OptionalMacroUserTeamExtractorV2<OwnerTeamRole, Eas, AuthorizationService>,
     Json(req): Json<CreateCheckoutSessionV2Request>,
 ) -> Result<Json<CheckoutSessionV2Response>, StripeOperationError> {
@@ -85,7 +85,7 @@ pub async fn create_checkout_session<Eas: EntityAccessService>(
 
         metadata.insert(
             "owner_id".to_string(),
-            user.authorization.user.macro_user_id.to_string(),
+            user.authorization.user.rox_user_id.to_string(),
         );
     }
 
@@ -102,7 +102,7 @@ pub async fn create_checkout_session<Eas: EntityAccessService>(
     let checkout = ctx
         .subscription_checkout
         .create(CheckoutRequest {
-            user_id: user.authorization.user.macro_user_id.clone(),
+            user_id: user.authorization.user.rox_user_id.clone(),
             plan: req.plan.unwrap_or(PaidPlan::Premium),
             onboarding_trial: req.onboarding_trial,
             success_url: req.success_url,

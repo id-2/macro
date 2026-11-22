@@ -49,7 +49,7 @@ async fn aliases(pool: &PgPool, group: Uuid) -> i64 {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_people_who_sent_removes_their_whatsapp_data(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     session
@@ -99,7 +99,7 @@ async fn deleting_people_who_sent_removes_their_whatsapp_data(pool: PgPool) {
     assert_eq!(sharing, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_alias_outlives_the_account_that_saw_it(pool: PgPool) {
     let (_, session, _, binding, _, bob) = adopted(&pool).await;
     session
@@ -115,7 +115,7 @@ async fn an_alias_outlives_the_account_that_saw_it(pool: PgPool) {
     assert_eq!(aliases(&pool, binding.id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn receipts_are_stored_once_per_message_and_expire(pool: PgPool) {
     use crate::domain::{
         events::{Receipt, ReceiptState},
@@ -157,7 +157,7 @@ async fn receipts_are_stored_once_per_message_and_expire(pool: PgPool) {
     assert_eq!(left, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_owners_session_stops_syncing_a_chat(pool: PgPool) {
     let (linked, _, _, binding, _, _) = adopted(&pool).await;
     for (user, authority) in [
@@ -187,7 +187,7 @@ async fn only_the_owners_session_stops_syncing_a_chat(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn consumed_pairings_are_pruned_after_a_day(pool: PgPool) {
     use crate::domain::ports::AccountRepository;
     let (_, _, repository, _, alice, _) = adopted(&pool).await;

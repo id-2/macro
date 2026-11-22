@@ -12,8 +12,8 @@ use item_filters::ast::{
     EntityFilterAst, calendar_event::CalendarEventLiteral, chat::ChatLiteral,
     document::DocumentLiteral,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_grouping::date_bucket_sql_key;
 use models_grouping::{GroupingConfig, date_bucket_order};
 use models_pagination::{Identify, Query, SimpleSortMethod};
@@ -61,10 +61,10 @@ fn property_join_includes_definition_id() {
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn property_grouping_uses_canonical_task_entity_type(
     pool: Pool<Postgres>,
@@ -108,7 +108,7 @@ async fn property_grouping_uses_canonical_task_entity_type(
     .execute(&pool)
     .await?;
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
@@ -142,13 +142,13 @@ async fn property_grouping_uses_canonical_task_entity_type(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_grouped_by_entity_type(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let grouping = GroupingConfig {
         field: GroupByField::EntityType,
         group_key: None,
@@ -195,13 +195,13 @@ async fn test_grouped_by_entity_type(pool: Pool<Postgres>) -> anyhow::Result<()>
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_grouped_by_project(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let grouping = GroupingConfig {
         field: GroupByField::Project,
         group_key: None,
@@ -238,13 +238,13 @@ async fn test_grouped_by_project(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_grouped_single_group_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // First, get all items grouped by entity type
     let all_items = expanded_dynamic_cursor_soup_grouped(
@@ -307,10 +307,10 @@ async fn test_grouped_single_group_filter(pool: Pool<Postgres>) -> anyhow::Resul
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn tagged_calendar_event_participates_in_grouped_property_soup(
     pool: Pool<Postgres>,
@@ -324,7 +324,7 @@ async fn tagged_calendar_event_participates_in_grouped_property_soup(
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, 'calendar-grouping@example.com', 'GMAIL')
         "#,
@@ -368,7 +368,7 @@ async fn tagged_calendar_event_participates_in_grouped_property_soup(
     .execute(&pool)
     .await?;
 
-    let user_id = MacroUserIdStr::parse_from_str(OWNER_ID).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(OWNER_ID).unwrap();
     let items = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
@@ -407,7 +407,7 @@ async fn tagged_calendar_event_participates_in_grouped_property_soup(
 /// A fired reminder counts as the event's latest activity: the grouped
 /// recency sort must place the event at its delivery time, not at the older
 /// Google last-modified time that made reminder rows surface in the past.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grouped_recency_sort_uses_reminder_delivery_time(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -418,7 +418,7 @@ async fn grouped_recency_sort_uses_reminder_delivery_time(
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, 'calendar-fired-grouped@example.com', 'GMAIL')
         "#,
@@ -466,7 +466,7 @@ async fn grouped_recency_sort_uses_reminder_delivery_time(
     .execute(&pool)
     .await?;
 
-    let user_id = MacroUserIdStr::parse_from_str(OWNER_ID).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(OWNER_ID).unwrap();
     let ids: Vec<uuid::Uuid> = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
@@ -500,13 +500,13 @@ async fn grouped_recency_sort_uses_reminder_delivery_time(
 /// ("UNION types text and boolean cannot be matched").
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_soup_runs_when_chat_arm_excluded(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     // Importance(false) never matches a chat, so the chat arm is omitted and
     // Combined unions document ∪ project ∪ calendar_event.
     let filter = EntityFilterAst {
@@ -545,13 +545,13 @@ async fn grouped_soup_runs_when_chat_arm_excluded(pool: Pool<Postgres>) -> anyho
 /// "UNION types text and bigint cannot be matched".
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_soup_runs_when_document_arm_excluded(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     // A nil document id filter is impossible, so the document arm is omitted.
     let filter = EntityFilterAst {
         document_filter: Some(Arc::new(Expr::val(DocumentLiteral::Id(uuid::Uuid::nil())))),
@@ -590,13 +590,13 @@ async fn grouped_soup_runs_when_document_arm_excluded(pool: Pool<Postgres>) -> a
 /// hand-numbered user id, failing with "operator does not exist: text = uuid".
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_soup_runs_when_calendar_arm_excluded(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let filter = EntityFilterAst {
         calendar_event_filter: Some(Arc::new(Expr::val(CalendarEventLiteral::Id(
             uuid::Uuid::nil(),
@@ -636,10 +636,10 @@ async fn grouped_soup_runs_when_calendar_arm_excluded(pool: Pool<Postgres>) -> a
 /// it survives this query's hand-numbered parameters.
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_soup_renders_bind_bearing_calendar_literals(
     pool: Pool<Postgres>,
@@ -651,7 +651,7 @@ async fn grouped_soup_renders_bind_bearing_calendar_literals(
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, 'calendar-binds-soup@example.com', 'GMAIL')
         "#,
@@ -678,7 +678,7 @@ async fn grouped_soup_renders_bind_bearing_calendar_literals(
     .execute(&pool)
     .await?;
 
-    let user_id = MacroUserIdStr::parse_from_str(OWNER_ID).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(OWNER_ID).unwrap();
     // Every bind-bearing literal at once: the grouped query numbers its
     // parameters by hand, so these must render inline — `push_bind`
     // placeholders would collide with `$1` (the user id) and fail with a
@@ -737,10 +737,10 @@ async fn grouped_soup_renders_bind_bearing_calendar_literals(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_soup_filters_calendar_events_by_notification_done(
     pool: Pool<Postgres>,
@@ -754,7 +754,7 @@ async fn grouped_soup_filters_calendar_events_by_notification_done(
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, 'calendar-notif-soup@example.com', 'GMAIL')
         "#,
@@ -826,7 +826,7 @@ async fn grouped_soup_filters_calendar_events_by_notification_done(
         .await?;
     }
 
-    let user_id = MacroUserIdStr::parse_from_str(OWNER_ID).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(OWNER_ID).unwrap();
     let filter = EntityFilterAst {
         calendar_event_filter: Some(Arc::new(Expr::or(
             filter_ast::Expr::val(CalendarEventLiteral::NotificationState(

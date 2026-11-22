@@ -37,7 +37,7 @@ and derived from `status == ATTENDED`. */
   guests: SoupCallRecordGuest[];
   /** Whether the call is currently active. */
   isActive: boolean;
-  /** Macro-account participants in the call. */
+  /** Rox-account participants in the call. */
   participants: SoupCallRecordParticipant[];
   /** When the call started. */
   startedAt: string;

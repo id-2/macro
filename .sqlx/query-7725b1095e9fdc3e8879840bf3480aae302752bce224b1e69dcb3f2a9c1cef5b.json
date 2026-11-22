@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        INSERT INTO macro_user_email_verification (macro_user_id, email, is_verified)\n        VALUES ($1, $2, true)\n        ",
+  "query": "\n        INSERT INTO rox_user_email_verification (rox_user_id, email, is_verified)\n        VALUES ($1, $2, true)\n        ",
   "describe": {
     "columns": [],
     "parameters": {

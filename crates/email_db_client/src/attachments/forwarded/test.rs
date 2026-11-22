@@ -3,12 +3,12 @@ use crate::attachments::forwarded::{
     fetch_forwarded_attachments_in_bulk, insert_forwarded_attachment,
 };
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn fetch_forwarded_attachments_returns_attachments_ordered_by_filename(
@@ -38,7 +38,7 @@ async fn fetch_forwarded_attachments_returns_attachments_ordered_by_filename(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn fetch_forwarded_attachments_returns_empty_for_wrong_link_id(
@@ -55,7 +55,7 @@ async fn fetch_forwarded_attachments_returns_empty_for_wrong_link_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn insert_forwarded_attachment_creates_new_link(pool: Pool<Postgres>) -> Result<()> {
@@ -79,7 +79,7 @@ async fn insert_forwarded_attachment_creates_new_link(pool: Pool<Postgres>) -> R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn insert_forwarded_attachment_is_idempotent(pool: Pool<Postgres>) -> Result<()> {
@@ -98,7 +98,7 @@ async fn insert_forwarded_attachment_is_idempotent(pool: Pool<Postgres>) -> Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn insert_forwarded_attachment_does_nothing_for_wrong_link_id(
@@ -120,7 +120,7 @@ async fn insert_forwarded_attachment_does_nothing_for_wrong_link_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn delete_forwarded_attachment_removes_link(pool: Pool<Postgres>) -> Result<()> {
@@ -145,7 +145,7 @@ async fn delete_forwarded_attachment_removes_link(pool: Pool<Postgres>) -> Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn delete_forwarded_attachment_returns_zero_for_wrong_link_id(
@@ -170,7 +170,7 @@ async fn delete_forwarded_attachment_returns_zero_for_wrong_link_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn delete_forwarded_attachment_returns_zero_for_nonexistent(
@@ -189,7 +189,7 @@ async fn delete_forwarded_attachment_returns_zero_for_nonexistent(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn fetch_forwarded_attachments_in_bulk_returns_grouped_by_draft_id(
@@ -214,7 +214,7 @@ async fn fetch_forwarded_attachments_in_bulk_returns_grouped_by_draft_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn fetch_forwarded_attachments_in_bulk_returns_empty_for_empty_input(
@@ -228,7 +228,7 @@ async fn fetch_forwarded_attachments_in_bulk_returns_empty_for_empty_input(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn fetch_forwarded_attachments_in_bulk_excludes_drafts_without_attachments(
@@ -247,7 +247,7 @@ async fn fetch_forwarded_attachments_in_bulk_excludes_drafts_without_attachments
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn scheduled_draft_blocks_all_attachment_mutations_and_preserves_manifest(
@@ -337,7 +337,7 @@ async fn scheduled_draft_blocks_all_attachment_mutations_and_preserves_manifest(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn attachment_request_waiting_for_admission_observes_the_committed_schedule(
@@ -380,7 +380,7 @@ async fn attachment_request_waiting_for_admission_observes_the_committed_schedul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("forwarded_attachments"))
 )]
 async fn cross_inbox_forward_keeps_the_source_inbox_for_provider_download(

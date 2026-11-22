@@ -2,7 +2,7 @@
 
 use async_trait::async_trait;
 use documents_hex::domain::canvas::{CanvasImageStore, StoredCanvasImage};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use static_file_service_client::StaticFileServiceClient;
 
 /// Static file storage for canvas renders.
@@ -18,7 +18,7 @@ impl CanvasImageStore for StaticFileCanvasImages {
     )]
     async fn save_png(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         name: &str,
         png: Vec<u8>,
     ) -> anyhow::Result<StoredCanvasImage> {

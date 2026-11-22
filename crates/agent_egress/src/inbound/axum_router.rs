@@ -66,7 +66,7 @@ where
         .route("/health", get(health))
         .route("/mcp/{slug}", any(mcp_handler::<Service>))
         .route("/mcp-custom/{key}", any(custom_mcp_handler::<Service>))
-        .route("/mcp-macro", any(macro_mcp_handler::<Service>))
+        .route("/mcp-macro", any(rox_mcp_handler::<Service>))
         .route("/mcp-preview", any(preview_mcp_handler::<Service>))
         .route(
             "/git/{*path}",
@@ -129,7 +129,7 @@ async fn preview_mcp_handler<Service: EgressService>(
 /// with no name shared between the built-in server and the owner's connected
 /// apps, no connected app can collide with it.
 #[tracing::instrument(skip_all, err(level = Level::INFO))]
-async fn macro_mcp_handler<Service>(
+async fn rox_mcp_handler<Service>(
     State(state): State<EgressRouterState<Service>>,
     request: Request,
 ) -> Result<Response, EgressError>

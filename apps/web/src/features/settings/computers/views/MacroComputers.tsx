@@ -158,7 +158,7 @@ function ManagedComputerRow(props: {
     // Guided setup picks Claude; until then there is nothing to show.
     if (!props.computer.setupCompletedAt) return { kind: 'unset' };
     const value = currentMode();
-    if (value === 'macro_credits') return { kind: 'credits' };
+    if (value === 'rox_credits') return { kind: 'credits' };
     if (value === 'own_account') return { kind: 'account', expired: expired() };
     return { kind: 'loading' };
   };
@@ -398,7 +398,7 @@ function ManagedComputerRow(props: {
  * list; team admins also get the call to buy one and the power and billing
  * controls; whoever may manage a computer's Claude gets those.
  */
-export function MacroComputers(props: {
+export function RoxComputers(props: {
   harnesses: readonly RegisteredHarness[];
   /** Get a computer, at the top of Machines, opened the buy flow. */
   buying: boolean;

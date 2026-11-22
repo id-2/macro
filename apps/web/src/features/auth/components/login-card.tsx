@@ -1,4 +1,4 @@
-import { MacroMarkIcon } from '@app/features/onboarding/components/macro-mark-icon';
+import { RoxMarkIcon } from '@app/features/onboarding/components/macro-mark-icon';
 import { OnboardingShell } from '@app/features/onboarding/components/onboarding-shell';
 import { displayName, sourceUrl } from '@core/constant/brand';
 import { type JSX, Show } from 'solid-js';
@@ -25,7 +25,7 @@ export function LoginCard(props: {
                 'var(--onboarding-intro-shadow, inset .5px .5px 1px #ffffff1c, inset -.5px -.5px 1px #0008, 0 1px 1px #131313, 0 4px 10px #0005)',
             }}
           >
-            <MacroMarkIcon class="size-10" />
+            <RoxMarkIcon class="size-10" />
           </div>
           <h1
             tabindex="-1"

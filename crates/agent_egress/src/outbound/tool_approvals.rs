@@ -9,8 +9,8 @@ use std::sync::Arc;
 
 use agent_runtime_protocol::domain::action::AgentActionId;
 use agent_runtime_protocol::domain::tool_approval::ToolApprovalStatus;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use sqlx::PgPool;
 use sqlx::postgres::PgListener;
 use tokio::sync::broadcast;
@@ -32,14 +32,14 @@ struct Row {
     agent_session_id: Uuid,
     turn_action_id: Uuid,
     request_id: serde_json::Value,
-    owner_id: MacroUserIdStr<'static>,
-    requested_by: Option<MacroUserIdStr<'static>>,
+    owner_id: RoxUserIdStr<'static>,
+    requested_by: Option<RoxUserIdStr<'static>>,
     server_slug: String,
     server_name: String,
     tool_name: String,
     arguments: serde_json::Value,
     status: String,
-    resolved_by: Option<MacroUserIdStr<'static>>,
+    resolved_by: Option<RoxUserIdStr<'static>>,
     remembered: bool,
 }
 
@@ -109,7 +109,7 @@ impl ToolApprovalStore for PgToolApprovalStore {
         &self,
         id: ToolApprovalId,
         status: ToolApprovalStatus,
-        resolved_by: Option<&MacroUserIdStr<'static>>,
+        resolved_by: Option<&RoxUserIdStr<'static>>,
         remembered: bool,
     ) -> Result<Option<ToolApproval>, EgressError> {
         let row = sqlx::query_as!(
@@ -126,14 +126,14 @@ impl ToolApprovalStore for PgToolApprovalStore {
                 resolved.agent_session_id AS "agent_session_id!",
                 resolved.turn_action_id AS "turn_action_id!",
                 resolved.request_id AS "request_id!",
-                resolved.owner_id AS "owner_id!: MacroUserIdStr<'static>",
-                resolved.requested_by AS "requested_by: MacroUserIdStr<'static>",
+                resolved.owner_id AS "owner_id!: RoxUserIdStr<'static>",
+                resolved.requested_by AS "requested_by: RoxUserIdStr<'static>",
                 resolved.server_slug AS "server_slug!",
                 resolved.server_name AS "server_name!",
                 resolved.tool_name AS "tool_name!",
                 resolved.arguments AS "arguments!",
                 resolved.status AS "status!",
-                resolved.resolved_by AS "resolved_by: MacroUserIdStr<'static>",
+                resolved.resolved_by AS "resolved_by: RoxUserIdStr<'static>",
                 resolved.remembered AS "remembered!"
             FROM resolved, pg_notify($4, resolved.id::text)
             "#,
@@ -155,10 +155,10 @@ impl ToolApprovalStore for PgToolApprovalStore {
             r#"
             SELECT
                 id, agent_session_id, turn_action_id, request_id,
-                owner_id AS "owner_id: MacroUserIdStr<'static>",
-                requested_by AS "requested_by: MacroUserIdStr<'static>",
+                owner_id AS "owner_id: RoxUserIdStr<'static>",
+                requested_by AS "requested_by: RoxUserIdStr<'static>",
                 server_slug, server_name, tool_name, arguments, status,
-                resolved_by AS "resolved_by: MacroUserIdStr<'static>",
+                resolved_by AS "resolved_by: RoxUserIdStr<'static>",
                 remembered
             FROM agent_session_tool_approval
             WHERE id = $1
@@ -234,7 +234,7 @@ impl ToolApprovalStore for PgToolApprovalStore {
     async fn is_standing(
         &self,
         session: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         server_slug: &str,
         tool: &str,
     ) -> Result<bool, EgressError> {
@@ -427,7 +427,7 @@ impl ToolApprovalStore for InMemoryToolApprovalStore {
         &self,
         id: ToolApprovalId,
         status: ToolApprovalStatus,
-        resolved_by: Option<&MacroUserIdStr<'static>>,
+        resolved_by: Option<&RoxUserIdStr<'static>>,
         remembered: bool,
     ) -> Result<Option<ToolApproval>, EgressError> {
         let resolved = {
@@ -500,7 +500,7 @@ impl ToolApprovalStore for InMemoryToolApprovalStore {
     async fn is_standing(
         &self,
         session: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         server_slug: &str,
         tool: &str,
     ) -> Result<bool, EgressError> {

@@ -3,7 +3,7 @@ use axum::Json;
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use models_email::api;
 use utoipa::ToSchema;
@@ -50,11 +50,11 @@ pub struct ListLinksResponse {
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id))]
 pub async fn list_links_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, ListLinksError> {
     let inboxes = ctx
         .inbox_catalog
-        .list(&authorization.authorization.user.macro_user_id)
+        .list(&authorization.authorization.user.rox_user_id)
         .await
         .map_err(|error| ListLinksError::DatabaseError(anyhow::Error::new(error)))?;
     let links = inboxes

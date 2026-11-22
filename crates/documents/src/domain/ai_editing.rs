@@ -4,8 +4,8 @@ use super::ports::editing::{EditMode, EditResult, EditingWorkerService, EditorNa
 use ai_billing::domain::admission::{AiAdmissionError, AiAdmissionService};
 use ai_usage::{AiFeature, UsageAmount, UsageContext, UsageRecorder};
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt};
-use macro_sync_service_jwt::DocumentPermissionToken;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_sync_service_jwt::DocumentPermissionToken;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 #[cfg(test)]
@@ -60,7 +60,7 @@ impl<W: EditingWorkerService> AiEditingService<W> {
     pub async fn edit(
         &self,
         receipt: EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         request: AiEditRequest<'_>,
     ) -> Result<EditResult, AiEditError> {
         self.admission.admit(caller, AiFeature::AiEditing).await?;
@@ -76,7 +76,7 @@ impl<W: EditingWorkerService> AiEditingService<W> {
             )
             .await?;
         let usage = UsageContext::new(AiFeature::AiEditing, caller.clone())
-            .with_entity(macro_uuid::string_to_uuid(document_id).ok());
+            .with_entity(rox_uuid::string_to_uuid(document_id).ok());
         for model in &result.usage {
             // The worker reports one input total per model with no cache
             // breakdown, so any cache tokens in it bill at the input rate.

@@ -41,14 +41,14 @@ impl Notification for EntityAccessRequestedMetadata {
     const TYPE_NAME: &'static str = "entity_access_requested";
 }
 impl NotificationTitle for EntityAccessRequestedMetadata {
-    fn format_title(&self, sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_title(&self, sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         let sender = comment_sender_label(sender, None);
         Ok(format!(
             "{sender} requested {} access to {}",
             self.access_level, self.entity_name
         ))
     }
-    fn format_body(&self, _sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_body(&self, _sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         Ok(self.entity_name.clone())
     }
 }
@@ -59,7 +59,7 @@ impl NotificationExtIos for EntityAccessRequestedMetadata {
     }
     fn as_apns<'a>(
         &self,
-        sender: Option<MacroUserIdStr<'a>>,
+        sender: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -86,14 +86,14 @@ impl Notification for EntityAccessGrantedMetadata {
     const TYPE_NAME: &'static str = "entity_access_granted";
 }
 impl NotificationTitle for EntityAccessGrantedMetadata {
-    fn format_title(&self, sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_title(&self, sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         let sender = comment_sender_label(sender, None);
         Ok(format!(
             "{sender} granted you {} access to {}",
             self.access_level, self.entity_name
         ))
     }
-    fn format_body(&self, _sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_body(&self, _sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         Ok(self.entity_name.clone())
     }
 }
@@ -104,7 +104,7 @@ impl NotificationExtIos for EntityAccessGrantedMetadata {
     }
     fn as_apns<'a>(
         &self,
-        sender: Option<MacroUserIdStr<'a>>,
+        sender: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -137,14 +137,14 @@ impl Notification for RuntimeAccessRemovedMetadata {
     const TYPE_NAME: &'static str = "runtime_access_removed";
 }
 impl NotificationTitle for RuntimeAccessRemovedMetadata {
-    fn format_title(&self, sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_title(&self, sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         let sender = comment_sender_label(sender, None);
         Ok(format!(
             "{sender} removed your access to {}",
             self.runtime_name
         ))
     }
-    fn format_body(&self, _sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_body(&self, _sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         let names: Vec<&str> = self
             .agents
             .iter()
@@ -165,7 +165,7 @@ impl NotificationExtIos for RuntimeAccessRemovedMetadata {
     }
     fn as_apns<'a>(
         &self,
-        sender: Option<MacroUserIdStr<'a>>,
+        sender: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -190,14 +190,14 @@ impl Notification for ChannelAccessRequestedMetadata {
     const TYPE_NAME: &'static str = "channel_access_requested";
 }
 impl NotificationTitle for ChannelAccessRequestedMetadata {
-    fn format_title(&self, sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_title(&self, sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         let sender = comment_sender_label(sender, None);
         Ok(format!(
             "{sender} asked to join #{}",
             self.common.channel_name
         ))
     }
-    fn format_body(&self, _sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_body(&self, _sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         Ok(format!("#{}", self.common.channel_name))
     }
 }
@@ -208,7 +208,7 @@ impl NotificationExtIos for ChannelAccessRequestedMetadata {
     }
     fn as_apns<'a>(
         &self,
-        sender: Option<MacroUserIdStr<'a>>,
+        sender: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {

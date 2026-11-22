@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::models::ReferencedShareItemType;
 use chrono::{Duration, SubsecRound};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const CHANNEL: Uuid = Uuid::from_u128(100);
 const THREAD_ROOT: Uuid = Uuid::from_u128(1);
@@ -10,8 +10,8 @@ const OTHER_BOT: BotId = BotId::TEST_B;
 const PERSON: &str = "macro|person@example.com";
 const SOMEONE_ELSE: &str = "macro|someone-else@example.com";
 
-fn person() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(PERSON.to_owned()).unwrap()
+fn person() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(PERSON.to_owned()).unwrap()
 }
 
 async fn post(pool: &PgPool, id: Uuid, thread_id: Option<Uuid>, sender: &str, at: DateTime<Utc>) {
@@ -72,7 +72,7 @@ fn document(id: &str) -> ReferencedShareItem {
     ReferencedShareItem::new(id, ReferencedShareItemType::Document)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_request_is_the_persons_latest_message_in_the_thread_before_the_reply(pool: PgPool) {
     let root_at = Utc::now() - Duration::hours(1);
     let follow_up_at = root_at + Duration::minutes(10);
@@ -129,7 +129,7 @@ async fn the_request_is_the_persons_latest_message_in_the_thread_before_the_repl
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_channel_request_is_the_persons_latest_message_anywhere_in_the_channel(pool: PgPool) {
     let asked_at = Utc::now() - Duration::minutes(5);
     let posted_at = asked_at + Duration::minutes(2);
@@ -169,7 +169,7 @@ async fn the_channel_request_is_the_persons_latest_message_anywhere_in_the_chann
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_what_the_replying_bot_created_for_the_person_since_the_request_counts(pool: PgPool) {
     let requested_at = Utc::now() - Duration::minutes(5);
     let after = requested_at + Duration::seconds(1);

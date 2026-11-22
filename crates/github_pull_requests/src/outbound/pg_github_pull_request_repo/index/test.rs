@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -47,7 +47,7 @@ async fn snapshot(pool: &PgPool) -> Vec<Value> {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn candidates_retain_older_cross_source_and_case_variant_metadata(pool: PgPool) {
     for (key, source, metadata) in [
         (
@@ -108,7 +108,7 @@ async fn candidates_retain_older_cross_source_and_case_variant_metadata(pool: Pg
     assert_eq!(metadata, expected);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn repository_boundaries_and_metacharacters_match_literally(pool: PgPool) {
     for key in [
         "macro-inc/appXrepo/pull/1",
@@ -125,7 +125,7 @@ async fn repository_boundaries_and_metacharacters_match_literally(pool: PgPool) 
     assert_eq!(records[0].github_key, "macro-inc/app_repo/pull/2");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn candidate_scan_reads_past_a_sql_page_without_duplicates(pool: PgPool) {
     let ids: Vec<_> = (0..SOURCE_PAGE_SIZE + 3).map(|_| Uuid::now_v7()).collect();
     sqlx::query!(
@@ -146,7 +146,7 @@ async fn candidate_scan_reads_past_a_sql_page_without_duplicates(pool: PgPool) {
     assert!(records.windows(2).all(|pair| pair[0].id < pair[1].id));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn initialization_and_retries_never_rewrite_existing_columns_or_timestamps(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     let original = row("Macro/App/pull/7", Some(99));
@@ -165,7 +165,7 @@ async fn initialization_and_retries_never_rewrite_existing_columns_or_timestamps
     assert_eq!(snapshot(&pool).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn conflicting_keys_unverified_rows_and_real_renames_remain_untouched(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     let original = row("Macro/App/pull/7", Some(99));
@@ -200,7 +200,7 @@ async fn conflicting_keys_unverified_rows_and_real_renames_remain_untouched(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn initialization_winning_after_empty_rename_lookup_allows_case_only_live_update(
     pool: PgPool,
 ) {
@@ -237,7 +237,7 @@ async fn initialization_winning_after_empty_rename_lookup_allows_case_only_live_
     assert_eq!(snapshot(&pool).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn live_first_initialization_preserves_live_values_and_timestamps(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     let mut live = row("macro/app/pull/7", Some(99));
@@ -255,7 +255,7 @@ async fn live_first_initialization_preserves_live_values_and_timestamps(pool: Pg
     assert_eq!(snapshot(&pool).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn normalized_lock_serializes_initialization_and_live_updates(pool: PgPool) {
     use std::time::Duration;
     let repo = PgGithubPullRequestRepo::new(pool.clone());
@@ -307,7 +307,7 @@ async fn normalized_lock_serializes_initialization_and_live_updates(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn simultaneous_case_variant_initializations_insert_once(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     let other = repo.clone();

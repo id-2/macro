@@ -3,7 +3,7 @@ use crate::domain::{
     email_followup::{EmailFollowupCommand, EmailFollowupRepo, FollowupRecord, FollowupState},
     models::ReminderError,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Postgres, Transaction, types::Json};
 use std::time::Duration;
 use uuid::Uuid;
@@ -21,7 +21,7 @@ impl EmailFollowupRepo for PgRemindersRepo {
 
     async fn lock_followup(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         thread: Uuid,
     ) -> Result<Self::Guard, ReminderError> {
         // The transaction exists only to hold the lock. Durable intent writes
@@ -61,7 +61,7 @@ impl EmailFollowupRepo for PgRemindersRepo {
 
     async fn thread_followup(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         thread: Uuid,
     ) -> Result<Option<FollowupRecord>, ReminderError> {
         Ok(sqlx::query_scalar!(
@@ -73,7 +73,7 @@ impl EmailFollowupRepo for PgRemindersRepo {
 
     async fn reminder_followup(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         reminder: Uuid,
     ) -> Result<Option<FollowupRecord>, ReminderError> {
         Ok(sqlx::query_scalar!(
@@ -90,7 +90,7 @@ impl EmailFollowupRepo for PgRemindersRepo {
 
     async fn previous_operation(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         operation: Uuid,
     ) -> Result<Option<(Uuid, EmailFollowupCommand)>, ReminderError> {
         Ok(sqlx::query!(

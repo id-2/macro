@@ -8,7 +8,7 @@ version = "0.1.0"
 anyhow = { workspace = true }
 futures = { workspace = true }
 http = { workspace = true }
-macro_env_var = { path = "../../../crates/macro_env_var" }
+rox_env_var = { path = "../../../crates/rox_env_var" }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -19,5 +19,5 @@ tungstenite = { workspace = true }
 workspace-hack = { version = "0.1", path = "../../../crates/workspace-hack" }
 
 [package.metadata.cargo-shear]
-# `macro_env_var` macros expand to `#[tracing::instrument]`.
+# `rox_env_var` macros expand to `#[tracing::instrument]`.
 ignored = ["tracing"]

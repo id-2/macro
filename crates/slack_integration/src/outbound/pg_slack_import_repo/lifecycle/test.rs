@@ -15,14 +15,14 @@ pub(crate) async fn fixture_parts(
     let user = Uuid::now_v7();
     let team = Uuid::now_v7();
     sqlx::query!("INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'lifecycle', 'lifecycle@example.com', 'lifecycle-customer')", user).execute(pool).await.unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|lifecycle@example.com', 'lifecycle@example.com', $1)"#, user).execute(pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|lifecycle@example.com', 'lifecycle@example.com', $1)"#, user).execute(pool).await.unwrap();
     sqlx::query!("INSERT INTO team (id, name, owner_id) VALUES ($1, 'Lifecycle', 'macro|lifecycle@example.com')", team).execute(pool).await.unwrap();
     let team = team.try_into().unwrap();
     let repo = PgSlackImportRepo::new(pool.clone(), ImportLimits::default());
     let job = repo
         .create(
             team,
-            &MacroUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
+            &RoxUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
             &CreateImport {
                 idempotency_token: Uuid::now_v7().try_into().unwrap(),
                 source: SourceIdentity::ConfirmedUnknown,
@@ -115,7 +115,7 @@ fn assert_error<T>(result: PortResult<T>, expected: ImportError) {
     }
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn claim_heartbeat_reclaim_fences_stale_worker(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(3)).await;
     assert_eq!(repo.requester(&event).await.unwrap().unwrap().0, team);
@@ -182,7 +182,7 @@ async fn claim_heartbeat_reclaim_fences_stale_worker(pool: PgPool) {
     assert_eq!(progress.status, JobStatus::Failed);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn finalize_cancel_race_and_duplicate_terminal_updates(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     let (finalized, cancelled) = futures::join!(
@@ -208,7 +208,7 @@ async fn finalize_cancel_race_and_duplicate_terminal_updates(pool: PgPool) {
     assert!(repo.pending_events(50).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn cancel_claim_race_and_running_completion(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     let (claim, cancel) = futures::join!(
@@ -249,7 +249,7 @@ async fn cancel_claim_race_and_running_completion(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn lost_publish_ack_recovers_and_reconcile_supersedes_old_dlq(pool: PgPool) {
     let (repo, _, event) = fixture(&pool, None).await;
     assert_eq!(repo.pending_events(1).await.unwrap(), vec![event.clone()]);
@@ -274,7 +274,7 @@ async fn lost_publish_ack_recovers_and_reconcile_supersedes_old_dlq(pool: PgPool
     assert_eq!(repo.dead_letter(&new).await.unwrap(), WorkerOutcome::Defer);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn cancellation_expired_lease_settles_without_restart(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     let running = claim(&repo, &event).await;
@@ -294,7 +294,7 @@ async fn cancellation_expired_lease_settles_without_restart(pool: PgPool) {
     assert_error(repo.heartbeat(&running.lease).await, ImportError::LeaseLost);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn retry_budget_and_dlq_are_duplicate_safe(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     for attempt in 1..=MAX_ATTEMPTS {
@@ -324,7 +324,7 @@ async fn retry_budget_and_dlq_are_duplicate_safe(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn expiry_precedes_s3_lifecycle_and_empty_jobs_settle(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     sqlx::query!("UPDATE slack_import_job SET staging_expires_at = clock_timestamp() + interval '12 hours' WHERE id = $1", Uuid::from(event.job_id)).execute(&pool).await.unwrap();
@@ -346,7 +346,7 @@ async fn expiry_precedes_s3_lifecycle_and_empty_jobs_settle(pool: PgPool) {
     let empty = repo
         .create(
             team,
-            &MacroUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
+            &RoxUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
             &CreateImport {
                 idempotency_token: Uuid::now_v7().try_into().unwrap(),
                 source: SourceIdentity::ConfirmedUnknown,
@@ -367,7 +367,7 @@ async fn expiry_precedes_s3_lifecycle_and_empty_jobs_settle(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn dead_letter_settles_queued_work_once(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(1)).await;
     assert_eq!(
@@ -387,7 +387,7 @@ async fn dead_letter_settles_queued_work_once(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn expiry_closes_abandoned_uploads_and_expired_importing(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(1)).await;
     let running = claim(&repo, &event).await;
@@ -421,7 +421,7 @@ async fn expiry_closes_abandoned_uploads_and_expired_importing(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn shape_only_completion_ignores_late_dlq(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     let running = claim(&repo, &event).await;

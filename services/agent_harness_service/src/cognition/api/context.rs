@@ -19,9 +19,9 @@ use documents::inbound::attachment::DocumentAttachmentService;
 use email::inbound::attachment::EmailAttachmentService;
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
 use entity_registry::NonUserOwners;
-use macro_auth::InternalApiKey;
-use macro_authorization::{
-    MacroAuthJwtValidator, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_auth::InternalApiKey;
+use rox_authorization::{
+    RoxAuthJwtValidator, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
 use notification::domain::service::SqsNotificationIngress;
 use notification::outbound::queue::SqsQueue;
@@ -37,7 +37,7 @@ use stream::domain::StreamRepo;
 pub type DcsEntityAccessService = EntityAccessServiceImpl<PgAccessRepository>;
 
 /// Type alias for the authorization service.
-pub type DcsAuthorizationService = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+pub type DcsAuthorizationService = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 
 /// Type alias for the roles-and-permissions service backed by RoxDB.
 pub type DcsUserPermissionsService =
@@ -73,8 +73,8 @@ pub type DcsAttachmentProvider = AttachmentProvider<
 >;
 
 /// Kafka-backed event broker with publish tasks tracked for graceful shutdown.
-pub type DcsEventBroker = macro_event_broker::MacroEventBrokerService<
-    macro_event_broker::KafkaEventPublisher,
+pub type DcsEventBroker = rox_event_broker::RoxEventBrokerService<
+    rox_event_broker::KafkaEventPublisher,
     tokio_util::task::TaskTracker,
 >;
 
@@ -146,7 +146,7 @@ pub struct ApiContext {
     pub document_storage_client: Arc<DocumentStorageServiceClient>,
     pub search_service_client: Arc<SearchServiceClient>,
     pub email_service_client_external: Arc<email_service_client::EmailServiceClientExternal>,
-    pub authorization_state: MacroAuthorizationState<DcsAuthorizationService>,
+    pub authorization_state: RoxAuthorizationState<DcsAuthorizationService>,
     pub user_permissions_service: Arc<DcsUserPermissionsService>,
     /// Whether a team bot with no acting user may own what it creates.
     pub non_user_owners: NonUserOwners,
@@ -190,7 +190,7 @@ pub struct ApiContext {
     pub import_service: Arc<DcsImportService>,
     pub onboarding_service: Arc<DcsOnboardingService>,
     /// Kafka-backed macro event broker for publishing domain events.
-    pub macro_event_broker: DcsEventBroker,
+    pub rox_event_broker: DcsEventBroker,
 }
 
 impl FromRef<ApiContext>

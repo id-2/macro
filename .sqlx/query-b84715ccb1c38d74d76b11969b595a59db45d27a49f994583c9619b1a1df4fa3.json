@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT DISTINCT macro_id FROM email_links ORDER BY macro_id",
+  "query": "SELECT DISTINCT rox_id FROM email_links ORDER BY rox_id",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "macro_id",
+        "name": "rox_id",
         "type_info": "Text"
       }
     ],

@@ -2227,7 +2227,7 @@
       "delete": {
         "tags": ["Links"],
         "summary": "Removes a linked inbox.",
-        "description": "For an inbox the caller owns this enqueues a full cascade teardown\n(`LinkManagerMessage::DeleteLink`). For an inbox reached via delegation it\nonly drops the `macro_user_links` edge, leaving the owner's data intact.",
+        "description": "For an inbox the caller owns this enqueues a full cascade teardown\n(`LinkManagerMessage::DeleteLink`). For an inbox reached via delegation it\nonly drops the `rox_user_links` edge, leaving the owner's data intact.",
         "operationId": "delete_link",
         "parameters": [
           {
@@ -2908,7 +2908,7 @@
       "delete": {
         "tags": ["Sync"],
         "summary": "Disables inbox syncing for the selected inbox.",
-        "description": "The inbox is the caller's primary, or the one named by `X-Email-Link-Id`,\nwhich may be an inbox the caller only reaches through delegation. Removal\ntherefore follows the same policy as `DELETE /email/links/{link_id}`: an\nowner's inbox is torn down, while a delegate only loses their\n`macro_user_links` edge and the owner's data stays intact.",
+        "description": "The inbox is the caller's primary, or the one named by `X-Email-Link-Id`,\nwhich may be an inbox the caller only reaches through delegation. Removal\ntherefore follows the same policy as `DELETE /email/links/{link_id}`: an\nowner's inbox is torn down, while a delegate only loses their\n`rox_user_links` edge and the owner's data stays intact.",
         "operationId": "disable_sync",
         "parameters": [
           {
@@ -4238,7 +4238,7 @@
             "type": ["string", "null"],
             "description": "HTML body (base64 URL_SAFE_NO_PAD encoded). Sanitized before storage."
           },
-          "body_macro": {
+          "body_rox": {
             "type": ["string", "null"],
             "description": "Rox body format."
           },
@@ -4329,7 +4329,7 @@
             "type": ["string", "null"],
             "description": "HTML body (decoded)."
           },
-          "body_macro": {
+          "body_rox": {
             "type": ["string", "null"],
             "description": "Rox body."
           },
@@ -4531,7 +4531,7 @@
           "body_html_sanitized": {
             "type": ["string", "null"]
           },
-          "body_macro": {
+          "body_rox": {
             "type": ["string", "null"]
           },
           "body_replyless": {
@@ -5716,7 +5716,7 @@
           "provider_rejected",
           "retryable",
           "persist_failed",
-          "macro_call_failed",
+          "rox_call_failed",
           "copy_choice_required",
           "confirmation_required"
         ]
@@ -6235,7 +6235,7 @@
           "backfill_job_id": {
             "type": ["string", "null"],
             "format": "uuid",
-            "description": "Present when init enqueued a backfill job. Absent for cross-user delegation,\nwhere the child link's backfill already ran under its own macro_id; present for\nthe self-link bootstrap, where a fresh link is provisioned and backfilled."
+            "description": "Present when init enqueued a backfill job. Absent for cross-user delegation,\nwhere the child link's backfill already ran under its own rox_id; present for\nthe self-link bootstrap, where a fresh link is provisioned and backfilled."
           },
           "link_id": {
             "type": "string",
@@ -6518,7 +6518,7 @@
         "type": "object",
         "required": [
           "id",
-          "macro_id",
+          "rox_id",
           "fusionauth_user_id",
           "email_address",
           "provider",
@@ -6562,7 +6562,7 @@
           "is_sync_active": {
             "type": "boolean"
           },
-          "macro_id": {
+          "rox_id": {
             "type": "string"
           },
           "needs_calendar_permission": {
@@ -6886,7 +6886,7 @@
           "body_html_sanitized": {
             "type": ["string", "null"]
           },
-          "body_macro": {
+          "body_rox": {
             "type": ["string", "null"]
           },
           "body_text": {

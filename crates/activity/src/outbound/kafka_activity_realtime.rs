@@ -1,6 +1,6 @@
 //! Kafka transport for addressed activity announcements.
 
-use macro_event_broker::{Event, MacroEvent, MacroEventBroker};
+use rox_event_broker::{Event, RoxEvent, RoxEventBroker};
 use rootcause::prelude::{Report, ResultExt as _};
 use tokio_util::task::AbortOnDropHandle;
 
@@ -21,7 +21,7 @@ impl<B> KafkaActivityRealtimePublisher<B> {
     }
 }
 
-impl<B: MacroEventBroker> ActivityEventPublisher for KafkaActivityRealtimePublisher<B> {
+impl<B: RoxEventBroker> ActivityEventPublisher for KafkaActivityRealtimePublisher<B> {
     type Err = Report;
 
     async fn publish(&self, event: ActivityTopicEvent) -> Result<(), Report> {

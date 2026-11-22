@@ -2,7 +2,7 @@ use std::num::NonZeroU32;
 
 use async_graphql::{Context, Enum, InputObject, SimpleObject};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Base64Str, CursorVal, CursorWithVal, Sortable};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -104,7 +104,7 @@ fn encode_cursor(occurred_at: DateTime<Utc>, id: Uuid, limit: u32) -> String {
 /// feed.
 pub async fn resolve_activity_feed<R>(
     ctx: &Context<'_>,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     input: ActivityFeedInput,
 ) -> async_graphql::Result<GraphqlActivityPage>
 where

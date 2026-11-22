@@ -17,9 +17,9 @@ use std::time::Duration;
 
 use agent_session::domain::events::{AgentSessionLifecycleEvent, AgentSessionLifecycleMacroEvent};
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    EventConsumer, KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _,
-    MacroEventConsumerService, MessageWrapper,
+use rox_event_broker::{
+    EventConsumer, KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _,
+    RoxEventConsumerService, MessageWrapper,
 };
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message};
@@ -29,7 +29,7 @@ use tracing::Instrument as _;
 use crate::domain::ports::{RunEventOutcome, SuggestionRuns};
 use crate::domain::run::{SessionEvent, SessionNews};
 
-macro_event_broker::declare_topics!(SessionLifecycle: AgentSessionLifecycleMacroEvent);
+rox_event_broker::declare_topics!(SessionLifecycle: AgentSessionLifecycleMacroEvent);
 
 struct SuggestionRunsGroup;
 
@@ -149,7 +149,7 @@ where
     C: CommittingConsumer,
     for<'a> C::MessageType<'a>: Message,
 {
-    let consumer = MacroEventConsumerService::new(consumer);
+    let consumer = RoxEventConsumerService::new(consumer);
     let mut shutdown = std::pin::pin!(shutdown);
     loop {
         let message = tokio::select! {

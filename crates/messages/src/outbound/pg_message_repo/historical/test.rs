@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -15,7 +15,7 @@ use crate::domain::{
 
 const USER: &str = "macro|historical@example.com";
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn read_targets_validate_live_roots_and_preserve_orphan_structure(pool: PgPool) {
     use crate::domain::ports::HistoricalMessageReader;
     let channel_id = channel(&pool).await;
@@ -69,7 +69,7 @@ async fn read_targets_validate_live_roots_and_preserve_orphan_structure(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn body_patch_is_guarded_silent_and_transactional(pool: PgPool) {
     use crate::domain::historical::HistoricalBodyPatch;
     let channel_id = channel(&pool).await;
@@ -180,7 +180,7 @@ fn historical_time() -> DateTime<Utc> {
 
 fn message(thread_id: Option<Uuid>, import_order: i64) -> HistoricalMessage {
     HistoricalMessage {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         thread_id,
         sender: USER.try_into().unwrap(),
         imported_author: None,
@@ -196,7 +196,7 @@ fn message(thread_id: Option<Uuid>, import_order: i64) -> HistoricalMessage {
 }
 
 async fn channel(pool: &PgPool) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels (id, name, channel_type, owner_id) VALUES ($1, 'History', 'private', $2)",
         id, USER,
@@ -204,13 +204,13 @@ async fn channel(pool: &PgPool) -> Uuid {
     id
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn roots_replies_attribution_and_order_across_batches(pool: PgPool) {
     let channel_id = channel(&pool).await;
     let parent = MessageParent::Channel(channel_id);
     let repo = PgMessageRepository::new(pool.clone());
     let mut root = message(None, 0);
-    root.sender = channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID);
+    root.sender = channel_sender::ChannelSender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID);
     root.imported_author = Some("Archive Author".into());
     let later = message(Some(root.id), 20);
     // Replies may occur before their root in the input vector.
@@ -253,7 +253,7 @@ async fn roots_replies_attribution_and_order_across_batches(pool: PgPool) {
     assert_eq!(stored.import_order, Some(0));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reactions_mentions_are_unique_and_have_no_live_effects(pool: PgPool) {
     let channel_id = channel(&pool).await;
     let before = sqlx::query!(
@@ -273,7 +273,7 @@ async fn reactions_mentions_are_unique_and_have_no_live_effects(pool: PgPool) {
     root.reactions = vec![reaction.clone(), reaction];
     root.mentions = (0..2)
         .map(|_| HistoricalUserMention {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             user_id: USER.try_into().unwrap(),
         })
         .collect();
@@ -339,7 +339,7 @@ async fn reactions_mentions_are_unique_and_have_no_live_effects(pool: PgPool) {
     // is implemented directly, never through MessageCommands or live services.
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rejects_foreign_missing_reply_and_deleted_roots(pool: PgPool) {
     let first_channel = channel(&pool).await;
     let second_channel = channel(&pool).await;
@@ -355,7 +355,7 @@ async fn rejects_foreign_missing_reply_and_deleted_roots(pool: PgPool) {
     for (channel_id, root_id) in [
         (second_channel, root.id),
         (first_channel, reply.id),
-        (first_channel, macro_uuid::generate_uuid_v7()),
+        (first_channel, rox_uuid::generate_uuid_v7()),
     ] {
         let new_root = message(None, 2);
         let result = repo
@@ -385,7 +385,7 @@ async fn rejects_foreign_missing_reply_and_deleted_roots(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reaction_failure_rolls_back_savepoint_and_outer_transaction_stays_usable(pool: PgPool) {
     let channel_id = channel(&pool).await;
     let mut root = message(None, 0);
@@ -450,13 +450,13 @@ async fn reaction_failure_rolls_back_savepoint_and_outer_transaction_stays_usabl
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn existing_id_is_a_conflict_without_partial_writes_or_overwrite(pool: PgPool) {
     let channel_id = channel(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
     let mut original = message(None, 0);
     original.mentions.push(HistoricalUserMention {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         user_id: USER.try_into().unwrap(),
     });
     repo.insert_historical(&HistoricalBatch {
@@ -508,7 +508,7 @@ async fn existing_id_is_a_conflict_without_partial_writes_or_overwrite(pool: PgP
 #[test]
 fn validates_timestamps_ids_counts_and_byte_limits() {
     let valid = HistoricalBatch {
-        channel_id: macro_uuid::generate_uuid_v7(),
+        channel_id: rox_uuid::generate_uuid_v7(),
         messages: vec![message(None, 0)],
     };
     valid.validate().unwrap();

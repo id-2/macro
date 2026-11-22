@@ -203,7 +203,7 @@ you are only giving it an editor (as `pptx` and `docx` did).
   [create-ai-tool skill](../../.agents/skills/create-ai-tool/SKILL.md) for
   wiring, `bun run gen-tools`, the tool-call UI
   (`apps/web/src/lib/core/component/AI/component/tool/handler.tsx`,
-  `apps/web/src/features/block-agent/component/parts/MacroToolCall.tsx`,
+  `apps/web/src/features/block-agent/component/parts/RoxToolCall.tsx`,
   `apps/web/src/features/block-agent/state/tool-approval-wording.ts`), and the
   MCP docs pages under `apps/docs/AI/mcp/tools/`.
 - **Saving.** Save through document storage from `queries/` (service clients

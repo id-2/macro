@@ -1,6 +1,6 @@
 //! Wire contract of the internal API, shared by the router and the client.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -13,7 +13,7 @@ use crate::domain::voice::VoiceConfig;
 #[serde(rename_all = "camelCase")]
 pub struct CreateRepoRequest {
     /// The agent's Rox user.
-    pub agent_user_id: MacroUserIdStr<'static>,
+    pub agent_user_id: RoxUserIdStr<'static>,
     /// The team whose admins may read the repo.
     pub team_id: Uuid,
     /// Who the agent is; written into the repo's charter.
@@ -62,7 +62,7 @@ impl std::fmt::Debug for EnsureRepoRequest {
 #[serde(rename_all = "camelCase")]
 pub struct CreatedRepoResponse {
     /// The agent's Rox user.
-    pub agent_user_id: MacroUserIdStr<'static>,
+    pub agent_user_id: RoxUserIdStr<'static>,
     /// Repo token: the HTTP Basic password for clone and push.
     pub token: RepoToken,
     /// Smart-HTTP clone URL.

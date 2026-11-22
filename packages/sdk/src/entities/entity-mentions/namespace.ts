@@ -1,5 +1,5 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { EntityReference } from '../reference';
 import { EntityMention } from './mention';
 
@@ -9,7 +9,7 @@ import { EntityMention } from './mention';
  * @routing Use when recording or removing a typed mention relationship between two Rox items; not writing mention tags into text.
  */
 export class EntityMentionNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a stored mention handle. */
   byId(id: string): EntityMention {

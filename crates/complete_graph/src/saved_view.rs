@@ -201,7 +201,7 @@ impl SavedViewMutationRoot {
         ctx: &Context<'_>,
         input: CreateSavedViewInput,
     ) -> async_graphql::Result<GraphqlSavedView> {
-        let viewer = ctx.data::<macro_user_id::user_id::MacroUserIdStr<'static>>()?;
+        let viewer = ctx.data::<rox_user_id::user_id::RoxUserIdStr<'static>>()?;
         service(ctx)?
             .create(
                 viewer.as_ref(),
@@ -221,7 +221,7 @@ impl SavedViewMutationRoot {
         ctx: &Context<'_>,
         input: UpdateSavedViewInput,
     ) -> async_graphql::Result<GraphqlSavedView> {
-        let viewer = ctx.data::<macro_user_id::user_id::MacroUserIdStr<'static>>()?;
+        let viewer = ctx.data::<rox_user_id::user_id::RoxUserIdStr<'static>>()?;
         let share = match input.sharing {
             None => ShareChange::Unchanged,
             Some(SavedViewSharingInput { team_id: None }) => ShareChange::Private,
@@ -251,7 +251,7 @@ impl SavedViewMutationRoot {
         ctx: &Context<'_>,
         input: DeleteSavedViewInput,
     ) -> async_graphql::Result<ID> {
-        let viewer = ctx.data::<macro_user_id::user_id::MacroUserIdStr<'static>>()?;
+        let viewer = ctx.data::<rox_user_id::user_id::RoxUserIdStr<'static>>()?;
         service(ctx)?
             .delete(
                 viewer.as_ref(),
@@ -270,7 +270,7 @@ impl SavedViewMutationRoot {
         ctx: &Context<'_>,
         input: ReorderSavedViewsInput,
     ) -> async_graphql::Result<Vec<GraphqlSavedView>> {
-        let viewer = ctx.data::<macro_user_id::user_id::MacroUserIdStr<'static>>()?;
+        let viewer = ctx.data::<rox_user_id::user_id::RoxUserIdStr<'static>>()?;
         let ids = input
             .ids
             .into_iter()

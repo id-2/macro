@@ -9,8 +9,8 @@ use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, Entity, EntityAccessReceipt, EntityPermission, EntityType,
     OwnerAccessLevel, ViewAccessLevel,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use mockall::Sequence;
 use models_permissions::share_permission::access_level::AccessLevel as ShareAccessLevel;
 use models_permissions::share_permission::team_share::{TeamShareCreation, TeamShareFacts};
@@ -33,8 +33,8 @@ const OWNER: &str = "macro|owner@rox.one";
 const MEMBER: &str = "macro|member@rox.one";
 const OTHER: &str = "macro|other@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id)
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id)
         .expect("valid user id")
         .into_owned()
 }
@@ -53,7 +53,7 @@ fn share_permission() -> SharePermissionV2 {
     SharePermissionV2::new_initiative_share_permission(None)
 }
 
-fn detail(member_ids: Vec<MacroUserIdStr<'static>>) -> InitiativeDetail {
+fn detail(member_ids: Vec<RoxUserIdStr<'static>>) -> InitiativeDetail {
     InitiativeDetail {
         appearance: None,
         id: initiative_id(),

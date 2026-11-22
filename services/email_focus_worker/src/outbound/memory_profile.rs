@@ -2,7 +2,7 @@
 
 use calendar_events::domain::ports::CalendarRepository;
 use email::domain::focus::ProfileSource;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use memory::domain::MemoryRepo;
 use rootcause::Report;
 
@@ -21,7 +21,7 @@ impl<R, C> MemoryProfiles<R, C> {
 }
 
 impl<R: MemoryRepo, C: CalendarRepository> ProfileSource for MemoryProfiles<R, C> {
-    async fn profile(&self, owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn profile(&self, owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(self
             .repo
             .get_latest_memory(owner.clone())
@@ -29,7 +29,7 @@ impl<R: MemoryRepo, C: CalendarRepository> ProfileSource for MemoryProfiles<R, C
             .map(|record| record.memory))
     }
 
-    async fn time_zone(&self, owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn time_zone(&self, owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         self.calendars.primary_time_zone(owner.as_ref()).await
     }
 }

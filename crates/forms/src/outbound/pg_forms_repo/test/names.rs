@@ -4,7 +4,7 @@
 
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn whether_a_form_goes_by_its_databases_name_is_read_back_as_created(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -55,7 +55,7 @@ async fn whether_a_form_goes_by_its_databases_name_is_read_back_as_created(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn touching_a_live_form_stamps_only_its_updated_at(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());

@@ -12,7 +12,7 @@ checkout.
 - `src/domain/service.rs`: create/redeem/revoke/list link lifecycle.
 - `src/domain/ports.rs` + `src/domain/models.rs`: the repo port and link model.
 - `src/inbound/axum_router/`: one file per route (`create_link`, `get_offer`,
-  `redeem_link`, `resolve_link`, `revoke_link`, `list_links`); `gtm_macro_staff.rs`
+  `redeem_link`, `resolve_link`, `revoke_link`, `list_links`); `gtm_rox_staff.rs`
   gates routes to Rox staff.
 - `src/outbound/pg_gtm_invite_repo.rs`: the Postgres adapter.
 
@@ -24,7 +24,7 @@ checkout.
 
 ## Boundaries
 
-- Depends on: `macro_authorization` (axum), `rate_limit` (axum).
+- Depends on: `rox_authorization` (axum), `rate_limit` (axum).
 - Used by: `services/authentication_service`, which mounts the router in its
   `src/api.rs` and lists it in `src/api/swagger.rs`.
 

@@ -40,15 +40,15 @@ pub(crate) fn exclude_source_content(query: &mut serde_json::Value) {
 }
 
 const MAX_VISIBLE_FRAGMENT_CHARS: usize = 1000;
-const OPEN_TAG: &str = "<macro_em>";
-const CLOSE_TAG: &str = "</macro_em>";
+const OPEN_TAG: &str = "<rox_em>";
+const CLOSE_TAG: &str = "</rox_em>";
 const CHARS_BEFORE_HIGHLIGHT: usize = 200;
 
 /// Merges adjacent highlight spans separated only by `@` into a single span.
 /// The `plain` highlighter wraps each matched token individually, so a hit on
 /// `hutch@rox.one` comes back as
-/// `<macro_em>hutch</macro_em>@<macro_em>rox.one</macro_em>`. Merging across
-/// `@` renders it as `<macro_em>hutch@rox.one</macro_em>`, which reads as
+/// `<rox_em>hutch</rox_em>@<rox_em>rox.one</rox_em>`. Merging across
+/// `@` renders it as `<rox_em>hutch@rox.one</rox_em>`, which reads as
 /// one email address.
 pub(crate) fn merge_highlights_across_at(fragment: &str) -> String {
     fragment.replace(&format!("{CLOSE_TAG}@{OPEN_TAG}"), "@")
@@ -88,7 +88,7 @@ fn normalize_highlight_fragment(fragment: &str) -> String {
 }
 
 /// Returns a window of `max_chars` visible characters around the first
-/// `<macro_em>` highlight tag. If the highlight is near the start, the window
+/// `<rox_em>` highlight tag. If the highlight is near the start, the window
 /// starts from the beginning. Otherwise, the front is trimmed (on a word
 /// boundary) to keep the highlight visible. If no highlight tag is found,
 /// truncates from the start.
@@ -131,7 +131,7 @@ fn window_around_highlight(s: &str, max_chars: usize) -> String {
 }
 
 /// Maps a visible-char byte length to the actual byte offset in text that may
-/// contain `<macro_em>` / `</macro_em>` tags (skipping tag bytes).
+/// contain `<rox_em>` / `</rox_em>` tags (skipping tag bytes).
 fn find_tag_aware_byte_offset(s: &str, visible_byte_len: usize) -> usize {
     let mut visible_bytes = 0;
     let mut byte_offset = 0;
@@ -155,7 +155,7 @@ fn find_tag_aware_byte_offset(s: &str, visible_byte_len: usize) -> usize {
 }
 
 /// Truncates a highlight fragment to `max_chars` visible characters (excluding
-/// `<macro_em>`/`</macro_em>` tags from the count). If truncation lands inside
+/// `<rox_em>`/`</rox_em>` tags from the count). If truncation lands inside
 /// an open tag, the closing tag is appended. Adds "..." when truncated.
 fn truncate_preserving_tags(s: &str, max_chars: usize) -> String {
     let mut result = String::new();
@@ -202,18 +202,18 @@ fn truncate_preserving_tags(s: &str, max_chars: usize) -> String {
 
 /// macro open/close tags for highlight matches
 #[derive(Debug, PartialEq)]
-pub(crate) enum MacroEm {
-    /// Open tag <macro_em>
+pub(crate) enum RoxEm {
+    /// Open tag <rox_em>
     Open,
-    /// Close tag </macro_em>
+    /// Close tag </rox_em>
     Close,
 }
 
-impl Display for MacroEm {
+impl Display for RoxEm {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Open => write!(f, "<macro_em>"),
-            Self::Close => write!(f, "</macro_em>"),
+            Self::Open => write!(f, "<rox_em>"),
+            Self::Close => write!(f, "</rox_em>"),
         }
     }
 }

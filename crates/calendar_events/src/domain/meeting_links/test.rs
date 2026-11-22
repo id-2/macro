@@ -251,7 +251,7 @@ impl MeetingLinkProvider for FakeMeetingLinks {
 
 #[test]
 fn attaching_fills_an_empty_location_and_appends_a_join_paragraph() {
-    let (description, location) = attach_macro_call(None, None, URL);
+    let (description, location) = attach_rox_call(None, None, URL);
     assert_eq!(
         description,
         format!("<p>Join Rox call: <a href=\"{URL}\">{URL}</a></p>")
@@ -261,7 +261,7 @@ fn attaching_fills_an_empty_location_and_appends_a_join_paragraph() {
 
 #[test]
 fn attaching_keeps_user_text_and_a_physical_location() {
-    let (description, location) = attach_macro_call(Some("<p>Agenda</p>"), Some("  Room 4 "), URL);
+    let (description, location) = attach_rox_call(Some("<p>Agenda</p>"), Some("  Room 4 "), URL);
     assert_eq!(
         description,
         format!("<p>Agenda</p>\n<p>Join Rox call: <a href=\"{URL}\">{URL}</a></p>")
@@ -271,7 +271,7 @@ fn attaching_keeps_user_text_and_a_physical_location() {
 
 #[test]
 fn a_blank_location_counts_as_absent() {
-    let (_, location) = attach_macro_call(None, Some("   "), URL);
+    let (_, location) = attach_rox_call(None, Some("   "), URL);
     assert_eq!(location, URL);
 }
 
@@ -305,7 +305,7 @@ async fn the_meeting_is_minted_as_the_requester_and_written_into_the_draft() {
     let links = FakeMeetingLinks::default();
     let calendar_id = Uuid::from_u128(3);
 
-    let created = create_event_with_macro_call(
+    let created = create_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -352,7 +352,7 @@ async fn a_calendar_write_refused_before_the_provider_cancels_the_fresh_meeting(
         let mutations = FakeMutations::failing_with(refused);
         let links = FakeMeetingLinks::default();
 
-        let error = create_event_with_macro_call(
+        let error = create_event_with_rox_call(
             &mutations,
             &links,
             "macro|owner@example.com",
@@ -362,7 +362,7 @@ async fn a_calendar_write_refused_before_the_provider_cancels_the_fresh_meeting(
         )
         .await
         .unwrap_err();
-        assert!(matches!(error, MacroCallEventError::Calendar(_)));
+        assert!(matches!(error, RoxCallEventError::Calendar(_)));
         assert_eq!(
             *links.cancelled.lock().unwrap(),
             vec![("macro|owner@example.com".to_string(), Uuid::from_u128(42))]
@@ -382,7 +382,7 @@ async fn an_event_that_may_have_reached_the_provider_keeps_its_meeting() {
         let mutations = FakeMutations::failing_with(ambiguous);
         let links = FakeMeetingLinks::default();
 
-        let error = create_event_with_macro_call(
+        let error = create_event_with_rox_call(
             &mutations,
             &links,
             "macro|owner@example.com",
@@ -392,7 +392,7 @@ async fn an_event_that_may_have_reached_the_provider_keeps_its_meeting() {
         )
         .await
         .unwrap_err();
-        assert!(matches!(error, MacroCallEventError::Calendar(_)));
+        assert!(matches!(error, RoxCallEventError::Calendar(_)));
         assert!(links.cancelled.lock().unwrap().is_empty());
     }
 }
@@ -405,7 +405,7 @@ async fn a_failed_meeting_writes_nothing_to_the_calendar() {
         ..FakeMeetingLinks::default()
     };
 
-    let error = create_event_with_macro_call(
+    let error = create_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -417,7 +417,7 @@ async fn a_failed_meeting_writes_nothing_to_the_calendar() {
     .unwrap_err();
     assert!(matches!(
         error,
-        MacroCallEventError::MeetingLink(MeetingLinkError::Failed(_))
+        RoxCallEventError::MeetingLink(MeetingLinkError::Failed(_))
     ));
     assert!(mutations.created.lock().unwrap().is_empty());
 }
@@ -437,7 +437,7 @@ async fn out_of_office_and_provider_conferencing_are_refused_before_minting() {
             ..draft()
         },
     ] {
-        let error = create_event_with_macro_call(
+        let error = create_event_with_rox_call(
             &mutations,
             &links,
             "macro|owner@example.com",
@@ -449,7 +449,7 @@ async fn out_of_office_and_provider_conferencing_are_refused_before_minting() {
         .unwrap_err();
         assert!(matches!(
             error,
-            MacroCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
+            RoxCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
         ));
     }
     assert!(links.requests.lock().unwrap().is_empty());
@@ -460,7 +460,7 @@ async fn out_of_office_and_provider_conferencing_are_refused_before_minting() {
 async fn an_unwired_host_refuses_the_call_without_touching_the_calendar() {
     let mutations = FakeMutations::default();
 
-    let error = create_event_with_macro_call(
+    let error = create_event_with_rox_call(
         &mutations,
         &UnavailableMeetingLinks,
         "macro|owner@example.com",
@@ -472,7 +472,7 @@ async fn an_unwired_host_refuses_the_call_without_touching_the_calendar() {
     .unwrap_err();
     assert!(matches!(
         error,
-        MacroCallEventError::MeetingLink(MeetingLinkError::Unavailable)
+        RoxCallEventError::MeetingLink(MeetingLinkError::Unavailable)
     ));
     assert!(mutations.created.lock().unwrap().is_empty());
 }
@@ -503,7 +503,7 @@ async fn switching_replaces_the_conference_with_a_call_in_one_write() {
     let event_id = Uuid::from_u128(7);
     let calendar_id = Uuid::from_u128(3);
 
-    update_event_with_macro_call(
+    update_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -554,7 +554,7 @@ async fn switching_applies_the_changes_the_patch_carries() {
         time_zone: None,
     };
 
-    update_event_with_macro_call(
+    update_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -593,7 +593,7 @@ async fn switching_applies_the_changes_the_patch_carries() {
 
 #[tokio::test]
 async fn switching_an_event_that_holds_a_call_keeps_it_and_drops_the_conference() {
-    let (description, location) = attach_macro_call(Some("<p>Agenda</p>"), None, URL);
+    let (description, location) = attach_rox_call(Some("<p>Agenda</p>"), None, URL);
     let mutations = mutations_holding(EventDetails {
         description: Some(description),
         location: Some(location),
@@ -601,7 +601,7 @@ async fn switching_an_event_that_holds_a_call_keeps_it_and_drops_the_conference(
     });
     let links = FakeMeetingLinks::default();
 
-    update_event_with_macro_call(
+    update_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -623,7 +623,7 @@ async fn switching_an_event_that_holds_a_call_keeps_it_and_drops_the_conference(
 
 #[tokio::test]
 async fn retrying_a_finished_switch_writes_nothing() {
-    let (description, location) = attach_macro_call(None, None, URL);
+    let (description, location) = attach_rox_call(None, None, URL);
     let mutations = mutations_holding(EventDetails {
         description: Some(description),
         location: Some(location),
@@ -632,7 +632,7 @@ async fn retrying_a_finished_switch_writes_nothing() {
     });
     let links = FakeMeetingLinks::default();
 
-    let error = update_event_with_macro_call(
+    let error = update_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -646,7 +646,7 @@ async fn retrying_a_finished_switch_writes_nothing() {
 
     assert!(matches!(
         error,
-        MacroCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
+        RoxCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
     ));
     assert!(links.requests.lock().unwrap().is_empty());
     assert!(mutations.updated.lock().unwrap().is_empty());
@@ -654,7 +654,7 @@ async fn retrying_a_finished_switch_writes_nothing() {
 
 #[tokio::test]
 async fn a_replacement_description_keeps_the_stored_calls_join_line() {
-    let (description, location) = attach_macro_call(None, None, URL);
+    let (description, location) = attach_rox_call(None, None, URL);
     let mutations = mutations_holding(EventDetails {
         description: Some(description),
         location: Some(location),
@@ -663,7 +663,7 @@ async fn a_replacement_description_keeps_the_stored_calls_join_line() {
     });
     let links = FakeMeetingLinks::default();
 
-    update_event_with_macro_call(
+    update_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -684,7 +684,7 @@ async fn a_replacement_description_keeps_the_stored_calls_join_line() {
     let written = patch.description.as_deref().expect("description written");
     assert!(written.starts_with("Agenda"));
     assert_eq!(
-        first_macro_call_url(None, Some(written)).as_deref(),
+        first_rox_call_url(None, Some(written)).as_deref(),
         Some(URL)
     );
 }
@@ -699,7 +699,7 @@ async fn a_switch_refused_before_the_provider_cancels_the_fresh_meeting() {
         *mutations.update_error.lock().unwrap() = Some(refused);
         let links = FakeMeetingLinks::default();
 
-        let error = update_event_with_macro_call(
+        let error = update_event_with_rox_call(
             &mutations,
             &links,
             "macro|owner@example.com",
@@ -711,7 +711,7 @@ async fn a_switch_refused_before_the_provider_cancels_the_fresh_meeting() {
         .await
         .unwrap_err();
 
-        assert!(matches!(error, MacroCallEventError::Calendar(_)));
+        assert!(matches!(error, RoxCallEventError::Calendar(_)));
         assert_eq!(
             *links.cancelled.lock().unwrap(),
             vec![("macro|owner@example.com".to_string(), Uuid::from_u128(42))]
@@ -726,7 +726,7 @@ async fn a_switch_whose_write_may_have_landed_keeps_the_meeting() {
         Some(CalendarMutationError::Retryable("timed out".to_string()));
     let links = FakeMeetingLinks::default();
 
-    update_event_with_macro_call(
+    update_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -749,7 +749,7 @@ async fn a_failed_mint_leaves_the_event_untouched() {
         ..FakeMeetingLinks::default()
     };
 
-    let error = update_event_with_macro_call(
+    let error = update_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -761,7 +761,7 @@ async fn a_failed_mint_leaves_the_event_untouched() {
     .await
     .unwrap_err();
 
-    assert!(matches!(error, MacroCallEventError::MeetingLink(_)));
+    assert!(matches!(error, RoxCallEventError::MeetingLink(_)));
     assert!(mutations.updated.lock().unwrap().is_empty());
 }
 
@@ -770,7 +770,7 @@ async fn switching_refuses_an_explicit_provider_conference() {
     let mutations = mutations_holding(stored_details());
     let links = FakeMeetingLinks::default();
 
-    let error = update_event_with_macro_call(
+    let error = update_event_with_rox_call(
         &mutations,
         &links,
         "macro|owner@example.com",
@@ -787,7 +787,7 @@ async fn switching_refuses_an_explicit_provider_conference() {
 
     assert!(matches!(
         error,
-        MacroCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
+        RoxCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
     ));
     assert!(links.requests.lock().unwrap().is_empty());
 }
@@ -795,12 +795,12 @@ async fn switching_refuses_an_explicit_provider_conference() {
 #[test]
 fn stripping_takes_back_the_join_line_and_a_call_only_location() {
     let (description, location) =
-        strip_macro_call(&format!("Agenda\nJoin Rox call: [{URL}]"), URL, URL);
+        strip_rox_call(&format!("Agenda\nJoin Rox call: [{URL}]"), URL, URL);
     assert_eq!(description, "Agenda");
     assert_eq!(location, "");
 }
 
-/// Events written before the label was renamed say "Join Macro call"; they
+/// Events written before the label was renamed say "Join Rox call"; they
 /// still lose their generated line, whether it carries the link bare or in
 /// the brackets html2text writes.
 #[test]
@@ -810,7 +810,7 @@ fn a_join_line_written_before_the_rename_is_still_stripped() {
         format!("Agenda\nJoin Macro call: {URL}"),
         "Agenda\nJoin Macro call".to_string(),
     ] {
-        let (description, location) = strip_macro_call(&text, URL, URL);
+        let (description, location) = strip_rox_call(&text, URL, URL);
         assert_eq!(description, "Agenda", "{text}");
         assert_eq!(location, "");
     }
@@ -819,7 +819,7 @@ fn a_join_line_written_before_the_rename_is_still_stripped() {
 #[test]
 fn a_bare_join_label_of_either_wording_is_stripped() {
     for label in [JOIN_LINE_LABEL, LEGACY_JOIN_LINE_LABEL] {
-        let (description, _) = strip_macro_call(&format!("Agenda\n{label}"), "", "");
+        let (description, _) = strip_rox_call(&format!("Agenda\n{label}"), "", "");
         assert_eq!(description, "Agenda", "{label}");
     }
 }

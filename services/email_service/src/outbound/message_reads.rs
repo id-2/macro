@@ -51,7 +51,7 @@ impl MessageReadRepository for PgMessageReads {
 
     async fn readable_inbox_ids(&self, caller: &str) -> Result<Vec<Uuid>, Self::Err> {
         Ok(
-            email_db_client::links::get::fetch_inboxes_for_macro_id(&self.0, caller)
+            email_db_client::links::get::fetch_inboxes_for_rox_id(&self.0, caller)
                 .await?
                 .into_iter()
                 .map(|link| link.id)
@@ -61,7 +61,7 @@ impl MessageReadRepository for PgMessageReads {
 
     async fn newest_owned_inbox(&self, caller: &str) -> Result<Option<Uuid>, Self::Err> {
         Ok(
-            email_db_client::links::get::fetch_link_by_macro_id(&self.0, caller)
+            email_db_client::links::get::fetch_link_by_rox_id(&self.0, caller)
                 .await?
                 .map(|link| link.id),
         )
@@ -89,6 +89,6 @@ impl MessageReadRepository for PgMessageReads {
     }
 
     async fn thread_owner(&self, id: Uuid) -> Result<Option<String>, Self::Err> {
-        Ok(email_db_client::threads::get::get_macro_id_from_thread_id(&self.0, id).await?)
+        Ok(email_db_client::threads::get::get_rox_id_from_thread_id(&self.0, id).await?)
     }
 }

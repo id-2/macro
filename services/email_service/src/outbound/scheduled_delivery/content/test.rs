@@ -8,8 +8,8 @@ use email::domain::{
     send_attempt::{EmailSendRepo, PreparedSend, SendAttemptId, SendSnapshot},
 };
 use email::outbound::EmailPgRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 fn link() -> Uuid {
@@ -39,7 +39,7 @@ async fn admit(pool: &PgPool) -> anyhow::Result<SendAttemptId> {
         bcc: vec![],
         body_text: Some("Approved body and signature".into()),
         body_html: Some("<p>Approved body</p><p>Frozen signature</p>".into()),
-        body_macro: Some("approved editor state".into()),
+        body_rox: Some("approved editor state".into()),
         headers_json: None,
         send_time: Some(chrono::Utc::now()),
         actor_id: None,
@@ -62,7 +62,7 @@ async fn admit(pool: &PgPool) -> anyhow::Result<SendAttemptId> {
             bcc: vec![],
             body_text: Some("Approved body".into()),
             body_html: None,
-            body_macro: None,
+            body_rox: None,
             headers_json: None,
             send_time: None,
             include_signature: None,
@@ -74,12 +74,12 @@ async fn admit(pool: &PgPool) -> anyhow::Result<SendAttemptId> {
         forwarded_attachment_ids: vec![],
         restore_body_html: None,
         restore_body_text: None,
-        restore_body_macro: None,
+        restore_body_rox: None,
     };
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     EmailPgRepo::new(pool.clone())
         .admit_send(
-            &MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap(),
+            &RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap(),
             link(),
             attempt,
             PreparedSend {
@@ -109,7 +109,7 @@ async fn admit(pool: &PgPool) -> anyhow::Result<SendAttemptId> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../crates/email/fixtures",
         scripts("email_draft")
@@ -162,7 +162,7 @@ async fn provider_sync_cannot_replace_approved_body_envelope_or_sender(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../crates/email/fixtures",
         scripts("email_draft")
@@ -190,7 +190,7 @@ async fn older_graphql_attempt_without_prepared_content_requires_review(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../crates/email_db_client/fixtures",
         scripts("get_process_scheduled_messages")

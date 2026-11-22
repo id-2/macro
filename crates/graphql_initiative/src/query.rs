@@ -3,7 +3,7 @@
 use async_graphql::{Context, ID};
 use graphql_common::{parse_id, require_authenticated_user};
 use graphql_soup::{GraphqlSoupEntity, GraphqlSoupInitiative, SoupEntityEdges, SoupItemDataLoader};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use uuid::Uuid;
 
@@ -28,7 +28,7 @@ pub(crate) async fn load_initiative<E: SoupEntityEdges>(
 /// Resolve a canonical initiative from a permission-filtered Soup reader.
 pub(crate) async fn load_from_soup<E: SoupEntityEdges>(
     loader: &SoupItemDataLoader,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     id: Uuid,
 ) -> async_graphql::Result<Option<GraphqlSoupInitiative<E>>> {
     let entity = EntityType::Initiative.with_entity_string(id.to_string());
@@ -57,7 +57,7 @@ pub async fn resolve_initiative<E: SoupEntityEdges>(
 /// Resolve visible tasks from an authorized initiative.
 pub async fn resolve_initiative_tasks(
     ctx: &Context<'_>,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     initiative_id: ID,
     input: InitiativeTasksInput,
 ) -> async_graphql::Result<GraphqlInitiativeTasksPage> {

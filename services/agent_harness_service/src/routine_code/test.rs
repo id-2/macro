@@ -138,7 +138,7 @@ fn outcomes_become_outputs_or_bounded_reasons() {
 fn rewrites_read_the_declarations_the_errors_name() {
     let names = quoted_names(&[
         "TS2339 [ERROR]: Property 'create' does not exist on type 'TaskNamespace'.".into(),
-        "TS2345 [ERROR]: Argument of type 'string' is not assignable to parameter of type 'Macro<MacroOpts>'.".into(),
+        "TS2345 [ERROR]: Argument of type 'string' is not assignable to parameter of type 'Rox<RoxOpts>'.".into(),
         "TS2339 [ERROR]: Property 'create' does not exist on type 'TaskNamespace'.".into(),
     ]);
     assert_eq!(names, ["create", "TaskNamespace", "string", "Rox"]);
@@ -202,7 +202,7 @@ struct RecordedTokens(std::sync::Mutex<Vec<(CodeIdentity, Uuid)>>);
 impl RoutineCredentials for RecordedTokens {
     async fn mint(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         acts_as: CodeIdentity,
         routine_id: Uuid,
     ) -> anyhow::Result<String> {
@@ -226,7 +226,7 @@ async fn a_step_waits_for_a_free_slot_before_its_credential_and_gives_up_after_f
         )
         .with_slots(1),
     );
-    let owner = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     let step = routine_program::CodeStep {
         id: None,
         title: "Label invoices".into(),
@@ -291,7 +291,7 @@ struct NoTimeZones;
 
 #[async_trait::async_trait]
 impl OwnerTimeZones for NoTimeZones {
-    async fn time_zone(&self, _: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn time_zone(&self, _: &RoxUserIdStr<'static>) -> Option<String> {
         None
     }
 }
@@ -316,7 +316,7 @@ mod real_deno {
     impl RoutineCredentials for FixedToken {
         async fn mint(
             &self,
-            _: &MacroUserIdStr<'static>,
+            _: &RoxUserIdStr<'static>,
             _: CodeIdentity,
             _: Uuid,
         ) -> anyhow::Result<String> {
@@ -419,8 +419,8 @@ export async function main({ macro, trigger, steps, run }: StepContext) {
         program.code_steps()[0].clone()
     }
 
-    fn owner() -> MacroUserIdStr<'static> {
-        MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+    fn owner() -> RoxUserIdStr<'static> {
+        RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
     }
 
     fn program(steps: serde_json::Value) -> RoutineProgram {

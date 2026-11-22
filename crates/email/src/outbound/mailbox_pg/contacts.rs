@@ -97,7 +97,7 @@ impl AddressBookRepository for PgMailboxSync {
                 ON CONFLICT(link_id,provider_id) DO UPDATE SET is_default = email_address_book_folders.is_default OR EXCLUDED.is_default"#,link,folder,is_default)
                 .execute(&mut *tx).await.map_err(db_error)?;
             sqlx::query!(r#"INSERT INTO email_sync_streams(id,link_id,generation,kind,scope_id) VALUES ($1,$2,$3,'contacts',$4)
-                ON CONFLICT DO NOTHING"#,macro_uuid::generate_uuid_v7(),link,work.stream.mailbox.sync_generation,folder)
+                ON CONFLICT DO NOTHING"#,rox_uuid::generate_uuid_v7(),link,work.stream.mailbox.sync_generation,folder)
                 .execute(&mut *tx).await.map_err(db_error)?;
         }
         project_contacts(&mut tx, work.stream.mailbox, &removed_emails).await?;
@@ -193,7 +193,7 @@ impl AddressBookRepository for PgMailboxSync {
     async fn reset(&self, work: &AddressBookWork) -> Result<(), MailboxError> {
         let mut tx = self.db.begin().await.map_err(db_error)?;
         lock_work(&mut tx, work).await?;
-        sqlx::query!("UPDATE email_sync_streams SET position = NULL,initial_complete = false,scan_id = $2,next_run_at = now(),lease_id = NULL,lease_until = NULL WHERE id = $1",work.stream.id,macro_uuid::generate_uuid_v7())
+        sqlx::query!("UPDATE email_sync_streams SET position = NULL,initial_complete = false,scan_id = $2,next_run_at = now(),lease_id = NULL,lease_until = NULL WHERE id = $1",work.stream.id,rox_uuid::generate_uuid_v7())
             .execute(&mut *tx).await.map_err(db_error)?;
         tx.commit().await.map_err(db_error)
     }
@@ -444,7 +444,7 @@ async fn project_contacts(
                 self_photo,
             })
             .map_err(|_| MailboxError::Persistence)?;
-            sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),link,mailbox.sync_generation,event)
+            sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),link,mailbox.sync_generation,event)
                 .execute(&mut **tx).await.map_err(db_error)?;
         }
     }

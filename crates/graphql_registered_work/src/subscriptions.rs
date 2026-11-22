@@ -12,7 +12,7 @@ use chrono::{DateTime, Utc};
 use futures::{Stream, StreamExt, future::join_all};
 use graphql_common::require_authenticated_user;
 use graphql_soup::{AgentSessionEntityLoader, SoupEntityEdges};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use soup_realtime::domain::models::Patch;
 use tokio::sync::mpsc::{self, Receiver};
@@ -156,8 +156,8 @@ fn session_ids(keys: &[FeedKey]) -> Vec<AgentSessionId> {
 async fn session_patches<E: SoupEntityEdges>(
     context: &RegisteredWorkGraphqlContext,
     loader: &AgentSessionEntityLoader,
-    viewer: &MacroUserIdStr<'static>,
-    accounts: &[MacroUserIdStr<'static>],
+    viewer: &RoxUserIdStr<'static>,
+    accounts: &[RoxUserIdStr<'static>],
     sessions: &[AgentSessionId],
     ended_after: DateTime<Utc>,
 ) -> Result<Vec<GraphqlRegisteredWorkPatch<E>>, AgentSessionError> {

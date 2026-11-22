@@ -17,7 +17,7 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::EditAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::DatabaseAccessLevelExtractor;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use models_databases::{DatabaseId, RowId, TableId};
 use serde::{Deserialize, Serialize};
@@ -33,7 +33,7 @@ use crate::domain::ports::DatabaseWebhooksService;
 pub struct DatabaseWebhooksRouterState<Service, EntityAccess, Authorization> {
     service: Arc<Service>,
     entity_access_service: Arc<EntityAccess>,
-    authorization_state: MacroAuthorizationState<Authorization>,
+    authorization_state: RoxAuthorizationState<Authorization>,
 }
 
 impl<Service, EntityAccess, Authorization> Clone
@@ -56,7 +56,7 @@ impl<Service, EntityAccess, Authorization>
     pub fn new(
         service: Arc<Service>,
         entity_access_service: Arc<EntityAccess>,
-        authorization_state: MacroAuthorizationState<Authorization>,
+        authorization_state: RoxAuthorizationState<Authorization>,
     ) -> Self {
         Self {
             service,
@@ -77,7 +77,7 @@ impl<Service, EntityAccess, Authorization>
 
 impl<Service, EntityAccess, Authorization>
     FromRef<DatabaseWebhooksRouterState<Service, EntityAccess, Authorization>>
-    for MacroAuthorizationState<Authorization>
+    for RoxAuthorizationState<Authorization>
 {
     fn from_ref(state: &DatabaseWebhooksRouterState<Service, EntityAccess, Authorization>) -> Self {
         state.authorization_state.clone()
@@ -91,7 +91,7 @@ pub fn database_webhooks_router<Service, EntityAccess, Authorization, RouterStat
 where
     Service: DatabaseWebhooksService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
     RouterState: Send + Sync + 'static,
 {
     Router::new()
@@ -302,7 +302,7 @@ pub async fn create_webhook_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabaseWebhooksService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let created = state
         .service
@@ -333,7 +333,7 @@ pub async fn list_webhooks_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabaseWebhooksService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let webhooks = state
         .service
@@ -371,7 +371,7 @@ pub async fn delete_webhook_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabaseWebhooksService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service

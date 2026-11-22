@@ -290,7 +290,7 @@ fn current_time_block(now: chrono::DateTime<chrono::Utc>, time_zone: Option<&str
 /// edits that same message with the final answer. Reads and writes go through
 /// the shared message service under the invoking user's current capability,
 /// so channels and document discussions behave the same way.
-pub struct MacroAiHandler<R, Z> {
+pub struct RoxAiHandler<R, Z> {
     messages: Arc<dyn MessageServiceApi>,
     access: Arc<dyn ConversationAccess>,
     responder: Arc<R>,
@@ -299,7 +299,7 @@ pub struct MacroAiHandler<R, Z> {
     admission: Arc<dyn AiAdmissionService>,
 }
 
-impl<R, Z> MacroAiHandler<R, Z>
+impl<R, Z> RoxAiHandler<R, Z>
 where
     R: AgentResponder,
     Z: UserTimeZones,

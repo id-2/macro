@@ -13,7 +13,7 @@ use super::{
 use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, RequiredPermission, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use std::sync::Arc;
 
@@ -65,7 +65,7 @@ pub enum SpreadsheetCaller<'a> {
     /// An AI agent acting for a user; the token names the agent as the actor.
     Agent {
         /// The user the agent acts for.
-        user: &'a MacroUserIdStr<'a>,
+        user: &'a RoxUserIdStr<'a>,
         /// The agent's storage id.
         actor: &'a str,
     },

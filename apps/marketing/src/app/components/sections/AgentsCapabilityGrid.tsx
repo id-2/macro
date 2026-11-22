@@ -6,7 +6,7 @@ import IconNotion from '../../../assets/icons/logo-notion.svg';
 import IconSlack from '../../../assets/icons/logo-slack.svg';
 import { keepLastWords } from '../../utils/utilTypography';
 import { AgentGlyph } from '../featureGraphics/AgentsGraphics';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 import './AgentsCapabilityGrid.css';
 
 function AssignmentGraphic() {
@@ -36,7 +36,7 @@ function ScheduleGraphic() {
       </div>
       <div class="agents-cap-inbox-line" />
       <div class="agents-cap-inbox-row">
-        <MacroMarkIcon />
+        <RoxMarkIcon />
         <div>
           <strong>Your morning brief</strong>
           <span>Two things need you today.</span>
@@ -53,7 +53,7 @@ function PermissionsGraphic() {
       <div class="agents-cap-access-header">
         <span />
         <span>You</span>
-        <MacroMarkIcon />
+        <RoxMarkIcon />
       </div>
       <div class="agents-cap-access-row">
         <span>
@@ -83,7 +83,7 @@ function ConnectionsGraphic() {
         <path d="M230 130H150Q130 130 130 110V65H80 M230 130H310Q330 130 330 110V65H380 M230 130H150Q130 130 130 150V195H80 M230 130H310Q330 130 330 150V195H380" />
       </svg>
       <div class="agents-cap-hub">
-        <MacroMarkIcon />
+        <RoxMarkIcon />
         <span>MCP</span>
       </div>
       <div class="agents-cap-tool agents-cap-tool--github">

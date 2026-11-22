@@ -11,7 +11,7 @@ use cursor_cloud_agents::domain::{
     model::RepoUrl,
     ports::{RepositoryChooser, SessionIntent},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::{
     ports::ReachableRepositories,
@@ -29,7 +29,7 @@ pub trait RepositoryChoiceModel: Send + Sync + 'static {
     /// Choose one of the authorized candidates, recording usage for the trusted owner.
     fn decide(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         prompt: &str,
         candidates: &[String],
         recent: &[AgentSession],
@@ -43,7 +43,7 @@ pub struct RepositoryChoiceService<Repositories, Sessions, Model> {
     sessions: Sessions,
     model: Model,
     admission: Arc<dyn AiAdmissionService>,
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     session_id: AgentSessionId,
 }
 
@@ -59,7 +59,7 @@ where
         sessions: Sessions,
         model: Model,
         admission: Arc<dyn AiAdmissionService>,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         session_id: AgentSessionId,
     ) -> Self {
         Self {

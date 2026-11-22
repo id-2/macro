@@ -80,7 +80,7 @@ pub(super) fn render(frame: &mut Frame, app: &App, area: Rect) {
                 Span::raw("Press "),
                 Span::styled("p", Style::new().fg(ACCENT).bold()),
                 Span::raw(" to pair it with "),
-                Span::styled(&app.config.macro_api.web_url, Style::new().fg(DIM)),
+                Span::styled(&app.config.rox_api.web_url, Style::new().fg(DIM)),
             ]));
         }
     }

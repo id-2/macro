@@ -1,7 +1,7 @@
 use anyhow::Context;
 
-pub use macro_env::Environment;
-use macro_env_var::env_vars;
+pub use rox_env::Environment;
+use rox_env_var::env_vars;
 
 env_vars! {
     struct RedisUri;

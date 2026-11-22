@@ -4,8 +4,8 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::user_id::MacroUserId;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::user_id::RoxUserId;
 
 use crate::api::context::{ApiContext, AuthorizationService};
 
@@ -69,15 +69,15 @@ impl IntoResponse for PatchUserGroupError {
 #[tracing::instrument(skip(ctx, user_context), err, fields(user_id=user_context.authorization.user.user_context.user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(req): extract::Json<PatchUserGroupRequest>,
 ) -> Result<Json<EmptyResponse>, PatchUserGroupError> {
     let user_id =
-        MacroUserId::parse_from_str(&user_context.authorization.user.user_context.user_id)
+        RoxUserId::parse_from_str(&user_context.authorization.user.user_context.user_id)
             .map_err(|_| PatchUserGroupError::InvalidMacroUserId)?
             .lowercase();
 
-    macro_db_client::user::patch::patch_user_group(&ctx.db, &user_id, &req.group)
+    rox_db_client::user::patch::patch_user_group(&ctx.db, &user_id, &req.group)
         .await
         .map_err(|e| match e.to_string().as_str() {
             "user not found" => PatchUserGroupError::UserNotFound,

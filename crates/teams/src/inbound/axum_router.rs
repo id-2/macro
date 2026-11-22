@@ -56,7 +56,7 @@ use entity_access::domain::{
     models::{EntityAccessReceipt, RequiredPermission},
     ports::EntityAccessService,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 
 use crate::domain::{
@@ -102,7 +102,7 @@ pub struct TeamRouterState<T, Eas, Auth> {
     /// The entity access service.
     pub entity_access_service: Arc<Eas>,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, Eas, Auth> FromRef<TeamRouterState<T, Eas, Auth>> for Arc<Eas> {
@@ -111,7 +111,7 @@ impl<T, Eas, Auth> FromRef<TeamRouterState<T, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<T, Eas, Auth> FromRef<TeamRouterState<T, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Eas, Auth> FromRef<TeamRouterState<T, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &TeamRouterState<T, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -133,7 +133,7 @@ pub fn teams_router<T, Eas, Auth, S>(state: TeamRouterState<T, Eas, Auth>) -> Ro
 where
     T: TeamService + TeamInviteLinkService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()

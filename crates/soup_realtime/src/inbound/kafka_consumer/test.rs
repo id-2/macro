@@ -22,8 +22,8 @@ use email::domain::events::{
     ThreadReadMetadata, ThreadSpamChangedMetadata, ThreadTrashedMetadata, ThreadsReindexReason,
     ThreadsReindexRequestedMetadata,
 };
-use macro_event_broker::{Event, EventBrokerError, MacroEventCollection as _, MessageParts};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, EventBrokerError, RoxEventCollection as _, MessageParts};
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::events::{
     MessageAttachmentCreatedMetadata, MessageDeletedMetadata, MessageEventAttachment,
     MessagePostedMetadata,
@@ -53,7 +53,7 @@ impl MessageParts for TestMessage {
     }
 
     fn topic(&self) -> &str {
-        "macro.documents"
+        "rox.documents"
     }
 }
 
@@ -63,8 +63,8 @@ fn decode_payload(payload: Vec<u8>) -> Result<DeclaredMacroEvent, EventBrokerErr
 
 const DOCUMENT_ID: &str = "00000000-0000-0000-0000-000000000001";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
 }
 
 fn updated_event() -> Event<DocumentTopicEvent> {
@@ -119,16 +119,16 @@ fn subscribes_to_all_existing_soup_source_topics() {
     assert_eq!(
         DeclaredMacroEvent::topics(),
         [
-            "macro.github_pull_requests",
-            "macro.documents",
-            "macro.projects",
-            "macro.chats",
-            "macro.email",
-            "macro.channels",
-            "macro.messages",
-            "macro.properties",
-            "macro.initiatives",
-            "macro.calls",
+            "rox.github_pull_requests",
+            "rox.documents",
+            "rox.projects",
+            "rox.chats",
+            "rox.email",
+            "rox.channels",
+            "rox.messages",
+            "rox.properties",
+            "rox.initiatives",
+            "rox.calls",
         ]
     );
 }

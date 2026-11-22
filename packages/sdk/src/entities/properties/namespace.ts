@@ -11,7 +11,7 @@ import type {
   TagSetResponse,
 } from '../../../generated/properties/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { PropertiedEntity, PropertyOptionDelta } from '../entity';
 import { PropertyDefinition } from './property-definition';
 import { PropertyOption } from './property-option';
@@ -38,7 +38,7 @@ export { PropertyDefinition, PropertyOption };
  * @routing Use when the request is about an item's custom properties or tags themselves, such as defining a property, creating or editing a tag, or bulk-setting options; not creating or updating a task, deal, event or row, whose own methods set their fields.
  */
 export class PropertiesNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * List property definitions visible to the user, pre-hydrated with their records.

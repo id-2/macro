@@ -6,7 +6,7 @@ vi.mock('@tauri-apps/api/core', () => ({ invoke: vi.fn() }));
 
 beforeEach(() => vi.clearAllMocks());
 afterEach(() => {
-  delete window.__MACRO_ANDROID_CALL_TRACING__;
+  delete window.__ROX_ANDROID_CALL_TRACING__;
 });
 
 it('does not invoke unsupported installed binaries', async () => {
@@ -19,7 +19,7 @@ it('does not invoke unsupported installed binaries', async () => {
 });
 
 it('clears native telemetry when the existing telemetry gate is disabled', async () => {
-  window.__MACRO_ANDROID_CALL_TRACING__ = true;
+  window.__ROX_ANDROID_CALL_TRACING__ = true;
   await configureNativeCallTracing({
     enabled: false,
     tracesUrl: 'https://example.com/v1/traces',
@@ -32,7 +32,7 @@ it('clears native telemetry when the existing telemetry gate is disabled', async
 });
 
 it('uses the resolved exporter for supported binaries', async () => {
-  window.__MACRO_ANDROID_CALL_TRACING__ = true;
+  window.__ROX_ANDROID_CALL_TRACING__ = true;
   await configureNativeCallTracing({
     enabled: true,
     tracesUrl: 'http://localhost:4318/v1/traces',

@@ -2,13 +2,13 @@ use super::*;
 
 use channel_sender::ChannelSender;
 use chrono::Utc;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 
 fn sender() -> ChannelSender<'static> {
     ChannelSender::new_from_user(
-        MacroUserIdStr::parse_from_str("macro|agent-trigger@rox.one")
+        RoxUserIdStr::parse_from_str("macro|agent-trigger@rox.one")
             .expect("valid user id")
             .into_owned(),
     )
@@ -448,7 +448,7 @@ fn a_mention_is_attributed_to_whoever_posted_it() {
     assert_eq!(message_id, message.message_id);
     assert!(matches!(by, Caller::Person { .. }));
 
-    let user = MacroUserIdStr::try_from_email("user@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("user@example.com").unwrap();
     let by_agent = NewAgentSessionEvent::Mentioned(AgentMentionedEvent {
         bot_id: BotId::TEST_A,
         message: MessagePostedMetadata {

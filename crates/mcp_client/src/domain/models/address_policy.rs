@@ -1,6 +1,6 @@
 //! Which addresses connections to a user's MCP server may reach.
 
-use macro_env::Environment;
+use rox_env::Environment;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 #[cfg(test)]

@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::{PreviewCursorQuery, PreviewView, PreviewViewStandardLabel};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Query, SimpleSortMethod};
 
 async fn sent_threads(repo: &EmailPgRepo, link: Uuid) -> Vec<Uuid> {
@@ -12,7 +12,7 @@ async fn sent_threads(repo: &EmailPgRepo, link: Uuid) -> Vec<Uuid> {
             query: Query::new(None, SimpleSortMethod::UpdatedAt, None),
             team_id: None,
         },
-        MacroUserIdStr::parse_from_str(ACTOR).unwrap().to_owned(),
+        RoxUserIdStr::parse_from_str(ACTOR).unwrap().to_owned(),
     )
     .await
     .unwrap()
@@ -31,7 +31,7 @@ async fn latest_outbound(db: &PgPool, thread: Uuid) -> Option<chrono::DateTime<c
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_confirmed_outlook_send_is_in_sent_before_the_provider_copy_syncs(db: PgPool) {
     let (sync, repo, input, link) = setup(&db, true).await;
     let lease = sync
@@ -62,7 +62,7 @@ async fn a_confirmed_outlook_send_is_in_sent_before_the_provider_copy_syncs(db: 
     assert_eq!(sent_threads(&repo, link).await, vec![input.thread_db_id]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_old_outlook_draft_sorts_in_sent_by_when_it_was_sent(db: PgPool) {
     let (sync, _, input, _) = setup(&db, true).await;
     sqlx::query!(

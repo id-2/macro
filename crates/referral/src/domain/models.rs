@@ -2,8 +2,8 @@
 
 pub use invite_email::{InviteToMacro, ReferralCode};
 
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::ShortUuidConverter;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::ShortUuidConverter;
 use rate_limit::RateLimitExceeded;
 
 /// A referral recorded for the first time.
@@ -12,7 +12,7 @@ pub struct TrackedReferral {
     /// The `referral_tracking` row.
     pub tracking_id: uuid::Uuid,
     /// Who referred the new user.
-    pub referrer: MacroUserIdStr<'static>,
+    pub referrer: RoxUserIdStr<'static>,
 }
 
 /// Errors that can occur during referral operations.

@@ -74,7 +74,7 @@ async fn cancelling_the_request_abandons_a_held_call_and_tells_the_server() {
     )
     .await;
     let request = RequestContext::new(
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
     );
     let cancel = request.cancel.clone();
     let call = tokio::spawn({
@@ -111,7 +111,7 @@ async fn cancelling_the_request_abandons_a_held_call_and_tells_the_server() {
         &tools,
         (),
         RequestContext::new(
-            macro_user_id::user_id::MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+            rox_user_id::user_id::RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
         ),
         "mcp__Macro__echo",
         &serde_json::json!({}),

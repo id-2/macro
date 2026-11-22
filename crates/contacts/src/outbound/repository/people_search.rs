@@ -6,7 +6,7 @@ use crate::domain::{
     },
     ports::PeopleSearchRepository,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 impl PeopleSearchRepository for DbContactsRepository {
@@ -18,7 +18,7 @@ impl PeopleSearchRepository for DbContactsRepository {
     )]
     async fn search_people(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         needle: &str,
         limit: PeopleSearchLimit,
     ) -> Result<Vec<PersonMatch>, Report> {
@@ -41,7 +41,7 @@ impl PeopleSearchRepository for DbContactsRepository {
             .into_iter()
             .filter_map(|row| {
                 // Legacy IDs that are not valid user IDs are never results.
-                let user_id = MacroUserIdStr::try_from(row.user_id).ok()?;
+                let user_id = RoxUserIdStr::try_from(row.user_id).ok()?;
                 let name = ContactName {
                     user_id: user_id.clone(),
                     first_name: row.first_name,

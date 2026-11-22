@@ -24,7 +24,7 @@ import { createVisible } from '../../utils/utilVisible';
 import { PhoneFrame, PhoneScreenContent } from '../utils/UtilPhoneFrame';
 
 const _HERO_DEMO_VIDEO_ID = 'tnsxkywzTvY';
-const _MACRO_REPO_URL = 'https://github.com/macro-inc/macro';
+const _ROX_REPO_URL = 'https://github.com/macro-inc/macro';
 
 // ---------------------------------------------------------------------------
 // Shared style fragments (matching the homepage / email / channels bento

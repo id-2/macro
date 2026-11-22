@@ -25,7 +25,7 @@ use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, EntityAccessAuth, EntityAccessReceipt, EntityPermission,
     OwnerAccessLevel, RequiredPermission, ViewAccessLevel,
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::service::property_value::PropertyValue;
 use models_properties::shared::DataType;
@@ -240,7 +240,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     /// Create a databases service from its port implementations.
     pub fn new(
@@ -532,7 +532,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     #[tracing::instrument(skip(self), err)]
     async fn create_database(&self, command: CreateDatabase) -> Result<Database, DatabaseError> {

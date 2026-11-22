@@ -13,6 +13,6 @@ export type ClaudeMode = (typeof ClaudeMode)[keyof typeof ClaudeMode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClaudeMode = {
-  macro_credits: 'macro_credits',
+  rox_credits: 'rox_credits',
   own_account: 'own_account',
 } as const;

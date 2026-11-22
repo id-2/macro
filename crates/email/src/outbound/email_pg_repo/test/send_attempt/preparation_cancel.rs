@@ -5,7 +5,7 @@ use crate::domain::scheduled_delivery::state::{
 };
 
 async fn admit_and_claim(pool: &Pool<Postgres>) -> anyhow::Result<(SendAttemptId, DeliveryClaim)> {
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let generation = sqlx::query_scalar!(
         "SELECT draft_generation FROM email_messages WHERE id=$1",
         message()
@@ -32,7 +32,7 @@ async fn expire(pool: &Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn active_backed_off_and_expired_preparation_can_be_cancelled(
@@ -87,7 +87,7 @@ async fn active_backed_off_and_expired_preparation_can_be_cancelled(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn schedule_cancellation_fences_managed_preparation_during_backoff(
@@ -131,7 +131,7 @@ async fn schedule_cancellation_fences_managed_preparation_during_backoff(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn submitted_delivery_remains_locked_after_lease_expiry(
@@ -163,14 +163,14 @@ async fn submitted_delivery_remains_locked_after_lease_expiry(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn expired_legacy_claim_cannot_be_mistaken_for_safe_preparation(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(
@@ -193,7 +193,7 @@ async fn expired_legacy_claim_cannot_be_mistaken_for_safe_preparation(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn cancellation_and_submission_race_has_exactly_one_winner(

@@ -4,7 +4,7 @@ import { cleanup, render } from '@solidjs/testing-library';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CodeExecutionToolCall } from './CodeExecutionToolCall';
 
-vi.mock('./MacroToolCall', () => ({ MacroToolCall: () => null }));
+vi.mock('./RoxToolCall', () => ({ RoxToolCall: () => null }));
 
 afterEach(cleanup);
 

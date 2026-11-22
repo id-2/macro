@@ -1,7 +1,7 @@
 use super::{BotDirectory, BotFacts, ManagedPersonaError, SelectedPersona, persona_for_owner};
 use bots::domain::models::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::Owner;
 
 const OWNER: &str = "macro|owner@example.com";
@@ -59,7 +59,7 @@ fn managed_facts(selected_channels: bool) -> BotFacts {
         has_agent: true,
         is_managed: true,
         is_system: false,
-        owner_user_id: Some(MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()),
+        owner_user_id: Some(RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()),
         owner_team_id: None,
         harness_id: None,
         on_team_agent_computer: false,
@@ -73,8 +73,8 @@ fn managed_facts(selected_channels: bool) -> BotFacts {
     }
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_owned()).unwrap()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_owned()).unwrap()
 }
 
 fn owner(id: &str) -> Owner {
@@ -88,7 +88,7 @@ impl BotDirectory for Directory {
 
     async fn user_has_team(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         _team_id: Uuid,
     ) -> super::Result<bool> {
         Ok(self.team_members.contains(&user.as_ref()))
@@ -96,7 +96,7 @@ impl BotDirectory for Directory {
 
     async fn user_shares_channel_with_bot(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> super::Result<bool> {
         Ok(self.channel_members.contains(&user.as_ref()))

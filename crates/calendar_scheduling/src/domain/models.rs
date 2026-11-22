@@ -101,7 +101,7 @@ pub struct EventType {
     /// Mutually exclusive with Google Meet. Omitted on links saved before
     /// Rox calls were a booking option, which keep their previous conference.
     #[serde(default)]
-    pub macro_call: bool,
+    pub rox_call: bool,
     /// Generate a Google Meet conference. Mutually exclusive with a Rox call.
     pub google_meet: bool,
     /// Whether new bookings are accepted.
@@ -376,7 +376,7 @@ pub struct PublicEvent {
     /// Location shared by the host.
     pub location: String,
     /// Whether a Rox call will be created for the booking.
-    pub macro_call: bool,
+    pub rox_call: bool,
     /// Whether a Google Meet will be created.
     pub google_meet: bool,
     /// Information requested from the booker.

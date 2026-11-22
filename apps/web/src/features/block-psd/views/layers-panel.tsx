@@ -82,7 +82,7 @@ interface DropState {
   zone: DropZone;
 }
 
-const DRAG_TYPE = 'application/x-macro-psd-layers';
+const DRAG_TYPE = 'application/x-rox-psd-layers';
 
 export function LayersPanel(props: {
   editor: PsdEditor;

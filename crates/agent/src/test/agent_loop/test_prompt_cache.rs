@@ -444,7 +444,7 @@ async fn the_turn_part_comes_after_the_model_line() {
     let (bodies, _) = run_session(
         &transport,
         "anthropic/claude-opus-4-8",
-        split_prompt("task A").with_turn("\n<macro_sdk>docs</macro_sdk>"),
+        split_prompt("task A").with_turn("\n<rox_sdk>docs</rox_sdk>"),
         "hi",
     )
     .await;
@@ -452,7 +452,7 @@ async fn the_turn_part_comes_after_the_model_line() {
     assert_eq!(
         bodies[0]["system"][1]["text"],
         json!(format!(
-            "\n<session_instructions>\ntask A\n</session_instructions>{MODEL_LINE}\n<macro_sdk>docs</macro_sdk>"
+            "\n<session_instructions>\ntask A\n</session_instructions>{MODEL_LINE}\n<rox_sdk>docs</rox_sdk>"
         ))
     );
 }
@@ -546,7 +546,7 @@ async fn other_providers_receive_the_prompt_joined_as_before() {
     for anthropic_only in [
         "defer_loading",
         "tool_reference",
-        "macro_prompt_layout",
+        "rox_prompt_layout",
         "cache_control",
     ] {
         assert!(!wire.contains(anthropic_only), "{anthropic_only} in {wire}");

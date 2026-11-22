@@ -67,7 +67,7 @@ export function removeCalendarMacroCall(
             .replace(/&amp;/g, '&')
             .trim();
           const linkedUrl = calendarMacroCallUrl({ description: paragraph });
-          // Invitations saved by earlier releases say "Join Macro call"; keep
+          // Invitations saved by earlier releases say "Join Rox call"; keep
           // reading that wording so old events still lose their generated line.
           const textUrl = text.match(
             /^Join (?:Macro|Rox) call:\s*(\S+)$/i

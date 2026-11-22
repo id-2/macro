@@ -1,7 +1,7 @@
 use async_graphql::{Context, ErrorExtensions, Object};
 use calendar_events::domain::{
     changes::CalendarEventChange,
-    meeting_links::{MacroCallEventError, MeetingLinkError},
+    meeting_links::{RoxCallEventError, MeetingLinkError},
     ports::CalendarMutationError,
 };
 use graphql_common::require_authenticated_user;
@@ -43,16 +43,16 @@ impl CalendarMutationRoot {
         let viewer = require_authenticated_user(ctx)?.as_ref().to_owned();
         let writes = &ctx.data::<CalendarGraphqlMutationContext>()?.writes;
         let request = input.into_request().map_err(invalid_input)?;
-        let event = if request.macro_call {
+        let event = if request.rox_call {
             writes
-                .create_event_with_macro_call(
+                .create_event_with_rox_call(
                     viewer.clone(),
                     request.email_link_id,
                     request.calendar_id,
                     request.draft,
                 )
                 .await
-                .map_err(macro_call_error)?
+                .map_err(rox_call_error)?
         } else {
             writes
                 .create_event(
@@ -290,19 +290,19 @@ pub(crate) fn mutation_error(error: CalendarMutationError) -> async_graphql::Err
 /// Map a failure creating an event together with its Rox call. A meeting
 /// that could not be minted leaves the calendar untouched, so the client may
 /// retry the same create.
-fn macro_call_error(error: MacroCallEventError) -> async_graphql::Error {
+fn rox_call_error(error: RoxCallEventError) -> async_graphql::Error {
     match error {
-        MacroCallEventError::Calendar(error) => mutation_error(error),
-        MacroCallEventError::MeetingLink(MeetingLinkError::InvalidInput(message)) => {
+        RoxCallEventError::Calendar(error) => mutation_error(error),
+        RoxCallEventError::MeetingLink(MeetingLinkError::InvalidInput(message)) => {
             invalid_input(async_graphql::Error::new(message))
         }
-        MacroCallEventError::MeetingLink(error) => {
+        RoxCallEventError::MeetingLink(error) => {
             tracing::error!(error = ?error, "calendar event macro call creation failed");
             async_graphql::Error::new(
                 "the Rox call for the event could not be created; the event was not saved",
             )
             .extend_with(|_, extensions| {
-                extensions.set("code", "macro_call_failed");
+                extensions.set("code", "rox_call_failed");
                 extensions.set("retryable", true);
             })
         }

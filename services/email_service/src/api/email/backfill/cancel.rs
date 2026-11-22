@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use email::domain::backfill_jobs::{BackfillCancelError, BackfillJobAccess};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use models_email::email::service::link::Link;
 use sqlx::types::Uuid;
@@ -34,7 +34,7 @@ pub struct CancelBackfillParams {
 #[tracing::instrument(skip(ctx, authorization, link), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     link: Extension<Link>,
     Json(req_body): Json<CancelBackfillParams>,
 ) -> Result<Response, Response> {

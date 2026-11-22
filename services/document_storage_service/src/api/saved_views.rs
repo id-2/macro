@@ -4,7 +4,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, patch, post};
 use axum::{Router, routing::get};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use saved_views::domain::Error as DomainError;
 use saved_views::{ExcludedDefaultViewStorage, PgViewStorage};
@@ -108,16 +108,16 @@ pub struct ExcludeDefaultViewRequest {
 #[tracing::instrument(skip_all, err)]
 async fn get_views_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<(StatusCode, Json<ViewsResponse>), SavedViewErr> {
     let pg_view_storage = PgViewStorage::new(ctx.db.clone());
 
     let views = ctx
         .saved_views
-        .legacy_list(user.authorization.user.macro_user_id.as_ref())
+        .legacy_list(user.authorization.user.rox_user_id.as_ref())
         .await?;
     let excluded_default_views = pg_view_storage
-        .get_excluded_default_views_for_user(user.authorization.user.macro_user_id.as_ref())
+        .get_excluded_default_views_for_user(user.authorization.user.rox_user_id.as_ref())
         .await?;
 
     Ok((
@@ -141,13 +141,13 @@ async fn get_views_handler(
 )]
 async fn create_view_handler(
     ctx: State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(create_view_request): Json<CreateViewRequest>,
 ) -> Result<(StatusCode, Json<View>), SavedViewErr> {
     let new_view = ctx
         .saved_views
         .legacy_create(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             create_view_request.name,
             create_view_request.config,
         )
@@ -177,11 +177,11 @@ struct SavedViewParams {
 #[tracing::instrument(skip_all, fields(view_id = %id), err)]
 async fn delete_view_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(SavedViewParams { saved_view_id: id }): Path<SavedViewParams>,
 ) -> Result<StatusCode, SavedViewErr> {
     ctx.saved_views
-        .legacy_delete(user.authorization.user.macro_user_id.as_ref(), id)
+        .legacy_delete(user.authorization.user.rox_user_id.as_ref(), id)
         .await?;
 
     Ok(StatusCode::OK)
@@ -203,13 +203,13 @@ async fn delete_view_handler(
 #[tracing::instrument(skip_all, fields(view_id = %id), err)]
 async fn patch_view_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(SavedViewParams { saved_view_id: id }): Path<SavedViewParams>,
     Json(patch): Json<ViewPatch>,
 ) -> Result<StatusCode, SavedViewErr> {
     ctx.saved_views
         .legacy_patch(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             id,
             patch.name.as_deref(),
             patch.config.as_ref(),
@@ -232,7 +232,7 @@ async fn patch_view_handler(
 #[tracing::instrument(skip_all, err)]
 pub async fn exclude_default_view_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(ExcludeDefaultViewRequest {
         default_view_id: id,
     }): Json<ExcludeDefaultViewRequest>,
@@ -241,7 +241,7 @@ pub async fn exclude_default_view_handler(
 
     pg_view_storage
         .create_excluded_default_view(ExcludedDefaultView::new(
-            user.authorization.user.macro_user_id.to_string(),
+            user.authorization.user.rox_user_id.to_string(),
             id.to_string(),
         ))
         .await?;

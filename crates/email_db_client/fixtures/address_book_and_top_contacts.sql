@@ -1,7 +1,7 @@
 -- One inbox with a synced address book of five contacts (one automated) and
 -- sent mail that ranks two of them: carol three messages, alice one.
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('ab000000-0000-0000-0000-000000000001', 'macro|owner@acme.com', 'fa-owner', 'owner@acme.com', 'GMAIL', true, NOW(), NOW());
 

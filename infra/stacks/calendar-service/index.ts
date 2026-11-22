@@ -24,7 +24,7 @@ const AUTHENTICATION_SERVICE_INTERNAL_API_KEY = config.require(
 );
 const JWT_SECRET_KEY = config.require(`jwt_secret_key`);
 const INTERNAL_AUTH_KEY = config.require(`internal_auth_key`);
-const MACRO_DB_URL_SECRET_NAME = config.require(`macro_db_secret_key`);
+const ROX_DB_URL_SECRET_NAME = config.require(`rox_db_secret_key`);
 
 const authenticationServiceInternalApiKeyArn: pulumi.Output<string> =
   aws.secretsmanager
@@ -42,10 +42,10 @@ const internalAuthKeyArn: pulumi.Output<string> = aws.secretsmanager
   .apply((secret) => secret.arn);
 
 const macroDbUrlArn: pulumi.Output<string> = aws.secretsmanager
-  .getSecretVersionOutput({ secretId: MACRO_DB_URL_SECRET_NAME })
+  .getSecretVersionOutput({ secretId: ROX_DB_URL_SECRET_NAME })
   .apply((secret) => secret.arn);
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
 const cloudStorageStack = new pulumi.StackReference('cloud-storage-stack', {
   name: `macro-inc/document-storage/${stack}`,
@@ -79,7 +79,7 @@ export const calendarServiceRedisEndpoint = calendarServiceRedis.endpoint;
 // Calendar's own backfill queue. The `Queue` construct appends
 // `-queue-${stack}`, producing `calendar-service-backfill-queue-{dev,prod}`,
 // which is exactly the name the Rust side expects
-// (`macro_queues::CalendarServiceBackfillQueue`).
+// (`rox_queues::CalendarServiceBackfillQueue`).
 const backfillQueue = new Queue('calendar-service-backfill', {
   tags,
   maxReceiveCount: 20,
@@ -102,7 +102,7 @@ const secretKeyArns = [
   jwtSecretKeyArn,
   internalAuthKeyArn,
   macroDbUrlArn,
-  MACRO_API_TOKENS.macroApiTokenPublicKeyArn,
+  ROX_API_TOKENS.macroApiTokenPublicKeyArn,
 ];
 
 const containerEnvVars = [

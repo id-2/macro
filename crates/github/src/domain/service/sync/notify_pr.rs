@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use chrono::{DateTime, Utc};
 use documents::domain::ports::DocumentService;
 use github_pull_requests::domain::ports::GithubPullRequestService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::{
     GithubPrEventAction, GithubPrEventStatus, GithubPrNotificationCommon, GithubPrStatusChanged,
@@ -39,8 +39,8 @@ struct PullRequestStatusTransition {
 /// from recipients so nobody is notified about their own GitHub activity.
 #[derive(Default)]
 pub(super) struct NotificationSender {
-    pub(super) sender_id: Option<MacroUserIdStr<'static>>,
-    actor_user_ids: HashSet<MacroUserIdStr<'static>>,
+    pub(super) sender_id: Option<RoxUserIdStr<'static>>,
+    actor_user_ids: HashSet<RoxUserIdStr<'static>>,
 }
 
 impl<
@@ -123,7 +123,7 @@ impl<
         notification: T,
         foreign_entity_id: uuid::Uuid,
         sender: &NotificationSender,
-        mut recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        mut recipient_ids: HashSet<RoxUserIdStr<'static>>,
     ) {
         recipient_ids.retain(|recipient| !sender.actor_user_ids.contains(recipient));
         if recipient_ids.is_empty() {
@@ -182,7 +182,7 @@ impl<
         &self,
         pull_request: &EnrichedGithubPullRequest,
         upserts: &[PullRequestForeignEntityUpsert],
-    ) -> HashSet<MacroUserIdStr<'static>> {
+    ) -> HashSet<RoxUserIdStr<'static>> {
         let github_user_ids = Self::pull_request_participant_github_user_ids(pull_request, upserts);
         if github_user_ids.is_empty() {
             tracing::trace!("skipping GitHub PR notification without participant GitHub user IDs");
@@ -226,7 +226,7 @@ impl<
     async fn macro_users_for_github_user_ids(
         &self,
         github_user_ids: &HashSet<String>,
-    ) -> HashSet<MacroUserIdStr<'static>> {
+    ) -> HashSet<RoxUserIdStr<'static>> {
         if github_user_ids.is_empty() {
             return HashSet::new();
         }
@@ -234,7 +234,7 @@ impl<
         let github_user_ids: Vec<String> = github_user_ids.iter().cloned().collect();
         let links = match self
             .repo
-            .get_macro_ids_by_github_user_ids(&github_user_ids)
+            .get_rox_ids_by_github_user_ids(&github_user_ids)
             .await
         {
             Ok(links) => links,
@@ -248,8 +248,8 @@ impl<
         };
 
         let mut user_ids = HashSet::new();
-        for (github_user_id, macro_ids) in links {
-            if macro_ids.is_empty() {
+        for (github_user_id, rox_ids) in links {
+            if rox_ids.is_empty() {
                 tracing::trace!(
                     participant_github_user_id=%github_user_id,
                     "GitHub PR participant has no Rox user mapping"
@@ -257,15 +257,15 @@ impl<
                 continue;
             }
 
-            for macro_id in macro_ids {
-                match MacroUserIdStr::try_from(macro_id.clone()) {
+            for rox_id in rox_ids {
+                match RoxUserIdStr::try_from(rox_id.clone()) {
                     Ok(user_id) => {
                         user_ids.insert(user_id);
                     }
                     Err(error) => {
                         tracing::warn!(
                             error=?error,
-                            macro_id=%macro_id,
+                            rox_id=%rox_id,
                             participant_github_user_id=%github_user_id,
                             "GitHub PR participant mapping is not a valid Rox user ID"
                         );
@@ -280,8 +280,8 @@ impl<
     pub(super) async fn participant_scoped_recipient_ids(
         &self,
         source: &GithubAppInstallationSource,
-        participant_user_ids: &HashSet<MacroUserIdStr<'static>>,
-    ) -> HashSet<MacroUserIdStr<'static>> {
+        participant_user_ids: &HashSet<RoxUserIdStr<'static>>,
+    ) -> HashSet<RoxUserIdStr<'static>> {
         if participant_user_ids.is_empty() {
             return HashSet::new();
         }
@@ -296,11 +296,11 @@ impl<
     pub(super) async fn notification_recipient_ids(
         &self,
         source: &GithubAppInstallationSource,
-    ) -> HashSet<MacroUserIdStr<'static>> {
+    ) -> HashSet<RoxUserIdStr<'static>> {
         match source {
             GithubAppInstallationSource::Team(team_id) => self.team_recipient_ids(*team_id).await,
             GithubAppInstallationSource::User(user_id) => {
-                match MacroUserIdStr::try_from(user_id.clone()) {
+                match RoxUserIdStr::try_from(user_id.clone()) {
                     Ok(user_id) => HashSet::from([user_id]),
                     Err(error) => {
                         tracing::warn!(
@@ -315,7 +315,7 @@ impl<
         }
     }
 
-    async fn team_recipient_ids(&self, team_id: uuid::Uuid) -> HashSet<MacroUserIdStr<'static>> {
+    async fn team_recipient_ids(&self, team_id: uuid::Uuid) -> HashSet<RoxUserIdStr<'static>> {
         match self.repo.get_team_member_ids(team_id).await {
             Ok(member_ids) => member_ids.into_iter().collect(),
             Err(error) => {
@@ -338,7 +338,7 @@ impl<
         };
         let links = match self
             .repo
-            .get_macro_ids_by_github_user_ids(std::slice::from_ref(&github_user_id))
+            .get_rox_ids_by_github_user_ids(std::slice::from_ref(&github_user_id))
             .await
         {
             Ok(links) => links,
@@ -353,8 +353,8 @@ impl<
         };
 
         let mut sender = NotificationSender::default();
-        for macro_id in links.get(&github_user_id).into_iter().flatten() {
-            match MacroUserIdStr::try_from(macro_id.clone()) {
+        for rox_id in links.get(&github_user_id).into_iter().flatten() {
+            match RoxUserIdStr::try_from(rox_id.clone()) {
                 Ok(user_id) => {
                     // A notification has a single sender; many Rox users may
                     // share one GitHub account, so attribute to the first
@@ -367,7 +367,7 @@ impl<
                 Err(error) => {
                     tracing::warn!(
                         error=?error,
-                        macro_id=%macro_id,
+                        rox_id=%rox_id,
                         sender_github_user_id=%github_user_id,
                         "GitHub PR notification sender mapping is not a valid Rox user ID"
                     );

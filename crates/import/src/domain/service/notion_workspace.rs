@@ -15,13 +15,13 @@ use std::time::{Duration, Instant};
 use agent_session::domain::model::AgentSessionId;
 use futures::{FutureExt, StreamExt, stream};
 use import_notion::domain::inventory::{all_users, inventory};
-use import_notion::domain::macro_cells::{PeopleMap, Person};
+use import_notion::domain::rox_cells::{PeopleMap, Person};
 use import_notion::domain::model::{
     ImportScope, NotionDataSource, NotionId, NotionPage, NotionUser, PageMarkdown, Paged, RowsPage,
     SearchHit, SearchObject,
 };
 use import_notion::domain::ports::{NotionApi, NotionConnections, NotionError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Instrument;
 use uuid::Uuid;
 
@@ -68,7 +68,7 @@ impl NotionConnections for NoNotionConnections {
 
     async fn for_user(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
     ) -> std::result::Result<Option<Self::Api>, NotionError> {
         Ok(None)
     }
@@ -165,7 +165,7 @@ where
 {
     async fn prepare_notion_import(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         scope: ImportScope,
         sharing: Option<NotionSharing>,
         wait: Duration,
@@ -212,7 +212,7 @@ where
 
     async fn notion_import_report(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<NotionImportReport> {
         self.reap_stale_runs(user).await;
         // A run whose process stopped is picked up here, and rows a stopped
@@ -226,7 +226,7 @@ where
 
     async fn attach_notion_review(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review_id: Uuid,
         session_id: AgentSessionId,
     ) -> Result<u64> {
@@ -240,7 +240,7 @@ where
 
     async fn start_notion_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review_id: Uuid,
         choices: NotionWriteChoices,
     ) -> Result<NotionImportReport> {
@@ -342,7 +342,7 @@ where
         self.notion_import_report(user).await
     }
 
-    async fn cancel_notion_import(&self, user: &MacroUserIdStr<'static>) -> Result<bool> {
+    async fn cancel_notion_import(&self, user: &RoxUserIdStr<'static>) -> Result<bool> {
         let cancelled = self
             .repo
             .transition_run(
@@ -370,7 +370,7 @@ where
     /// survives this process; fails the run when that is not possible.
     pub(super) async fn hold_new_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         status: RunStatus,
         job: &NotionJob,
     ) -> Result<()> {
@@ -394,7 +394,7 @@ where
     /// Plan and record the outcome on the run.
     pub(super) fn plan_workspace<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'static>,
+        user: &'a RoxUserIdStr<'static>,
         scope: ImportScope,
         sharing: NotionSharing,
     ) -> futures::future::BoxFuture<'a, ()> {
@@ -446,7 +446,7 @@ where
 
     pub(super) async fn try_plan_workspace(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         scope: ImportScope,
         sharing: NotionSharing,
         control: &JobControl,
@@ -521,7 +521,7 @@ where
     )]
     pub(super) async fn stage_verdicts(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         tree: &plan::PlanTree,
         items: &[triage::TriageItem],
         batches: impl futures::Stream<Item = HashMap<String, triage::Verdict>>,
@@ -580,7 +580,7 @@ where
         ),
         name = "workspace_import.write"
     )]
-    pub(super) async fn write_plan(&self, user: &MacroUserIdStr<'static>, set: WriteSet) {
+    pub(super) async fn write_plan(&self, user: &RoxUserIdStr<'static>, set: WriteSet) {
         let (control, _held) = self.hold_run(user);
         let outcome = Importer::write(self, user, set.review_id, &control).await;
         if let Some(reason) = control.reason() {
@@ -642,7 +642,7 @@ where
     /// returns how many failed.
     pub(super) async fn try_write_plan(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         set: &WriteSet,
         control: &JobControl,
     ) -> Result<usize> {
@@ -795,7 +795,7 @@ where
 
     /// The user's "Notion" folder: the one earlier imports made while it
     /// still exists, otherwise a new one.
-    async fn root_folder(&self, user: &MacroUserIdStr<'static>) -> Result<Uuid> {
+    async fn root_folder(&self, user: &RoxUserIdStr<'static>) -> Result<Uuid> {
         if let Some(folder) = self.repo.root_folder(user).await?
             && self.creator.folder_exists(user, folder).await?
         {
@@ -811,7 +811,7 @@ where
 
     /// Notion users matched to the user's team by email. Empty when Notion
     /// will not share emails; people columns then stay empty.
-    async fn people(&self, api: &N::Api, user: &MacroUserIdStr<'static>) -> PeopleMap {
+    async fn people(&self, api: &N::Api, user: &RoxUserIdStr<'static>) -> PeopleMap {
         let notion_users = match all_users(api).await {
             Ok(users) => users,
             Err(error) => {
@@ -843,7 +843,7 @@ where
     }
 
     /// Whether the user cancelled the import.
-    pub(super) async fn cancelled(&self, user: &MacroUserIdStr<'static>) -> bool {
+    pub(super) async fn cancelled(&self, user: &RoxUserIdStr<'static>) -> bool {
         match self.repo.list_runs(user).await {
             Ok(runs) => runs.iter().any(|run| {
                 run.source == self.workspace_source && run.status == RunStatus::Dismissed

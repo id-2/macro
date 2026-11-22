@@ -21,15 +21,15 @@ where
     E: BackfillEffects,
     C: BackfillCrm,
 {
-    let macro_id_str = payload.macro_id.0.as_ref();
+    let rox_id_str = payload.rox_id.0.as_ref();
     let team_id = ctx
         .crm
-        .get_team_id_for_user(macro_id_str)
+        .get_team_id_for_user(rox_id_str)
         .await
         .map_err(|e| {
             ProcessingError::Retryable(DetailedError {
                 reason: FailureReason::DatabaseQueryFailed,
-                source: anyhow::Error::from(e).context("Failed to look up team for macro_id"),
+                source: anyhow::Error::from(e).context("Failed to look up team for rox_id"),
             })
         })?;
 
@@ -40,7 +40,7 @@ where
 
     let mailbox = ctx
         .crm
-        .contribution_mailbox(team_id, macro_id_str)
+        .contribution_mailbox(team_id, rox_id_str)
         .await
         .map_err(|e| {
             ProcessingError::Retryable(DetailedError {

@@ -54,7 +54,7 @@ impl BulkDigestStateMachine for NoDigest {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_publication_retries_original_recipients_without_resetting_state(
     pool: Pool<Postgres>,
 ) {

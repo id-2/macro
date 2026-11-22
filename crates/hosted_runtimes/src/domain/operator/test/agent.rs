@@ -6,14 +6,14 @@ use crate::domain::agent::{
     AgentEnvKey,
 };
 
-fn ada() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|ada-1@agents.macro.invalid".to_owned()).unwrap()
+fn ada() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|ada-1@agents.macro.invalid".to_owned()).unwrap()
 }
 
 fn ada_enrollment() -> AgentEnrollment {
     let mut values = BTreeMap::new();
     values.insert(
-        AgentEnvKey::new("MACRO_API_KEY").unwrap(),
+        AgentEnvKey::new("ROX_API_KEY").unwrap(),
         "mak_ada".to_owned(),
     );
     AgentEnrollment {

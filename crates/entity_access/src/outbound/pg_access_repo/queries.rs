@@ -7,10 +7,10 @@ use cached::proc_macro::cached;
 
 use anyhow::Context;
 use bot_id::BotIdStr;
-use macro_user_id::{
+use rox_user_id::{
     cowlike::CowLike,
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_entity::EntityType;
 use single_flight::{DatabaseKey, SingleFlight};
@@ -68,7 +68,7 @@ static RUNNING_SOURCE_ID_LOOKUPS: LazyLock<SingleFlight<UserSourceIdsKey, UserSo
 /// `Arc<sqlx::Error>`.
 pub async fn get_user_source_ids(
     pool: &Pool<Postgres>,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> anyhow::Result<SourceIds> {
     let source_ids = shared_user_source_ids(pool, user_id).await?;
 
@@ -99,7 +99,7 @@ pub async fn get_user_source_ids(
 )]
 async fn shared_user_source_ids(
     pool: &Pool<Postgres>,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> anyhow::Result<Arc<SourceIds>> {
     let Some(user_id) = user_id else {
         return Ok(Arc::new(SourceIds(vec![])));
@@ -221,25 +221,25 @@ pub(in crate::outbound::pg_access_repo) async fn get_entity_users(
     pool: &Pool<Postgres>,
     entity_id: &uuid::Uuid,
     entity_type: EntityType,
-) -> anyhow::Result<Vec<MacroUserIdStr<'static>>> {
+) -> anyhow::Result<Vec<RoxUserIdStr<'static>>> {
     if entity_type == EntityType::ForeignEntity {
         return foreign_entity_access::get_foreign_entity_users(pool, entity_id).await;
     }
     // because we don't store entity_access per email we need to also grab the owner
     // of the email to append to the list, plus any primary that delegates the inbox
-    // via macro_user_links (shared inbox)
-    let mut email_owner: Vec<MacroUserIdStr> = if let EntityType::EmailThread = entity_type {
-        let macro_ids = sqlx::query_scalar!(
+    // via rox_user_links (shared inbox)
+    let mut email_owner: Vec<RoxUserIdStr> = if let EntityType::EmailThread = entity_type {
+        let rox_ids = sqlx::query_scalar!(
             r#"
-        SELECT l.macro_id AS "macro_id!"
+        SELECT l.rox_id AS "rox_id!"
         FROM email_threads et
         JOIN email_links l ON et.link_id = l.id
         WHERE et.id = $1
         UNION
-        SELECT mul.primary_macro_id
+        SELECT mul.primary_rox_id
         FROM email_threads et
         JOIN email_links l ON et.link_id = l.id
-        JOIN macro_user_links mul ON mul.link_id = l.id
+        JOIN rox_user_links mul ON mul.link_id = l.id
         WHERE et.id = $1
         "#,
             entity_id
@@ -247,10 +247,10 @@ pub(in crate::outbound::pg_access_repo) async fn get_entity_users(
         .fetch_all(pool)
         .await?;
 
-        macro_ids
+        rox_ids
             .into_iter()
-            .map(|macro_id| {
-                MacroUserIdStr::parse_from_str(macro_id.as_str())
+            .map(|rox_id| {
+                RoxUserIdStr::parse_from_str(rox_id.as_str())
                     .map(|u| u.into_owned())
                     .context("macro user id should be valid")
             })
@@ -259,7 +259,7 @@ pub(in crate::outbound::pg_access_repo) async fn get_entity_users(
         vec![]
     };
 
-    let mut users: Vec<MacroUserIdStr<'static>> = sqlx::query_scalar!(
+    let mut users: Vec<RoxUserIdStr<'static>> = sqlx::query_scalar!(
         r#"
     SELECT user_id FROM (
         -- Direct user grants
@@ -294,12 +294,12 @@ pub(in crate::outbound::pg_access_repo) async fn get_entity_users(
     .into_iter()
     .filter_map(|u| {
         u.and_then(|u| {
-            MacroUserIdStr::parse_from_str(u.as_str())
+            RoxUserIdStr::parse_from_str(u.as_str())
                 .ok()
                 .map(|u| u.into_owned())
         })
     })
-    .collect::<Vec<MacroUserIdStr<'static>>>();
+    .collect::<Vec<RoxUserIdStr<'static>>>();
 
     // add in email owner (if applicable)
     users.append(&mut email_owner);

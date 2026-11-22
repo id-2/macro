@@ -6,7 +6,7 @@ use crate::domain::{
     timeline::{view::StoredVote, *},
 };
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::{
     LinkShare, SharePermissionV2, UpdateSharePermissionRequestV2, access_level::AccessLevel,
 };
@@ -215,7 +215,7 @@ impl PgExternalChatRepository {
 impl TimelineRepository for PgExternalChatRepository {
     async fn visible_chats(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ExternalChatResult<Vec<VisibleChat>> {
         let user = user.as_ref();
         self.chat_rows(user, None).await
@@ -251,7 +251,7 @@ impl TimelineRepository for PgExternalChatRepository {
     async fn mark_read(
         &self,
         chat: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         message: Uuid,
     ) -> ExternalChatResult<()> {
         let user = user.as_ref();
@@ -305,7 +305,7 @@ impl TimelineRepository for PgExternalChatRepository {
     async fn update_permissions(
         &self,
         chat: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         update: &UpdateSharePermissionRequestV2,
         command: Option<
             &models_permissions::share_permission::team_share::AuthorizedTeamShareCommand,

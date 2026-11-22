@@ -16,14 +16,14 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalAuthConfig, JwtValidator,
-    MacroAuthorizationError, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_authorization::{
+    INTERNAL_API_KEY_HEADER, INTERNAL_ROX_USER_ID_HEADER, InternalAuthConfig, JwtValidator,
+    RoxAuthorizationError, RoxAuthorizationServiceImpl, RoxAuthorizationState,
     ValidatedIdentity,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use rootcause::Report;
 use serde_json::{Value, json};
@@ -59,10 +59,10 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         match jwt {
-            VALID_TOKEN => Ok(macro_authorization::ValidatedCredential {
-                origin: macro_authorization::CredentialOrigin::Session,
+            VALID_TOKEN => Ok(rox_authorization::ValidatedCredential {
+                origin: rox_authorization::CredentialOrigin::Session,
                 identity: ValidatedIdentity {
                     agent_id: None,
                     agent_via: None,
@@ -72,13 +72,13 @@ impl JwtValidator for FakeJwtValidator {
                     permissions: None,
                 },
             }),
-            "expired" => Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            "expired" => Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 }
 
-type TestAuthorizationService = MacroAuthorizationServiceImpl<FakeJwtValidator>;
+type TestAuthorizationService = RoxAuthorizationServiceImpl<FakeJwtValidator>;
 
 #[derive(Clone, Copy)]
 enum PermissionResult {
@@ -114,7 +114,7 @@ impl FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -134,7 +134,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -143,7 +143,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -162,7 +162,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _organization_id: Option<i64>,
@@ -172,7 +172,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -205,7 +205,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         panic!("unexpected get_users_by_entity call")
     }
 
@@ -225,7 +225,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         panic!("unexpected get_user_team call")
     }
@@ -335,7 +335,7 @@ impl CrmService for FakeCrmService {
         panic!("unexpected depopulate_link_in_team call")
     }
 
-    async fn get_team_id_for_user(&self, _macro_id: &str) -> Result<Option<Uuid>, CrmError> {
+    async fn get_team_id_for_user(&self, _rox_id: &str) -> Result<Option<Uuid>, CrmError> {
         panic!("unexpected get_team_id_for_user call")
     }
 
@@ -605,14 +605,14 @@ fn test_router(
     entity_access: FakeEntityAccessService,
 ) -> (Router, FakeEntityAccessService, FakeCrmService) {
     let crm_service = FakeCrmService;
-    let authorization_service = MacroAuthorizationServiceImpl::new(
+    let authorization_service = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: INTERNAL_KEY.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
     let state: CrmRouterState<
         FakeCrmService,
@@ -623,7 +623,7 @@ fn test_router(
         service: Arc::new(crm_service.clone()),
         stage_service: Arc::new(()),
         entity_access_service: Arc::new(entity_access.clone()),
-        authorization_state: MacroAuthorizationState::new(Arc::new(authorization_service)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(authorization_service)),
     };
     let router = Router::new()
         .route("/companies/{company_id}", get(company_handler))
@@ -649,7 +649,7 @@ fn bearer_request(path: &str, token: &str) -> Request<Body> {
 fn internal_request(path: &str, acting_user: Option<&str>) -> Request<Body> {
     let mut request = Request::get(path).header(INTERNAL_API_KEY_HEADER, INTERNAL_KEY);
     if let Some(acting_user) = acting_user {
-        request = request.header(INTERNAL_MACRO_USER_ID_HEADER, acting_user);
+        request = request.header(INTERNAL_ROX_USER_ID_HEADER, acting_user);
     }
     request.body(Body::empty()).unwrap()
 }
@@ -820,7 +820,7 @@ async fn credential_failures_happen_before_permission_lookup() {
     }
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 async fn contact_mutation_http_contract_covers_addresses_and_company_links(
     pool: sqlx::PgPool,
 ) -> anyhow::Result<()> {
@@ -840,7 +840,7 @@ async fn contact_mutation_http_contract_covers_addresses_and_company_links(
     .execute(&pool)
     .await?;
     sqlx::query!(
-        "INSERT INTO \"User\" (id, email, macro_user_id) VALUES ($1, $1, $2)",
+        "INSERT INTO \"User\" (id, email, rox_user_id) VALUES ($1, $1, $2)",
         USER_ID,
         user
     )
@@ -866,14 +866,14 @@ async fn contact_mutation_http_contract_covers_addresses_and_company_links(
         NoOpCompanyMetadataResolver,
     ));
     let router = |level| {
-        let authorization = MacroAuthorizationServiceImpl::new(
+        let authorization = RoxAuthorizationServiceImpl::new(
             FakeJwtValidator,
             InternalAuthConfig {
                 api_key: INTERNAL_KEY.to_string(),
                 default_user_id: None,
             },
-            macro_authorization::NoBotAuthorizer,
-            macro_authorization::NoUserApiKeyAuthorizer,
+            rox_authorization::NoBotAuthorizer,
+            rox_authorization::NoUserApiKeyAuthorizer,
         );
         Router::new()
             .route(
@@ -894,7 +894,7 @@ async fn contact_mutation_http_contract_covers_addresses_and_company_links(
                 service: service.clone(),
                 stage_service: Arc::new(()),
                 entity_access_service: Arc::new(FakeEntityAccessService::with_access_level(level)),
-                authorization_state: MacroAuthorizationState::new(Arc::new(authorization)),
+                authorization_state: RoxAuthorizationState::new(Arc::new(authorization)),
             })
     };
     let edit = router(AccessLevel::Edit);
@@ -1081,7 +1081,7 @@ async fn contact_mutation_http_contract_covers_addresses_and_company_links(
     Ok(())
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 async fn contact_detail_http_contract_carries_the_company_summary(
     pool: sqlx::PgPool,
 ) -> anyhow::Result<()> {
@@ -1101,7 +1101,7 @@ async fn contact_detail_http_contract_carries_the_company_summary(
     .execute(&pool)
     .await?;
     sqlx::query!(
-        "INSERT INTO \"User\" (id, email, macro_user_id) VALUES ($1, $1, $2)",
+        "INSERT INTO \"User\" (id, email, rox_user_id) VALUES ($1, $1, $2)",
         USER_ID,
         user
     )
@@ -1144,14 +1144,14 @@ async fn contact_detail_http_contract_carries_the_company_summary(
     let service = Arc::new(CrmServiceImpl::new(repo, NoOpCompanyMetadataResolver));
     // Edit maps to an admin's team role in the fake, View to a member's.
     let get = |level, id: Uuid| {
-        let authorization = MacroAuthorizationServiceImpl::new(
+        let authorization = RoxAuthorizationServiceImpl::new(
             FakeJwtValidator,
             InternalAuthConfig {
                 api_key: INTERNAL_KEY.to_string(),
                 default_user_id: None,
             },
-            macro_authorization::NoBotAuthorizer,
-            macro_authorization::NoUserApiKeyAuthorizer,
+            rox_authorization::NoBotAuthorizer,
+            rox_authorization::NoUserApiKeyAuthorizer,
         );
         Router::new()
             .route(
@@ -1162,7 +1162,7 @@ async fn contact_detail_http_contract_carries_the_company_summary(
                 service: service.clone(),
                 stage_service: Arc::new(()),
                 entity_access_service: Arc::new(FakeEntityAccessService::with_access_level(level)),
-                authorization_state: MacroAuthorizationState::new(Arc::new(authorization)),
+                authorization_state: RoxAuthorizationState::new(Arc::new(authorization)),
             })
             .oneshot(
                 Request::get(format!("/contacts/{id}"))

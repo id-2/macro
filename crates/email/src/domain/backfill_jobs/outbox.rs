@@ -1,5 +1,5 @@
 //! Durable backfill publication with a row lock held through each queue send.
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::backfill::{
     BackfillOperation, BackfillPubsubMessage, FinalizeBackfillPayload, JobScopedPayload,
     PopulateCrmForUserPayload,
@@ -196,7 +196,7 @@ pub async fn drain_crm<R: BackfillOutboxRepository, Q: BackfillOutboxPublisher>(
                 sqs.publish(BackfillPubsubMessage {
                     backfill_operation: BackfillOperation::PopulateCrmForUser(
                         PopulateCrmForUserPayload {
-                            macro_id: MacroUserIdStr::try_from(row.user_id.clone())?,
+                            rox_id: RoxUserIdStr::try_from(row.user_id.clone())?,
                         },
                     ),
                 })

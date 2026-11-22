@@ -1,8 +1,8 @@
 use super::*;
 use crate::domain::models::CatalogEntry;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("caller@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("caller@example.com").unwrap()
 }
 use std::sync::Mutex;
 
@@ -30,7 +30,7 @@ impl FakeDirectory {
 impl ConnectorDirectory for FakeDirectory {
     async fn search(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         search: Option<&str>,
         cursor: Option<&str>,
         limit: u32,
@@ -45,7 +45,7 @@ impl ConnectorDirectory for FakeDirectory {
 
     async fn retrieve(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Option<CatalogEntry>> {
         Ok(self

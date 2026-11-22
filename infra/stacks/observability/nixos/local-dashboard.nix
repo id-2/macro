@@ -321,7 +321,7 @@ let
   machineFilter = ''host_name=~"$machine"'';
   serviceLogs = ''{deployment_environment="local", service_name!="local-telemetry"} | ${machineFilter}'';
   errorLogs = ''${serviceLogs} | severity_text=~"(?i)error|fatal|critical"'';
-  bothLabels = "host_name, macro_local_instance";
+  bothLabels = "host_name, rox_local_instance";
 
   recentRuns = {
     id = 13;
@@ -593,7 +593,7 @@ let
           description = "Each machine's stacks by instance, from their log lines. A stack started before `services = true` was turned on has no instance until its next bring-up.";
           by = [
             "host_name"
-            "macro_local_instance"
+            "rox_local_instance"
           ];
           sort = "Log lines";
           columns = [

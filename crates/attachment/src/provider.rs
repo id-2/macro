@@ -1,7 +1,7 @@
 //! Attachment provider — routes [`Entity`] references to the correct
 //! [`AttachmentService`] by [`EntityType`].
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use non_empty::NonEmpty;
 
@@ -32,7 +32,7 @@ where
 {
     async fn resolve_attachments<'a>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&'a Entity<'a>]>,
     ) -> Attachments<'a> {
         let mut doc = Vec::new();
@@ -73,7 +73,7 @@ where
 
 async fn dispatch<'a, S: AttachmentService>(
     service: &S,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     refs: &[&'a Entity<'a>],
 ) -> Vec<Result<AttachmentContent<'a>, ResolutionError>> {
     if refs.is_empty() {

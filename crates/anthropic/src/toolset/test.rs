@@ -7,7 +7,7 @@ use ai_billing::domain::{
 };
 use ai_usage::financial::{FinancialError, WriteDisposition};
 use ai_usage::{FinancialFuture, UsageTracking};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
@@ -18,7 +18,7 @@ struct Refuse {
 impl AiAdmissionService for Refuse {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: ai_usage::AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {

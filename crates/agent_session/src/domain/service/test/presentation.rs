@@ -6,7 +6,7 @@ use std::time::Duration;
 fn card() -> SessionToolPresentation {
     SessionToolPresentation {
         tool_call_id: "review_stable-id".into(),
-        title: "mcp__macro_internal__PresentReview".into(),
+        title: "mcp__rox_internal__PresentReview".into(),
         raw_input: serde_json::json!({"reviewId":"stable-id","kind":"email","title":"Draft"}),
         raw_output: serde_json::json!({"reviewId":"stable-id","message":"Presented to the user"}),
     }
@@ -80,7 +80,7 @@ async fn presentation_retry_completes_an_interrupted_pair() {
 #[tokio::test]
 async fn presentation_rejects_cross_owner_and_archived_before_actor_delivery() {
     let fx = fixture();
-    let other = MacroUserIdStr::parse_from_str("macro|other@example.com")
+    let other = RoxUserIdStr::parse_from_str("macro|other@example.com")
         .unwrap()
         .to_owned();
     assert!(matches!(
@@ -213,7 +213,7 @@ async fn presentation_frames_fold_to_the_shared_mcp_card_for_every_runtime() {
                 .any(|part| matches!(part, MessagePart::ToolUse {
             id, name: ToolName::Mcp { server, tool }, status: ToolStatus::Completed,
             detail: ToolDetail::Other { .. },
-        } if id.0 == "review_stable-id" && server == "macro_internal" && tool == "PresentReview")),
+        } if id.0 == "review_stable-id" && server == "rox_internal" && tool == "PresentReview")),
             "runtime {runtime}: {parts:?}"
         );
     }

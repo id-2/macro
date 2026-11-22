@@ -16,8 +16,8 @@ use agent_session::domain::routines::RoutineSessions;
 use anyhow::{Context as _, Result};
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use routine_program::Step;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{oneshot, watch};
@@ -245,7 +245,7 @@ impl DraftJob {
 #[derive(Debug, Clone, PartialEq)]
 pub struct NewDraftJob {
     pub session: Uuid,
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The id the client gave the start: one live job per id and owner.
     pub client_id: Uuid,
     /// The agent whose session drafts it.
@@ -409,7 +409,7 @@ struct Job<Code, Sessions, Updates> {
     drafts: Arc<RoutineDrafts<Code, Sessions>>,
     store: Arc<dyn DraftJobStore>,
     updates: Arc<Updates>,
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     session: AgentSessionId,
     request: DraftRequest,
     program: Vec<Step>,
@@ -577,7 +577,7 @@ fn removed(id: Uuid, progress: DraftJobProgress) -> DraftUpdate {
 async fn write_progress(
     store: &dyn DraftJobStore,
     updates: &impl RoutineDraftUpdates,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     id: Uuid,
     mut watching: watch::Receiver<DraftJobProgress>,
 ) -> DraftJobProgress {
@@ -617,7 +617,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions, Updates: RoutineDraftUpdates>
     ), err)]
     async fn start(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         client_id: Uuid,
         request: DraftRequest,
         context: DraftContext,
@@ -639,11 +639,11 @@ impl<Code: RoutineCode, Sessions: RoutineSessions, Updates: RoutineDraftUpdates>
             .context("start a background routine draft")?
     }
 
-    async fn jobs(&self, owner: MacroUserIdStr<'static>) -> Result<Vec<DraftJob>> {
+    async fn jobs(&self, owner: RoxUserIdStr<'static>) -> Result<Vec<DraftJob>> {
         self.store.jobs(&owner, LISTED).await
     }
 
-    async fn job(&self, owner: MacroUserIdStr<'static>, id: Uuid) -> Result<DraftJob> {
+    async fn job(&self, owner: RoxUserIdStr<'static>, id: Uuid) -> Result<DraftJob> {
         Ok(self
             .store
             .job(&owner, id)
@@ -659,7 +659,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions, Updates: RoutineDraftUpdates>
         routine.draft.outcome = tracing::field::Empty,
         routine.draft.start_traceparent = tracing::field::Empty,
     ), err)]
-    async fn discard(&self, owner: MacroUserIdStr<'static>, id: Uuid) -> Result<()> {
+    async fn discard(&self, owner: RoxUserIdStr<'static>, id: Uuid) -> Result<()> {
         let span = tracing::Span::current();
         let Some(cancelled) = self.store.cancel_job(&owner, id).await? else {
             span.record("routine.draft.outcome", "not_found");
@@ -702,7 +702,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions, Updates: RoutineDraftUpdates>
     /// start's span: the row, the drafter and the answer to the start.
     async fn begin(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         client_id: Uuid,
         request: DraftRequest,
         program: Vec<Step>,

@@ -36,7 +36,7 @@ corpus found.
 ## Patches
 
 Changes to upstream files are marked with `MACRO:` comments; new files say so at
-the top. `base/src/test/test_macro_patches.rs` tests them.
+the top. `base/src/test/test_rox_patches.rs` tests them.
 
 Build and packaging:
 

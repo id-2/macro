@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -9,7 +9,7 @@ const CHANNEL: Uuid = Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_5a11)
 const TEAM: Uuid = Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_5a12);
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     let email = user_id.trim_start_matches("macro|");
 
     sqlx::query!(
@@ -17,7 +17,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $2)
         "#,
-        macro_user_id,
+        rox_user_id,
         user_id,
         email,
     )
@@ -25,10 +25,10 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     .await?;
 
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await?;
@@ -91,7 +91,7 @@ fn sources(ids: &[&str]) -> SourceIds {
     SourceIds(ids.iter().map(ToString::to_string).collect())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_grant_returns_owner(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let action_id = insert_scheduled_action(&pool, OWNER).await?;
@@ -111,7 +111,7 @@ async fn owner_grant_returns_owner(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stranger_source_ids_return_none(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let action_id = insert_scheduled_action(&pool, OWNER).await?;
@@ -131,7 +131,7 @@ async fn stranger_source_ids_return_none(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn channel_source_grant_matches(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let action_id = insert_scheduled_action(&pool, OWNER).await?;
@@ -155,7 +155,7 @@ async fn channel_source_grant_matches(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_source_grant_matches(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let action_id = insert_scheduled_action(&pool, OWNER).await?;
@@ -178,7 +178,7 @@ async fn team_source_grant_matches(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn higher_grant_wins(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let action_id = insert_scheduled_action(&pool, OWNER).await?;
@@ -209,7 +209,7 @@ async fn higher_grant_wins(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn accessible_ids_return_the_live_granted_action_once(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let live_id = insert_scheduled_action(&pool, OWNER).await?;

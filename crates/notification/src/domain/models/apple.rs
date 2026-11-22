@@ -1,6 +1,6 @@
 //! Apple Push Notification Service (APNS) payload models.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -211,7 +211,7 @@ pub struct PushNotificationData {
     /// Account that owns the receiving device, set during per-recipient delivery.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "schema", schema(value_type = Option<String>))]
-    pub recipient_id: Option<MacroUserIdStr<'static>>,
+    pub recipient_id: Option<RoxUserIdStr<'static>>,
     /// Destination to open without fetching the notification record first.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub navigation: Option<PushNotificationNavigation>,

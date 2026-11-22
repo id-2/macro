@@ -1,10 +1,10 @@
 use super::*;
 
 fn owner() -> Owner {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 
-fn macro_id(n: u128) -> AgentSessionId {
+fn rox_id(n: u128) -> AgentSessionId {
     AgentSessionId::new_from_uuid(uuid::Uuid::from_u128(n))
 }
 
@@ -17,20 +17,20 @@ fn drain(rx: &mut mpsc::UnboundedReceiver<Work>) -> Vec<Work> {
     std::iter::from_fn(|| rx.try_recv().ok()).collect()
 }
 
-fn opened(session: &str, macro_session: Option<AgentSessionId>) -> TapEvent {
+fn opened(session: &str, rox_session: Option<AgentSessionId>) -> TapEvent {
     TapEvent::Opened {
         session: session.to_owned(),
-        macro_session,
+        rox_session,
     }
 }
 
 #[test]
 fn a_named_session_opens_one_window_and_is_steerable() {
     let (mut hub, mut work) = state();
-    hub.session_created(macro_id(1), owner());
-    hub.apply(opened("acp-1", Some(macro_id(1))));
+    hub.session_created(rox_id(1), owner());
+    hub.apply(opened("acp-1", Some(rox_id(1))));
     // A later load of the same session does not open a second window.
-    hub.apply(opened("acp-1", Some(macro_id(1))));
+    hub.apply(opened("acp-1", Some(rox_id(1))));
 
     assert_eq!(
         drain(&mut work),
@@ -45,7 +45,7 @@ fn a_named_session_opens_one_window_and_is_steerable() {
             },
         ]
     );
-    assert_eq!(hub.control_target("acp-1"), Some((macro_id(1), owner())));
+    assert_eq!(hub.control_target("acp-1"), Some((rox_id(1), owner())));
     assert!(hub.unclaimed_macro.is_empty());
 }
 
@@ -53,22 +53,22 @@ fn a_named_session_opens_one_window_and_is_steerable() {
 fn unnamed_sessions_pair_with_created_ones_in_order_either_way() {
     let (mut hub, _work) = state();
     // The create answered before the agent did.
-    hub.session_created(macro_id(1), owner());
+    hub.session_created(rox_id(1), owner());
     hub.apply(opened("acp-1", None));
     // The agent answered before the create did.
     hub.apply(opened("acp-2", None));
-    hub.session_created(macro_id(2), owner());
+    hub.session_created(rox_id(2), owner());
 
-    assert_eq!(hub.control_target("acp-1").map(|t| t.0), Some(macro_id(1)));
-    assert_eq!(hub.control_target("acp-2").map(|t| t.0), Some(macro_id(2)));
+    assert_eq!(hub.control_target("acp-1").map(|t| t.0), Some(rox_id(1)));
+    assert_eq!(hub.control_target("acp-2").map(|t| t.0), Some(rox_id(2)));
 }
 
 #[test]
 fn a_session_without_an_owner_is_view_only() {
     let (mut hub, _work) = state();
-    hub.apply(opened("acp-1", Some(macro_id(1))));
+    hub.apply(opened("acp-1", Some(rox_id(1))));
     assert_eq!(hub.control_target("acp-1"), None);
-    hub.owners.insert(macro_id(1), owner());
+    hub.owners.insert(rox_id(1), owner());
     assert!(hub.control_target("acp-1").is_some());
 }
 

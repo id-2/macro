@@ -1,7 +1,7 @@
 //! User-owned notification mute and snooze preferences.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use rootcause::Report;
 use std::{collections::HashMap, future::Future};
@@ -20,32 +20,32 @@ pub trait ItemNotificationPreferenceRepository: Send + Sync {
     /// Return only permanent mutes and unexpired snoozes.
     fn list(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<ItemNotificationPreference>, Report>> + Send;
     /// Replace this user's preference for an item.
     fn set(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entity: Entity<'_>,
         until: Option<DateTime<Utc>>,
     ) -> impl Future<Output = Result<(), Report>> + Send;
     /// Atomically replace this user's preferences for all items.
     fn set_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
         until: Option<DateTime<Utc>>,
     ) -> impl Future<Output = Result<(), Report>> + Send;
     /// Atomically resume notifications for all items belonging to this user.
     fn remove_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
     ) -> impl Future<Output = Result<(), Report>> + Send;
     /// Resume notifications for this user's item.
     fn remove(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entity: Entity<'_>,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 }
@@ -82,7 +82,7 @@ impl<R: ItemNotificationPreferenceRepository> ItemNotificationPreferenceService<
     /// List the authenticated user's active preferences.
     pub async fn list(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> Result<Vec<ItemNotificationPreference>, Report> {
         self.repository.list(user).await
     }
@@ -90,7 +90,7 @@ impl<R: ItemNotificationPreferenceRepository> ItemNotificationPreferenceService<
     /// Replace a mute or snooze. Only the authenticated user's preference can change.
     pub async fn set(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entity: Entity<'_>,
         until: Option<DateTime<Utc>>,
         now: DateTime<Utc>,
@@ -108,7 +108,7 @@ impl<R: ItemNotificationPreferenceRepository> ItemNotificationPreferenceService<
     #[tracing::instrument(skip_all, fields(item_count = entities.len()), err)]
     pub async fn set_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: Vec<Entity<'static>>,
         until: Option<DateTime<Utc>>,
         now: DateTime<Utc>,
@@ -129,7 +129,7 @@ impl<R: ItemNotificationPreferenceRepository> ItemNotificationPreferenceService<
     #[tracing::instrument(skip_all, fields(item_count = entities.len()), err)]
     pub async fn remove_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: Vec<Entity<'static>>,
     ) -> Result<(), ItemNotificationPreferenceError> {
         let entities = Self::validate_bulk(entities)?;
@@ -167,7 +167,7 @@ impl<R: ItemNotificationPreferenceRepository> ItemNotificationPreferenceService<
     }
 
     /// Resume delivery without modifying existing notifications or read state.
-    pub async fn remove(&self, user: MacroUserIdStr<'_>, entity: Entity<'_>) -> Result<(), Report> {
+    pub async fn remove(&self, user: RoxUserIdStr<'_>, entity: Entity<'_>) -> Result<(), Report> {
         self.repository.remove(user, entity).await
     }
 }

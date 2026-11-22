@@ -25,10 +25,10 @@ required-features = ["backfill"]
 backfill = [
   "dep:aws-sdk-secretsmanager",
   "dep:clap",
-  "dep:macro_aws_config",
+  "dep:rox_aws_config",
   "dep:secretsmanager_client",
   "dep:tokio",
-  "dep:macro_env_var"
+  "dep:rox_env_var"
 ]
 
 default = ["backfill"]
@@ -58,19 +58,19 @@ uuid = { workspace = true }
 # Optional — only compiled in for the `backfill` feature (the backfill binary).
 aws-sdk-secretsmanager = { workspace = true, optional = true }
 clap = { workspace = true, optional = true }
-macro_aws_config = { path = "../macro_aws_config", optional = true }
+rox_aws_config = { path = "../rox_aws_config", optional = true }
 secretsmanager_client = { path = "../secretsmanager_client", optional = true }
 tokio = { workspace = true, features = [
   "macros",
   "rt-multi-thread",
 ], optional = true }
-macro_env_var = { path = "../macro_env_var", optional = true }
+rox_env_var = { path = "../rox_env_var", optional = true }
 
-macro_service_urls = { path = "../macro_service_urls" }
+rox_service_urls = { path = "../rox_service_urls" }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 automod = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
-macro_env_var = { path = "../macro_env_var" }
+rox_db_migrator = { path = "../rox_db_migrator" }
+rox_env_var = { path = "../rox_env_var" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

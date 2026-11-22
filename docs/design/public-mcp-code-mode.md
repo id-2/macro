@@ -85,14 +85,14 @@ pub trait UserCodeMode: Send + Sync + 'static {
     /// Execute as the authenticated user; no session, journal or reviews.
     async fn execute(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         request: ExecuteRequest,
         cancel: CancellationToken,
     ) -> Result<UserExecutionReceipt, CodeModeError>;
 }
 ```
 
-- **Credentials:** `MacroApiTokenSigner::mint_for(user, 60)`, with no agent
+- **Credentials:** `RoxApiTokenSigner::mint_for(user, 60)`, with no agent
   id, so writes are attributed to the user like every other MCP tool. No
   `NativeToolGate`: the MCP client already asks the user before tool calls.
 - **No journal:** the MCP response is the record, and there is no UI to load a

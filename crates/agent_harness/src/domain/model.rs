@@ -15,8 +15,8 @@ use agent_session::domain::session::PermissionPolicy;
 #[cfg(test)]
 mod test;
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::events::MessageEventAttachment;
 use trigger_context::TriggerContext;
 mod current_time;
@@ -186,13 +186,13 @@ impl AgentKind {
     /// The kind of runtime serving `bot`'s sessions.
     #[must_use]
     pub fn of(bot: BotId) -> Self {
-        if bot == bot_id::MACRO_CODER_BOT_ID {
+        if bot == bot_id::ROX_CODER_BOT_ID {
             Self::SandboxedCoder
         } else if bot == bot_id::CURSOR_BOT_ID {
             Self::Cursor
         } else if bot == bot_id::CODEX_BOT_ID {
             Self::CodexCloud
-        } else if bot == bot_id::MACRO_NEW_BOT_ID {
+        } else if bot == bot_id::ROX_NEW_BOT_ID {
             Self::InMemory
         } else {
             Self::External
@@ -400,7 +400,7 @@ pub struct AgentRuntimeConfig {
 /// Whether a user belongs to the Rox staff domain - the egress crate's
 /// predicate, reused so the harness's staff gates and the proxy's can never
 /// disagree about who staff is.
-pub(crate) use agent_egress::domain::model::is_macro_staff;
+pub(crate) use agent_egress::domain::model::is_rox_staff;
 
 /// Where a prompt came from, when it came from somewhere the session should
 /// answer back into.
@@ -466,7 +466,7 @@ pub struct ReplyPresentation {
     /// The bot the session speaks as; the message is posted as it.
     pub bot_id: BotId,
     /// Who prompted the turn; the bot writes on their current capability.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
     /// Where the reply is shown.
     pub parent: messages::domain::models::MessageParent,
     /// The thread it is shown in; `None` for a timeline.
@@ -497,7 +497,7 @@ pub struct AgentTypingUpdate {
     /// The bot the session speaks as.
     pub bot_id: BotId,
     /// Who prompted the turn; the bot types on their current capability.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
     /// Where the reply will appear.
     pub parent: messages::domain::models::MessageParent,
     /// The thread it will appear in; `None` for a timeline.
@@ -532,9 +532,9 @@ pub struct AnnounceOrigin {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PromptPeople {
     /// The session's owner.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The prompt's sender; absent when a bot sent it on nobody's behalf.
-    pub sender: Option<MacroUserIdStr<'static>>,
+    pub sender: Option<RoxUserIdStr<'static>>,
 }
 
 /// Do something in a session that already exists.
@@ -546,7 +546,7 @@ pub struct DeliverAction {
     /// What the agent is being asked to do.
     pub action: AgentAction,
     /// The user responsible, absent when nobody in particular is.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Where to announce this, for prompts that arrived from elsewhere.
     ///
     /// `None` means "do not announce": either the caller drove the session
@@ -607,7 +607,7 @@ pub enum HarnessCommand {
     /// Persist a nonblocking tool card on the replica owning this session.
     PresentTool {
         /// Authenticated session owner.
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         /// Stable component identity and presentation payload.
         presentation: agent_session::domain::model::SessionToolPresentation,
     },
@@ -624,14 +624,14 @@ pub enum HarnessCommand {
         /// The user responsible, judged by the same gates as sending: whoever
         /// may not prompt a session may not rewrite what it is about to be
         /// prompted with.
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     },
     /// Remove a queued action before it dispatches.
     RemoveQueued {
         /// The queue entry to remove.
         action_id: AgentActionId,
         /// The user responsible, as on [`Self::EditQueued`].
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     },
     /// Run a queued action next: move it to the front and, when a turn is in
     /// flight, cancel that turn so this entry flushes ahead of the rest.
@@ -639,7 +639,7 @@ pub enum HarnessCommand {
         /// The queue entry to run next.
         action_id: AgentActionId,
         /// The user responsible, as on [`Self::EditQueued`].
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     },
     /// The session's fold reported a turn fact: an ended turn clears the
     /// busy mark and dispatches the next queued action; a raised or cleared
@@ -686,7 +686,7 @@ impl DeliverAction {
     /// ride along; `AgentAction::prompt(text)` is the plain-text form.
     pub fn prompt(
         action: AgentAction,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
         announce: Option<AnnounceOrigin>,
     ) -> Self {
         Self {
@@ -734,7 +734,7 @@ pub struct AnnouncePrompt {
     /// The mention's text, shown in the announcement's reply target.
     pub content: String,
     /// Who mentioned the bot.
-    pub sender: MacroUserIdStr<'static>,
+    pub sender: RoxUserIdStr<'static>,
 }
 
 /// Facts required to announce one prompt into its originating context.
@@ -764,7 +764,7 @@ pub struct SessionAnnouncement {
     /// Text of the prompting message, shown in the reply target.
     pub prompted_content: String,
     /// User whose mention triggered the announcement.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
 }
 
 impl SessionAnnouncement {
@@ -800,7 +800,7 @@ pub struct DeclinedMention {
     /// Where the mention was posted, and so where the reply goes.
     pub origin: AnnounceOrigin,
     /// Who mentioned the bot.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
     /// What stands between them and a session.
     pub blocker: SessionBlocker,
 }
@@ -919,7 +919,7 @@ pub struct ResolvedReply {
     /// Channel or document the mention was posted in.
     pub origin_parent: messages::domain::models::MessageParent,
     /// Who prompted the turn.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
     /// What the reply should say now.
     pub outcome: ReplyOutcome,
     /// The turn the reply answers.
@@ -987,20 +987,20 @@ pub struct SandboxEgress {
 /// with the container: `container/ensure_ready.sh` reads it to build the git
 /// remote it clones from. Like `provision::SIDECAR_PORT`, the agreement between
 /// the two is held by a test rather than by comment.
-pub const EGRESS_URL_VARIABLE: &str = "MACRO_EGRESS_URL";
+pub const EGRESS_URL_VARIABLE: &str = "ROX_EGRESS_URL";
 
 /// The session token the sandbox presents on every proxied call. Shared with
 /// `container/ensure_ready.sh` on the same terms as [`EGRESS_URL_VARIABLE`].
-pub const SESSION_TOKEN_VARIABLE: &str = "MACRO_SESSION_TOKEN";
+pub const SESSION_TOKEN_VARIABLE: &str = "ROX_SESSION_TOKEN";
 
 /// The name every session's server list gives Rox's own MCP server.
 ///
 /// Purely a display name now - resolution happens by route, not by name - but
 /// kept short and stable because agents namespace tool names under it.
-pub const MACRO_MCP_NAME: &str = "macro";
+pub const ROX_MCP_NAME: &str = "macro";
 
 /// Harness-owned session tools, separate from the workspace MCP catalog.
-pub const INTERNAL_MCP_NAME: &str = "macro_internal";
+pub const INTERNAL_MCP_NAME: &str = "rox_internal";
 
 impl SandboxEgress {
     /// Where the proxy serves `slug` - the URL a client dials to reach that
@@ -1011,7 +1011,7 @@ impl SandboxEgress {
 
     /// Where the proxy serves Rox's own MCP server: its own route, so no
     /// connected app's slug can ever name it.
-    pub fn macro_mcp_url(&self) -> String {
+    pub fn rox_mcp_url(&self) -> String {
         format!("{}/mcp-macro", self.base_url)
     }
 
@@ -1066,7 +1066,7 @@ impl SandboxEgress {
     /// with an earlier entry, suffixed with a piece of its key.
     pub fn server_entries(&self) -> impl Iterator<Item = (String, String)> + '_ {
         let mut entries: Vec<(String, String)> = vec![
-            (MACRO_MCP_NAME.to_owned(), self.macro_mcp_url()),
+            (ROX_MCP_NAME.to_owned(), self.rox_mcp_url()),
             (
                 INTERNAL_MCP_NAME.to_owned(),
                 format!("{}/mcp/internal", self.base_url),

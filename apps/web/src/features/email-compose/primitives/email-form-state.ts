@@ -179,7 +179,7 @@ export function createEmailFormState(
     if (!decodedHtml) return false;
     const parsed = new DOMParser().parseFromString(decodedHtml, 'text/html');
 
-    return parsed.body.querySelector('div.macro_quote') !== null;
+    return parsed.body.querySelector('div.rox_quote') !== null;
   };
 
   const defaultReplyType = (): ReplyType =>

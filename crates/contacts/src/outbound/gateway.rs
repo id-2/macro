@@ -2,7 +2,7 @@
 mod test;
 
 use crate::domain::ports::ContactsNotifier;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 /// Notifier that sends invalidation messages through the connection gateway.
@@ -47,7 +47,7 @@ impl ConnectionGatewayNotifier {
 impl ContactsNotifier for ConnectionGatewayNotifier {
     async fn invalidate_contacts_for_users(
         &self,
-        user_ids: Vec<MacroUserIdStr<'_>>,
+        user_ids: Vec<RoxUserIdStr<'_>>,
     ) -> Result<(), Report> {
         for user_id in user_ids {
             self.invalidate_contacts(user_id.as_ref() as &str)
@@ -66,7 +66,7 @@ impl ContactsNotifier for ConnectionGatewayNotifier {
 impl ContactsNotifier for Option<ConnectionGatewayNotifier> {
     async fn invalidate_contacts_for_users(
         &self,
-        user_ids: Vec<MacroUserIdStr<'_>>,
+        user_ids: Vec<RoxUserIdStr<'_>>,
     ) -> Result<(), Report> {
         if let Some(notifier) = self {
             notifier.invalidate_contacts_for_users(user_ids).await?;

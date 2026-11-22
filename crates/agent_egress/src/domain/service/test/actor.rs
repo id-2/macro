@@ -10,7 +10,7 @@ impl ActorMcpTransport for ActorTransport {
     async fn exchange(
         &self,
         _: AgentSessionId,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: UpstreamCall,
         request: Value,
     ) -> Result<Value, EgressError> {
@@ -27,7 +27,7 @@ impl ActorMcpTransport for ActorTransport {
 
 #[tokio::test]
 async fn requester_credentials_are_used_and_actor_is_never_forwarded() {
-    let asker = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let asker = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     let transport = Arc::new(ActorTransport::default());
     let service = gated(prompted_by(Some(asker.clone())), SpyCredentials::knowing())
         .with_actor_mcp(transport.clone());
@@ -65,7 +65,7 @@ async fn choosing_owner_still_holds_the_call_without_executing_it() {
     let transport = Arc::new(ActorTransport::default());
     let service = gated(
         prompted_by(Some(
-            MacroUserIdStr::try_from_email("asker@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("asker@example.com").unwrap(),
         )),
         SpyCredentials::knowing(),
     )
@@ -117,7 +117,7 @@ async fn missing_selection_and_missing_requester_never_resolve_credentials() {
 
 #[tokio::test]
 async fn missing_requester_connection_offers_connect_without_owner_fallback() {
-    let asker = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let asker = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     let transport = Arc::new(ActorTransport::default());
     let service = gated(
         prompted_by(Some(asker.clone())),
@@ -184,7 +184,7 @@ impl SessionAuthority for TurnChanges {
         if self.0.fetch_add(1, std::sync::atomic::Ordering::SeqCst) == 0 {
             grant.prompter.as_mut().unwrap().action_id =
                 agent_runtime_protocol::domain::action::AgentActionId::from_uuid(
-                    macro_uuid::Uuid::from_u128(1),
+                    rox_uuid::Uuid::from_u128(1),
                 );
         }
         Ok(grant)
@@ -230,7 +230,7 @@ async fn an_owner_approval_cannot_execute_after_the_original_turn_is_superseded(
 /// Rox's own tools write as the agent the session row is bound to. A bot
 /// the agent names in its arguments never reaches the credential.
 #[tokio::test]
-async fn macro_tools_are_attributed_to_the_sessions_agent_not_one_the_caller_names() {
+async fn rox_tools_are_attributed_to_the_sessions_agent_not_one_the_caller_names() {
     let StubSessions(Ok(mut grant)) = prompted_by(Some(asker())) else {
         unreachable!("granting grants");
     };
@@ -269,7 +269,7 @@ async fn macro_tools_are_attributed_to_the_sessions_agent_not_one_the_caller_nam
 
 #[tokio::test]
 async fn an_in_process_call_spends_the_settled_account_without_holding() {
-    let asker = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let asker = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     let transport = Arc::new(ActorTransport::default());
     let service = gated(prompted_by(Some(asker.clone())), SpyCredentials::knowing())
         .with_actor_mcp(transport.clone());
@@ -300,7 +300,7 @@ async fn an_in_process_call_spends_the_settled_account_without_holding() {
 
 #[tokio::test]
 async fn an_in_process_listing_reads_the_owner_catalog_and_an_unconnected_call_offers_connect() {
-    let asker = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let asker = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     let transport = Arc::new(ActorTransport::default());
     let service = gated(
         prompted_by(Some(asker.clone())),
@@ -344,7 +344,7 @@ async fn an_in_process_listing_reads_the_owner_catalog_and_an_unconnected_call_o
 }
 
 #[tokio::test]
-async fn an_in_process_exchange_never_reaches_macro_or_preview() {
+async fn an_in_process_exchange_never_reaches_rox_or_preview() {
     let transport = Arc::new(ActorTransport::default());
     let service =
         gated(prompted_by(None), SpyCredentials::knowing()).with_actor_mcp(transport.clone());
@@ -426,7 +426,7 @@ async fn an_in_process_drive_write_in_the_owners_turn_runs_only_once_they_approv
 
 #[tokio::test]
 async fn an_in_process_owner_call_in_someone_elses_turn_runs_once_the_owner_approves() {
-    let asker = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let asker = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     let transport = Arc::new(ActorTransport::default());
     let service = gated(prompted_by(Some(asker.clone())), SpyCredentials::knowing())
         .with_actor_mcp(transport.clone());
@@ -457,7 +457,7 @@ async fn an_in_process_owner_call_in_someone_elses_turn_runs_once_the_owner_appr
 
 #[tokio::test]
 async fn an_in_process_owner_call_the_owner_declines_never_runs() {
-    let asker = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let asker = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     let transport = Arc::new(ActorTransport::default());
     let service = gated(prompted_by(Some(asker)), SpyCredentials::knowing())
         .with_actor_mcp(transport.clone());

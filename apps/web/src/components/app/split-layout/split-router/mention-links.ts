@@ -16,15 +16,15 @@ import type { BlockAlias, BlockName } from '@core/block';
 import { parseInternalAppLink } from '@core/util/macroAppUrl';
 import { z } from 'zod';
 
-export type MacroMentionLink = {
+export type RoxMentionLink = {
   id: string;
   block: BlockName | BlockAlias;
   params: Record<string, string>;
 };
 
-export type MacroMentionLinkResolver = (
+export type RoxMentionLinkResolver = (
   url: string
-) => MacroMentionLink | undefined;
+) => RoxMentionLink | undefined;
 
 const referenceSchema = z.object({
   id: z.string().min(1),
@@ -51,7 +51,7 @@ function isBlockRouteReference(
 /** Interpret a matched app route as an entity without importing eager view routes. */
 export function createMacroMentionLinkResolver(
   routes: SplitRoutesManifest
-): MacroMentionLinkResolver {
+): RoxMentionLinkResolver {
   return (url) => {
     const link = parseInternalAppLink(url);
     if (!link) return;
@@ -73,7 +73,7 @@ export function createMacroMentionLinkResolver(
       .get(leaf.id)
       ?.definition.toReference?.(leaf.params, query);
     if (!isBlockRouteReference(reference)) return;
-    const mention: MacroMentionLink = {
+    const mention: RoxMentionLink = {
       id: reference.id,
       block: reference.type,
       params: { ...reference.params },
@@ -92,7 +92,7 @@ export function createMacroMentionLinkResolver(
 
 /** Capture an app-owned resolver at an editor host, then pass it to the editor. */
 export function useMacroMentionLinkResolver():
-  | MacroMentionLinkResolver
+  | RoxMentionLinkResolver
   | undefined {
   const router = useOptionalSplitRouter();
   return router && createMacroMentionLinkResolver(router.routes);

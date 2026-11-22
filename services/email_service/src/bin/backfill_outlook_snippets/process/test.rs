@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const OUTLOOK_LINK: Uuid = uuid::uuid!("0190a000-0000-7000-8000-000000000001");
 const GMAIL_LINK: Uuid = uuid::uuid!("0190a000-0000-7000-8000-000000000002");
@@ -11,7 +11,7 @@ async fn seed(db: &PgPool) {
     let thread = uuid::uuid!("0190a000-0000-7000-8000-0000000000a1");
     let gmail_thread = uuid::uuid!("0190a000-0000-7000-8000-0000000000a2");
     sqlx::query!(
-        "INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider) VALUES ($1,'macro|outlook@example.com','outlook','outlook@example.com','OUTLOOK'),($2,'macro|gmail@example.com','gmail','gmail@example.com','GMAIL')",
+        "INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,'macro|outlook@example.com','outlook','outlook@example.com','OUTLOOK'),($2,'macro|gmail@example.com','gmail','gmail@example.com','GMAIL')",
         OUTLOOK_LINK,
         GMAIL_LINK
     )
@@ -122,7 +122,7 @@ async fn run(db: &PgPool, mode: Mode) -> Vec<(Uuid, u64)> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rewrites_only_outlook_replies_that_have_a_body(db: PgPool) {
     seed(&db).await;
 
@@ -146,7 +146,7 @@ async fn rewrites_only_outlook_replies_that_have_a_body(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn verify_counts_stale_snippets_without_writing(db: PgPool) {
     seed(&db).await;
     let before = snippets(&db).await;
@@ -156,7 +156,7 @@ async fn verify_counts_stale_snippets_without_writing(db: PgPool) {
     assert_eq!(snippets(&db).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_second_run_changes_nothing(db: PgPool) {
     seed(&db).await;
     assert_eq!(run(&db, Mode::Apply).await, vec![(OUTLOOK_LINK, 2)]);

@@ -7,7 +7,7 @@ valid:
   - |
     struct Context { service: Service, sqs_worker: Worker }
   - |
-    fn process(ctx: Context) { ctx.macro_event_broker.publish(); }
+    fn process(ctx: Context) { ctx.rox_event_broker.publish(); }
   - |
     fn process() { tracing::info!("ctx.db and ctx.email_api"); }
   - |

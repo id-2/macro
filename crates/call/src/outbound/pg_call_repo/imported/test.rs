@@ -6,8 +6,8 @@ use item_filters::{
     CallStatus,
     ast::{LiteralTree, call::CallLiteral},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde_json::json;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
@@ -24,14 +24,14 @@ const LATEST_FIRST: CallRecordPage = CallRecordPage {
     after: None,
 };
 
-fn user(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|{name}@test.com"))
+fn user(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|{name}@test.com"))
         .unwrap()
         .into_owned()
 }
 
 fn granola_meeting(owner: &str) -> ImportedCall {
-    let attendee = macro_uuid::generate_uuid_v7();
+    let attendee = rox_uuid::generate_uuid_v7();
     let started_at = Utc.with_ymd_and_hms(2026, 10, 15, 18, 54, 0).unwrap();
     ImportedCall {
         title: Some("Design review".into()),
@@ -47,7 +47,7 @@ fn granola_meeting(owner: &str) -> ImportedCall {
             attendance: vec![],
         }],
         transcript: Some(CallTranscript {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             recording_id: None,
             language: None,
             provider: Some(CallProvider::Granola),
@@ -90,7 +90,7 @@ fn status_filter(status: CallStatus) -> LiteralTree<CallLiteral> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("import_users"))
 )]
 async fn imported_calls_are_listed_for_their_owner(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -132,7 +132,7 @@ async fn imported_calls_are_listed_for_their_owner(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("import_users"))
 )]
 async fn imported_call_record_reads_source_and_transcript(

@@ -10,7 +10,7 @@
 (before midnight in the calendar's zone for all-day events) it fires.
  */
 export interface EventReminderOverride {
-  /** Provider method, stored verbatim; only `popup` fires Macro
+  /** Provider method, stored verbatim; only `popup` fires Rox
 notifications. */
   method: string;
   /**

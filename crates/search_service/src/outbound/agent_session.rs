@@ -6,7 +6,7 @@ use agent_session::domain::search::{
     AgentSessionSearchMetadata, AgentSessionSearchMetadataService,
 };
 use entity_access::outbound::{accessible_session_ids, get_user_source_ids};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use readonly_pool::ReadOnlyPool;
 use rootcause::Report;
 use uuid::Uuid;
@@ -21,7 +21,7 @@ pub(crate) struct AgentSessionSearchMetadataSource {
 impl AgentSessionSearchSource for AgentSessionSearchMetadataSource {
     async fn accessible(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         requested: &[Uuid],
     ) -> Result<Vec<AgentSessionSearchMetadata>, Report> {
         let sources = get_user_source_ids(&self.db, Some(user))

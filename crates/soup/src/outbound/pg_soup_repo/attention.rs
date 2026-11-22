@@ -167,7 +167,7 @@ fn email_inbox_gate() -> String {
 /// fixed guess made the planner read a heavy viewer's whole history.
 fn own_work(alias: &str) -> String {
     let sent: &'static str = Action::Sent.into();
-    let system = Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID);
+    let system = Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID);
     format!(
         "({alias}.actor_id NOT LIKE '{bots}|%' OR {alias}.actor_id = '{system}') \
          AND {alias}.agent_correlation_id IS NULL \

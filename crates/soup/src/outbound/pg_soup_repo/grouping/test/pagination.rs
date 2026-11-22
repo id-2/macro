@@ -32,10 +32,10 @@ pub(super) fn continuation(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn fanout_caps_counts_and_tied_cursor_pages(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let mut ids = (0..18)
@@ -95,7 +95,7 @@ async fn fanout_caps_counts_and_tied_cursor_pages(pool: Pool<Postgres>) -> anyho
             expanded_dynamic_cursor_soup_grouped(
                 &pool,
                 GroupedDynamicCursorArgs {
-                    user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap(),
+                    user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap(),
                     limit: 2,
                     cursor,
                     exclude_frecency: false,
@@ -165,7 +165,7 @@ async fn fanout_caps_counts_and_tied_cursor_pages(pool: Pool<Postgres>) -> anyho
     let excluded = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
             limit: 50,
             cursor: Query::Sort(SimpleSortMethod::UpdatedAt.into(), task_filter()),
             exclude_frecency: true,

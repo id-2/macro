@@ -74,7 +74,7 @@ function fakeServer(context: BrowserContext, messages: Message[]) {
   const ready = context.route('**/*', async (route) => {
     const request = route.request();
     const url = new URL(request.url());
-    const path = url.pathname.replace(/^\/__macro_dev\/gateway\/dss/, '');
+    const path = url.pathname.replace(/^\/__rox_dev\/gateway\/dss/, '');
     const guest = path.startsWith(`/call/guest-chat/${CALL}/`);
     const member = path.startsWith(`/messages/call/${CALL}`);
     if (guest || member) {
@@ -159,7 +159,7 @@ function fakeServer(context: BrowserContext, messages: Message[]) {
     }
     if (
       url.hostname === 'localhost' &&
-      !url.pathname.startsWith('/__macro_dev/')
+      !url.pathname.startsWith('/__rox_dev/')
     ) {
       await route.continue();
       return;

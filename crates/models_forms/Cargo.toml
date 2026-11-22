@@ -4,7 +4,7 @@ name = "models_forms"
 publish = false
 version = "0.1.0"
 
-# The wire vocabulary of Macro Forms, shared by the service, the web client
+# The wire vocabulary of Rox Forms, shared by the service, the web client
 # and the SDK. Answers and gate rules are `models_databases` types unchanged.
 [features]
 schema = ["dep:schemars", "models_databases/schema"]
@@ -13,7 +13,7 @@ schema = ["dep:schemars", "models_databases/schema"]
 schemars = { workspace = true, optional = true }
 chrono = { workspace = true, features = ["serde"] }
 lazy-regex = { workspace = true }
-macro_uuid = { path = "../macro_uuid" }
+rox_uuid = { path = "../rox_uuid" }
 model-entity = { path = "../model-entity" }
 models_databases = { path = "../models_databases" }
 serde = { workspace = true }

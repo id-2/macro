@@ -1,4 +1,4 @@
-import MacroLogo from '@icon/macro-logo.svg';
+import RoxLogo from '@icon/macro-logo.svg';
 import { FeaturePage } from '../../features/marketing/components/FeaturePage';
 import { setPageSeo } from '../utils/utilSeo';
 import '../../features/documentation/components/documentation.css';
@@ -16,7 +16,7 @@ export function RouteDownload() {
       <div class="downloads-page">
         <header class="downloads-header">
           <div class="downloads-app-icon" aria-hidden="true">
-            <MacroLogo />
+            <RoxLogo />
           </div>
           <h1>Get Rox.</h1>
           <p>Use Rox in your browser or on your iPhone.</p>

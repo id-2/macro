@@ -30,7 +30,7 @@ events to the `macro.properties` Kafka topic.
 
 ## Boundaries
 
-- Depends on: `entity_access`, `macro_event_broker`, `model_owner`,
+- Depends on: `entity_access`, `rox_event_broker`, `model_owner`,
   `notification` (optional, `outbound` feature).
 - Used by: `databases`, `ai_tools`, `agent_trigger`, `initiative`, `messages`,
   `search_service`, `soup`, `crm`, `graphql_properties`, `properties_service`,

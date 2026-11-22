@@ -10,7 +10,7 @@ use ai_toolset::RequestContext;
 use async_trait::async_trait;
 use import::domain::models::{NotionImportReport, NotionWriteChoices, RunStatus};
 use import::domain::service::WorkspaceImporter;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Serialize, de::DeserializeOwned};
 use std::sync::Arc;
 
@@ -65,7 +65,7 @@ where
     }
     async fn approvable(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         record: &ReviewRecord,
     ) -> Result<bool, CodeModeError> {
         if record.kind() != ReviewKind::Import {
@@ -78,14 +78,14 @@ where
     }
     async fn send_email(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         draft: &EmailDraft,
     ) -> Result<EmailResult, CodeModeError> {
         self.user_action(account_holder, "SendEmail", draft).await
     }
     async fn create_calendar_event(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         draft: &CalendarDraft,
     ) -> Result<CalendarResult, CodeModeError> {
         self.user_action(account_holder, "CreateCalendarEvent", draft)
@@ -93,7 +93,7 @@ where
     }
     async fn start_import(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         record: &ReviewRecord,
         draft: &ImportDraft,
     ) -> Result<ImportResult, CodeModeError> {
@@ -119,7 +119,7 @@ where
     }
     async fn present(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         record: &ReviewRecord,
     ) -> Result<(), CodeModeError> {
         if record.kind() == ReviewKind::Import {
@@ -159,7 +159,7 @@ where
     }
     async fn present_view(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: agent_session::domain::model::AgentSessionId,
         view: &PresentedView,
     ) -> Result<(), CodeModeError> {
@@ -197,7 +197,7 @@ impl<S, L, H> Actions<S, L, H> {
 
     async fn import_report(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         source: import::domain::models::ImportSource,
     ) -> Result<NotionImportReport, CodeModeError> {
         self.import_service()?
@@ -212,7 +212,7 @@ impl<S, L, H> Actions<S, L, H> {
     /// Run a user tool with a reviewed draft and decode its confirmed response.
     async fn user_action<Draft: Serialize, Response: DeserializeOwned>(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         name: &str,
         draft: &Draft,
     ) -> Result<Response, CodeModeError> {

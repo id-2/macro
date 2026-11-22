@@ -2327,7 +2327,7 @@ export type ToolApprovalStatus =
  *  rendered) and a kind this fold does not yet know about.
  *
  *  Four variants are chosen by *name* rather than kind: Rox's own tools
- *  ([`Self::Macro`], [`Self::View`], [`Self::UserTool`]) arrive as ACP `other`, and what a
+ *  ([`Self::Rox`], [`Self::View`], [`Self::UserTool`]) arrive as ACP `other`, and what a
  *  reader wants for them is the tool's own JSON, not a generic card; a
  *  delegation ([`Self::Subagent`]) is a tool call by whatever name its
  *  harness gives it. The harness layer decides which names are which.
@@ -2347,7 +2347,7 @@ export type ToolDetail = ToolDetail_Serialize | ToolDetail_Deserialize;
  *  rendered) and a kind this fold does not yet know about.
  *
  *  Four variants are chosen by *name* rather than kind: Rox's own tools
- *  ([`Self::Macro`], [`Self::View`], [`Self::UserTool`]) arrive as ACP `other`, and what a
+ *  ([`Self::Rox`], [`Self::View`], [`Self::UserTool`]) arrive as ACP `other`, and what a
  *  reader wants for them is the tool's own JSON, not a generic card; a
  *  delegation ([`Self::Subagent`]) is a tool call by whatever name its
  *  harness gives it. The harness layer decides which names are which.
@@ -2526,7 +2526,7 @@ result: SubagentResult | null }) & { acpKind?: never; command?: never; diffs?: n
  *  rendered) and a kind this fold does not yet know about.
  *
  *  Four variants are chosen by *name* rather than kind: Rox's own tools
- *  ([`Self::Macro`], [`Self::View`], [`Self::UserTool`]) arrive as ACP `other`, and what a
+ *  ([`Self::Rox`], [`Self::View`], [`Self::UserTool`]) arrive as ACP `other`, and what a
  *  reader wants for them is the tool's own JSON, not a generic card; a
  *  delegation ([`Self::Subagent`]) is a tool call by whatever name its
  *  harness gives it. The harness layer decides which names are which.

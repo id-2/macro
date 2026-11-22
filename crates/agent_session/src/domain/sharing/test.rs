@@ -1,6 +1,6 @@
 use super::*;
 use entity_access::domain::models::{Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::{
     LinkShare, channel_share_permission::UpdateChannelSharePermission,
 };
@@ -48,7 +48,7 @@ impl SessionSharingRepo for Repo {
         Ok(TeamShareFacts {
             entity: EntityType::AgentSession.with_entity_string(self.id.to_string()),
             owner: user(OWNER).into(),
-            owner_team_id: Some(macro_uuid::generate_uuid_v7()),
+            owner_team_id: Some(rox_uuid::generate_uuid_v7()),
             current: None,
             revision: 0,
         })
@@ -57,7 +57,7 @@ impl SessionSharingRepo for Repo {
     async fn update_permissions(
         &self,
         id: AgentSessionId,
-        _actor: MacroUserIdStr<'static>,
+        _actor: RoxUserIdStr<'static>,
         request: UpdateSharePermissionRequestV2,
         command: Option<AuthorizedTeamShareCommand>,
     ) -> Result<SharePermissionV2> {
@@ -66,8 +66,8 @@ impl SessionSharingRepo for Repo {
     }
 }
 
-fn user(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).unwrap()
+fn user(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).unwrap()
 }
 
 fn entity(id: AgentSessionId, entity_type: EntityType) -> Entity {
@@ -130,7 +130,7 @@ async fn rejects_owner_grants_before_writing() {
         },
         UpdateSharePermissionRequestV2 {
             channel_share_permissions: Some(vec![UpdateChannelSharePermission {
-                channel_id: macro_uuid::generate_uuid_v7().to_string(),
+                channel_id: rox_uuid::generate_uuid_v7().to_string(),
                 operation: UpdateOperation::Replace,
                 access_level: Some(AccessLevel::Owner),
             }]),
@@ -153,7 +153,7 @@ async fn validates_channel_identity_and_required_access_level() {
     let service = SessionSharingService::new(repo.clone());
     for (channel_id, access_level) in [
         ("invalid".into(), Some(AccessLevel::View)),
-        (macro_uuid::generate_uuid_v7().to_string(), None),
+        (rox_uuid::generate_uuid_v7().to_string(), None),
     ] {
         let change = UpdateSharePermissionRequestV2 {
             channel_share_permissions: Some(vec![UpdateChannelSharePermission {
@@ -230,7 +230,7 @@ async fn forwards_explicit_link_and_channel_downgrades() {
         link_share: Some(None),
         link_share_access_level: Some(None),
         channel_share_permissions: Some(vec![UpdateChannelSharePermission {
-            channel_id: macro_uuid::generate_uuid_v7().to_string(),
+            channel_id: rox_uuid::generate_uuid_v7().to_string(),
             operation: UpdateOperation::Replace,
             access_level: Some(AccessLevel::View),
         }]),

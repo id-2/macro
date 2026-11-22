@@ -2,7 +2,7 @@ use crate::api::context::SearchHandlerState;
 use crate::api::search::simple::SearchError;
 use email_db_client::contacts::get::ThreadContactsMap;
 use indexmap::IndexMap;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::message::{MessageSenderInfo, ThreadHistoryInfo};
 use models_properties::{EntityReference, EntityType};
 use models_search::email::{
@@ -33,7 +33,7 @@ pub(in crate::api::search) async fn enrich_emails(
 
     // Resolve every inbox the user can access (their own + delegated) so hits
     // from delegated inboxes are enriched rather than dropped.
-    let inboxes = email_db_client::links::get::fetch_inboxes_for_macro_id(&ctx.db, user_id)
+    let inboxes = email_db_client::links::get::fetch_inboxes_for_rox_id(&ctx.db, user_id)
         .await
         .map_err(SearchError::InternalError)?;
     if inboxes.is_empty() {
@@ -83,7 +83,7 @@ pub(in crate::api::search) async fn enrich_emails(
         .collect();
     // Scope tags to the viewer so another user's personal tags never leak into
     // the response. System properties still ride along via the key list.
-    let viewer_user_id = MacroUserIdStr::parse_from_str(user_id)
+    let viewer_user_id = RoxUserIdStr::parse_from_str(user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?;
     let properties_map: HashMap<String, Vec<SoupProperty>> =
         properties::outbound::entity_properties_get_query::get_bulk_entity_properties_values_filtered(

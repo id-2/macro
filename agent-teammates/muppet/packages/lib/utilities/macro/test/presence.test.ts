@@ -9,7 +9,7 @@ describe("stayOnline", () => {
 			port: 0,
 			fetch: (request, server) => {
 				seen.push({
-					key: request.headers.get("x-macro-user-api-key"),
+					key: request.headers.get("x-rox-user-api-key"),
 					messages: [],
 				});
 				return server.upgrade(request, { data: { index: seen.length - 1 } })

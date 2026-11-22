@@ -2,14 +2,14 @@ import type { ChatStream } from '@service-cognition/generated/schemas';
 import { describe, expect, it } from 'vitest';
 import {
   createMentionBufferPlugin,
-  MAX_MACRO_XML_LENGTH,
+  MAX_ROX_XML_LENGTH,
   MAX_MENTION_LENGTH,
   MENTION_CLOSE,
   MENTION_OPEN,
 } from './mentionPlugin';
 
 const MENTION = `${MENTION_OPEN}{"documentId":"6a2b138d-dfbe-439a-a78b-282471a1e165","documentName":"","blockName":"md","blockParams":{}}${MENTION_CLOSE}`;
-const OTHER_MACRO_XML_TAGS = [
+const OTHER_ROX_XML_TAGS = [
   '<m-user-mention>{"userId":"u1","email":"a@example.com"}</m-user-mention>',
   '<m-date-mention>{"date":"2026-07-08","displayFormat":"Today"}</m-date-mention>',
   '<m-contact-mention>{"contactId":"c1","name":"Ness Chu"}</m-contact-mention>',
@@ -83,7 +83,7 @@ describe('Rox XML buffer plugin', () => {
   });
 
   it('never releases a partial Rox XML tag while it is streaming', () => {
-    for (const macroXml of [MENTION, ...OTHER_MACRO_XML_TAGS]) {
+    for (const macroXml of [MENTION, ...OTHER_ROX_XML_TAGS]) {
       const plugin = createMentionBufferPlugin();
       let emitted = '';
       for (const char of Array.from(`a ${macroXml} b`)) {
@@ -137,7 +137,7 @@ describe('Rox XML buffer plugin', () => {
 
   it('gives up on any open Rox XML tag that grows past the size cap', () => {
     const plugin = createMentionBufferPlugin();
-    const runaway = `<m-future-widget>${'x'.repeat(MAX_MACRO_XML_LENGTH)}`;
+    const runaway = `<m-future-widget>${'x'.repeat(MAX_ROX_XML_LENGTH)}`;
     const out = textOf(feedChars(plugin, runaway));
     expect(out).toBe(runaway);
     expect(plugin.isHolding()).toBe(false);
@@ -145,7 +145,7 @@ describe('Rox XML buffer plugin', () => {
 
   it('gives up on an unterminated Rox XML tag name that grows past the size cap', () => {
     const plugin = createMentionBufferPlugin();
-    const runaway = `<m-${'x'.repeat(MAX_MACRO_XML_LENGTH)}`;
+    const runaway = `<m-${'x'.repeat(MAX_ROX_XML_LENGTH)}`;
     const out = textOf(feedChars(plugin, runaway));
     expect(out).toBe(runaway);
     expect(plugin.isHolding()).toBe(false);

@@ -1,9 +1,9 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 fn receipt(entity_id: &str, entity_type: EntityType) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::try_from_email("reader@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("reader@example.com").unwrap(),
         entity_id,
         entity_type,
     )

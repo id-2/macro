@@ -506,7 +506,7 @@ impl Txn<'_> {
                 publish_id: source.guid,
             })
         });
-        p.macro_data = None;
+        p.rox_data = None;
         p
     }
 

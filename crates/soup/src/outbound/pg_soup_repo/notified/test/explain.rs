@@ -69,7 +69,7 @@ fn plan_nodes(plan: &Value, nodes: &mut Vec<Value>) {
 /// test harness at hosted data.
 #[sqlx::test(
     fixtures(path = "../../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 #[ignore = "local EXPLAIN diagnostic; run explicitly with --ignored --nocapture"]
 async fn notified_query_explain_local(pool: Pool<Postgres>) -> anyhow::Result<()> {

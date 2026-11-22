@@ -1,10 +1,10 @@
 mod notification_state;
 
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_inbox_view(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -40,7 +40,7 @@ async fn test_dynamic_query_inbox_view(pool: Pool<Postgres>) -> anyhow::Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_read_filter_is_independent_of_notifications(
@@ -99,7 +99,7 @@ async fn test_dynamic_query_read_filter_is_independent_of_notifications(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_sent_view(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -126,7 +126,7 @@ async fn test_dynamic_query_sent_view(pool: Pool<Postgres>) -> anyhow::Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_multi_inbox")
@@ -161,7 +161,7 @@ async fn test_dynamic_query_sent_view_multi_inbox_without_sender_filter(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_multi_inbox")
@@ -214,7 +214,7 @@ async fn test_dynamic_query_sent_view_multi_inbox_cursor_pagination(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_multi_inbox")
@@ -248,7 +248,7 @@ async fn test_dynamic_query_sent_view_single_address_sender_filter_misses_other_
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_drafts_view(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -275,7 +275,7 @@ async fn test_dynamic_query_drafts_view(pool: Pool<Postgres>) -> anyhow::Result<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_starred_view(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -302,7 +302,7 @@ async fn test_dynamic_query_starred_view(pool: Pool<Postgres>) -> anyhow::Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_important_view(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -342,7 +342,7 @@ async fn test_dynamic_query_important_view(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_static_important_query_includes_drafts(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -382,7 +382,7 @@ async fn test_static_important_query_includes_drafts(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_user_label_view(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -409,7 +409,7 @@ async fn test_dynamic_query_user_label_view(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_sender_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -444,7 +444,7 @@ async fn test_dynamic_query_with_sender_filter(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_partial_sender_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -472,7 +472,7 @@ async fn test_dynamic_query_with_partial_sender_filter(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_recipient_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -500,7 +500,7 @@ async fn test_dynamic_query_with_recipient_filter(pool: Pool<Postgres>) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_cc_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -529,7 +529,7 @@ async fn test_dynamic_query_with_cc_filter(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_inbox_with_sender_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -566,7 +566,7 @@ async fn test_dynamic_query_inbox_with_sender_filter(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_drafts_with_recipient_filter(
@@ -598,7 +598,7 @@ async fn test_dynamic_query_drafts_with_recipient_filter(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_and_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -631,7 +631,7 @@ async fn test_dynamic_query_with_and_filter(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_or_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -664,7 +664,7 @@ async fn test_dynamic_query_with_or_filter(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_pagination(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -737,7 +737,7 @@ async fn test_dynamic_query_pagination(pool: Pool<Postgres>) -> anyhow::Result<(
 //   Thread 7 (msg 7): INBOX + CATEGORY_PROMOTIONS → NOT important (depriority, no priority)
 //   Thread 8 (msg 8): DRAFT + CATEGORY_UPDATES → important (DRAFT priority overrides depriority)
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_importance_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -841,7 +841,7 @@ async fn test_dynamic_query_with_importance_filter(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_mixed_or_sender_importance_preserves_both_branches(
@@ -877,7 +877,7 @@ async fn test_mixed_or_sender_importance_preserves_both_branches(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_email_filters")
@@ -914,7 +914,7 @@ async fn test_dynamic_query_importance_true_email_filters_domain_with_address_ov
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_email_filters")
@@ -947,7 +947,7 @@ async fn test_dynamic_query_importance_true_email_filters_excludes_trashed_messa
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_email_filters")
@@ -986,7 +986,7 @@ async fn test_dynamic_query_importance_false_email_filters_domain_with_address_o
 // ── Project ID filter tests ──────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_single_project_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1018,7 +1018,7 @@ async fn test_dynamic_query_with_single_project_id(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_multiple_project_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1057,7 +1057,7 @@ async fn test_dynamic_query_with_multiple_project_ids(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_project_id_with_sender_filter(
@@ -1098,7 +1098,7 @@ async fn test_dynamic_query_project_id_with_sender_filter(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_project_id_with_inbox_view(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1138,7 +1138,7 @@ async fn test_dynamic_query_project_id_with_inbox_view(pool: Pool<Postgres>) -> 
 // Thread 6 (CATEGORY_UPDATES) has importance=false but inbox_visible=false → excluded by Inbox view.
 // Thread 7 (CATEGORY_PROMOTIONS) has importance=false AND inbox_visible=true → included.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_inbox_view_with_importance_false(
@@ -1181,7 +1181,7 @@ async fn test_dynamic_query_inbox_view_with_importance_false(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_with_single_thread_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1205,7 +1205,7 @@ async fn test_dynamic_query_with_single_thread_id(pool: Pool<Postgres>) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_thread_id_with_sender_filter(
@@ -1245,7 +1245,7 @@ async fn test_dynamic_query_thread_id_with_sender_filter(
 // DRAFT is a priority label, so it should appear in importance=true results
 // even though it has a depriority label.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_importance_true_includes_drafts_with_depriority_label(
@@ -1285,7 +1285,7 @@ async fn test_importance_true_includes_drafts_with_depriority_label(
 // Thread 9 is a draft with the TRASH label.
 // Even though is_draft=true would normally make it important, the TRASH label should exclude it.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_importance_true_excludes_trashed_drafts(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1328,7 +1328,7 @@ async fn test_importance_true_excludes_trashed_drafts(pool: Pool<Postgres>) -> a
 // Thread 8 is a draft with CATEGORY_UPDATES (depriority label).
 // DRAFT is a priority label, so it should NOT appear in importance=false results.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_importance_false_excludes_drafts(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1382,7 +1382,7 @@ async fn test_importance_false_excludes_drafts(pool: Pool<Postgres>) -> anyhow::
 
 // Static important query should exclude trashed drafts (thread 9) and trashed important messages.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_static_important_excludes_trashed(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1419,7 +1419,7 @@ async fn test_static_important_excludes_trashed(pool: Pool<Postgres>) -> anyhow:
 // combination of facts inputs it must page through the same threads, preview
 // messages and order as a query on the view itself.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_mailbox_facts_matrix")
@@ -1479,7 +1479,7 @@ async fn test_static_important_matches_mailbox_facts(pool: Pool<Postgres>) -> an
 
 // Static starred query should exclude trashed starred messages (thread 10).
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_static_starred_excludes_trashed(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1514,7 +1514,7 @@ async fn test_static_starred_excludes_trashed(pool: Pool<Postgres>) -> anyhow::R
 // data doesn't have macro-style drafts with TRASH. This test verifies the
 // query doesn't break and still returns expected results.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_static_drafts_excludes_trashed(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1539,7 +1539,7 @@ async fn test_static_drafts_excludes_trashed(pool: Pool<Postgres>) -> anyhow::Re
 
 // Static user label query should exclude trashed messages with that label (thread 11).
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_static_user_label_excludes_trashed(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1576,7 +1576,7 @@ async fn test_static_user_label_excludes_trashed(pool: Pool<Postgres>) -> anyhow
 // === Shared email thread tests ===
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads")
@@ -1629,7 +1629,7 @@ async fn test_shared_exclude_returns_only_own_threads(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads")
@@ -1692,7 +1692,7 @@ async fn test_shared_only_returns_only_shared_threads(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads")
@@ -1757,7 +1757,7 @@ async fn test_shared_include_returns_own_and_shared_threads(
 // calendar_only=true predicate; thread 7 and all unattached threads should not.
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_calendar")
@@ -1823,7 +1823,7 @@ async fn test_dynamic_query_calendar_only_filter(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_calendar")
@@ -1864,7 +1864,7 @@ async fn test_dynamic_query_calendar_only_inbox_view(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_calendar")
@@ -1907,7 +1907,7 @@ async fn test_dynamic_query_calendar_only_combined_with_sender(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_calendar")
@@ -1950,7 +1950,7 @@ async fn test_dynamic_query_calendar_only_false_is_noop(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads")
@@ -1976,7 +1976,7 @@ async fn test_shared_only_returns_correct_owner_id(pool: Pool<Postgres>) -> anyh
     )
     .await?;
 
-    // All shared threads should have user2's macro_id as owner
+    // All shared threads should have user2's rox_id as owner
     for result in &results {
         assert_eq!(
             result.owner_id.as_str(),
@@ -1996,7 +1996,7 @@ async fn test_shared_only_returns_correct_owner_id(pool: Pool<Postgres>) -> anyh
 // `can_short_circuit` are for: the AST `Sender(Complete(missing))`
 // folds to FALSE and the entry point returns `Vec::new()`.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_dynamic_query_short_circuits_on_unresolved_complete_email(
@@ -2031,7 +2031,7 @@ async fn test_dynamic_query_short_circuits_on_unresolved_complete_email(
 // `build_matching_threads_cte_body`. Without this test, no SQL-level
 // path covers BCC.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_address_edge_cases")
@@ -2081,7 +2081,7 @@ async fn test_dynamic_query_with_bcc_filter(pool: Pool<Postgres>) -> anyhow::Res
 // proving the fixture is wired correctly and the exclusion above is
 // driven by single-message semantics rather than a missing fixture row.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_address_edge_cases")
@@ -2169,7 +2169,7 @@ async fn test_dynamic_query_and_filter_uses_single_message_semantics(
 //   Thread 11: 2024-01-05 00:00:00+00 (oldest)
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2221,7 +2221,7 @@ async fn test_dynamic_query_updated_at_greater_than(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2277,7 +2277,7 @@ async fn test_dynamic_query_updated_at_less_than(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2331,7 +2331,7 @@ async fn test_dynamic_query_updated_at_greater_than_or_equal(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2379,7 +2379,7 @@ async fn test_dynamic_query_updated_at_less_than_or_equal(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2423,7 +2423,7 @@ async fn test_dynamic_query_created_at_greater_than(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2479,7 +2479,7 @@ async fn test_dynamic_query_created_at_less_than(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2544,7 +2544,7 @@ async fn test_dynamic_query_date_range_combined(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2597,7 +2597,7 @@ async fn test_dynamic_query_date_with_sender_filter(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2651,7 +2651,7 @@ async fn test_dynamic_query_date_with_inbox_view(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_date_range")
@@ -2767,7 +2767,7 @@ fn inbox_partial_query(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_updated_at_sort_projects_viewed_at_via_deferred_join(
@@ -2835,7 +2835,7 @@ async fn test_updated_at_sort_projects_viewed_at_via_deferred_join(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_viewed_at_sort_orders_by_view_history(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -2874,7 +2874,7 @@ async fn test_viewed_at_sort_orders_by_view_history(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_viewed_at_filter_uses_view_history_with_updated_sort(
@@ -2912,7 +2912,7 @@ async fn test_viewed_at_filter_uses_view_history_with_updated_sort(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_mixed_sender_or_viewed_at_and_not_preserve_semantics(
@@ -2988,7 +2988,7 @@ async fn test_mixed_sender_or_viewed_at_and_not_preserve_semantics(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn test_viewed_updated_sort_falls_back_to_view_timestamp(
@@ -3035,7 +3035,7 @@ async fn test_viewed_updated_sort_falls_back_to_view_timestamp(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_properties")

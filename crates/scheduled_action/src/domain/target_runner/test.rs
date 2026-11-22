@@ -5,8 +5,8 @@ use agent_session::domain::routines::{
     ValidatedRoutineSession,
 };
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::generate_uuid_v7;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::generate_uuid_v7;
 use model_owner::Owner;
 use serde_json::json;
 use std::{collections::VecDeque, sync::Mutex};
@@ -27,7 +27,7 @@ use crate::domain::{
     program_runner::{ProgramRunner, test as program},
 };
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use routine_program::RoutineProgram;
 use tokio_util::{sync::CancellationToken, task::TaskTracker};
@@ -39,7 +39,7 @@ struct NoModelAdmission;
 impl ai_billing::AiAdmissionService for NoModelAdmission {
     fn admit<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
         _: ai_usage::AiFeature,
     ) -> ai_billing::AdmissionFuture<'a> {
         panic!("agent funding must be decided by the session/harness service")
@@ -205,7 +205,7 @@ impl RoutineSessions for Sessions {
 fn action() -> ScheduledAction {
     ScheduledAction {
         id: Some(generate_uuid_v7()),
-        owner: Owner::User(MacroUserIdStr::parse_from_str(USER).unwrap()),
+        owner: Owner::User(RoxUserIdStr::parse_from_str(USER).unwrap()),
         name: "routine".into(),
         trigger: serde_json::from_value(
             json!({"type":"cron", "schedule":"0 0 * * * *", "timezone":"UTC"}),
@@ -246,8 +246,8 @@ fn program_runner(sessions: Sessions) -> (Arc<Sessions>, Arc<Program>) {
     (sessions, Arc::new(runner))
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER).unwrap()
 }
 
 /// The routine's only step: its agent.
@@ -275,12 +275,12 @@ fn assert_identity(
             .get("agent")
             .filter(|agent| !agent.is_null())
             .map(|agent| agent["bot_id"].clone())
-            .unwrap_or_else(|| json!(bot_id::MACRO_NEW_BOT_ID))
+            .unwrap_or_else(|| json!(bot_id::ROX_NEW_BOT_ID))
     );
 }
 
 #[tokio::test]
-async fn model_targets_use_macro_sessions_with_the_selected_model() {
+async fn model_targets_use_rox_sessions_with_the_selected_model() {
     {
         let runner = runner(Sessions {
             statuses: Mutex::new([Ok(RoutineActionStatus::Succeeded)].into()),
@@ -316,7 +316,7 @@ async fn model_targets_use_macro_sessions_with_the_selected_model() {
 
         let preparations = runner.sessions.preparations.lock().unwrap();
         assert_eq!(preparations.len(), 1);
-        assert_eq!(preparations[0].selection.bot_id, bot_id::MACRO_NEW_BOT_ID);
+        assert_eq!(preparations[0].selection.bot_id, bot_id::ROX_NEW_BOT_ID);
         assert_eq!(
             preparations[0].selection.model.as_deref(),
             Some("runtime/model")
@@ -336,7 +336,7 @@ async fn model_targets_use_macro_sessions_with_the_selected_model() {
         assert_eq!(prompts[0].prompt, PROMPT);
         assert_eq!(prompts[0].context, Some(context));
         let identity = &prompts[0].action;
-        assert_eq!(identity.bot_id, bot_id::MACRO_NEW_BOT_ID);
+        assert_eq!(identity.bot_id, bot_id::ROX_NEW_BOT_ID);
         assert_eq!(identity.session_id.as_uuid(), handle.session_id);
         assert_eq!(identity.action_id.as_uuid(), handle.action_id);
         assert_eq!(&identity.owner, action.owner_user().unwrap());
@@ -664,7 +664,7 @@ impl ScheduledActionRepo for UnusedRepo {
     async fn create_action(&self, _: ScheduledAction) -> Result<ScheduledAction> {
         unimplemented!()
     }
-    async fn get_owned_actions(&self, _: &MacroUserIdStr<'static>) -> Result<Vec<ScheduledAction>> {
+    async fn get_owned_actions(&self, _: &RoxUserIdStr<'static>) -> Result<Vec<ScheduledAction>> {
         unimplemented!()
     }
     async fn get_actions_by_ids(&self, _: &[Uuid]) -> Result<Vec<ScheduledAction>> {
@@ -736,7 +736,7 @@ fn event_run() -> ClaimedEventRun {
         run: AuthorizedEventRun {
             access: EventAccessCapability::Document(
                 EntityAccessReceipt::<ViewAccessLevel>::dangerously_assert_authenticated_user(
-                    MacroUserIdStr::parse_from_str(USER).unwrap(),
+                    RoxUserIdStr::parse_from_str(USER).unwrap(),
                     &event.entity_id().unwrap().to_string(),
                     EntityType::Document,
                 ),
@@ -828,7 +828,7 @@ async fn executor_failed_model_prompt_keeps_session_history_and_stops_once() {
     assert_eq!(sessions.stops.lock().unwrap().len(), 1);
     assert_eq!(
         sessions.stops.lock().unwrap()[0].bot_id,
-        bot_id::MACRO_NEW_BOT_ID
+        bot_id::ROX_NEW_BOT_ID
     );
 }
 
@@ -890,7 +890,7 @@ async fn invalid_targets_and_non_user_owners_never_reach_sessions() {
             .await
             .is_err()
     );
-    action.owner = Owner::User(MacroUserIdStr::parse_from_str(USER).unwrap());
+    action.owner = Owner::User(RoxUserIdStr::parse_from_str(USER).unwrap());
     for value in [
         json!({}),
         json!({"model":" ", "prompt":"", "user_prompt":""}),

@@ -11,9 +11,9 @@ async-trait.workspace = true
 chrono.workspace = true
 chrono-tz.workspace = true
 cron.workspace = true
-macro_authorization = { path = "../macro_authorization", default-features = false, features = ["axum"] }
-macro_tower_layers = { path = "../macro_tower_layers" }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", default-features = false, features = ["axum"] }
+rox_tower_layers = { path = "../rox_tower_layers" }
+rox_user_id = { path = "../rox_user_id" }
 reqwest.workspace = true
 routine_program = { path = "../routine_program" }
 schemars.workspace = true

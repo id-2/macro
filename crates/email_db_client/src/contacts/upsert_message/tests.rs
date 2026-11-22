@@ -1,16 +1,16 @@
 use super::*;
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::db::contact::ContactPhotoless;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should fetch existing contacts by their email addresses
 async fn fetch_contacts_by_emails_returns_existing_contacts(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let emails = vec![
@@ -37,14 +37,14 @@ async fn fetch_contacts_by_emails_returns_existing_contacts(pool: Pool<Postgres>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should return empty when no matching emails exist
 async fn fetch_contacts_by_emails_returns_empty_for_nonexistent(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let emails = vec![
@@ -60,12 +60,12 @@ async fn fetch_contacts_by_emails_returns_empty_for_nonexistent(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should only return contacts for the specified link_id
 async fn fetch_contacts_by_emails_respects_link_id_isolation(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Link B has a contact with existing1@example.com but different ID
     let link_b_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001b")?;
@@ -82,12 +82,12 @@ async fn fetch_contacts_by_emails_respects_link_id_isolation(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should return partial results when some emails exist and some don't
 async fn fetch_contacts_by_emails_returns_partial_matches(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let emails = vec![
@@ -104,12 +104,12 @@ async fn fetch_contacts_by_emails_returns_partial_matches(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should successfully insert new contacts
 async fn insert_new_contacts_creates_contacts(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let new_contact_id_1 = Uuid::parse_str("00000000-0000-0000-0000-0000000d0001")?;
@@ -147,12 +147,12 @@ async fn insert_new_contacts_creates_contacts(pool: Pool<Postgres>) -> Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should insert contacts with null names
 async fn insert_new_contacts_handles_null_names(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let new_contact_id = Uuid::parse_str("00000000-0000-0000-0000-0000000d0003")?;
@@ -174,14 +174,14 @@ async fn insert_new_contacts_handles_null_names(pool: Pool<Postgres>) -> Result<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should handle conflict by doing nothing and not returning conflicting rows
 async fn insert_new_contacts_handles_conflict_on_existing_email(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let new_contact_id = Uuid::parse_str("00000000-0000-0000-0000-0000000d0004")?;
@@ -211,12 +211,12 @@ async fn insert_new_contacts_handles_conflict_on_existing_email(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should insert new contacts and skip existing ones in a mixed batch
 async fn insert_new_contacts_mixed_new_and_existing(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let new_contact_id = Uuid::parse_str("00000000-0000-0000-0000-0000000d0005")?;
@@ -248,12 +248,12 @@ async fn insert_new_contacts_mixed_new_and_existing(pool: Pool<Postgres>) -> Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should return empty when inserting empty contacts slice
 async fn insert_new_contacts_handles_empty_input(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let contacts: Vec<ContactPhotoless> = vec![];
 
@@ -265,12 +265,12 @@ async fn insert_new_contacts_handles_empty_input(pool: Pool<Postgres>) -> Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should handle empty emails slice in fetch
 async fn fetch_contacts_by_emails_handles_empty_input(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let emails: Vec<String> = vec![];
@@ -283,12 +283,12 @@ async fn fetch_contacts_by_emails_handles_empty_input(pool: Pool<Postgres>) -> R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should allow same email for different link_ids
 async fn insert_new_contacts_allows_same_email_different_links(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_a_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let link_b_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001b")?;
@@ -325,18 +325,18 @@ async fn insert_new_contacts_allows_same_email_different_links(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_message_contacts"))
 )]
 // should not deadlock when concurrent batches insert the same new addresses in different orders
 async fn insert_new_contacts_overlapping_batches_do_not_deadlock(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let contact = |email: &str| ContactPhotoless {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         link_id,
         email_address: email.to_string(),
         name: None,
@@ -356,7 +356,7 @@ async fn insert_new_contacts_overlapping_batches_do_not_deadlock(
     // hold an address the other still needs at the moment the gate opens.
     let mut gate = pool.begin().await?;
     sqlx::query("INSERT INTO email_contacts (id, link_id, email_address) VALUES ($1, $2, $3)")
-        .bind(macro_uuid::generate_uuid_v7())
+        .bind(rox_uuid::generate_uuid_v7())
         .bind(link_id)
         .bind("gate@example.com")
         .execute(&mut *gate)
@@ -395,12 +395,12 @@ async fn insert_new_contacts_overlapping_batches_do_not_deadlock(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("update_missing_contact_names"))
 )]
 // should update name for a contact that has no name
 async fn update_missing_contact_names_sets_name_when_null(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let contact_id = Uuid::parse_str("00000000-0000-0000-0000-0000000c0002")?;
     let updates = vec![(contact_id, "Now Has A Name".to_string())];
@@ -416,14 +416,14 @@ async fn update_missing_contact_names_sets_name_when_null(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("update_missing_contact_names"))
 )]
 // should not overwrite an existing name
 async fn update_missing_contact_names_does_not_overwrite_existing_name(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let contact_id = Uuid::parse_str("00000000-0000-0000-0000-0000000c0001")?;
     let updates = vec![(contact_id, "Should Not Replace".to_string())];
@@ -439,12 +439,12 @@ async fn update_missing_contact_names_does_not_overwrite_existing_name(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("update_missing_contact_names"))
 )]
 // should handle a batch with mixed null and non-null existing names
 async fn update_missing_contact_names_mixed_batch(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let has_name_id = Uuid::parse_str("00000000-0000-0000-0000-0000000c0001")?;
     let no_name_id = Uuid::parse_str("00000000-0000-0000-0000-0000000c0002")?;
@@ -480,12 +480,12 @@ async fn update_missing_contact_names_mixed_batch(pool: Pool<Postgres>) -> Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("update_missing_contact_names"))
 )]
 // should handle empty updates slice without error
 async fn update_missing_contact_names_empty_input(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let updates: Vec<(Uuid, String)> = vec![];
 
@@ -495,12 +495,12 @@ async fn update_missing_contact_names_empty_input(pool: Pool<Postgres>) -> Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("update_missing_contact_names"))
 )]
 // should update updated_at timestamp when name is set
 async fn update_missing_contact_names_updates_timestamp(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let contact_id = Uuid::parse_str("00000000-0000-0000-0000-0000000c0002")?;
 

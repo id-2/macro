@@ -21,19 +21,19 @@ impl EmailUserRepo for Probe {
     }
     async fn user_inbox_details(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<EmailInboxDetails>, EmailErr> {
         Ok(Vec::new())
     }
     async fn user_accessible_inboxes(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<crate::domain::models::Link>, EmailErr> {
         let link = &self.record.link;
         Ok(if self.accessible {
             vec![crate::domain::models::Link {
                 id: link.id,
-                macro_id: link.macro_id.clone(),
+                rox_id: link.rox_id.clone(),
                 fusionauth_user_id: link.fusionauth_user_id.clone(),
                 email_address: link.email_address.clone(),
                 provider: crate::domain::models::UserProvider::Gmail,
@@ -72,9 +72,9 @@ fn probe(accessible: bool) -> Probe {
             subject: Some("Re: Q3 plan".into()),
             link: Link {
                 id: link,
-                macro_id: MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+                rox_id: RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
                 fusionauth_user_id: "owner".into(),
-                email_address: macro_user_id::email::EmailStr::try_from(
+                email_address: rox_user_id::email::EmailStr::try_from(
                     "owner@example.com".to_owned(),
                 )
                 .unwrap(),
@@ -107,7 +107,7 @@ fn service(probe: &Probe) -> MessageSourceService<Probe, Probe, NoOpEntityAccess
 #[tokio::test]
 async fn unauthorized_reader_never_reaches_the_provider() {
     let probe = probe(false);
-    let actor = MacroUserIdStr::try_from_email("unrelated@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("unrelated@example.com").unwrap();
     assert!(matches!(
         service(&probe)
             .download(&actor, probe.record.message_id)
@@ -120,7 +120,7 @@ async fn unauthorized_reader_never_reaches_the_provider() {
 #[tokio::test]
 async fn inbox_reader_downloads_named_source() {
     let probe = probe(true);
-    let actor = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let source = service(&probe)
         .download(&actor, probe.record.message_id)
         .await

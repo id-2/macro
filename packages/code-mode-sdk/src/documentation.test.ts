@@ -218,14 +218,14 @@ describe('TypeDoc documentation packaging', () => {
     expect(guide('channels')).toContain('A form for a channel is a poll:');
     expect(guide('tasks')).toContain('Never edit, merge or delete');
     expect(guide('agentSessions')).toContain(
-      'macro.agentSessions.createManaged'
+      'rox.agentSessions.createManaged'
     );
     expect(guide('routines')).toContain('never sees this conversation');
     expect(guide('documents')).toContain('<m-document-mention>');
     expect(guide('documents')).toContain('document.edit(instructions)');
-    expect(guide('search')).toContain('macro.search.all');
-    expect(guide('search')).toContain('macro.documents.search');
-    expect(guide('search')).toContain('macro.workspace.page');
+    expect(guide('search')).toContain('rox.search.all');
+    expect(guide('search')).toContain('rox.documents.search');
+    expect(guide('search')).toContain('rox.workspace.page');
     expect(guide('core')).toBe('');
     expect(docs.symbols.DatabaseNamespace).toContain('## Agent guidance');
   });

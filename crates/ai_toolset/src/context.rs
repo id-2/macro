@@ -1,5 +1,5 @@
 use crate::tool_search::{SearchableTool, ToolLoader, ToolMatch};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::ops::{Deref, DerefMut};
 use std::sync::Arc;
 use tokio_util::sync::CancellationToken;
@@ -29,7 +29,7 @@ impl<S> DerefMut for ServiceContext<S> {
 #[derive(Clone, Debug)]
 pub struct RequestContext {
     /// The ID of the user making the request.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Catalog of on-demand (searchable) tools for this request, read by the
     /// `SearchTools` tool to match the model's query. Empty when the request has
     /// no searchable tools.
@@ -55,7 +55,7 @@ pub struct RequestContext {
 impl RequestContext {
     /// Create a request context for `user_id` with no tool-search wiring (no
     /// searchable catalog, no loader).
-    pub fn new(user_id: MacroUserIdStr<'static>) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>) -> Self {
         Self {
             user_id,
             searchable_tools: Arc::new(Vec::new()),

@@ -31,22 +31,22 @@ where
     E: BackfillEffects,
     C: BackfillCrm,
 {
-    let macro_id_str = payload.macro_id.0.as_ref();
+    let rox_id_str = payload.rox_id.0.as_ref();
     // Must resolve the same link `populate_crm_for_user` seeded from — the
-    // inbox whose address matches the macro_id email — so teardown targets
+    // inbox whose address matches the rox_id email — so teardown targets
     // the link that was actually populated.
-    let email_address = payload.macro_id.email_str();
+    let email_address = payload.rox_id.email_str();
 
     let link = ctx
         .repository
-        .link_by_email(macro_id_str, email_address)
+        .link_by_email(rox_id_str, email_address)
         .await
         .map_err(|e| {
             ProcessingError::Retryable(DetailedError {
                 reason: FailureReason::DatabaseQueryFailed,
                 source: e
                     .into_original()
-                    .context("Failed to fetch link by macro_id and email_address"),
+                    .context("Failed to fetch link by rox_id and email_address"),
             })
         })?;
 

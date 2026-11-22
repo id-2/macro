@@ -2772,7 +2772,7 @@
           "provider_rejected",
           "retryable",
           "persist_failed",
-          "macro_call_failed",
+          "rox_call_failed",
           "copy_choice_required",
           "confirmation_required"
         ]

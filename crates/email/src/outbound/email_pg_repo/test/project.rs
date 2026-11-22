@@ -15,7 +15,7 @@ async fn project_updated_at(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn touch_project_updated_at_advances_stored_timestamp(

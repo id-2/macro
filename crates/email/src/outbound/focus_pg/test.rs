@@ -4,7 +4,7 @@ use std::sync::{
 };
 
 use chrono::{Duration, NaiveDate};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::Value;
 use sqlx::{Pool, Postgres};
 
@@ -49,11 +49,11 @@ const HIGH_ANSWERS: [f32; 10] = [0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.
 struct NoProfile;
 
 impl ProfileSource for NoProfile {
-    async fn profile(&self, _owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn profile(&self, _owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(None)
     }
 
-    async fn time_zone(&self, _owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn time_zone(&self, _owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(None)
     }
 }
@@ -68,7 +68,7 @@ struct FixedDueDates {
 impl DueDateExtractor for FixedDueDates {
     async fn due_on(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _thread_id: Uuid,
         _input: &DueDateInput,
     ) -> Result<Option<NaiveDate>, Report> {
@@ -87,7 +87,7 @@ struct FixedClassifier {
 impl FocusClassifier for FixedClassifier {
     async fn answer(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _thread_id: Uuid,
         _input: &Value,
         _questions: &[&'static str],
@@ -103,7 +103,7 @@ impl FocusClassifier for FixedClassifier {
 struct NoReaders;
 
 impl FocusNotifier for NoReaders {
-    fn focus_changed(&self, _owner: &MacroUserIdStr<'static>, _link_id: Uuid) {}
+    fn focus_changed(&self, _owner: &RoxUserIdStr<'static>, _link_id: Uuid) {}
 }
 
 fn worker(
@@ -150,7 +150,7 @@ async fn insert_message_from(
     is_sent: bool,
     at: DateTime<Utc>,
 ) -> Result<(), Report> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO email_messages (
@@ -204,8 +204,8 @@ async fn load_thread(
     Ok(Some(FocusThread::new(inbox, mail)))
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@acme.example").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@acme.example").unwrap()
 }
 
 fn record(thread_id: Uuid, message_id: Uuid, at: DateTime<Utc>, importance: u8) -> FocusRecord {
@@ -233,7 +233,7 @@ fn record(thread_id: Uuid, message_id: Uuid, at: DateTime<Utc>, importance: u8) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn reads_a_thread_with_its_relationship(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -271,7 +271,7 @@ async fn reads_a_thread_with_its_relationship(pool: Pool<Postgres>) -> Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn marks_bulk_mail_and_finds_brush_offs(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -287,7 +287,7 @@ async fn marks_bulk_mail_and_finds_brush_offs(pool: Pool<Postgres>) -> Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn stale_threads_cover_enabled_inbox_signal_mail_in_the_window(
@@ -340,7 +340,7 @@ async fn stale_threads_cover_enabled_inbox_signal_mail_in_the_window(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn threads_with_the_same_latest_mail_do_not_fall_between_pages(
@@ -375,7 +375,7 @@ async fn threads_with_the_same_latest_mail_do_not_fall_between_pages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn an_older_classification_never_replaces_a_newer_one(
@@ -420,7 +420,7 @@ async fn an_older_classification_never_replaces_a_newer_one(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn focus_list_is_the_owners_inbox_newest_first(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -468,7 +468,7 @@ async fn focus_list_is_the_owners_inbox_newest_first(pool: Pool<Postgres>) -> Re
     );
 
     // The other inbox's owner sees only their own thread.
-    let stranger = MacroUserIdStr::try_from_email("other@elsewhere.example").unwrap();
+    let stranger = RoxUserIdStr::try_from_email("other@elsewhere.example").unwrap();
     assert_eq!(
         repo.focus_thread_ids(&stranger, since, now, now, 10)
             .await?,
@@ -489,7 +489,7 @@ async fn focus_list_is_the_owners_inbox_newest_first(pool: Pool<Postgres>) -> Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_linked")
@@ -519,7 +519,7 @@ async fn focus_covers_inboxes_linked_to_the_owner(pool: Pool<Postgres>) -> Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -606,7 +606,7 @@ async fn a_thread_the_owner_answered_last_reaches_the_list_after_the_wait(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -640,7 +640,7 @@ async fn the_owner_writing_again_restarts_the_wait(pool: Pool<Postgres>) -> Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -671,7 +671,7 @@ async fn an_answer_ends_the_wait_however_long_ago_it_came(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -711,7 +711,7 @@ async fn a_thread_of_only_sent_mail_stays_out(pool: Pool<Postgres>) -> Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -758,7 +758,7 @@ async fn done_threads_and_closed_exchanges_are_not_waiting(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -827,7 +827,7 @@ async fn a_reschedule_reaches_focus_from_outside_the_signal_inbox(
 
 fn invite(method: InvitationMethod, sequence: u32, end: DateTime<Utc>) -> CalendarInvitation {
     CalendarInvitation {
-        id: macro_uuid::generate_uuid_v7().to_string(),
+        id: rox_uuid::generate_uuid_v7().to_string(),
         uid: "event@numbers.example".to_owned(),
         method,
         sequence,
@@ -862,8 +862,8 @@ async fn notice_thread(
     at: DateTime<Utc>,
     filed_under_updates: bool,
 ) -> Result<Uuid, Report> {
-    let thread_id = macro_uuid::generate_uuid_v7();
-    let message_id = macro_uuid::generate_uuid_v7();
+    let thread_id = rox_uuid::generate_uuid_v7();
+    let message_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO email_threads (id, link_id, inbox_visible, is_read, is_signal, created_at, updated_at)
@@ -961,7 +961,7 @@ async fn assert_held(repo: &FocusPgRepository, thread: Uuid) -> Result<(), Repor
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -996,7 +996,7 @@ async fn an_upcoming_reschedule_is_in_until_the_event_is_over(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1034,7 +1034,7 @@ async fn a_held_thread_that_needs_a_reply_loses_the_flag_with_the_hold(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1088,7 +1088,7 @@ async fn a_new_invite_stays_out(pool: Pool<Postgres>) -> Result<(), Report> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1137,7 +1137,7 @@ async fn an_update_to_an_event_already_over_stays_out(pool: Pool<Postgres>) -> R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1187,7 +1187,7 @@ async fn a_thread_in_focus_for_more_than_the_hold_stays_after_the_event(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1239,7 +1239,7 @@ async fn a_change_subject_on_a_first_revision_holds_by_the_events_own_time(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1274,7 +1274,7 @@ async fn a_held_thread_marked_done_leaves_focus(pool: Pool<Postgres>) -> Result<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1287,7 +1287,7 @@ async fn the_sweep_ignores_a_change_only_in_the_owners_mail_or_a_draft(
     let now = Utc::now();
     for (is_sent, is_draft) in [(false, true), (true, false)] {
         let thread = notice_thread(&pool, "Lunch?", None, now - Duration::hours(2), true).await?;
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         sqlx::query!(
             r#"
             INSERT INTO email_messages (
@@ -1313,7 +1313,7 @@ async fn the_sweep_ignores_a_change_only_in_the_owners_mail_or_a_draft(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1338,7 +1338,7 @@ async fn a_cancellation_is_in(pool: Pool<Postgres>) -> Result<(), Report> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1363,7 +1363,7 @@ async fn a_counter_proposal_is_in(pool: Pool<Postgres>) -> Result<(), Report> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1400,7 +1400,7 @@ async fn a_series_or_a_subject_alone_holds_for_a_week_after_the_notice(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1496,7 +1496,7 @@ async fn a_person_writing_after_a_notice_makes_it_a_conversation(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1524,7 +1524,7 @@ async fn the_owner_answering_a_notice_ends_the_hold(pool: Pool<Postgres>) -> Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1563,7 +1563,7 @@ async fn mail_from_a_recent_contact_is_found_and_pinned_outside_the_signal_inbox
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn a_thread_that_lost_signal_leaves_focus_unless_pinned(
@@ -1605,7 +1605,7 @@ async fn a_thread_that_lost_signal_leaves_focus_unless_pinned(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1638,7 +1638,7 @@ async fn a_follow_up_that_lost_signal_reads_as_out(pool: Pool<Postgres>) -> Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn rows_from_an_older_rule_read_right_and_are_decided_again_without_the_classifier(
@@ -1712,7 +1712,7 @@ async fn rows_from_an_older_rule_read_right_and_are_decided_again_without_the_cl
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1746,7 +1746,7 @@ async fn a_row_from_an_older_rule_is_swept_even_outside_the_signal_inbox(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("email_focus", "email_focus_waiting")
@@ -1810,7 +1810,7 @@ fn record_moving(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn importance_moves_at_its_stored_rate_as_the_classified_message_ages(
@@ -1846,7 +1846,7 @@ async fn importance_moves_at_its_stored_rate_as_the_classified_message_ages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn importance_never_changes_who_is_on_the_list(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -1873,7 +1873,7 @@ async fn importance_never_changes_who_is_on_the_list(pool: Pool<Postgres>) -> Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn newer_mail_stops_importance_moving_before_the_worker_gets_to_the_thread(
@@ -1894,7 +1894,7 @@ async fn newer_mail_stops_importance_moving_before_the_worker_gets_to_the_thread
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn a_row_stored_before_the_time_questions_stays_flat_without_asking_jev_again(
@@ -1969,7 +1969,7 @@ async fn a_row_stored_before_the_time_questions_stays_flat_without_asking_jev_ag
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn the_next_message_sets_a_new_rate_and_restarts_the_clock(
@@ -2010,7 +2010,7 @@ fn nov(day: u32) -> NaiveDate {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn a_stored_due_date_reads_back_as_a_calendar_date(
@@ -2036,7 +2036,7 @@ async fn a_stored_due_date_reads_back_as_a_calendar_date(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn a_classification_of_an_older_message_never_replaces_a_newer_date(
@@ -2068,7 +2068,7 @@ async fn a_classification_of_an_older_message_never_replaces_a_newer_date(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn deciding_a_row_again_keeps_its_due_date_without_asking_the_model(
@@ -2108,7 +2108,7 @@ async fn deciding_a_row_again_keeps_its_due_date_without_asking_the_model(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_focus"))
 )]
 async fn a_messages_date_header_is_read_for_its_offset(pool: Pool<Postgres>) -> Result<(), Report> {

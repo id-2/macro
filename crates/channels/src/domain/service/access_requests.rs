@@ -15,7 +15,7 @@ use crate::domain::{
 };
 use chrono::Utc;
 use entity_access::domain::models::{EntityAccessReceipt, EntityType, MemberParticipantRole};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 fn repo_err(error: impl Into<anyhow::Error>) -> ChannelAccessRequestErr {
@@ -42,7 +42,7 @@ where
     #[tracing::instrument(name = "channel_access_requests.mine", skip_all, fields(channel_id = %channel_id), err)]
     async fn my_access_request(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         channel_id: Uuid,
     ) -> Result<ChannelAccessRequestState, ChannelAccessRequestErr> {
         let info = self
@@ -71,7 +71,7 @@ where
     #[tracing::instrument(name = "channel_access_requests.submit", skip_all, fields(channel_id = %channel_id), err)]
     async fn request_access(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         channel_id: Uuid,
     ) -> Result<ChannelAccessRequest, ChannelAccessRequestErr> {
         let info = self
@@ -157,7 +157,7 @@ where
     #[tracing::instrument(name = "channel_access_requests.cancel", skip_all, fields(channel_id = %channel_id), err)]
     async fn cancel_access_request(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         channel_id: Uuid,
     ) -> Result<(), ChannelAccessRequestErr> {
         let participants = self

@@ -2,7 +2,7 @@
 //! document: the CommentOnText tool and `POST /documents/{id}/comments/text`.
 
 use entity_access::domain::models::{EntityAccessAuth, EntityAccessReceipt, EntityType};
-use macro_sync_service_jwt::DocumentPermissionToken;
+use rox_sync_service_jwt::DocumentPermissionToken;
 use messages::domain::{
     api::MessageCommands,
     models::{

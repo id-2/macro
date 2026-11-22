@@ -82,7 +82,7 @@ async fn execute(
         .execute(
             harness
                 .request(&query(database), authenticated_parts())
-                .data(MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap())
+                .data(RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap())
                 .data(context),
         )
         .await

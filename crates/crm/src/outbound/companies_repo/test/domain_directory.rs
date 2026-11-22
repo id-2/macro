@@ -8,7 +8,7 @@ use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use crate::outbound::no_op_resolver::NoOpCompanyMetadataResolver;
 use chrono::{DateTime, TimeDelta, Utc};
 use entity_access::domain::models::MemberTeamRole;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -43,7 +43,7 @@ fn acme_metadata() -> DomainMetadata {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn upsert_fills_pending_entry_but_keeps_resolved_entry(pool: PgPool) -> anyhow::Result<()> {
     let repo = CompaniesRepositoryImpl::new(pool.clone());
 
@@ -76,7 +76,7 @@ async fn upsert_fills_pending_entry_but_keeps_resolved_entry(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn claim_pending_domains_is_bounded(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;
@@ -127,7 +127,7 @@ async fn claim_pending_domains_is_bounded(pool: PgPool) -> anyhow::Result<()> {
 /// leaves a pending entry instead of a permanent empty one, and the
 /// enrichment worker later fills it for every team tracking the domain —
 /// without touching a team's own name for the company.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn manual_company_is_enriched_later_and_keeps_team_names(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();

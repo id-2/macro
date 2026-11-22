@@ -292,7 +292,7 @@ fn typed_entity(column: &Column, target: EntityKind, lit: Literal) -> Result<Str
     }
 }
 
-/// Macro entity ids are either a UUID or `<kind>|<rest>` (`macro|sam@example.com`,
+/// Rox entity ids are either a UUID or `<kind>|<rest>` (`macro|sam@example.com`,
 /// `bot|<uuid>`). A bare name is what an agent writes when it has not looked
 /// the person up.
 fn is_entity_id(text: &str) -> bool {

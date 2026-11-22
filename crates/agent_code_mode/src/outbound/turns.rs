@@ -2,7 +2,7 @@
 use crate::domain::{CodeModeError, ExecutionTurns};
 use agent_session::domain::{model::AgentSessionId, ports::ActiveSessionTurn};
 use async_trait::async_trait;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 /// Adapts the session's durable turn capability without querying its tables.
 pub struct SessionTurns<R>(pub R);

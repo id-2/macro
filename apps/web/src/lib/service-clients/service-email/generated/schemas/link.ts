@@ -27,7 +27,7 @@ that no longer recognizes an older grant. */
   id: string;
   is_primary: boolean;
   is_sync_active: boolean;
-  macro_id: string;
+  rox_id: string;
   /** Whether the link's Google grant is missing the calendar scope. True for
 inboxes connected before the calendar capability existed (and for
 grants where the user declined it); drives the per-inbox calendar

@@ -6,16 +6,16 @@ use super::*;
 
 struct RecordingSender {
     calls: Arc<Mutex<Vec<serde_json::Value>>>,
-    delivered: Vec<MacroUserIdStr<'static>>,
+    delivered: Vec<RoxUserIdStr<'static>>,
     fail: bool,
 }
 
 impl RealtimeSender for RecordingSender {
     async fn send_notifications<'a, T: Serialize + Send + Sync>(
         &self,
-        _recipients: &[MacroUserIdStr<'a>],
+        _recipients: &[RoxUserIdStr<'a>],
         notification: &T,
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         self.calls
             .lock()
             .expect("calls lock")
@@ -29,8 +29,8 @@ impl RealtimeSender for RecordingSender {
     }
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user ID")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user ID")
 }
 
 #[tokio::test]

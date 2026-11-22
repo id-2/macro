@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
   success: vi.fn(),
   failure: vi.fn(),
 }));
-vi.mock('@app/features/integrations/mcp-setup/MacroMcpSetupModal', () => ({
+vi.mock('@app/features/integrations/mcp-setup/RoxMcpSetupModal', () => ({
   openMacroMcpSetupModal: vi.fn(),
 }));
 vi.mock('@core/component/LexicalMarkdown/utils', () => ({

@@ -7,7 +7,7 @@ use super::*;
 const TEAM: &str = "0195d6b1-7a8f-7c3e-9a51-2a2b3c4d5e6f";
 
 /// Historical prices Rox still bills subscribers at.
-const MACRO_WEB_PRICE: &str = "price_1PnRu9JaD7zvQeOBbExpFxPX";
+const ROX_WEB_PRICE: &str = "price_1PnRu9JaD7zvQeOBbExpFxPX";
 const PROFESSIONAL_PRICE: &str = "price_1KnR08JaD7zvQeOB7S30pQ0C";
 /// A price neither sold nor on the legacy list.
 const UNLISTED_PRICE: &str = "price_1ZzUnlistedJaD7zvQeOBzzzz";
@@ -241,13 +241,13 @@ fn incomplete_and_team_subscriptions_are_not_personal_plans() {
 #[test]
 fn an_upgrade_records_macros_own_change_time() {
     let mut object = subscription("sub_Person", "active", 1_700_000_000, "price_max");
-    object["metadata"]["macro_plan_change_at"] = json!("2027-01-15T08:00:10.123456Z");
+    object["metadata"]["rox_plan_change_at"] = json!("2027-01-15T08:00:10.123456Z");
     let upgraded = change(
         EventType::CustomerSubscriptionUpdated,
         object,
         json!({
             "items": {"data": [{"id": "si_Seat", "price": {"id": "price_premium"}}]},
-            "metadata": {"macro_plan_change_at": null}
+            "metadata": {"rox_plan_change_at": null}
         }),
     );
 
@@ -268,7 +268,7 @@ fn an_upgrade_records_macros_own_change_time() {
 #[test]
 fn a_stamp_this_update_did_not_set_is_not_reused() {
     let mut object = subscription("sub_Person", "active", 1_700_000_000, "price_max");
-    object["metadata"]["macro_plan_change_at"] = json!("2026-01-15T08:00:10Z");
+    object["metadata"]["rox_plan_change_at"] = json!("2026-01-15T08:00:10Z");
     let portal_edit = change(
         EventType::CustomerSubscriptionUpdated,
         object,
@@ -563,7 +563,7 @@ fn paid_invoice_of(price: &str) -> InvoiceFacts {
 
 #[test]
 fn legacy_prices_keep_premium_through_grant_renewal_and_cancel_and_revoke_only_premium() {
-    for price in [MACRO_WEB_PRICE, PROFESSIONAL_PRICE] {
+    for price in [ROX_WEB_PRICE, PROFESSIONAL_PRICE] {
         let created = change(
             EventType::CustomerSubscriptionCreated,
             subscription("sub_Person", "active", 1_800_000_000, price),
@@ -753,7 +753,7 @@ fn analytics_skips_an_unknown_price_instead_of_failing() {
 
     let legacy = change(
         EventType::CustomerSubscriptionCreated,
-        subscription("sub_Person", "active", 1_800_000_000, MACRO_WEB_PRICE),
+        subscription("sub_Person", "active", 1_800_000_000, ROX_WEB_PRICE),
         Value::Null,
     );
     assert_eq!(
@@ -770,7 +770,7 @@ fn analytics_skips_an_unknown_price_instead_of_failing() {
 
 #[test]
 fn a_deleted_team_ignores_its_subscription_events() {
-    let mut object = subscription("sub_Team", "canceled", 1_800_000_000, MACRO_WEB_PRICE);
+    let mut object = subscription("sub_Team", "canceled", 1_800_000_000, ROX_WEB_PRICE);
     object["metadata"]["team_id"] = json!(TEAM);
     let deleted = change(EventType::CustomerSubscriptionDeleted, object, Value::Null);
     let update = decide_team_subscription(&event_id(), event_at(), &deleted).unwrap();

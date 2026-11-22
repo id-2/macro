@@ -7,7 +7,7 @@ use ai_billing::{AiAdmissionError, AiAdmissionService};
 use ai_usage::{AiFeature, UsageContext};
 use feature_flags::FeatureFlags;
 use jev::domain::{JevError, YesNoClassifier, YesNoQuestion};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Serialize;
 use tracing::Instrument;
 use utoipa::ToSchema;
@@ -70,7 +70,7 @@ pub trait ModeChoiceService: Send + Sync + 'static {
     /// Choose for the authenticated `owner`, who is billed for any usage.
     async fn choose(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         prompt: &str,
     ) -> Result<AgentMode, ModeChoiceError>;
 }
@@ -98,7 +98,7 @@ impl<C: YesNoClassifier, F: FeatureFlags + 'static> ModeChoiceServiceImpl<C, F> 
         }
     }
 
-    async fn enabled(&self, owner: &MacroUserIdStr<'_>) -> bool {
+    async fn enabled(&self, owner: &RoxUserIdStr<'_>) -> bool {
         let Some(flags) = &self.flags else {
             return false;
         };
@@ -128,7 +128,7 @@ impl<C: YesNoClassifier, F: FeatureFlags + 'static> ModeChoiceService
     )]
     async fn choose(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         prompt: &str,
     ) -> Result<AgentMode, ModeChoiceError> {
         let prompt = prompt.trim();

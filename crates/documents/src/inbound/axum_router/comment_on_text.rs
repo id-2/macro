@@ -19,7 +19,7 @@ use entity_access::{
     },
     inbound::axum_extractors::message_sender_entity_access_receipt,
 };
-use macro_authorization::{AnyPrincipal, MacroAuthorizationExtractor, MacroAuthorizationService};
+use rox_authorization::{AnyPrincipal, RoxAuthorizationExtractor, RoxAuthorizationService};
 use messages::{
     domain::{
         models::{Message, SimpleMention},
@@ -168,10 +168,10 @@ impl IntoResponse for CommentOnTextError {
 pub async fn comment_on_text_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    caller: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     // Request-local metadata from ensure_document_exists, not a shared service.
     // ast-grep-ignore: rust-no-axum-extension-param
     Extension(document): Extension<DocumentBasic>,

@@ -1,10 +1,10 @@
 -- Team 1 has an owner, an admin and a member; team 2's owner is outside team 1.
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
     ('00000000-0000-0000-0000-000000000001', 'owner@previews.test', 'owner@previews.test', 'previews_owner'),
     ('00000000-0000-0000-0000-000000000002', 'admin@previews.test', 'admin@previews.test', 'previews_admin'),
     ('00000000-0000-0000-0000-000000000003', 'member@previews.test', 'member@previews.test', 'previews_member'),
     ('00000000-0000-0000-0000-000000000004', 'outsider@previews.test', 'outsider@previews.test', 'previews_outsider');
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
     ('macro|owner@previews.test', 'owner@previews.test', '00000000-0000-0000-0000-000000000001'),
     ('macro|admin@previews.test', 'admin@previews.test', '00000000-0000-0000-0000-000000000002'),
     ('macro|member@previews.test', 'member@previews.test', '00000000-0000-0000-0000-000000000003'),

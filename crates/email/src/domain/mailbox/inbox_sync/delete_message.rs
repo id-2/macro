@@ -16,7 +16,7 @@ where
     R: InboxSyncRepository,
     G: InboxSyncGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher,
+    E: RoxEventBroker + InboxSyncRefresher,
 {
     let mut tx = ctx.repository.begin_delete().await.map_err(|e| {
         ProcessingError::Retryable(DetailedError {
@@ -124,7 +124,7 @@ where
         &ctx.effects,
         &EmailMacroEvent::message_deleted(MessageDeletedMetadata {
             link_id: link.id,
-            owner: link.macro_id.clone(),
+            owner: link.rox_id.clone(),
             message_id: message.db_id,
             provider_message_id: payload.provider_message_id.clone(),
             thread_id: message.thread_db_id,
@@ -134,7 +134,7 @@ where
     // tell FE to refresh user's inbox
     ctx.effects
         .refresh(
-            link.macro_id.as_ref(),
+            link.rox_id.as_ref(),
             InboxSyncRefresh::DeleteMessage(link.id),
         )
         .await;

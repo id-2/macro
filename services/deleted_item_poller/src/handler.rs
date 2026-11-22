@@ -11,8 +11,8 @@ use lambda_runtime::{
     Error, LambdaEvent,
     tracing::{self},
 };
-use macro_db_client::projects::ProjectToDelete;
-use macro_event_broker::MacroEventBroker;
+use rox_db_client::projects::ProjectToDelete;
+use rox_event_broker::RoxEventBroker;
 use model_owner::Owner;
 use projects::domain::events::{ProjectMacroEvent, ProjectPermanentlyDeletedMetadata};
 
@@ -31,7 +31,7 @@ pub async fn handler(
 }
 
 #[tracing::instrument(skip(event_broker, document_ids), err)]
-async fn publish_document_purge_events<B: MacroEventBroker>(
+async fn publish_document_purge_events<B: RoxEventBroker>(
     event_broker: &B,
     document_ids: &[String],
 ) -> anyhow::Result<()> {
@@ -68,7 +68,7 @@ async fn publish_document_purge_events<B: MacroEventBroker>(
 }
 
 #[tracing::instrument(skip(event_broker, projects_to_delete), err)]
-async fn publish_project_purge_events<B: MacroEventBroker>(
+async fn publish_project_purge_events<B: RoxEventBroker>(
     event_broker: &B,
     projects_to_delete: &[ProjectToDelete],
 ) -> anyhow::Result<()> {
@@ -115,7 +115,7 @@ async fn publish_project_purge_events<B: MacroEventBroker>(
 }
 
 #[tracing::instrument(skip(event_broker, chat_ids), err)]
-async fn publish_chat_purge_events<B: MacroEventBroker>(
+async fn publish_chat_purge_events<B: RoxEventBroker>(
     event_broker: &B,
     chat_ids: &[String],
 ) -> anyhow::Result<()> {
@@ -155,7 +155,7 @@ async fn handle_projects(ctx: &context::Context) -> anyhow::Result<()> {
     let date = chrono::Utc::now().naive_utc() - chrono::Duration::days(30);
 
     let projects_to_delete =
-        macro_db_client::projects::get_projects_to_delete(&ctx.db, &date).await?;
+        rox_db_client::projects::get_projects_to_delete(&ctx.db, &date).await?;
 
     if projects_to_delete.is_empty() {
         tracing::info!("no projects to delete");
@@ -164,7 +164,7 @@ async fn handle_projects(ctx: &context::Context) -> anyhow::Result<()> {
 
     tracing::debug!(projects_to_delete=?projects_to_delete, "projects to delete");
 
-    publish_project_purge_events(&ctx.macro_event_broker, &projects_to_delete)
+    publish_project_purge_events(&ctx.rox_event_broker, &projects_to_delete)
         .await
         .context("unable to publish project purge events")?;
 
@@ -175,7 +175,7 @@ async fn handle_projects(ctx: &context::Context) -> anyhow::Result<()> {
 
     // We can actually perform the project deletion here as we will automatically be queuing all
     // the items in the project for deletion as well
-    macro_db_client::projects::delete::delete_projects_bulk(&ctx.db, &project_ids)
+    rox_db_client::projects::delete::delete_projects_bulk(&ctx.db, &project_ids)
         .await
         .context("unable to delete projects")?;
 
@@ -186,7 +186,7 @@ async fn handle_projects(ctx: &context::Context) -> anyhow::Result<()> {
 async fn handle_chats(ctx: &context::Context) -> anyhow::Result<()> {
     let date = chrono::Utc::now().naive_utc() - chrono::Duration::days(30);
 
-    let chats_to_delete = macro_db_client::chat::get_chats_to_delete(&ctx.db, &date).await?;
+    let chats_to_delete = rox_db_client::chat::get_chats_to_delete(&ctx.db, &date).await?;
 
     if chats_to_delete.is_empty() {
         tracing::info!("no chats to delete");
@@ -195,7 +195,7 @@ async fn handle_chats(ctx: &context::Context) -> anyhow::Result<()> {
 
     tracing::debug!(chats_to_delete=?chats_to_delete, "chats to delete");
 
-    publish_chat_purge_events(&ctx.macro_event_broker, &chats_to_delete)
+    publish_chat_purge_events(&ctx.rox_event_broker, &chats_to_delete)
         .await
         .context("unable to publish chat purge events")?;
 
@@ -211,7 +211,7 @@ async fn handle_documents(ctx: &context::Context) -> anyhow::Result<()> {
     let date = chrono::Utc::now().naive_utc() - chrono::Duration::days(30);
 
     let documents_to_delete =
-        macro_db_client::document::get_all_documents::get_documents_to_delete(&ctx.db, &date)
+        rox_db_client::document::get_all_documents::get_documents_to_delete(&ctx.db, &date)
             .await?;
 
     if documents_to_delete.is_empty() {
@@ -221,7 +221,7 @@ async fn handle_documents(ctx: &context::Context) -> anyhow::Result<()> {
 
     tracing::debug!(documents_to_delete=?documents_to_delete, "documents to delete");
 
-    publish_document_purge_events(&ctx.macro_event_broker, &documents_to_delete)
+    publish_document_purge_events(&ctx.rox_event_broker, &documents_to_delete)
         .await
         .context("unable to publish document purge events")?;
 

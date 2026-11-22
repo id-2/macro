@@ -178,7 +178,7 @@ fn authored_html_keeps_editor_round_trip_markers() {
     // silently degrades mentions, indentation, and list state.
     let authored = r#"<p style="padding-inline-start:40px" data-lexical-indent="1">indented</p>
         <a href="https://app.rox.one/app/doc/1" data-document-mention="true" data-document-id="1" data-document-name="Spec" data-block-name="doc">Spec</a>
-        <div class="macro_quote"><p>quoted</p></div>
+        <div class="rox_quote"><p>quoted</p></div>
         <ol><li value="3">three</li></ol>"#;
 
     let sanitized = sanitize_authored_html(authored);
@@ -187,7 +187,7 @@ fn authored_html_keeps_editor_round_trip_markers() {
     assert!(sanitized.contains("padding-inline-start:40px"));
     assert!(sanitized.contains(r#"data-document-mention="true""#));
     assert!(sanitized.contains(r#"data-document-id="1""#));
-    assert!(sanitized.contains(r#"class="macro_quote""#));
+    assert!(sanitized.contains(r#"class="rox_quote""#));
     assert!(sanitized.contains(r#"value="3""#));
 }
 

@@ -229,7 +229,7 @@ pub fn generate(
                     .map(|s| s.to_string())
                     .collect(),
                 )),
-                env_file: Some(dct::StringOrList::Simple("${MACRO_ENV_FILE}".to_string())),
+                env_file: Some(dct::StringOrList::Simple("${ROX_ENV_FILE}".to_string())),
                 networks: net_aliases(&[("services", &["gmail-forwarder"])]),
                 ..Default::default()
             }),
@@ -1070,7 +1070,7 @@ pub fn docker_compose(
     }
     cmd.arg("--env-file").arg(generated_env);
     cmd.env("COMPOSE_PROJECT_NAME", instance.project_name());
-    cmd.env("MACRO_ENV_FILE", generated_env);
+    cmd.env("ROX_ENV_FILE", generated_env);
     // Compose gives the shell precedence over --env-file. This key is owned
     // by the resolved run policy, so inherit it only from that generated file.
     cmd.env_remove("SYNC_SERVICE_OTEL_EXPORTER_OTLP_ENDPOINT");

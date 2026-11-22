@@ -45,7 +45,7 @@ where
         || progress.completed_threads % REFRESH_EMAIL_THREAD_INTERVAL == 0
     {
         ctx.effects
-            .refresh_progress(&link.macro_id, link.id, progress)
+            .refresh_progress(&link.rox_id, link.id, progress)
             .await;
     }
 
@@ -277,7 +277,7 @@ where
         ctx.effects.top_contact_dms(&link).await;
         ctx.effects
             .refresh_progress(
-                &link.macro_id,
+                &link.rox_id,
                 canonical_link_id,
                 BackfillProgress {
                     job_complete: true,

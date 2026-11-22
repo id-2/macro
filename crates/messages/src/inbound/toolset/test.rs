@@ -12,9 +12,9 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use models_permissions::share_permission::access_level::AccessLevel;
 use uuid::Uuid;
@@ -54,7 +54,7 @@ fn user_sender() -> ChannelSender<'static> {
 }
 
 fn bot_sender() -> ChannelSender<'static> {
-    ChannelSender::try_from(bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string()).unwrap()
+    ChannelSender::try_from(bot_id::ROX_AI_BOT_ID.into_storage_id().to_string()).unwrap()
 }
 
 fn message(id: Uuid, thread_id: Option<Uuid>, sender: ChannelSender<'static>) -> Message {
@@ -347,7 +347,7 @@ struct FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -356,7 +356,7 @@ impl EntityAccessService for FakeEntityAccessService {
             return Err(AccessError::NotFound("entity"));
         }
         EntityAccessReceipt::try_new_authenticated_user(
-            MacroUserIdStr::try_from(user_id.as_ref().to_string())
+            RoxUserIdStr::try_from(user_id.as_ref().to_string())
                 .expect("test user id should be valid"),
             Entity {
                 entity_id: entity_id.to_string(),
@@ -393,7 +393,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -402,7 +402,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -421,7 +421,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -431,7 +431,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -442,7 +442,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         panic!("unexpected get_users_by_entity call")
     }
 
@@ -462,7 +462,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         panic!("unexpected get_user_team call")
     }
@@ -491,7 +491,7 @@ fn context_without_items(messages: FakeMessages) -> ServiceContext<TestToolConte
 }
 
 fn request() -> RequestContext {
-    RequestContext::new(MacroUserIdStr::try_from(USER.to_owned()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from(USER.to_owned()).unwrap())
 }
 
 fn comment_on_initiative(content: &str) -> Comment {
@@ -617,7 +617,7 @@ async fn a_comment_through_an_mcp_client_names_the_client() {
         let EntityAccessAuth::Bot(bot) = access.auth() else {
             panic!("expected a bot post, got {:?}", access.auth());
         };
-        assert_eq!(bot.bot_id(), bot_id::MACRO_AI_BOT_ID);
+        assert_eq!(bot.bot_id(), bot_id::ROX_AI_BOT_ID);
     }
     assert_eq!(
         via_post.attribution,
@@ -856,7 +856,7 @@ async fn read_discussion_lists_threads_oldest_first_with_every_live_reply() {
     assert_eq!(second.comments.len(), 2);
     assert_eq!(
         second.comments[1].author,
-        bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string()
+        bot_id::ROX_AI_BOT_ID.into_storage_id().to_string()
     );
 }
 

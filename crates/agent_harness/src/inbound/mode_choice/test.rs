@@ -3,8 +3,8 @@ use std::sync::Arc;
 use axum::body::{Body, to_bytes};
 use axum::http::{Request, StatusCode};
 use jev::domain::JevError;
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rootcause::Report;
 use tower::ServiceExt as _;
@@ -17,10 +17,10 @@ const USER_ID: &str = "macro|mode-chooser@example.com";
 #[derive(Clone)]
 struct TestAuthorizationService;
 
-impl MacroAuthorizationService for TestAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for TestAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: USER_ID.to_owned(),
@@ -33,18 +33,18 @@ impl MacroAuthorizationService for TestAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -58,7 +58,7 @@ struct StubChoice {
 impl ModeChoiceService for StubChoice {
     async fn choose(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         prompt: &str,
     ) -> Result<AgentMode, ModeChoiceError> {
         self.asked
@@ -76,7 +76,7 @@ fn router(result: Result<AgentMode, ModeChoiceError>) -> (Router, Arc<StubChoice
     });
     let state = AgentModeChoiceRouterState::new(
         Arc::clone(&choice) as Arc<dyn ModeChoiceService>,
-        MacroAuthorizationState::new(Arc::new(TestAuthorizationService)),
+        RoxAuthorizationState::new(Arc::new(TestAuthorizationService)),
     );
     (agent_mode_choice_router(state), choice)
 }

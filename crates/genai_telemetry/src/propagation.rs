@@ -11,7 +11,7 @@ use opentelemetry::trace::TraceContextExt as _;
 use serde_json::{Map, Value};
 use tracing_opentelemetry::OpenTelemetrySpanExt as _;
 
-const TRACE_CONTEXT: &str = "macro.dev/trace-context";
+const TRACE_CONTEXT: &str = "rox.dev/trace-context";
 
 struct Carrier<'a>(&'a Map<String, Value>);
 

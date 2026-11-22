@@ -93,7 +93,7 @@ describe('query schema', () => {
     expect(schema.tables.map((table) => table.sqlName)).toEqual([
       '"Projects"',
       '"Contacts"',
-      'macro.people',
+      'rox.people',
     ]);
     expect(schema.tables[1].columns[0]).toMatchObject({
       multiple: true,

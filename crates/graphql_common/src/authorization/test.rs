@@ -8,10 +8,10 @@ use axum::{
     extract::FromRef,
     http::{Request as HttpRequest, header},
 };
-use macro_authorization::{
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims, BotAuthentication, BotScope,
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
 use model_user::UserContext;
 use rootcause::Report;
@@ -33,12 +33,12 @@ impl FakeAuthorizationService {
     }
 }
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         self.authorization_calls.fetch_add(1, Ordering::SeqCst);
 
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(UserContext {
@@ -52,10 +52,10 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_bot(
@@ -63,11 +63,11 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         token: &str,
         bot_scope: BotScope,
         _acting_user: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         self.authorization_calls.fetch_add(1, Ordering::SeqCst);
 
         if token != VALID_BOT_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(BotAuthentication {
@@ -85,17 +85,17 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
 #[derive(Clone)]
 struct TestState {
-    authorization: MacroAuthorizationState<FakeAuthorizationService>,
+    authorization: RoxAuthorizationState<FakeAuthorizationService>,
 }
 
-impl FromRef<TestState> for MacroAuthorizationState<FakeAuthorizationService> {
+impl FromRef<TestState> for RoxAuthorizationState<FakeAuthorizationService> {
     fn from_ref(state: &TestState) -> Self {
         state.authorization.clone()
     }
@@ -146,7 +146,7 @@ async fn execute(
     };
     let (parts, ()) = request.into_parts();
     let state = TestState {
-        authorization: MacroAuthorizationState::new(Arc::new(service.clone())),
+        authorization: RoxAuthorizationState::new(Arc::new(service.clone())),
     };
     let schema = Schema::build(TestQuery, EmptyMutation, EmptySubscription).finish();
     let request = async_graphql::Request::new(query)

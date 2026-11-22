@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type MacroApiTokenParams = {
+export type RoxApiTokenParams = {
   /**
    * The email to generate the macro-api-token for. If not provided, we use your default profile.
    */

@@ -1,6 +1,6 @@
 use super::*;
 use anyhow::Context;
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::{Link, UserProvider};
 
 pub(super) async fn connect<L, T, P, G, I, B, N, O>(
@@ -45,8 +45,8 @@ where
                     "Failed to look up existing macro user by linked_email",
                 )
             })?;
-        if let Some(child_macro_id) = existing_owner.as_deref()
-            && child_macro_id != request.actor_id
+        if let Some(child_rox_id) = existing_owner.as_deref()
+            && child_rox_id != request.actor_id
         {
             let child = service
                 .links
@@ -61,7 +61,7 @@ where
                     .delegate(
                         &request.actor_id,
                         &linked_email,
-                        child_macro_id,
+                        child_rox_id,
                         child_link.id,
                     )
                     .await?;
@@ -77,7 +77,7 @@ where
                     backfill_job_id: None,
                 });
             }
-            let child_macro_id_owned = MacroUserIdStr::try_from(child_macro_id.to_string())?;
+            let child_rox_id_owned = RoxUserIdStr::try_from(child_rox_id.to_string())?;
             let child_fusion_id = service
                 .links
                 .account_fusion_id(&linked_email)
@@ -91,7 +91,7 @@ where
                 .context("child macro user disappeared before self-link bootstrap")?
                 .to_string();
             let provisional =
-                new_gmail_link(child_fusion_id, child_macro_id_owned, linked_email.clone())?;
+                new_gmail_link(child_fusion_id, child_rox_id_owned, linked_email.clone())?;
             let cursor = service
                 .provider
                 .register_watch(&provisional)
@@ -102,7 +102,7 @@ where
                 .bootstrap(
                     &request.actor_id,
                     &linked_email,
-                    child_macro_id,
+                    child_rox_id,
                     provisional,
                     &cursor,
                 )
@@ -144,18 +144,18 @@ where
                             "Failed to look up existing link for shared-mailbox dedup",
                         )
                     })?
-                && existing_link.macro_id.as_ref() != request.actor_id.as_str()
+                && existing_link.rox_id.as_ref() != request.actor_id.as_str()
             {
                 if !request.force_share {
                     return Err(ConnectionError::SharedInboxConflict {
                         email_address: linked_email.clone(),
-                        existing_owner_email: existing_link.macro_id.email_str().to_string(),
+                        existing_owner_email: existing_link.rox_id.email_str().to_string(),
                         existing_link_id: existing_link.id,
                     });
                 }
                 let organization = service
                     .links
-                    .organization(existing_link.macro_id.as_ref())
+                    .organization(existing_link.rox_id.as_ref())
                     .await
                     .map_err(|error| {
                         database(error, "Failed to fetch organization for shared-inbox owner")
@@ -191,7 +191,7 @@ where
             }
             let provisional = new_gmail_link(
                 request.actor_fusion_id.clone(),
-                request.actor_macro_id.clone(),
+                request.actor_rox_id.clone(),
                 linked_email,
             )?;
             let cursor = service
@@ -207,7 +207,7 @@ where
     } else {
         let existing = service
             .links
-            .link_for_identity(&request.actor_fusion_id, request.actor_macro_id.clone())
+            .link_for_identity(&request.actor_fusion_id, request.actor_rox_id.clone())
             .await
             .map_err(|error| database(error, "Failed to fetch existing link"))?;
         if existing.is_some() {
@@ -216,7 +216,7 @@ where
         let email = service.identity.login_email(&request.actor_id)?;
         let provisional = new_gmail_link(
             request.actor_fusion_id.clone(),
-            request.actor_macro_id.clone(),
+            request.actor_rox_id.clone(),
             email,
         )?;
         let cursor = service
@@ -243,14 +243,14 @@ where
 
 fn new_gmail_link(
     fusion_user_id: String,
-    macro_id: MacroUserIdStr<'static>,
+    rox_id: RoxUserIdStr<'static>,
     email_address: String,
 ) -> Result<Link, ConnectionError> {
     let email_address = EmailStr::try_from(email_address)?;
     let is_primary = Link::derive_is_primary(UserProvider::Gmail);
     Ok(Link {
-        id: macro_uuid::generate_uuid_v7(),
-        macro_id,
+        id: rox_uuid::generate_uuid_v7(),
+        rox_id,
         fusionauth_user_id: fusion_user_id,
         email_address,
         provider: UserProvider::Gmail,

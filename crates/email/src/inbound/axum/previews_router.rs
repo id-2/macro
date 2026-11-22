@@ -4,8 +4,8 @@ use axum::{
     routing::get,
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use models_pagination::{
@@ -57,9 +57,9 @@ pub fn router<S, T, Auth>() -> Router<S>
 where
     S: Send + Sync + Clone + 'static,
     T: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     EmailRouterState<T>: axum::extract::FromRef<S>,
-    MacroAuthorizationState<Auth>: axum::extract::FromRef<S>,
+    RoxAuthorizationState<Auth>: axum::extract::FromRef<S>,
 {
     Router::new().route("/cursor/{view}", get(cursor_handler::<T, Auth>))
 }
@@ -89,9 +89,9 @@ where
         fusionauth_user_id = tracing::field::Empty,
     )
 )]
-async fn cursor_handler<T: EmailService, Auth: MacroAuthorizationService>(
+async fn cursor_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(service): State<EmailRouterState<T>>,
-    Cached(macro_user): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(macro_user): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Cached(MultiEmailLinkExtractor(links, _)): Cached<MultiEmailLinkExtractor<T, Auth>>,
     PreviewViewPathExtractor(preview_view): PreviewViewPathExtractor,
     extract::Query(params): extract::Query<GetPreviewsCursorParams>,
@@ -110,7 +110,7 @@ async fn cursor_handler<T: EmailService, Auth: MacroAuthorizationService>(
             .get_email_thread_previews(GetEmailsRequest {
                 view: preview_view,
                 link_ids: links.iter().map(|link| link.id).collect(),
-                macro_id: user.macro_user_id.clone(),
+                rox_id: user.rox_user_id.clone(),
                 limit: params.limit,
                 query: cursor
                     .into_query(

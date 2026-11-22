@@ -6,7 +6,7 @@
  */
 import type { BotId } from './botId';
 import type { Lineage } from './lineage';
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './macroUserIdStr';
 
 /**
  * An agent acting for a person.
@@ -17,5 +17,5 @@ export interface AgentActor {
   /** Where the agent's own work came from. */
   lineage: Lineage;
   /** The person it acts for. */
-  on_behalf_of: MacroUserIdStr;
+  on_behalf_of: RoxUserIdStr;
 }

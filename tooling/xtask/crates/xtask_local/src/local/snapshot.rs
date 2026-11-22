@@ -14,7 +14,7 @@
 //!
 //! Snapshots are tarballs of the Docker volumes, written by a throwaway helper
 //! container, stored machine-wide under `~/.cache/macro-local/stack-snapshots/<key>/`
-//! (override with `MACRO_STACK_SNAPSHOT_DIR` — CI and Cloud install can bake
+//! (override with `ROX_STACK_SNAPSHOT_DIR` — CI and Cloud install can bake
 //! this dir). The key leaves out the instance's ports, so every worktree and
 //! instance on a machine shares one snapshot per schema; FusionAuth's redirect
 //! URLs are rewritten for the instance after each start instead.
@@ -70,13 +70,13 @@ fn archives(instance: &Instance) -> [(&'static str, String); 5] {
 /// archives are written so the files are consistent.
 const STATEFUL_SERVICES: &[&str] = &["postgres", "search", "kafka", "fusionauth", "db"];
 
-/// Where snapshots live. `MACRO_STACK_SNAPSHOT_DIR` overrides for CI and Cloud
+/// Where snapshots live. `ROX_STACK_SNAPSHOT_DIR` overrides for CI and Cloud
 /// install bakes; the default is shared by every checkout on the machine.
 // xtask is host tooling, not a service reading APP_SECRETS_JSON, so reading the
 // process environment directly is correct here.
 #[allow(clippy::disallowed_methods)]
 pub fn root_dir() -> Result<PathBuf> {
-    if let Some(dir) = std::env::var_os("MACRO_STACK_SNAPSHOT_DIR") {
+    if let Some(dir) = std::env::var_os("ROX_STACK_SNAPSHOT_DIR") {
         return Ok(PathBuf::from(dir));
     }
     let home = std::env::var_os("HOME").context("HOME is not set")?;
@@ -134,7 +134,7 @@ impl Plan {
         // Database schema.
         hash_dir(
             &mut h,
-            &workspace_root().join("crates/macro_db_client/migrations"),
+            &workspace_root().join("crates/rox_db_client/migrations"),
             &[],
         )?;
         // Search index mappings (canonical TS helpers; node_modules excluded).
@@ -182,7 +182,7 @@ pub fn restore(stage: &Stage, instance: &Instance, plan: &Plan) -> Result<()> {
         || {
             // Held while reading, so pruning can't remove it meanwhile. A store
             // this user can't write to (a read-only baked
-            // MACRO_STACK_SNAPSHOT_DIR) can't hold a lock file, and for the same
+            // ROX_STACK_SNAPSHOT_DIR) can't hold a lock file, and for the same
             // reason this user can't prune it, so restore without one there.
             let _reading = match super::content_key::read_lock(&dir) {
                 Ok(lock) => Some(lock),

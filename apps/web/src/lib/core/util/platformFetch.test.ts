@@ -150,7 +150,7 @@ it('routes the installed global fetch to the native transport without recursing'
   vi.stubGlobal('fetch', browser);
   installPlatformFetch();
   await fetch('https://gateway.example/auth/user/legacy_user_permissions');
-  await platformFetch('https://gateway.example/auth/jwt/macro_api_token');
+  await platformFetch('https://gateway.example/auth/jwt/rox_api_token');
   await fetch('https://api.klipy.com/v2/search');
   expect(nativeFetch).toHaveBeenCalledTimes(2);
   expect(browser).toHaveBeenCalledTimes(1);

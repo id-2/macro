@@ -46,11 +46,11 @@ const connectionGatewayRedis = new Redis('connection-gateway-redis', {
   },
 });
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
-const MACRO_DB_URL = config.require(`macro_db_secret_key`);
+const ROX_DB_URL = config.require(`rox_db_secret_key`);
 const macroDbUrlArn: pulumi.Output<string> = aws.secretsmanager
-  .getSecretVersionOutput({ secretId: MACRO_DB_URL })
+  .getSecretVersionOutput({ secretId: ROX_DB_URL })
   .apply((secret) => secret.arn);
 
 const connectionGateway = new ConnectionGateway(`connection-gateway-${stack}`, {
@@ -63,7 +63,7 @@ const connectionGateway = new ConnectionGateway(`connection-gateway-${stack}`, {
   },
   secretKeyArns: [
     jwtSecretKeyArn,
-    MACRO_API_TOKENS.macroApiTokenPublicKeyArn,
+    ROX_API_TOKENS.macroApiTokenPublicKeyArn,
     macroDbUrlArn,
   ],
   serviceContainerPort: 8080,

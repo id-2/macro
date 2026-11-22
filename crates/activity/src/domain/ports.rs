@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::num::NonZeroU32;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use uuid::Uuid;
 
@@ -37,7 +37,7 @@ pub trait ActivityMetadataResolver: Send + Sync + 'static {
     /// Resolve the requested property definition ids for `viewer`.
     async fn resolve_properties(
         &self,
-        viewer: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        viewer: &rox_user_id::user_id::RoxUserIdStr<'_>,
         property_ids: &[String],
     ) -> HashMap<String, ActivityPropertyMetadata>;
 }
@@ -108,7 +108,7 @@ pub trait ActivityAudienceExpander: Send + Sync {
         &self,
         entity_type: EntityType,
         entity_id: &str,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Self::Err>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Self::Err>> + Send;
 
     /// Check a particular viewer, including link-based access that cannot be
     /// enumerated as an audience. The conservative default uses explicit recipients.
@@ -116,7 +116,7 @@ pub trait ActivityAudienceExpander: Send + Sync {
         &self,
         entity_type: EntityType,
         entity_id: &str,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send {
         async move {
             Ok(self

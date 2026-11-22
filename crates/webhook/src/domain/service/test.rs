@@ -8,8 +8,8 @@ use crate::domain::{
     ports::{WebhookError, WebhookRepo, WebhookService, WebhookValidationClient},
 };
 use chrono::Utc;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker, NoopMacroEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use std::{
     collections::BTreeMap,
@@ -83,7 +83,7 @@ impl WebhookRepo for FakeRepo {
 
     async fn create_webhook(
         &self,
-        created_by_user_id: MacroUserIdStr<'static>,
+        created_by_user_id: RoxUserIdStr<'static>,
         workspace_id: String,
         request: CreateWebhookRequest,
         _signing_secret: String,
@@ -247,7 +247,7 @@ impl WebhookRepo for FakeRepo {
 
     async fn get_user_team_workspace_id(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> Result<Option<String>, Self::Err> {
         let state = self.state.lock().await;
         if state.team_lookup_fails {
@@ -283,8 +283,8 @@ impl TestEventBroker {
     }
 }
 
-impl MacroEventBroker for TestEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for TestEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -365,8 +365,8 @@ impl WebhookValidationClient for FakeValidationClient {
     }
 }
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("user@example.com").unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("user@example.com").unwrap()
 }
 
 fn valid_filters() -> WebhookFilters {
@@ -401,7 +401,7 @@ fn patch_request() -> PatchWebhookRequest {
 }
 
 fn webhook_from_create(
-    created_by_user_id: MacroUserIdStr<'static>,
+    created_by_user_id: RoxUserIdStr<'static>,
     workspace_id: String,
     request: CreateWebhookRequest,
 ) -> Webhook {
@@ -466,7 +466,7 @@ async fn create_publishes_full_sanitized_snapshot() {
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.webhooks");
+    assert_eq!(event.topic, "rox.webhooks");
     assert_eq!(event.key, webhook.id);
     assert_eq!(event.payload["schema_version"], 1);
     assert_eq!(event.payload["event_type"], "webhook.created");
@@ -671,7 +671,7 @@ async fn patch_publishes_requested_fields_and_status_transition() {
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.webhooks");
+    assert_eq!(event.topic, "rox.webhooks");
     assert_eq!(event.key, patched.id);
     assert_eq!(event.payload["schema_version"], 1);
     assert_eq!(event.payload["event_type"], "webhook.updated");
@@ -734,7 +734,7 @@ async fn patch_endpoint_and_headers_publish_final_validity_row_without_secrets()
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.webhooks");
+    assert_eq!(event.topic, "rox.webhooks");
     assert_eq!(event.key, patched.id);
     assert_eq!(event.payload["event_type"], "webhook.updated");
     assert_eq!(
@@ -1131,7 +1131,7 @@ async fn validate_publishes_success_when_persisted_validity_is_unchanged() {
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.webhooks");
+    assert_eq!(event.topic, "rox.webhooks");
     assert_eq!(event.key, "wh_test");
     assert_eq!(event.payload["schema_version"], 1);
     assert_eq!(event.payload["event_type"], "webhook.validated");
@@ -1179,7 +1179,7 @@ async fn validate_http_failure_publishes_sanitized_invalid_result() {
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.webhooks");
+    assert_eq!(event.topic, "rox.webhooks");
     assert_eq!(event.key, "wh_test");
     assert_eq!(event.payload["event_type"], "webhook.validated");
     assert_eq!(
@@ -1331,7 +1331,7 @@ async fn delete_publishes_event_after_soft_deletion() {
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.webhooks");
+    assert_eq!(event.topic, "rox.webhooks");
     assert_eq!(event.key, "wh_test");
     assert_eq!(event.payload["schema_version"], 1);
     assert_eq!(event.payload["event_type"], "webhook.deleted");

@@ -1,5 +1,5 @@
 //! Starting a chat with someone never written to: their number looked up,
-//! the chat added and messaged first from Macro, and their answer by LID
+//! the chat added and messaged first from Rox, and their answer by LID
 //! landing in the same chat.
 
 use whatsapp_linked::domain::models::{Lookup, LookupState};
@@ -20,7 +20,7 @@ async fn answered(world: &World, lookup: &Lookup) -> Lookup {
     world.expect(answered, "WhatsApp answers the lookup").await
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_looked_up_number_is_added_messaged_and_answers_in_the_same_chat(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;

@@ -14,7 +14,7 @@ impl CsvFiles for TextOnly {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn agent_add_and_csv_import_enforce_stage_rules_and_report_invalid_rows(pool: PgPool) {
     let Fixture {
         workflows, acme, ..

@@ -1,10 +1,10 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 use super::delete_chat;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn delete_chat_removes_entity_row(pool: Pool<Postgres>) {
@@ -21,7 +21,7 @@ async fn delete_chat_removes_entity_row(pool: Pool<Postgres>) {
     .await
     .unwrap();
 
-    let chat_uuid = macro_uuid::string_to_uuid(&chat_id).unwrap();
+    let chat_uuid = rox_uuid::string_to_uuid(&chat_id).unwrap();
     sqlx::query(
         r#"
         INSERT INTO entity (id, entity_type, owner_type, owner_id)

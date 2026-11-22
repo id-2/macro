@@ -4,7 +4,7 @@
  * agent_harness_service
  * OpenAPI spec version: 0.1.0
  */
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './macroUserIdStr';
 import type { TriggerOriginOneOfThreeOrigin } from './triggerOriginOneOfThreeOrigin';
 
 /**
@@ -12,7 +12,7 @@ import type { TriggerOriginOneOfThreeOrigin } from './triggerOriginOneOfThreeOri
  */
 export type TriggerOriginOneOfThree = {
   /** Who wrote. */
-  by: MacroUserIdStr;
+  by: RoxUserIdStr;
   /** The message. */
   message_id: string;
   origin: TriggerOriginOneOfThreeOrigin;

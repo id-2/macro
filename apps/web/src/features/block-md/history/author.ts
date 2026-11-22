@@ -1,6 +1,6 @@
 import {
   isBotPrincipalId,
-  MACRO_AGENT_BOT_ID,
+  ROX_AGENT_BOT_ID,
 } from '@core/constant/macroAgent';
 import { isAiPeer } from '@macro-inc/collaboration/collab/ai-peer';
 import { usePropertyUserDisplay } from '@property/hooks/usePropertyUserDisplay';
@@ -23,7 +23,7 @@ export function peerAuthorId(
 ): string {
   if (record?.actor) return record.actor;
   if (isAiPeer(BigInt(peer))) {
-    return record ? `${AI_AUTHOR_PREFIX}${record.userId}` : MACRO_AGENT_BOT_ID;
+    return record ? `${AI_AUTHOR_PREFIX}${record.userId}` : ROX_AGENT_BOT_ID;
   }
   return record?.userId ?? 'unknown';
 }

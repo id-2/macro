@@ -3,8 +3,8 @@ use crate::domain::{
     models::{WebhookFilter, WebhookScope, WebhookStatus},
     ports::{WebhookRepo, WebhookWorkspaceResolver},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use sqlx::{PgPool, types::Uuid};
 
@@ -14,16 +14,16 @@ const TEAM_ID: &str = "11111111-1111-1111-1111-111111111111";
 const UNRELATED_TEAM_ID: &str = "22222222-2222-2222-2222-222222222222";
 const OTHER_WORKSPACE_ID: &str = "workspace_other";
 
-fn macro_user_id(user_id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(user_id.to_string()).expect("valid macro user id")
+fn rox_user_id(user_id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(user_id.to_string()).expect("valid macro user id")
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    macro_user_id(USER_ID)
+fn user_id() -> RoxUserIdStr<'static> {
+    rox_user_id(USER_ID)
 }
 
-fn second_user_id() -> MacroUserIdStr<'static> {
-    macro_user_id(SECOND_USER_ID)
+fn second_user_id() -> RoxUserIdStr<'static> {
+    rox_user_id(SECOND_USER_ID)
 }
 
 fn create_request() -> CreateWebhookRequest {
@@ -45,15 +45,15 @@ fn create_request_with_namespace(namespace: &str) -> CreateWebhookRequest {
 }
 
 async fn insert_user_with_id(pool: &PgPool, user_id: &str, email: &str) -> anyhow::Result<()> {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
-    let stripe_customer_id = format!("stripe_{macro_user_id}");
+    let rox_user_id = rox_uuid::generate_uuid_v7();
+    let stripe_customer_id = format!("stripe_{rox_user_id}");
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (id) DO NOTHING
         "#,
-        macro_user_id,
+        rox_user_id,
         email,
         email,
         stripe_customer_id
@@ -63,13 +63,13 @@ async fn insert_user_with_id(pool: &PgPool, user_id: &str, email: &str) -> anyho
 
     sqlx::query!(
         r#"
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ($1, $2, $3)
         ON CONFLICT (id) DO NOTHING
         "#,
         user_id,
         email,
-        macro_user_id
+        rox_user_id
     )
     .execute(pool)
     .await?;
@@ -187,7 +187,7 @@ async fn insert_webhook_for_matching(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_inserts_webhook_with_filters(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool).await?;
     let repo = PgRepository::new(pool.clone());
@@ -207,7 +207,7 @@ async fn create_inserts_webhook_with_filters(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_with_taken_namespace_returns_conflict(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool).await?;
     let repo = PgRepository::new(pool.clone());
@@ -223,7 +223,7 @@ async fn create_with_taken_namespace_returns_conflict(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_with_same_namespace_in_another_workspace_succeeds(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -238,7 +238,7 @@ async fn create_with_same_namespace_in_another_workspace_succeeds(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn namespace_is_reusable_after_soft_delete(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool).await?;
     let repo = PgRepository::new(pool.clone());
@@ -252,7 +252,7 @@ async fn namespace_is_reusable_after_soft_delete(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn object_shaped_filters_are_rejected_by_check_constraint(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -290,7 +290,7 @@ async fn object_shaped_filters_are_rejected_by_check_constraint(
     clippy::disallowed_methods,
     reason = "EXPLAIN output is planner text; the macros have nothing to validate"
 )]
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn containment_query_uses_filters_gin_index(pool: PgPool) -> anyhow::Result<()> {
     let mut connection = pool.acquire().await?;
     sqlx::query("SET enable_seqscan = off")
@@ -317,7 +317,7 @@ async fn containment_query_uses_filters_gin_index(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_matching_event_treats_missing_ids_as_wildcard(pool: PgPool) -> anyhow::Result<()> {
     insert_webhook_for_matching(
         &pool,
@@ -359,7 +359,7 @@ async fn list_matching_event_treats_missing_ids_as_wildcard(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_matching_event_requires_id_in_same_filter_element(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -411,7 +411,7 @@ async fn list_matching_event_requires_id_in_same_filter_element(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_matching_event_excludes_ineligible_webhooks(pool: PgPool) -> anyhow::Result<()> {
     let matching_filter = vec![webhook_filter(&["document.created"], None)];
     insert_webhook_for_matching(
@@ -478,7 +478,7 @@ async fn list_matching_event_excludes_ineligible_webhooks(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_workspaces_returns_every_status_except_deleted(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -547,7 +547,7 @@ async fn list_for_workspaces_returns_every_status_except_deleted(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn resolved_workspaces_match_personal_and_related_team_webhooks(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -624,7 +624,7 @@ async fn resolved_workspaces_match_personal_and_related_team_webhooks(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn resolve_workspace_ids_returns_empty_for_no_people(pool: PgPool) -> anyhow::Result<()> {
     let repo = PgRepository::new(pool.clone());
     pool.close().await;
@@ -633,7 +633,7 @@ async fn resolve_workspace_ids_returns_empty_for_no_people(pool: PgPool) -> anyh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn patch_updates_endpoint_and_resets_validity(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool).await?;
     let repo = PgRepository::new(pool.clone());
@@ -660,7 +660,7 @@ async fn patch_updates_endpoint_and_resets_validity(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_webhook_validity_marks_valid_and_invalid(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool).await?;
     let repo = PgRepository::new(pool);
@@ -680,7 +680,7 @@ async fn set_webhook_validity_marks_valid_and_invalid(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_webhook_excludes_deleted_rows(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool).await?;
     let repo = PgRepository::new(pool.clone());
@@ -697,7 +697,7 @@ async fn get_webhook_excludes_deleted_rows(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_user_team_workspace_id_returns_team_membership(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool).await?;
     let team_id = Uuid::parse_str(TEAM_ID)?;

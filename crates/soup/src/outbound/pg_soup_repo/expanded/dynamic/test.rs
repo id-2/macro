@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::sync::Arc;
 
 #[test]
@@ -102,7 +102,7 @@ fn grouped_access_shape() {
     assert!(candidates.contains("cp.left_at IS NULL"));
     assert!(candidates.contains("event.owner_id = $1"));
     assert!(candidates.contains("link.link_id = event.source_link_id"));
-    assert!(candidates.contains("link.primary_macro_id = $1"));
+    assert!(candidates.contains("link.primary_rox_id = $1"));
     assert!(candidates.contains("THEN 'TASK'::property_entity_type"));
 }
 
@@ -344,10 +344,10 @@ fn task_only_filters_omit_redundant_namespace_joins() {
 /// the test harness at a hosted database. No planner settings or timing assertions.
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 #[ignore = "local EXPLAIN diagnostic; run explicitly with --ignored --nocapture"]
 async fn grouped_query_explain_local(pool: PgPool) -> anyhow::Result<()> {
@@ -577,7 +577,7 @@ async fn seed_background_initiatives(pool: &PgPool, count: i32) -> anyhow::Resul
     .execute(pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id)
+        r#"INSERT INTO "User" (id, email, rox_user_id)
         SELECT 'macro|background-' || n || '@paths.test', 'background-' || n || '@paths.test',
             ('a2000000-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid
         FROM generate_series(1, $1::int) n"#,
@@ -659,7 +659,7 @@ async fn explain_first_page(
 
 #[sqlx::test(
     fixtures("../../initiative/test/access_paths.sql"),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn initiative_listing_reads_the_callers_initiatives_not_the_table(
     pool: PgPool,
@@ -686,7 +686,7 @@ async fn initiative_listing_reads_the_callers_initiatives_not_the_table(
 
 #[sqlx::test(
     fixtures("../../initiative/test/access_paths.sql"),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn initiatives_named_by_id_check_access_per_row(pool: PgPool) -> anyhow::Result<()> {
     // The viewer can also list 5,000 initiatives other people shared with them.

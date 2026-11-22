@@ -1,6 +1,6 @@
 //! Persistence and delivery boundaries. Transactions carry no SQL types inward.
 use super::models::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::{share_permission::access_level::AccessLevel, sharing::SharingFacts};
 use uuid::Uuid;
 
@@ -11,13 +11,13 @@ pub trait RequestTransaction: Send {
     /// The requester's latest attempt.
     fn mine(
         &mut self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<AccessRequest>, RequestError>> + Send;
     /// Whether two people share a team.
     fn shares_team(
         &mut self,
-        a: &MacroUserIdStr<'_>,
-        b: &MacroUserIdStr<'_>,
+        a: &RoxUserIdStr<'_>,
+        b: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, RequestError>> + Send;
     /// An entity-scoped request identity.
     fn request(
@@ -42,7 +42,7 @@ pub trait RequestTransaction: Send {
     /// Apply a direct grant through the owning access domain's transaction helpers.
     fn grant(
         &mut self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         level: Option<AccessLevel>,
         upgrade_only: bool,
     ) -> impl Future<Output = Result<(), RequestError>> + Send;
@@ -51,7 +51,7 @@ pub trait RequestTransaction: Send {
     /// every other entity type.
     fn stopped_residents(
         &mut self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Resident>, RequestError>> + Send;
     /// Queue notifications/cache invalidations and attach prior notifications to complete.
     fn enqueue(

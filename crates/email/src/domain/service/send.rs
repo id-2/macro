@@ -4,7 +4,7 @@ use crate::domain::{
     ports::{EmailMessageEnqueuer, EmailRepo},
 };
 use frecency::domain::ports::FrecencyQueryService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 
 use super::EmailServiceImpl;
 
@@ -14,26 +14,26 @@ where
     U: FrecencyQueryService,
     E: EmailMessageEnqueuer,
     CS: crm::domain::service::CrmService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
     anyhow::Error: From<E::Err>,
 {
     #[tracing::instrument(skip_all, err)]
     pub(crate) async fn send_message_for_user_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         link_id: Option<uuid::Uuid>,
         mut input: CreateDraftInput,
     ) -> Result<CreatedDraft, EmailErr> {
         let inboxes = self
             .email_repo
-            .inboxes_for_macro_id(macro_id.clone())
+            .inboxes_for_rox_id(rox_id.clone())
             .await
             .map_err(anyhow::Error::from)?;
-        let link = super::draft::resolve_target_link(&inboxes, link_id, &macro_id)?;
+        let link = super::draft::resolve_target_link(&inboxes, link_id, &rox_id)?;
         let link_ids: Vec<_> = inboxes.iter().map(|link| link.id).collect();
         self.resolve_client_handles(&mut input, &link_ids).await?;
-        input.actor = Some(macro_id);
+        input.actor = Some(rox_id);
         self.send_message_impl(link, &inboxes, input).await
     }
 
@@ -68,7 +68,7 @@ where
         self.publish_email_event(&EmailMacroEvent::message_send_queued(
             MessageSendQueuedMetadata {
                 link_id: link.id,
-                owner: link.macro_id.clone(),
+                owner: link.rox_id.clone(),
                 actor,
                 message_id: created.db_id,
                 thread_id: created.thread_db_id,

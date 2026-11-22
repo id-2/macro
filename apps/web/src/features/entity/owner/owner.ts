@@ -1,9 +1,9 @@
-import { type MacroId, tryMacroId } from '@core/user/macroId';
+import { type RoxId, tryMacroId } from '@core/user/macroId';
 import { isHexHyphenatedId } from '@queries/bots/bot-id';
 import { firstPartyBotName } from '@queries/bots/first-party-bot-name';
 
 export type Owner =
-  | { kind: 'user'; id: MacroId }
+  | { kind: 'user'; id: RoxId }
   | { kind: 'bot'; botId: string }
   | { kind: 'team'; teamId: string }
   | { kind: 'unknown'; raw: string };

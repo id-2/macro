@@ -7,7 +7,7 @@ version = "0.1.0"
 [dependencies]
 anyhow = { workspace = true }
 bytes = { workspace = true }
-macro_aws_config = { path = "../macro_aws_config" }
+rox_aws_config = { path = "../rox_aws_config" }
 models_sfs = { path = "../models_sfs" }
 reqwest = { workspace = true }
 serde = { workspace = true }
@@ -16,5 +16,5 @@ tracing = { workspace = true }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_service_urls = { path = "../macro_service_urls" }
+rox_service_urls = { path = "../rox_service_urls" }
 tokio = { workspace = true }

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run Claude Code with only the local stack's public Macro MCP, signed in as a
+# Run Claude Code with only the local stack's public Rox MCP, signed in as a
 # local user. The user must already exist (sign in once through the web app).
 #
 #   tooling/scripts/claude-local-mcp.sh --instance <name> --email <email> [claude args...]

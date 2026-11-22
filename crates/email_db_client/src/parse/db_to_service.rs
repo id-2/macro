@@ -132,7 +132,7 @@ pub fn map_db_message_to_message_to_send(
         },
         body_text: db_message.body_text,
         body_html: db_message.body_html_sanitized,
-        body_macro: db_message.body_macro,
+        body_rox: db_message.body_rox,
         // we don't currently support sending attachments - they get converted to rox.one links on the FE before sending
         attachments: None,
         headers_json: db_message.headers_jsonb,
@@ -182,7 +182,7 @@ pub fn map_attachmentless_db_message_to_service(
         labels: labels_list,
         body_text: db_message.body_text,
         body_html_sanitized: db_message.body_html_sanitized,
-        body_macro: db_message.body_macro,
+        body_rox: db_message.body_rox,
         attachments: Vec::new(),
         attachments_draft: Vec::new(),
         attachments_forwarded: Vec::new(),

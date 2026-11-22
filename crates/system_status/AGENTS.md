@@ -2,7 +2,7 @@
 
 ## What it is
 
-Platform status banner: Macro staff set the status (operational, degraded,
+Platform status banner: Rox staff set the status (operational, degraded,
 major outage with a message) and every user sees a banner while it is not
 operational. Each update is kept as history; the newest is current.
 
@@ -31,7 +31,7 @@ remembers a dismissal by that id.
 
 ## Boundaries
 
-- Depends on: `macro_authorization` (axum), `connection_gateway_client`.
+- Depends on: `rox_authorization` (axum), `connection_gateway_client`.
 - Used by: `services/authentication_service`, which mounts the router at
   `/system-status` and lists it in `src/api/swagger.rs`.
 

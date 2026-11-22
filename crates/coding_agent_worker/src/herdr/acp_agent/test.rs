@@ -18,7 +18,7 @@ fn prompts_keep_text_and_reference_files() {
 }
 
 #[test]
-fn macro_mcp_servers_become_claude_config() {
+fn rox_mcp_servers_become_claude_config() {
     let servers = [
         json!({"type": "http", "name": "macro", "url": "https://x/mcp",
             "headers": [{"name": "Authorization", "value": "Bearer t"}]}),
@@ -211,7 +211,7 @@ fn append_turn(path: &Path, id: &str, prompt: &str) {
 }
 
 #[tokio::test]
-async fn restore_replays_history_and_observes_local_turns_without_a_macro_prompt() {
+async fn restore_replays_history_and_observes_local_turns_without_a_rox_prompt() {
     let root = tempfile::tempdir().unwrap();
     let id = uuid::Uuid::new_v4().to_string();
     let transcript = save_transcript(root.path(), &id);
@@ -282,7 +282,7 @@ async fn restore_rejects_a_different_workspace_or_agent() {
 }
 
 #[tokio::test]
-async fn observer_waits_until_the_macro_prompt_response_has_been_sent() {
+async fn observer_waits_until_the_rox_prompt_response_has_been_sent() {
     let root = tempfile::tempdir().unwrap();
     let id = uuid::Uuid::new_v4().to_string();
     let transcript = save_transcript(root.path(), &id);
@@ -599,7 +599,7 @@ esac
 }
 
 #[tokio::test]
-async fn a_late_codex_item_never_answers_a_waiting_macro_prompt() {
+async fn a_late_codex_item_never_answers_a_waiting_rox_prompt() {
     use std::io::Write as _;
     let root = tempfile::tempdir().unwrap();
     let id = uuid::Uuid::new_v4().to_string();

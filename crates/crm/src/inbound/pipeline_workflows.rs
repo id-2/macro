@@ -18,8 +18,8 @@ use axum::{
     routing::{get, post},
 };
 use databases::domain::models::{RowId, TableVersion, Viewer};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use uuid::Uuid;
@@ -51,7 +51,7 @@ pub struct PipelineWorkflowRouterState<Workflows, Transfer, Authorization> {
     /// CSV imports and exports.
     pub transfer: Arc<Transfer>,
     /// Authentication state.
-    pub authorization: MacroAuthorizationState<Authorization>,
+    pub authorization: RoxAuthorizationState<Authorization>,
 }
 
 impl<Workflows, Transfer, Authorization> Clone
@@ -68,7 +68,7 @@ impl<Workflows, Transfer, Authorization> Clone
 
 impl<Workflows, Transfer, Authorization>
     FromRef<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>
-    for MacroAuthorizationState<Authorization>
+    for RoxAuthorizationState<Authorization>
 {
     fn from_ref(state: &PipelineWorkflowRouterState<Workflows, Transfer, Authorization>) -> Self {
         state.authorization.clone()
@@ -82,7 +82,7 @@ pub fn router<Workflows, Transfer, Authorization, S>(
 where
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()
@@ -141,10 +141,10 @@ where
 /// The caller, with the agent its SDK token names acting for it. The agent
 /// only attributes writes; access stays the user's.
 fn viewer<Authorization>(
-    auth: &MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: &RoxAuthorizationExtractor<Authorization, UserOrInternal>,
 ) -> Viewer {
     Viewer {
-        user_id: auth.authorization.user.macro_user_id.clone(),
+        user_id: auth.authorization.user.rox_user_id.clone(),
         acting_bot: auth.authorization.user.agent_id,
     }
 }
@@ -180,9 +180,9 @@ fn csv_input(csv: Option<String>, document_id: Option<Uuid>) -> Result<CsvInput,
 pub async fn list_details<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
 ) -> Result<Json<Vec<PipelineFields>>, WorkflowError> {
     let pipelines = state.workflows.pipelines(&viewer(&auth)).await?;
@@ -198,9 +198,9 @@ pub async fn list_details<
 pub async fn find_entries<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Path(id): Path<Uuid>,
     Json(request): Json<FindEntriesRequest>,
@@ -225,9 +225,9 @@ pub async fn find_entries<
 pub async fn record_entries<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Json(request): Json<RecordEntriesRequest>,
 ) -> Result<Json<Vec<PipelineEntries>>, WorkflowError> {
@@ -253,9 +253,9 @@ pub async fn record_entries<
 pub async fn search_entries<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Query(query): Query<EntrySearchQuery>,
 ) -> Result<Json<Vec<PipelineEntries>>, WorkflowError> {
@@ -280,9 +280,9 @@ pub async fn search_entries<
 pub async fn add_entries<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Path(id): Path<Uuid>,
     Json(request): Json<AddEntriesRequest>,
@@ -331,9 +331,9 @@ pub async fn add_entries<
 pub async fn update_entries<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Path(id): Path<Uuid>,
     Json(request): Json<UpdateEntriesRequest>,
@@ -385,9 +385,9 @@ pub async fn update_entries<
 pub async fn remove_entries<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Path(id): Path<Uuid>,
     Json(request): Json<RemoveEntriesRequest>,
@@ -419,9 +419,9 @@ pub async fn remove_entries<
 pub async fn create<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Json(request): Json<CreatePipelineRequest>,
 ) -> Result<Json<PipelineFields>, WorkflowError> {
@@ -441,9 +441,9 @@ pub async fn create<
 pub async fn edit<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Path(id): Path<Uuid>,
     Json(request): Json<EditPipelineRequest>,
@@ -492,9 +492,9 @@ pub async fn edit<
 pub async fn import_pipeline<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Path(id): Path<Uuid>,
     Json(request): Json<ImportPipelineCsvRequest>,
@@ -516,9 +516,9 @@ pub async fn import_pipeline<
 pub async fn import_companies<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Json(request): Json<ImportCompaniesCsvRequest>,
 ) -> Result<Json<CompanyImportResponse>, TransferError> {
@@ -552,9 +552,9 @@ pub async fn import_companies<
 pub async fn pipeline_csv<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<PipelineCsvResponse>, TransferError> {
@@ -571,9 +571,9 @@ pub async fn pipeline_csv<
 pub async fn export_pipeline<
     Workflows: PipelineWorkflowService,
     Transfer: CrmTransferService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     State(state): State<PipelineWorkflowRouterState<Workflows, Transfer, Authorization>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<PipelineExportResponse>, TransferError> {

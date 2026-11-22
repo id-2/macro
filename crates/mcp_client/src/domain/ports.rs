@@ -1,4 +1,4 @@
-use super::models::{MacroUserIdStr, McpServer, McpServerRecord, RefusedAddress};
+use super::models::{RoxUserIdStr, McpServer, McpServerRecord, RefusedAddress};
 use rmcp::transport::auth::{AuthError, AuthorizationManager};
 use rmcp::transport::streamable_http_client::StreamableHttpClient;
 use std::sync::Arc;
@@ -38,21 +38,21 @@ pub trait McpServerStore: Send + Sync + 'static {
     /// Load a server record for a user and server URL. Returns `None` if not stored.
     fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> impl Future<Output = Result<Option<McpServerRecord>, Self::Err>> + Send;
 
     /// Delete a server record for a user and server URL.
     fn delete(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// List all stored server records for a user.
     fn list(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<McpServerRecord>, Self::Err>> + Send;
 }
 
@@ -118,7 +118,7 @@ pub trait OAuthClient: Send + Sync + 'static {
     /// needed, and returns the authorization URL the user should be redirected to.
     fn start_authorization(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
         server_name: &str,
     ) -> impl Future<Output = anyhow::Result<String>> + Send;
@@ -145,6 +145,6 @@ pub trait LinkedGithubTokens: Send + Sync + 'static {
     /// token stopped working.
     async fn access_token(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> anyhow::Result<Option<String>>;
 }

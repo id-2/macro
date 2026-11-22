@@ -99,7 +99,7 @@ async fn an_agent_is_attributed_as_acting_for_the_user() {
         seeded.row_id,
     );
     world.lock().unwrap().broker_events.clear();
-    let agent = bot_id::MACRO_AI_BOT_ID;
+    let agent = bot_id::ROX_AI_BOT_ID;
 
     svc.create_database(CreateDatabase {
         name: "Agent Offsite".into(),

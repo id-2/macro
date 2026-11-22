@@ -102,7 +102,7 @@ function parseLinearStatusOptionId(args: {
   return PROPERTY_OPTION_IDS.STATUS.NOT_STARTED;
 }
 
-type MacroTaskDraft = {
+type RoxTaskDraft = {
   title: string;
   content: string;
   propertyValues: PropertyInput[];
@@ -112,7 +112,7 @@ type MacroTaskDraft = {
 export function linearCsvRecordToMacroTaskDraft(args: {
   record: Record<string, string>;
   assigneeUserId?: string | null;
-}): MacroTaskDraft {
+}): RoxTaskDraft {
   const record = args.record;
   const title = normalizeText(record[LINEAR_CSV_HEADERS.title]);
   const description = normalizeText(record[LINEAR_CSV_HEADERS.description]);

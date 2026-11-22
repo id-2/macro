@@ -7,7 +7,7 @@ fn noon() -> DateTime<Utc> {
 }
 
 #[test]
-fn a_computer_on_macro_credits_chosen_at_setup_never_starts_a_sign_in() {
+fn a_computer_on_rox_credits_chosen_at_setup_never_starts_a_sign_in() {
     let signed_out = Response::SignedOut {
         agent: AgentProvider::Claude,
     };

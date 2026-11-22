@@ -12,7 +12,7 @@
 //! error *without* committing, so the supervising restart loop redelivers the
 //! event and retries durably. Undecodable messages are logged and skipped
 //! rather than wedging the partition. The transport mirrors
-//! [`macro_event_broker::KafkaEventPublisher`]: plaintext for
+//! [`rox_event_broker::KafkaEventPublisher`]: plaintext for
 //! `ENVIRONMENT=local`, TLS + SASL/OAUTHBEARER with MSK IAM otherwise.
 //!
 //! For local testing, run with `RUST_LOG=webhook=trace` to see every received
@@ -25,8 +25,8 @@ use crate::domain::ingestion::{WebhookEventIngestionError, WebhookEventIngestion
 use crate::topics::DeclaredMacroEvent;
 use anyhow::Context as _;
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message};
@@ -47,7 +47,7 @@ impl GroupName for WebhookEventIngestionConsumerGroup {
 
 type WebhookKafkaAdapter =
     KafkaConsumerAdapter<WebhookEventIngestionConsumerGroup, DeclaredMacroEvent>;
-type WebhookKafkaConsumer = MacroEventConsumerService<DeclaredMacroEvent, WebhookKafkaAdapter>;
+type WebhookKafkaConsumer = RoxEventConsumerService<DeclaredMacroEvent, WebhookKafkaAdapter>;
 
 /// Maximum in-process ingestion attempts per event before the consumer bails
 /// out and lets a restart redeliver from the last committed offset.

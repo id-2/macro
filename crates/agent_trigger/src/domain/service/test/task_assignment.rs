@@ -59,7 +59,7 @@ async fn another_users_private_agent_cannot_be_assigned() {
     assert!(
         service
             .authorize_task_assignment(
-                &MacroUserIdStr::try_from_email("another@example.com").unwrap(),
+                &RoxUserIdStr::try_from_email("another@example.com").unwrap(),
                 &task(),
                 Uuid::from_u128(3),
                 BotId::TEST_A,

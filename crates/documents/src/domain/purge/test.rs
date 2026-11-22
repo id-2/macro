@@ -3,7 +3,7 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 use model_owner::Owner;
 use shared_entity_registry::{OwnedPurgeOutcome, PurgeOwnedEntity};
 use tokio::task::JoinHandle;
@@ -143,8 +143,8 @@ impl DocxPartReferences for Arc<State> {
 
 struct Broker(Arc<State>);
 
-impl MacroEventBroker for Broker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for Broker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

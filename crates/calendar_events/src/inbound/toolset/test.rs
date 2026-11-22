@@ -7,7 +7,7 @@ use std::sync::Mutex;
 use ai_toolset::schema::generate_validated_input_schema;
 use ai_toolset::{AsyncTool, RequestContext, ServiceContext, ToolSet};
 use chrono::{NaiveDate, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -165,8 +165,8 @@ struct MockMutations {
     created: Mutex<Vec<RecordedCreate>>,
     create_error: Mutex<Option<CalendarMutationError>>,
     updated: Mutex<Vec<(Uuid, CalendarEventPatch, CalendarUpdateScope)>>,
-    switched_to_macro_call: Mutex<Vec<(Uuid, CalendarEventPatch, CalendarUpdateScope)>>,
-    macro_call_error: Mutex<Option<MacroCallEventError>>,
+    switched_to_rox_call: Mutex<Vec<(Uuid, CalendarEventPatch, CalendarUpdateScope)>>,
+    rox_call_error: Mutex<Option<RoxCallEventError>>,
     deleted: Mutex<Vec<(Uuid, CalendarDeletionScope)>>,
     answered: Mutex<Vec<(Uuid, AttendeeResponseStatus, CalendarRsvpScope)>>,
     calendars: Mutex<Vec<VisibleCalendar>>,
@@ -175,28 +175,28 @@ struct MockMutations {
 }
 
 impl CalendarMacroCallService for MockMutations {
-    async fn create_event_with_macro_call(
+    async fn create_event_with_rox_call(
         &self,
         _requester_id: &str,
         _email_link_id: Option<Uuid>,
         _calendar_id: Option<Uuid>,
         _draft: CalendarEventDraft,
-    ) -> Result<crate::domain::models::CalendarEvent, MacroCallEventError> {
+    ) -> Result<crate::domain::models::CalendarEvent, RoxCallEventError> {
         unreachable!("the create tool mints its call through the meeting link port")
     }
 
-    async fn update_event_with_macro_call(
+    async fn update_event_with_rox_call(
         &self,
         _requester_id: &str,
         event_id: Uuid,
         _calendar_id: Option<Uuid>,
         patch: CalendarEventPatch,
         scope: CalendarUpdateScope,
-    ) -> Result<crate::domain::models::CalendarEvent, MacroCallEventError> {
-        if let Some(error) = self.macro_call_error.lock().unwrap().take() {
+    ) -> Result<crate::domain::models::CalendarEvent, RoxCallEventError> {
+        if let Some(error) = self.rox_call_error.lock().unwrap().take() {
             return Err(error);
         }
-        self.switched_to_macro_call
+        self.switched_to_rox_call
             .lock()
             .unwrap()
             .push((event_id, patch, scope));
@@ -474,7 +474,7 @@ fn context_with_meeting_links(
 }
 
 fn request_context() -> RequestContext {
-    RequestContext::new(MacroUserIdStr::try_from("macro|test@example.com".to_string()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap())
 }
 
 fn empty_occurrences() -> MockOccurrences {
@@ -664,7 +664,7 @@ async fn create_converts_input_into_a_domain_draft() {
                 minutes: 15,
             }],
         }),
-        add_macro_call: false,
+        add_rox_call: false,
         add_conference: true,
         event_type: CalendarEventTypeInput::Default,
         out_of_office: None,
@@ -715,7 +715,7 @@ async fn create_maps_out_of_office_input_into_the_draft() {
         recurrence_lines: Vec::new(),
         calendar_id: None,
         reminders: None,
-        add_macro_call: false,
+        add_rox_call: false,
         add_conference: false,
         event_type: CalendarEventTypeInput::OutOfOffice,
         out_of_office: Some(OutOfOfficeInput {
@@ -756,7 +756,7 @@ async fn create_rejects_out_of_office_settings_on_a_default_event() {
         recurrence_lines: Vec::new(),
         calendar_id: None,
         reminders: None,
-        add_macro_call: false,
+        add_rox_call: false,
         add_conference: false,
         event_type: CalendarEventTypeInput::Default,
         out_of_office: Some(OutOfOfficeInput::default()),
@@ -787,7 +787,7 @@ async fn create_surfaces_missing_calendar_as_an_actionable_error() {
         recurrence_lines: Vec::new(),
         calendar_id: None,
         reminders: None,
-        add_macro_call: false,
+        add_rox_call: false,
         add_conference: false,
         event_type: CalendarEventTypeInput::Default,
         out_of_office: None,
@@ -801,7 +801,7 @@ async fn create_surfaces_missing_calendar_as_an_actionable_error() {
     );
 }
 
-fn macro_call_tool() -> CreateCalendarEvent {
+fn rox_call_tool() -> CreateCalendarEvent {
     CreateCalendarEvent {
         title: "Design review".to_string(),
         time: EventTimeInput::Timed {
@@ -818,7 +818,7 @@ fn macro_call_tool() -> CreateCalendarEvent {
         recurrence_lines: Vec::new(),
         calendar_id: Some(Uuid::from_u128(3)),
         reminders: None,
-        add_macro_call: true,
+        add_rox_call: true,
         add_conference: false,
         event_type: CalendarEventTypeInput::Default,
         out_of_office: None,
@@ -827,19 +827,19 @@ fn macro_call_tool() -> CreateCalendarEvent {
 }
 
 #[tokio::test]
-async fn create_with_a_macro_call_mints_a_meeting_and_writes_its_link_into_the_event() {
+async fn create_with_a_rox_call_mints_a_meeting_and_writes_its_link_into_the_event() {
     let (mutations, meeting_links, context) = context_with_meeting_links(
         MockMutations::default(),
         empty_occurrences(),
         MockMeetingLinks::default(),
     );
 
-    let response = macro_call_tool()
+    let response = rox_call_tool()
         .call(context, request_context())
         .await
         .unwrap();
     assert_eq!(response.event_id, Uuid::from_u128(7));
-    assert_eq!(response.macro_call_url.as_deref(), Some(MEETING_URL));
+    assert_eq!(response.rox_call_url.as_deref(), Some(MEETING_URL));
 
     let requests = meeting_links.requests.lock().unwrap();
     let request = requests.first().expect("one meeting minted");
@@ -872,7 +872,7 @@ async fn create_with_a_macro_call_mints_a_meeting_and_writes_its_link_into_the_e
 }
 
 #[tokio::test]
-async fn mcp_toolset_accepts_add_macro_call() {
+async fn mcp_toolset_accepts_add_rox_call() {
     let (mutations, meeting_links, context) = context_with_meeting_links(
         MockMutations::default(),
         empty_occurrences(),
@@ -894,7 +894,7 @@ async fn mcp_toolset_accepts_add_macro_call() {
 }
 
 #[tokio::test]
-async fn create_refuses_both_a_macro_call_and_a_google_meet() {
+async fn create_refuses_both_a_rox_call_and_a_google_meet() {
     let (mutations, meeting_links, context) = context_with_meeting_links(
         MockMutations::default(),
         empty_occurrences(),
@@ -903,7 +903,7 @@ async fn create_refuses_both_a_macro_call_and_a_google_meet() {
 
     let error = CreateCalendarEvent {
         add_conference: true,
-        ..macro_call_tool()
+        ..rox_call_tool()
     }
     .call(context, request_context())
     .await
@@ -919,7 +919,7 @@ async fn create_refuses_both_a_macro_call_and_a_google_meet() {
 }
 
 #[tokio::test]
-async fn create_with_a_macro_call_rolls_the_meeting_back_when_the_calendar_write_fails() {
+async fn create_with_a_rox_call_rolls_the_meeting_back_when_the_calendar_write_fails() {
     let (mutations, meeting_links, context) = context_with_meeting_links(
         MockMutations {
             create_error: Mutex::new(Some(CalendarMutationError::NoWritableCalendar)),
@@ -929,7 +929,7 @@ async fn create_with_a_macro_call_rolls_the_meeting_back_when_the_calendar_write
         MockMeetingLinks::default(),
     );
 
-    let error = macro_call_tool()
+    let error = rox_call_tool()
         .call(context, request_context())
         .await
         .unwrap_err();
@@ -947,7 +947,7 @@ async fn create_with_a_macro_call_rolls_the_meeting_back_when_the_calendar_write
 }
 
 #[tokio::test]
-async fn create_with_a_macro_call_explains_an_unwired_host() {
+async fn create_with_a_rox_call_explains_an_unwired_host() {
     let (mutations, _, context) = context_with_meeting_links(
         MockMutations::default(),
         empty_occurrences(),
@@ -957,7 +957,7 @@ async fn create_with_a_macro_call_explains_an_unwired_host() {
         },
     );
 
-    let error = macro_call_tool()
+    let error = rox_call_tool()
         .call(context, request_context())
         .await
         .unwrap_err();
@@ -971,7 +971,7 @@ async fn create_with_a_macro_call_explains_an_unwired_host() {
 }
 
 #[tokio::test]
-async fn update_can_switch_the_event_to_a_macro_call() {
+async fn update_can_switch_the_event_to_a_rox_call() {
     let (mutations, context) = context(MockMutations::default(), empty_occurrences());
     let event_id = Uuid::from_u128(11);
 
@@ -984,16 +984,16 @@ async fn update_can_switch_the_event_to_a_macro_call() {
     .unwrap();
     let response = tool.call(context, request_context()).await.unwrap();
 
-    assert_eq!(response.macro_call_url.as_deref(), Some(MEETING_URL));
+    assert_eq!(response.rox_call_url.as_deref(), Some(MEETING_URL));
     assert!(mutations.updated.lock().unwrap().is_empty());
-    let switched = mutations.switched_to_macro_call.lock().unwrap();
+    let switched = mutations.switched_to_rox_call.lock().unwrap();
     let (switched_id, patch, _) = switched.first().expect("one switch");
     assert_eq!(*switched_id, event_id);
     assert_eq!(patch.title.as_deref(), Some("Renamed"));
 }
 
 #[tokio::test]
-async fn update_refuses_both_a_macro_call_and_a_conference() {
+async fn update_refuses_both_a_rox_call_and_a_conference() {
     let (mutations, context) = context(MockMutations::default(), empty_occurrences());
 
     let tool: UpdateCalendarEvent = serde_json::from_value(serde_json::json!({
@@ -1010,7 +1010,7 @@ async fn update_refuses_both_a_macro_call_and_a_conference() {
         "unexpected description: {}",
         error.description
     );
-    assert!(mutations.switched_to_macro_call.lock().unwrap().is_empty());
+    assert!(mutations.switched_to_rox_call.lock().unwrap().is_empty());
 }
 
 #[tokio::test]
@@ -1019,7 +1019,7 @@ async fn update_converts_input_into_a_domain_patch() {
     let event_id = Uuid::from_u128(11);
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id,
         calendar_id: None,
         inbox: None,
@@ -1063,7 +1063,7 @@ async fn update_maps_out_of_office_settings_into_the_patch() {
     let event_id = Uuid::from_u128(11);
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id,
         calendar_id: None,
         inbox: None,
@@ -1104,7 +1104,7 @@ async fn update_passes_the_selected_occurrence_scope() {
     let event_id = Uuid::from_u128(11);
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id,
         calendar_id: None,
         inbox: None,
@@ -1143,7 +1143,7 @@ async fn scoped_update_requires_a_recurrence_id() {
     let (mutations, context) = context(MockMutations::default(), empty_occurrences());
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id: Uuid::from_u128(11),
         calendar_id: None,
         inbox: None,
@@ -1174,7 +1174,7 @@ async fn series_update_rejects_a_stray_recurrence_id() {
     let (mutations, context) = context(MockMutations::default(), empty_occurrences());
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id: Uuid::from_u128(11),
         calendar_id: None,
         inbox: None,
@@ -1202,7 +1202,7 @@ async fn update_carries_reminders_into_the_patch() {
     let (mutations, context) = context(MockMutations::default(), empty_occurrences());
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id: Uuid::from_u128(11),
         calendar_id: None,
         inbox: None,
@@ -1250,7 +1250,7 @@ async fn rsvp_alone_answers_without_patching() {
     let event_id = Uuid::from_u128(11);
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id,
         calendar_id: None,
         inbox: None,
@@ -1287,7 +1287,7 @@ async fn rsvp_follows_the_occurrence_scope_of_the_call() {
     let (mutations, context) = context(MockMutations::default(), empty_occurrences());
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id: Uuid::from_u128(11),
         calendar_id: None,
         inbox: None,
@@ -1325,7 +1325,7 @@ async fn update_answers_after_applying_the_patch() {
     let (mutations, context) = context(MockMutations::default(), empty_occurrences());
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id: Uuid::from_u128(11),
         calendar_id: None,
         inbox: None,
@@ -1357,7 +1357,7 @@ async fn update_without_a_change_or_an_rsvp_is_rejected() {
     let (mutations, context) = context(MockMutations::default(), empty_occurrences());
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id: Uuid::from_u128(11),
         calendar_id: None,
         inbox: None,
@@ -2027,7 +2027,7 @@ async fn update_result_names_the_copy_it_changed() {
     let (_, context) = context(mutations, empty_occurrences());
 
     let tool = UpdateCalendarEvent {
-        add_macro_call: false,
+        add_rox_call: false,
         event_id: Uuid::from_u128(7),
         calendar_id: None,
         inbox: None,

@@ -38,7 +38,7 @@ use super::{
     },
 };
 use crate::domain::events::{CalendarEventMetadata, CalendarMacroEvent, CalendarTopicEvent};
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 
 const EMPTY_PATCH: &str = "the patch changes nothing";
 
@@ -48,7 +48,7 @@ pub struct CalendarMutationServiceImpl<R, G, T, B, N> {
     repository: R,
     provider: G,
     tokens: T,
-    macro_event_broker: B,
+    rox_event_broker: B,
     refresh: N,
     outlook_writes_enabled: bool,
 }
@@ -58,16 +58,16 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     /// Construct the service from its ports.
-    pub fn new(repository: R, provider: G, tokens: T, macro_event_broker: B, refresh: N) -> Self {
+    pub fn new(repository: R, provider: G, tokens: T, rox_event_broker: B, refresh: N) -> Self {
         Self {
             repository,
             provider,
             tokens,
-            macro_event_broker,
+            rox_event_broker,
             refresh,
             outlook_writes_enabled: true,
         }
@@ -97,7 +97,7 @@ where
     /// point, so a publish failure must not fail the mutation.
     fn publish_calendar_event(&self, event: CalendarTopicEvent) {
         let _ = self
-            .macro_event_broker
+            .rox_event_broker
             .send_event(&CalendarMacroEvent::for_change(event))
             .inspect_err(|error| {
                 tracing::error!(error=?error, "failed to publish calendar event");
@@ -256,7 +256,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(
@@ -290,7 +290,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(skip(self, requester_id, draft), err)]
@@ -599,7 +599,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     /// Close the push channels a disconnected calendar left open. Best-effort:
@@ -871,7 +871,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(skip(self, requester_id), err)]

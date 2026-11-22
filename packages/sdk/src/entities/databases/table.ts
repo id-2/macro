@@ -2,7 +2,7 @@ import type {
   TableDetail,
   TableVersion,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError } from '../../utils';
+import { RoxNotFoundError } from '../../utils';
 import { DatabaseColumn } from './column';
 import type { AddColumnOptions, Database } from './database';
 import { DatabaseRow } from './row';
@@ -40,7 +40,7 @@ export class DatabaseTable {
     const { tables } = await this.database.schema();
     const found = tables.find((table) => table.table.id === this.id);
     if (!found) {
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `table ${this.id} is not in database ${this.database.id}`,
       );
     }

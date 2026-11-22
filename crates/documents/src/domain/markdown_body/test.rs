@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::permission_token::decode_permission_token;
 use crate::domain::ports::editing::MockEditingWorkerService;
 use entity_access::domain::models::{Entity, EntityPermission, EntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813b";
@@ -23,7 +23,7 @@ fn document(file_type: &str) -> DocumentBasic {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
+fn user() -> RoxUserIdStr<'static> {
     "macro|editor@example.com".to_owned().try_into().unwrap()
 }
 

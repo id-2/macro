@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::replacement::*;
 use serde_json::json;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replacement_journal_serializes_confirmation_preserves_privacy_and_survives_source_retirement(
     pool: PgPool,
 ) {

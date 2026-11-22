@@ -1,7 +1,7 @@
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
 ('90000000-0000-0000-0000-000000000001', 'sponsor', 'sponsor@example.com', 'owner-grants-sponsor'),
 ('90000000-0000-0000-0000-000000000002', 'creator', 'creator@example.com', 'owner-grants-creator');
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
 ('macro|sponsor@example.com', 'sponsor@example.com', '90000000-0000-0000-0000-000000000001'),
 ('macro|creator@example.com', 'creator@example.com', '90000000-0000-0000-0000-000000000002');
 INSERT INTO team (id, name, owner_id) VALUES

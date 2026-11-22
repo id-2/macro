@@ -3,13 +3,13 @@ use crate::domain::models::{
     AllowanceDecision, AutoReloadThresholds, BillingError, Entitlement, PayerScope, PlanTier,
     UsageSnapshot,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
-use macro_uuid::Uuid;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
+use rox_uuid::Uuid;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{email}")).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
 }
 
 /// The `(since, now)` window one candidate query was asked for.
@@ -18,7 +18,7 @@ type Window = (DateTime<Utc>, DateTime<Utc>);
 /// Returns the configured candidates and remembers the window it was asked for.
 #[derive(Clone, Default)]
 struct FakeCandidates {
-    users: Vec<MacroUserIdStr<'static>>,
+    users: Vec<RoxUserIdStr<'static>>,
     fail: bool,
     windows: Arc<Mutex<Vec<Window>>>,
 }
@@ -28,7 +28,7 @@ impl SettlementCandidates for FakeCandidates {
         &self,
         since: DateTime<Utc>,
         now: DateTime<Utc>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>> {
         self.windows.lock().unwrap().push((since, now));
         if self.fail {
             return Err(BillingError::Storage(anyhow::anyhow!(
@@ -46,7 +46,7 @@ struct FakeEntitlements {
 }
 
 impl EntitlementSource for FakeEntitlements {
-    async fn entitlement(&self, user: &MacroUserIdStr<'_>) -> Result<Entitlement> {
+    async fn entitlement(&self, user: &RoxUserIdStr<'_>) -> Result<Entitlement> {
         if self.fail_for.as_deref() == Some(user.as_ref()) {
             return Err(BillingError::Entitlement(anyhow::anyhow!(
                 "roles unavailable"
@@ -58,10 +58,10 @@ impl EntitlementSource for FakeEntitlements {
             .cloned()
             .unwrap_or_else(|| Entitlement::personal(user.clone().into_owned(), PlanTier::Free)))
     }
-    async fn stripe_customer_id(&self, _user: &MacroUserIdStr<'_>) -> Result<Option<String>> {
+    async fn stripe_customer_id(&self, _user: &RoxUserIdStr<'_>) -> Result<Option<String>> {
         unreachable!()
     }
-    async fn team_payer(&self, _team_id: Uuid) -> Result<Option<MacroUserIdStr<'static>>> {
+    async fn team_payer(&self, _team_id: Uuid) -> Result<Option<RoxUserIdStr<'static>>> {
         unreachable!()
     }
 }
@@ -76,28 +76,28 @@ struct FakeBilling {
 impl BillingService for FakeBilling {
     async fn change_plan(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _change: crate::domain::plan_change::PlanChange,
     ) -> Result<()> {
         unreachable!()
     }
 
-    async fn settle(&self, user: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn settle(&self, user: &RoxUserIdStr<'_>) -> Result<()> {
         self.settled.lock().unwrap().push(user.to_string());
         if self.fail_for.as_deref() == Some(user.as_ref()) {
             return Err(BillingError::NoStripeCustomer);
         }
         Ok(())
     }
-    async fn snapshot(&self, _user: &MacroUserIdStr<'_>) -> Result<UsageSnapshot> {
+    async fn snapshot(&self, _user: &RoxUserIdStr<'_>) -> Result<UsageSnapshot> {
         unreachable!()
     }
-    async fn check_allowance(&self, _user: &MacroUserIdStr<'_>) -> Result<AllowanceDecision> {
+    async fn check_allowance(&self, _user: &RoxUserIdStr<'_>) -> Result<AllowanceDecision> {
         unreachable!()
     }
     async fn update_overage(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _enabled: bool,
         _limit_cents: i64,
     ) -> Result<UsageSnapshot> {
@@ -105,7 +105,7 @@ impl BillingService for FakeBilling {
     }
     async fn update_auto_reload(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _enabled: bool,
         _thresholds: AutoReloadThresholds,
     ) -> Result<UsageSnapshot> {
@@ -113,14 +113,14 @@ impl BillingService for FakeBilling {
     }
     async fn purchase_credits(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _amount_cents: i64,
     ) -> Result<crate::domain::CreditPurchase> {
         unreachable!()
     }
     async fn create_credit_checkout(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _amount_cents: i64,
         _success_url: String,
         _cancel_url: String,
@@ -129,7 +129,7 @@ impl BillingService for FakeBilling {
     }
     async fn apply_credit_purchase(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         _amount_cents: i64,
         _stripe_reference: &str,
     ) -> Result<()> {
@@ -137,7 +137,7 @@ impl BillingService for FakeBilling {
     }
     async fn sync_period(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         _start: DateTime<Utc>,
         _end: DateTime<Utc>,
         _verified: Option<crate::domain::period::SubscriptionPeriod>,
@@ -150,14 +150,14 @@ impl BillingService for FakeBilling {
     async fn mark_credit_reload_invoice(
         &self,
         _stripe_invoice_id: &str,
-        _reload_id: Option<macro_uuid::Uuid>,
+        _reload_id: Option<rox_uuid::Uuid>,
         _paid: bool,
     ) -> Result<()> {
         unreachable!()
     }
 }
 
-fn team_member(member: &MacroUserIdStr<'static>, owner: &MacroUserIdStr<'static>) -> Entitlement {
+fn team_member(member: &RoxUserIdStr<'static>, owner: &RoxUserIdStr<'static>) -> Entitlement {
     let team_id = Uuid::nil();
     Entitlement {
         tier: PlanTier::Premium,

@@ -44,7 +44,7 @@ async fn grants(pool: &PgPool, form: FormId) -> Vec<(String, Option<String>)> {
     .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_form_in_a_folder_holds_the_grants_of_every_folder_above_it(pool: PgPool) {
     let table = insert_table(&pool).await;
     shared_folders(&pool).await;
@@ -80,7 +80,7 @@ async fn a_form_in_a_folder_holds_the_grants_of_every_folder_above_it(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_trashed_form_stays_where_it_was_and_a_purged_folder_frees_a_form(pool: PgPool) {
     let table = insert_table(&pool).await;
     shared_folders(&pool).await;
@@ -105,7 +105,7 @@ async fn a_trashed_form_stays_where_it_was_and_a_purged_folder_frees_a_form(pool
     assert_eq!(stored.form.project_id, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn trashing_its_folder_returns_a_form_to_the_root_without_its_grants(pool: PgPool) {
     let table = insert_table(&pool).await;
     shared_folders(&pool).await;

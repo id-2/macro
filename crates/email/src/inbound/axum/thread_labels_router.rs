@@ -6,8 +6,8 @@ use axum::{
     routing::{get, patch},
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use thiserror::Error;
@@ -103,9 +103,9 @@ pub fn thread_labels_router<S, T, Auth>() -> Router<S>
 where
     S: Send + Sync + Clone + 'static,
     T: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     EmailRouterState<T>: axum::extract::FromRef<S>,
-    MacroAuthorizationState<Auth>: axum::extract::FromRef<S>,
+    RoxAuthorizationState<Auth>: axum::extract::FromRef<S>,
 {
     Router::new()
         .route(
@@ -138,16 +138,16 @@ where
     )
 )]
 #[tracing::instrument(err, skip(state, macro_user, body))]
-pub async fn update_thread_labels_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn update_thread_labels_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
-    Cached(macro_user): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(macro_user): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Path(thread_id): Path<Uuid>,
     Json(body): Json<UpdateThreadLabelRequest>,
 ) -> Result<Json<UpdateThreadLabelsResponse>, UpdateThreadLabelError> {
     let result = state
         .inner
         .update_thread_labels_for_user(
-            macro_user.authorization.user.macro_user_id.clone(),
+            macro_user.authorization.user.rox_user_id.clone(),
             thread_id,
             body.label_id,
             body.value,
@@ -180,9 +180,9 @@ pub struct UpdateThreadStateRequest {
 #[utoipa::path(patch,tag="Threads",path="/email/threads/{id}/state",operation_id="update_thread_state",request_body=UpdateThreadStateRequest,
     params(("id"=Uuid,Path,description="Thread ID")),responses((status=204),(status=400,body=ErrorResponse),(status=401,body=ErrorResponse),(status=404,body=ErrorResponse),(status=409,body=ErrorResponse)))]
 #[tracing::instrument(skip_all, err)]
-pub async fn update_thread_state_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn update_thread_state_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
-    Cached(actor): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(actor): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Path(thread): Path<Uuid>,
     Json(input): Json<UpdateThreadStateRequest>,
 ) -> Result<StatusCode, UpdateThreadLabelError> {
@@ -195,7 +195,7 @@ pub async fn update_thread_state_handler<T: EmailService, Auth: MacroAuthorizati
     };
     state
         .inner
-        .change_thread_mailbox_state(actor.authorization.user.macro_user_id, thread, action)
+        .change_thread_mailbox_state(actor.authorization.user.rox_user_id, thread, action)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -203,9 +203,9 @@ pub async fn update_thread_state_handler<T: EmailService, Auth: MacroAuthorizati
 /// Fetch the latest organization action outcomes without provider-specific status strings.
 #[utoipa::path(get,tag="Threads",path="/email/threads/{id}/operations",operation_id="thread_operations",
     params(("id"=Uuid,Path,description="Thread ID")),responses((status=200,body=Vec<crate::domain::models::mailbox_action::MailboxOperation>),(status=404,body=ErrorResponse)))]
-pub async fn thread_operations_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn thread_operations_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
-    Cached(actor): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(actor): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Path(thread): Path<Uuid>,
 ) -> Result<
     Json<Vec<crate::domain::models::mailbox_action::MailboxOperation>>,
@@ -214,7 +214,7 @@ pub async fn thread_operations_handler<T: EmailService, Auth: MacroAuthorization
     Ok(Json(
         state
             .inner
-            .thread_mailbox_operations(actor.authorization.user.macro_user_id, thread)
+            .thread_mailbox_operations(actor.authorization.user.rox_user_id, thread)
             .await?,
     ))
 }

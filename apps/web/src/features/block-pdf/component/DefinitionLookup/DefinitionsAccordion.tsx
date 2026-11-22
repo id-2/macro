@@ -26,9 +26,9 @@ import {
 
 // Default delimiter used to pass colors to definition popups
 // Make sure this delimiter matches the value in SafeWriter.java
-const COLORDELIMITER = '%%MACRO_COLOR_DELIMITER%%';
-const BOLDDELIMITER = '%%MACRO_BOLD_DELIMITER%%';
-const ITALICDELIMITER = '%%MACRO_ITALIC_DELIMITER%%';
+const COLORDELIMITER = '%%ROX_COLOR_DELIMITER%%';
+const BOLDDELIMITER = '%%ROX_BOLD_DELIMITER%%';
+const ITALICDELIMITER = '%%ROX_ITALIC_DELIMITER%%';
 const htmlSpecialEntities = [
   ['&amp;', '&'],
   ['&lt;', '<'],

@@ -1,5 +1,5 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { ExternalChat } from './chat';
 
 /**
@@ -7,11 +7,11 @@ import { ExternalChat } from './chat';
  * to Rox: read, share and send in them. Find and add a provider's chats
  * through its own namespace, such as `macro.whatsapp.chats()`.
  *
- * @routing Use when reading, sharing or sending in an external chat, such as a WhatsApp chat, already added to Macro; not Macro channels, or finding chats to add (`macro.whatsapp`).
+ * @routing Use when reading, sharing or sending in an external chat, such as a WhatsApp chat, already added to Rox; not Rox channels, or finding chats to add (`macro.whatsapp`).
  */
 export class ExternalChatsNamespace {
   /** Bind external chat operations to this authenticated client. */
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Added chats the caller can view, including without a provider account of their own.

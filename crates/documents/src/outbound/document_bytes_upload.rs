@@ -32,7 +32,7 @@ impl DocumentBytesUploadPort for ReqwestDocumentBytesUploader {
         // network and has to use LocalStack's own hostname to reach the same
         // object. No-op outside local AWS.
         let presigned_url =
-            macro_aws_config::transform_aws_url_for_internal_fetch(&upload.presigned_url);
+            rox_aws_config::transform_aws_url_for_internal_fetch(&upload.presigned_url);
         let upload_response = self
             .http_client
             .put(&presigned_url)

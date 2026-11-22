@@ -746,7 +746,7 @@ fn styles_in_a_new_design_make_an_internal_canvas() {
 fn figma_shaped_file() -> Vec<u8> {
     use crate::kiwi::{Schema, schema_from_text};
     use crate::testing::{V, color, encode, guid, node, size, solid, translate};
-    let text = crate::save::MACRO_SCHEMA
+    let text = crate::save::ROX_SCHEMA
         .replace(
             "message ComponentPropAssignment defID:GUID value:ComponentPropValue",
             "enum VariableDataType BOOLEAN FLOAT STRING ALIAS COLOR EXPRESSION MAP SYMBOL_ID FONT_STYLE TEXT_DATA\nmessage SymbolId guid:GUID assetRef:AssetRef\nmessage VariableAnyValue boolValue:bool textValue:string symbolIdValue:SymbolId textDataValue:TextData\nmessage VariableData value:VariableAnyValue dataType:VariableDataType resolvedDataType:VariableDataType\nmessage ComponentPropAssignment defID:GUID value:ComponentPropValue varValue:VariableData",

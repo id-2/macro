@@ -1,6 +1,6 @@
 use super::*;
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 async fn remove_message_labels(pool: &Pool<Postgres>, message_id: Uuid) -> Result<()> {
@@ -33,7 +33,7 @@ async fn attachment_is_claimed(pool: &Pool<Postgres>, attachment_id: Uuid) -> Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
@@ -41,7 +41,7 @@ async fn attachment_is_claimed(pool: &Pool<Postgres>, attachment_id: Uuid) -> Re
 )]
 // should return attachments for thread with sent message
 async fn thread_attachments_for_backfill_condition_1(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
 
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000101")?;
     let res = thread_document_atts_for_backfill(&pool, thread_id).await?;
@@ -56,7 +56,7 @@ async fn thread_attachments_for_backfill_condition_1(pool: Pool<Postgres>) -> Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
@@ -64,7 +64,7 @@ async fn thread_attachments_for_backfill_condition_1(pool: Pool<Postgres>) -> Re
 )]
 // should return attachments for thread with important labeled message
 async fn thread_attachments_for_backfill_condition_2(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
 
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000102")?;
     let res = thread_document_atts_for_backfill(&pool, thread_id).await?;
@@ -76,7 +76,7 @@ async fn thread_attachments_for_backfill_condition_2(pool: Pool<Postgres>) -> Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
@@ -85,7 +85,7 @@ async fn thread_attachments_for_backfill_condition_2(pool: Pool<Postgres>) -> Re
 async fn thread_attachments_for_backfill_requires_important_label(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     remove_message_labels(
         &pool,
@@ -102,7 +102,7 @@ async fn thread_attachments_for_backfill_requires_important_label(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
@@ -110,7 +110,7 @@ async fn thread_attachments_for_backfill_requires_important_label(
 )]
 // should return attachments for thread with same domain contact message
 async fn thread_attachments_for_backfill_condition_3(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
 
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000103")?;
     let res = thread_document_atts_for_backfill(&pool, thread_id).await?;
@@ -122,14 +122,14 @@ async fn thread_attachments_for_backfill_condition_3(pool: Pool<Postgres>) -> Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
     )
 )]
 async fn thread_attachments_for_backfill_rejects_domain_suffix(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000106")?;
     let res = thread_document_atts_for_backfill(&pool, thread_id).await?;
@@ -140,7 +140,7 @@ async fn thread_attachments_for_backfill_rejects_domain_suffix(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
@@ -149,7 +149,7 @@ async fn thread_attachments_for_backfill_rejects_domain_suffix(pool: Pool<Postgr
 async fn thread_attachments_for_backfill_matches_domain_case_insensitively(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000107")?;
     let res = thread_document_atts_for_backfill(&pool, thread_id).await?;
@@ -164,7 +164,7 @@ async fn thread_attachments_for_backfill_matches_domain_case_insensitively(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
@@ -172,7 +172,7 @@ async fn thread_attachments_for_backfill_matches_domain_case_insensitively(
 )]
 // should return empty when no messages match any condition
 async fn thread_attachments_for_backfill_no_matching_messages(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
 
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000104")?;
     let res = thread_document_atts_for_backfill(&pool, thread_id).await?;
@@ -183,7 +183,7 @@ async fn thread_attachments_for_backfill_no_matching_messages(pool: Pool<Postgre
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
@@ -191,7 +191,7 @@ async fn thread_attachments_for_backfill_no_matching_messages(pool: Pool<Postgre
 )]
 // should return attachments for thread with whitelisted domain message
 async fn thread_attachments_for_backfill_condition_4(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
 
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000105")?;
     let res = thread_document_atts_for_backfill(&pool, thread_id).await?;
@@ -204,7 +204,7 @@ async fn thread_attachments_for_backfill_condition_4(pool: Pool<Postgres>) -> Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_job_attachments_for_backfill")
@@ -213,7 +213,7 @@ async fn thread_attachments_for_backfill_condition_4(pool: Pool<Postgres>) -> Re
 async fn job_attachments_for_backfill_includes_previously_contacted_participants(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let res = fetch_job_attachments_for_backfill(&pool, link_id).await?;
@@ -235,7 +235,7 @@ async fn job_attachments_for_backfill_includes_previously_contacted_participants
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_job_attachments_for_backfill")
@@ -244,7 +244,7 @@ async fn job_attachments_for_backfill_includes_previously_contacted_participants
 async fn job_attachments_for_backfill_excludes_ineligible_and_filtered_attachments(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let res = fetch_job_attachments_for_backfill(&pool, link_id).await?;
@@ -262,7 +262,7 @@ async fn job_attachments_for_backfill_excludes_ineligible_and_filtered_attachmen
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_job_attachments_for_backfill")
@@ -271,7 +271,7 @@ async fn job_attachments_for_backfill_excludes_ineligible_and_filtered_attachmen
 async fn job_attachments_for_backfill_allows_missing_self_contact(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000002a")?;
     let res = fetch_job_attachments_for_backfill(&pool, link_id).await?;
@@ -283,7 +283,7 @@ async fn job_attachments_for_backfill_allows_missing_self_contact(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_job_attachments_for_backfill")
@@ -292,7 +292,7 @@ async fn job_attachments_for_backfill_allows_missing_self_contact(
 async fn job_attachments_for_backfill_does_not_leak_other_links(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let res = fetch_job_attachments_for_backfill(&pool, link_id).await?;
@@ -306,14 +306,14 @@ async fn job_attachments_for_backfill_does_not_leak_other_links(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_condition_1_user_sent_message(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Test condition 1: user sent the message
     let message_provider_id = "target-msg-101";
@@ -334,14 +334,14 @@ async fn insertable_attachments_condition_1_user_sent_message(pool: Pool<Postgre
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_condition_2_important_label(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Test condition 2: message has IMPORTANT label
     let message_provider_id = "target-msg-201";
@@ -362,14 +362,14 @@ async fn insertable_attachments_condition_2_important_label(pool: Pool<Postgres>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_require_important_label(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     remove_message_labels(
         &pool,
@@ -390,14 +390,14 @@ async fn insertable_attachments_require_important_label(pool: Pool<Postgres>) ->
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_condition_3_same_domain(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Test condition 3: message from same domain as user
     let message_provider_id = "target-msg-301";
@@ -418,14 +418,14 @@ async fn insertable_attachments_condition_3_same_domain(pool: Pool<Postgres>) ->
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_rejects_domain_suffix(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let res = new_email_document_atts(
         &pool,
@@ -440,7 +440,7 @@ async fn insertable_attachments_rejects_domain_suffix(pool: Pool<Postgres>) -> R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
@@ -449,7 +449,7 @@ async fn insertable_attachments_rejects_domain_suffix(pool: Pool<Postgres>) -> R
 async fn insertable_attachments_matches_domain_case_insensitively(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let res = new_email_document_atts(
         &pool,
@@ -468,14 +468,14 @@ async fn insertable_attachments_matches_domain_case_insensitively(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_condition_4_whitelisted_domain(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Test condition 4: message from whitelisted domain
     let message_provider_id = "target-msg-801";
@@ -499,7 +499,7 @@ async fn insertable_attachments_condition_4_whitelisted_domain(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
@@ -508,7 +508,7 @@ async fn insertable_attachments_condition_4_whitelisted_domain(pool: Pool<Postgr
 async fn insertable_attachments_condition_5_contacted_participant_claims(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let message_provider_id = "target-msg-401";
     let res = new_email_document_atts(
@@ -530,7 +530,7 @@ async fn insertable_attachments_condition_5_contacted_participant_claims(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
@@ -539,7 +539,7 @@ async fn insertable_attachments_condition_5_contacted_participant_claims(
 async fn insertable_attachments_condition_5_repeated_invocation_does_not_reclaim(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let first_res = new_email_document_atts(&pool, link_id, "target-msg-401").await?;
@@ -552,7 +552,7 @@ async fn insertable_attachments_condition_5_repeated_invocation_does_not_reclaim
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
@@ -561,7 +561,7 @@ async fn insertable_attachments_condition_5_repeated_invocation_does_not_reclaim
 async fn insertable_attachments_condition_5_never_contacted_participant_does_not_claim(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let res = new_email_document_atts(
         &pool,
@@ -583,7 +583,7 @@ async fn insertable_attachments_condition_5_never_contacted_participant_does_not
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
@@ -592,7 +592,7 @@ async fn insertable_attachments_condition_5_never_contacted_participant_does_not
 async fn insertable_attachments_condition_5_self_is_only_contacted_participant(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let res = new_email_document_atts(
         &pool,
@@ -614,7 +614,7 @@ async fn insertable_attachments_condition_5_self_is_only_contacted_participant(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
@@ -623,7 +623,7 @@ async fn insertable_attachments_condition_5_self_is_only_contacted_participant(
 async fn insertable_attachments_condition_5_missing_self_contact_allows_contacted_participant(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let res = new_email_document_atts(
         &pool,
@@ -639,14 +639,14 @@ async fn insertable_attachments_condition_5_missing_self_contact_allows_contacte
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_excludes_already_uploaded(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Test document_email exclusion
     let message_provider_id = "target-msg-701";
@@ -664,14 +664,14 @@ async fn insertable_attachments_excludes_already_uploaded(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_filters_mime_types(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Test that filtered mime types are excluded
     let message_provider_id = "target-msg-101";
@@ -699,14 +699,14 @@ async fn insertable_attachments_filters_mime_types(pool: Pool<Postgres>) -> Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
     )
 )]
 async fn insertable_attachments_thread_exists_logic(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let target_message_id = Uuid::parse_str("00000000-0000-0000-0000-0000000e0202")?;
     sqlx::query!(
@@ -753,7 +753,7 @@ async fn insertable_attachments_thread_exists_logic(pool: Pool<Postgres>) -> Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
@@ -762,7 +762,7 @@ async fn insertable_attachments_thread_exists_logic(pool: Pool<Postgres>) -> Res
 async fn insertable_attachments_returns_first_query_when_available(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // Test that when first query (conditions 1-3) returns results,
     // the second query (condition 4) is not executed
@@ -784,7 +784,7 @@ async fn insertable_attachments_returns_first_query_when_available(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_media_for_backfill")
@@ -820,7 +820,7 @@ async fn thread_media_for_backfill_includes_non_inline_images_and_videos(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_media_for_backfill")
@@ -837,7 +837,7 @@ async fn thread_media_for_backfill_filters_inline_images(pool: Pool<Postgres>) -
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_media_for_backfill")
@@ -870,7 +870,7 @@ async fn thread_media_for_backfill_handles_multiple_media_types(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_media_for_backfill")
@@ -889,7 +889,7 @@ async fn thread_media_for_backfill_returns_empty_for_thread_without_media(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("fetch_new_email_media"))
 )]
 async fn new_email_media_includes_non_inline_attachments(pool: Pool<Postgres>) -> Result<()> {
@@ -920,7 +920,7 @@ async fn new_email_media_includes_non_inline_attachments(pool: Pool<Postgres>) -
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("fetch_new_email_media"))
 )]
 async fn new_email_media_excludes_already_uploaded_to_sfs(pool: Pool<Postgres>) -> Result<()> {
@@ -939,7 +939,7 @@ async fn new_email_media_excludes_already_uploaded_to_sfs(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("fetch_new_email_media"))
 )]
 async fn new_email_media_filters_inline_images(pool: Pool<Postgres>) -> Result<()> {
@@ -963,7 +963,7 @@ async fn new_email_media_filters_inline_images(pool: Pool<Postgres>) -> Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("fetch_new_email_media"))
 )]
 async fn new_email_media_returns_empty_for_nonexistent_message(pool: Pool<Postgres>) -> Result<()> {
@@ -990,7 +990,7 @@ fn claim_test_link_id() -> Uuid {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn document_candidate_probe_finds_eligible_unclaimed_attachment(
@@ -1009,7 +1009,7 @@ async fn document_candidate_probe_finds_eligible_unclaimed_attachment(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn document_candidate_probe_excludes_preclaimed_attachment(
@@ -1028,7 +1028,7 @@ async fn document_candidate_probe_excludes_preclaimed_attachment(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_insertable_attachments_for_new_email")
@@ -1045,7 +1045,7 @@ async fn document_candidate_probe_excludes_existing_document_email(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn document_candidate_probe_excludes_unsupported_mime_types(
@@ -1064,7 +1064,7 @@ async fn document_candidate_probe_excludes_unsupported_mime_types(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn document_candidate_probe_excludes_missing_filenames(pool: Pool<Postgres>) -> Result<()> {
@@ -1091,7 +1091,7 @@ async fn document_candidate_probe_excludes_missing_filenames(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn document_candidate_probe_excludes_unknown_message(pool: Pool<Postgres>) -> Result<()> {
@@ -1104,7 +1104,7 @@ async fn document_candidate_probe_excludes_unknown_message(pool: Pool<Postgres>)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn document_candidate_probe_excludes_mismatched_link(pool: Pool<Postgres>) -> Result<()> {
@@ -1119,11 +1119,11 @@ async fn document_candidate_probe_excludes_mismatched_link(pool: Pool<Postgres>)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn new_email_document_atts_claims_attachments(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let message_provider_id = "claim-test-doc-msg";
 
@@ -1167,11 +1167,11 @@ async fn new_email_document_atts_claims_attachments(pool: Pool<Postgres>) -> Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn new_email_media_atts_claims_attachments(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let message_provider_id = "claim-test-media-msg";
 
@@ -1215,13 +1215,13 @@ async fn new_email_media_atts_claims_attachments(pool: Pool<Postgres>) -> Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn new_email_document_atts_excludes_preclaimed_attachments(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // This message has an attachment that was pre-claimed (upload_claimed_at already set)
     let message_provider_id = "claim-test-preclaimed-msg";
@@ -1244,11 +1244,11 @@ async fn new_email_document_atts_excludes_preclaimed_attachments(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn new_email_media_atts_excludes_preclaimed_attachments(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     // This message has an attachment that was pre-claimed (upload_claimed_at already set)
     let message_provider_id = "claim-test-preclaimed-media-msg";
@@ -1271,7 +1271,7 @@ async fn new_email_media_atts_excludes_preclaimed_attachments(pool: Pool<Postgre
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("fetch_thread_attachments_for_backfill")
@@ -1303,11 +1303,11 @@ async fn cloud_reference_documents_are_never_claimed_as_files(pool: Pool<Postgre
 /// A claimed attachment that the query doesn't return is never uploaded, and
 /// its claim keeps the message's projection waiting forever.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn senderless_message_returns_every_attachment_it_claims(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-000000000c01")?;
     let document_id = Uuid::parse_str("00000000-0000-0000-0000-00000c5a0501")?;
@@ -1338,13 +1338,13 @@ async fn senderless_message_returns_every_attachment_it_claims(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("upload_claim_tests"))
 )]
 async fn pending_upload_claim_names_the_claim_until_its_file_is_stored(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let message_id = Uuid::parse_str("00000000-0000-0000-0000-0000000ec401")?;
     let attachment_id = Uuid::parse_str("00000000-0000-0000-0000-00000c4a0401")?;

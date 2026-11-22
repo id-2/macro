@@ -3,7 +3,7 @@ import type {
   ListSkillsData,
   ReadSkillData,
 } from '../../../generated/cognition/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Document } from './document';
 import { DocumentNamespace } from './namespace';
 import { SystemSkill } from './system-skill';
@@ -34,7 +34,7 @@ describe('documents.skills', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const found = await new DocumentNamespace(client).skills({
       query: 'deploy',
@@ -67,7 +67,7 @@ describe('documents.skills', () => {
           return { data: { skills: [] } };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     expect(await new DocumentNamespace(client).skills()).toEqual([]);
     expect(requests).toEqual([{ query: undefined, matchType: undefined }]);
@@ -96,7 +96,7 @@ describe('SystemSkill.content', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const [listing] = await new DocumentNamespace(client).skills();
     if (!(listing?.skill instanceof SystemSkill))

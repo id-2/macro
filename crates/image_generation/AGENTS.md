@@ -35,7 +35,7 @@ feature `axum`) that the SDK's `macro.images.generate()` calls.
 
 - Depends on: `ai_billing` (admission port), `ai_toolset`, `ai_usage`,
   `attachment`, `lexical_client`, `static_file_service_client`; with `axum`,
-  `entity_registry` and `macro_authorization`.
+  `entity_registry` and `rox_authorization`.
 - Used by: `ai_tools` (composes providers and wires the toolset);
   `agent_harness_service` mounts the router under `/cognition`.
 

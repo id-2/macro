@@ -1943,7 +1943,7 @@ Layout and test hooks:
   (`fig-present-button`, ⌥⌘↵ / Ctrl+Alt+Enter) are in the inspector header,
   or float at the canvas's top right while that panel is hidden. The
   shortcuts dialog (`fig-shortcuts`, Ctrl+⇧+?) is also in the main menu.
-- **Comments** (the comment tool, C): Macro comments, the same threads as
+- **Comments** (the comment tool, C): Rox comments, the same threads as
   markdown, PDF, and spreadsheet comments. Pins (`fig-comment-pin`,
   `data-thread`, `data-unread`) sit at a constant size over the canvas; a
   click places a comment on the top-level frame there (it moves with the
@@ -2260,7 +2260,7 @@ is hidden, and on close, as a new document version through
 `PUT /documents/{id}/simple_save`. Saving writes a standard PDF-based `.ai`
 that Illustrator and PDF readers open; an unedited file is written back
 byte for byte. Names given in the Layers and Artboards panels are saved
-with it (`/MacroName` marked content and a `/MacroArtboard` page key, which
+with it (`/RoxName` marked content and a `/RoxArtboard` page key, which
 other readers ignore). For files Illustrator saved, a dismissible note
 (`ai-illustrator-note`) says that Illustrator-only editing data (live
 effects and the like) is not kept, and what the engine could not read

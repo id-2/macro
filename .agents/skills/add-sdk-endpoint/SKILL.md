@@ -54,7 +54,7 @@ To skip: add the method name, alphabetically, to `<camelService>Excluded` in
 4. **Match the conventions:**
    - `static byId(client, id)`; detail via `Lazy` + `protected fetch()`, exposed with
      `this.field(...)` / `this.mappedField(...)`
-   - extend `MacroEntity` / `FavoritableEntity` / `PropertiedEntity`, setting
+   - extend `RoxEntity` / `FavoritableEntity` / `PropertiedEntity`, setting
      `entityType` / `propertyEntityType`
    - writes touching this entity's detail → `this.mutate(...)`; others → `unwrap(...)`
    - every generated call goes through `unwrap()`
@@ -69,7 +69,7 @@ To skip: add the method name, alphabetically, to `<camelService>Excluded` in
      `toJSON()` override adding `url: this.webUrl()`. Agents hand these links
      to users; without one they guess the route.
 5. **New service?** Only when the endpoint's service isn't reachable from
-   `MacroClient` yet — per *service*, not per entity; a new entity needs none of this.
+   `RoxClient` yet — per *service*, not per entity; a new entity needs none of this.
    Wire the `Sdk` into `src/utils/client.ts`, a host into `src/config.ts`, and an
    entry into `ACCESSORS` in `src/coverage/check.ts`. That last one is easy to miss:
    coverage decides "is this called?" by grepping `src/` for the literal text

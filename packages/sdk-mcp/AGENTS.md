@@ -11,7 +11,7 @@ caller, so no tool is handwritten.
 
 - `scripts/generate.ts` reads the SDK with the TypeScript compiler and writes
   `src/generated/catalog.ts` (never committed): each method of every
-  namespace under `Macro` and every class with a `static byId`, its
+  namespace under `Rox` and every class with a `static byId`, its
   parameter schemas from the TS types, and its hint class from TSDoc tags.
 - `src/tools.ts` turns operations into tools. `entity` grouping (default):
   `<entity>_read` / `_write` / `_delete`, one `op` discriminated union each.
@@ -27,7 +27,7 @@ caller, so no tool is handwritten.
 ## Tags
 
 Every public SDK method carries exactly one of `@readonly`, `@write`
-(undoable change), `@send` (only sends something new outside Macro, such as
+(undoable change), `@send` (only sends something new outside Rox, such as
 an email; a call that can also edit or delete is `@destructive`; its
 own `<entity>_send` tool, not destructive, always open-world) or
 `@destructive` (deletes, overwrites, cancels), plus `@openworld` and

@@ -4,7 +4,7 @@ use super::ImportServiceImpl;
 use crate::domain::ports::SlackWorkspaceSource;
 use ai_billing::{AiAdmissionError, AiAdmissionService};
 use ai_usage::AiFeature;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 impl<R, S, C, W: SlackWorkspaceSource, N: Send + Sync + 'static> ImportServiceImpl<R, S, C, W, N> {
@@ -17,7 +17,7 @@ impl<R, S, C, W: SlackWorkspaceSource, N: Send + Sync + 'static> ImportServiceIm
 
     pub(super) async fn admit_ai(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> std::result::Result<(), AiAdmissionError> {
         self.admission.admit(user, AiFeature::Import).await
     }

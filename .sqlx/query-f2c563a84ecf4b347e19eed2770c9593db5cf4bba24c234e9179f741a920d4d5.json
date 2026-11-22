@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT \"macro_user_id\" as \"macro_user_id!\", \"id\"\n        FROM \"User\"\n        WHERE \"email\" = $1\n        ",
+  "query": "\n        SELECT \"rox_user_id\" as \"rox_user_id!\", \"id\"\n        FROM \"User\"\n        WHERE \"email\" = $1\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "macro_user_id!",
+        "name": "rox_user_id!",
         "type_info": "Uuid"
       },
       {

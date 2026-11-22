@@ -35,7 +35,7 @@ struct ParsedMessageRow {
     is_draft: bool,
     body_text: Option<String>,
     body_html_sanitized: Option<String>,
-    body_macro: Option<String>,
+    body_rox: Option<String>,
     headers_jsonb: Option<JsonValue>,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
@@ -66,7 +66,7 @@ impl From<ParsedMessageRow> for db::message::Message {
             is_draft: row.is_draft,
             body_text: row.body_text,
             body_html_sanitized: row.body_html_sanitized,
-            body_macro: row.body_macro,
+            body_rox: row.body_rox,
             headers_jsonb: row.headers_jsonb,
             created_at: row.created_at,
             updated_at: row.updated_at,
@@ -93,7 +93,7 @@ pub async fn get_parsed_message_by_id(
             m.from_contact_id, m.sent_at, m.has_attachments, m.is_read, m.is_starred, m.is_sent, m.is_draft,
             NULL::TEXT as body_text,
             NULL::TEXT as body_html_sanitized,
-            NULL::TEXT as body_macro,
+            NULL::TEXT as body_rox,
             m.headers_jsonb, m.created_at, m.updated_at
         FROM email_messages m
         JOIN email_links l ON m.link_id = l.id
@@ -160,7 +160,7 @@ pub async fn get_parsed_messages_by_id_batch(
             m.from_contact_id, m.sent_at, m.has_attachments, m.is_read, m.is_starred, m.is_sent, m.is_draft,
             m.body_text as body_text,
             m.body_html_sanitized as body_html_sanitized,
-            NULL::TEXT as body_macro,
+            NULL::TEXT as body_rox,
             m.headers_jsonb, m.created_at, m.updated_at
         FROM email_messages m
         JOIN email_links l ON m.link_id = l.id
@@ -263,7 +263,7 @@ pub async fn get_paginated_parsed_messages_by_thread_id(
             -- No body attributes
             body_text as body_text,
             body_html_sanitized as body_html_sanitized,
-            NULL::TEXT as body_macro
+            NULL::TEXT as body_rox
         FROM email_messages
         WHERE thread_id = $1
           AND NOT (is_draft AND COALESCE((mailbox_state->>'provider_missing')::boolean, false))

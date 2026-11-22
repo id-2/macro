@@ -168,7 +168,7 @@ describe('AgentSession', () => {
           .status(),
     ]) {
       await expect(read()).rejects.toMatchObject({
-        name: 'MacroForbiddenError',
+        name: 'RoxForbiddenError',
         status: 403,
         data: { message: 'Forbidden' },
       });
@@ -503,7 +503,7 @@ describe('AgentSession', () => {
         repoUrl: 'https://github.com/macro-inc/macro',
       }),
     ).rejects.toMatchObject({
-      name: 'MacroApiError',
+      name: 'RoxApiError',
       status: 422,
       message:
         'Rox API error 422: repoUrl needs a Cursor coding agent; choose a Cursor agent persona or omit repoUrl',

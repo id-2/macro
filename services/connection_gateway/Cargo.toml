@@ -26,7 +26,7 @@ name = "connection_gateway_openapi"
 path = "src/openapi.rs"
 
 [features]
-local_auth = ["macro_authorization/local_auth"]
+local_auth = ["rox_authorization/local_auth"]
 
 [dependencies]
 agent_correlation = { path = "../../crates/agent_correlation", features = ["http", "postgres"] }
@@ -51,17 +51,17 @@ futures = { workspace = true }
 http-body-util = { workspace = true }
 itertools = { workspace = true }
 last_online_tracker = { path = "../../crates/last_online_tracker" }
-macro_auth = { path = "../../crates/macro_auth" }
-macro_authorization = { path = "../../crates/macro_authorization", features = [
+rox_auth = { path = "../../crates/rox_auth" }
+rox_authorization = { path = "../../crates/rox_authorization", features = [
   "postgres",
 ] }
-macro_user_id = { path = "../../crates/macro_user_id" }
-macro_aws_config = { path = "../../crates/macro_aws_config" }
-macro_config = { path = "../../crates/macro_config" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env = { path = "../../crates/macro_env" }
-macro_env_var = { path = "../../crates/macro_env_var" }
-macro_tower_layers = { path = "../../crates/macro_tower_layers" }
+rox_user_id = { path = "../../crates/rox_user_id" }
+rox_aws_config = { path = "../../crates/rox_aws_config" }
+rox_config = { path = "../../crates/rox_config" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env = { path = "../../crates/rox_env" }
+rox_env_var = { path = "../../crates/rox_env_var" }
+rox_tower_layers = { path = "../../crates/rox_tower_layers" }
 postcard = { workspace = true }
 model = { path = "../../crates/model" }
 model-entity = { path = "../../crates/model-entity" }
@@ -92,4 +92,4 @@ doppler-config = { workspace = true }
 
 [dev-dependencies]
 cool_asserts = "2"
-macro_auth = { path = "../../crates/macro_auth", features = ["testing"] }
+rox_auth = { path = "../../crates/rox_auth", features = ["testing"] }

@@ -1,7 +1,7 @@
 import { For } from 'solid-js';
 import { PostProductGraphic } from '../../PostProductGraphic';
-import '../macro-vs-notion/MacroVsNotion.css';
-import './MacroVsLinear.css';
+import '../macro-vs-notion/RoxVsNotion.css';
+import './RoxVsLinear.css';
 import avatarJacob from '../../../../assets/people/jacob.webp';
 import {
   type ComparisonRow,
@@ -130,10 +130,10 @@ export const postMeta: PostMeta = {
   showTOC: true,
   tocDepth: 2,
   author: { name: 'Jacob Beckerman', role: 'Rox', avatar: avatarJacob },
-  ctaButtonName: 'macro_vs_linear_cta',
+  ctaButtonName: 'rox_vs_linear_cta',
 };
 
-export default function MacroVsLinearPost() {
+export default function RoxVsLinearPost() {
   return (
     <div class="mvn-post linear-post">
       <article>

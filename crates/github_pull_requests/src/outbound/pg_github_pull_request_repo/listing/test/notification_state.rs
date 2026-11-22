@@ -1,7 +1,7 @@
 use super::*;
 use item_filters::NotificationState::{Done, Seen, Unseen};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn notification_boolean_filters_match_every_present_state_set(pool: PgPool) {
     let repo = PgForeignEntityRepo::new(pool.clone());
     let listing = PgGithubPullRequestRepo::new(pool.clone());

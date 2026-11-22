@@ -667,7 +667,7 @@ export type EmptyResponse = {
 };
 
 /**
- * The Entity describes the minimum amount of information required to describe a unique thing in Macro
+ * The Entity describes the minimum amount of information required to describe a unique thing in Rox
  * This contains the type of the entity [EntityType] and the string id of that entity
  */
 export type Entity = {
@@ -734,7 +734,7 @@ export type EntityAccessRequestedMetadata = {
 };
 
 /**
- * The type of an entity in Macro
+ * The type of an entity in Rox
  */
 export type EntityType = 'user' | 'chat' | 'channel' | 'channel_message' | 'document' | 'project' | 'email_thread' | 'calendar_event' | 'team' | 'call' | 'foreign_entity' | 'static_file' | 'crm_company' | 'crm_contact' | 'crm_pipeline' | 'reminder' | 'harness' | 'skill' | 'agent_session' | 'scheduled_action' | 'initiative' | 'database' | 'database_row' | 'form' | 'external_chat';
 
@@ -1155,7 +1155,7 @@ export type ItemSharedMetadata = {
     userIds: Array<string>;
 };
 
-export type MacroUserIdStr = string;
+export type RoxUserIdStr = string;
 
 /**
  * Notification sent when a user is mentioned in a document comment.
@@ -1551,7 +1551,7 @@ export type RealtimeNotifTaggedContentValue = Entity & {
         content: unknown;
         tag: NotificationTypeName;
     };
-    sender_id?: null | MacroUserIdStr;
+    sender_id?: null | RoxUserIdStr;
     /**
      * Whether the notification has been sent.
      */

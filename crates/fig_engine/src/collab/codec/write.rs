@@ -680,7 +680,7 @@ impl<'a> Writer<'a> {
             overlay,
             prototype_start,
             library,
-            macro_data,
+            rox_data,
             recomputed,
         } = p;
         self.opt(guid, |w, g| w.guid(g));
@@ -875,7 +875,7 @@ impl<'a> Writer<'a> {
             w.opt_str(source);
             w.opt(publish_id, |w, g| w.guid(g));
         });
-        self.opt(macro_data, |w, list| {
+        self.opt(rox_data, |w, list| {
             w.list(list, |w, (k, v)| {
                 w.str(k);
                 w.str(v);

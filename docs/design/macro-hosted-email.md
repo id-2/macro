@@ -102,7 +102,7 @@ prerequisite PR in phase 0, behaviour-neutral for existing providers:
    scheduled send and undo send stay in `email_scheduled_messages` and only the
    final submit is per provider.
 5. **Sync stream kinds.** `email_sync_streams.kind` is a CHECK list; add
-   `macro_import` for the one-off migration import (phase 3). The Rox mailbox
+   `rox_import` for the one-off migration import (phase 3). The Rox mailbox
    itself needs no stream.
 
 ## Inbound
@@ -250,7 +250,7 @@ A team moving its MX to Rox keeps its history:
 1. Verify the domain for sending (`active_send`).
 2. Each user's existing Gmail or Outlook link, already synced, is copied into
    their Rox mailbox by an import job (`email_sync_streams` kind
-   `macro_import`), fetching raw MIME through the existing
+   `rox_import`), fetching raw MIME through the existing
    `MailboxRawMessageClient` / `MailboxContentReader::mime` ports so the Rox
    store holds real originals.
 3. The admin switches MX. Mail arriving at the old provider during DNS

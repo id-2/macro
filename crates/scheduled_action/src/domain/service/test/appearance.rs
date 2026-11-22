@@ -54,7 +54,7 @@ async fn invalid_or_foreign_appearance_writes_do_not_mutate_the_routine() {
             .is_err()
     );
     let foreign = EntityAccessReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::parse_from_str(FOREIGN_USER).unwrap(),
+        RoxUserIdStr::parse_from_str(FOREIGN_USER).unwrap(),
         &id.to_string(),
         EntityType::ScheduledAction,
     );
@@ -104,7 +104,7 @@ async fn bot_appearance_changes_retain_actor_and_require_the_owner_scope() {
 
     for scope in [
         BotReceiptScope::User {
-            acting_user: MacroUserIdStr::parse_from_str(FOREIGN_USER).unwrap(),
+            acting_user: RoxUserIdStr::parse_from_str(FOREIGN_USER).unwrap(),
         },
         BotReceiptScope::Team {
             team_id: Uuid::from_u128(78),

@@ -1,6 +1,6 @@
 //! Memory composition root. The domain never depends on the combined tool host.
 use crate::{ToolEmailToolContext, ToolServiceContext, base_toolset};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use memory::{
     domain::{ports::*, service::MemoryServiceImpl},
     outbound::{generator::AgentMemoryGenerator, pg_memory_repo::PgMemoryRepo},
@@ -14,7 +14,7 @@ struct MemoryTeamRepository<R>(R);
 #[async_trait::async_trait]
 impl<R: TeamRepository> MemoryTeams for MemoryTeamRepository<R> {
     #[tracing::instrument(skip_all, err)]
-    async fn members(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<(uuid::Uuid, Vec<String>)>> {
+    async fn members(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<(uuid::Uuid, Vec<String>)>> {
         let teams = self
             .0
             .get_user_teams(user)

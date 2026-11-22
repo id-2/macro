@@ -57,7 +57,7 @@ function appendQuotedThread(editor: LexicalEditor) {
       $getRoot().append(
         $createClassedBlockNode({
           tag: 'div',
-          classes: ['macro_quote', 'gmail_quote'],
+          classes: ['rox_quote', 'gmail_quote'],
         })
       ),
     { discrete: true }

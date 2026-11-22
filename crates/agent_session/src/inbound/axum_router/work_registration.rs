@@ -11,7 +11,7 @@ use entity_access::{
     domain::{models::EditAccessLevel, ports::EntityAccessService},
     inbound::axum_extractors::AgentSessionAccessLevelExtractor,
 };
-use macro_authorization::{ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService};
+use rox_authorization::{ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService};
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -26,7 +26,7 @@ pub fn work_registration_router<T, Access, Auth, S>(
 where
     T: WorkRegistrations,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -87,17 +87,17 @@ impl From<WorkRegistration> for WorkRegistrationResponse {
 pub async fn register_work<
     T: WorkRegistrations,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
 ) -> Result<Json<WorkRegistrationResponse>, AgentSessionApiError> {
     let registration = state
         .service
         .register(
             &access.entity_access_receipt,
-            &caller.authorization.user.macro_user_id,
+            &caller.authorization.user.rox_user_id,
         )
         .await?;
     Ok(Json(registration.into()))
@@ -121,16 +121,16 @@ pub async fn register_work<
 pub async fn unregister_work<
     T: WorkRegistrations,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Path(session_id): Path<uuid::Uuid>,
 ) -> Result<StatusCode, AgentSessionApiError> {
     state
         .service
         .unregister(
-            &caller.authorization.user.macro_user_id,
+            &caller.authorization.user.rox_user_id,
             AgentSessionId::new_from_uuid(session_id),
         )
         .await?;
@@ -153,12 +153,12 @@ pub async fn unregister_work<
 pub async fn list_own_work<
     T: WorkRegistrations,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
 ) -> Result<Json<Vec<WorkRegistrationResponse>>, AgentSessionApiError> {
-    let account = &caller.authorization.user.macro_user_id;
+    let account = &caller.authorization.user.rox_user_id;
     let registrations = state
         .service
         .visible_registrations(account, std::slice::from_ref(account))

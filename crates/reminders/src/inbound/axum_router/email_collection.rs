@@ -30,11 +30,11 @@ pub struct EmailReminderParams {
     pub limit: Option<u32>,
 }
 
-fn viewer<Auth: MacroAuthorizationService>(
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+fn viewer<Auth: RoxAuthorizationService>(
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> EmailReminderViewer {
     EmailReminderViewer {
-        user_id: user.authorization.user.macro_user_id.clone(),
+        user_id: user.authorization.user.rox_user_id.clone(),
         org_id: user
             .authorization
             .user
@@ -53,10 +53,10 @@ fn viewer<Auth: MacroAuthorizationService>(
 pub async fn list_email_reminders_handler<
     S: RemindersService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<RemindersRouterState<S, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(params): Query<EmailReminderParams>,
 ) -> Result<Json<EmailReminderPage>, ReminderError> {
     let tags = params

@@ -13,7 +13,7 @@ use agent_session::domain::ports::AgentSessionRepo;
 use async_trait::async_trait;
 use connection_gateway_client::ConnectionGatewayClient;
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use rate_limit::{RateLimitConfig, RateLimitKey, RateLimitService};
 use std::sync::Arc;
@@ -65,7 +65,7 @@ pub struct NavigationFlag<Flags>(pub Option<Flags>);
 
 #[async_trait]
 impl<Flags: FeatureFlags + 'static> UiNavigationFlag for NavigationFlag<Flags> {
-    async fn enabled(&self, user: &MacroUserIdStr<'static>) -> bool {
+    async fn enabled(&self, user: &RoxUserIdStr<'static>) -> bool {
         let Some(flags) = &self.0 else {
             return false;
         };
@@ -131,7 +131,7 @@ impl UiCommandDelivery for GatewayUiDelivery {
     #[tracing::instrument(name = "ui.command.send", skip_all, err)]
     async fn send(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         frame: &UiCommandFrame,
     ) -> Result<u64, CodeModeError> {
         let message = serde_json::to_value(frame).map_err(storage)?;

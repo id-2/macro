@@ -11,7 +11,7 @@ use std::{
 
 use broadcast::{BroadcastManager, GlobalSpawner};
 use futures::{StreamExt as _, stream};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use rootcause::prelude::{Report, ResultExt as _};
 use tokio::{sync::oneshot, task::JoinHandle};
@@ -46,7 +46,7 @@ where
     C: SoupRealtimeConsumer,
 {
     consumer: C,
-    broadcasts: BroadcastManager<GlobalSpawner, MacroUserIdStr<'static>, Patch<Entity<'static>>>,
+    broadcasts: BroadcastManager<GlobalSpawner, RoxUserIdStr<'static>, Patch<Entity<'static>>>,
 }
 
 impl<C> SoupRealtimeConsumerService<C>
@@ -68,7 +68,7 @@ where
     #[must_use]
     pub fn subscribe(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> tokio::sync::mpsc::Receiver<Patch<Entity<'static>>> {
         self.broadcasts
             .subscribe(user_id, SUBSCRIBER_BUFFER_CAPACITY)
@@ -107,7 +107,7 @@ where
 {
     fn subscribe(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> tokio::sync::mpsc::Receiver<Patch<Entity<'static>>> {
         SoupRealtimeConsumerService::subscribe(self, user_id)
     }

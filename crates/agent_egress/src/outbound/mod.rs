@@ -7,7 +7,7 @@ pub mod github_tokens;
 pub mod custom_mcp;
 
 /// Answering the reserved `macro` slug with Rox's own MCP server.
-pub mod macro_mcp;
+pub mod rox_mcp;
 
 /// Resolving an owner's Pipedream-connected apps to scoped upstream calls.
 pub mod mcp_credentials;

@@ -3,7 +3,7 @@
 
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_anonymous_response_is_a_receipt_and_an_entry_that_name_nothing_of_each_other(
     pool: PgPool,
 ) {
@@ -53,7 +53,7 @@ async fn an_anonymous_response_is_a_receipt_and_an_entry_that_name_nothing_of_ea
     assert_eq!(repo.respondents_by_row(form.id).await.unwrap(), vec![]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_anonymous_responses_by_one_person_record_exactly_one(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -91,7 +91,7 @@ async fn concurrent_anonymous_responses_by_one_person_record_exactly_one(pool: P
     assert_eq!(entries, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn whether_a_form_is_anonymous_cannot_change_once_a_response_is_recorded(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());

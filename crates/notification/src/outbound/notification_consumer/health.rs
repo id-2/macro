@@ -13,7 +13,7 @@ use tokio::{
 use tokio_util::{sync::CancellationToken, task::TaskTracker};
 use uuid::Uuid;
 
-const TOPIC: &str = "macro.notifications";
+const TOPIC: &str = "rox.notifications";
 const REPORT_INTERVAL: Duration = Duration::from_secs(10);
 const STALE_AFTER: Duration = Duration::from_secs(30);
 

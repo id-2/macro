@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::models::ChannelLabelRule;
 use cowlike::CowLike;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_eligible_team_channels_can_be_assigned_or_moved_during_creation(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -87,7 +87,7 @@ async fn only_eligible_team_channels_can_be_assigned_or_moved_during_creation(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_assignments_are_hidden_and_not_counted_but_can_be_removed(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -171,7 +171,7 @@ async fn legacy_assignments_are_hidden_and_not_counted_but_can_be_removed(pool: 
     assert_eq!(changed.channel_count, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn smart_preview_and_membership_include_only_eligible_team_channels(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -238,7 +238,7 @@ async fn smart_preview_and_membership_include_only_eligible_team_channels(pool: 
     assert_eq!(listed[0].channel_count, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sections_replace_picks_with_rules_for_unjoined_team_members(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -343,7 +343,7 @@ async fn sections_replace_picks_with_rules_for_unjoined_team_members(pool: PgPoo
     assert_eq!(old_preview.total_count, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sections_reject_cross_team_and_clear_picks_on_rule_edits_and_transfers(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -422,7 +422,7 @@ async fn sections_reject_cross_team_and_clear_picks_on_rule_edits_and_transfers(
     assert_eq!(transferred.channel_ids, vec![foreign]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rule_section_transfer_rejects_unjoined_matches(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -468,7 +468,7 @@ async fn rule_section_transfer_rejects_unjoined_matches(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn manual_section_transfer_with_new_rule_replaces_picks_without_moving_matches(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let team = insert_team(&pool, USER_A).await;
@@ -539,7 +539,7 @@ async fn manual_section_transfer_with_new_rule_replaces_picks_without_moving_mat
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_section_transfer_rolls_back_source_and_destination_assignments(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let team = insert_team(&pool, USER_A).await;
@@ -601,7 +601,7 @@ async fn failed_section_transfer_rolls_back_source_and_destination_assignments(p
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unjoined_assignments_require_team_membership_and_never_enter_personal_scope(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;

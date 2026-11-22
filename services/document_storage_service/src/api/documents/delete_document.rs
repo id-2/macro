@@ -6,7 +6,7 @@ use axum::response::Response;
 use axum::{extract::Path, http::StatusCode, response::IntoResponse};
 use documents_hex::domain::purge::DocumentPurgeService as _;
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{
     ErrorResponse, GenericErrorResponse, GenericResponse, GenericSuccessResponse, SuccessResponse,
 };
@@ -34,11 +34,11 @@ pub struct Params {
             (status = 500, body=GenericErrorResponse),
         )
     )]
-#[tracing::instrument(skip(state, user, _access), fields(user_id=?user.authorization.user.macro_user_id))]
+#[tracing::instrument(skip(state, user, _access), fields(user_id=?user.authorization.user.rox_user_id))]
 pub async fn permanently_delete_document_handler(
     _access: DocumentAccessExtractor<OwnerAccessLevel, EntityAccessService, AuthorizationService>,
     State(state): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(Params { document_id }): Path<Params>,
 ) -> Result<Response, Response> {
     tracing::info!("permanently_delete_document");

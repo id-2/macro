@@ -4,9 +4,9 @@ use super::*;
 
 #[test]
 fn env_keys_are_upper_snake_case() {
-    assert!(AgentEnvKey::new("MACRO_API_KEY").is_ok());
+    assert!(AgentEnvKey::new("ROX_API_KEY").is_ok());
     assert!(AgentEnvKey::new("OVERRIDE_AUTH_SERVICE_URL2").is_ok());
-    assert!(AgentEnvKey::new("macro_api_key").is_err());
+    assert!(AgentEnvKey::new("rox_api_key").is_err());
     assert!(AgentEnvKey::new("1KEY").is_err());
     assert!(AgentEnvKey::new("KEY=VALUE").is_err());
     assert!(AgentEnvKey::new("").is_err());
@@ -16,8 +16,8 @@ fn env_keys_are_upper_snake_case() {
 fn env_rejects_values_that_span_lines() {
     let mut values = BTreeMap::new();
     values.insert(
-        AgentEnvKey::new("MACRO_API_KEY").unwrap(),
-        "mak_abc\nMACRO_GATEWAY=https://evil.example".to_owned(),
+        AgentEnvKey::new("ROX_API_KEY").unwrap(),
+        "mak_abc\nROX_GATEWAY=https://evil.example".to_owned(),
     );
     assert!(AgentEnv::new(values).is_err());
 }
@@ -26,12 +26,12 @@ fn env_rejects_values_that_span_lines() {
 fn env_debug_shows_names_but_not_values() {
     let mut values = BTreeMap::new();
     values.insert(
-        AgentEnvKey::new("MACRO_API_KEY").unwrap(),
+        AgentEnvKey::new("ROX_API_KEY").unwrap(),
         "mak_secret_value".to_owned(),
     );
     let env = AgentEnv::new(values).unwrap();
     let debug = format!("{env:?}");
-    assert!(debug.contains("MACRO_API_KEY"));
+    assert!(debug.contains("ROX_API_KEY"));
     assert!(!debug.contains("mak_secret_value"));
 }
 
@@ -39,11 +39,11 @@ fn env_debug_shows_names_but_not_values() {
 fn enrollment_round_trips_through_json() {
     let mut values = BTreeMap::new();
     values.insert(
-        AgentEnvKey::new("MACRO_API_KEY").unwrap(),
+        AgentEnvKey::new("ROX_API_KEY").unwrap(),
         "mak_secret_value".to_owned(),
     );
     let enrollment = AgentEnrollment {
-        agent_user_id: MacroUserIdStr::try_from("macro|ada-agent@rox.one".to_owned()).unwrap(),
+        agent_user_id: RoxUserIdStr::try_from("macro|ada-agent@rox.one".to_owned()).unwrap(),
         env: AgentEnv::new(values).unwrap(),
     };
     let json = serde_json::to_value(&enrollment).unwrap();
@@ -51,7 +51,7 @@ fn enrollment_round_trips_through_json() {
         json,
         serde_json::json!({
             "agent_user_id": "macro|ada-agent@rox.one",
-            "env": {"MACRO_API_KEY": "mak_secret_value"},
+            "env": {"ROX_API_KEY": "mak_secret_value"},
         })
     );
     let back: AgentEnrollment = serde_json::from_value(json).unwrap();

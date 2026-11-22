@@ -10,13 +10,13 @@ use codex_cloud_agents::domain::cloud::{
 use codex_cloud_agents::domain::runtime::{CloudRuntime, CloudTarget, RuntimeIdentity};
 use codex_cloud_agents::domain::{Credentials, OAuth};
 use codex_connection::domain::{ConnectionError, ConnectionService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 /// Resolve the owner's account and environment before provisioning a session.
 pub(crate) async fn connection_preflight(
     connections: &dyn ConnectionService,
-    owner: &MacroUserIdStr<'_>,
+    owner: &RoxUserIdStr<'_>,
 ) -> crate::domain::error::Result<Option<SessionBlocker>> {
     match connections.resolve(owner.as_ref()).await {
         Ok(connection) if connection.environment_id.is_none() => {
@@ -65,7 +65,7 @@ pub struct CodexRuntime<P, S, H = S> {
     /// Connection lifecycle service, consulted before every provider operation.
     pub connections: Arc<dyn ConnectionService>,
     /// Session owner whose authorization pays for cloud work.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Immutable original connection/account identity.
     pub binding: RuntimeIdentity,
     /// Rox session receiving the external task mapping.

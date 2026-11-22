@@ -3,7 +3,7 @@
 use crate::domain::ids::ComputerId;
 use bot_id::BotId;
 use harness_id::HarnessId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
@@ -113,7 +113,7 @@ pub struct FakeRepo {
     pub events: Mutex<Vec<(ComputerId, Event)>>,
     pub agent_counts: Mutex<HashMap<ComputerId, u32>>,
     /// The agent teammate each computer was bought for.
-    pub agents: Mutex<HashMap<ComputerId, MacroUserIdStr<'static>>>,
+    pub agents: Mutex<HashMap<ComputerId, RoxUserIdStr<'static>>>,
 }
 
 impl crate::domain::agent::ComputerAgents for FakeRepo {
@@ -122,14 +122,14 @@ impl crate::domain::agent::ComputerAgents for FakeRepo {
     async fn agent_of(
         &self,
         computer: ComputerId,
-    ) -> Result<Option<MacroUserIdStr<'static>>, Self::Error> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, Self::Error> {
         Ok(self.agents.lock().unwrap().get(&computer).cloned())
     }
 
     async fn computer_for_agent(
         &self,
         team_id: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Option<ComputerId>, Self::Error> {
         let computers = self.computers.lock().unwrap();
         Ok(self
@@ -147,7 +147,7 @@ impl crate::domain::agent::ComputerAgents for FakeRepo {
     async fn has_live_computer(
         &self,
         team_id: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<bool, Self::Error> {
         Ok(self.computer_for_agent(team_id, agent).await?.is_some())
     }
@@ -889,7 +889,7 @@ pub fn enrollment(computer_id: ComputerId, agent: bool) -> crate::domain::enroll
         deployment: deployment(),
         traceparent: None,
         agent: agent.then(|| crate::domain::agent::AgentEnrollment {
-            agent_user_id: macro_user_id::user_id::MacroUserIdStr::try_from(
+            agent_user_id: rox_user_id::user_id::RoxUserIdStr::try_from(
                 "macro|agent@example.com".to_owned(),
             )
             .unwrap(),

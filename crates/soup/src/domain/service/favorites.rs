@@ -18,7 +18,7 @@ mod test;
 pub(super) trait FavoriteReader: Send + Sync {
     fn read<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<Entity<'static>>, SoupErr>> + Send + 'a>>;
 }
 
@@ -27,7 +27,7 @@ pub(super) struct Reader<S>(pub Arc<S>);
 impl<S: FavoritesService> FavoriteReader for Reader<S> {
     fn read<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<Entity<'static>>, SoupErr>> + Send + 'a>> {
         Box::pin(async move {
             let favorites = self

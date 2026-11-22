@@ -182,7 +182,7 @@ impl InboxSyncNotificationFacts for Fake {
     async fn previews(
         &self,
         _: PreviewCursorQuery,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<EmailThreadPreview>, Failure> {
         self.io("previews", ())?;
         let yes = self
@@ -197,7 +197,7 @@ impl InboxSyncNotificationFacts for Fake {
             vec![EmailThreadPreview {
                 id: THREAD,
                 provider_id: None,
-                owner_id: super::fakes::link().macro_id,
+                owner_id: super::fakes::link().rox_id,
                 inbox_visible: true,
                 is_read: false,
                 is_draft: false,
@@ -364,8 +364,8 @@ impl InboxSyncUploads for Fake {
 impl InboxSyncContacts for Fake {
     fn connect<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'static>,
-        contacts: Vec<MacroUserIdStr<'static>>,
+        _: &'a RoxUserIdStr<'static>,
+        contacts: Vec<RoxUserIdStr<'static>>,
     ) -> BoxFuture<'a, anyhow::Result<()>> {
         Box::pin(async move {
             self.io("connect", contacts)
@@ -411,7 +411,7 @@ pub(super) fn received_message(link_id: Uuid, thread_db_id: Uuid) -> Message {
         labels: vec![],
         body_text: Some("body".to_string()),
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         attachments: vec![],
         attachments_draft: vec![],
         attachments_forwarded: vec![],

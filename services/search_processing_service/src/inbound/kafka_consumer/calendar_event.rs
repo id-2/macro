@@ -1,7 +1,7 @@
 //! Maps calendar event changes to search-index reconciliations and processes them.
 
 use calendar_events::domain::events::{CalendarMacroEvent, CalendarTopicEvent};
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 use sqs_client::search::calendar_event::UpsertCalendarEvent;
 
 use super::{

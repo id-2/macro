@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE microsoft_link_attempts a SET claimed_at = now()\n            FROM in_progress_user_link p\n            WHERE a.id = $1 AND a.id = p.id AND p.email_provider = 'OUTLOOK'\n                AND a.claimed_at IS NULL AND a.completed_at IS NULL AND a.expires_at > now()\n            RETURNING a.id, p.macro_user_id, a.identity_provider_id, a.redirect_uri,\n                a.return_uri, a.pkce_verifier, a.oidc_nonce, a.expires_at, a.calendar_requested\n        ",
+  "query": "\n            UPDATE microsoft_link_attempts a SET claimed_at = now()\n            FROM in_progress_user_link p\n            WHERE a.id = $1 AND a.id = p.id AND p.email_provider = 'OUTLOOK'\n                AND a.claimed_at IS NULL AND a.completed_at IS NULL AND a.expires_at > now()\n            RETURNING a.id, p.rox_user_id, a.identity_provider_id, a.redirect_uri,\n                a.return_uri, a.pkce_verifier, a.oidc_nonce, a.expires_at, a.calendar_requested\n        ",
   "describe": {
     "columns": [
       {
@@ -10,7 +10,7 @@
       },
       {
         "ordinal": 1,
-        "name": "macro_user_id",
+        "name": "rox_user_id",
         "type_info": "Uuid"
       },
       {

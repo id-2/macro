@@ -3,7 +3,7 @@
 use anyhow::Context as _;
 use authentication_service_client::{AuthServiceClient, error::AuthServiceClientError};
 use email::domain::mailbox::initialization::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
@@ -51,20 +51,20 @@ pub struct PgMailboxInitialization(pub PgPool);
 pub async fn ensure_rox_mailbox(
     db: &PgPool,
     fusionauth_user_id: &str,
-    macro_id: MacroUserIdStr<'static>,
+    rox_id: RoxUserIdStr<'static>,
     writers_enabled: bool,
 ) -> anyhow::Result<Option<models_email::email::service::link::Link>> {
     use models_email::email::service::link::{Link, UserProvider};
 
-    let user = macro_db_client::macro_user::get_macro_user(db, fusionauth_user_id).await?;
-    let Ok(handle) = macro_user_id::handle::MailboxHandle::parse(&user.username) else {
+    let user = rox_db_client::macro_user::get_macro_user(db, fusionauth_user_id).await?;
+    let Ok(handle) = rox_user_id::handle::MailboxHandle::parse(&user.username) else {
         return Ok(None);
     };
     let address = handle.email_address();
     if let Some(link) =
         email_db_client::links::get::fetch_link_by_email(db, &address, UserProvider::Rox).await?
     {
-        if link.macro_id.as_ref() != macro_id.as_ref()
+        if link.rox_id.as_ref() != rox_id.as_ref()
             || link.fusionauth_user_id != fusionauth_user_id
         {
             anyhow::bail!("Rox mailbox link belongs to a different account");
@@ -74,10 +74,10 @@ pub async fn ensure_rox_mailbox(
     if !writers_enabled {
         return Ok(None);
     }
-    let email_address = macro_user_id::email::EmailStr::try_from(address.clone())?;
+    let email_address = rox_user_id::email::EmailStr::try_from(address.clone())?;
     let link = Link {
-        id: macro_uuid::generate_uuid_v7(),
-        macro_id: macro_id.clone(),
+        id: rox_uuid::generate_uuid_v7(),
+        rox_id: rox_id.clone(),
         fusionauth_user_id: fusionauth_user_id.to_owned(),
         email_address,
         provider: UserProvider::Rox,
@@ -110,7 +110,7 @@ pub async fn ensure_rox_mailbox(
             email_db_client::links::get::fetch_link_by_email(db, &address, UserProvider::Rox)
                 .await?
                 .context("ROX link disappeared during initialization")?;
-        if link.macro_id.as_ref() != macro_id.as_ref()
+        if link.rox_id.as_ref() != rox_id.as_ref()
             || link.fusionauth_user_id != fusionauth_user_id
         {
             anyhow::bail!("Rox mailbox link belongs to a different account");
@@ -119,16 +119,16 @@ pub async fn ensure_rox_mailbox(
     }
 
     sqlx::query!(
-        "UPDATE email_links SET is_primary = false WHERE macro_id = $1 AND provider <> 'ROX'",
-        macro_id.as_ref(),
+        "UPDATE email_links SET is_primary = false WHERE rox_id = $1 AND provider <> 'ROX'",
+        rox_id.as_ref(),
     )
     .execute(tx.as_mut())
     .await?;
     let link = email_db_client::links::insert::upsert_link(tx.as_mut(), link).await?;
     sqlx::query!(
         "INSERT INTO enterprise_audit (id, actor_id, action, resource_id, result) VALUES ($1, $2, $3, $4, 'local_link_created')",
-        macro_uuid::generate_uuid_v7(),
-        macro_id.as_ref(),
+        rox_uuid::generate_uuid_v7(),
+        rox_id.as_ref(),
         enterprise::audit::AuditAction::MailboxProvision.as_ref(),
         link.id.to_string()
     )
@@ -156,9 +156,9 @@ pub async fn lock_gmail_connection(
     let facts=sqlx::query!(r#"SELECT
         EXISTS(SELECT 1 FROM "RolesOnUsers" ru JOIN "RolesOnPermissions" rp ON rp."roleId"=ru."roleId"
             WHERE ru."userId"=$1 AND rp."permissionId"='read:professional_features') AS "professional!",
-        (SELECT count(*) FROM email_links l WHERE l.macro_id=$1 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=l.id AND u.primary_macro_id=$1)) AS "inboxes!",
+        (SELECT count(*) FROM email_links l WHERE l.rox_id=$1 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=l.id AND u.primary_rox_id=$1)) AS "inboxes!",
         EXISTS(SELECT 1 FROM email_links l WHERE l.provider='GMAIL' AND lower(l.email_address)=lower($2)
-            AND (l.macro_id=$1 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=l.id AND u.primary_macro_id=$1))) AS "reconnecting!"
+            AND (l.rox_id=$1 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=l.id AND u.primary_rox_id=$1))) AS "reconnecting!"
     "#,actor,address).fetch_one(&mut *conn).await.map_err(unavailable)?;
     if !(email::domain::inbox_entitlement::InboxConnectionFacts {
         professional: facts.professional,
@@ -183,10 +183,10 @@ async fn snapshot(
     grant: &VerifiedMailboxGrant,
 ) -> Result<InitializationSnapshot, InitializationError> {
     let existing = sqlx::query!(r#"
-        SELECT l.id,l.macro_id,l.grant_id,l.grant_generation,l.sync_generation,
+        SELECT l.id,l.rox_id,l.grant_id,l.grant_generation,l.sync_generation,
             l.provider_tenant_id,l.provider_mailbox_id,l.disconnect_requested_at,
-            EXISTS(SELECT 1 FROM macro_user_links e WHERE e.link_id = l.id
-                AND e.primary_macro_id = $4 AND e.child_macro_id = l.macro_id) AS "actor_has_access!"
+            EXISTS(SELECT 1 FROM rox_user_links e WHERE e.link_id = l.id
+                AND e.primary_rox_id = $4 AND e.child_rox_id = l.rox_id) AS "actor_has_access!"
         FROM email_links l WHERE l.provider = 'OUTLOOK'
             AND ((l.provider_tenant_id = $1 AND l.provider_mailbox_id = $2) OR lower(l.email_address) = lower($3))
         ORDER BY (l.provider_tenant_id = $1 AND l.provider_mailbox_id = $2) DESC NULLS LAST,l.id
@@ -200,7 +200,7 @@ async fn snapshot(
             }
             Ok::<_, InitializationError>(ExistingMailbox {
                 id: row.id,
-                owner: MacroUserIdStr::try_from(row.macro_id).map_err(unavailable)?,
+                owner: RoxUserIdStr::try_from(row.rox_id).map_err(unavailable)?,
                 grant_id: row.grant_id,
                 grant_generation: row.grant_generation,
                 sync_generation: row.sync_generation,
@@ -217,13 +217,13 @@ async fn snapshot(
     .fetch_optional(&mut *conn)
     .await
     .map_err(unavailable)?
-    .map(MacroUserIdStr::try_from)
+    .map(RoxUserIdStr::try_from)
     .transpose()
     .map_err(unavailable)?;
     let facts=sqlx::query!(r#"SELECT
         EXISTS(SELECT 1 FROM "RolesOnUsers" ru JOIN "RolesOnPermissions" rp ON rp."roleId"=ru."roleId"
             WHERE ru."userId"=$1 AND rp."permissionId"='read:professional_features') AS "professional!",
-        (SELECT count(*) FROM email_links l WHERE l.macro_id=$1 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=l.id AND u.primary_macro_id=$1)) AS "inboxes!"
+        (SELECT count(*) FROM email_links l WHERE l.rox_id=$1 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=l.id AND u.primary_rox_id=$1)) AS "inboxes!"
         "#,request.actor.as_ref()).fetch_one(&mut *conn).await.map_err(unavailable)?;
     let entitlement = email::domain::inbox_entitlement::InboxConnectionFacts {
         professional: facts.professional,
@@ -243,7 +243,7 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
     async fn recognizes(&self, request: &InitializeMailbox) -> Result<bool, InitializationError> {
         sqlx::query_scalar!(r#"
             SELECT (EXISTS(SELECT 1 FROM in_progress_user_link WHERE id = $1
-                AND macro_user_id = $2 AND email_provider = 'OUTLOOK') OR
+                AND rox_user_id = $2 AND email_provider = 'OUTLOOK') OR
                 EXISTS(SELECT 1 FROM email_link_initializations WHERE attempt_id = $1 AND actor_id = $3)) AS "recognized!"
         "#,request.attempt,request.actor_fusion_id,request.actor.as_ref())
             .fetch_one(&self.0).await.map_err(unavailable)
@@ -254,9 +254,9 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
     ) -> Result<Option<Uuid>, InitializationError> {
         sqlx::query_scalar!(r#"
             SELECT r.link_id FROM email_link_initializations r JOIN email_links l ON l.id = r.link_id
-            WHERE r.attempt_id = $1 AND r.actor_id = $2 AND (l.macro_id = $2 OR EXISTS (
-                SELECT 1 FROM macro_user_links e WHERE e.link_id = l.id
-                    AND e.primary_macro_id = $2 AND e.child_macro_id = l.macro_id))
+            WHERE r.attempt_id = $1 AND r.actor_id = $2 AND (l.rox_id = $2 OR EXISTS (
+                SELECT 1 FROM rox_user_links e WHERE e.link_id = l.id
+                    AND e.primary_rox_id = $2 AND e.child_rox_id = l.rox_id))
         "#,request.attempt,request.actor.as_ref()).fetch_optional(&self.0).await.map_err(unavailable)
     }
 
@@ -314,7 +314,7 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
         }
         let consumed = sqlx::query!(
             r#"
-            DELETE FROM in_progress_user_link WHERE id = $1 AND macro_user_id = $2
+            DELETE FROM in_progress_user_link WHERE id = $1 AND rox_user_id = $2
                 AND email_provider = 'OUTLOOK' AND linked_email = $3
                 AND created_at > now() - interval '24 hours'
         "#,
@@ -331,9 +331,9 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
 
         let (link_id, owner, restart) = match (decision, &current.existing) {
             (InitializationDecision::Create { owner }, None) => {
-                let id = macro_uuid::generate_uuid_v7();
+                let id = rox_uuid::generate_uuid_v7();
                 sqlx::query!(r#"
-                    INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider,
+                    INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider,
                         grant_id,grant_generation,provider_tenant_id,provider_mailbox_id,is_sync_active)
                     VALUES ($1,$2,$3,$4,'OUTLOOK',$5,$6,$7,$8,true)
                 "#,id,owner.as_ref(),grant.owner.to_string(),grant.email,grant.id,grant.generation,grant.tenant_id,grant.mailbox_id)
@@ -348,7 +348,7 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
                 .fetch_one(&mut *tx)
                 .await
                 .map_err(unavailable)?;
-                let promoted = macro_db_client::shared_inbox::promote_link_to_shared(
+                let promoted = rox_db_client::shared_inbox::promote_link_to_shared(
                     &mut tx,
                     existing.id,
                     existing.owner.as_ref(),
@@ -360,7 +360,7 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
                 .map_err(unavailable)?;
                 (
                     existing.id,
-                    MacroUserIdStr::try_from(promoted.mailbox_macro_id).map_err(unavailable)?,
+                    RoxUserIdStr::try_from(promoted.mailbox_rox_id).map_err(unavailable)?,
                     true,
                 )
             }
@@ -395,7 +395,7 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
                 calendar_disabled_at = CASE WHEN $4 THEN NULL ELSE email_link_microsoft_scopes.calendar_disabled_at END,updated_at = now()"#,
             link_id,grant.generation,&grant.scopes,grant.calendar_requested).execute(&mut *tx).await.map_err(unavailable)?;
         if owner != request.actor {
-            macro_db_client::macro_user_links::insert_edge(
+            rox_db_client::rox_user_links::insert_edge(
                 &mut *tx,
                 request.actor.as_ref(),
                 owner.as_ref(),
@@ -450,21 +450,21 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
                 INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id)
                 VALUES ($1,$2,$3,'folder_catalog','mail') ON CONFLICT DO NOTHING
             "#,
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 link_id,
                 link.sync_generation
             )
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
-            sqlx::query!("INSERT INTO email_mailbox_settings_work(id,link_id,kind,resource_key) VALUES($1,$2,'catalog','') ON CONFLICT(link_id,kind,resource_key) DO UPDATE SET next_run_at=now()", macro_uuid::generate_uuid_v7(), link_id)
+            sqlx::query!("INSERT INTO email_mailbox_settings_work(id,link_id,kind,resource_key) VALUES($1,$2,'catalog','') ON CONFLICT(link_id,kind,resource_key) DO UPDATE SET next_run_at=now()", rox_uuid::generate_uuid_v7(), link_id)
                 .execute(&mut *tx).await.map_err(unavailable)?;
             sqlx::query!("INSERT INTO email_mailbox_watch_work(link_id) VALUES($1) ON CONFLICT(link_id) DO UPDATE SET next_run_at=now(),revision=email_mailbox_watch_work.revision+1",link_id)
                 .execute(&mut *tx).await.map_err(unavailable)?;
             for kind in ["contacts_catalog", "contacts_profile"] {
                 sqlx::query!(
                     "INSERT INTO email_sync_streams(id,link_id,generation,kind,scope_id) VALUES ($1,$2,$3,$4,'address_book') ON CONFLICT DO NOTHING",
-                    macro_uuid::generate_uuid_v7(),link_id,link.sync_generation,kind
+                    rox_uuid::generate_uuid_v7(),link_id,link.sync_generation,kind
                 ).execute(&mut *tx).await.map_err(unavailable)?;
             }
             // Old leases cannot write into this generation. Organization commands
@@ -479,7 +479,7 @@ impl MailboxInitializationRepository for PgMailboxInitialization {
         sqlx::query!("INSERT INTO email_link_initializations (attempt_id,actor_id,link_id) VALUES ($1,$2,$3)",request.attempt,request.actor.as_ref(),link_id)
             .execute(&mut *tx).await.map_err(unavailable)?;
         let event = serde_json::json!({"kind":"link_connected","actor_id":request.actor.as_ref(),"is_new":current.existing.is_none()});
-        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),link_id,link.sync_generation,event)
+        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),link_id,link.sync_generation,event)
             .execute(&mut *tx).await.map_err(unavailable)?;
         tx.commit().await.map_err(unavailable)?;
         if restart {

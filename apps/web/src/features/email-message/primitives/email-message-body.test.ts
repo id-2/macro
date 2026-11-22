@@ -117,7 +117,7 @@ describe('independent email body', () => {
       const [value, setValue] = createSignal(
         message('one', {
           body_html_sanitized:
-            '<p>Hello <a href="mailto:person@example.com">Person</a></p><div class="macro_quote">Quoted thread</div>',
+            '<p>Hello <a href="mailto:person@example.com">Person</a></p><div class="rox_quote">Quoted thread</div>',
           body_replyless: '<p>Hello Person</p>',
         })
       );
@@ -225,7 +225,7 @@ describe('independent email body', () => {
     }
   });
   it.each([
-    { body_macro: 'A document mention' },
+    { body_rox: 'A document mention' },
     {
       body_html_sanitized: null,
       body_text: '**Plaintext using the existing app renderer**',

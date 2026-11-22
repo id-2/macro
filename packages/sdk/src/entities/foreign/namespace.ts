@@ -4,7 +4,7 @@ import type {
   GithubUserFacet as WireGithubUserFacet,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { ForeignEntity } from './foreign-entity';
 
 export type { GithubRepositoryFacet };
@@ -47,7 +47,7 @@ function withoutNullLogin({
  * @routing Use when resolving a linked external entity, such as an imported item; not Rox's own items.
  */
 export class ForeignEntityNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   byId(id: string): ForeignEntity {
     return ForeignEntity.byId(this.client, id);

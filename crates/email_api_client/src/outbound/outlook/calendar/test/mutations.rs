@@ -5,8 +5,8 @@ use calendar_events::{
 };
 use chrono::{Days, Duration};
 use chrono_tz::America::Los_Angeles;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_event_broker::NoopMacroEventBroker;
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
 use wiremock::{Request, Respond, matchers::path_regex};
@@ -85,28 +85,28 @@ pub(super) async fn linked_mailbox(
     settings: Value,
     calendars: Value,
 ) -> PgCalendarRepository {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
-        macro_user_id,
+        rox_user_id,
         OWNER,
-        format!("cus_{macro_user_id}"),
+        format!("cus_{rox_user_id}"),
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         OWNER,
         INBOX,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     let link = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, sync_generation, grant_generation, is_sync_active) VALUES ($1, $2, $2, $3, 'OUTLOOK', 1, 1, true)",
+        "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, sync_generation, grant_generation, is_sync_active) VALUES ($1, $2, $2, $3, 'OUTLOOK', 1, 1, true)",
         link,
         OWNER,
         INBOX,
@@ -199,7 +199,7 @@ fn two_weeks() -> OccurrenceRange {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_event_created_on_a_chosen_outlook_calendar_is_posted_there_and_listed_at_its_time(
     pool: PgPool,
 ) {
@@ -334,7 +334,7 @@ async fn an_event_created_on_a_chosen_outlook_calendar_is_posted_there_and_liste
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_all_day_outlook_event_is_sent_as_utc_midnights_and_listed_on_its_dates(pool: PgPool) {
     let (server, api) = setup().await;
     let repo = connected_mailbox(
@@ -414,7 +414,7 @@ async fn an_all_day_outlook_event_is_sent_as_utc_midnights_and_listed_on_its_dat
     assert_eq!(listed[0].occurrence.time, time);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn moving_a_synced_outlook_meeting_patches_only_its_times_and_lists_it_at_the_new_slot(
     pool: PgPool,
 ) {
@@ -550,7 +550,7 @@ async fn moving_a_synced_outlook_meeting_patches_only_its_times_and_lists_it_at_
     }));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_synced_outlook_event_deletes_it_in_graph_and_drops_it_from_the_calendar(
     pool: PgPool,
 ) {
@@ -808,7 +808,7 @@ fn mutations(
     CalendarMutationServiceImpl::new(repo, api, IssuedToken, NoopMacroEventBroker, NoOpenClients)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn editing_one_meeting_of_a_synced_outlook_series_patches_only_that_meeting(pool: PgPool) {
     let (server, api, repo, event_id, key) = synced_series(&pool, true).await;
     mutations(repo, api)
@@ -836,7 +836,7 @@ async fn editing_one_meeting_of_a_synced_outlook_series_patches_only_that_meetin
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn answering_one_meeting_of_an_outlook_series_answers_only_that_meeting(pool: PgPool) {
     let (server, api, repo, event_id, key) = synced_series(&pool, false).await;
     mutations(repo, api)
@@ -862,7 +862,7 @@ async fn answering_one_meeting_of_an_outlook_series_answers_only_that_meeting(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_one_meeting_of_an_outlook_series_deletes_only_that_meeting(pool: PgPool) {
     let (server, api, repo, event_id, key) = synced_series(&pool, true).await;
     mutations(repo.clone(), api)
@@ -895,7 +895,7 @@ async fn deleting_one_meeting_of_an_outlook_series_deletes_only_that_meeting(poo
     assert!(!left.contains(&key));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ending_an_outlook_series_at_one_meeting_ends_it_the_day_before(pool: PgPool) {
     let (server, api, repo, event_id, key) = synced_series(&pool, true).await;
     let reads = CalendarService::new(repo.clone());
@@ -939,7 +939,7 @@ async fn ending_an_outlook_series_at_one_meeting_ends_it_the_day_before(pool: Pg
     assert_eq!(left, [first], "only the meeting before it is left");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inviting_a_guest_to_one_meeting_of_an_outlook_series_writes_only_that_meeting(
     pool: PgPool,
 ) {

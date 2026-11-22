@@ -7,8 +7,8 @@ use email::domain::events::{
 };
 use email_api_client::domain::models::EmailApiError;
 use futures::{StreamExt, stream};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::contact::{Contact, ContactList};
 use models_email::service::link::Link;
 use models_email::service::pubsub::SFSUploaderMessage;
@@ -23,12 +23,12 @@ use uuid::Uuid;
 mod test;
 
 /// Syncs user's contacts with gmail
-pub async fn sync_contacts<B: MacroEventBroker, I: ContactsIngress>(
+pub async fn sync_contacts<B: RoxEventBroker, I: ContactsIngress>(
     link: &Link,
     db: &PgPool,
     email_api: &GmailApi,
     sqs_client: &SQS,
-    macro_event_broker: &B,
+    rox_event_broker: &B,
     contacts_ingress: &I,
 ) -> anyhow::Result<()> {
     // 1. Get existing sync tokens from our DB
@@ -52,7 +52,7 @@ pub async fn sync_contacts<B: MacroEventBroker, I: ContactsIngress>(
         Box::pin(process_and_store_contacts(
             db,
             sqs_client,
-            macro_event_broker,
+            rox_event_broker,
             link,
             new_contacts,
         ))
@@ -82,8 +82,8 @@ fn address_book_connections(link: &Link, contacts: &[Contact]) -> Vec<ContactCon
                 && !email_utils::is_generic_email(email)
                 && seen.insert(email.clone())
         })
-        .filter_map(|email| match MacroUserIdStr::try_from_email(&email) {
-            Ok(contact) => Some(ContactConnection::new(link.macro_id.clone(), contact)),
+        .filter_map(|email| match RoxUserIdStr::try_from_email(&email) {
+            Ok(contact) => Some(ContactConnection::new(link.rox_id.clone(), contact)),
             Err(error) => {
                 // One malformed address must not drop the rest of the address book.
                 tracing::warn!(error = ?error, "skipping invalid address-book email");
@@ -256,10 +256,10 @@ async fn list_contacts_once(
 }
 
 /// Handles processing (SFS uploads) and database storage for a list of contacts.
-async fn process_and_store_contacts<B: MacroEventBroker>(
+async fn process_and_store_contacts<B: RoxEventBroker>(
     db: &PgPool,
     sqs_client: &SQS,
-    macro_event_broker: &B,
+    rox_event_broker: &B,
     link: &Link,
     contacts: Vec<Contact>,
 ) -> anyhow::Result<()> {
@@ -305,7 +305,7 @@ async fn process_and_store_contacts<B: MacroEventBroker>(
     );
 
     if !changed_contact_ids.is_empty() {
-        reindex_threads_for_changed_contacts(db, macro_event_broker, link, &changed_contact_ids)
+        reindex_threads_for_changed_contacts(db, rox_event_broker, link, &changed_contact_ids)
             .await;
     }
 
@@ -344,10 +344,10 @@ async fn process_and_store_contacts<B: MacroEventBroker>(
 
 const REINDEX_BATCH_SIZE: usize = 50;
 
-#[tracing::instrument(skip(db, macro_event_broker, link, changed_contact_ids))]
-async fn reindex_threads_for_changed_contacts<B: MacroEventBroker>(
+#[tracing::instrument(skip(db, rox_event_broker, link, changed_contact_ids))]
+async fn reindex_threads_for_changed_contacts<B: RoxEventBroker>(
     db: &PgPool,
-    macro_event_broker: &B,
+    rox_event_broker: &B,
     link: &Link,
     changed_contact_ids: &[Uuid],
 ) {
@@ -375,18 +375,18 @@ async fn reindex_threads_for_changed_contacts<B: MacroEventBroker>(
         "Re-indexing threads for contacts with name changes"
     );
 
-    publish_thread_reindex_batches(macro_event_broker, link.id, &link.macro_id, &thread_ids);
+    publish_thread_reindex_batches(rox_event_broker, link.id, &link.rox_id, &thread_ids);
 }
 
-fn publish_thread_reindex_batches<B: MacroEventBroker>(
-    macro_event_broker: &B,
+fn publish_thread_reindex_batches<B: RoxEventBroker>(
+    rox_event_broker: &B,
     link_id: Uuid,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     thread_ids: &[Uuid],
 ) {
     for thread_ids in thread_ids.chunks(REINDEX_BATCH_SIZE) {
         publish_email_event(
-            macro_event_broker,
+            rox_event_broker,
             &EmailMacroEvent::threads_reindex_requested(ThreadsReindexRequestedMetadata {
                 link_id,
                 owner: owner.clone(),

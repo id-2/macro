@@ -6,7 +6,7 @@ use axum::{
 };
 use fusionauth::FusionAuthClient;
 use fusionauth::error::FusionAuthClientError;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::authentication::google_token::GoogleAccessToken;
 use model::response::ErrorResponse;
 use std::sync::Arc;
@@ -29,7 +29,7 @@ pub struct GoogleAccessTokenParams {
 #[tracing::instrument(skip(auth_client, _internal_authorization))]
 pub async fn handler(
     State(auth_client): State<Arc<FusionAuthClient>>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Query(params): extract::Query<GoogleAccessTokenParams>,
 ) -> Result<Response, Response> {
     get_access_token(auth_client, &params, "google_gmail").await

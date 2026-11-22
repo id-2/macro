@@ -166,7 +166,7 @@ impl PgCallRepo {
         &self,
         meeting_id: &Uuid,
         call_id: &Uuid,
-        users: &[MacroUserIdStr<'_>],
+        users: &[RoxUserIdStr<'_>],
     ) -> Result<(), CallError> {
         let mut tx = self.pool.begin().await?;
         // Match archival's lock order: call first, then meeting. Keep the session

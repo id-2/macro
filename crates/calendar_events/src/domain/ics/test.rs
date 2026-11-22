@@ -2,10 +2,10 @@ use chrono::{NaiveDate, TimeZone, Utc};
 
 use super::{
     CalendarEventExport, CalendarEventExportAccess, ForwardedCopy, IcsParticipant, IcsPurpose,
-    JoinLink, content_without_macro_call, render_event_ics,
+    JoinLink, content_without_rox_call, render_event_ics,
 };
 use crate::domain::{
-    meeting_links::attach_macro_call,
+    meeting_links::attach_rox_call,
     models::{ConferenceProvider, EventTime, EventType},
 };
 
@@ -134,10 +134,10 @@ fn plain_text_description_keeps_its_line_breaks() {
 }
 
 #[test]
-fn a_macro_call_leaves_neither_its_join_line_nor_its_link_as_the_location() {
+fn a_rox_call_leaves_neither_its_join_line_nor_its_link_as_the_location() {
     let mut event = export(all_day());
     let (description, location) =
-        attach_macro_call(Some("<p>Bring the budget draft</p>"), None, CALL_URL);
+        attach_rox_call(Some("<p>Bring the budget draft</p>"), None, CALL_URL);
     event.description = Some(description);
     event.location = Some(location);
 
@@ -156,9 +156,9 @@ fn a_macro_call_leaves_neither_its_join_line_nor_its_link_as_the_location() {
 }
 
 #[test]
-fn a_macro_call_keeps_a_physical_location_and_drops_an_empty_description() {
+fn a_rox_call_keeps_a_physical_location_and_drops_an_empty_description() {
     let mut event = export(all_day());
-    let (description, location) = attach_macro_call(None, Some("Room 4"), CALL_URL);
+    let (description, location) = attach_rox_call(None, Some("Room 4"), CALL_URL);
     event.description = Some(description);
     event.location = Some(location);
 
@@ -175,7 +175,7 @@ fn a_macro_call_keeps_a_physical_location_and_drops_an_empty_description() {
 fn the_join_line_goes_even_when_an_earlier_call_link_is_found_first() {
     let earlier = "https://rox.one/app/meet/join/fedcba9876543210fedcba9876543210";
     let mut event = export(all_day());
-    let (description, location) = attach_macro_call(
+    let (description, location) = attach_rox_call(
         Some(&format!("<p>Last week: {earlier}</p>")),
         Some("Room 4"),
         CALL_URL,
@@ -197,13 +197,13 @@ fn the_join_line_goes_even_when_an_earlier_call_link_is_found_first() {
 fn only_a_description_holding_the_link_is_reduced_to_plain_text() {
     let rich = "<p>See <a href=\"https://example.com/notes\">the notes</a></p>";
     let (description, location) =
-        content_without_macro_call(Some(rich.to_string()), Some(CALL_URL.to_string()));
+        content_without_rox_call(Some(rich.to_string()), Some(CALL_URL.to_string()));
     assert_eq!(description.as_deref(), Some(rich));
     assert_eq!(location, None);
 
     // No join line to match here, so only the markup going takes the link.
     let behind_text = format!("<p><a href=\"{CALL_URL}\">Agenda</a></p>");
-    let (description, _) = content_without_macro_call(Some(behind_text), None);
+    let (description, _) = content_without_rox_call(Some(behind_text), None);
     assert!(
         !description.unwrap_or_default().contains("/meet/join/"),
         "the link must not survive in an href"
@@ -264,7 +264,7 @@ fn forward_file(join_link: Option<&JoinLink>) -> IcsPurpose<'_> {
 fn a_share_never_carries_the_join_link() {
     // The .ics download has no conference to name: the export carries none.
     let mut event = export(all_day());
-    let (description, location) = attach_macro_call(None, None, CALL_URL);
+    let (description, location) = attach_rox_call(None, None, CALL_URL);
     event.description = Some(description);
     event.location = Some(location);
 
@@ -276,10 +276,10 @@ fn a_share_never_carries_the_join_link() {
 }
 
 #[test]
-fn a_forward_keeps_the_macro_call_it_would_strip_from_a_share() {
+fn a_forward_keeps_the_rox_call_it_would_strip_from_a_share() {
     let mut event = export(all_day());
     let (description, location) =
-        attach_macro_call(Some("<p>Bring the budget draft</p>"), None, CALL_URL);
+        attach_rox_call(Some("<p>Bring the budget draft</p>"), None, CALL_URL);
     event.description = Some(description);
     event.location = Some(location);
 

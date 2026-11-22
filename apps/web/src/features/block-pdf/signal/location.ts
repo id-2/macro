@@ -323,7 +323,7 @@ export function parseLocationFromUrl(
 }
 
 /**
- * Applies custom highlights using phraseSearch: false to highlight all macro_em terms
+ * Applies custom highlights using phraseSearch: false to highlight all rox_em terms
  * in a single search pass, filtered to only matches within the snippet boundaries.
  */
 async function applyCustomHighlights(

@@ -5,7 +5,7 @@ import type {
   UnifiedSearchResponseItem,
 } from '../../../generated/search/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { AgentSession } from '../agent-sessions/agent-session';
 import { CalendarEvent } from '../calendar/event';
 import { CallRecord } from '../calls/call-record';
@@ -68,7 +68,7 @@ const searchTypes: readonly SearchType[] = [
  * handles, with the same filters as the per-type searches and more: exact
  * matching, tags, one inbox and agent session transcripts.
  *
- * @routing Use when finding or looking up the user's own Macro content by keyword, across types or in one; not browsing recent items (`macro.workspace`), the web, or one item already in context.
+ * @routing Use when finding or looking up the user's own Rox content by keyword, across types or in one; not browsing recent items (`macro.workspace`), the web, or one item already in context.
  *
  * @agent
  * Search is keyword search, not semantic: pass 1-3 words that would literally appear in the item, not the user's description. Whitespace-separated terms are ANDed; for documents and email each word is a prefix and terms may match different passages, while for other kinds the query is one adjacent phrase prefix, so long phrases match nothing. Quote a multi-word phrase; use matchType 'exact' for a whole word, identifier or email address. Search a person and a topic separately. To find someone's email, search their quoted address, not their name.
@@ -108,7 +108,7 @@ const searchTypes: readonly SearchType[] = [
  * ```
  */
 export class SearchNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * One bounded page of matches across every kind of item, most relevant
@@ -252,7 +252,7 @@ function propertiesOf(hit: UnifiedSearchResponseItem) {
 }
 
 function searchResult(
-  client: MacroClient,
+  client: RoxClient,
   hit: UnifiedSearchResponseItem,
   tagMap: Map<string, WorkspaceTag>,
 ): SearchResult {

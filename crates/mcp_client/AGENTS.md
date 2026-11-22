@@ -26,7 +26,7 @@ through `rmcp`, returning the result to the caller's tool-calling loop.
   adapters implement. The address policy itself is pure domain code
   (`src/domain/models/address_policy.rs`).
 - `src/domain/provider_registry.rs` (feature `providers`): pre-registered
-  OAuth credentials for known MCP providers, keyed off `macro_env_var`.
+  OAuth credentials for known MCP providers, keyed off `rox_env_var`.
 - `src/domain/service/linked_github.rs`: `WithLinkedGithub`, the store
   decorator that answers GitHub's MCP server with the user's GitHub account
   link token (same GitHub App), read through the `LinkedGithubTokens` port
@@ -51,8 +51,8 @@ through `rmcp`, returning the result to the caller's tool-calling loop.
 ## Boundaries
 
 - Depends on: `agent`, `ai_toolset`, `authentication_service_client`,
-  `macro_authorization` (feature `axum`),
-  `macro_user_id`, `rmcp`.
+  `rox_authorization` (feature `axum`),
+  `rox_user_id`, `rmcp`.
 - Used by: `agent_egress`, `agent_harness`, `ai_tools`, `mcp_select`,
   `onboarding`.
 

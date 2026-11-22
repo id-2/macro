@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use async_graphql::Context;
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_soup::{item::SoupItem, project::SoupProject};
 
 use crate::objects::{GraphqlSoupEntity, GraphqlSoupProject, SoupEntityEdges};
@@ -23,7 +23,7 @@ pub trait FoldersQueryReader: Send + Sync {
     /// Return accessible folders (projects), newest `updatedAt` first.
     async fn list_folders<'a>(
         &'a self,
-        user_id: &'a MacroUserIdStr<'static>,
+        user_id: &'a RoxUserIdStr<'static>,
     ) -> Result<Vec<SoupProject<()>>, FoldersQueryError>;
 }
 
@@ -51,7 +51,7 @@ pub struct NoOpFoldersQueryReader;
 impl FoldersQueryReader for NoOpFoldersQueryReader {
     async fn list_folders<'a>(
         &'a self,
-        _user_id: &'a MacroUserIdStr<'static>,
+        _user_id: &'a RoxUserIdStr<'static>,
     ) -> Result<Vec<SoupProject<()>>, FoldersQueryError> {
         Ok(Vec::new())
     }
@@ -61,7 +61,7 @@ impl FoldersQueryReader for NoOpFoldersQueryReader {
 #[tracing::instrument(skip_all, err(Debug))]
 pub async fn resolve_folders<E>(
     ctx: &Context<'_>,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
 ) -> async_graphql::Result<Vec<GraphqlSoupProject<E>>>
 where
     E: SoupEntityEdges,

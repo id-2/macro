@@ -9,7 +9,7 @@ use entity_access::{
     },
     inbound::axum_extractors::AgentSessionAccessLevelExtractor,
 };
-use macro_authorization::{ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService};
+use rox_authorization::{ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -25,7 +25,7 @@ pub fn agent_auto_archive_router<T, Access, Auth, S>(
 where
     T: AutoArchive,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -138,14 +138,14 @@ impl From<SessionAutoArchive> for SessionAutoArchiveResponse {
 pub async fn get_auto_archive_preferences<
     T: AutoArchive,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
 ) -> Result<Json<AutoArchivePreferencesBody>, AgentSessionApiError> {
     let preferences = state
         .service
-        .preferences(&caller.authorization.user.macro_user_id)
+        .preferences(&caller.authorization.user.rox_user_id)
         .await?;
     Ok(Json(preferences.into()))
 }
@@ -175,15 +175,15 @@ pub async fn get_auto_archive_preferences<
 pub async fn put_auto_archive_preferences<
     T: AutoArchive,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(request): Json<AutoArchivePreferencesBody>,
 ) -> Result<Json<AutoArchivePreferencesBody>, AgentSessionApiError> {
     state
         .service
-        .set_preferences(&caller.authorization.user.macro_user_id, request.into())
+        .set_preferences(&caller.authorization.user.rox_user_id, request.into())
         .await?;
     Ok(Json(request))
 }
@@ -206,7 +206,7 @@ pub async fn put_auto_archive_preferences<
 pub async fn get_session_auto_archive<
     T: AutoArchive,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -237,7 +237,7 @@ pub async fn get_session_auto_archive<
 pub async fn put_session_auto_archive<
     T: AutoArchive,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<OwnerAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,

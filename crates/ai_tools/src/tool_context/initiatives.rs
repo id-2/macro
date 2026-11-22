@@ -64,6 +64,6 @@ pub fn build_initiative_tool_context(
             access.clone(),
         )),
         resources,
-        actor: bot_id::MACRO_AI_BOT_ID,
+        actor: bot_id::ROX_AI_BOT_ID,
     }
 }

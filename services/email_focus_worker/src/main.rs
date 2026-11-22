@@ -26,8 +26,8 @@ use calendar_events::outbound::pg::PgCalendarRepository;
 use connection_gateway_client::ConnectionGatewayClient;
 use email::{domain::focus::FocusService, outbound::FocusPgRepository};
 use jev::{domain::JevClassifier, outbound::SystemOneJev};
-use macro_entrypoint::{MacroEntrypoint, shutdown_signal};
-use macro_service_urls::{AgentHarnessServiceUrl, ConnectionGatewayUrl};
+use rox_entrypoint::{RoxEntrypoint, shutdown_signal};
+use rox_service_urls::{AgentHarnessServiceUrl, ConnectionGatewayUrl};
 use memory::outbound::pg_memory_repo::PgMemoryRepo;
 use rootcause::Report;
 use sqlx::postgres::PgPoolOptions;
@@ -47,7 +47,7 @@ use crate::{
 #[tokio::main]
 async fn main() -> Result<(), Report> {
     let config = Config::from_env()?;
-    MacroEntrypoint::new(config.environment).init();
+    RoxEntrypoint::new(config.environment).init();
     let enforcement = ai_usage::config::load_ai_usage_enforcement()?;
 
     let domains = config.enabled_domains();
@@ -69,7 +69,7 @@ async fn main() -> Result<(), Report> {
     let db = PgPoolOptions::new()
         .min_connections(1)
         .max_connections(5)
-        .connect(config.macro_db_url.as_ref())
+        .connect(config.rox_db_url.as_ref())
         .await?;
     let shutdown = CancellationToken::new();
     let notifications = TaskTracker::new();

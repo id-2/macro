@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE email_links SET is_primary = false WHERE macro_id = $1 AND provider <> 'ROX'",
+  "query": "UPDATE email_links SET is_primary = false WHERE rox_id = $1 AND provider <> 'ROX'",
   "describe": {
     "columns": [],
     "parameters": {

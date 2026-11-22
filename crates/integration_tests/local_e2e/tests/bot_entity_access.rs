@@ -9,10 +9,10 @@ use sqlx::{PgPool, postgres::PgPoolOptions};
 use uuid::Uuid;
 
 const DEFAULT_LOCAL_DATABASE_URL: &str = "postgres://user:password@localhost:5432/macrodb";
-const BOT_TOKEN_HEADER: &str = "x-macro-bot-token";
-const BOT_SCOPE_HEADER: &str = "x-macro-bot-scope";
-const BOT_FOR_MACRO_USER_ID_HEADER: &str = "x-macro-bot-for-macro-user-id";
-const BOT_FOR_FUSIONAUTH_USER_ID_HEADER: &str = "x-macro-bot-for-fusionauth-user-id";
+const BOT_TOKEN_HEADER: &str = "x-rox-bot-token";
+const BOT_SCOPE_HEADER: &str = "x-rox-bot-scope";
+const BOT_FOR_ROX_USER_ID_HEADER: &str = "x-rox-bot-for-macro-user-id";
+const BOT_FOR_FUSIONAUTH_USER_ID_HEADER: &str = "x-rox-bot-for-fusionauth-user-id";
 
 #[tokio::test]
 #[ignore = "requires `just local-e2e-rust` plus document_storage_service"]
@@ -87,7 +87,7 @@ impl ScopedBotFixture {
 
         sqlx::query(
             r#"
-            INSERT INTO "User" (id, email, macro_user_id)
+            INSERT INTO "User" (id, email, rox_user_id)
             VALUES ($1, $2, $3)
             "#,
         )
@@ -282,7 +282,7 @@ impl ScopedBotFixture {
             .header(BOT_SCOPE_HEADER, scope);
         if include_acting_user {
             request = request
-                .header(BOT_FOR_MACRO_USER_ID_HEADER, &self.acting_user_id)
+                .header(BOT_FOR_ROX_USER_ID_HEADER, &self.acting_user_id)
                 .header(BOT_FOR_FUSIONAUTH_USER_ID_HEADER, &self.fusion_user_id);
         }
 

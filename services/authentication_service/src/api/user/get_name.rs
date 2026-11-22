@@ -4,11 +4,11 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_db_client::user::get_user_name::get_user_name;
+use rox_db_client::user::get_user_name::get_user_name;
 
 use crate::api::context::{ApiContext, AuthorizationService};
 
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use model::user::UserName;
 
@@ -26,7 +26,7 @@ use model::user::UserName;
 #[tracing::instrument(skip(ctx, authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, Response> {
     let user_name = get_user_name(
         &ctx.db,

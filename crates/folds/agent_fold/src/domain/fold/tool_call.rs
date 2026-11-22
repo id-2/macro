@@ -39,7 +39,7 @@ impl FoldState {
         // detail it opened with and reads into that.
         let detail = match harness::tool_shape(reader, &name, &frame) {
             ToolShape::Harness => tool_detail(reader, &frame),
-            ToolShape::Macro(_) => macro_detail(reader, &frame),
+            ToolShape::Macro(_) => rox_detail(reader, &frame),
             ToolShape::UserTool(tool) => user_tool_detail(reader, tool, &frame),
             ToolShape::View => view_detail(reader, &frame),
             ToolShape::Subagent => subagent_detail(reader, &name, &frame),
@@ -142,7 +142,7 @@ impl FoldState {
 
         match detail {
             ToolDetail::Macro { .. } | ToolDetail::UserTool { .. } => {
-                patch_macro_detail(reader, name, detail, &frame);
+                patch_rox_detail(reader, name, detail, &frame);
             }
             ToolDetail::View { .. } => {
                 if frame.raw_output.is_some() {
@@ -219,7 +219,7 @@ fn tool_output(
 
 /// Build the detail for a Rox tool from its opening frame: its input as
 /// given, its output out of the harness's wrapper.
-pub(super) fn macro_detail(reader: &dyn HarnessReader, frame: &ToolFrame<'_>) -> ToolDetail {
+pub(super) fn rox_detail(reader: &dyn HarnessReader, frame: &ToolFrame<'_>) -> ToolDetail {
     let (output, error) = match frame.raw_output.map(|raw| reader.unwrap_tool_output(raw)) {
         None => (None, None),
         Some((value, error)) => (Some(value), error),
@@ -280,7 +280,7 @@ pub(super) fn user_tool_detail(
 /// Both replace rather than merge: a harness sends the arguments whole each
 /// time, and so does the session API that later records what the user did
 /// with a user tool.
-pub(super) fn patch_macro_detail(
+pub(super) fn patch_rox_detail(
     reader: &dyn HarnessReader,
     name: &ToolName,
     detail: &mut ToolDetail,
@@ -308,7 +308,7 @@ pub(super) fn patch_macro_detail(
             if let Some(raw) = frame.raw_output {
                 // The detail says this is a user tool, so the name's short
                 // form is the tool's: `SendEmail` whether the harness wrote it
-                // bare or as `mcp__macro__SendEmail`.
+                // bare or as `mcp__rox__SendEmail`.
                 *outcome = harness::user_tool_outcome(reader, name.display(), raw);
             }
         }
@@ -398,7 +398,7 @@ pub(super) fn patch_detail(
                 *error = failure;
             }
         }
-        // Patched by `patch_macro_detail` / `patch_subagent_detail`, which
+        // Patched by `patch_rox_detail` / `patch_subagent_detail`, which
         // have the name and the harness's result shapes to hand.
         ToolDetail::Macro { .. }
         | ToolDetail::View { .. }

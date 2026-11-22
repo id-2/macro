@@ -5,8 +5,8 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
-use macro_middleware::tracking::ClientIp;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
+use rox_middleware::tracking::ClientIp;
 use utoipa::ToSchema;
 
 use crate::{
@@ -39,7 +39,7 @@ static VERIFY_EMAIL_TEMPLATE: &str = include_str!("./_verify_email_template.html
 #[tracing::instrument(skip(ctx, authorization, ip_context,req), fields(client_ip=%ip_context, email=%req.email, fusion_user_id=%authorization.authorization.user.user_context.fusion_user_id), err(Debug))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
     ip_context: ClientIp,
     extract::Json(mut req): extract::Json<GenerateEmailLinkRequest>,
 ) -> Result<Response, Response> {
@@ -59,7 +59,7 @@ pub async fn handler(
         .to_string();
 
     let (minute, daily) = ctx
-        .macro_cache_client
+        .rox_cache_client
         .get_resend_verify_email_rate_limits(&req.email)
         .await
         .map_err(|e| {
@@ -96,7 +96,7 @@ pub async fn handler(
     }
 
     // Check if the user profile already exists
-    match macro_db_client::user::get::get_user_id_by_email(ctx.db.clone(), &req.email).await {
+    match rox_db_client::user::get::get_user_id_by_email(ctx.db.clone(), &req.email).await {
         Ok(_) => {
             return Err((
                 StatusCode::BAD_REQUEST,
@@ -122,8 +122,8 @@ pub async fn handler(
     }
 
     // Check if that email is already an in progress email link
-    let link_id = if let Some((macro_user_id, link_id)) =
-        macro_db_client::in_progress_email_link::check_existing_in_progress_email_link(
+    let link_id = if let Some((rox_user_id, link_id)) =
+        rox_db_client::in_progress_email_link::check_existing_in_progress_email_link(
             &ctx.db, &req.email,
         )
         .await
@@ -135,8 +135,8 @@ pub async fn handler(
             )
                 .into_response()
         })? {
-        // if the macro_user_id matches the user_id, we count this as "regenerating" the link
-        if !macro_user_id.to_string().eq(&user_context.fusion_user_id) {
+        // if the rox_user_id matches the user_id, we count this as "regenerating" the link
+        if !rox_user_id.to_string().eq(&user_context.fusion_user_id) {
             return Err((
                 StatusCode::BAD_REQUEST,
                 Json(ErrorResponse {
@@ -148,7 +148,7 @@ pub async fn handler(
 
         link_id
     } else {
-        macro_db_client::macro_user_email_verification::upsert_macro_user_email_verification(
+        rox_db_client::rox_user_email_verification::upsert_macro_user_email_verification(
             &ctx.db,
             &user_context.fusion_user_id,
             &req.email,
@@ -164,7 +164,7 @@ pub async fn handler(
                 .into_response()
         })?;
 
-        macro_db_client::in_progress_email_link::insert_in_progress_email_link(
+        rox_db_client::in_progress_email_link::insert_in_progress_email_link(
             &ctx.db,
             &user_context.fusion_user_id,
             &req.email,
@@ -198,7 +198,7 @@ pub async fn handler(
         })?;
 
     // Increment the rate limits
-    ctx.macro_cache_client
+    ctx.rox_cache_client
         .increment_resend_verify_email_rate_limits(&req.email)
         .await
         .map_err(|e| {

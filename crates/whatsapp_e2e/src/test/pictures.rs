@@ -49,7 +49,7 @@ async fn make_due(pool: &PgPool, jid: &str) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pictures_of_an_added_group_and_its_people_follow_whatsapp(pool: PgPool) {
     let world = World::new(pool).await;
     let repository = PgWhatsAppRepository::new(world.pool.clone());

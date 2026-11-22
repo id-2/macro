@@ -4,7 +4,7 @@ use crate::domain::{
     contact_listing::CrmContactListScope,
 };
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -21,7 +21,7 @@ async fn resolve(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn company_covers_every_contact_the_viewer_may_see(pool: PgPool) {
@@ -51,7 +51,7 @@ async fn company_covers_every_contact_the_viewer_may_see(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn invisible_records_do_not_resolve(pool: PgPool) {
@@ -72,7 +72,7 @@ async fn invisible_records_do_not_resolve(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn contact_covers_only_itself(pool: PgPool) {
@@ -99,7 +99,7 @@ async fn contact_covers_only_itself(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn team_scope_is_restricted_to_its_team(pool: PgPool) {
@@ -133,7 +133,7 @@ async fn team_scope_is_restricted_to_its_team(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn legacy_email_settings_do_not_hide_associated_records(pool: PgPool) {
@@ -171,7 +171,7 @@ async fn legacy_email_settings_do_not_hide_associated_records(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn activity_preserves_duplicates_without_consent_and_excludes_hidden(pool: PgPool) {
@@ -240,7 +240,7 @@ async fn activity_preserves_duplicates_without_consent_and_excludes_hidden(pool:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn activity_returns_every_address_of_visible_contacts(pool: PgPool) {

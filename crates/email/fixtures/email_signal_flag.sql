@@ -18,11 +18,11 @@
 --   draft must send it back out of the inbox (is_signal stays true via the
 --   SENT label, but inbox_visible/latest_inbound_message_ts reset).
 -- Thread e207 (is_signal=true, stale on purpose): unlabeled message from
---   Macro's own digest sender (no-reply@notification.rox.one) — Macro
+--   Rox's own digest sender (no-reply@notification.rox.one) — Rox
 --   notification emails are never signal, so update_thread_metadata must
 --   clear it, and marking the sender important must not promote it.
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000e01', 'macro|sigflag_email@example.com', '00000000-0000-0000-0000-000000000e01',
         'sigflag_email@example.com', 'GMAIL', true, NOW(), NOW());
 

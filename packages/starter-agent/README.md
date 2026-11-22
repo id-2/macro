@@ -51,8 +51,8 @@ lists them.
 
 A hosted agent's credentials are its enrollment's `agent.env` (`KEY=value`
 lines, given as a systemd credential at `MUPPET_CREDENTIALS_FILE`): its Rox
-key and where Rox is (`MACRO_GATEWAY`, the `OVERRIDE_*` service URLs and
-`MACRO_SPEECH_URL`, the speech gateway a call's relay opens `…/stt` and
+key and where Rox is (`ROX_GATEWAY`, the `OVERRIDE_*` service URLs and
+`ROX_SPEECH_URL`, the speech gateway a call's relay opens `…/stt` and
 `…/tts` under),
 its repository's, and, in Rox-credits mode, `ANTHROPIC_BASE_URL`,
 `ANTHROPIC_AUTH_TOKEN` and `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`, the
@@ -74,7 +74,7 @@ fails.
 
 | Credential                                                   | What it turns on                                                     |
 | ------------------------------------------------------------ | -------------------------------------------------------------------- |
-| `MACRO_API_KEY`, `MACRO_GATEWAY`                             | The agent itself: chat, schedules, memory. Set by enrollment.        |
+| `ROX_API_KEY`, `ROX_GATEWAY`                             | The agent itself: chat, schedules, memory. Set by enrollment.        |
 | `AGENT_GITHUB_TOKEN`                                         | Only with a GitHub remote: landing through a PR and CI.              |
 
 
@@ -153,8 +153,8 @@ agent's service.
 | `HARNESSD_STATE_DIRECTORY` | yes (with systemd credentials) | harnessd's Claude sign-in, read-only inside the sandbox; the `claude` wrapper on PATH reads it. |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | no | Where spans go; none means none are exported. |
 
-`agent.env` holds `MACRO_API_KEY`, `MACRO_GATEWAY`, the `OVERRIDE_*` service
-addresses, `MACRO_REPO_URL` and `MACRO_REPO_TOKEN`, and, in Rox-credits
+`agent.env` holds `ROX_API_KEY`, `ROX_GATEWAY`, the `OVERRIDE_*` service
+addresses, `ROX_REPO_URL` and `ROX_REPO_TOKEN`, and, in Rox-credits
 mode, `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN` and
 `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`, which only Claude Code gets.
 Without them, Claude Code uses the computer's Claude login (harnessd).

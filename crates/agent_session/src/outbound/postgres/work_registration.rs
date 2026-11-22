@@ -32,7 +32,7 @@ fn registration(
     registered_at: DateTime<Utc>,
 ) -> Result<WorkRegistration> {
     let account_id =
-        MacroUserIdStr::try_from(account_id).context("stored work registration account id")?;
+        RoxUserIdStr::try_from(account_id).context("stored work registration account id")?;
     Ok(WorkRegistration {
         id: WorkRegistrationId::new_from_uuid(id),
         account_id,
@@ -41,7 +41,7 @@ fn registration(
     })
 }
 
-fn account_strings(accounts: &[MacroUserIdStr<'static>]) -> Vec<String> {
+fn account_strings(accounts: &[RoxUserIdStr<'static>]) -> Vec<String> {
     accounts
         .iter()
         .map(|account| account.as_ref().to_owned())
@@ -51,7 +51,7 @@ fn account_strings(accounts: &[MacroUserIdStr<'static>]) -> Vec<String> {
 impl<B: BotFacts + Clone + 'static> WorkRegistrationRepo for PgAgentSessionRepo<B> {
     async fn register(
         &self,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> Result<Registered> {
         let mut transaction = self.pool.begin().await.context("begin work registration")?;
@@ -119,7 +119,7 @@ impl<B: BotFacts + Clone + 'static> WorkRegistrationRepo for PgAgentSessionRepo<
 
     async fn unregister(
         &self,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> Result<bool> {
         let ended = sqlx::query!(
@@ -139,7 +139,7 @@ impl<B: BotFacts + Clone + 'static> WorkRegistrationRepo for PgAgentSessionRepo<
 
     async fn active_registrations(
         &self,
-        accounts: &[MacroUserIdStr<'static>],
+        accounts: &[RoxUserIdStr<'static>],
         limit: u32,
     ) -> Result<Vec<WorkRegistration>> {
         let rows = sqlx::query!(
@@ -174,7 +174,7 @@ impl<B: BotFacts + Clone + 'static> WorkRegistrationRepo for PgAgentSessionRepo<
 
     async fn registration_states(
         &self,
-        accounts: &[MacroUserIdStr<'static>],
+        accounts: &[RoxUserIdStr<'static>],
         sessions: &[AgentSessionId],
         ended_after: DateTime<Utc>,
     ) -> Result<Vec<WorkRegistrationState>> {

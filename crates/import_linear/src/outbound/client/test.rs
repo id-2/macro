@@ -22,7 +22,7 @@ async fn cursors_are_followed_and_repeated_cursors_fail() {
         json!({"data":{"users":{"nodes":[],"pageInfo":{"hasNextPage":true,"endCursor":"same"}}}}),
         json!({"data":{"users":{"nodes":[],"pageInfo":{"hasNextPage":true,"endCursor":"same"}}}}),
     ]));
-    let user = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let connections = Connections::new(
         Arc::new(support::Store),
         Some(proxy.clone()),
@@ -50,7 +50,7 @@ async fn graphql_errors_never_return_partial_inventory() {
     let proxy = Arc::new(support::Proxy::new(vec![
         json!({"data":{"users":{"nodes":[]}},"errors":[{"message":"Access denied"}]}),
     ]));
-    let user = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let connections = Connections::new(
         Arc::new(support::Store),
         Some(proxy),
@@ -69,7 +69,7 @@ async fn an_unreadable_node_is_reported_without_losing_its_neighbors() {
     let proxy = Arc::new(support::Proxy::new(vec![
         json!({"data":{"users":{"nodes":[{"id":"u1","name":"A","email":null},{"id":"bad/id","name":"Broken"},{"id":"u2","name":"B","email":null}],"pageInfo":{"hasNextPage":false,"endCursor":null}}}}),
     ]));
-    let user = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let connections = Connections::new(
         Arc::new(support::Store),
         Some(proxy),

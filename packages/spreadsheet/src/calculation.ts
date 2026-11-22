@@ -214,7 +214,7 @@ function configureSheets(model: Model, names: string[]) {
   while (model.getWorksheetsProperties().length < names.length)
     model.newSheet();
   const reserved = new Set(names.map((name) => name.toLowerCase()));
-  let prefix = '__macro_tmp_';
+  let prefix = '__rox_tmp_';
   while (names.some((_, index) => reserved.has(`${prefix}${index}`)))
     prefix += '_';
   for (let index = 0; index < names.length; index++)

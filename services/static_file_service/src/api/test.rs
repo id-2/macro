@@ -4,9 +4,9 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use macro_auth::{
+use rox_auth::{
     InternalApiKey,
-    macro_api_token::{EncodeMacroApiTokenArgs, encode_macro_api_token},
+    rox_api_token::{EncodeMacroApiTokenArgs, encode_rox_api_token},
 };
 use tower::ServiceExt;
 
@@ -21,8 +21,8 @@ const PUBLIC: &str = include_str!(
 /// is answered before a handler would reach AWS.
 fn service() -> Router {
     use aws_sdk_s3::config::{BehaviorVersion, Region};
-    let jwt = JwtValidationArgs::testing_macro_token("fixture", PUBLIC);
-    let aws = macro_aws_config::SdkConfig::builder()
+    let jwt = JwtValidationArgs::testing_rox_token("fixture", PUBLIC);
+    let aws = rox_aws_config::SdkConfig::builder()
         .behavior_version(BehaviorVersion::latest())
         .region(Region::new("us-east-1"))
         .build();
@@ -44,23 +44,23 @@ fn service() -> Router {
         sqs_client: aws_sdk_sqs::Client::new(&aws),
         config: Arc::new(config),
         public_url: Arc::new(StaticFilePublicUrl::local()),
-        authorization_state: MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-            MacroAuthJwtValidator::new(jwt.clone()),
+        authorization_state: RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+            RoxAuthJwtValidator::new(jwt.clone()),
             InternalAuthConfig {
                 api_key: "internal".to_owned(),
-                default_user_id: Some(MACRO_INTERNAL_USER_ID.to_owned()),
+                default_user_id: Some(ROX_INTERNAL_USER_ID.to_owned()),
             },
-            macro_authorization::NoBotAuthorizer,
-            macro_authorization::NoUserApiKeyAuthorizer,
+            rox_authorization::NoBotAuthorizer,
+            rox_authorization::NoUserApiKeyAuthorizer,
         ))),
     };
     app(state, jwt)
 }
 
 fn credential(scope: Option<&str>) -> String {
-    encode_macro_api_token(EncodeMacroApiTokenArgs {
+    encode_rox_api_token(EncodeMacroApiTokenArgs {
         fusionauth_id: "fixture".into(),
-        macro_user_id: "macro|owner@example.com".into(),
+        rox_user_id: "macro|owner@example.com".into(),
         organization_id: None,
         issuer: "fixture".into(),
         private_key: PRIVATE.into(),

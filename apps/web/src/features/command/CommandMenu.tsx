@@ -16,7 +16,7 @@ import {
 } from '@components/app/tab-layout/open-in-new-tab';
 import {
   enableProjects,
-  USE_MACRO_PR_SUMMARY_BLOCK,
+  USE_ROX_PR_SUMMARY_BLOCK,
 } from '@core/constant/featureFlags';
 import { useUserId } from '@core/context/user';
 import { getActiveCommandsFromScope } from '@core/hotkey/getCommands';
@@ -171,7 +171,7 @@ export function CommandMenu() {
       isEntityItem(item) &&
         (item.bucket === 'initiative' ||
           (item.data.type !== 'foreign' &&
-            (!isGithubPrEntity(item.data) || USE_MACRO_PR_SUMMARY_BLOCK)))
+            (!isGithubPrEntity(item.data) || USE_ROX_PR_SUMMARY_BLOCK)))
     );
     if (
       isSearchItem(item) ||
@@ -598,7 +598,7 @@ function CommandSearchMenu(
   const selectedOpensInSplit = () => {
     const item = selectedItem();
     if (!item || !isEntityItem(item)) return false;
-    if (isGithubPrEntity(item.data)) return USE_MACRO_PR_SUMMARY_BLOCK;
+    if (isGithubPrEntity(item.data)) return USE_ROX_PR_SUMMARY_BLOCK;
     return item.data.type !== 'foreign';
   };
   const selectedIsSearch = () => {

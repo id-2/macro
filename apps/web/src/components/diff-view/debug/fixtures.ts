@@ -61,10 +61,10 @@ index 0000000..3333333
 +  return lastEventAt > (session.lastReadAt ?? 0);
 +}
 +
-diff --git a/crates/macro_agent_sessions/src/service.rs b/crates/macro_agent_sessions/src/service.rs
+diff --git a/crates/rox_agent_sessions/src/service.rs b/crates/rox_agent_sessions/src/service.rs
 index 4444444..5555555 100644
---- a/crates/macro_agent_sessions/src/service.rs
-+++ b/crates/macro_agent_sessions/src/service.rs
+--- a/crates/rox_agent_sessions/src/service.rs
++++ b/crates/rox_agent_sessions/src/service.rs
 @@ -85,8 +85,14 @@ impl SessionService {
      #[instrument(skip(self), fields(session_id = %id))]
      pub async fn archive(&self, id: AgentSessionId) -> Result<(), ArchiveError> {
@@ -81,20 +81,20 @@ index 4444444..5555555 100644
      }
  
      #[instrument(skip(self), fields(owner = %owner))]
-diff --git a/crates/macro_agent_sessions/src/legacy_unread.rs b/crates/macro_agent_sessions/src/legacy_unread.rs
+diff --git a/crates/rox_agent_sessions/src/legacy_unread.rs b/crates/rox_agent_sessions/src/legacy_unread.rs
 deleted file mode 100644
 index 6666666..0000000
---- a/crates/macro_agent_sessions/src/legacy_unread.rs
+--- a/crates/rox_agent_sessions/src/legacy_unread.rs
 +++ /dev/null
 @@ -1,3 +0,0 @@
 -pub fn unread(last_event_at: i64, last_read_at: i64) -> bool {
 -    last_event_at > last_read_at
 -}
-diff --git a/crates/macro_db_client/migrations/20260914042311_agent_session_archived_index.sql b/crates/macro_db_client/migrations/20260914042311_agent_session_archived_index.sql
+diff --git a/crates/rox_db_client/migrations/20260914042311_agent_session_archived_index.sql b/crates/rox_db_client/migrations/20260914042311_agent_session_archived_index.sql
 new file mode 100644
 index 0000000..7777777
 --- /dev/null
-+++ b/crates/macro_db_client/migrations/20260914042311_agent_session_archived_index.sql
++++ b/crates/rox_db_client/migrations/20260914042311_agent_session_archived_index.sql
 @@ -0,0 +1,5 @@
 +-- Archived sessions drop out of the unread count. Without a partial index
 +-- the filter falls back to a sequential scan on long workspace histories.
@@ -122,7 +122,7 @@ export const SAMPLE_FILES: DiffFile[] = [
     patchOmitted: false,
   },
   {
-    path: 'crates/macro_agent_sessions/src/service.rs',
+    path: 'crates/rox_agent_sessions/src/service.rs',
     kind: 'modified',
     additions: 8,
     deletions: 2,
@@ -130,7 +130,7 @@ export const SAMPLE_FILES: DiffFile[] = [
     patchOmitted: false,
   },
   {
-    path: 'crates/macro_agent_sessions/src/legacy_unread.rs',
+    path: 'crates/rox_agent_sessions/src/legacy_unread.rs',
     kind: 'deleted',
     additions: 0,
     deletions: 3,
@@ -138,7 +138,7 @@ export const SAMPLE_FILES: DiffFile[] = [
     patchOmitted: false,
   },
   {
-    path: 'crates/macro_db_client/migrations/20260914042311_agent_session_archived_index.sql',
+    path: 'crates/rox_db_client/migrations/20260914042311_agent_session_archived_index.sql',
     kind: 'added',
     additions: 5,
     deletions: 0,
@@ -168,8 +168,8 @@ const GENERATED_DIRECTORIES = [
   'apps/web/src/features/inbox/components',
   'apps/web/src/features/inbox/queries',
   'apps/web/src/lib/core/util',
-  'crates/macro_inbox/src',
-  'crates/macro_inbox/src/outbound',
+  'crates/rox_inbox/src',
+  'crates/rox_inbox/src/outbound',
   'packages/email-renderer/src',
 ];
 

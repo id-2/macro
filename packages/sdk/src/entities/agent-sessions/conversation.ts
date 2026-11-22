@@ -3,7 +3,7 @@ import type {
   AgentConversationTurnDto,
 } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Agent } from '../agents/agent';
 import type { Channel } from '../channels/channel';
 import { Message } from '../channels/message';
@@ -16,7 +16,7 @@ import { AgentSession } from './agent-session';
  */
 export class AgentConversation {
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Parent channel. */
     readonly channel: Channel,
     private readonly record: AgentConversationDto,
@@ -82,7 +82,7 @@ export class AgentConversation {
  */
 export class ConversationTurn {
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Parent conversation. */
     readonly conversation: AgentConversation,
     private readonly record: AgentConversationTurnDto,

@@ -11,8 +11,8 @@ use agent_runtime_protocol::domain::action::{AgentAction, AgentActionId, PromptA
 use agent_runtime_protocol::domain::ports::Transport;
 use agent_runtime_protocol::domain::schema::v0::{ToRuntimeMessage, ToServerMessage};
 use bots::domain::models::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::{Owner, OwnerType};
 use shared_entity_registry::OwnedPurgeOutcome;
 use std::num::NonZeroUsize;
@@ -41,7 +41,7 @@ pub struct BotFacts {
     /// team-owned persona. System bots belong to everyone.
     pub is_system: bool,
     /// The user who owns the bot, when it is user-owned.
-    pub owner_user_id: Option<MacroUserIdStr<'static>>,
+    pub owner_user_id: Option<RoxUserIdStr<'static>>,
     /// Team that owns the bot, when it is team-owned.
     pub owner_team_id: Option<Uuid>,
     /// The registered harness this bot's agent is bound to, when it is one.
@@ -88,14 +88,14 @@ pub trait BotDirectory: Send + Sync + 'static {
     /// Whether a user belongs to a team that owns a persona.
     fn user_has_team(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<bool>> + Send;
 
     /// Whether the user and bot share at least one active channel.
     fn user_shares_channel_with_bot(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<bool>> + Send;
 }
@@ -125,7 +125,7 @@ pub struct RequestedExternalSession {
     /// The bot the session runs for.
     pub bot_id: BotId,
     /// Who asked; owns the session that the runtime creates.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The model they chose over the persona's default, when they did. It
     /// reaches the runtime the way the persona's own does: recorded on the
     /// session, then selected when the session binds on its first prompt.
@@ -487,7 +487,7 @@ pub trait AgentSessionRepo: Send + Sync + 'static {
     /// session are simply absent.
     fn preview(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         ids: &[AgentSessionId],
     ) -> impl Future<Output = Result<Vec<SessionPreviewCandidate>>> + Send;
 
@@ -511,7 +511,7 @@ pub trait AgentSessionRepo: Send + Sync + 'static {
     fn add_follower(
         &self,
         id: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Who prompted the turn `id` is running or last ran; `None` before its
@@ -564,7 +564,7 @@ pub trait AgentSessionRepo: Send + Sync + 'static {
     /// The owner's newest sessions, newest first, at most `limit`.
     fn recent_for_owner<'owner>(
         &self,
-        owner: &MacroUserIdStr<'owner>,
+        owner: &RoxUserIdStr<'owner>,
         limit: NonZeroUsize,
     ) -> impl Future<Output = Result<Vec<AgentSession>>> + Send;
 
@@ -667,13 +667,13 @@ pub trait AgentSessionRepo: Send + Sync + 'static {
     /// A missing row is [`SandboxSize::Default`], not an error.
     fn user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<SandboxSize>> + Send;
 
     /// Upsert the user's default sandbox size for the next `@coder` mention.
     fn set_user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         size: SandboxSize,
     ) -> impl Future<Output = Result<()>> + Send;
 
@@ -682,13 +682,13 @@ pub trait AgentSessionRepo: Send + Sync + 'static {
     /// A missing row is every preference off, not an error.
     fn user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<CodingPreferences>> + Send;
 
     /// Upsert the user's coding preferences, replacing every field.
     fn set_user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         preferences: CodingPreferences,
     ) -> impl Future<Output = Result<()>> + Send;
 
@@ -905,7 +905,7 @@ pub trait AgentSessionLogRepo: Send + Sync + 'static {
     fn participants(
         &self,
         agent_session_id: AgentSessionId,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send;
 }
 
 /// One tool a session's agent may call, as the MCP server offering it
@@ -1318,7 +1318,7 @@ pub struct ControlEvent {
     ///
     /// `None` means "no user is responsible", not "unknown" - a bot's own
     /// actions are attributed to the bot, which this field does not carry.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Why the agent is being asked, when a runtime forwards a triggered
     /// prompt. Users driving a session directly supply none.
     pub context: Option<trigger_context::TriggerContext>,
@@ -1358,7 +1358,7 @@ pub struct QueuedControl {
     /// is what editing replaces.
     pub action: AgentAction,
     /// The user who queued it, absent when a bot acted on nobody's behalf.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// When it was accepted.
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
@@ -1376,7 +1376,7 @@ pub trait AgentSessionNotificationRecipient: Send + Sync + 'static {
     fn present_tool(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         presentation: super::model::SessionToolPresentation,
     ) -> impl Future<Output = Result<()>> + Send {
         async move {
@@ -1389,7 +1389,7 @@ pub trait AgentSessionNotificationRecipient: Send + Sync + 'static {
     /// Internal account lifecycle only; shared sessions owned by others are untouched.
     fn delete_user_sessions(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// The session is going away: release its live resources and delete it.
@@ -1436,7 +1436,7 @@ pub trait AgentSessionNotificationRecipient: Send + Sync + 'static {
         id: AgentSessionId,
         action_id: AgentActionId,
         prompt: String,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Remove a queued action before it dispatches.
@@ -1446,7 +1446,7 @@ pub trait AgentSessionNotificationRecipient: Send + Sync + 'static {
         &self,
         id: AgentSessionId,
         action_id: AgentActionId,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Run a queued action next. Moves it to the front of the queue and, when
@@ -1457,7 +1457,7 @@ pub trait AgentSessionNotificationRecipient: Send + Sync + 'static {
         &self,
         id: AgentSessionId,
         action_id: AgentActionId,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Resize this session's sandbox and remember `size` as the owner's default.
@@ -1492,7 +1492,7 @@ pub trait SessionViewAccess: Send + Sync + 'static {
     /// Whether `viewer` may currently view `session`.
     fn can_view<'a>(
         &'a self,
-        viewer: &'a MacroUserIdStr<'static>,
+        viewer: &'a RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> Pin<Box<dyn Future<Output = Result<bool>> + Send + 'a>>;
 }
@@ -1505,7 +1505,7 @@ pub struct NoInheritedSessionAccess;
 impl SessionViewAccess for NoInheritedSessionAccess {
     fn can_view<'a>(
         &'a self,
-        _viewer: &'a MacroUserIdStr<'static>,
+        _viewer: &'a RoxUserIdStr<'static>,
         _session: AgentSessionId,
     ) -> Pin<Box<dyn Future<Output = Result<bool>> + Send + 'a>> {
         Box::pin(async { Ok(false) })

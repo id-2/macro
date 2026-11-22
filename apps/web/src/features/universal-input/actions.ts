@@ -262,7 +262,7 @@ export function createInputActions(
       body_html:
         body?.bodyHtml ??
         encodeBase64UrlUtf8(plainTextToHtml(input.fields.body)),
-      body_macro: input.fields.body,
+      body_rox: input.fields.body,
       db_id: prior?.draftId,
       thread_db_id: prior?.threadId,
     };

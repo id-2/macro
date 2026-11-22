@@ -8,7 +8,7 @@ use entity_access::inbound::axum_extractors::{
     OptionalMacroUserTeamExtractorV2, ProjectBodyAccessLevelExtractorV2,
 };
 use entity_registry::CreationPrincipalExtractor;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use models_permissions::share_permission::access_level::{AccessLevel, EditAccessLevel};
 
 use super::DocumentRouterState;
@@ -39,7 +39,7 @@ use super::task_duplicates::spawn_task_duplicate_detection;
 pub async fn create_task_handler<
     T: DocumentService + DocumentCreationService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
     CreationPrincipalExtractor { principal, .. }: CreationPrincipalExtractor<Auth>,
@@ -60,7 +60,7 @@ pub async fn create_task_handler<
     let team_id = if req.share_with_team || !agent_correlation::context::may_share() {
         optional_team
             .entity_access_receipt
-            .map(|team| macro_uuid::string_to_uuid(&team.entity().entity_id).unwrap())
+            .map(|team| rox_uuid::string_to_uuid(&team.entity().entity_id).unwrap())
     } else {
         None
     };

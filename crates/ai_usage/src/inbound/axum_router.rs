@@ -13,10 +13,10 @@ use axum::{
     routing::post,
 };
 use chrono::{DateTime, Utc};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use utoipa::ToSchema;
@@ -105,7 +105,7 @@ pub struct AiUsageRouterState<T, Auth> {
     /// The usage service implementation.
     pub service: Arc<T>,
     /// The authorization state used by the request extractors.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 // Manual Clone impl so T doesn't need to be Clone (it's behind Arc).
@@ -124,7 +124,7 @@ impl<T, Auth> FromRef<AiUsageRouterState<T, Auth>> for Arc<T> {
     }
 }
 
-impl<T, Auth> FromRef<AiUsageRouterState<T, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Auth> FromRef<AiUsageRouterState<T, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AiUsageRouterState<T, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -134,7 +134,7 @@ impl<T, Auth> FromRef<AiUsageRouterState<T, Auth>> for MacroAuthorizationState<A
 pub fn ai_usage_router<T, Auth, S>(state: AiUsageRouterState<T, Auth>) -> Router<S>
 where
     T: UsageService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -181,15 +181,15 @@ fn error_response(error: UsageError, context: &str) -> Response {
     skip(service, user),
     fields(actor = %user.acting_entity())
 )]
-pub async fn get_usage_handler<T: UsageService, Auth: MacroAuthorizationService>(
+pub async fn get_usage_handler<T: UsageService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<UsageRequest>,
 ) -> Response {
-    let include_users: std::result::Result<Vec<MacroUserIdStr<'static>>, _> = req
+    let include_users: std::result::Result<Vec<RoxUserIdStr<'static>>, _> = req
         .include_users
         .into_iter()
-        .map(MacroUserIdStr::try_from)
+        .map(RoxUserIdStr::try_from)
         .collect();
     let include_users = match include_users {
         Ok(u) => u,
@@ -212,7 +212,7 @@ pub async fn get_usage_handler<T: UsageService, Auth: MacroAuthorizationService>
     };
 
     match service
-        .get_usage(user.authorization.user.macro_user_id, params)
+        .get_usage(user.authorization.user.rox_user_id, params)
         .await
     {
         Ok(summary) => Json(UsageSummary::from(summary)).into_response(),
@@ -237,9 +237,9 @@ pub async fn get_usage_handler<T: UsageService, Auth: MacroAuthorizationService>
     skip(service, user),
     fields(actor = %user.acting_entity())
 )]
-pub async fn set_pricing_handler<T: UsageService, Auth: MacroAuthorizationService>(
+pub async fn set_pricing_handler<T: UsageService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<SetPricingRequest>,
 ) -> Response {
     let pricing = match req.pricing() {
@@ -255,7 +255,7 @@ pub async fn set_pricing_handler<T: UsageService, Auth: MacroAuthorizationServic
         }
     };
     match service
-        .set_pricing(user.authorization.user.macro_user_id, req.model, pricing)
+        .set_pricing(user.authorization.user.rox_user_id, req.model, pricing)
         .await
     {
         Ok(()) => StatusCode::OK.into_response(),

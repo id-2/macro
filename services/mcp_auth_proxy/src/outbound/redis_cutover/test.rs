@@ -1,6 +1,6 @@
 use std::time::{Duration, SystemTime};
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -123,7 +123,7 @@ impl InflightAuthStore for BrokenLegacy {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_registration_only_in_redis_is_found_and_copied(pool: PgPool) {
     let (store, legacy_clients, _) = cutover(pool.clone());
     legacy_clients
@@ -145,7 +145,7 @@ async fn a_registration_only_in_redis_is_found_and_copied(pool: PgPool) {
     assert!(copied.is_some(), "the fallback should copy into Postgres");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_registration_is_written_to_both_stores(pool: PgPool) {
     let (store, legacy_clients, _) = cutover(pool.clone());
 
@@ -171,7 +171,7 @@ async fn a_new_registration_is_written_to_both_stores(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_binding_only_in_redis_is_found_and_copied(pool: PgPool) {
     let (store, legacy_clients, _) = cutover(pool.clone());
     legacy_clients
@@ -192,7 +192,7 @@ async fn a_binding_only_in_redis_is_found_and_copied(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unbound_digest_stays_unbound_in_both_stores(pool: PgPool) {
     let (store, legacy_clients, _) = cutover(pool);
     store
@@ -220,7 +220,7 @@ async fn an_unbound_digest_stays_unbound_in_both_stores(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_revocation_is_written_to_both_stores(pool: PgPool) {
     let (store, legacy_clients, _) = cutover(pool.clone());
 
@@ -241,7 +241,7 @@ async fn a_revocation_is_written_to_both_stores(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_revocation_only_in_redis_is_honored_and_copied(pool: PgPool) {
     let (store, legacy_clients, _) = cutover(pool.clone());
     legacy_clients
@@ -265,7 +265,7 @@ async fn a_revocation_only_in_redis_is_honored_and_copied(pool: PgPool) {
     assert!(!store.is_grant_revoked("other").await.expect("lookup"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn issued_codes_are_never_written_to_redis(pool: PgPool) {
     let (store, _, legacy_inflight) = cutover(pool);
 
@@ -284,7 +284,7 @@ async fn issued_codes_are_never_written_to_redis(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_code_issued_before_the_cutover_redeems_once(pool: PgPool) {
     let (store, _, legacy_inflight) = cutover(pool);
     legacy_inflight
@@ -307,7 +307,7 @@ async fn a_code_issued_before_the_cutover_redeems_once(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failing_redis_does_not_fail_requests(pool: PgPool) {
     let store: Store<BrokenLegacy, BrokenLegacy> = RedisCutoverAuthStore::new(
         postgres(pool),

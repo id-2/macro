@@ -2,8 +2,8 @@
 
 use axum::{Json, extract::State};
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    MacroAuthorizationService, OptionalMacroAuthorizationExtractor, UserOrInternalService,
+use rox_authorization::{
+    RoxAuthorizationService, OptionalMacroAuthorizationExtractor, UserOrInternalService,
 };
 use model::project::{
     request::GetBatchProjectPreviewRequest, response::GetBatchProjectPreviewResponse,
@@ -37,7 +37,7 @@ pub async fn get_batch_preview_handler<T, Svc, Auth>(
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     if let Some(actor) = user.acting_entity() {
         tracing::Span::current().record("actor", tracing::field::display(actor));
@@ -46,7 +46,7 @@ where
         .authorization
         .as_ref()
         .and_then(|authorization| authorization.acting_user())
-        .map(|user| user.macro_user_id.clone());
+        .map(|user| user.rox_user_id.clone());
     let previews = state
         .service
         .get_batch_preview(user_id, request.project_ids)

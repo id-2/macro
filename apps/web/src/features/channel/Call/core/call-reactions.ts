@@ -5,7 +5,7 @@ export type CallReaction = {
   sender: string;
   emoji: CallReactionEmoji;
 };
-export const CALL_REACTION_TOPIC = 'macro.call.reaction.v1';
+export const CALL_REACTION_TOPIC = 'rox.call.reaction.v1';
 export const CALL_REACTION_LIFETIME_MS = 3200;
 
 export function decodeCallReaction(

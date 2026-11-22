@@ -77,7 +77,7 @@ async fn real_rollout_denies_every_method_before_any_vault_work() {
                         .method(method)
                         .uri(&path)
                         .header("authorization", "Bearer session")
-                        .header("x-macro-passwords", "1")
+                        .header("x-rox-passwords", "1")
                         .header("content-type", "application/json")
                         .body(Body::from(body.to_string()))
                         .unwrap(),
@@ -131,7 +131,7 @@ async fn disabled_query_body_path_and_method_variants_never_perform_work() {
                         .method("POST")
                         .uri(format!("{item}/{action}"))
                         .header("authorization", "Bearer session")
-                        .header("x-macro-passwords", "1")
+                        .header("x-rox-passwords", "1")
                         .header("content-type", "application/json")
                         .body(Body::from(version.to_string()))
                         .unwrap(),
@@ -152,7 +152,7 @@ async fn disabled_query_body_path_and_method_variants_never_perform_work() {
                     .method("PUT")
                     .uri(format!("{item}/share"))
                     .header("authorization", "Bearer session")
-                    .header("x-macro-passwords", "1")
+                    .header("x-rox-passwords", "1")
                     .header("content-type", "application/json")
                     .body(Body::from(serde_json::json!({"grants":grants}).to_string()))
                     .unwrap(),
@@ -218,7 +218,7 @@ async fn disabled_query_body_path_and_method_variants_never_perform_work() {
                     .method(method)
                     .uri(path)
                     .header("authorization", "Bearer session")
-                    .header("x-macro-passwords", "1")
+                    .header("x-rox-passwords", "1")
                     .header("content-type", content)
                     .body(Body::from(body))
                     .unwrap(),
@@ -268,7 +268,7 @@ async fn session_shaped_agent_account_is_denied_with_team_and_existing_direct_gr
                         .method(method)
                         .uri(&path)
                         .header("authorization", "Bearer agent-session")
-                        .header("x-macro-passwords", "1")
+                        .header("x-rox-passwords", "1")
                         .header("content-type", "application/json")
                         .body(Body::from(body.to_string()))
                         .unwrap(),

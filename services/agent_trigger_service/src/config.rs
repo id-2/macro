@@ -2,7 +2,7 @@
 
 use anyhow::Context as _;
 use database_env_vars::DatabaseUrl;
-use macro_env_var::env_vars;
+use rox_env_var::env_vars;
 
 env_vars! {
     /// Comma-separated Kafka bootstrap servers.
@@ -10,11 +10,11 @@ env_vars! {
 }
 
 /// Configuration required by the agent trigger worker.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Default-off quota admission and prospective usage counting.
-    #[macro_config_default(ai_usage::AiUsageEnforcement::Disabled)]
+    #[rox_config_default(ai_usage::AiUsageEnforcement::Disabled)]
     pub enable_ai_usage_enforcement: ai_usage::AiUsageEnforcement,
     /// The free plan's hard monthly AI cap, in cents at provider cost.
     /// Mandatory; set in Doppler.
@@ -60,7 +60,7 @@ impl Config {
     pub fn from_env() -> anyhow::Result<Self> {
         let enforcement = ai_usage::config::load_ai_usage_enforcement()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
-        let mut config = macro_config::ConfigLoader::load::<Self>()
+        let mut config = rox_config::ConfigLoader::load::<Self>()
             .context("failed to load agent trigger service config")?;
         config.enable_ai_usage_enforcement = enforcement;
         Ok(config)

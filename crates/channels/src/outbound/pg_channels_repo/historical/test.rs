@@ -11,7 +11,7 @@ use crate::domain::{
     ports::{ChannelListRepo, ChannelRepo, ChannelService},
     service::ChannelServiceImpl,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_pagination::{Query, SimpleSortMethod};
 use sqlx::PgPool;
 use std::{
@@ -31,8 +31,8 @@ impl ChannelEventDispatcher for CreationEvents {
     }
 }
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{email}")).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
 }
 
 fn timestamp(seconds: i64) -> DateTime<Utc> {
@@ -52,7 +52,7 @@ fn historical_dm(id: Uuid) -> DmCreation {
 
 fn channel() -> HistoricalChannel {
     HistoricalChannel {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         name: "source name".into(),
         kind: HistoricalChannelKind::Private,
         owner: user("admin@example.com"),
@@ -61,7 +61,7 @@ fn channel() -> HistoricalChannel {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn historical_replay_preserves_settings_roles_leavers_and_live_activity(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool.clone());
     let mut request = channel();
@@ -150,7 +150,7 @@ async fn historical_replay_preserves_settings_roles_leavers_and_live_activity(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_live_and_import_dm_creation_share_one_channel(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool.clone());
     let service = ChannelServiceImpl::new(repo.clone());
@@ -160,7 +160,7 @@ async fn concurrent_live_and_import_dm_creation_share_one_channel(pool: PgPool) 
         let service = service.clone();
         calls.push(tokio::spawn(async move {
             if index % 2 == 0 {
-                repo.ensure_dm(pair(), historical_dm(macro_uuid::generate_uuid_v7()))
+                repo.ensure_dm(pair(), historical_dm(rox_uuid::generate_uuid_v7()))
                     .await
                     .unwrap()
             } else {
@@ -208,11 +208,11 @@ async fn concurrent_live_and_import_dm_creation_share_one_channel(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn malformed_dm_is_not_reused_and_exact_duplicates_choose_oldest_then_id(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool.clone());
     let malformed = repo
-        .ensure_dm(pair(), historical_dm(macro_uuid::generate_uuid_v7()))
+        .ensure_dm(pair(), historical_dm(rox_uuid::generate_uuid_v7()))
         .await
         .unwrap();
     // Legacy corruption includes even a departed third member.
@@ -221,7 +221,7 @@ async fn malformed_dm_is_not_reused_and_exact_duplicates_choose_oldest_then_id(p
         malformed.id,
     ).execute(&pool).await.unwrap();
     let exact = repo
-        .ensure_dm(pair(), historical_dm(macro_uuid::generate_uuid_v7()))
+        .ensure_dm(pair(), historical_dm(rox_uuid::generate_uuid_v7()))
         .await
         .unwrap();
     assert!(exact.created);
@@ -237,7 +237,7 @@ async fn malformed_dm_is_not_reused_and_exact_duplicates_choose_oldest_then_id(p
     );
 
     // Simulate pre-lock duplicate DMs, including a historical leaver.
-    let duplicate_id = macro_uuid::generate_uuid_v7();
+    let duplicate_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels (id, owner_id, channel_type, created_at) VALUES ($1, 'macro|a@example.com', 'direct_message', $2)",
         duplicate_id, timestamp(1_000),
@@ -271,7 +271,7 @@ async fn malformed_dm_is_not_reused_and_exact_duplicates_choose_oldest_then_id(p
     .await
     .unwrap();
     assert_eq!(
-        repo.ensure_dm(pair(), historical_dm(macro_uuid::generate_uuid_v7()))
+        repo.ensure_dm(pair(), historical_dm(rox_uuid::generate_uuid_v7()))
             .await
             .unwrap()
             .id,
@@ -288,7 +288,7 @@ async fn malformed_dm_is_not_reused_and_exact_duplicates_choose_oldest_then_id(p
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn importing_a_live_dm_preserves_owner_and_creates_no_additional_activity(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool.clone());
     let live = repo
@@ -297,7 +297,7 @@ async fn importing_a_live_dm_preserves_owner_and_creates_no_additional_activity(
         .unwrap();
     let before = repo.get_channel_participants(live.id).await.unwrap();
     let imported = repo
-        .ensure_dm(pair(), historical_dm(macro_uuid::generate_uuid_v7()))
+        .ensure_dm(pair(), historical_dm(rox_uuid::generate_uuid_v7()))
         .await
         .unwrap();
     assert_eq!(
@@ -333,7 +333,7 @@ async fn importing_a_live_dm_preserves_owner_and_creates_no_additional_activity(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn dm_rejects_outsider_owner_and_conflicting_reservation(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool.clone());
     assert!(
@@ -355,10 +355,10 @@ async fn dm_rejects_outsider_owner_and_conflicting_reservation(pool: PgPool) {
     assert_eq!(count, Some(1));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn historical_dm_preserves_live_timestamps_and_activity_update_rolls_back(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool.clone());
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     assert_eq!(
         repo.ensure_dm(pair(), historical_dm(id)).await.unwrap(),
         EnsuredChannel { id, created: true }
@@ -404,7 +404,7 @@ async fn historical_dm_preserves_live_timestamps_and_activity_update_rolls_back(
         .unwrap();
     assert!(
         !repo
-            .ensure_dm(pair(), historical_dm(macro_uuid::generate_uuid_v7()))
+            .ensure_dm(pair(), historical_dm(rox_uuid::generate_uuid_v7()))
             .await
             .unwrap()
             .created
@@ -423,13 +423,13 @@ async fn historical_dm_preserves_live_timestamps_and_activity_update_rolls_back(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_includes_unregistered_memberships_without_activity(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool);
     let request = channel();
     repo.create_historical_channel(&request).await.unwrap();
     let params = GetChannelsRequest {
-        macro_id: user("a@example.com"),
+        rox_id: user("a@example.com"),
         limit: Some(10),
         include_frecency: false,
         query: Query::Sort(SimpleSortMethod::UpdatedAt, None),
@@ -446,7 +446,7 @@ async fn list_includes_unregistered_memberships_without_activity(pool: PgPool) {
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn team_creation_is_explicit_and_reuse_preserves_auto_join(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool.clone());
@@ -505,7 +505,7 @@ async fn team_creation_is_explicit_and_reuse_preserves_auto_join(pool: PgPool) {
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn onboarding_and_archive_share_reserved_target_without_replaying_effects(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool.clone());

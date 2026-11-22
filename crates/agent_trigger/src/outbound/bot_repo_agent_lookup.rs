@@ -4,8 +4,8 @@ use agent_session::domain::error::{AgentSessionError, Result};
 use bot_id::BotId;
 use bots::domain::models::{Agent, Bot};
 use bots::domain::ports::BotRepo;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use crate::domain::service::{AgentBotLookup, ChannelParticipationLookup, TeamMembershipLookup};
 
@@ -51,7 +51,7 @@ impl<Repo> TeamMembershipLookup for BotRepoAgentLookup<Repo>
 where
     Repo: BotRepo,
 {
-    async fn user_has_team(&self, caller: MacroUserIdStr<'static>, team_id: Uuid) -> Result<bool> {
+    async fn user_has_team(&self, caller: RoxUserIdStr<'static>, team_id: Uuid) -> Result<bool> {
         self.repo
             .user_has_team(caller, team_id)
             .await

@@ -7,7 +7,7 @@ use slack_integration::{domain::models::ImportError, inbound::worker::WorkerConf
 mod test;
 
 /// Settings supplied by the deployment, never by an import archive.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// RoxDB connection URL.
@@ -17,10 +17,10 @@ pub struct Config {
     /// Credential for scoped search backfill requests.
     pub internal_api_key: String,
     /// Pause new claims and outbox sends, not reconciliation or queues.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub slack_import_enabled: bool,
     /// Initially one; fail startup above two rather than silently widening work.
-    #[macro_config_default(1)]
+    #[rox_config_default(1)]
     pub slack_import_concurrency: u8,
 }
 

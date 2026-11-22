@@ -43,7 +43,7 @@ pub struct LocalPasswordsFlags;
 impl FeatureFlags for LocalPasswordsFlags {
     async fn load(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<FlagSnapshot, rootcause::Report> {
         Ok(FlagSnapshot::new([(
             PASSWORDS_FLAG.into(),

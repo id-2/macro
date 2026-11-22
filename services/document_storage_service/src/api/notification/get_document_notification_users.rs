@@ -3,7 +3,7 @@ use axum::Json;
 use axum::extract::State;
 use axum::response::Response;
 use axum::{extract::Path, http::StatusCode, response::IntoResponse};
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::GenericErrorResponse;
 use sqlx::PgPool;
 
@@ -30,11 +30,11 @@ pub struct Params {
 #[tracing::instrument(skip(db, _auth))]
 pub async fn handler(
     State(db): State<PgPool>,
-    _auth: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _auth: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path(Params { document_id }): Path<Params>,
 ) -> Result<Response, Response> {
     let users =
-        macro_db_client::notification::document::get_document_notification_users(&db, &document_id)
+        rox_db_client::notification::document::get_document_notification_users(&db, &document_id)
             .await
             .map_err(|e| {
                 tracing::error!(error=?e, "unable to get document notification users");

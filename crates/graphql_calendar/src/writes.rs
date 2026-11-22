@@ -2,7 +2,7 @@ use std::{future::Future, pin::Pin, sync::Arc};
 
 use calendar_events::domain::{
     changes::{CalendarChangeQueryService, CalendarEventChange},
-    meeting_links::MacroCallEventError,
+    meeting_links::RoxCallEventError,
     models::{
         AttendeeResponseStatus, CalendarAttendeeInput, CalendarEvent, CalendarEventDraft,
         CalendarEventPatch,
@@ -30,13 +30,13 @@ pub(crate) trait CalendarGraphqlWrites: Send + Sync {
         draft: CalendarEventDraft,
     ) -> WriteFuture<'_, CalendarEvent>;
 
-    fn create_event_with_macro_call(
+    fn create_event_with_rox_call(
         &self,
         viewer: String,
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> WriteFuture<'_, CalendarEvent, MacroCallEventError>;
+    ) -> WriteFuture<'_, CalendarEvent, RoxCallEventError>;
 
     fn update_event(
         &self,
@@ -129,16 +129,16 @@ where
         })
     }
 
-    fn create_event_with_macro_call(
+    fn create_event_with_rox_call(
         &self,
         viewer: String,
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> WriteFuture<'_, CalendarEvent, MacroCallEventError> {
+    ) -> WriteFuture<'_, CalendarEvent, RoxCallEventError> {
         Box::pin(async move {
             self.mutations
-                .create_event_with_macro_call(&viewer, email_link_id, calendar_id, draft)
+                .create_event_with_rox_call(&viewer, email_link_id, calendar_id, draft)
                 .await
         })
     }

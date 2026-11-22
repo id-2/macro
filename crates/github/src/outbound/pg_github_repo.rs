@@ -3,10 +3,10 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::{
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use sqlx::PgPool;
 use std::time::Duration;
@@ -73,19 +73,19 @@ impl GithubRepo for PgGithubRepo {
     #[tracing::instrument(skip(self), err)]
     async fn get_github_link_by_user_id<'a>(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'a>>,
+        rox_user_id: &RoxUserId<Lowercase<'a>>,
     ) -> Result<Option<GithubLink>, Self::Err> {
         sqlx::query!(
         r#"
-        SELECT id, macro_id, fusionauth_user_id as "fusionauth_user_id: Uuid", github_username, github_user_id, created_at, updated_at
+        SELECT id, rox_id, fusionauth_user_id as "fusionauth_user_id: Uuid", github_username, github_user_id, created_at, updated_at
         FROM github_links
-        WHERE macro_id = $1
+        WHERE rox_id = $1
         "#,
-        macro_user_id.as_ref()
+        rox_user_id.as_ref()
         )
         .try_map(|r| Ok(GithubLink{
                 id: r.id,
-                macro_id: MacroUserIdStr::parse_from_str(&r.macro_id)
+                rox_id: RoxUserIdStr::parse_from_str(&r.rox_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
                 fusionauth_user_id: r.fusionauth_user_id,
@@ -105,7 +105,7 @@ impl GithubRepo for PgGithubRepo {
     ) -> Result<Option<GithubLink>, Self::Err> {
         sqlx::query!(
         r#"
-        SELECT id, macro_id, fusionauth_user_id as "fusionauth_user_id: Uuid", github_username, github_user_id, created_at, updated_at
+        SELECT id, rox_id, fusionauth_user_id as "fusionauth_user_id: Uuid", github_username, github_user_id, created_at, updated_at
         FROM github_links
         WHERE github_user_id = $1
         ORDER BY created_at ASC
@@ -115,7 +115,7 @@ impl GithubRepo for PgGithubRepo {
         )
         .try_map(|r| Ok(GithubLink{
                 id: r.id,
-                macro_id: MacroUserIdStr::parse_from_str(&r.macro_id)
+                rox_id: RoxUserIdStr::parse_from_str(&r.rox_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
                 fusionauth_user_id: r.fusionauth_user_id,
@@ -151,7 +151,7 @@ impl GithubRepo for PgGithubRepo {
     async fn get_github_link_by_id(&self, id: &uuid::Uuid) -> Result<GithubLink, Self::Err> {
         let link = sqlx::query!(
         r#"
-        SELECT id, macro_id, fusionauth_user_id as "fusionauth_user_id: Uuid", github_username, github_user_id, created_at, updated_at
+        SELECT id, rox_id, fusionauth_user_id as "fusionauth_user_id: Uuid", github_username, github_user_id, created_at, updated_at
         FROM github_links
         WHERE id = $1
         "#,
@@ -159,7 +159,7 @@ impl GithubRepo for PgGithubRepo {
         )
         .try_map(|r| Ok(GithubLink{
                 id: r.id,
-                macro_id: MacroUserIdStr::parse_from_str(&r.macro_id)
+                rox_id: RoxUserIdStr::parse_from_str(&r.rox_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
                 fusionauth_user_id: r.fusionauth_user_id,
@@ -181,11 +181,11 @@ impl GithubRepo for PgGithubRepo {
     async fn insert_github_link(&self, link: &GithubLink) -> Result<(), Self::Err> {
         sqlx::query!(
                   r#"
-                  INSERT INTO github_links (id, macro_id, fusionauth_user_id, github_username, github_user_id, created_at, updated_at)
+                  INSERT INTO github_links (id, rox_id, fusionauth_user_id, github_username, github_user_id, created_at, updated_at)
                   VALUES ($1, $2, $3, $4, $5, $6, $7)
                   "#,
                   link.id,
-                  link.macro_id.as_ref(),
+                  link.rox_id.as_ref(),
                   link.fusionauth_user_id,
                   link.github_username,
                   link.github_user_id,

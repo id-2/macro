@@ -7,8 +7,8 @@ use axum::{
     http::StatusCode,
     routing::{get, post},
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -17,7 +17,7 @@ use uuid::Uuid;
 /// Shared replacement use case and authentication boundary.
 pub struct CalendarReplacementRouterState<S, Auth> {
     service: Arc<S>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 impl<S, Auth> Clone for CalendarReplacementRouterState<S, Auth> {
     fn clone(&self) -> Self {
@@ -29,14 +29,14 @@ impl<S, Auth> Clone for CalendarReplacementRouterState<S, Auth> {
 }
 impl<S, Auth> CalendarReplacementRouterState<S, Auth> {
     /// Compose the domain service with authentication at the application root.
-    pub fn new(service: Arc<S>, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<S>, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization_state,
         }
     }
 }
-impl<S, Auth> FromRef<CalendarReplacementRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<CalendarReplacementRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &CalendarReplacementRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -44,7 +44,7 @@ impl<S, Auth> FromRef<CalendarReplacementRouterState<S, Auth>> for MacroAuthoriz
 /// Routes used by preview, confirmation, and recovery UI.
 pub fn calendar_replacement_router<
     S: CalendarReplacementService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 >(
     state: CalendarReplacementRouterState<S, Auth>,
@@ -101,10 +101,10 @@ pub struct CalendarEventProviderUrl {
     responses((status=200,body=CalendarReplacementView),(status=409,body=CalendarMutationApiError)))]
 pub async fn prepare_calendar_replacement<
     S: CalendarReplacementService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CalendarReplacementRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(event_id): Path<Uuid>,
     Json(request): Json<PrepareCalendarReplacementRequest>,
 ) -> Result<Json<CalendarReplacementView>, CalendarMutationApiError> {
@@ -112,7 +112,7 @@ pub async fn prepare_calendar_replacement<
         state
             .service
             .prepare_replacement(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 event_id,
                 request.calendar_id,
                 request.recurrence_id,
@@ -126,16 +126,16 @@ pub async fn prepare_calendar_replacement<
     params(("operation_id"=Uuid,Path)),responses((status=200,body=CalendarReplacementView),(status=409,body=CalendarMutationApiError)))]
 pub async fn confirm_calendar_replacement<
     S: CalendarReplacementService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CalendarReplacementRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<CalendarReplacementView>, CalendarMutationApiError> {
     Ok(Json(
         state
             .service
-            .confirm_replacement(user.authorization.user.macro_user_id.as_ref(), id)
+            .confirm_replacement(user.authorization.user.rox_user_id.as_ref(), id)
             .await?,
     ))
 }
@@ -144,16 +144,16 @@ pub async fn confirm_calendar_replacement<
     params(("operation_id"=Uuid,Path)),responses((status=200,body=CalendarReplacementView),(status=404,body=CalendarMutationApiError)))]
 pub async fn calendar_replacement_status<
     S: CalendarReplacementService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CalendarReplacementRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<CalendarReplacementView>, CalendarMutationApiError> {
     Ok(Json(
         state
             .service
-            .replacement_status(user.authorization.user.macro_user_id.as_ref(), id)
+            .replacement_status(user.authorization.user.rox_user_id.as_ref(), id)
             .await?,
     ))
 }
@@ -162,15 +162,15 @@ pub async fn calendar_replacement_status<
     params(("operation_id"=Uuid,Path)),responses((status=204),(status=409,body=CalendarMutationApiError)))]
 pub async fn discard_calendar_replacement<
     S: CalendarReplacementService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CalendarReplacementRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, CalendarMutationApiError> {
     state
         .service
-        .discard_replacement(user.authorization.user.macro_user_id.as_ref(), id)
+        .discard_replacement(user.authorization.user.rox_user_id.as_ref(), id)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -180,10 +180,10 @@ pub async fn discard_calendar_replacement<
     responses((status=200,body=CalendarEventProviderUrl),(status=404,body=CalendarMutationApiError)))]
 pub async fn calendar_event_provider_url<
     S: CalendarReplacementService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CalendarReplacementRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(event_id): Path<Uuid>,
     Query(request): Query<CalendarProviderEventQuery>,
 ) -> Result<Json<CalendarEventProviderUrl>, CalendarMutationApiError> {
@@ -191,7 +191,7 @@ pub async fn calendar_event_provider_url<
         url: state
             .service
             .event_provider_url(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 event_id,
                 request.calendar_id,
                 request.recurrence_id,

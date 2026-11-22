@@ -219,7 +219,7 @@ items, since these mutate real data.
 
 ### Requesting access the user lacks
 
-A write the user can only view fails in code mode with `MacroForbiddenError`
+A write the user can only view fails in code mode with `RoxForbiddenError`
 (a 403). The agent should say the user can only view the item and offer to
 ask its owner for edit access; only after the user agrees does it call
 `<item>.access.request('edit')`. The owner gets the same request the Share
@@ -1325,7 +1325,7 @@ and settlement tests still require the isolated backend fixtures above.
 
 ## Code mode in agent sessions
 
-When the harness has its local Deno runtime configured, the session's `macro_internal`
+When the harness has its local Deno runtime configured, the session's `rox_internal`
 server exposes `DescribeCodeTools`, `ReadCodeDocs` and `ExecuteCode`. The in-process agent sees
 all three schemas on its first model call, without `SearchTools` or `LoadTools`.
 For Rox's in-process agent, every conversation turn of a user's session runs
@@ -1848,7 +1848,7 @@ and new-conversation inputs and to the mobile **Ask AI** composer. On desktop
 Enter still sends and Shift+Enter inserts a newline. Tapping the model opens a
 bottom sheet listing every model the same way, with a check on the current one
 — pick a row to switch. Models read as names even when the runtime reports
-only ids: Macro Agent's `anthropic/claude-sonnet-5-5` shows as **Sonnet 5.5**. On desktop the
+only ids: Rox Agent's `anthropic/claude-sonnet-5-5` shows as **Sonnet 5.5**. On desktop the
 transcript and composer use the shared channel message width so expanding **Context** only
 grows vertically; your messages are right-aligned bubbles and the model pill
 sits above the box. Tap the session title
@@ -2523,7 +2523,7 @@ Empty or failed warm responses do not trigger a refill loop, and mismatched
 agent settings leave a usable reservation available for the default agent.
 
 
-### Free-plan models in the new Macro agent
+### Free-plan models in the new Rox agent
 
 The in-memory Rox runtime uses the session owner's current permissions.
 Free users see only Gemini 3.8 Flash in model discovery and the live session

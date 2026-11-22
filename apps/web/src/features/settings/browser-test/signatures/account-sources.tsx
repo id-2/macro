@@ -25,7 +25,7 @@ import {
 /** Real shared query observers over controlled service responses. */
 export function AccountSources() {
   queryClient.removeQueries({
-    queryKey: emailKeys.links(link.macro_id).queryKey,
+    queryKey: emailKeys.links(link.rox_id).queryKey,
   });
   const links = useEmailLinksQuery();
   const channels = useListChannelsQuery();

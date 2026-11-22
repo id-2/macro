@@ -161,15 +161,15 @@ pairing_id = "00000000-0000-0000-0000-00000000000a"
 
     let loaded = Config::load(&config).unwrap();
     assert_eq!(
-        loaded.macro_api.api_url,
+        loaded.rox_api.api_url,
         "http://10.200.0.1:41009/agent-harness"
     );
     assert_eq!(
-        loaded.macro_api.egress_url.as_deref(),
+        loaded.rox_api.egress_url.as_deref(),
         Some("http://10.200.0.1:41027")
     );
-    assert_eq!(loaded.macro_api.storage_url, "http://10.200.0.1:41009/dss");
-    assert_eq!(loaded.macro_api.web_url, "http://10.200.0.1:41000/app");
+    assert_eq!(loaded.rox_api.storage_url, "http://10.200.0.1:41009/dss");
+    assert_eq!(loaded.rox_api.web_url, "http://10.200.0.1:41000/app");
     assert_eq!(loaded.workspace.path, workspace);
     assert!(workspace.is_dir());
     assert_eq!(
@@ -379,8 +379,8 @@ fn an_agent_computer_gets_its_brains_environment_file() {
         r#"{
             "agent_user_id": "macro|sam-rivera-abc123@agents.macro.invalid",
             "env": {
-                "MACRO_API_KEY": "mak_secret",
-                "MACRO_REPO_URL": "http://agent-git:8111/macro%7Csam.git",
+                "ROX_API_KEY": "mak_secret",
+                "ROX_REPO_URL": "http://agent-git:8111/macro%7Csam.git",
                 "ODD_VALUE": "a \"quoted\" \\ value"
             }
         }"#,
@@ -393,8 +393,8 @@ fn an_agent_computer_gets_its_brains_environment_file() {
     assert_eq!(
         std::fs::read_to_string(&env_path).unwrap(),
         concat!(
-            "MACRO_API_KEY=\"mak_secret\"\n",
-            "MACRO_REPO_URL=\"http://agent-git:8111/macro%7Csam.git\"\n",
+            "ROX_API_KEY=\"mak_secret\"\n",
+            "ROX_REPO_URL=\"http://agent-git:8111/macro%7Csam.git\"\n",
             "ODD_VALUE=\"a \\\"quoted\\\" \\\\ value\"\n",
         )
     );
@@ -419,7 +419,7 @@ fn a_computer_without_an_agent_has_no_brain_environment() {
     let directory = tempfile::tempdir().expect("temp dir");
     let config = directory.path().join("roxd.toml");
     let env_path = directory.path().join("agent.env");
-    std::fs::write(&env_path, "MACRO_API_KEY=\"stale\"\n").unwrap();
+    std::fs::write(&env_path, "ROX_API_KEY=\"stale\"\n").unwrap();
 
     write_agent_env(&env_path, None, &config, &FakeHost::default()).unwrap();
     assert!(!env_path.exists());

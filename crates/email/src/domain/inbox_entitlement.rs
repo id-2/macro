@@ -23,7 +23,7 @@ pub struct InboxConnectionService<R>(pub R);
 impl<R: super::ports::EmailUserRepo> InboxConnectionService<R> {
     pub async fn permits_connection(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         professional: bool,
         provider: super::models::UserProvider,
         reconnect: Option<uuid::Uuid>,

@@ -10,7 +10,7 @@ struct Eligibility(Arc<AtomicBool>);
 impl AgentDmAuthorizer for Eligibility {
     async fn authorize(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: BotId,
     ) -> Result<(), ChannelMutationErr> {
         if self.0.load(Ordering::SeqCst) {
@@ -29,13 +29,13 @@ struct Repo(Arc<AtomicUsize>);
 impl AgentDmRepo for Repo {
     async fn for_user(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<AgentDm>, ChannelMutationErr> {
         unreachable!("creation does not enumerate conversations")
     }
     async fn ensure(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<EnsuredAgentDm, ChannelMutationErr> {
         Ok(EnsuredAgentDm {
@@ -58,8 +58,8 @@ impl ChannelEventDispatcher for Events {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|person@example.com".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|person@example.com".to_owned()).unwrap()
 }
 
 #[tokio::test]
@@ -69,11 +69,11 @@ async fn reopening_reuses_the_dm_and_only_creation_notifies_the_human() {
     let events = Events::default();
     let service = AgentDmService::new(Repo::default(), eligibility, events.clone());
     let first = service
-        .get_or_create(user(), bot_id::MACRO_NEW_BOT_ID)
+        .get_or_create(user(), bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap();
     let second = service
-        .get_or_create(user(), bot_id::MACRO_NEW_BOT_ID)
+        .get_or_create(user(), bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap();
     assert_eq!(first.channel_id, second.channel_id);
@@ -93,13 +93,13 @@ async fn revoked_persona_access_cannot_restore_or_create_membership() {
     let events = Events::default();
     let service = AgentDmService::new(repo.clone(), eligibility.clone(), events.clone());
     service
-        .get_or_create(user(), bot_id::MACRO_NEW_BOT_ID)
+        .get_or_create(user(), bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap();
     eligibility.0.store(false, Ordering::SeqCst);
     assert!(matches!(
         service
-            .get_or_create(user(), bot_id::MACRO_NEW_BOT_ID)
+            .get_or_create(user(), bot_id::ROX_NEW_BOT_ID)
             .await,
         Err(ChannelMutationErr::Forbidden(_))
     ));
@@ -114,7 +114,7 @@ async fn unavailable_persona_does_not_create_a_channel() {
     let service = AgentDmService::new(repo.clone(), Eligibility::default(), events.clone());
     assert!(
         service
-            .get_or_create(user(), bot_id::MACRO_NEW_BOT_ID)
+            .get_or_create(user(), bot_id::ROX_NEW_BOT_ID)
             .await
             .is_err()
     );

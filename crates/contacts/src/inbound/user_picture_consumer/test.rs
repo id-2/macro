@@ -1,5 +1,5 @@
 use super::*;
-use macro_event_broker::{Event, MessageParts};
+use rox_event_broker::{Event, MessageParts};
 use user_events::UserPictureChangedMetadata;
 
 struct TestMessage<'a> {
@@ -23,7 +23,7 @@ impl MessageParts for TestMessage<'_> {
 
 fn picture_changed() -> UserTopicEvent {
     UserTopicEvent::PictureChanged(UserPictureChangedMetadata {
-        user_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        user_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
         file_id: Some("file".to_string()),
         url: None,
     })
@@ -31,14 +31,14 @@ fn picture_changed() -> UserTopicEvent {
 
 #[test]
 fn subscribes_to_macro_users() {
-    assert_eq!(DeclaredMacroEvent::topics(), ["macro.users"]);
+    assert_eq!(DeclaredMacroEvent::topics(), ["rox.users"]);
 }
 
 #[test]
 fn decodes_picture_changed_events() {
     let payload = serde_json::to_vec(&Event::new(picture_changed())).expect("serializable");
     let decoded = DeclaredMacroEvent::decode(&TestMessage {
-        topic: "macro.users",
+        topic: "rox.users",
         payload: &payload,
     })
     .expect("decodable");
@@ -55,7 +55,7 @@ fn decodes_picture_changed_events() {
 fn rejects_undecodable_payloads() {
     assert!(
         DeclaredMacroEvent::decode(&TestMessage {
-            topic: "macro.users",
+            topic: "rox.users",
             payload: b"not json",
         })
         .is_err()

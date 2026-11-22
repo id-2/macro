@@ -8,8 +8,8 @@
 mod test;
 
 use bot_id::{
-    MACRO_AI_HANDLE, MACRO_AI_NAME, MACRO_CODER_NAME, MACRO_NEW_HANDLE, MACRO_SYSTEM_HANDLE,
-    MACRO_SYSTEM_NAME,
+    ROX_AI_HANDLE, ROX_AI_NAME, ROX_CODER_NAME, ROX_NEW_HANDLE, ROX_SYSTEM_HANDLE,
+    ROX_SYSTEM_NAME,
 };
 
 /// The longest name a client keeps.
@@ -25,12 +25,12 @@ const ALLOWED_PUNCTUATION: &[char] = &['-', '_', '.', ',', ':', '(', ')', '&', '
 /// Cursor and Codex are first-party bots too, but are also the real names of
 /// MCP clients, so they are not reserved.
 const RESERVED_NAMES: &[&str] = &[
-    MACRO_AI_NAME,
-    MACRO_AI_HANDLE,
-    MACRO_NEW_HANDLE,
-    MACRO_CODER_NAME,
-    MACRO_SYSTEM_NAME,
-    MACRO_SYSTEM_HANDLE,
+    ROX_AI_NAME,
+    ROX_AI_HANDLE,
+    ROX_NEW_HANDLE,
+    ROX_CODER_NAME,
+    ROX_SYSTEM_NAME,
+    ROX_SYSTEM_HANDLE,
     "Rox AI",
     "Rox Agent",
     "Rox Team",

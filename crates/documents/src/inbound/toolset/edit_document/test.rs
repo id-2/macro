@@ -21,8 +21,8 @@ use entity_access::domain::models::{
     MemberTeamRole, OwnerAccessLevel, RequiredPermission, TeamRole, UserTeamInfo, ViewAccessLevel,
 };
 use lexical_client::LexicalClient;
-use macro_sync_service_jwt::DocumentPermissionToken;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId, user_id::MacroUserIdStr};
+use rox_sync_service_jwt::DocumentPermissionToken;
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId, user_id::RoxUserIdStr};
 use model::{document::DocumentBasic, sync_service::SyncServiceVersionID};
 use model_entity::Entity;
 use model_owner::{CreationPrincipal, Owner};
@@ -38,7 +38,7 @@ struct Refuse(AiAdmissionError);
 impl AiAdmissionService for Refuse {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: ai_usage::AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {
@@ -272,7 +272,7 @@ impl DocumentService for FakeDocumentService {
     async fn update_task_status(
         &self,
         _entity_access_receipt: EntityAccessReceipt<EditAccessLevel>,
-        _credited_user: Option<MacroUserIdStr<'static>>,
+        _credited_user: Option<RoxUserIdStr<'static>>,
         _source: Option<models_properties::service::property_change_source::PropertyChangeSource>,
         _status: &str,
     ) -> Result<(), DocumentError> {
@@ -428,13 +428,13 @@ impl Default for FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<EntityAccessReceipt<T>, AccessError> {
         EntityAccessReceipt::try_new_authenticated_user(
-            MacroUserIdStr::try_from(user_id.as_ref().to_string())
+            RoxUserIdStr::try_from(user_id.as_ref().to_string())
                 .expect("test user id should be valid"),
             entity_access::domain::models::Entity {
                 entity_id: entity_id.to_string(),
@@ -468,7 +468,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -477,7 +477,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -496,7 +496,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -506,7 +506,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -517,7 +517,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         panic!("unexpected get_users_by_entity call")
     }
 
@@ -537,7 +537,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         panic!("unexpected get_user_team call")
     }
@@ -751,7 +751,7 @@ pub(in crate::inbound::toolset) fn tool_context(
 
 pub(in crate::inbound::toolset) fn request_context() -> RequestContext {
     RequestContext::new(
-        MacroUserIdStr::try_from(TEST_USER_ID.to_string()).expect("test user id should be valid"),
+        RoxUserIdStr::try_from(TEST_USER_ID.to_string()).expect("test user id should be valid"),
     )
 }
 
@@ -909,7 +909,7 @@ async fn allows_markdown_document() {
     );
     assert_eq!(
         claims.actor.as_deref(),
-        Some(bot_id::MACRO_AI_BOT_ID.into_storage_id().as_ref())
+        Some(bot_id::ROX_AI_BOT_ID.into_storage_id().as_ref())
     );
 }
 
@@ -933,7 +933,7 @@ async fn edit_is_presented_as_the_default_actor_by_name() {
 
     assert_eq!(
         presented_editor(&editing).as_deref(),
-        Some(bot_id::MACRO_AI_NAME)
+        Some(bot_id::ROX_AI_NAME)
     );
 }
 
@@ -971,7 +971,7 @@ fn a_blank_actor_name_is_no_name() {
     let named = context.0.clone().with_actor_name("   ");
     assert_eq!(
         named.actor_editor_name(),
-        EditorName::new(bot_id::MACRO_AI_NAME)
+        EditorName::new(bot_id::ROX_AI_NAME)
     );
 
     let named = context.0.with_actor(BotId::TEST_A).with_actor_name("");
@@ -1003,10 +1003,10 @@ fn editor_name_is_trimmed_and_never_blank() {
 
 #[test]
 fn tool_creations_are_made_by_the_context_actor_for_the_requesting_user() {
-    let user = MacroUserIdStr::try_from(TEST_USER_ID.to_string()).expect("valid user");
+    let user = RoxUserIdStr::try_from(TEST_USER_ID.to_string()).expect("valid user");
     let default_context =
         tool_context(FakeDocumentService::new("md"), FakeEditingWorker::default());
-    assert_eq!(default_context.actor, bot_id::MACRO_AI_BOT_ID);
+    assert_eq!(default_context.actor, bot_id::ROX_AI_BOT_ID);
 
     let principal = default_context
         .0

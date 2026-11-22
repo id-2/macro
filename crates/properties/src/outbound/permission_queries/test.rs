@@ -1,6 +1,6 @@
 use super::*;
 use crate::outbound::{entity_properties_get_query, entity_property_queries};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_properties::service::property_value::PropertyValue;
 
 const OWNER: &str = "macro|user1@test.com";
@@ -46,7 +46,7 @@ async fn insert_row(pool: &Pool<Postgres>) -> anyhow::Result<(Uuid, Uuid)> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("properties"))
 )]
 async fn database_row_owner_and_trash_come_from_its_database(
@@ -78,7 +78,7 @@ async fn database_row_owner_and_trash_come_from_its_database(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("properties"))
 )]
 async fn database_row_cells_round_trip_through_entity_properties(

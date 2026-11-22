@@ -10,7 +10,7 @@ use super::*;
 use crate::domain::models::{DatabaseError, OpRefusal, SchemaError};
 use crate::domain::ports::{DatabasesRepo, DatabasesService};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn table_ops_wait_for_a_concurrent_trash_and_then_find_the_database_gone(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -72,7 +72,7 @@ async fn table_ops_wait_for_a_concurrent_trash_and_then_find_the_database_gone(p
     assert_eq!(tables[0].version, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_deleted_database_is_not_found_rather_than_a_name_conflict_or_storage_error(
     pool: PgPool,
 ) {
@@ -109,7 +109,7 @@ async fn a_deleted_database_is_not_found_rather_than_a_name_conflict_or_storage_
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_table_takes_its_rows_and_columns_but_never_the_last_table(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -258,7 +258,7 @@ async fn deleting_a_table_takes_its_rows_and_columns_but_never_the_last_table(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_table_rename_checks_its_previous_name_and_other_tables_names(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -358,7 +358,7 @@ async fn a_table_rename_checks_its_previous_name_and_other_tables_names(pool: Pg
     assert_eq!(stored.version, TableVersion(before.0 + 1));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_concurrent_table_create_and_rename_cannot_take_the_same_name(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);

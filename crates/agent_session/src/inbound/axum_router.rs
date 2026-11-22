@@ -36,13 +36,13 @@ use entity_access::domain::models::{EditAccessLevel, OwnerAccessLevel, ViewAcces
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::AgentSessionAccessLevelExtractor;
 use entity_registry::{NonUserOwners, resolve_creation_principal};
-use macro_authorization::{
-    ActingUser, InternalOnly, MacroAuthorization, MacroAuthorizationExtractor,
-    MacroAuthorizationService, MacroAuthorizationState, UserBotOrHarness,
+use rox_authorization::{
+    ActingUser, InternalOnly, RoxAuthorization, RoxAuthorizationExtractor,
+    RoxAuthorizationService, RoxAuthorizationState, UserBotOrHarness,
     UserBotOrHarnessAuthorization, UserOnly,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::Owner;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -94,7 +94,7 @@ pub mod activity;
 pub struct AgentSessionRouterState<T, Access, Auth> {
     service: Arc<T>,
     entity_access: Arc<Access>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, Access, Auth> AgentSessionRouterState<T, Access, Auth> {
@@ -103,7 +103,7 @@ impl<T, Access, Auth> AgentSessionRouterState<T, Access, Auth> {
     pub fn new(
         service: T,
         entity_access: Arc<Access>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service: Arc::new(service),
@@ -125,7 +125,7 @@ impl<T, Access, Auth> Clone for AgentSessionRouterState<T, Access, Auth> {
 }
 
 impl<T, Access, Auth> FromRef<AgentSessionRouterState<T, Access, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &AgentSessionRouterState<T, Access, Auth>) -> Self {
         state.authorization_state.clone()
@@ -143,7 +143,7 @@ impl<T, Access, Auth> FromRef<AgentSessionRouterState<T, Access, Auth>> for Arc<
 pub struct AgentSessionControlState<R, Access, Auth> {
     recipient: Arc<R>,
     entity_access: Arc<Access>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<R, Access, Auth> AgentSessionControlState<R, Access, Auth> {
@@ -152,7 +152,7 @@ impl<R, Access, Auth> AgentSessionControlState<R, Access, Auth> {
     pub fn new(
         recipient: Arc<R>,
         entity_access: Arc<Access>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             recipient,
@@ -174,7 +174,7 @@ impl<R, Access, Auth> Clone for AgentSessionControlState<R, Access, Auth> {
 }
 
 impl<R, Access, Auth> FromRef<AgentSessionControlState<R, Access, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &AgentSessionControlState<R, Access, Auth>) -> Self {
         state.authorization_state.clone()
@@ -198,7 +198,7 @@ pub fn agent_session_read_router<T, Access, Auth, S>(
 where
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -240,7 +240,7 @@ pub fn agent_session_control_router<R, Access, Auth, S>(
 where
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -283,13 +283,13 @@ where
 /// Account lifecycle endpoint: never grants cleanup authority to a user or harness token.
 async fn delete_user_sessions_handler<R, Access, Auth>(
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
-    Path(user_id): Path<MacroUserIdStr<'static>>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
+    Path(user_id): Path<RoxUserIdStr<'static>>,
 ) -> Result<StatusCode, AgentSessionApiError>
 where
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state.recipient.delete_user_sessions(user_id).await?;
     Ok(StatusCode::NO_CONTENT)
@@ -302,7 +302,7 @@ pub fn agent_sandbox_size_router<T, Access, Auth, S>(
 where
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -321,7 +321,7 @@ pub fn agent_coding_preferences_router<T, Access, Auth, S>(
 where
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -789,7 +789,7 @@ impl AgentSessionResponse {
 pub async fn get_agent_session_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -930,16 +930,16 @@ impl From<AgentSessionPreview> for AgentSessionPreviewDto {
 pub async fn preview_agent_sessions_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(request): Json<PreviewAgentSessionsRequest>,
 ) -> Result<Json<PreviewAgentSessionsResponse>, AgentSessionApiError> {
     let previews = state
         .service
         .preview_sessions(
-            &caller.authorization.user.macro_user_id,
+            &caller.authorization.user.rox_user_id,
             request
                 .session_ids
                 .into_iter()
@@ -973,7 +973,7 @@ pub async fn preview_agent_sessions_handler<
 pub async fn rename_agent_session_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<OwnerAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -1007,7 +1007,7 @@ pub async fn rename_agent_session_handler<
 pub async fn set_agent_session_archived_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<OwnerAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -1055,7 +1055,7 @@ pub(crate) fn control_principal(
 
     match caller {
         UserBotOrHarnessAuthorization::User(user)
-            if macro_authorization::is_agent_run(user.agent_id.is_some(), headers) =>
+            if rox_authorization::is_agent_run(user.agent_id.is_some(), headers) =>
         {
             ControlPrincipal::Program
         }
@@ -1063,7 +1063,7 @@ pub(crate) fn control_principal(
         authorization => ControlPrincipal::Runtime(
             authorization
                 .acting_user()
-                .map(|user| user.macro_user_id.clone()),
+                .map(|user| user.rox_user_id.clone()),
         ),
     }
 }
@@ -1115,11 +1115,11 @@ pub(crate) fn control_principal(
 pub async fn control_agent_session_handler<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserBotOrHarness>,
+    caller: RoxAuthorizationExtractor<Auth, UserBotOrHarness>,
     Path(session_id): Path<Uuid>,
     headers: axum::http::HeaderMap,
     Json(req): Json<ControlRequest>,
@@ -1173,11 +1173,11 @@ pub async fn control_agent_session_handler<
 pub async fn get_agent_session_queue_handler<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserBotOrHarness>,
+    caller: RoxAuthorizationExtractor<Auth, UserBotOrHarness>,
     Path(session_id): Path<Uuid>,
 ) -> Result<Json<AgentSessionQueueResponse>, AgentSessionApiError> {
     let session_id = AgentSessionId::new_from_uuid(session_id);
@@ -1218,11 +1218,11 @@ pub async fn get_agent_session_queue_handler<
 pub async fn edit_queued_action_handler<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserBotOrHarness>,
+    caller: RoxAuthorizationExtractor<Auth, UserBotOrHarness>,
     Path((session_id, action_id)): Path<(Uuid, Uuid)>,
     Json(request): Json<EditQueuedActionRequest>,
 ) -> Result<StatusCode, AgentSessionApiError> {
@@ -1236,7 +1236,7 @@ pub async fn edit_queued_action_handler<
     let actor = caller
         .authorization
         .acting_user()
-        .map(|user| user.macro_user_id.clone());
+        .map(|user| user.rox_user_id.clone());
     state
         .recipient
         .edit_queued_control(
@@ -1276,11 +1276,11 @@ pub async fn edit_queued_action_handler<
 pub async fn remove_queued_action_handler<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserBotOrHarness>,
+    caller: RoxAuthorizationExtractor<Auth, UserBotOrHarness>,
     Path((session_id, action_id)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, AgentSessionApiError> {
     let session_id = AgentSessionId::new_from_uuid(session_id);
@@ -1290,7 +1290,7 @@ pub async fn remove_queued_action_handler<
     let actor = caller
         .authorization
         .acting_user()
-        .map(|user| user.macro_user_id.clone());
+        .map(|user| user.rox_user_id.clone());
     state
         .recipient
         .remove_queued_control(session_id, AgentActionId::from_uuid(action_id), actor)
@@ -1325,11 +1325,11 @@ pub async fn remove_queued_action_handler<
 pub async fn steer_queued_action_handler<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserBotOrHarness>,
+    caller: RoxAuthorizationExtractor<Auth, UserBotOrHarness>,
     Path((session_id, action_id)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, AgentSessionApiError> {
     let session_id = AgentSessionId::new_from_uuid(session_id);
@@ -1339,7 +1339,7 @@ pub async fn steer_queued_action_handler<
     let actor = caller
         .authorization
         .acting_user()
-        .map(|user| user.macro_user_id.clone());
+        .map(|user| user.rox_user_id.clone());
     state
         .recipient
         .steer_queued_control(session_id, AgentActionId::from_uuid(action_id), actor)
@@ -1365,11 +1365,11 @@ pub async fn steer_queued_action_handler<
 pub async fn delete_agent_session_handler<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: AgentSessionAccessLevelExtractor<OwnerAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserBotOrHarness>,
+    caller: RoxAuthorizationExtractor<Auth, UserBotOrHarness>,
     Path(session_id): Path<Uuid>,
 ) -> Result<StatusCode, AgentSessionApiError> {
     let session_id = AgentSessionId::new_from_uuid(session_id);
@@ -1408,11 +1408,11 @@ pub struct SandboxSizeBody {
 pub async fn put_agent_session_sandbox_size_handler<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: AgentSessionAccessLevelExtractor<OwnerAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserBotOrHarness>,
+    caller: RoxAuthorizationExtractor<Auth, UserBotOrHarness>,
     Path(session_id): Path<Uuid>,
     Json(req): Json<SandboxSizeBody>,
 ) -> Result<Json<SandboxSizeBody>, AgentSessionApiError> {
@@ -1443,14 +1443,14 @@ pub async fn put_agent_session_sandbox_size_handler<
 pub async fn get_agent_sandbox_size_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
 ) -> Result<Json<SandboxSizeBody>, AgentSessionApiError> {
     let size = state
         .service
-        .user_sandbox_size(&caller.authorization.user.macro_user_id)
+        .user_sandbox_size(&caller.authorization.user.rox_user_id)
         .await?;
     Ok(Json(SandboxSizeBody { size }))
 }
@@ -1476,15 +1476,15 @@ pub async fn get_agent_sandbox_size_handler<
 pub async fn put_agent_sandbox_size_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(req): Json<SandboxSizeBody>,
 ) -> Result<Json<SandboxSizeBody>, AgentSessionApiError> {
     state
         .service
-        .set_user_sandbox_size(&caller.authorization.user.macro_user_id, req.size)
+        .set_user_sandbox_size(&caller.authorization.user.rox_user_id, req.size)
         .await?;
     Ok(Json(req))
 }
@@ -1533,14 +1533,14 @@ impl From<CodingPreferencesBody> for CodingPreferences {
 pub async fn get_agent_coding_preferences_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
 ) -> Result<Json<CodingPreferencesBody>, AgentSessionApiError> {
     let preferences = state
         .service
-        .user_coding_preferences(&caller.authorization.user.macro_user_id)
+        .user_coding_preferences(&caller.authorization.user.rox_user_id)
         .await?;
     Ok(Json(preferences.into()))
 }
@@ -1570,15 +1570,15 @@ pub async fn get_agent_coding_preferences_handler<
 pub async fn put_agent_coding_preferences_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(req): Json<CodingPreferencesBody>,
 ) -> Result<Json<CodingPreferencesBody>, AgentSessionApiError> {
     state
         .service
-        .set_user_coding_preferences(&caller.authorization.user.macro_user_id, req.into())
+        .set_user_coding_preferences(&caller.authorization.user.rox_user_id, req.into())
         .await?;
     Ok(Json(req))
 }
@@ -1717,7 +1717,7 @@ pub struct AgentSessionLogResponse {
 pub async fn get_agent_session_log_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -1784,7 +1784,7 @@ pub struct AgentSessionFoldedLogResponse {
 pub async fn get_agent_session_folded_log_handler<
     T: AgentSessionService,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -1817,7 +1817,7 @@ pub struct CreateSessionState<Opener, Bots, Requests, Controls, Auth> {
     requests: Arc<Requests>,
     /// Delivers the first prompt to a session its operator's runtime opened.
     controls: Arc<Controls>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
     non_user_owners: NonUserOwners,
 }
 
@@ -1830,7 +1830,7 @@ impl<Opener, Bots, Requests, Controls, Auth>
         bots: Arc<Bots>,
         requests: Arc<Requests>,
         controls: Arc<Controls>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
         non_user_owners: NonUserOwners,
     ) -> Self {
         Self {
@@ -1862,7 +1862,7 @@ impl<Opener, Bots, Requests, Controls, Auth> Clone
 
 impl<Opener, Bots, Requests, Controls, Auth>
     FromRef<CreateSessionState<Opener, Bots, Requests, Controls, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &CreateSessionState<Opener, Bots, Requests, Controls, Auth>) -> Self {
         state.authorization_state.clone()
@@ -1879,7 +1879,7 @@ where
     Bots: BotDirectory,
     Requests: ExternalSessionRequester,
     Controls: AgentSessionNotificationRecipient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -2276,19 +2276,19 @@ fn resolve_owner(
 ) -> Result<Owner, CreateSessionApiError> {
     match caller {
         UserBotOrHarnessAuthorization::User(user) => {
-            principal_owner(&MacroAuthorization::User(user.clone()), non_user_owners)
+            principal_owner(&RoxAuthorization::User(user.clone()), non_user_owners)
         }
         UserBotOrHarnessAuthorization::Harness(harness) => {
-            Ok(Owner::User(harness.acting_user.macro_user_id.clone()))
+            Ok(Owner::User(harness.acting_user.rox_user_id.clone()))
         }
         UserBotOrHarnessAuthorization::Bot(bot) => match (bot.acting_user.as_ref(), claimed) {
-            (Some(_), _) => principal_owner(&MacroAuthorization::Bot(bot.clone()), non_user_owners),
-            (None, Some(text)) => MacroUserIdStr::try_from(text)
+            (Some(_), _) => principal_owner(&RoxAuthorization::Bot(bot.clone()), non_user_owners),
+            (None, Some(text)) => RoxUserIdStr::try_from(text)
                 .map(Owner::User)
                 .map_err(|_| CreateSessionApiError::UnparseableOwner),
             (None, None) => {
                 match resolve_creation_principal(
-                    &MacroAuthorization::Bot(bot.clone()),
+                    &RoxAuthorization::Bot(bot.clone()),
                     non_user_owners,
                 ) {
                     Ok(principal) => Ok(principal.owner()),
@@ -2303,7 +2303,7 @@ fn resolve_owner(
 /// acting user, so an error here is a programming error and surfaces as the
 /// existing 500.
 fn principal_owner(
-    authorization: &MacroAuthorization,
+    authorization: &RoxAuthorization,
     non_user_owners: NonUserOwners,
 ) -> Result<Owner, CreateSessionApiError> {
     resolve_creation_principal(authorization, non_user_owners)
@@ -2343,10 +2343,10 @@ pub async fn create_agent_session_handler<
     Bots: BotDirectory,
     Requests: ExternalSessionRequester,
     Controls: AgentSessionNotificationRecipient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CreateSessionState<Opener, Bots, Requests, Controls, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserBotOrHarness>,
+    caller: RoxAuthorizationExtractor<Auth, UserBotOrHarness>,
     headers: axum::http::HeaderMap,
     Json(request): Json<CreateAgentSessionRequest>,
 ) -> Result<(StatusCode, Json<CreateAgentSessionResponse>), CreateSessionApiError> {
@@ -2563,7 +2563,7 @@ pub async fn create_agent_session_handler<
     // check: its sessions are opened with the bot's own token until team
     // membership is modeled here.
     if let UserBotOrHarnessAuthorization::User(user) = &caller.authorization
-        && owner_user_id.as_ref() != Some(&user.macro_user_id)
+        && owner_user_id.as_ref() != Some(&user.rox_user_id)
     {
         return Err(CreateSessionApiError::NotYourBot);
     }
@@ -2669,13 +2669,13 @@ pub async fn warm_agent_session_handler<
     Bots: BotDirectory,
     Requests: ExternalSessionRequester,
     Controls: AgentSessionNotificationRecipient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CreateSessionState<Opener, Bots, Requests, Controls, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserOnly>,
+    caller: RoxAuthorizationExtractor<Auth, UserOnly>,
     Json(request): Json<WarmAgentSessionRequest>,
 ) -> Result<Json<WarmAgentSessionResponse>, CreateSessionApiError> {
-    let owner = Owner::User(caller.authorization.macro_user_id.clone());
+    let owner = Owner::User(caller.authorization.rox_user_id.clone());
     let session = state
         .opener
         .warm_session(owner, AgentSessionId::new_from_uuid(request.id))

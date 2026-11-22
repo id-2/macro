@@ -1,4 +1,4 @@
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 use serde_json::json;
 
 use super::*;
@@ -7,8 +7,8 @@ fn user(id: &str) -> ChannelSender<'static> {
     ChannelSender::try_from(id.to_string()).expect("valid user principal")
 }
 
-fn user_id(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user_id(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn created_event_wire_shape() {
 #[test]
 fn created_event_wire_shape_includes_on_behalf_of() {
     let channel_id = Uuid::nil();
-    let actor = ChannelSender::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID);
+    let actor = ChannelSender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID);
     let event = Event::with_event_id(
         Uuid::nil(),
         ChannelTopicEvent::Created(ChannelCreatedMetadata {

@@ -33,7 +33,7 @@ agent loop.
 
 ## Boundaries
 
-- Depends on: `strum`, `macro_env_var` (reads `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT`).
+- Depends on: `strum`, `rox_env_var` (reads `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT`).
 - Used by: `agent`, `agent_inmem`, `agent_session`, `ai_toolset`; for
   `provider_account`, also every crate with its own provider client
   (`anthropic`, `dictation`, `embedding`, `image_generation`, `task_dedup`,

@@ -5,7 +5,7 @@ use activity::{Action, Actor, Attribution, RecordedAction};
 use model_entity::{AppearanceColor, EntityAppearance};
 use std::num::NonZeroU32;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn appearance_and_history_commit_without_changing_scheduling(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -26,7 +26,7 @@ async fn appearance_and_history_commit_without_changing_scheduling(pool: PgPool)
         id,
         appearance: appearance.clone(),
         attribution: Attribution::direct(Actor::new_from_user(user(USER_A))),
-        event_id: macro_uuid::generate_uuid_v7(),
+        event_id: rox_uuid::generate_uuid_v7(),
         occurred_at: Utc::now(),
     };
     assert!(repo.set_appearance(change).await.unwrap().is_some());
@@ -35,7 +35,7 @@ async fn appearance_and_history_commit_without_changing_scheduling(pool: PgPool)
             id,
             appearance: appearance.clone(),
             attribution: Attribution::direct(Actor::new_from_user(user(USER_A))),
-            event_id: macro_uuid::generate_uuid_v7(),
+            event_id: rox_uuid::generate_uuid_v7(),
             occurred_at: Utc::now(),
         })
         .await
@@ -91,7 +91,7 @@ async fn appearance_and_history_commit_without_changing_scheduling(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_failure_rolls_back_the_appearance(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -111,7 +111,7 @@ async fn history_failure_rolls_back_the_appearance(pool: PgPool) {
                 color: Some(AppearanceColor::Blue)
             },
             attribution: Attribution::direct(Actor::new_from_user(user(USER_A))),
-            event_id: macro_uuid::generate_uuid_v7(),
+            event_id: rox_uuid::generate_uuid_v7(),
             occurred_at: Utc::now(),
         })
         .await

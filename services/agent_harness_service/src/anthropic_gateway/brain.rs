@@ -6,7 +6,7 @@ use std::{future::Future, pin::Pin, sync::Arc};
 use agent_credentials::AgentCreators;
 use feature_flags::FeatureFlags;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use user_api_key::domain::{models::UserApiKey, ports::UserApiKeysRepo};
 use user_api_key::outbound::pg_user_api_keys_repo::PgUserApiKeysRepo;
@@ -16,7 +16,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct BrainCaller {
     /// The agent account the key belongs to.
-    pub(crate) user_id: MacroUserIdStr<'static>,
+    pub(crate) user_id: RoxUserIdStr<'static>,
     /// The agent's team.
     pub(crate) team_id: Uuid,
 }
@@ -32,7 +32,7 @@ pub(crate) trait BrainAuthenticator: Send + Sync + 'static {
 }
 
 type Evaluate =
-    dyn Fn(MacroUserIdStr<'static>) -> Pin<Box<dyn Future<Output = bool> + Send>> + Send + Sync;
+    dyn Fn(RoxUserIdStr<'static>) -> Pin<Box<dyn Future<Output = bool> + Send>> + Send + Sync;
 
 /// `enable-agent-teammates` for the agent's creator
 /// ([`agent_credentials::rollout`]). No provider, no creator, a failed load
@@ -66,7 +66,7 @@ impl BrainRollout {
         }
     }
 
-    pub(crate) async fn enabled(&self, agent: &MacroUserIdStr<'static>) -> bool {
+    pub(crate) async fn enabled(&self, agent: &RoxUserIdStr<'static>) -> bool {
         let Some(evaluate) = &self.evaluate else {
             return false;
         };

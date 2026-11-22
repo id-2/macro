@@ -16,9 +16,9 @@ use github_pull_requests::domain::{
     ports::GithubPullRequestRepository,
     service::GithubPullRequestServiceImpl,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 
 use crate::domain::{
@@ -135,7 +135,7 @@ impl GithubRepo for StubGithubRepo {
 
     async fn get_github_link_by_user_id<'a>(
         &self,
-        _macro_user_id: &MacroUserId<Lowercase<'a>>,
+        _macro_user_id: &RoxUserId<Lowercase<'a>>,
     ) -> Result<Option<GithubLink>, Self::Err> {
         Ok(self.state.lock().unwrap().link_by_user_id.clone())
     }
@@ -813,16 +813,16 @@ impl ForeignEntityService for StubForeignEntityService {
     }
 }
 
-fn test_user_id() -> MacroUserId<Lowercase<'static>> {
-    MacroUserIdStr::try_from_email("user@example.com")
+fn test_user_id() -> RoxUserId<Lowercase<'static>> {
+    RoxUserIdStr::try_from_email("user@example.com")
         .unwrap()
         .0
 }
 
-fn test_link(user_id: &MacroUserId<Lowercase<'static>>) -> GithubLink {
+fn test_link(user_id: &RoxUserId<Lowercase<'static>>) -> GithubLink {
     GithubLink {
         id: uuid::Uuid::nil(),
-        macro_id: MacroUserIdStr((*user_id).clone()),
+        rox_id: RoxUserIdStr((*user_id).clone()),
         fusionauth_user_id: uuid::Uuid::nil(),
         github_username: "octocat".to_string(),
         github_user_id: "1".to_string(),
@@ -832,12 +832,12 @@ fn test_link(user_id: &MacroUserId<Lowercase<'static>>) -> GithubLink {
 }
 
 fn owner_link(fusionauth_user_id: uuid::Uuid) -> GithubLink {
-    let owner_user_id = MacroUserIdStr::try_from_email("owner@example.com")
+    let owner_user_id = RoxUserIdStr::try_from_email("owner@example.com")
         .unwrap()
         .0;
     GithubLink {
         id: uuid::Uuid::from_u128(0xFFFF),
-        macro_id: MacroUserIdStr(owner_user_id),
+        rox_id: RoxUserIdStr(owner_user_id),
         fusionauth_user_id,
         github_username: "octocat".to_string(),
         github_user_id: "1".to_string(),

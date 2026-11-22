@@ -30,7 +30,7 @@ use entity_access::{
     inbound::axum_extractors::{DocumentAccessExtractor, ProjectBodyAccessLevelExtractorV2},
 };
 use entity_registry::CreationPrincipalExtractor;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 
 /// Request to create a blank native spreadsheet.
@@ -190,7 +190,7 @@ fn body<T>(body: Result<Json<T>, JsonRejection>) -> Result<T, SpreadsheetError> 
 pub async fn create_spreadsheet_handler<
     T: DocumentService + DocumentCreationService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
     CreationPrincipalExtractor { principal, .. }: CreationPrincipalExtractor<Auth>,
@@ -237,7 +237,7 @@ pub async fn create_spreadsheet_handler<
 pub async fn read_spreadsheet_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -280,7 +280,7 @@ pub async fn read_spreadsheet_handler<
 pub async fn calculate_spreadsheet_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -325,7 +325,7 @@ pub async fn calculate_spreadsheet_handler<
 pub async fn edit_spreadsheet_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -375,7 +375,7 @@ pub async fn edit_spreadsheet_handler<
 pub async fn ai_edit_spreadsheet_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

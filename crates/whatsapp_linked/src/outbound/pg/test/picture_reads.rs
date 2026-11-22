@@ -45,7 +45,7 @@ fn file_of(files: &Files, id: &str) -> Uuid {
         .file_id
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn everyone_sees_the_pictures_the_owner_sees_and_initials_once_hidden(pool: PgPool) {
     let (linked, session, repository, binding, alice, bob) = adopted(&pool).await;
     session
@@ -134,7 +134,7 @@ async fn everyone_sees_the_pictures_the_owner_sees_and_initials_once_hidden(pool
     assert_eq!(senders(ALICE).await, vec![None, None]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_direct_chat_and_its_person_show_the_chats_picture_and_no_owner_alias_does(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, repository) = services(&pool);

@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use email::domain::message_reads::MessageReadError;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use sqlx::types::Uuid;
 use strum_macros::AsRefStr;
@@ -69,7 +69,7 @@ pub struct PathParams {
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(PathParams { id }): Path<PathParams>,
 ) -> Result<Response, GetMessageError> {
     let messages = ctx
@@ -104,7 +104,7 @@ pub async fn handler(
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id))]
 pub async fn batch_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(ids): Json<Vec<Uuid>>,
 ) -> Result<Response, GetMessageError> {
     let messages = ctx

@@ -2,7 +2,7 @@ use crate::api::context::{ApiContext, AuthorizationService};
 use axum::extract::State;
 use axum::response::Response;
 use axum::{Extension, Json};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use models_email::service::link::Link;
 use utoipa::ToSchema;
@@ -33,12 +33,12 @@ pub struct ListBlockedResponse {
 #[tracing::instrument(skip(ctx, link, authorization), fields(link_id = %link.id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     link: Extension<Link>,
 ) -> Result<Json<ListBlockedResponse>, Response> {
     let blocked_emails = ctx
         .mailbox_settings
-        .blocked_senders(&authorization.authorization.user.macro_user_id, link.id)
+        .blocked_senders(&authorization.authorization.user.rox_user_id, link.id)
         .await
         .map_err(super::super::labels::settings_error)?;
 

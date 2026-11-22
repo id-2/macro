@@ -8,7 +8,7 @@ version = "0.1.0"
 axum = [
   "dep:axum",
   "dep:entity_access",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:utoipa",
   "github_pull_requests/schema",
@@ -64,14 +64,14 @@ hex = { workspace = true }
 hmac = { workspace = true }
 jsonwebtoken = { workspace = true }
 lru = { workspace = true }
-macro_env = { path = "../macro_env" }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
-macro_env_var = { path = "../macro_env_var" }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = [
+rox_env = { path = "../rox_env" }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
+rox_env_var = { path = "../rox_env_var" }
+rox_authorization = { path = "../rox_authorization", default-features = false, features = [
   "axum",
 ], optional = true }
-macro_service_urls = { path = "../macro_service_urls" }
+rox_service_urls = { path = "../rox_service_urls" }
 model-entity = { path = "../model-entity", optional = true }
 model_notifications = { path = "../model_notifications", optional = true }
 notification = { path = "../notification", optional = true }
@@ -90,9 +90,9 @@ url = { workspace = true }
 uuid = { workspace = true }
 
 fusionauth = { path = "../fusionauth", optional = true }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 models_properties = { path = "../models_properties" }
-macro_uuid = { path = "../macro_uuid" }
+rox_uuid = { path = "../rox_uuid" }
 redis = { workspace = true, features = ["aio", "tokio-comp"], optional = true }
 tokio = { workspace = true, features = ["sync"], optional = true }
 
@@ -111,7 +111,7 @@ foreign_entity = { path = "../foreign_entity", default-features = false, feature
 github_pull_requests = { path = "../github_pull_requests", default-features = false, features = [
   "service",
 ] }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 mockall = { workspace = true }
 model = { path = "../model" }
 model_owner = { path = "../model_owner" }

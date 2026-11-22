@@ -4,7 +4,7 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -57,9 +57,9 @@ impl TryFrom<GrantRow> for AccountManagerGrant {
 
         Ok(Self {
             id: row.id,
-            managed_user_id: MacroUserIdStr::try_from(row.managed_user_id)
+            managed_user_id: RoxUserIdStr::try_from(row.managed_user_id)
                 .map_err(|_| PgAccountManagerRepoError::InvalidRow)?,
-            manager_user_id: MacroUserIdStr::try_from(row.manager_user_id)
+            manager_user_id: RoxUserIdStr::try_from(row.manager_user_id)
                 .map_err(|_| PgAccountManagerRepoError::InvalidRow)?,
             requested_by: row
                 .requested_by
@@ -84,7 +84,7 @@ fn grant(row: Option<GrantRow>) -> Result<Option<AccountManagerGrant>, PgAccount
 impl AccountManagerRepo for PgAccountManagerRepo {
     type Err = PgAccountManagerRepoError;
 
-    async fn is_agent(&self, user: &MacroUserIdStr<'_>) -> Result<Option<bool>, Self::Err> {
+    async fn is_agent(&self, user: &RoxUserIdStr<'_>) -> Result<Option<bool>, Self::Err> {
         let is_agent = sqlx::query_scalar!(
             r#"SELECT "isAgent" FROM "User" WHERE id = $1"#,
             user.as_ref(),
@@ -98,8 +98,8 @@ impl AccountManagerRepo for PgAccountManagerRepo {
     async fn open_request(
         &self,
         id: Uuid,
-        managed: &MacroUserIdStr<'_>,
-        manager: &MacroUserIdStr<'_>,
+        managed: &RoxUserIdStr<'_>,
+        manager: &RoxUserIdStr<'_>,
         requested_by: AccountManagerRole,
         expires_at: DateTime<Utc>,
     ) -> Result<OpenedRequest, Self::Err> {
@@ -188,7 +188,7 @@ impl AccountManagerRepo for PgAccountManagerRepo {
 
     async fn list_for_managed(
         &self,
-        managed: &MacroUserIdStr<'_>,
+        managed: &RoxUserIdStr<'_>,
     ) -> Result<Vec<AccountManagerGrant>, Self::Err> {
         let rows = sqlx::query_as!(
             GrantRow,

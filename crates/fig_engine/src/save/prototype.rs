@@ -7,7 +7,7 @@
 //! legacy single connection on the node is dropped once interactions are
 //! written, as Figma does when it upgrades a file.
 //!
-//! Files whose schema has no prototype fields (designs made in Macro) get
+//! Files whose schema has no prototype fields (designs made in Rox) get
 //! them, with Figma's type and field names, when an edit adds any.
 
 use super::Build;

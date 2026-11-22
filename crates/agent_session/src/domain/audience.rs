@@ -8,7 +8,7 @@ use entity_access::domain::{
     models::{AccessError, EntityType, ViewAccessLevel},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::models::MessageParent;
 use std::collections::HashSet;
 
@@ -28,7 +28,7 @@ pub trait SessionAudience: Send + Sync + 'static {
     fn viewers(
         &self,
         id: AgentSessionId,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, rootcause::Report>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, rootcause::Report>> + Send;
 }
 
 /// Includes the owner and currently authorized viewers watching either surface.
@@ -54,7 +54,7 @@ impl<Repo: AgentSessionRepo, Access: EntityAccessService, Subscriptions: Session
     async fn viewers(
         &self,
         id: AgentSessionId,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, rootcause::Report> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, rootcause::Report> {
         let session = self
             .repo
             .get(id)
@@ -67,7 +67,7 @@ impl<Repo: AgentSessionRepo, Access: EntityAccessService, Subscriptions: Session
         candidates.insert(session.owner_id.to_string());
         let mut viewers = Vec::new();
         for candidate in candidates {
-            let Ok(user) = MacroUserIdStr::try_from(candidate) else {
+            let Ok(user) = RoxUserIdStr::try_from(candidate) else {
                 continue;
             };
             match self
@@ -110,7 +110,7 @@ impl<Access> EntityAccessSessionView<Access> {
 impl<Access: EntityAccessService> SessionViewAccess for EntityAccessSessionView<Access> {
     fn can_view<'a>(
         &'a self,
-        viewer: &'a MacroUserIdStr<'static>,
+        viewer: &'a RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> std::pin::Pin<Box<dyn Future<Output = super::error::Result<bool>> + Send + 'a>> {
         Box::pin(async move {

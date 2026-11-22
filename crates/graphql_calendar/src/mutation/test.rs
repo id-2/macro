@@ -6,7 +6,7 @@ use calendar_events::domain::{
         CalendarChangeQueryService, CalendarChangesPage, CalendarEventChange, CalendarWatermark,
         EventOccurrence,
     },
-    meeting_links::{MacroCallEventError, MeetingLinkError},
+    meeting_links::{RoxCallEventError, MeetingLinkError},
     models::{
         AttendeeResponseStatus, CalendarAttendeeInput, CalendarEvent, CalendarEventDraft,
         CalendarEventPatch, ConferenceChange, EventTime, EventVisibility,
@@ -18,7 +18,7 @@ use calendar_events::domain::{
     },
 };
 use chrono::{NaiveDate, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::Value;
 use uuid::Uuid;
@@ -177,13 +177,13 @@ impl CalendarMutationService for FakeMutations {
 }
 
 impl CalendarMacroCallService for FakeMutations {
-    async fn create_event_with_macro_call(
+    async fn create_event_with_rox_call(
         &self,
         requester_id: &str,
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> Result<CalendarEvent, MacroCallEventError> {
+    ) -> Result<CalendarEvent, RoxCallEventError> {
         if let Some(error) = self.meeting_failure.lock().unwrap().take() {
             return Err(error.into());
         }
@@ -194,14 +194,14 @@ impl CalendarMacroCallService for FakeMutations {
         Ok(series_event())
     }
 
-    async fn update_event_with_macro_call(
+    async fn update_event_with_rox_call(
         &self,
         _requester_id: &str,
         _event_id: Uuid,
         _calendar_id: Option<Uuid>,
         _patch: CalendarEventPatch,
         _scope: CalendarUpdateScope,
-    ) -> Result<CalendarEvent, MacroCallEventError> {
+    ) -> Result<CalendarEvent, RoxCallEventError> {
         unreachable!("GraphQL updates carry no Rox call")
     }
 }
@@ -272,7 +272,7 @@ async fn execute(
     authenticated: bool,
 ) -> async_graphql::Response {
     let schema = Schema::build(
-        GraphqlCalendarQuery::new(MacroUserIdStr::parse_from_str(VIEWER).unwrap()),
+        GraphqlCalendarQuery::new(RoxUserIdStr::parse_from_str(VIEWER).unwrap()),
         CalendarMutationRoot,
         EmptySubscription,
     )
@@ -280,7 +280,7 @@ async fn execute(
     .finish();
     let request = async_graphql::Request::new(query);
     let request = if authenticated {
-        request.data(MacroUserIdStr::parse_from_str(VIEWER).unwrap())
+        request.data(RoxUserIdStr::parse_from_str(VIEWER).unwrap())
     } else {
         request
     };
@@ -438,7 +438,7 @@ async fn create_and_update_forward_conference_changes_without_losing_calendar_se
 }
 
 #[tokio::test]
-async fn create_with_a_macro_call_mints_the_meeting_before_the_calendar_write() {
+async fn create_with_a_rox_call_mints_the_meeting_before_the_calendar_write() {
     let mutations = Arc::new(FakeMutations::default());
     let committed = Arc::new(FakeCommitted {
         change: Some(committed_change()),
@@ -481,7 +481,7 @@ async fn create_with_a_macro_call_mints_the_meeting_before_the_calendar_write() 
 }
 
 #[tokio::test]
-async fn a_macro_call_that_cannot_be_minted_fails_the_create_as_retryable() {
+async fn a_rox_call_that_cannot_be_minted_fails_the_create_as_retryable() {
     let mutations = Arc::new(FakeMutations {
         meeting_failure: Mutex::new(Some(MeetingLinkError::Failed(
             "call service at 10.0.0.9 returned 502".to_string(),
@@ -504,7 +504,7 @@ async fn a_macro_call_that_cannot_be_minted_fails_the_create_as_retryable() {
     .await;
 
     let (message, code, retryable) = error_extensions(&response);
-    assert_eq!(code, Value::from("macro_call_failed"));
+    assert_eq!(code, Value::from("rox_call_failed"));
     assert_eq!(retryable, Value::Bool(true));
     assert!(!message.contains("10.0.0.9"), "{message}");
     assert!(mutations.calls.lock().unwrap().is_empty());
@@ -512,7 +512,7 @@ async fn a_macro_call_that_cannot_be_minted_fails_the_create_as_retryable() {
 }
 
 #[tokio::test]
-async fn a_calendar_failure_behind_a_macro_call_keeps_its_own_code() {
+async fn a_calendar_failure_behind_a_rox_call_keeps_its_own_code() {
     let mutations = Arc::new(FakeMutations {
         failure: Mutex::new(Some(CalendarMutationError::NoWritableCalendar)),
         ..Default::default()

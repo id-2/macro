@@ -73,7 +73,7 @@ setup_test_envs:
     echo "DATABASE_URL={{ DATABASE_URL }}" >> ./crates/scheduled_action/.env
     echo "DATABASE_URL={{ DATABASE_URL }}" >> ./crates/notification_db_client/.env
     echo "DATABASE_URL={{ DATABASE_URL }}" >> ./crates/notification/.env
-    echo "DATABASE_URL={{ DATABASE_URL }}" >> ./crates/macro_db_client/.env
+    echo "DATABASE_URL={{ DATABASE_URL }}" >> ./crates/rox_db_client/.env
     echo "DATABASE_URL={{ DATABASE_URL }}" >> ./crates/email_db_client/.env
     echo "DATABASE_URL={{ DATABASE_URL }}" >> ./services/email_refresh_handler/.env
     echo "DATABASE_URL={{ DATABASE_URL }}" >> ./crates/comms_db_client/.env
@@ -129,8 +129,8 @@ setup_test_envs:
     echo "DATABASE_URL={{ DATABASE_URL }}" >> ./services/email_service/.env
 
 setup_macrodb:
-    just crates/macro_db_client/create_db
-    just crates/macro_db_client/migrate_db
+    just crates/rox_db_client/create_db
+    just crates/rox_db_client/migrate_db
 
 initialize_dbs: setup_macrodb
 
@@ -139,4 +139,4 @@ initialize_dbs: setup_macrodb
 # nothing to apply. Every database created on this server afterwards gets the schema
 # too, so only run it against a Postgres dedicated to one checkout, such as CI's.
 setup_test_template:
-    cd crates/macro_db_client && sqlx migrate run --database-url {{ replace(DATABASE_URL, "/macrodb", "/template1") }}
+    cd crates/rox_db_client && sqlx migrate run --database-url {{ replace(DATABASE_URL, "/macrodb", "/template1") }}

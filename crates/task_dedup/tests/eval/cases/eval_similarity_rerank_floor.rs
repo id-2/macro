@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use embedding::embedding_provider::openai::{DIMS, TextEmbedding3Small};
 use embedding::{Content, EmbeddingModel, KeyedEmbedding, RerankModel, VectorStore};
 use futures::StreamExt;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use task_dedup::outbound::cohere::CohereReranker;
 use task_dedup::outbound::postgres::PgTaskVectorDb;
@@ -33,7 +33,7 @@ use crate::util::metrics::{fmt_ratio, sweep_report};
 use crate::util::seed::{EVAL_OWNER, seed_documents};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../documents/fixtures", scripts("documents_test_data"))
 )]
 #[ignore = "hits OpenAI and Cohere; run locally with API keys"]

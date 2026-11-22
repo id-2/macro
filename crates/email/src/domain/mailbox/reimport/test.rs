@@ -14,7 +14,7 @@ struct Script {
 
 impl Script {
     fn link(&mut self, name: &'static str, state: impl FnOnce(MailboxKey) -> LinkReimport) -> Uuid {
-        let link_id = macro_uuid::generate_uuid_v7();
+        let link_id = rox_uuid::generate_uuid_v7();
         self.names.insert(link_id, name);
         self.states.insert(
             link_id,

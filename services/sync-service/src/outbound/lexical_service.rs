@@ -2,7 +2,7 @@ use serde::Deserialize;
 use worker::{Env, Fetch, Method, Request, RequestInit};
 
 use crate::{
-    constants::header_names::MACRO_INTERNAL_AUTH_KEY_HEADER_KEY,
+    constants::header_names::ROX_INTERNAL_AUTH_KEY_HEADER_KEY,
     error::ResultExt,
     state::RootChange,
     timeout::{DEFAULT_TIMEOUT_MS, timeout},
@@ -52,7 +52,7 @@ impl<'a> LexicalServiceClient<'a> {
                 .with_body(Some(body.to_string().into())),
         )?;
         request.headers_mut()?.set(
-            MACRO_INTERNAL_AUTH_KEY_HEADER_KEY,
+            ROX_INTERNAL_AUTH_KEY_HEADER_KEY,
             &self.internal_auth_key()?,
         )?;
         request

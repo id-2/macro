@@ -1,39 +1,39 @@
 /**
- * Branded type for MacroId strings.
+ * Branded type for RoxId strings.
  * Format: `macro|email@domain.com`
  */
-declare const MacroIdBrand: unique symbol;
-export type MacroId = string & { readonly [MacroIdBrand]: never };
+declare const RoxIdBrand: unique symbol;
+export type RoxId = string & { readonly [RoxIdBrand]: never };
 
 /**
- * Type guard to check if a string is a valid MacroId.
+ * Type guard to check if a string is a valid RoxId.
  */
-export function isMacroId(str: string): str is MacroId {
+export function isMacroId(str: string): str is RoxId {
   return str.startsWith('macro|') && str.slice(6).includes('@');
 }
 
 /**
- * Attempts to parse a string as a MacroId.
- * Returns the MacroId if valid, undefined otherwise.
+ * Attempts to parse a string as a RoxId.
+ * Returns the RoxId if valid, undefined otherwise.
  */
-export function tryMacroId(str: string): MacroId | undefined {
+export function tryMacroId(str: string): RoxId | undefined {
   return isMacroId(str) ? str : undefined;
 }
 
 /**
- * Extracts the email from a MacroId.
+ * Extracts the email from a RoxId.
  */
-export function macroIdToEmail(id: MacroId): string {
+export function macroIdToEmail(id: RoxId): string {
   return id.slice(6);
 }
 
 /**
- * Creates a MacroId from an email address.
+ * Creates a RoxId from an email address.
  * Returns undefined if the email is invalid.
  */
-export function emailToMacroId(email: string): MacroId | undefined {
+export function emailToMacroId(email: string): RoxId | undefined {
   if (!email.includes('@')) {
     return undefined;
   }
-  return `macro|${email}` as MacroId;
+  return `macro|${email}` as RoxId;
 }

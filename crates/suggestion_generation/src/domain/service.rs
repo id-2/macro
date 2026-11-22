@@ -33,8 +33,8 @@ use agent_session::domain::routines::{
 use chrono::{DateTime, TimeDelta, Utc};
 use chrono_tz::Tz;
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use routine_program::Surface;
 use scheduled_action::domain::suggestions::ROUTINE_SUGGESTIONS_FLAG;
 use scheduled_action::domain::suggestions::model::RoutineGenerationReport;
@@ -129,7 +129,7 @@ struct Runner<Repo, Sessions, Routines, SuggestionFeed> {
 struct Run {
     generation: Uuid,
     started_at: DateTime<Utc>,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     trigger: GenerationTrigger,
     timezone: Tz,
     suggestions: bool,
@@ -269,7 +269,7 @@ where
     }
 
     /// The person's plan; without plans, nobody pays.
-    async fn plan(&self, user: &MacroUserIdStr<'static>) -> Plan {
+    async fn plan(&self, user: &RoxUserIdStr<'static>) -> Plan {
         let Some(plans) = &self.plans else {
             return Plan::Unpaid;
         };
@@ -284,7 +284,7 @@ where
     }
 
     /// Which kinds are on for the person: suggestions, routine suggestions.
-    async fn kinds(&self, user: &MacroUserIdStr<'_>) -> (bool, bool) {
+    async fn kinds(&self, user: &RoxUserIdStr<'_>) -> (bool, bool) {
         let Some(flags) = &self.flags else {
             return (false, false);
         };
@@ -307,7 +307,7 @@ where
     /// for the others.
     pub async fn start(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         trigger: GenerationTrigger,
         timezone: Tz,
     ) -> Result<StartOutcome, GenerationError> {
@@ -319,7 +319,7 @@ where
     /// within [`super::generation::REGENERATE_EVERY`] of their last.
     pub async fn regenerate(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         timezone: Tz,
     ) -> Result<(), GenerationError> {
         match self
@@ -346,7 +346,7 @@ where
     /// and when they may ask for fresh suggestions.
     pub async fn overview(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<GenerationOverview, GenerationError> {
         let (suggestions, _) = self.kinds(user).await;
         if !suggestions {
@@ -372,7 +372,7 @@ where
     ), err)]
     async fn launch(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         trigger: GenerationTrigger,
         timezone: Tz,
         permit: Option<OwnedSemaphorePermit>,
@@ -469,7 +469,7 @@ where
         }
         // Its sessions' tool calls arrive without this trace's context: they
         // record its id, kept with the generation, to be joined to it.
-        if let Some(trace) = run_span.in_scope(macro_tower_layers::current_trace_id)
+        if let Some(trace) = run_span.in_scope(rox_tower_layers::current_trace_id)
             && let Err(error) = repo.traced(generation, &trace).await
         {
             tracing::warn!(?error, "could not keep a generation's trace id");
@@ -587,7 +587,7 @@ where
 
     /// Start one person's nightly run with one of this process's nightly
     /// places; what became of them.
-    async fn start_nightly(&self, user: &MacroUserIdStr<'static>, timezone: Tz) -> NightlyOutcome {
+    async fn start_nightly(&self, user: &RoxUserIdStr<'static>, timezone: Tz) -> NightlyOutcome {
         let Ok(permit) = Arc::clone(&self.nightly).try_acquire_owned() else {
             // The tick is the only one taking places, and runs only free
             // them; never expected.
@@ -692,7 +692,7 @@ where
     /// paid plan, they count as active for nightly runs.
     pub async fn seen(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         timezone: Tz,
     ) -> Result<(), GenerationError> {
         let (suggestions, _) = self.kinds(user).await;
@@ -715,7 +715,7 @@ where
     /// The person's routine suggestions: AI's, then Rox's templates.
     pub async fn routine_suggestions(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<scheduled_action::domain::suggestions::model::RoutineSuggestions, GenerationError>
     {
         self.runner

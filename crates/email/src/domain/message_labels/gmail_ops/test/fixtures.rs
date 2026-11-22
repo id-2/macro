@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::{Link, UserProvider};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::{Arc, Mutex};
@@ -122,7 +122,7 @@ impl GmailOpsLinks for Fake {
         self.record("link", Call::Link)?;
         Ok((!self.0.lock().unwrap().missing_link).then(|| Link {
             id: LINK,
-            macro_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+            rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
             fusionauth_user_id: "owner".into(),
             email_address: EmailStr::try_from("inbox@example.com".to_string()).unwrap(),
             provider: UserProvider::Gmail,

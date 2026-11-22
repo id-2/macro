@@ -2,9 +2,9 @@
 
 use crate::domain::period::{PeriodBindingSource, SubscriptionPeriod};
 use crate::domain::{BillingError, Entitlement, EntitlementSource, PayerScope, PlanTier, Result};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use roles_and_permissions::domain::port::UserRolesAndPermissionsService;
 use teams::domain::model::{Team, TeamError};
 use teams::domain::team_repo::TeamRepository;
@@ -42,7 +42,7 @@ where
     P: UserRolesAndPermissionsService,
     T: TeamRepository,
 {
-    async fn tier_of(&self, user: &MacroUserIdStr<'_>) -> Result<PlanTier> {
+    async fn tier_of(&self, user: &RoxUserIdStr<'_>) -> Result<PlanTier> {
         let roles = self
             .permissions
             .get_user_roles(user)
@@ -89,9 +89,9 @@ where
 {
     async fn seats(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         observation: &SubscriptionPeriod,
-    ) -> Result<Option<Vec<MacroUserIdStr<'static>>>> {
+    ) -> Result<Option<Vec<RoxUserIdStr<'static>>>> {
         // The user/customer mapping is unique in the owning domain. Email is only
         // an existing webhook candidate, never sufficient evidence of ownership.
         let customer = self
@@ -173,7 +173,7 @@ where
     T: TeamRepository,
 {
     #[tracing::instrument(skip(self), err)]
-    async fn entitlement(&self, user: &MacroUserIdStr<'_>) -> Result<Entitlement> {
+    async fn entitlement(&self, user: &RoxUserIdStr<'_>) -> Result<Entitlement> {
         let user_owned = user.clone().into_owned();
         let own_tier = self.tier_of(user).await?;
 
@@ -192,7 +192,7 @@ where
             return Ok(Entitlement::personal(user_owned, own_tier));
         }
 
-        let owner = MacroUserIdStr::parse_from_str(team.owner_id())
+        let owner = RoxUserIdStr::parse_from_str(team.owner_id())
             .map_err(entitlement_err)?
             .into_owned();
         let is_owner = owner.as_ref() == user.as_ref();
@@ -206,7 +206,7 @@ where
             .get_team_members(team.id())
             .await
             .map_err(entitlement_err)?;
-        let mut seats: Vec<(MacroUserIdStr<'static>, PlanTier)> =
+        let mut seats: Vec<(RoxUserIdStr<'static>, PlanTier)> =
             Vec::with_capacity(members.len() + 1);
         for member in members {
             let member_id = member.user_id.into_owned();
@@ -247,7 +247,7 @@ where
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn team_payer(&self, team_id: Uuid) -> Result<Option<MacroUserIdStr<'static>>> {
+    async fn team_payer(&self, team_id: Uuid) -> Result<Option<RoxUserIdStr<'static>>> {
         match self.teams.get_team_owner(&team_id).await {
             Ok(owner) => Ok(Some(owner)),
             Err(TeamError::TeamDoesNotExist) => Ok(None),
@@ -256,7 +256,7 @@ where
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn stripe_customer_id(&self, user: &MacroUserIdStr<'_>) -> Result<Option<String>> {
+    async fn stripe_customer_id(&self, user: &RoxUserIdStr<'_>) -> Result<Option<String>> {
         Ok(self
             .teams
             .get_stripe_customer_id(user)

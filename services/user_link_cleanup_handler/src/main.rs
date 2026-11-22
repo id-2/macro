@@ -4,8 +4,8 @@ use lambda_runtime::{
     Error, LambdaEvent, run, service_fn,
     tracing::{self},
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_env_var::env_vars;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env_var::env_vars;
 use sqlx::postgres::PgPoolOptions;
 
 env_vars! {
@@ -14,7 +14,7 @@ env_vars! {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     tracing::trace!("initiating lambda");
 
@@ -38,9 +38,9 @@ async fn main() -> Result<(), Error> {
 }
 
 pub async fn handler(db: sqlx::PgPool, _event: LambdaEvent<EventBridgeEvent>) -> Result<(), Error> {
-    macro_db_client::in_progress_user_link::delete_day_old_in_progress_user_links(&db).await?;
+    rox_db_client::in_progress_user_link::delete_day_old_in_progress_user_links(&db).await?;
 
-    macro_db_client::in_progress_email_link::delete_day_old_in_progress_email_links(&db).await?;
+    rox_db_client::in_progress_email_link::delete_day_old_in_progress_email_links(&db).await?;
 
     Ok(())
 }

@@ -1,17 +1,17 @@
 import { match } from 'ts-pattern';
 import type { ExternalChatSendProgress } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { ExternalChat, ExternalChatContent } from './chat';
 import { ExternalChatMessage } from './message';
 import { ExternalChatParticipant } from './participant';
 import { ExternalChatUpload } from './upload';
 
 /** One deliberate send intent. Unknown outcomes must never be automatically resent. */
-export class ExternalChatSend extends MacroEntity<ExternalChatSendProgress> {
+export class ExternalChatSend extends RoxEntity<ExternalChatSendProgress> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** The chat containing this send. */
     readonly chat: ExternalChat,
     id: string,
@@ -22,7 +22,7 @@ export class ExternalChatSend extends MacroEntity<ExternalChatSendProgress> {
 
   /** Reference a send intent within its original chat. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     chat: ExternalChat,
     id: string,
   ): ExternalChatSend {
@@ -31,7 +31,7 @@ export class ExternalChatSend extends MacroEntity<ExternalChatSendProgress> {
 
   /** Seed a send handle from a server response. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     chat: ExternalChat,
     record: ExternalChatSendProgress,
   ): ExternalChatSend {
@@ -47,7 +47,7 @@ export class ExternalChatSend extends MacroEntity<ExternalChatSendProgress> {
     );
     const record = records.find((send) => send.id === this.id);
     if (!record)
-      throw new MacroNotFoundError('External chat send is not available');
+      throw new RoxNotFoundError('External chat send is not available');
     return record;
   }
 

@@ -17,7 +17,7 @@ import type { AgentSessionLifecycleEventOneOfThree } from './agentSessionLifecyc
 import type { AgentSessionLifecycleEventOneOfTwoone } from './agentSessionLifecycleEventOneOfTwoone';
 
 /**
- * Events publishable to [`MacroAgentSessionLifecycleTopic`].
+ * Events publishable to [`RoxAgentSessionLifecycleTopic`].
 
 The serde tag and [`AgentSessionLifecycleEventName`] spell the same wire
 names: subscribers filter on them, so they are API. The

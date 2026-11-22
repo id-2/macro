@@ -3,7 +3,7 @@ use crate::domain::{
     models::people::PeopleSearchQuery, ports::PeopleSearchService, service::ContactsDomainService,
 };
 use crate::outbound::gateway::ConnectionGatewayNotifier;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 const VIEWER: &str = "viewer@example.com";
@@ -20,7 +20,7 @@ fn service(
 async fn search(pool: &PgPool, query: &str, limit: u32) -> Vec<(String, Option<String>, bool)> {
     service(pool.clone())
         .search_people(
-            MacroUserIdStr::try_from_email(VIEWER).unwrap(),
+            RoxUserIdStr::try_from_email(VIEWER).unwrap(),
             &PeopleSearchQuery::new(query).unwrap(),
             PeopleSearchLimit::new(limit).unwrap(),
         )
@@ -38,7 +38,7 @@ async fn search(pool: &PgPool, query: &str, limit: u32) -> Vec<(String, Option<S
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("people_search"))
 )]
 async fn teammates_rank_first_then_prefix_then_substring_matches(pool: PgPool) {
@@ -74,13 +74,13 @@ async fn teammates_rank_first_then_prefix_then_substring_matches(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("people_search"))
 )]
-async fn results_flag_agents_and_treat_non_macro_contacts_as_people(pool: PgPool) {
+async fn results_flag_agents_and_treat_non_rox_contacts_as_people(pool: PgPool) {
     let flags: Vec<_> = service(pool)
         .search_people(
-            MacroUserIdStr::try_from_email(VIEWER).unwrap(),
+            RoxUserIdStr::try_from_email(VIEWER).unwrap(),
             &PeopleSearchQuery::new("sam").unwrap(),
             PeopleSearchLimit::DEFAULT,
         )
@@ -101,7 +101,7 @@ async fn results_flag_agents_and_treat_non_macro_contacts_as_people(pool: PgPool
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("people_search"))
 )]
 async fn search_is_scoped_to_the_viewers_contacts_self_and_team(pool: PgPool) {
@@ -133,7 +133,7 @@ async fn search_is_scoped_to_the_viewers_contacts_self_and_team(pool: PgPool) {
     // A user with no edges and no team finds only themselves.
     let lonely = service(pool.clone())
         .search_people(
-            MacroUserIdStr::try_from_email("nobody@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("nobody@example.com").unwrap(),
             &PeopleSearchQuery::new("example").unwrap(),
             PeopleSearchLimit::DEFAULT,
         )
@@ -148,7 +148,7 @@ async fn search_is_scoped_to_the_viewers_contacts_self_and_team(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn limit_is_honoured_and_capped_at_fifty(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO contacts_connections (user1, user2)
@@ -175,7 +175,7 @@ async fn limit_is_honoured_and_capped_at_fifty(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("people_search"))
 )]
 async fn blank_and_one_character_queries_return_nobody(pool: PgPool) {

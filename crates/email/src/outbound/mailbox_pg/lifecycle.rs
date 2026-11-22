@@ -17,16 +17,16 @@ async fn snapshot(
     conn: &mut PgConnection,
     link: Uuid,
 ) -> Result<InboxLifecycleSnapshot, InboxLifecycleError> {
-    let row=sqlx::query!(r#"SELECT l.id,l.macro_id,l.provider::text AS "provider!",l.sync_generation,l.grant_id,l.grant_generation,l.fusionauth_user_id,
-        l.disconnect_requested_at,EXISTS(SELECT 1 FROM promoted_shared_mailboxes p WHERE p.macro_id = l.macro_id) AS "promoted!"
+    let row=sqlx::query!(r#"SELECT l.id,l.rox_id,l.provider::text AS "provider!",l.sync_generation,l.grant_id,l.grant_generation,l.fusionauth_user_id,
+        l.disconnect_requested_at,EXISTS(SELECT 1 FROM promoted_shared_mailboxes p WHERE p.rox_id = l.rox_id) AS "promoted!"
         FROM email_links l WHERE l.id = $1 FOR UPDATE OF l"#,link).fetch_optional(&mut *conn).await.map_err(failed)?.ok_or(InboxLifecycleError::NotFound)?;
-    let delegates=sqlx::query_scalar!("SELECT primary_macro_id FROM macro_user_links WHERE link_id = $1 AND child_macro_id = $2 ORDER BY primary_macro_id",link,row.macro_id)
+    let delegates=sqlx::query_scalar!("SELECT primary_rox_id FROM rox_user_links WHERE link_id = $1 AND child_rox_id = $2 ORDER BY primary_rox_id",link,row.rox_id)
         .fetch_all(&mut *conn).await.map_err(failed)?;
     let custodians=sqlx::query!("SELECT actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes FROM email_mailbox_custodians WHERE link_id = $1 ORDER BY verified_at DESC,actor_id",link)
         .fetch_all(&mut *conn).await.map_err(failed)?.into_iter().map(|row|MailboxCustodian {actor_id:row.actor_id,credential_owner:row.fusionauth_user_id,grant_id:row.grant_id,grant_generation:row.grant_generation,scopes:row.granted_scopes}).collect();
     Ok(InboxLifecycleSnapshot {
         link_id: link,
-        owner: row.macro_id,
+        owner: row.rox_id,
         provider: match row.provider.as_str() {
             "GMAIL" => UserProvider::Gmail,
             "OUTLOOK" => UserProvider::Outlook,
@@ -52,7 +52,7 @@ async fn enqueue(
     let payload = serde_json::to_value(effect).map_err(failed)?;
     sqlx::query!(
         "INSERT INTO email_mailbox_lifecycle_outbox(id,link_id,payload) VALUES ($1,$2,$3)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link,
         payload
     )
@@ -82,7 +82,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
             return Ok(());
         }
         let link = current.link_id;
-        sqlx::query!("DELETE FROM macro_user_links WHERE link_id = $1 AND primary_macro_id = $2 AND child_macro_id = $3",link,actor.macro_id.as_ref(),current.owner)
+        sqlx::query!("DELETE FROM rox_user_links WHERE link_id = $1 AND primary_rox_id = $2 AND child_rox_id = $3",link,actor.rox_id.as_ref(),current.owner)
             .execute(&mut *tx).await.map_err(failed)?;
         // Emit the leaving viewer's refresh outside the link-scoped projection
         // queue, which deliberately stops processing after mailbox removal.
@@ -90,7 +90,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
             &mut tx,
             link,
             InboxLifecycleEffect::AccessRemoved {
-                viewer: actor.macro_id.to_string(),
+                viewer: actor.rox_id.to_string(),
             },
         )
         .await?;
@@ -99,7 +99,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
             .iter()
             .filter(|candidate| {
                 matches!(decision, InboxRemoval::Disconnect)
-                    || candidate.actor_id == actor.macro_id.as_ref()
+                    || candidate.actor_id == actor.rox_id.as_ref()
             })
             .cloned()
             .collect::<Vec<_>>();
@@ -114,7 +114,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
             && let Some(grant_id) = current.grant_id
         {
             revoke.push(MailboxCustodian {
-                actor_id: actor.macro_id.to_string(),
+                actor_id: actor.rox_id.to_string(),
                 credential_owner: current.credential_owner.clone(),
                 grant_id,
                 grant_generation: current.grant_generation,
@@ -168,7 +168,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
                 )
                 .await?;
                 for viewer in &current.delegates {
-                    if viewer != actor.macro_id.as_ref() {
+                    if viewer != actor.rox_id.as_ref() {
                         enqueue(
                             &mut tx,
                             link,
@@ -187,7 +187,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
                 sqlx::query!(
                     "DELETE FROM email_mailbox_custodians WHERE link_id = $1 AND actor_id = $2",
                     link,
-                    actor.macro_id.as_ref()
+                    actor.rox_id.as_ref()
                 )
                 .execute(&mut *tx)
                 .await
@@ -220,7 +220,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
                         ProjectionEvent::LinkChanged
                     };
                     let payload = serde_json::to_value(event).map_err(failed)?;
-                    sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),link,row.sync_generation,payload)
+                    sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),link,row.sync_generation,payload)
                         .execute(&mut *tx).await.map_err(failed)?;
                 }
             }
@@ -262,7 +262,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
                         already_in_progress: true,
                     }
                 } else {
-                    let id = macro_uuid::generate_uuid_v7();
+                    let id = rox_uuid::generate_uuid_v7();
                     let inserted=sqlx::query_scalar!(r#"INSERT INTO email_backfill_jobs(id,link_id,fusionauth_user_id,status,is_recovery) VALUES ($1,$2,$3,'Init',false)
                         ON CONFLICT(link_id) WHERE status IN ('Init','InProgress') DO NOTHING RETURNING id"#,id,link,current.credential_owner).fetch_optional(&mut *tx).await.map_err(failed)?;
                     if inserted.is_some() {
@@ -291,7 +291,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
                     OR EXISTS(SELECT 1 FROM email_message_reconciliation WHERE link_id = $1 AND generation = $2 AND is_import AND available_at <> 'infinity') AS "running!""#,link,current.sync_generation).fetch_one(&mut *tx).await.map_err(failed)?;
                 let run_id = stream
                     .as_ref()
-                    .map_or_else(macro_uuid::generate_uuid_v7, |stream| stream.id);
+                    .map_or_else(rox_uuid::generate_uuid_v7, |stream| stream.id);
                 if !in_progress || stream.is_none() {
                     sqlx::query!("INSERT INTO email_sync_streams(id,link_id,generation,kind,scope_id) VALUES ($1,$2,$3,'folder_catalog','mail') ON CONFLICT DO NOTHING",run_id,link,current.sync_generation).execute(&mut *tx).await.map_err(failed)?;
                     sqlx::query!(r#"UPDATE email_sync_streams SET position = NULL,initial_complete = false, attachments_rechecked = false,scan_id = gen_random_uuid(),next_run_at = now(),fence = fence + 1,lease_id = NULL,lease_until = NULL,
@@ -320,13 +320,13 @@ impl InboxLifecycleRepository for PgMailboxSync {
         owner: &str,
     ) -> Result<Vec<DeletedUserBinding>, InboxLifecycleError> {
         let rows=sqlx::query!(r#"SELECT c.link_id AS "link_id!",c.actor_id AS "actor_id!",true AS "is_custodian!" FROM email_mailbox_custodians c WHERE c.fusionauth_user_id = $1
-            UNION SELECT l.id AS link_id,l.macro_id AS actor_id,false AS is_custodian FROM email_links l WHERE l.fusionauth_user_id = $1
-                AND NOT EXISTS(SELECT 1 FROM promoted_shared_mailboxes p WHERE p.macro_id = l.macro_id)"#,owner).fetch_all(&self.db).await.map_err(failed)?;
+            UNION SELECT l.id AS link_id,l.rox_id AS actor_id,false AS is_custodian FROM email_links l WHERE l.fusionauth_user_id = $1
+                AND NOT EXISTS(SELECT 1 FROM promoted_shared_mailboxes p WHERE p.rox_id = l.rox_id)"#,owner).fetch_all(&self.db).await.map_err(failed)?;
         rows.into_iter()
             .map(|row| {
                 Ok(DeletedUserBinding {
                     actor: InboxActor {
-                        macro_id: macro_user_id::user_id::MacroUserIdStr::try_from(row.actor_id)
+                        rox_id: rox_user_id::user_id::RoxUserIdStr::try_from(row.actor_id)
                             .map_err(failed)?,
                         credential_owner: owner.into(),
                     },

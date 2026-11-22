@@ -62,7 +62,7 @@ export default function ChangesGallery() {
     );
     controller.review.addNote(
       {
-        path: 'crates/macro_agent_sessions/src/service.rs',
+        path: 'crates/rox_agent_sessions/src/service.rs',
         side: 'additions',
         lineNumber: 88,
         endLineNumber: 92,

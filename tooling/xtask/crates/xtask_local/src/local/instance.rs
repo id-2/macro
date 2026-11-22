@@ -153,7 +153,7 @@ impl Instance {
 
     /// The networks this instance creates itself, each with the subnet its
     /// allocation assigns. The default instance's `services` and `auth-internal`
-    /// stay Compose-managed: the machine-wide collectors share `macro_services`.
+    /// stay Compose-managed: the machine-wide collectors share `rox_services`.
     pub fn networks(&self) -> Vec<(String, Option<String>)> {
         let mut names = vec![self.network_databases(), self.network_auth()];
         if !self.is_default() {
@@ -173,19 +173,19 @@ impl Instance {
     }
 
     pub fn volume_postgres(&self) -> String {
-        self.suffixed_underscore("macro_postgres_data")
+        self.suffixed_underscore("rox_postgres_data")
     }
 
     pub fn volume_redis(&self) -> String {
-        self.suffixed_underscore("macro_redis_data")
+        self.suffixed_underscore("rox_redis_data")
     }
 
     pub fn volume_opensearch(&self) -> String {
-        self.suffixed_underscore("macro_opensearch_data")
+        self.suffixed_underscore("rox_opensearch_data")
     }
 
     pub fn volume_kafka(&self) -> String {
-        self.suffixed_underscore("macro_kafka_data")
+        self.suffixed_underscore("rox_kafka_data")
     }
 
     pub fn volume_fusionauth_db(&self) -> String {

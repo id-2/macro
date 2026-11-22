@@ -5,19 +5,19 @@ use crate::domain::model::{SessionPurpose, SessionVisibility};
 use crate::domain::ports::AgentSessionRepo;
 use crate::domain::warm::{WarmClaim, WarmMissReason, WarmSessionLifecycle};
 use crate::outbound::postgres::test::{OWNER, create_test_bot, new_session, test_repo};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::num::NonZeroUsize;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn dm_contexts_stay_hidden_and_cannot_be_claimed_or_expired(pool: PgPool) {
     let bot = create_test_bot(&pool).await;
     let repo =
         test_repo(&pool).with_list_policy(crate::domain::list_visibility::SessionListPolicy {
             hide_agent_dms: true,
         });
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'direct_message', $2)",
         channel,
@@ -68,7 +68,7 @@ async fn dm_contexts_stay_hidden_and_cannot_be_claimed_or_expired(pool: PgPool) 
     }
     let listed = repo
         .recent_for_owner(
-            &MacroUserIdStr::parse_from_str(OWNER).unwrap(),
+            &RoxUserIdStr::parse_from_str(OWNER).unwrap(),
             NonZeroUsize::new(10).unwrap(),
         )
         .await
@@ -101,11 +101,11 @@ async fn dm_contexts_stay_hidden_and_cannot_be_claimed_or_expired(pool: PgPool) 
     assert_eq!(repo.sessions(conversation).await.unwrap().len(), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn warm_creation_rejects_a_reserved_conversation(pool: PgPool) {
     let bot = create_test_bot(&pool).await;
     let repo = test_repo(&pool);
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'direct_message', $2)",
         channel,
@@ -165,7 +165,7 @@ async fn migration_preserves_old_writers_and_stages_dm_visibility(pool: PgPool) 
         .execute(&pool)
         .await
         .unwrap();
-    sqlx::raw_sql(include_str!("../../../../../macro_db_client/migrations/20261015022720_separate_warm_session_lifecycle.up.sql"))
+    sqlx::raw_sql(include_str!("../../../../../rox_db_client/migrations/20261015022720_separate_warm_session_lifecycle.up.sql"))
         .execute(&pool).await.unwrap();
     let before = sqlx::query!("SELECT id, list_hidden, for_warming FROM agent_session ORDER BY id")
         .fetch_all(&pool)
@@ -186,7 +186,7 @@ async fn migration_preserves_old_writers_and_stages_dm_visibility(pool: PgPool) 
         "inline mention remains hidden but not warm"
     );
     // Emulate an older writer that omits the marker entirely.
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO agent_session (id, list_hidden) VALUES ($1, TRUE)",
         id
@@ -216,7 +216,7 @@ async fn migration_preserves_old_writers_and_stages_dm_visibility(pool: PgPool) 
     // Once the old reapers are gone, the domain policy backfills both contexts.
     // It writes `visibility`, which a later migration adds and keeps
     // `list_hidden` in step with.
-    sqlx::raw_sql(include_str!("../../../../../macro_db_client/migrations/20261022031656_agent_session_source_and_visibility.sql"))
+    sqlx::raw_sql(include_str!("../../../../../rox_db_client/migrations/20261022031656_agent_session_source_and_visibility.sql"))
         .execute(&pool).await.unwrap();
     let repo = test_repo(&pool);
     crate::domain::list_visibility::SessionListPolicy {
@@ -253,7 +253,7 @@ async fn migration_preserves_old_writers_and_stages_dm_visibility(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_old_claimant_cannot_leave_a_visible_session_eligible_for_cleanup(pool: PgPool) {
     let bot = create_test_bot(&pool).await;
     let repo = test_repo(&pool);

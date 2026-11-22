@@ -5,7 +5,7 @@ test('holding a column type menu item never starts a column drag', async ({
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(page, '/src/features/block-database/browser-test/api.html');
   await page
     .getByRole('button', { name: 'Name column menu', exact: true })
@@ -54,7 +54,7 @@ test('database titles stay static until Rename is requested and save without ent
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(page, '/src/features/block-database/browser-test/api.html');
   await expect(
     page.getByText('Untitled database', { exact: true })
@@ -85,7 +85,7 @@ test('adds a column and starts naming it while creation is still saving', async 
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(
     page,
     '/src/features/block-database/browser-test/api.html?holdColumnWrites'
@@ -122,7 +122,7 @@ test('an API-only host pages rows, writes cells and creates columns through the 
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(page, '/src/features/block-database/browser-test/api.html');
   await expect(page.getByRole('grid', { name: 'API records' })).toBeVisible();
   await expect(

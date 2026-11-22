@@ -4,7 +4,7 @@ import {
 } from '@queries/auth/user-name-cache';
 import { userNameCache } from '@queries/auth/user-name-cache-runtime';
 import { getOwner, onCleanup } from 'solid-js';
-import { type MacroId, macroIdToEmail } from './macroId';
+import { type RoxId, macroIdToEmail } from './macroId';
 import type { UserNameItem, UserNamePreviewFetcher } from './types';
 
 /** Initials from structured names, falling back to the email's first letter. */
@@ -40,10 +40,10 @@ type DisplayNamePartStrings = {
   fullName: string;
 };
 
-function fallbackItem(id: MacroId): UserNameItem {
+function fallbackItem(id: RoxId): UserNameItem {
   return { id, loading: false, _createdAt: new Date(0) };
 }
-function getUserNameItem(id: MacroId): UserNameItem {
+function getUserNameItem(id: RoxId): UserNameItem {
   const value = userNameCache().read(id);
   return {
     id,
@@ -56,7 +56,7 @@ function getUserNameItem(id: MacroId): UserNameItem {
 }
 function display(
   item: UserNameItem,
-  id: MacroId,
+  id: RoxId,
   options?: DisplayNameOptions
 ): string {
   const email = macroIdToEmail(id);
@@ -73,18 +73,18 @@ function display(
 
 /** Reactive, non-suspending reads of the account-scoped bounded query cache. */
 export function getDisplayName(
-  id: MacroId | undefined | null,
+  id: RoxId | undefined | null,
   options?: DisplayNameOptions
 ): string {
   return id ? display(getUserNameItem(id), id, options) : '';
 }
 /** Agent metadata shares the same bounded, account-scoped name value owner. */
-export function isAgentAccount(id: MacroId | undefined | null): boolean {
+export function isAgentAccount(id: RoxId | undefined | null): boolean {
   return !!id && getUserNameItem(id).isAgent === true;
 }
 
 export function getDisplayNameParts(
-  id: MacroId | undefined | null,
+  id: RoxId | undefined | null,
   options?: DisplayNameOptions
 ): DisplayNamePartStrings {
   if (!id) return { firstName: '', lastName: '', fullName: '' };
@@ -101,7 +101,7 @@ export function getDisplayNameParts(
     fullName: display(item, id, options),
   };
 }
-function useUserNameItem(id: MacroId) {
+function useUserNameItem(id: RoxId) {
   getUserNameItem(id);
   const controls = userNameCache().control(id);
   let active = true;
@@ -135,7 +135,7 @@ type DisplayNameParts = {
 };
 /** @deprecated Prefer getDisplayNameParts inside a reactive accessor for changing IDs. */
 export function useDisplayNameParts(
-  id: MacroId | undefined | null,
+  id: RoxId | undefined | null,
   options?: DisplayNameOptions
 ): DisplayNameParts {
   if (!id)
@@ -165,7 +165,7 @@ export function useDisplayNameParts(
 }
 /** @deprecated Prefer getDisplayName inside a reactive accessor for changing IDs. */
 export function useDisplayName(
-  id: MacroId | undefined | null,
+  id: RoxId | undefined | null,
   options?: DisplayNameOptions
 ): UserNamePreviewFetcher {
   if (!id) return [() => '', { refetch: () => {}, mutate: () => {} }];

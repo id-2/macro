@@ -2,10 +2,10 @@
 -- Sets up threads, messages, contacts, recipients, labels for comprehensive testing
 
 -- Insert test user for project ownership
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES ('a1111111-1111-1111-1111-111111111111', 'user1@test.com', 'user1@test.com', 'stripe_user1');
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES ('macro|user1@test.com', 'user1@test.com', 'Test User 1', 'a1111111-1111-1111-1111-111111111111');
 
 -- Insert test projects
@@ -15,7 +15,7 @@ VALUES
     ('proj-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Beta', 'macro|user1@test.com', NOW(), NOW());
 
 -- Insert test link
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'macro|user1@test.com', 'user1', 'user1@test.com', 'GMAIL', true, NOW(), NOW());
 

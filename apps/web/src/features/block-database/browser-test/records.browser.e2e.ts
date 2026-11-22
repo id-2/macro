@@ -5,7 +5,7 @@ test('Enter continues down the column and creates successive records from the bl
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(
     page,
     '/src/features/block-database/browser-test/records.html'
@@ -49,7 +49,7 @@ test('edits embedded records without entity metadata or schema controls', async 
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(
     page,
     '/src/features/block-database/browser-test/records.html'

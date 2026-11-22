@@ -2,11 +2,11 @@ use super::*;
 use crate::domain::models::ImportEntity;
 use crate::domain::ports::Result;
 use crate::domain::service::{DiscardOutcome, ImportStager, StageOutcome};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|tester@rox.one".to_string()).expect("valid test user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|tester@rox.one".to_string()).expect("valid test user id")
 }
 
 fn row(source: ImportSource, status: ImportStatus) -> ImportEntity {
@@ -43,7 +43,7 @@ struct MockStager {
 impl ImportStager for MockStager {
     async fn stage(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         initiator: Initiator,
         source: ImportSource,
         foreign_id: &str,
@@ -61,7 +61,7 @@ impl ImportStager for MockStager {
 
     async fn record_imported(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _initiator: Initiator,
         source: ImportSource,
         _foreign_id: &str,
@@ -73,7 +73,7 @@ impl ImportStager for MockStager {
 
     async fn discard_entity(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _id: Uuid,
     ) -> Result<DiscardOutcome> {
         Ok(DiscardOutcome::NotDiscardable(ImportStatus::Imported))
@@ -81,7 +81,7 @@ impl ImportStager for MockStager {
 
     async fn list_entities(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _source: Option<ImportSource>,
         _status: Option<ImportStatus>,
     ) -> Result<Vec<ImportEntity>> {
@@ -92,7 +92,7 @@ impl ImportStager for MockStager {
 impl NotionPageImporter for MockStager {
     async fn import_notion_page(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         page_url_or_id: &str,
     ) -> Result<ImportNotionPageOutcome> {
         self.notion_import_calls

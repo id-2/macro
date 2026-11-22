@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::{process::Command, sync::Mutex};
 use tracing::instrument::WithSubscriber;
 
@@ -348,7 +348,7 @@ impl crate::domain::ports::Availability for Available {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 #[ignore = "requires explicit disposable local OpenBao and bootstrap signing key"]
 #[expect(
     clippy::disallowed_methods,
@@ -361,7 +361,7 @@ async fn delayed_enrollment_cannot_replace_live_key_or_survive_retirement_cleanu
         domain::{ports::Repository, service::PasswordService},
         outbound::postgres::PgRepository,
     };
-    use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+    use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
     let address =
         std::env::var("PASSWORDS_TEST_OPENBAO_ADDRESS").expect("explicit disposable address");
     let key_path =
@@ -393,16 +393,16 @@ async fn delayed_enrollment_cannot_replace_live_key_or_survive_retirement_cleanu
         .expect("provider"),
     );
     let owner = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|enrollment@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|enrollment@example.test")
             .expect("identity")
             .into_owned(),
     };
-    let macro_user_id = uuid::Uuid::now_v7();
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,'enrollment@example.test','enrollment@example.test',$2)",macro_user_id,format!("fixture-{macro_user_id}")).execute(&pool).await.expect("account");
+    let rox_user_id = uuid::Uuid::now_v7();
+    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,'enrollment@example.test','enrollment@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}")).execute(&pool).await.expect("account");
     sqlx::query!(
-        r#"INSERT INTO "User"(id,email,macro_user_id) VALUES ($1,'enrollment@example.test',$2)"#,
+        r#"INSERT INTO "User"(id,email,rox_user_id) VALUES ($1,'enrollment@example.test',$2)"#,
         owner.user_id.as_ref(),
-        macro_user_id
+        rox_user_id
     )
     .execute(&pool)
     .await

@@ -1,12 +1,12 @@
 use chrono::TimeZone;
 use chrono_tz::Asia::Tokyo;
 
-use macro_user_id::cowlike::CowLike as _;
+use rox_user_id::cowlike::CowLike as _;
 
 use super::*;
 
-fn user(n: u32) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|night{n}@rox.one"))
+fn user(n: u32) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|night{n}@rox.one"))
         .unwrap()
         .into_owned()
 }

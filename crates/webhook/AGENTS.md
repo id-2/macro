@@ -31,7 +31,7 @@ before changing ingestion or delivery behavior.
 ## Boundaries
 
 - Depends on: `channels`, `documents`, `messages`, `agent_session`,
-  `agent_trigger`, `user_events`, `entity_access`, `macro_event_broker`, `kafka_util`,
+  `agent_trigger`, `user_events`, `entity_access`, `rox_event_broker`, `kafka_util`,
   `rdkafka`, `rate_limit`.
 - Used by: `services/document_storage_service`, `crates/coding_agent_worker`.
 

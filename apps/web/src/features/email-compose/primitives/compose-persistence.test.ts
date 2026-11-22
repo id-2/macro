@@ -229,14 +229,14 @@ it('sends a reloaded reply without appending its quoted thread again', async () 
       replying_to_id: 'parent',
       thread_db_id: 'thread',
       body_html_sanitized:
-        '<p>Reply</p><div class="macro_quote gmail_quote"><blockquote>Earlier</blockquote></div>',
+        '<p>Reply</p><div class="rox_quote gmail_quote"><blockquote>Earlier</blockquote></div>',
     }),
   });
   await root.sendEmail();
   root.dispose();
   const sent = vi.mocked(composeContext.delivery.sendMessage).mock.calls[0][0];
   expect(decodeBase64Utf8(sent.message.body_html ?? '')).not.toContain(
-    'macro_quote'
+    'rox_quote'
   );
 });
 

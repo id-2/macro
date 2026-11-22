@@ -29,7 +29,7 @@ methods, shared by almost every list endpoint in the backend.
 - Used by: most list-returning crates — `ai_tools`, `calendar_events`, `call`,
   `channels`, `complete_graph`, `databases_sql`, `email`, `email_db_client`,
   `foreign_entity`, `github_pull_requests`, `graphql_activity`,
-  `graphql_calendar`, `graphql_initiative`, `graphql_soup`, `macro_db_client`,
+  `graphql_calendar`, `graphql_initiative`, `graphql_soup`, `rox_db_client`,
   `messages`, `model`, `model_notifications`, `models_email`, `models_soup`,
   `notification`, `notification_db_client`, `skills`, `soup`, `teams`.
 

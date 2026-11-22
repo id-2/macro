@@ -5,7 +5,7 @@ use super::{
     ports::EmailUserRepo,
 };
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use std::future::Future;
 use uuid::Uuid;
@@ -179,7 +179,7 @@ impl<R: DraftAttachmentRepository, S: DraftAttachmentStorage, A: EntityAccessSer
 {
     async fn inbox(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         link: Uuid,
     ) -> Result<UserProvider, AttachmentError> {
         let links = self
@@ -196,7 +196,7 @@ impl<R: DraftAttachmentRepository, S: DraftAttachmentStorage, A: EntityAccessSer
 
     pub async fn upload(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         link: Uuid,
         draft: Uuid,
         upload: DraftAttachmentUpload,
@@ -213,7 +213,7 @@ impl<R: DraftAttachmentRepository, S: DraftAttachmentStorage, A: EntityAccessSer
         // Existing Gmail clients predate upload completion. Outlook and every
         // client supplying an idempotency key use the verified upload protocol.
         let upload_pending = upload_id.is_some() || provider == UserProvider::Outlook;
-        let id = upload_id.unwrap_or_else(macro_uuid::generate_uuid_v7);
+        let id = upload_id.unwrap_or_else(rox_uuid::generate_uuid_v7);
         let attachment = AttachmentDraft {
             id,
             draft_id: draft,
@@ -241,7 +241,7 @@ impl<R: DraftAttachmentRepository, S: DraftAttachmentStorage, A: EntityAccessSer
 
     pub async fn complete_upload(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         link: Uuid,
         draft: Uuid,
         id: Uuid,
@@ -267,7 +267,7 @@ impl<R: DraftAttachmentRepository, S: DraftAttachmentStorage, A: EntityAccessSer
 
     pub async fn forward(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         link: Uuid,
         draft: Uuid,
         id: Uuid,
@@ -314,7 +314,7 @@ impl<R: DraftAttachmentRepository, S: DraftAttachmentStorage, A: EntityAccessSer
 
     pub async fn remove(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         link: Uuid,
         draft: Uuid,
         attachment_id: Uuid,

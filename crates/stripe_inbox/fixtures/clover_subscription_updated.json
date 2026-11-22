@@ -16,7 +16,7 @@
       "metadata": {
         "ga_client_id": "GA1.2.3",
         "fbp": "fb.1.2",
-        "macro_plan_change_at": "2027-01-15T08:00:10.123456Z"
+        "rox_plan_change_at": "2027-01-15T08:00:10.123456Z"
       },
       "items": {
         "object": "list",
@@ -53,7 +53,7 @@
           }
         ]
       },
-      "metadata": {"macro_plan_change_at": null}
+      "metadata": {"rox_plan_change_at": null}
     }
   }
 }

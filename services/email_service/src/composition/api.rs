@@ -27,12 +27,12 @@ use email::{
 use email_api_client::GmailApiClientRepository;
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use static_file_service_client::StaticFileServiceClient;
 use std::sync::Arc;
 use system_properties::{PgSystemPropertiesRepository, SystemPropertiesServiceImpl};
@@ -57,7 +57,7 @@ pub(crate) struct ApiDependencies {
     pub dss_client: DocumentStorageServiceClient,
     pub connection_gateway_client: connection_gateway_client::client::ConnectionGatewayClient,
     pub jwt_args: JwtValidationArgs,
-    pub macro_event_broker: MacroEventBrokerService<KafkaEventPublisher, TaskTracker>,
+    pub rox_event_broker: RoxEventBrokerService<KafkaEventPublisher, TaskTracker>,
 }
 
 /// Wires the services for the production listener.
@@ -76,7 +76,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
         dss_client,
         connection_gateway_client,
         jwt_args,
-        macro_event_broker,
+        rox_event_broker,
     } = deps;
     let gmail_api_repository = GmailApiClientRepository::new(gmail_client.clone());
 
@@ -84,13 +84,13 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
         PgSystemPropertiesRepository::new(db.clone()),
     ));
 
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
             default_user_id: Some("macro|INTERNAL@rox.one".to_string()),
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
 
@@ -122,7 +122,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
                 Arc::new(auth_service_client.clone()),
             ),
         ))
-        .with_macro_event_broker(macro_event_broker.clone()),
+        .with_rox_event_broker(rox_event_broker.clone()),
     );
     let entity_access_service = Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
         db.clone(),
@@ -183,7 +183,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
                 ),
             },
             CalendarTokenProviderAdapter::new(redis_conn.clone(), auth_service_client.clone()),
-            macro_event_broker.clone(),
+            rox_event_broker.clone(),
             ConnectionGatewayCalendarRefresh::new(connection_gateway_client.clone(), db.clone()),
         )
         .with_outlook_writes_enabled(config.outlook_writes_enabled),
@@ -247,7 +247,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
         provider: crate::outbound::inbox_connection::GoogleConnectionProvider {
             gmail: email_api.clone(),
             auth: auth_service_client.clone(),
-            token_info_url: macro_service_urls::GoogleOauthTokenInfoUrl::new()?,
+            token_info_url: rox_service_urls::GoogleOauthTokenInfoUrl::new()?,
         },
         grants: crate::outbound::inbox_connection::GoogleConnectionGrants {
             db: db.clone(),
@@ -257,7 +257,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
         backfill: crate::outbound::inbox_connection::InitialConnectionBackfill {
             jobs: backfill_jobs.clone(),
             history: crate::outbound::inbox_connection::ConnectionHistory(db.clone()),
-            events: crate::outbound::inbox_connection::ConnectionEvents(macro_event_broker.clone()),
+            events: crate::outbound::inbox_connection::ConnectionEvents(rox_event_broker.clone()),
         },
         identity: crate::outbound::inbox_connection::LoginEmailIdentity,
         failure_observer: crate::api::context::InitFailureObserver,
@@ -316,7 +316,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
         message_labels: Arc::new(email::domain::message_labels::MessageLabelService {
             repository: crate::outbound::message_labels::PgMessageLabels(db.clone()),
             enqueuer: sqs_client.as_ref().clone(),
-            broker: macro_event_broker.clone(),
+            broker: rox_event_broker.clone(),
         }),
         message_reads: Arc::new(email::domain::message_reads::MessageReadService {
             repository: crate::outbound::message_reads::PgMessageReads(db.clone()),
@@ -359,7 +359,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
             auth_service_client.as_ref().clone(),
             redis_client.as_ref().clone(),
             sqs_client.as_ref().clone(),
-            macro_event_broker.clone(),
+            rox_event_broker.clone(),
             contacts_ingress,
         )),
         recent_inbox: Arc::new(email::domain::recent_inbox::RecentInboxService::new(

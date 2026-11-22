@@ -6,7 +6,7 @@ use document_sub_type::DocumentSubType;
 use entity_access::domain::ports::EntityAccessService;
 use futures::future::join_all;
 use lexical_client::types::NewMdNode;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::DocumentBasic;
 use model_entity::EntityType;
 use non_empty::NonEmpty;
@@ -19,7 +19,7 @@ use super::service::{DocumentAttachmentService, skill_type_metadata};
 /// text and image parts.
 pub(super) async fn resolve_markdown<DSvc: DocumentService, ESvc: EntityAccessService>(
     svc: &DocumentAttachmentService<DSvc, ESvc>,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     id: &str,
     document: &DocumentBasic,
 ) -> Result<AttachmentContent<'static>, AttachmentError> {
@@ -59,7 +59,7 @@ pub(super) async fn resolve_markdown<DSvc: DocumentService, ESvc: EntityAccessSe
 
 async fn resolve_dss_image<DSvc: DocumentService, ESvc: EntityAccessService>(
     svc: &DocumentAttachmentService<DSvc, ESvc>,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     image_id: &str,
 ) -> AttachmentPart<'static> {
     let reference = EntityType::Document.with_entity_string(image_id.to_string());
@@ -76,7 +76,7 @@ async fn resolve_dss_image<DSvc: DocumentService, ESvc: EntityAccessService>(
 
 async fn try_resolve_dss_image<DSvc: DocumentService, ESvc: EntityAccessService>(
     svc: &DocumentAttachmentService<DSvc, ESvc>,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     image_id: &str,
 ) -> Result<ImageData, AttachmentError> {
     let receipt = svc

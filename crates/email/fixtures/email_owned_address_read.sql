@@ -22,23 +22,23 @@
 --   • A few threads of link 0 written by hand where only a message the view
 --     hides carries the participant (see the end).
 
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 SELECT md5('owned-user' || i)::uuid, 'u' || i || '@owned.test', 'u' || i || '@owned.test', 'stripe_owned_u' || i
 FROM generate_series(0, 1) i;
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 SELECT 'macro|u' || i || '@owned.test', 'u' || i || '@owned.test', 'U' || i, md5('owned-user' || i)::uuid
 FROM generate_series(0, 1) i;
 
 CREATE TEMP TABLE owned_link AS
 SELECT i, ('f1000000-0000-0000-0000-' || lpad(to_hex(i), 12, '0'))::uuid AS id,
-       'macro|u' || u || '@owned.test' AS macro_id, email
+       'macro|u' || u || '@owned.test' AS rox_id, email
 FROM (VALUES (0, 0, 'u0@owned.test'), (1, 0, 'u0.second@else.test'),
              (2, 1, 'u1@owned.test')) AS link(i, u, email);
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active,
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active,
   created_at, updated_at)
-SELECT id, macro_id, 'fa_owned_u' || i, email, 'GMAIL', true, NOW(), NOW()
+SELECT id, rox_id, 'fa_owned_u' || i, email, 'GMAIL', true, NOW(), NOW()
 FROM owned_link;
 
 -- Every address each inbox knows.

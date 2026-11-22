@@ -16,11 +16,11 @@ item-level sharing — see Scope).
 
 - Owns: user-level role/permission domain logic and its Postgres adapter.
 - Not here: item/document share permissions → `share_permission_db_utils`;
-  authorization decisions for a request → `macro_authorization`.
+  authorization decisions for a request → `rox_authorization`.
 
 ## Boundaries
 
-- Depends on: `macro_user_id`, `non_empty`.
+- Depends on: `rox_user_id`, `non_empty`.
 - Used by: `agent_inmem`, `ai_billing`, `chat`, `teams`.
 
 ## Recipes

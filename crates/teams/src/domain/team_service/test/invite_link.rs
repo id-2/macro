@@ -13,12 +13,12 @@ const TEAM_ID: Uuid = Uuid::from_u128(0x1_1000);
 const CALLER: &str = "macro|caller@example.com";
 const JOINER: &str = "macro|joiner@example.com";
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(CALLER).unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(CALLER).unwrap()
 }
 
-fn joiner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(JOINER).unwrap()
+fn joiner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(JOINER).unwrap()
 }
 
 fn repository(role: TeamRole, allow_non_admin_invites: bool) -> MockTeamRepository {

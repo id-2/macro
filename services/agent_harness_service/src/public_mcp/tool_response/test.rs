@@ -24,7 +24,7 @@ impl MarkdownImageResolver for RecordingResolver {
         })
     }
 
-    async fn resolve_dss(&self, _user_id: &MacroUserIdStr<'_>, _id: &str) -> Option<ResolvedImage> {
+    async fn resolve_dss(&self, _user_id: &RoxUserIdStr<'_>, _id: &str) -> Option<ResolvedImage> {
         panic!("channel attachments must not be resolved as document images")
     }
 
@@ -53,7 +53,7 @@ fn message(entity_type: &str, entity_id: &str) -> Value {
 async fn render(resolver: &RecordingResolver, tool: &str, value: Value) -> CallToolResult {
     tool_result_with_media(
         resolver,
-        &MacroUserIdStr::try_from_email("reader@example.com").unwrap(),
+        &RoxUserIdStr::try_from_email("reader@example.com").unwrap(),
         tool,
         &Url::parse("https://static.example/").unwrap(),
         value,

@@ -142,7 +142,7 @@ export type EmailAttachment = {
 	/**
 	 *  The id of the Rox document to attach. It must be a stored file -
 	 *  an uploaded PDF, image, spreadsheet, Word document, or other upload -
-	 *  that the user can view. A Macro-native document (one written in the
+	 *  that the user can view. A Rox-native document (one written in the
 	 *  editor) has no file to attach; link to it in the body instead.
 	 */
 	documentId: string,

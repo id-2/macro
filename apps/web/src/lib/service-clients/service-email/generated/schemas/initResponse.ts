@@ -8,7 +8,7 @@ import type { InitResponseBackfillJobId } from './initResponseBackfillJobId';
 
 export interface InitResponse {
   /** Present when init enqueued a backfill job. Absent for cross-user delegation,
-where the child link's backfill already ran under its own macro_id; present for
+where the child link's backfill already ran under its own rox_id; present for
 the self-link bootstrap, where a fresh link is provisioned and backfilled. */
   backfill_job_id?: InitResponseBackfillJobId;
   /** The email_links row id for the now-accessible inbox. For cross-user delegation

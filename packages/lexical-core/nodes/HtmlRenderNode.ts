@@ -97,7 +97,7 @@ export class HtmlRenderNode extends DecoratorBlockNode<
       // the class marker is what survives a draft save/restore round-trip
       if (
         !domNode.hasAttribute('data-html-render') &&
-        !domNode.classList.contains('macro_html_render')
+        !domNode.classList.contains('rox_html_render')
       ) {
         return null;
       }
@@ -112,7 +112,7 @@ export class HtmlRenderNode extends DecoratorBlockNode<
 
       const node = $createHtmlRenderNode({
         html: htmlString,
-        adaptColors: domNode.classList.contains('macro_html_render_adapt')
+        adaptColors: domNode.classList.contains('rox_html_render_adapt')
           ? true
           : undefined,
       });
@@ -126,7 +126,7 @@ export class HtmlRenderNode extends DecoratorBlockNode<
       // unconditional claim here would swallow every other node's divs.
       div: (domNode: HTMLElement) =>
         domNode.hasAttribute('data-html-render') ||
-        domNode.classList.contains('macro_html_render')
+        domNode.classList.contains('rox_html_render')
           ? { conversion: convert, priority: 1 }
           : null,
     };
@@ -137,8 +137,8 @@ export class HtmlRenderNode extends DecoratorBlockNode<
     host.setAttribute('data-html-render', 'true');
     // Class markers survive the backend sanitizer (data-* attributes don't)
     host.className = this.__adaptColors
-      ? 'macro_html_render macro_html_render_adapt'
-      : 'macro_html_render';
+      ? 'rox_html_render rox_html_render_adapt'
+      : 'rox_html_render';
 
     const template = document.createElement('template');
     template.setAttribute('shadowrootmode', 'open');

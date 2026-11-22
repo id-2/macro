@@ -1,7 +1,7 @@
 //! How routines' code was brought to new SDKs, in `scheduled_action_code_upgrade`.
 
 use anyhow::{Context, Result};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use routine_program::SdkFingerprint;
 use serde_json::Value;
 use sqlx::PgPool;
@@ -68,7 +68,7 @@ impl CodeUpgrades for PgCodeUpgrades {
                 VALUES ($1, $2, $3, $4, 'checked', $5)
                 ON CONFLICT (action_id, to_sdk) DO NOTHING
                 "#,
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 id,
                 from_sdk(action),
                 sdk.as_str(),
@@ -96,7 +96,7 @@ impl CodeUpgrades for PgCodeUpgrades {
                   < now() - make_interval(mins => $6::int)
             RETURNING id
             "#,
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             id,
             from_sdk(action),
             sdk.as_str(),

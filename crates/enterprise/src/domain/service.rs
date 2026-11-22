@@ -8,7 +8,7 @@ use super::{
 };
 use crate::audit::{AuditAction, AuditRecord, AuditResult};
 use entity_access::domain::models::{AdminTeamRole, EntityAccessReceipt};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use uuid::Uuid;
 
 /// Admin and identity use cases over small outbound ports.
@@ -38,24 +38,24 @@ impl<R: EnterpriseRepository, T, U, D, H> EnterpriseService<R, T, U, D, H> {
     /// Persist identity facts a trusted caller has already verified.
     pub async fn bind_verified(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        rox_user_id: &RoxUserIdStr<'_>,
         identity: VerifiedRoxIdentity,
     ) -> Result<()> {
-        self.repository.bind_verified(macro_user_id, identity).await
+        self.repository.bind_verified(rox_user_id, identity).await
     }
 
     /// Exchange through the supplied port and bind only verified returned facts.
     pub async fn exchange_and_bind<B: IdentityBroker>(
         &self,
         broker: &B,
-        macro_user_id: &MacroUserIdStr<'_>,
+        rox_user_id: &RoxUserIdStr<'_>,
     ) -> Result<()> {
         let identity = broker.exchange().await?;
-        self.bind_verified(macro_user_id, identity).await
+        self.bind_verified(rox_user_id, identity).await
     }
 
     /// Record a completed login without storing any token or login payload.
-    pub async fn record_login(&self, actor: &MacroUserIdStr<'_>) -> Result<()> {
+    pub async fn record_login(&self, actor: &RoxUserIdStr<'_>) -> Result<()> {
         self.repository
             .record(AuditRecord::new(
                 actor,
@@ -82,7 +82,7 @@ where
     async fn ensure_team_member(
         &self,
         receipt: &EntityAccessReceipt<AdminTeamRole>,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
     ) -> Result<Uuid> {
         let team_id = team_id(receipt)?;
         let teams = self.teams.team_ids(member.clone().into_owned()).await?;
@@ -104,7 +104,7 @@ where
     async fn disable_member(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        member: MacroUserIdStr<'static>,
+        member: RoxUserIdStr<'static>,
     ) -> Result<DisableMemberReport> {
         self.ensure_team_member(&receipt, &member).await?;
         let actor = receipt.get_authenticated_user()?.clone().into_owned();
@@ -124,7 +124,7 @@ where
     async fn enable_member(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        member: MacroUserIdStr<'static>,
+        member: RoxUserIdStr<'static>,
     ) -> Result<()> {
         self.ensure_team_member(&receipt, &member).await?;
         let actor = receipt.get_authenticated_user()?.clone().into_owned();
@@ -181,7 +181,7 @@ impl<R> MemberAccessService<R> {
 impl<R: EnterpriseRepository> MemberAccess for MemberAccessService<R> {
     fn ensure_active<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
     ) -> super::EnterpriseFuture<'a, ()> {
         Box::pin(async move {
             if self.0.member_disabled(user).await? {
@@ -209,7 +209,7 @@ impl<R, T> RuntimePolicy<R, T> {
 impl<R: EnterpriseRepository, T: TeamDirectory> AgentSessionAdmission for RuntimePolicy<R, T> {
     fn ensure_allowed<'a>(
         &'a self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         preset_id: &'a str,
     ) -> super::EnterpriseFuture<'a, ()> {
         Box::pin(async move {

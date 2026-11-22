@@ -1,7 +1,7 @@
 //! PostgreSQL implementation for properties repository.
 
 use document_sub_type::DocumentSubType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::entity_property_with_definition::EntityPropertyWithDefinition;
 use models_properties::service::property_value::PropertyValue;
 use models_properties::{EntityReference, EntityType};
@@ -79,7 +79,7 @@ impl PropertiesRepo for PropertiesPgRepo {
     async fn get_property_definition_with_owner(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_id: Option<Uuid>,
     ) -> Result<Option<PropertyDefinition>, Self::Err> {
         property_definition_queries::get_property_definition_with_owner(
@@ -95,7 +95,7 @@ impl PropertiesRepo for PropertiesPgRepo {
     async fn list_property_definitions(
         &self,
         team_id: Option<Uuid>,
-        user_id: Option<&MacroUserIdStr<'_>>,
+        user_id: Option<&RoxUserIdStr<'_>>,
         include_system: bool,
     ) -> Result<Vec<PropertyDefinition>, Self::Err> {
         property_definition_queries::list_property_definitions(
@@ -111,7 +111,7 @@ impl PropertiesRepo for PropertiesPgRepo {
     async fn list_property_definitions_with_options(
         &self,
         team_id: Option<Uuid>,
-        user_id: Option<&MacroUserIdStr<'_>>,
+        user_id: Option<&RoxUserIdStr<'_>>,
         include_system: bool,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, Self::Err> {
         property_definition_queries::list_property_definitions_with_options(
@@ -157,7 +157,7 @@ impl PropertiesRepo for PropertiesPgRepo {
         Ok(
             property_definition_queries::create_database_property_definition(
                 &self.pool,
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 database_id,
                 display_name,
                 data_type,
@@ -242,7 +242,7 @@ impl PropertiesRepo for PropertiesPgRepo {
     async fn get_visible_property_options_batch(
         &self,
         property_definition_ids: &[Uuid],
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_id: Option<Uuid>,
     ) -> Result<HashMap<Uuid, Vec<PropertyOption>>, Self::Err> {
         property_definition_queries::get_visible_property_options_batch(
@@ -552,7 +552,7 @@ impl PropertiesRepo for PropertiesPgRepo {
         &self,
         entity_refs: Vec<EntityReference>,
         property_ids: Vec<Uuid>,
-        tag_viewer_user_id: Option<&MacroUserIdStr<'_>>,
+        tag_viewer_user_id: Option<&RoxUserIdStr<'_>>,
     ) -> Result<HashMap<EntityPropertiesKey, Vec<EntityPropertyWithDefinition>>, Self::Err> {
         let properties_by_entity_id =
             entity_properties_get_query::get_bulk_entity_properties_values_filtered(

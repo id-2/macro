@@ -1,5 +1,5 @@
-import { MACRO_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
-import { MACRO_SYSTEM_PRINCIPAL_ID } from '@core/constant/macroSystem';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
+import { ROX_SYSTEM_PRINCIPAL_ID } from '@core/constant/macroSystem';
 import { createRoot } from 'solid-js';
 import { describe, expect, it } from 'vitest';
 import {
@@ -31,11 +31,11 @@ describe('createActorName', () => {
   });
 
   it('names the system principal "System"', () => {
-    expect(nameOf(context, MACRO_SYSTEM_PRINCIPAL_ID)).toBe('System');
+    expect(nameOf(context, ROX_SYSTEM_PRINCIPAL_ID)).toBe('System');
   });
 
   it('names first-party bots from their constants', () => {
-    expect(nameOf(context, MACRO_AGENT_PRINCIPAL_ID)).toBe('Rox');
+    expect(nameOf(context, ROX_AGENT_PRINCIPAL_ID)).toBe('Rox');
   });
 
   it('resolves team bots through botName', () => {

@@ -1,7 +1,7 @@
-import { MacroApiError } from '../../utils/unwrap';
+import { RoxApiError } from '../../utils/unwrap';
 
 /** The account is participating in another call. */
-export class InOtherCallError extends MacroApiError {
+export class InOtherCallError extends RoxApiError {
   constructor(data: unknown) {
     super(409, data);
     this.name = 'InOtherCallError';
@@ -9,7 +9,7 @@ export class InOtherCallError extends MacroApiError {
 }
 
 /** This identity already has a room connection. */
-export class AlreadyConnectedError extends MacroApiError {
+export class AlreadyConnectedError extends RoxApiError {
   constructor(data: unknown) {
     super(409, data);
     this.name = 'AlreadyConnectedError';
@@ -17,7 +17,7 @@ export class AlreadyConnectedError extends MacroApiError {
 }
 
 /** The call ended before this join completed. */
-export class CallEndedError extends MacroApiError {
+export class CallEndedError extends RoxApiError {
   constructor(data: unknown) {
     super(410, data);
     this.name = 'CallEndedError';
@@ -26,7 +26,7 @@ export class CallEndedError extends MacroApiError {
 
 /** Preserve the server's branchable call admission codes. */
 export function callAdmissionError(error: unknown): never {
-  if (error instanceof MacroApiError) {
+  if (error instanceof RoxApiError) {
     if (error.status === 410) throw new CallEndedError(error.data);
     if (
       error.status === 409 &&

@@ -34,7 +34,7 @@ async fn lock_links(
 ) -> Result<(MailboxKey, MailboxKey, UserProvider, UserProvider, String), EmailErr> {
     let ids = vec![request.source_link_id, request.destination_link_id];
     let rows=sqlx::query!(r#"SELECT id,provider::text AS "provider!",email_address,sync_generation,grant_generation,is_sync_active,
-        (macro_id=$2 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=l.id AND u.primary_macro_id=$2)) AS "authorized!"
+        (rox_id=$2 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=l.id AND u.primary_rox_id=$2)) AS "authorized!"
         FROM email_links l WHERE id=ANY($1) ORDER BY id FOR UPDATE"#,&ids,actor).fetch_all(tx).await.map_err(db)?;
     if rows.len() != 2
         || rows
@@ -92,7 +92,7 @@ async fn source_facts(
             OR COALESCE(d.checkpoint->>'stage' NOT IN ('inspect','ready'),false)) AS "busy!",
         EXISTS(SELECT 1 FROM email_draft_transfers t WHERE t.destination_id=m.id AND t.state NOT IN ('ready','retained')) AS "predecessor!",
         jsonb_build_object('db_id',m.id,'thread_db_id',m.thread_id,'subject',COALESCE(m.subject,''),'replying_to_id',m.replying_to_id,
-            'body_text',m.body_text,'body_html',m.body_html_sanitized,'body_macro',m.body_macro,'headers_json',m.headers_jsonb,
+            'body_text',m.body_text,'body_html',m.body_html_sanitized,'body_rox',m.body_rox,'headers_json',m.headers_jsonb,
             'to',COALESCE(recipients.to_addresses,'[]'::jsonb),'cc',COALESCE(recipients.cc_addresses,'[]'::jsonb),'bcc',COALESCE(recipients.bcc_addresses,'[]'::jsonb)) AS "content!"
         FROM email_messages m JOIN email_links l ON l.id=m.link_id LEFT JOIN email_mailbox_drafts d ON d.message_id=m.id
         CROSS JOIN LATERAL (SELECT jsonb_agg(jsonb_build_object('email',c.email_address,'name',COALESCE(r.name,c.name))) FILTER(WHERE r.recipient_type='TO') AS to_addresses,
@@ -149,7 +149,7 @@ impl DraftTransferRepository for EmailPgRepo {
         if let Some(row)=sqlx::query!("SELECT actor_id,plan,state,destination_link_id FROM email_draft_transfers WHERE id=$1 FOR UPDATE",id).fetch_optional(&mut *tx).await.map_err(db)? {
             if row.actor_id!=actor {return Err(EmailErr::Unauthorized);}
             if row.state!="preparing" {
-                let allowed=sqlx::query_scalar!(r#"SELECT EXISTS(SELECT 1 FROM email_links l WHERE l.id=$1 AND (l.macro_id=$2 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=l.id AND u.primary_macro_id=$2))) AS "allowed!""#,row.destination_link_id,actor).fetch_one(&mut *tx).await.map_err(db)?;
+                let allowed=sqlx::query_scalar!(r#"SELECT EXISTS(SELECT 1 FROM email_links l WHERE l.id=$1 AND (l.rox_id=$2 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=l.id AND u.primary_rox_id=$2))) AS "allowed!""#,row.destination_link_id,actor).fetch_one(&mut *tx).await.map_err(db)?;
                 if !allowed {return Err(EmailErr::Unauthorized);}
                 let plan=serde_json::from_value(row.plan).map_err(anyhow::Error::from)?;
                 return Ok(Some(receipt(&mut tx,&plan).await?));
@@ -224,8 +224,8 @@ impl DraftTransferRepository for EmailPgRepo {
             source_thread_id,
             mut input,
         ) = source_facts(&mut tx, request).await?;
-        input.db_id = macro_uuid::generate_uuid_v7();
-        input.thread_db_id = macro_uuid::generate_uuid_v7();
+        input.db_id = rox_uuid::generate_uuid_v7();
+        input.thread_db_id = rox_uuid::generate_uuid_v7();
         if let Some(reply) = input.replying_to_id
             && let Some(parent) = sqlx::query!("SELECT thread_id,provider_thread_id FROM email_messages WHERE id=$1 AND link_id=$2",reply,request.destination_link_id).fetch_optional(&mut *tx).await.map_err(db)?
         {
@@ -243,7 +243,7 @@ impl DraftTransferRepository for EmailPgRepo {
         for file in &mut uploads {
             file.content_id
                 .get_or_insert_with(|| format!("{}@attachments.rox.one", file.id));
-            file.id = macro_uuid::generate_uuid_v7();
+            file.id = rox_uuid::generate_uuid_v7();
             file.draft_id = input.db_id;
         }
         let files=sqlx::query_scalar!(r#"SELECT a.id AS "id!" FROM email_attachments a WHERE a.message_id=$1
@@ -251,7 +251,7 @@ impl DraftTransferRepository for EmailPgRepo {
             AND NOT EXISTS(SELECT 1 FROM email_attachments_drafts u WHERE u.draft_id=$1 AND trim(both '<>' from a.content_id)=COALESCE(trim(both '<>' from u.content_id),u.id::text||'@attachments.rox.one'))
             AND NOT EXISTS(SELECT 1 FROM email_attachments_fwd f JOIN email_attachments original ON original.id=f.attachment_id WHERE f.message_id=$1 AND (trim(both '<>' from a.content_id)=trim(both '<>' from original.content_id) OR trim(both '<>' from a.content_id)=f.attachment_id::text||'@attachments.rox.one'))
             UNION SELECT attachment_id FROM email_attachments_fwd WHERE message_id=$1"#,request.source_id).fetch_all(&mut *tx).await.map_err(db)?
-            .into_iter().map(|source_id|TransferFile {source_id,destination_id:macro_uuid::generate_uuid_v7()}).collect();
+            .into_iter().map(|source_id|TransferFile {source_id,destination_id:rox_uuid::generate_uuid_v7()}).collect();
         let plan = DraftTransferPlan {
             request: request.clone(),
             actor: actor.to_owned(),
@@ -429,7 +429,7 @@ impl DraftTransferRepository for EmailPgRepo {
                 .await
                 .map_err(db)?;
             let payload = serde_json::json!({"kind":"organization","thread_id":thread_id});
-            sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),mailbox.link_id,mailbox.sync_generation,payload).execute(&mut *tx).await.map_err(db)?;
+            sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),mailbox.link_id,mailbox.sync_generation,payload).execute(&mut *tx).await.map_err(db)?;
         }
         thread::upsert_user_history(&mut tx, destination.link_id, plan.input.thread_db_id)
             .await
@@ -469,8 +469,8 @@ impl DraftTransferRepository for EmailPgRepo {
         plan: &DraftTransferPlan,
     ) -> Result<Option<MailboxKey>, MailboxError> {
         let row=sqlx::query!(r#"SELECT l.id,l.sync_generation,l.grant_generation FROM email_links l
-            WHERE l.id=$1 AND l.is_sync_active AND (l.macro_id=$2 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=l.id AND u.primary_macro_id=$2))
-              AND EXISTS(SELECT 1 FROM email_links target WHERE target.id=$3 AND (target.macro_id=$2 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=target.id AND u.primary_macro_id=$2)))"#,
+            WHERE l.id=$1 AND l.is_sync_active AND (l.rox_id=$2 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=l.id AND u.primary_rox_id=$2))
+              AND EXISTS(SELECT 1 FROM email_links target WHERE target.id=$3 AND (target.rox_id=$2 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=target.id AND u.primary_rox_id=$2)))"#,
             plan.request.source_link_id,plan.actor,plan.request.destination_link_id).fetch_optional(&self.pool).await.map_err(|_|MailboxError::Persistence)?;
         Ok(row.map(|r| MailboxKey {
             link_id: r.id,
@@ -525,7 +525,7 @@ impl DraftTransferRepository for EmailPgRepo {
         }
         let payload =
             serde_json::json!({"kind":"organization","thread_id":plan.input.thread_db_id});
-        sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),plan.destination_mailbox.link_id,plan.destination_mailbox.sync_generation,payload).execute(&mut *tx).await.map_err(|_|MailboxError::Persistence)?;
+        sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),plan.destination_mailbox.link_id,plan.destination_mailbox.sync_generation,payload).execute(&mut *tx).await.map_err(|_|MailboxError::Persistence)?;
         tx.commit().await.map_err(|_| MailboxError::Persistence)
     }
 }

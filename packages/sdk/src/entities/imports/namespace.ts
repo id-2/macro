@@ -5,8 +5,8 @@ import type {
   ImportStatus,
   TrackImportOutcome,
 } from '../../../generated/cognition/types.gen';
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
 import { Task } from '../tasks/task';
 import { ImportEntry, type ImportedItem } from './entry';
@@ -57,10 +57,10 @@ export interface NotionPageImport {
 /**
  * The import ledger: the external items (Linear and Jira issues, Notion pages,
  * Slack channels) the caller has proposed for import, imported, or declined,
- * with the team's imports. Check it before copying an item into Macro, so
+ * with the team's imports. Check it before copying an item into Rox, so
  * nothing is imported twice.
  *
- * @routing Use when tracking one external item being copied into Macro, checking whether it was already imported, or importing one Notion page; not a whole Notion, Linear or Jira workspace, which goes through a reviewed import.
+ * @routing Use when tracking one external item being copied into Rox, checking whether it was already imported, or importing one Notion page; not a whole Notion, Linear or Jira workspace, which goes through a reviewed import.
  *
  * @agent
  * Stage an item with `track` before creating anything for it, and stop when
@@ -70,7 +70,7 @@ export interface NotionPageImport {
  * recreating it.
  */
 export class ImportNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * The caller's ledger entries, newest first: their staged candidates,
@@ -131,7 +131,7 @@ export class ImportNamespace {
       }))
       .exhaustive();
     if (!expected.fits)
-      throw new MacroError(
+      throw new RoxError(
         `A ${candidate.source} import is recorded as a ${expected.kind}`,
       );
     return this.trackAs(candidate, 'imported', item);

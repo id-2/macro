@@ -109,7 +109,7 @@ export function createHandler(config: Config) {
   );
   const validators = new InputValidators(catalog);
   const hosts = Object.fromEntries(
-    Object.entries(config.MACRO_HOSTS ?? {}).filter(([name]) =>
+    Object.entries(config.ROX_HOSTS ?? {}).filter(([name]) =>
       isServiceName(name)
     )
   );
@@ -136,7 +136,7 @@ export function createHandler(config: Config) {
       span.setAttr('mcp.hint', selected.operation.hint);
       const macro = new Macro({
         token,
-        env: config.MACRO_ENV,
+        env: config.ROX_ENV,
         ...(Object.keys(hosts).length ? { hosts } : {}),
       });
       const result = await runOperation({

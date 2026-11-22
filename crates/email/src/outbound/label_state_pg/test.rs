@@ -5,7 +5,7 @@ use crate::domain::message_labels::state::{
 };
 use anyhow::Result;
 use email_db_client::labels::pending_writes::pending_provider_label_ids;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 const LINK: Uuid = Uuid::from_u128(0x801);
@@ -83,7 +83,7 @@ async fn confirm(pool: &Pool<Postgres>, write_id: Uuid) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -112,7 +112,7 @@ async fn marks_only_messages_of_the_link(pool: Pool<Postgres>) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -135,7 +135,7 @@ async fn an_older_write_waits_until_a_newer_one_is_confirmed(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -158,7 +158,7 @@ async fn an_abandoned_write_puts_the_label_back_for_the_older_write_still_waitin
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -186,7 +186,7 @@ async fn abandoned_writes_keep_every_older_write_they_took_over(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -217,7 +217,7 @@ async fn when_every_write_is_abandoned_the_label_returns_to_its_state_before_the
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -244,7 +244,7 @@ async fn a_confirmed_write_is_what_a_newer_abandoned_write_falls_back_to(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -282,7 +282,7 @@ async fn a_write_waits_for_live_newer_writes_whatever_their_ids(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -350,7 +350,7 @@ async fn writes_newer_than_each_other_on_two_messages_each_have_one_to_send(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -385,7 +385,7 @@ async fn an_abandoned_write_does_not_bring_back_an_expired_older_write(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")
@@ -426,7 +426,7 @@ async fn writes_abandoned_after_an_older_write_expired_return_to_the_state_befor
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../email_db_client/fixtures",
         scripts("fetch_message_labels_in_bulk")

@@ -21,7 +21,7 @@ import { Notifications } from '@core/component/Notifications';
 import { References } from '@core/component/References';
 import {
   enableProjects,
-  USE_MACRO_PR_SUMMARY_BLOCK,
+  USE_ROX_PR_SUMMARY_BLOCK,
 } from '@core/constant/featureFlags';
 import type { Entity } from '@core/types';
 import type { DateValue } from '@core/util/date';
@@ -357,7 +357,7 @@ function GithubSectionConditional(props: {
             {(pr, index) => {
               const title = () => pr.name?.trim() || pr.displayName;
               const openPullRequest = () => {
-                if (USE_MACRO_PR_SUMMARY_BLOCK && pr.foreignEntityId) {
+                if (USE_ROX_PR_SUMMARY_BLOCK && pr.foreignEntityId) {
                   openWithSplit(
                     {
                       type: 'pr',

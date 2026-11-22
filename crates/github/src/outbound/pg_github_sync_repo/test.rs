@@ -1,9 +1,9 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
 use crate::domain::models::{
-    GithubAppInstallationSource, GithubKey, MacroTaskId, ResolvedTeamTaskReference,
+    GithubAppInstallationSource, GithubKey, RoxTaskId, ResolvedTeamTaskReference,
     TeamTaskReference,
 };
 use crate::domain::ports::GithubSyncRepo;
@@ -14,7 +14,7 @@ use crate::outbound::pg_github_sync_repo::PgGithubSyncRepo;
 // ---------------------------------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_sync_test_data"))
 )]
 async fn test_get_task_ids(pool: Pool<Postgres>) {
@@ -30,7 +30,7 @@ async fn test_get_task_ids(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_sync_test_data"))
 )]
 async fn test_get_task_ids_different_pr(pool: Pool<Postgres>) {
@@ -43,7 +43,7 @@ async fn test_get_task_ids_different_pr(pool: Pool<Postgres>) {
     assert_eq!(task_ids[0].short_uuid, "xdyzHm2ZVGr6UAkaeBCUxZ");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_task_ids_empty(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
@@ -57,14 +57,14 @@ async fn test_get_task_ids_empty(pool: Pool<Postgres>) {
 // upsert_task_ids
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_upsert_task_ids_inserts_new(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
     let key = GithubKey::new("org", "repo", 10);
     let tasks = vec![
-        MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
-        MacroTaskId::from_short_uuid("2ZbZ7wJQfEMWyBSycKYTYr").unwrap(),
+        RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
+        RoxTaskId::from_short_uuid("2ZbZ7wJQfEMWyBSycKYTYr").unwrap(),
     ];
 
     repo.upsert_task_ids(key.clone(), &tasks).await.unwrap();
@@ -74,7 +74,7 @@ async fn test_upsert_task_ids_inserts_new(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_sync_test_data"))
 )]
 async fn test_upsert_task_ids_ignores_duplicates(pool: Pool<Postgres>) {
@@ -82,8 +82,8 @@ async fn test_upsert_task_ids_ignores_duplicates(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("my-org", "my-repo", 1);
     let tasks = vec![
-        MacroTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(), // already exists
-        MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
+        RoxTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(), // already exists
+        RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
     ];
 
     repo.upsert_task_ids(key.clone(), &tasks).await.unwrap();
@@ -93,7 +93,7 @@ async fn test_upsert_task_ids_ignores_duplicates(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_team_task_test_data"))
 )]
 async fn test_upsert_task_ids_records_owning_team(pool: Pool<Postgres>) {
@@ -102,8 +102,8 @@ async fn test_upsert_task_ids_records_owning_team(pool: Pool<Postgres>) {
     // 0d0dc589-f301-43f1-8b11-4ab448ca4bb4 is team task ENG-123 of team
     // dddddddd-...; the second task id has no team_task row.
     let team_task =
-        MacroTaskId::from_uuid(&Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap());
-    let teamless_task = MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap();
+        RoxTaskId::from_uuid(&Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap());
+    let teamless_task = RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap();
 
     let key = GithubKey::new("org", "repo", 10);
     repo.upsert_task_ids(key.clone(), &[team_task.clone(), teamless_task.clone()])
@@ -131,20 +131,20 @@ async fn test_upsert_task_ids_records_owning_team(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_team_task_test_data"))
 )]
 async fn test_upsert_task_ids_backfills_team_on_existing_rows(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool.clone());
 
     let team_task =
-        MacroTaskId::from_uuid(&Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap());
+        RoxTaskId::from_uuid(&Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap());
     let key = GithubKey::new("org", "repo", 10);
 
     // Simulate a legacy row written before team_id existed.
     sqlx::query!(
         r#"INSERT INTO github_pr_tasks (id, github_key, task_id) VALUES ($1, $2, $3)"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         key.as_ref(),
         &team_task.short_uuid
     )
@@ -172,7 +172,7 @@ async fn test_upsert_task_ids_backfills_team_on_existing_rows(pool: Pool<Postgre
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_upsert_task_ids_empty_list(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
@@ -188,7 +188,7 @@ async fn test_upsert_task_ids_empty_list(pool: Pool<Postgres>) {
 // ---------------------------------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_sync_test_data"))
 )]
 async fn test_filter_duplicate_tasks_removes_existing(pool: Pool<Postgres>) {
@@ -196,9 +196,9 @@ async fn test_filter_duplicate_tasks_removes_existing(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("my-org", "my-repo", 1);
     let candidates = vec![
-        MacroTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(), // exists
-        MacroTaskId::from_short_uuid("bMv3eymKvu18qsQyrpt1VH").unwrap(), // exists
-        MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
+        RoxTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(), // exists
+        RoxTaskId::from_short_uuid("bMv3eymKvu18qsQyrpt1VH").unwrap(), // exists
+        RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
     ];
 
     let new_only = repo.filter_duplicate_tasks(key, &candidates).await.unwrap();
@@ -208,7 +208,7 @@ async fn test_filter_duplicate_tasks_removes_existing(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_sync_test_data"))
 )]
 async fn test_filter_duplicate_tasks_all_new(pool: Pool<Postgres>) {
@@ -216,8 +216,8 @@ async fn test_filter_duplicate_tasks_all_new(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("my-org", "my-repo", 1);
     let candidates = vec![
-        MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
-        MacroTaskId::from_short_uuid("2ZbZ7wJQfEMWyBSycKYTYr").unwrap(),
+        RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
+        RoxTaskId::from_short_uuid("2ZbZ7wJQfEMWyBSycKYTYr").unwrap(),
     ];
 
     let new_only = repo.filter_duplicate_tasks(key, &candidates).await.unwrap();
@@ -226,7 +226,7 @@ async fn test_filter_duplicate_tasks_all_new(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_sync_test_data"))
 )]
 async fn test_filter_duplicate_tasks_all_existing(pool: Pool<Postgres>) {
@@ -234,8 +234,8 @@ async fn test_filter_duplicate_tasks_all_existing(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("my-org", "my-repo", 1);
     let candidates = vec![
-        MacroTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(),
-        MacroTaskId::from_short_uuid("bMv3eymKvu18qsQyrpt1VH").unwrap(),
+        RoxTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(),
+        RoxTaskId::from_short_uuid("bMv3eymKvu18qsQyrpt1VH").unwrap(),
     ];
 
     let new_only = repo.filter_duplicate_tasks(key, &candidates).await.unwrap();
@@ -243,7 +243,7 @@ async fn test_filter_duplicate_tasks_all_existing(pool: Pool<Postgres>) {
     assert!(new_only.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_filter_duplicate_tasks_empty_input(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
@@ -258,7 +258,7 @@ async fn test_filter_duplicate_tasks_empty_input(pool: Pool<Postgres>) {
 // ---------------------------------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_team_task_test_data"))
 )]
 async fn test_resolve_team_task_references(pool: Pool<Postgres>) {
@@ -277,14 +277,14 @@ async fn test_resolve_team_task_references(pool: Pool<Postgres>) {
     let expected_known = ResolvedTeamTaskReference {
         reference: TeamTaskReference::new("eng", 123).unwrap(),
         team_id: Uuid::parse_str("dddddddd-dddd-dddd-dddd-dddddddddddd").unwrap(),
-        task_id: MacroTaskId::from_uuid(
+        task_id: RoxTaskId::from_uuid(
             &Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap(),
         ),
     };
     let expected_platform = ResolvedTeamTaskReference {
         reference: TeamTaskReference::new("platform_api", 7).unwrap(),
         team_id: Uuid::parse_str("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee").unwrap(),
-        task_id: MacroTaskId::from_uuid(
+        task_id: RoxTaskId::from_uuid(
             &Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap(),
         ),
     };
@@ -295,7 +295,7 @@ async fn test_resolve_team_task_references(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_team_task_test_data"))
 )]
 async fn test_resolve_team_task_references_returns_all_teams_sharing_a_slug(pool: Pool<Postgres>) {
@@ -308,7 +308,7 @@ async fn test_resolve_team_task_references_returns_all_teams_sharing_a_slug(pool
             INSERT INTO macro_user (id, username, email, stripe_customer_id)
             VALUES ('99999999-9999-9999-9999-999999999999'::uuid, 'owner3', 'owner3@test.com', 'cus_test3')
         ), new_user AS (
-            INSERT INTO "User" (id, email, macro_user_id)
+            INSERT INTO "User" (id, email, rox_user_id)
             VALUES ('macro|owner3@user.com', 'owner3@test.com', '99999999-9999-9999-9999-999999999999'::uuid)
             RETURNING id
         ), new_team AS (
@@ -352,7 +352,7 @@ async fn test_resolve_team_task_references_returns_all_teams_sharing_a_slug(pool
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_team_task_test_data"))
 )]
 async fn test_resolve_team_task_references_requires_team_source(pool: Pool<Postgres>) {
@@ -368,7 +368,7 @@ async fn test_resolve_team_task_references_requires_team_source(pool: Pool<Postg
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_team_task_test_data"))
 )]
 async fn test_resolve_team_task_references_ignores_user_source(pool: Pool<Postgres>) {
@@ -396,7 +396,7 @@ async fn test_resolve_team_task_references_ignores_user_source(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_sync_test_data"))
 )]
 async fn test_filter_duplicate_tasks_different_key_not_filtered(pool: Pool<Postgres>) {
@@ -404,7 +404,7 @@ async fn test_filter_duplicate_tasks_different_key_not_filtered(pool: Pool<Postg
 
     // s61dee.. exists for my-org/my-repo/pull/1, but not for this key
     let key = GithubKey::new("my-org", "other-repo", 42);
-    let candidates = vec![MacroTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap()];
+    let candidates = vec![RoxTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap()];
 
     let new_only = repo.filter_duplicate_tasks(key, &candidates).await.unwrap();
 
@@ -417,7 +417,7 @@ async fn test_filter_duplicate_tasks_different_key_not_filtered(pool: Pool<Postg
 // ---------------------------------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_team_task_test_data"))
 )]
 async fn test_get_installation_sources_returns_sources(pool: Pool<Postgres>) {
@@ -438,7 +438,7 @@ async fn test_get_installation_sources_returns_sources(pool: Pool<Postgres>) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_installation_sources_empty(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
@@ -448,18 +448,18 @@ async fn test_get_installation_sources_empty(pool: Pool<Postgres>) {
 }
 
 // ---------------------------------------------------------------------------
-// get_macro_ids_by_github_user_ids
+// get_rox_ids_by_github_user_ids
 // ---------------------------------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
-async fn test_get_macro_ids_by_github_user_ids_found(pool: Pool<Postgres>) {
+async fn test_get_rox_ids_by_github_user_ids_found(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
     let links = repo
-        .get_macro_ids_by_github_user_ids(&["12345".to_string()])
+        .get_rox_ids_by_github_user_ids(&["12345".to_string()])
         .await
         .unwrap();
 
@@ -469,12 +469,12 @@ async fn test_get_macro_ids_by_github_user_ids_found(pool: Pool<Postgres>) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn test_get_macro_ids_by_github_user_ids_not_found(pool: Pool<Postgres>) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn test_get_rox_ids_by_github_user_ids_not_found(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
     let links = repo
-        .get_macro_ids_by_github_user_ids(&["99999".to_string()])
+        .get_rox_ids_by_github_user_ids(&["99999".to_string()])
         .await
         .unwrap();
 
@@ -482,15 +482,15 @@ async fn test_get_macro_ids_by_github_user_ids_not_found(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
-async fn test_get_macro_ids_by_github_user_ids_fans_out_to_multiple_users(pool: Pool<Postgres>) {
+async fn test_get_rox_ids_by_github_user_ids_fans_out_to_multiple_users(pool: Pool<Postgres>) {
     // A second link sharing github_user_id '12345' (github_user_id is not unique;
     // multiple Rox users may share one GitHub account).
     sqlx::query(
         r#"
-        INSERT INTO public.github_links (id, macro_id, fusionauth_user_id, github_username, github_user_id)
+        INSERT INTO public.github_links (id, rox_id, fusionauth_user_id, github_username, github_user_id)
         VALUES ($1, $2, $3, $4, $5)
         "#,
     )
@@ -510,14 +510,14 @@ async fn test_get_macro_ids_by_github_user_ids_fans_out_to_multiple_users(pool: 
     let repo = PgGithubSyncRepo::new(pool);
 
     let links = repo
-        .get_macro_ids_by_github_user_ids(&["12345".to_string()])
+        .get_rox_ids_by_github_user_ids(&["12345".to_string()])
         .await
         .unwrap();
 
-    let mut macro_ids = links.get("12345").cloned().unwrap_or_default();
-    macro_ids.sort();
+    let mut rox_ids = links.get("12345").cloned().unwrap_or_default();
+    rox_ids.sort();
     assert_eq!(
-        macro_ids,
+        rox_ids,
         vec![
             "macro|user2@user.com".to_string(),
             "macro|user@user.com".to_string(),
@@ -526,18 +526,18 @@ async fn test_get_macro_ids_by_github_user_ids_fans_out_to_multiple_users(pool: 
 }
 
 // ---------------------------------------------------------------------------
-// get_macro_ids_by_github_logins
+// get_rox_ids_by_github_logins
 // ---------------------------------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
-async fn test_get_macro_ids_by_github_logins_matches_case_insensitively(pool: Pool<Postgres>) {
+async fn test_get_rox_ids_by_github_logins_matches_case_insensitively(pool: Pool<Postgres>) {
     // A second link sharing the 'testuser' login (github_username is not unique).
     sqlx::query!(
         r#"
-        INSERT INTO github_links (id, macro_id, fusionauth_user_id, github_username, github_user_id)
+        INSERT INTO github_links (id, rox_id, fusionauth_user_id, github_username, github_user_id)
         VALUES ('11111111-2222-3333-4444-555555555555'::uuid, 'macro|user2@user.com', 'cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'TestUser', '54321')
         "#
     )
@@ -547,7 +547,7 @@ async fn test_get_macro_ids_by_github_logins_matches_case_insensitively(pool: Po
     let repo = PgGithubSyncRepo::new(pool);
 
     let links = repo
-        .get_macro_ids_by_github_logins(&[
+        .get_rox_ids_by_github_logins(&[
             "TESTUSER".to_string(),
             "solo".to_string(),
             "unlinked".to_string(),
@@ -572,11 +572,11 @@ async fn test_get_macro_ids_by_github_logins_matches_case_insensitively(pool: Po
     assert!(!links.contains_key("unlinked"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn test_get_macro_ids_by_github_logins_empty_input(pool: Pool<Postgres>) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn test_get_rox_ids_by_github_logins_empty_input(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
-    let links = repo.get_macro_ids_by_github_logins(&[]).await.unwrap();
+    let links = repo.get_rox_ids_by_github_logins(&[]).await.unwrap();
 
     assert!(links.is_empty());
 }
@@ -586,7 +586,7 @@ async fn test_get_macro_ids_by_github_logins_empty_input(pool: Pool<Postgres>) {
 // ---------------------------------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn test_get_user_team_ids(pool: Pool<Postgres>) {
@@ -615,7 +615,7 @@ async fn test_get_user_team_ids(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn test_get_user_team_ids_no_teams(pool: Pool<Postgres>) {
@@ -633,7 +633,7 @@ async fn test_get_user_team_ids_no_teams(pool: Pool<Postgres>) {
 async fn insert_user_account(
     pool: &Pool<Postgres>,
     user_id: &str,
-    macro_user_id: Uuid,
+    rox_user_id: Uuid,
     username: &str,
     email: &str,
     stripe_customer_id: &str,
@@ -644,7 +644,7 @@ async fn insert_user_account(
         VALUES ($1, $2, $3, $4)
         "#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(username)
     .bind(email)
     .bind(stripe_customer_id)
@@ -654,13 +654,13 @@ async fn insert_user_account(
 
     sqlx::query(
         r#"
-        INSERT INTO public."User" (id, email, macro_user_id)
+        INSERT INTO public."User" (id, email, rox_user_id)
         VALUES ($1, $2, $3)
         "#,
     )
     .bind(user_id)
     .bind(email)
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .execute(pool)
     .await
     .unwrap();
@@ -681,7 +681,7 @@ async fn insert_team_member(pool: &Pool<Postgres>, team_id: Uuid, user_id: &str)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn test_get_team_member_ids(pool: Pool<Postgres>) {
@@ -776,7 +776,7 @@ async fn get_installation_sources(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn test_upsert_installation_sources_inserts_team_sources(pool: Pool<Postgres>) {
@@ -811,7 +811,7 @@ async fn test_upsert_installation_sources_inserts_team_sources(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn test_upsert_installation_sources_idempotent_team_source(pool: Pool<Postgres>) {
@@ -841,7 +841,7 @@ async fn test_upsert_installation_sources_idempotent_team_source(pool: Pool<Post
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn test_upsert_installation_sources_idempotent_user_source(pool: Pool<Postgres>) {
@@ -875,7 +875,7 @@ async fn test_upsert_installation_sources_idempotent_user_source(pool: Pool<Post
 // ---------------------------------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn test_delete_installation_sources_removes_all_sources(pool: Pool<Postgres>) {
@@ -899,7 +899,7 @@ async fn test_delete_installation_sources_removes_all_sources(pool: Pool<Postgre
     assert_eq!(get_installation_sources(&pool, "654321").await.len(), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_delete_installation_sources_missing_installation_is_noop(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
 
@@ -911,7 +911,7 @@ async fn test_delete_installation_sources_missing_installation_is_noop(pool: Poo
 // installation requests
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_installation_request_roundtrip(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
     let team_id: Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
@@ -932,7 +932,7 @@ async fn test_installation_request_roundtrip(pool: Pool<Postgres>) {
     repo.delete_installation_request("777").await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_upsert_installation_request_replaces_earlier_request(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
     let first_team: Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
@@ -956,7 +956,7 @@ async fn test_upsert_installation_request_replaces_earlier_request(pool: Pool<Po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_installation_requests_are_scoped_by_github_user(pool: Pool<Postgres>) {
     let repo = PgGithubSyncRepo::new(pool);
     let team_id: Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();

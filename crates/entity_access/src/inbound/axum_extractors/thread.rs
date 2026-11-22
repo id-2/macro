@@ -12,8 +12,8 @@ use axum::{
     extract::{FromRef, FromRequestParts, Path},
     http::request::Parts,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
     OptionalMacroAuthorizationExtractor,
 };
 use tracing::Level;
@@ -44,8 +44,8 @@ where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -74,7 +74,7 @@ where
             ))?
             .clone();
 
-        if let Some(MacroAuthorization::Bot(authentication)) = authorization.as_ref() {
+        if let Some(RoxAuthorization::Bot(authentication)) = authorization.as_ref() {
             let entity_access_receipt = generate_bot_entity_access_receipt::<T>(
                 service.as_ref(),
                 authentication,
@@ -91,13 +91,13 @@ where
 
         let is_internal_access = authorization
             .as_ref()
-            .is_some_and(MacroAuthorization::is_internal);
-        let macro_user_id = authorization
+            .is_some_and(RoxAuthorization::is_internal);
+        let rox_user_id = authorization
             .as_ref()
-            .and_then(MacroAuthorization::acting_user)
-            .map(|user| user.macro_user_id.clone());
+            .and_then(RoxAuthorization::acting_user)
+            .map(|user| user.rox_user_id.clone());
 
-        if macro_user_id.is_none() && is_internal_access {
+        if rox_user_id.is_none() && is_internal_access {
             return Ok(Self {
                 entity_access_receipt: EntityAccessReceipt {
                     entity: Entity {
@@ -116,7 +116,7 @@ where
 
         let access_level = match service
             .get_access_level(
-                macro_user_id.as_deref(),
+                rox_user_id.as_deref(),
                 &thread_id,
                 EntityType::EmailThread,
             )
@@ -138,7 +138,7 @@ where
                     entity_id: thread_id,
                     entity_type: EntityType::EmailThread,
                 },
-                auth: macro_user_id
+                auth: rox_user_id
                     .map(EntityAccessAuth::Authenticated)
                     .unwrap_or(EntityAccessAuth::Unauthenticated),
                 entity_permission: permission,

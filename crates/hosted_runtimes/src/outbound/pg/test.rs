@@ -7,8 +7,8 @@ mod billing_races;
 mod boot;
 
 use chrono::{Duration, TimeZone};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 use crate::domain::lifecycle::{Phase, Rejected};
@@ -26,20 +26,20 @@ fn policy() -> BillingPolicy {
 }
 
 async fn insert_team(pool: &PgPool) {
-    let macro_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0011);
+    let rox_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0011);
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'owner@example.com', 'owner@example.com', 'stripe_owner')
         "#,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|owner@example.com', 'owner@example.com', $1)"#,
-        macro_user_id,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|owner@example.com', 'owner@example.com', $1)"#,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -71,7 +71,7 @@ fn standard(id: u128) -> NewReservation {
         funding: Funding::Stripe {
             price_id: stripe::PriceId::from_str("price_standard").unwrap(),
         },
-        created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
         extra_items: vec![],
         provision_traceparent: None,
         agent: None,
@@ -143,7 +143,7 @@ async fn host(
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reserve_holds_sold_units_until_the_host_is_sold_out(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -188,7 +188,7 @@ async fn reserve_holds_sold_units_until_the_host_is_sold_out(pool: PgPool) {
 
 /// Edge case (a), storage side: a purchase key finds its reservation while
 /// the charge is confirmed, and the computer once it is converted.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reused_purchase_key_finds_its_reservation_then_its_computer(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -220,7 +220,7 @@ async fn a_reused_purchase_key_finds_its_reservation_then_its_computer(pool: PgP
     assert!(repo.team_reservations(TEAM).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn converting_a_reservation_inserts_the_computer_and_its_creation_once(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
@@ -293,7 +293,7 @@ async fn converting_a_reservation_inserts_the_computer_and_its_creation_once(poo
     assert_eq!(row.enrollment_generation, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_deleted_reservation_frees_its_capacity(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -311,7 +311,7 @@ async fn a_deleted_reservation_frees_its_capacity(pool: PgPool) {
     reserve(&repo, standard(2)).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn apply_stores_state_effects_and_timers_and_wakes_only_with_room(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -361,7 +361,7 @@ async fn apply_stores_state_effects_and_timers_and_wakes_only_with_room(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_computers_effects_run_one_at_a_time_in_order(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -402,7 +402,7 @@ async fn a_computers_effects_run_one_at_a_time_in_order(pool: PgPool) {
     assert!(matches!(third[0].effect, Effect::Stop { .. }));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_replaced_timer_does_not_fire(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -432,7 +432,7 @@ async fn a_replaced_timer_does_not_fire(pool: PgPool) {
     assert_eq!(repo.list_for_team(TEAM).await.unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_released_computer_frees_its_units_and_leaves_the_team_list(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
@@ -470,7 +470,7 @@ async fn a_released_computer_frees_its_units_and_leaves_the_team_list(pool: PgPo
     reserve(&repo, standard(2)).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_rejected_request_writes_nothing(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
@@ -503,7 +503,7 @@ async fn a_rejected_request_writes_nothing(pool: PgPool) {
 
 /// Edge case (c), storage side: a team row deleted after its computers
 /// were released leaves their rows for the release effects to finish.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_team_keeps_its_released_computers_for_their_effects(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
@@ -538,7 +538,7 @@ async fn deleting_a_team_keeps_its_released_computers_for_their_effects(pool: Pg
     assert!(repo.get(id).await.unwrap().is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_comped_reservation_converts_with_its_reason(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -590,7 +590,7 @@ async fn a_comped_reservation_converts_with_its_reason(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn capacity_counts_recorded_resources_independently_of_size(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool, policy());
@@ -631,7 +631,7 @@ async fn capacity_counts_recorded_resources_independently_of_size(pool: PgPool) 
 
 /// Should-fix S4: a buyer can delete their account. The computer and the
 /// reservation keep the buyer's id for attribution, with no foreign key.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_the_buyer_keeps_computers_and_reservations(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
@@ -645,13 +645,13 @@ async fn deleting_the_buyer_keeps_computers_and_reservations(pool: PgPool) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|buyer@example.com', 'buyer@example.com', $1)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|buyer@example.com', 'buyer@example.com', $1)"#,
         buyer_macro_user,
     )
     .execute(&pool)
     .await
     .unwrap();
-    let buyer = MacroUserIdStr::try_from("macro|buyer@example.com".to_owned()).unwrap();
+    let buyer = RoxUserIdStr::try_from("macro|buyer@example.com".to_owned()).unwrap();
     let reservation = reserve(
         &repo,
         NewReservation {
@@ -697,7 +697,7 @@ mod enrollment;
 mod capacity;
 mod waiting;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fleet_attachment_tracks_host_heartbeat_freshness(pool: PgPool) {
     use crate::domain::models::{FleetAttachment, HOST_HEARTBEAT_FRESHNESS};
     use crate::domain::ports::FleetAttachmentSource;
@@ -744,7 +744,7 @@ async fn fleet_attachment_tracks_host_heartbeat_freshness(pool: PgPool) {
 }
 
 /// The sign-in refresh visits awake computers that have a harness.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn awake_computers_are_those_awake_with_a_harness(pool: PgPool) {
     sqlx::raw_sql(
         r#"

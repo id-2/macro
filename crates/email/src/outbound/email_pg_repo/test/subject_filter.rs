@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use std::collections::HashSet;
 
 const LINK_ID: &str = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
@@ -72,7 +72,7 @@ async fn all_mail_pages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_subject")
@@ -93,7 +93,7 @@ async fn subject_matches_any_message_ignoring_case(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_subject")
@@ -112,7 +112,7 @@ async fn subject_treats_like_wildcards_as_text(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_subject")
@@ -135,7 +135,7 @@ async fn subject_and_sender_must_match_the_same_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_subject")
@@ -159,7 +159,7 @@ async fn subject_pages_fill_with_matching_threads(pool: Pool<Postgres>) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_subject")
@@ -176,7 +176,7 @@ async fn negated_subject_keeps_messages_without_a_subject(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_subject")
@@ -197,7 +197,7 @@ async fn subject_pages_follow_thread_order(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_subject")
@@ -226,7 +226,7 @@ async fn subject_page_skips_a_thread_whose_match_is_in_trash(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts(

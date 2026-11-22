@@ -30,7 +30,7 @@ impl DomainActivity for TaskAdded {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn project_history_filters_task_events_until_task_access_is_granted(
     pool: PgPool,
 ) -> anyhow::Result<()> {

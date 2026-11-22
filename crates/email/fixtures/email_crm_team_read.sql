@@ -26,11 +26,11 @@
 --   • A few threads of u0's written by hand where only a draft or a spam
 --     message carries a participant (see the end).
 
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 SELECT md5('user' || i)::uuid, 'u' || i || '@gamma.test', 'u' || i || '@gamma.test', 'stripe_u' || i
 FROM generate_series(0, 9) i;
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 SELECT 'macro|u' || i || '@gamma.test', 'u' || i || '@gamma.test', 'U' || i, md5('user' || i)::uuid
 FROM generate_series(0, 9) i;
 
@@ -55,7 +55,7 @@ VALUES ('e0000003-0000-0000-0000-000000000003', TRUE), ('e0000004-0000-0000-0000
 -- when its address is its owner's.
 CREATE TEMP TABLE gamma_link AS
 SELECT i, ('f0000000-0000-0000-0000-' || lpad(to_hex(i), 12, '0'))::uuid AS id,
-       'macro|u' || u || '@gamma.test' AS macro_id, email
+       'macro|u' || u || '@gamma.test' AS rox_id, email
 FROM (VALUES (0, 0, 'u0@gamma.test'), (1, 1, 'u1@gamma.test'), (2, 2, 'u2@gamma.test'),
              (3, 3, 'u3@gamma.test'), (4, 4, 'u4@gamma.test'), (5, 0, 'u0.personal@else.test'),
              (6, 5, 'u5@gamma.test'), (7, 5, 'u5.second@else.test'), (8, 6, 'u6@gamma.test'),
@@ -63,21 +63,21 @@ FROM (VALUES (0, 0, 'u0@gamma.test'), (1, 1, 'u1@gamma.test'), (2, 2, 'u2@gamma.
 
 -- Link 8 is inserted already being deleted: setting `deleting_at` later
 -- would revoke its consent (`email_links_revoke_crm_consent`).
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active,
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active,
   deleting_at, created_at, updated_at)
-SELECT id, macro_id, 'fa_u' || i, email, 'GMAIL', true, CASE WHEN i = 8 THEN NOW() END, NOW(), NOW()
+SELECT id, rox_id, 'fa_u' || i, email, 'GMAIL', true, CASE WHEN i = 8 THEN NOW() END, NOW(), NOW()
 FROM gamma_link;
 
 INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled)
-SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, macro_id, id, TRUE FROM gamma_link WHERE i < 3
+SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, rox_id, id, TRUE FROM gamma_link WHERE i < 3
 UNION ALL
-SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, macro_id, id, i <> 9
+SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, rox_id, id, i <> 9
 FROM gamma_link WHERE i IN (7, 8, 9)
 UNION ALL
 SELECT 'e0000003-0000-0000-0000-000000000003'::uuid, 'macro|u8@gamma.test', id, TRUE
 FROM gamma_link WHERE i = 3
 UNION ALL
-SELECT 'e0000004-0000-0000-0000-000000000004'::uuid, macro_id, id, TRUE FROM gamma_link WHERE i = 10;
+SELECT 'e0000004-0000-0000-0000-000000000004'::uuid, rox_id, id, TRUE FROM gamma_link WHERE i = 10;
 
 INSERT INTO crm_blocked_domains (team_id, domain)
 VALUES ('e0000003-0000-0000-0000-000000000003', 'blocked.test');

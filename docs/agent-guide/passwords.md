@@ -1,6 +1,6 @@
 # Passwords
 
-Passwords is a Macro-managed team vault: Macro's servers decrypt protected
+Passwords is a Rox-managed team vault: Rox's servers decrypt protected
 values on explicit reveal or copy. The `enable-passwords-v1` feature flag controls
 the `/passwords` route, and the route also needs a team: without the flag it
 redirects to Home, and without a team it shows "Passwords is for teams". The

@@ -4,8 +4,8 @@
 use super::models::{ConnectedServer, DismissedPrompts, OnboardingRow, OnboardingState, PromptId};
 use super::ports::{OnboardingError, OnboardingRepo, Result};
 use generic_email_domains::is_generic_email_domain;
-use macro_user_id::email::ReadEmailParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::email::ReadEmailParts;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::domain::ports::McpServerStore;
 use std::sync::Arc;
 
@@ -15,7 +15,7 @@ mod test;
 /// The account email's domain when it can back a domain team (not a
 /// generic consumer provider), `None` otherwise. The same judgment the
 /// teams service applies to domain auto-join and claiming.
-fn suggested_team_domain(user: &MacroUserIdStr<'_>) -> Option<String> {
+fn suggested_team_domain(user: &RoxUserIdStr<'_>) -> Option<String> {
     let email = user.email_part().lowercase();
     let domain = email.domain_part();
     (!is_generic_email_domain(domain)).then(|| domain.to_owned())
@@ -26,13 +26,13 @@ pub trait OnboardingService: Send + Sync + 'static {
     /// The full aggregate for the user.
     fn get_state(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<OnboardingState>> + Send;
 
     /// Finish the flow (`skipped` records how).
     fn complete(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         skipped: bool,
     ) -> impl Future<Output = Result<OnboardingRow>> + Send;
 
@@ -40,13 +40,13 @@ pub trait OnboardingService: Send + Sync + 'static {
     /// every device. Never enters the user into the onboarding flow.
     fn dismissed_prompts(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<DismissedPrompts>> + Send;
 
     /// Dismiss one sidebar prompt for good.
     fn dismiss_prompt(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         prompt: PromptId,
     ) -> impl Future<Output = Result<()>> + Send;
 }
@@ -71,7 +71,7 @@ where
 {
     async fn connected_servers(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ConnectedServer>> {
         let servers = self
             .mcp_store
@@ -95,7 +95,7 @@ where
     S: McpServerStore,
 {
     #[tracing::instrument(skip(self, user), err)]
-    async fn get_state(&self, user: MacroUserIdStr<'static>) -> Result<OnboardingState> {
+    async fn get_state(&self, user: RoxUserIdStr<'static>) -> Result<OnboardingState> {
         let row = self.repo.ensure_row(&user).await?;
         let connected_servers = self.connected_servers(&user).await?;
         Ok(OnboardingState {
@@ -108,21 +108,21 @@ where
     #[tracing::instrument(skip(self, user), err)]
     async fn complete(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         skipped: bool,
     ) -> Result<OnboardingRow> {
         self.repo.complete(&user, skipped).await
     }
 
     #[tracing::instrument(skip(self, user), err)]
-    async fn dismissed_prompts(&self, user: MacroUserIdStr<'static>) -> Result<DismissedPrompts> {
+    async fn dismissed_prompts(&self, user: RoxUserIdStr<'static>) -> Result<DismissedPrompts> {
         Ok(DismissedPrompts {
             dismissed: self.repo.dismissed_prompts(&user).await?,
         })
     }
 
     #[tracing::instrument(skip(self, user), err)]
-    async fn dismiss_prompt(&self, user: MacroUserIdStr<'static>, prompt: PromptId) -> Result<()> {
+    async fn dismiss_prompt(&self, user: RoxUserIdStr<'static>, prompt: PromptId) -> Result<()> {
         self.repo.dismiss_prompt(&user, &prompt).await
     }
 }

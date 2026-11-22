@@ -1037,16 +1037,16 @@ impl RecordingEventBroker {
     }
 }
 
-impl macro_event_broker::MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: macro_event_broker::MacroEvent + ?Sized>(
+impl rox_event_broker::RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: rox_event_broker::RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<
-        tokio::task::JoinHandle<Result<(), macro_event_broker::EventBrokerError>>,
-        macro_event_broker::EventBrokerError,
+        tokio::task::JoinHandle<Result<(), rox_event_broker::EventBrokerError>>,
+        rox_event_broker::EventBrokerError,
     > {
         if self.fail {
-            return Err(macro_event_broker::EventBrokerError::Publish(
+            return Err(rox_event_broker::EventBrokerError::Publish(
                 "test failure".to_string(),
             ));
         }
@@ -1260,7 +1260,7 @@ async fn create_publishes_created_when_the_row_was_inserted() {
     let published = broker.published();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.calendar");
+    assert_eq!(event.topic, "rox.calendar");
     // Keyed by entity id: the consumer shards on the key, so every change to
     // one event must land on one partition to stay ordered.
     assert_eq!(event.key, applied_id.to_string());

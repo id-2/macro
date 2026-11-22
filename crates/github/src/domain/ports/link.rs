@@ -12,7 +12,7 @@ use crate::domain::models::{
     SetGithubPullRequestDraftRequest, SetGithubPullRequestDraftResponse,
     SetGithubPullRequestStateRequest, SetGithubPullRequestStateResponse,
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 
 /// Repository for accessing github link data from the database.
 ///
@@ -43,7 +43,7 @@ pub trait GithubRepo: Send + Sync + 'static {
     /// not linked GitHub.
     fn get_github_link_by_user_id<'a>(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'a>>,
+        rox_user_id: &RoxUserId<Lowercase<'a>>,
     ) -> impl Future<Output = Result<Option<GithubLink>, Self::Err>> + Send;
 
     /// Gets the owner's github link for the github user id, or `None` when no
@@ -238,7 +238,7 @@ pub trait GithubLinkService: Send + Sync + 'static {
     /// Uses token exchange to link the user to the github account
     fn link_user(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
         fusionauth_user_id: &uuid::Uuid,
         in_progress_user_link: &uuid::Uuid,
         redirect_uri: &str,
@@ -248,14 +248,14 @@ pub trait GithubLinkService: Send + Sync + 'static {
     /// Deletes the link for the user
     fn delete_user_link(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
     ) -> impl Future<Output = Result<(), GithubError>> + Send;
 
     /// Reports whether the user has linked GitHub and whether the link's
     /// token still works.
     fn get_user_link_status(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
     ) -> impl Future<Output = Result<GithubLinkStatus, GithubError>> + Send;
 
     /// The user's GitHub token from their account link, checked against
@@ -263,13 +263,13 @@ pub trait GithubLinkService: Send + Sync + 'static {
     /// [`GithubError::ReauthenticationRequired`] when the token no longer works.
     fn get_user_access_token(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
     ) -> impl Future<Output = Result<GithubAccessToken, GithubError>> + Send;
 
     /// Enriches GitHub pull request references with details from the GitHub API.
     fn enrich_pull_requests(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
         pull_requests: Vec<GithubPullRequestRef>,
     ) -> impl Future<Output = Result<Vec<EnrichedGithubPullRequest>, GithubError>> + Send;
 
@@ -280,7 +280,7 @@ pub trait GithubLinkService: Send + Sync + 'static {
     /// [`GithubError::PullRequestMergeRejected`] with GitHub's message.
     fn merge_pull_request(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
         request: MergeGithubPullRequestRequest,
     ) -> impl Future<Output = Result<MergeGithubPullRequestResponse, GithubError>> + Send;
 
@@ -291,7 +291,7 @@ pub trait GithubLinkService: Send + Sync + 'static {
     /// [`GithubError::PullRequestUpdateRejected`] with GitHub's message.
     fn set_pull_request_draft(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
         request: SetGithubPullRequestDraftRequest,
     ) -> impl Future<Output = Result<SetGithubPullRequestDraftResponse, GithubError>> + Send;
 
@@ -302,7 +302,7 @@ pub trait GithubLinkService: Send + Sync + 'static {
     /// [`GithubError::PullRequestUpdateRejected`] with GitHub's message.
     fn set_pull_request_state(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
         request: SetGithubPullRequestStateRequest,
     ) -> impl Future<Output = Result<SetGithubPullRequestStateResponse, GithubError>> + Send;
 
@@ -312,7 +312,7 @@ pub trait GithubLinkService: Send + Sync + 'static {
     /// pull requests is [`GithubError::TooManyPullRequests`].
     fn get_pull_request_mergeability(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
         pull_requests: Vec<GithubPullRequestNumber>,
     ) -> impl Future<Output = Result<Vec<GithubPullRequestMergeabilityEntry>, GithubError>> + Send;
 }

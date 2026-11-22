@@ -74,7 +74,7 @@ fn maps_domain_errors_to_status_codes() {
 fn token_routes_refuse_code_execution_header() {
     let mut headers = axum::http::HeaderMap::new();
     headers.insert(
-        macro_authorization::CODE_EXECUTION_HEADER,
+        rox_authorization::CODE_EXECUTION_HEADER,
         "1".parse().unwrap(),
     );
     assert!(matches!(
@@ -242,9 +242,9 @@ mod authenticated_join_routes {
         http::{Request, StatusCode},
     };
     use entity_access::domain::ports::NoOpEntityAccessService;
-    use macro_authorization::{
-        CredentialOrigin, InternalIdentityClaims, MacroAuthorizationError,
-        MacroAuthorizationService, MacroAuthorizationState, ValidatedCredential,
+    use rox_authorization::{
+        CredentialOrigin, InternalIdentityClaims, RoxAuthorizationError,
+        RoxAuthorizationService, RoxAuthorizationState, ValidatedCredential,
     };
     use model_user::UserContext;
     use rootcause::Report;
@@ -260,15 +260,15 @@ mod authenticated_join_routes {
     #[derive(Clone)]
     struct Auth;
 
-    impl MacroAuthorizationService for Auth {
+    impl RoxAuthorizationService for Auth {
         async fn authorize(
             &self,
             jwt: &str,
-        ) -> Result<UserContext, Report<MacroAuthorizationError>> {
+        ) -> Result<UserContext, Report<RoxAuthorizationError>> {
             let user_id = match jwt {
                 "member" | "program" | "api-jwt" | "agent-session" => "macro|member@example.com",
                 "viewer" => "macro|viewer@example.com",
-                _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+                _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
             };
             Ok(UserContext {
                 user_id: user_id.to_string(),
@@ -281,14 +281,14 @@ mod authenticated_join_routes {
         async fn authorize_identity(
             &self,
             jwt: &str,
-        ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+        ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
             self.authorize(jwt).await.map(|context| {
                 let mut credential = ValidatedCredential::session(context);
                 match jwt {
                     "program" => credential.origin = CredentialOrigin::UserApiKey,
-                    "api-jwt" => credential.origin = CredentialOrigin::MacroApiJwt,
+                    "api-jwt" => credential.origin = CredentialOrigin::RoxApiJwt,
                     "agent-session" => {
-                        credential.identity.agent_id = Some(bot_id::MACRO_NEW_BOT_ID);
+                        credential.identity.agent_id = Some(bot_id::ROX_NEW_BOT_ID);
                     }
                     _ => {}
                 }
@@ -300,8 +300,8 @@ mod authenticated_join_routes {
             &self,
             _key: &str,
             _claims: InternalIdentityClaims,
-        ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-            Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+        ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+            Err(Report::new(RoxAuthorizationError::InvalidCredentials))
         }
     }
 
@@ -312,7 +312,7 @@ mod authenticated_join_routes {
         call_router(CallRouterState::new(
             Arc::new(service),
             Arc::new(NoOpEntityAccessService),
-            MacroAuthorizationState::new(Arc::new(Auth)),
+            RoxAuthorizationState::new(Arc::new(Auth)),
         ))
     }
 
@@ -383,7 +383,7 @@ mod authenticated_join_routes {
 
         let mut request = join(Uuid::now_v7(), "member");
         request.headers_mut().insert(
-            macro_authorization::CODE_EXECUTION_HEADER,
+            rox_authorization::CODE_EXECUTION_HEADER,
             "1".parse().unwrap(),
         );
         let response = router_with_flag(service, false)
@@ -604,13 +604,13 @@ mod scoped_edits {
         EntityPermission, EntityType, RequiredPermission, TeamRole, UserTeamInfo,
     };
     use entity_access::domain::ports::EntityAccessService;
-    use macro_authorization::{
-        InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-        MacroAuthorizationState, ValidatedCredential,
+    use rox_authorization::{
+        InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+        RoxAuthorizationState, ValidatedCredential,
     };
-    use macro_user_id::{
+    use rox_user_id::{
         lowercased::Lowercase,
-        user_id::{MacroUserId, MacroUserIdStr},
+        user_id::{RoxUserId, RoxUserIdStr},
     };
     use model_user::UserContext;
     use rootcause::Report;
@@ -625,11 +625,11 @@ mod scoped_edits {
     #[derive(Clone)]
     struct Auth;
 
-    impl MacroAuthorizationService for Auth {
+    impl RoxAuthorizationService for Auth {
         async fn authorize(
             &self,
             _jwt: &str,
-        ) -> Result<UserContext, Report<MacroAuthorizationError>> {
+        ) -> Result<UserContext, Report<RoxAuthorizationError>> {
             Ok(UserContext {
                 user_id: OWNER.to_string(),
                 fusion_user_id: "00000000-0000-0000-0000-000000000001".to_string(),
@@ -641,7 +641,7 @@ mod scoped_edits {
         async fn authorize_identity(
             &self,
             jwt: &str,
-        ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+        ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
             self.authorize(jwt).await.map(ValidatedCredential::session)
         }
 
@@ -649,8 +649,8 @@ mod scoped_edits {
             &self,
             _key: &str,
             _claims: InternalIdentityClaims,
-        ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-            Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+        ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+            Err(Report::new(RoxAuthorizationError::InvalidCredentials))
         }
     }
 
@@ -665,7 +665,7 @@ mod scoped_edits {
     impl EntityAccessService for OwnedCalls {
         async fn generate_entity_access_receipt<T: RequiredPermission>(
             &self,
-            _user_id: &MacroUserId<Lowercase<'_>>,
+            _user_id: &RoxUserId<Lowercase<'_>>,
             _user_org_id: Option<i64>,
             _entity_id: &str,
             _entity_type: EntityType,
@@ -685,7 +685,7 @@ mod scoped_edits {
 
         async fn get_access_level(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
         ) -> Result<Option<AccessLevel>, AccessError> {
@@ -694,7 +694,7 @@ mod scoped_edits {
 
         async fn check_access(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
             _required_level: AccessLevel,
@@ -713,7 +713,7 @@ mod scoped_edits {
 
         async fn get_entity_permission(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             entity_type: EntityType,
             _user_org_id: Option<i64>,
@@ -726,7 +726,7 @@ mod scoped_edits {
 
         async fn get_crm_entity_permission_with_team(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
         ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -737,7 +737,7 @@ mod scoped_edits {
             &self,
             _entity_id: &str,
             _entity_type: EntityType,
-        ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+        ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
             Err(unused())
         }
 
@@ -760,7 +760,7 @@ mod scoped_edits {
 
         async fn get_user_team(
             &self,
-            _user_id: &MacroUserId<Lowercase<'_>>,
+            _user_id: &RoxUserId<Lowercase<'_>>,
         ) -> Result<Option<UserTeamInfo>, AccessError> {
             Err(unused())
         }
@@ -786,7 +786,7 @@ mod scoped_edits {
         let router = call_router(CallRouterState::new(
             Arc::new(service),
             Arc::new(OwnedCalls),
-            MacroAuthorizationState::new(Arc::new(Auth)),
+            RoxAuthorizationState::new(Arc::new(Auth)),
         ));
         let edit = |body: &str| {
             Request::patch(format!("/record/{call_id}"))

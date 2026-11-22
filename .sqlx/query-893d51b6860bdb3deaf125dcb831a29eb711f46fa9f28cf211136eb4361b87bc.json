@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        INSERT INTO promoted_shared_mailboxes (macro_id)\n        VALUES ($1)\n        ON CONFLICT (macro_id) DO NOTHING\n        ",
+  "query": "\n        INSERT INTO promoted_shared_mailboxes (rox_id)\n        VALUES ($1)\n        ON CONFLICT (rox_id) DO NOTHING\n        ",
   "describe": {
     "columns": [],
     "parameters": {

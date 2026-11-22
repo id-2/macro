@@ -13,8 +13,8 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{delete, get, post},
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use serde::Deserialize;
 use std::str::FromStr;
@@ -44,7 +44,7 @@ pub struct ImportRouterState<T, Auth> {
     /// The import service implementation.
     pub service: Arc<T>,
     /// The authorization state used by the request extractors.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 // Manual Clone impl so T doesn't need to be Clone (it's behind Arc).
@@ -63,7 +63,7 @@ impl<T, Auth> FromRef<ImportRouterState<T, Auth>> for Arc<T> {
     }
 }
 
-impl<T, Auth> FromRef<ImportRouterState<T, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Auth> FromRef<ImportRouterState<T, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ImportRouterState<T, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -73,7 +73,7 @@ impl<T, Auth> FromRef<ImportRouterState<T, Auth>> for MacroAuthorizationState<Au
 pub fn import_router<T, Auth, S>(state: ImportRouterState<T, Auth>) -> Router<S>
 where
     T: ImportService + WorkspaceImporter + ImportStager + NotionPageImporter,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -122,13 +122,13 @@ where
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn notion_report_handler<T: NotionWorkspaceImporter, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn notion_report_handler<T: NotionWorkspaceImporter, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Response {
     match service
-        .notion_import_report(&user.authorization.user.macro_user_id)
+        .notion_import_report(&user.authorization.user.rox_user_id)
         .await
     {
         Ok(report) => Json(report).into_response(),
@@ -147,12 +147,12 @@ pub async fn notion_report_handler<T: NotionWorkspaceImporter, Auth: MacroAuthor
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn cancel_notion_handler<T: NotionWorkspaceImporter, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn cancel_notion_handler<T: NotionWorkspaceImporter, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Response {
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     if let Err(e) = service.cancel_notion_import(&user).await {
         return error_response(e);
     }
@@ -164,17 +164,17 @@ pub async fn cancel_notion_handler<T: NotionWorkspaceImporter, Auth: MacroAuthor
 
 /// Report progress for one reviewed workspace source.
 #[utoipa::path(get, path = "/import/workspaces/{source}", params(("source" = ImportSource, Path)), responses((status = 200, body = NotionImportReport)), tag = "import")]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn workspace_report_handler<T: WorkspaceImporter, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn workspace_report_handler<T: WorkspaceImporter, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(source): Path<String>,
 ) -> Response {
     let Ok(source) = ImportSource::from_str(&source) else {
         return unknown_source_response(&source);
     };
     match service
-        .workspace_import_report(&user.authorization.user.macro_user_id, source)
+        .workspace_import_report(&user.authorization.user.rox_user_id, source)
         .await
     {
         Ok(report) => Json(report).into_response(),
@@ -184,16 +184,16 @@ pub async fn workspace_report_handler<T: WorkspaceImporter, Auth: MacroAuthoriza
 
 /// Cancel this source's plan or write, keeping completed entities.
 #[utoipa::path(post, path = "/import/workspaces/{source}/cancel", params(("source" = ImportSource, Path)), responses((status = 200, body = NotionImportReport)), tag = "import")]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn cancel_workspace_handler<T: WorkspaceImporter, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn cancel_workspace_handler<T: WorkspaceImporter, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(source): Path<String>,
 ) -> Response {
     let Ok(source) = ImportSource::from_str(&source) else {
         return unknown_source_response(&source);
     };
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     if let Err(error) = service.cancel_workspace_import(&user, source).await {
         return error_response(error);
     }
@@ -230,12 +230,12 @@ fn unknown_source_response(source: &str) -> Response {
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn get_state_handler<T: ImportService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn get_state_handler<T: ImportService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Response {
-    match service.state(user.authorization.user.macro_user_id).await {
+    match service.state(user.authorization.user.rox_user_id).await {
         Ok(state) => Json(state).into_response(),
         Err(e) => error_response(e),
     }
@@ -252,15 +252,15 @@ pub async fn get_state_handler<T: ImportService, Auth: MacroAuthorizationService
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user, body), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn run_import_handler<T: ImportService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user, body), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn run_import_handler<T: ImportService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<RunImportRequest>,
 ) -> Response {
     match service
         .run_import(
-            user.authorization.user.macro_user_id,
+            user.authorization.user.rox_user_id,
             body.import_ids,
             body.discard_ids,
         )
@@ -283,17 +283,17 @@ pub async fn run_import_handler<T: ImportService, Auth: MacroAuthorizationServic
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn discover_handler<T: ImportService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn discover_handler<T: ImportService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(source): Path<String>,
 ) -> Response {
     let Ok(source) = ImportSource::from_str(&source) else {
         return unknown_source_response(&source);
     };
     match service
-        .start_discovery(user.authorization.user.macro_user_id, source)
+        .start_discovery(user.authorization.user.rox_user_id, source)
         .await
     {
         Ok(_) => StatusCode::NO_CONTENT.into_response(),

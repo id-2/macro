@@ -6,7 +6,7 @@ use std::{
 };
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -77,7 +77,7 @@ struct RecordingMetadata {
 impl ActivityMetadataResolver for RecordingMetadata {
     async fn resolve_properties(
         &self,
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
         property_ids: &[String],
     ) -> HashMap<String, ActivityPropertyMetadata> {
         self.requests.lock().unwrap().push(property_ids.to_vec());
@@ -97,8 +97,8 @@ impl ActivityMetadataResolver for RecordingMetadata {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
 }
 
 fn time(value: &str) -> DateTime<Utc> {

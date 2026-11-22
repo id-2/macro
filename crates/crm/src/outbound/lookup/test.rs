@@ -1,6 +1,6 @@
 mod message_store;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -14,19 +14,19 @@ const OWNER: &str = "macro|crm-lookup-owner@example.com";
 
 async fn seed_team(pool: &PgPool) -> Uuid {
     let team_id = Uuid::now_v7();
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(OWNER)
-    .bind(format!("stripe_{macro_user_id}"))
+    .bind(format!("stripe_{rox_user_id}"))
     .execute(pool)
     .await
     .unwrap();
-    sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#)
+    sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#)
         .bind(OWNER)
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .execute(pool)
         .await
         .unwrap();
@@ -95,7 +95,7 @@ async fn read(pool: &PgPool, parent: MessageParent) -> Option<CrmParentFacts> {
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn company_name_prefers_custom_then_directory_then_primary_domain(pool: PgPool) {
     let team_id = seed_team(&pool).await;
     sqlx::query(
@@ -123,7 +123,7 @@ async fn company_name_prefers_custom_then_directory_then_primary_domain(pool: Pg
     assert_eq!(bare_parent.company_id, Some(bare));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn contact_resolves_its_company_and_falls_back_to_email(pool: PgPool) {
     let team_id = seed_team(&pool).await;
     let company_id = seed_company(&pool, team_id, None, &["acme.test"]).await;
@@ -145,7 +145,7 @@ async fn contact_resolves_its_company_and_falls_back_to_email(pool: PgPool) {
     assert_eq!(unnamed.name, "bob@acme.test");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleted_records_are_absent(pool: PgPool) {
     let team_id = seed_team(&pool).await;
     let company_id = seed_company(&pool, team_id, None, &["gone.test"]).await;

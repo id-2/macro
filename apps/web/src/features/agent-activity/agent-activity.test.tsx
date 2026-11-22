@@ -257,7 +257,7 @@ it('replaces a live code step with observed SDK operations and preserves uncerta
     {
       kind: 'tool_use',
       id: 'code-1',
-      name: { kind: 'mcp', server: 'macro_internal', tool: 'ExecuteCode' },
+      name: { kind: 'mcp', server: 'rox_internal', tool: 'ExecuteCode' },
       status: 'running',
       detail: {
         kind: 'other',

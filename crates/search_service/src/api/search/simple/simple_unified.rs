@@ -13,8 +13,8 @@ use axum::{
 };
 use crm::domain::auth::CrmTeamReceipt;
 use entity_access::domain::models::MemberTeamRole;
-use macro_authorization::{MacroAuthorizationExtractor, MacroUserAuthentication, UserOrInternal};
-use macro_user_id::user_id::MacroUserId;
+use rox_authorization::{RoxAuthorizationExtractor, RoxUserAuthentication, UserOrInternal};
+use rox_user_id::user_id::RoxUserId;
 use model::{response::ErrorResponse, user::UserContext};
 use models_search::unified::SearchEntityFilters;
 use models_search::{
@@ -204,7 +204,7 @@ const DEFAULT_PAGE_SIZE: u32 = 10;
 /// by: who called, the mode, and sizes. The request itself stays off it, since
 /// the query and the filter values are whatever the user typed or picked.
 fn unified_search_span(
-    user: &MacroUserAuthentication,
+    user: &RoxUserAuthentication,
     query_params: &SearchPaginationParams,
     req: &UnifiedSearchRequest,
 ) -> tracing::Span {
@@ -250,7 +250,7 @@ fn searched_entity_types(
 /// by calling individual simple search endpoints for each entity type
 pub(in crate::api::search) async fn perform_unified_search(
     ctx: &SearchHandlerState,
-    user: &MacroUserAuthentication,
+    user: &RoxUserAuthentication,
     crm_access: Option<&CrmTeamReceipt<MemberTeamRole>>,
     query_params: SearchPaginationParams,
     req: UnifiedSearchRequest,
@@ -289,7 +289,7 @@ async fn search_unified_sources(
     if user_id.is_empty() {
         return Err(SearchError::NoUserId);
     }
-    let user_id = MacroUserId::parse_from_str(&user_id)
+    let user_id = RoxUserId::parse_from_str(&user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?
         .lowercase();
 
@@ -521,14 +521,14 @@ async fn search_unified_sources(
     // Widen the email access filter to every inbox the caller can reach (their
     // own plus delegated). Connected secondary inboxes share the owner's
     // user_id; delegated inboxes index under their own, so collect the
-    // distinct macro_ids the caller can search.
+    // distinct rox_ids the caller can search.
     if should_include_emails {
         let inboxes =
-            email_db_client::links::get::fetch_inboxes_for_macro_id(&ctx.db, user_id.as_ref())
+            email_db_client::links::get::fetch_inboxes_for_rox_id(&ctx.db, user_id.as_ref())
                 .await
                 .map_err(SearchError::InternalError)?;
         let mut email_user_ids: Vec<String> =
-            inboxes.iter().map(|l| l.macro_id.to_string()).collect();
+            inboxes.iter().map(|l| l.rox_id.to_string()).collect();
         email_user_ids.sort();
         email_user_ids.dedup();
         filter_email_response.user_ids = email_user_ids;
@@ -917,7 +917,7 @@ async fn search_unified_sources(
 )]
 pub async fn handler(
     State(ctx): State<SearchHandlerState>,
-    authorization: MacroAuthorizationExtractor<SearchAuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<SearchAuthorizationService, UserOrInternal>,
     extract::Query(query_params): extract::Query<SearchPaginationParams>,
     extract::Json(req): extract::Json<UnifiedSearchRequest>,
 ) -> Result<Json<SimpleSearchResponse>, SearchError> {

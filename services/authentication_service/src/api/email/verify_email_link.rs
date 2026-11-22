@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Redirect, Response},
 };
-use macro_middleware::tracking::ClientIp;
+use rox_middleware::tracking::ClientIp;
 
 use crate::api::{context::ApiContext, utils::default_redirect_url};
 use crate::service::user::create_user::create_user_profile;
@@ -38,7 +38,7 @@ pub async fn handler(
     tracing::info!("verify_email_link");
 
     // verify email
-    let link = macro_db_client::in_progress_email_link::get_in_progress_email_link(
+    let link = rox_db_client::in_progress_email_link::get_in_progress_email_link(
         &ctx.db,
         &verification_id,
     )
@@ -66,7 +66,7 @@ pub async fn handler(
     };
 
     // check if user already exists
-    match macro_db_client::user::get::get_user_id_by_email(ctx.db.clone(), &link.email).await {
+    match rox_db_client::user::get::get_user_id_by_email(ctx.db.clone(), &link.email).await {
         Ok(_) => {
             return Err((
                 StatusCode::BAD_REQUEST,
@@ -92,9 +92,9 @@ pub async fn handler(
     }
 
     // set email link to validated
-    macro_db_client::macro_user_email_verification::upsert_macro_user_email_verification(
+    rox_db_client::rox_user_email_verification::upsert_macro_user_email_verification(
         &ctx.db,
-        &link.macro_user_id.to_string(),
+        &link.rox_user_id.to_string(),
         &link.email,
         true,
     )
@@ -109,7 +109,7 @@ pub async fn handler(
     })?;
 
     // create new user profile
-    create_user_profile(&link.macro_user_id.to_string(), &link.email, &ctx.db)
+    create_user_profile(&link.rox_user_id.to_string(), &link.email, &ctx.db)
         .await
         .map_err(|e| {
             tracing::error!(error=?e, "failed to insert macro user email verification");
@@ -121,7 +121,7 @@ pub async fn handler(
         })?;
 
     // delete link
-    if let Err(e) = macro_db_client::in_progress_email_link::delete_in_progress_email_link(
+    if let Err(e) = rox_db_client::in_progress_email_link::delete_in_progress_email_link(
         &ctx.db,
         &verification_id,
     )

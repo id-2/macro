@@ -32,7 +32,7 @@ it('keeps browser image URLs proxied but gives the agent a fetchable hosted URL'
     './servers'
   );
   expect(staticFileIdEndpoint('test-image')).toBe(
-    'https://localhost:3003/__macro_dev/static/file/test-image'
+    'https://localhost:3003/__rox_dev/static/file/test-image'
   );
   expect(staticFileReferenceEndpoint('test-image')).toBe(
     'https://static-file-service-dev.rox.one/file/test-image'

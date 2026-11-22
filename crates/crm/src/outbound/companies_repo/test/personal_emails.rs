@@ -8,7 +8,7 @@ use crate::domain::service::{CrmService, CrmServiceImpl};
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use crate::outbound::no_op_resolver::NoOpCompanyMetadataResolver;
 use chrono::{Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -18,7 +18,7 @@ const OWNER: &str = "macro|owner@example.com";
 /// company, and no reserved example domain is one.
 const PERSONAL_DOMAIN: &str = "gmail.com";
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_sync_preserves_the_manually_selected_company(pool: PgPool) -> anyhow::Result<()> {
     use crate::domain::contact_update::ContactFieldUpdate;
     let team = Uuid::now_v7();
@@ -72,7 +72,7 @@ async fn personal_sync_preserves_the_manually_selected_company(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_sync_finds_a_contact_by_any_of_its_addresses(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, OWNER).await?;
@@ -181,7 +181,7 @@ async fn populate(
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_emails_stay_out_by_default(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, OWNER).await?;
@@ -206,7 +206,7 @@ async fn personal_emails_stay_out_by_default(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_emails_file_without_a_company_when_let_in(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, OWNER).await?;
@@ -265,7 +265,7 @@ async fn personal_emails_file_without_a_company_when_let_in(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn link_teardown_removes_synced_unfiled_contacts(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, OWNER).await?;
@@ -294,7 +294,7 @@ async fn link_teardown_removes_synced_unfiled_contacts(pool: PgPool) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_contact_for_team_without_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, OWNER).await?;
@@ -340,7 +340,7 @@ async fn create_contact_for_team_without_company(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_shared_personal_provider_is_not_the_users_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let mailbox = personal("me");
@@ -376,7 +376,7 @@ async fn a_shared_personal_provider_is_not_the_users_company(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn manual_unfiled_contact_does_not_mask_synced_company_contact(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -403,7 +403,7 @@ async fn manual_unfiled_contact_does_not_mask_synced_company_contact(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn assigned_personal_sync_keeps_admission_archive_and_team_boundaries(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -577,7 +577,7 @@ async fn assigned_personal_sync_keeps_admission_archive_and_team_boundaries(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ambiguous_personal_matches_are_never_selected_by_sync_or_cleanup(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -635,7 +635,7 @@ async fn ambiguous_personal_matches_are_never_selected_by_sync_or_cleanup(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn assigned_personal_population_locks_parent_before_bulk_cleanup(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -722,7 +722,7 @@ async fn assigned_personal_population_locks_parent_before_bulk_cleanup(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_switch_survives_cleanup_after_admission_is_disabled(
     pool: PgPool,
 ) -> anyhow::Result<()> {

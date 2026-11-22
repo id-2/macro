@@ -1,4 +1,4 @@
-use macro_event_broker::{Event, MacroEvent as _, TopicEvent};
+use rox_event_broker::{Event, RoxEvent as _, TopicEvent};
 use model::document::FileType;
 use model_owner::Owner;
 use serde_json::{Value, json};

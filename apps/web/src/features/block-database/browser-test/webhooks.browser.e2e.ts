@@ -14,7 +14,7 @@ for (const mobile of [false, true]) {
     });
     const page = await context.newPage();
     await page.route('https://**', (route) => route.abort());
-    await page.route('**/__macro_dev/**', (route) => route.abort());
+    await page.route('**/__rox_dev/**', (route) => route.abort());
     await page.goto(
       'http://localhost:' +
         (process.env.DATABASE_TABLE_TEST_PORT ?? '3005') +

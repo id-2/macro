@@ -9,8 +9,8 @@ use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, Entity, EntityAccessReceipt, EntityPermission, EntityType,
     ViewAccessLevel,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::{
     CellValue, CellWrite, ColumnChange, ColumnKind, DatabaseOp, NewColumn, NewOption, OpResult,
     OptionId, OptionRef, RowChange, RowChanges, RowsChange, RowsResult,
@@ -31,8 +31,8 @@ use crate::outbound::pg_databases_repo::PgDatabasesRepo;
 pub(super) const WOLF: &str = "macro|wolf@rox.one";
 pub(super) const JULIA: &str = "macro|julia@rox.one";
 
-pub(super) fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+pub(super) fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
 pub(super) fn person(id: &str) -> Viewer {
@@ -297,7 +297,7 @@ async fn position_of(pool: &PgPool, table: TableId, row: RowId) -> String {
         .to_string()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn every_committed_batch_of_the_guest_list_is_journaled_with_its_inverse(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, omar) = insert_guests(&pool, &wedding).await;
@@ -574,7 +574,7 @@ async fn every_committed_batch_of_the_guest_list_is_journaled_with_its_inverse(p
     assert_eq!(updated_by.as_deref(), Some(JULIA));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_rows_history_reads_newest_first_even_after_the_row_is_deleted(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, omar) = insert_guests(&pool, &wedding).await;
@@ -748,7 +748,7 @@ async fn inverse_of(pool: &PgPool, change: i64) -> ChangeInverse {
     serde_json::from_value(inverse).unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn applying_each_inverse_newest_first_puts_the_table_back_as_it_was(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let empty = table_state(&pool, wedding.table_id).await;
@@ -779,7 +779,7 @@ async fn applying_each_inverse_newest_first_puts_the_table_back_as_it_was(pool: 
     assert_eq!(restored, vec![without_omar, maybe, inserted, empty]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unknown_journal_payload_versions_are_refused_by_every_history_reader(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, _) = insert_guests(&pool, &wedding).await;

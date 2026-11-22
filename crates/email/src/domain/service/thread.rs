@@ -38,12 +38,12 @@ where
     /// thread's alias requires independent access to its entire inbox.
     pub(crate) async fn resolve_thread_read_id_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         thread_id: Uuid,
     ) -> Result<Uuid, EmailErr> {
         let inboxes = self
             .email_repo
-            .inboxes_for_macro_id(macro_id)
+            .inboxes_for_rox_id(rox_id)
             .await
             .map_err(anyhow::Error::from)?;
         let link_ids: Vec<_> = inboxes.iter().map(|link| link.id).collect();
@@ -113,10 +113,10 @@ where
         // Surface a reply draft the caller moved to another of their inboxes by
         // switching the sender: it lives in a different thread, so pull it in here
         // (matched by the message it replies to) and let the reply reopen with it.
-        if let Ok(macro_id) = receipt.get_authenticated_user() {
+        if let Ok(rox_id) = receipt.get_authenticated_user() {
             let accessible = self
                 .email_repo
-                .inboxes_for_macro_id(macro_id.clone())
+                .inboxes_for_rox_id(rox_id.clone())
                 .await
                 .map_err(anyhow::Error::from)?;
             let link_ids: Vec<Uuid> = accessible.iter().map(|l| l.id).collect();
@@ -379,7 +379,7 @@ where
     /// Fetch Mail projection data for authorized threads in one repository batch.
     pub(crate) async fn get_email_thread_mail_projections_impl(
         &self,
-        viewer: macro_user_id::user_id::MacroUserIdStr<'static>,
+        viewer: rox_user_id::user_id::RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
     ) -> Result<HashMap<Uuid, EmailThreadMailProjection>, EmailErr> {
         let thread_ids = email_thread_ids_from_receipts(receipts)?;
@@ -554,7 +554,7 @@ fn parsed_message_from_row(
         body_parsed,
         body_text: row.body_text,
         body_html_sanitized: row.body_html_sanitized,
-        body_macro: row.body_macro,
+        body_rox: row.body_rox,
         body_replyless,
         internal_date_ts: row.internal_date_ts,
         sent_at: row.sent_at,

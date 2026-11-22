@@ -62,7 +62,7 @@ test fixtures. Describe the code change and nothing else.
   products. Name a third-party product only when the code integrates with it
   (`Slack integration`), never as the source of a request or report.
 - Never cite support channels, tickets, chat channels or threads, calls,
-  meetings, emails, or links into support tools or Macro workspace items
+  meetings, emails, or links into support tools or Rox workspace items
   (task and agent-session links are fine). Don't say who asked or where it was reported.
 - Never mention places tied to a person or customer (cities, offices, regions).
 - When the reason matters, say it in general terms: "Users with long read
@@ -74,7 +74,7 @@ test fixtures. Describe the code change and nothing else.
   stays in the conversation; restate it as the general problem before writing.
 
 CI's `PR Privacy Check` fails a PR whose title, body, or commits contain
-emails, phone numbers, @mentions, chat-channel names, or support-tool and Macro
+emails, phone numbers, @mentions, chat-channel names, or support-tool and Rox
 workspace links (Dependabot PRs are exempt). It cannot see names, so passing it
 is not enough: reread every title, body, and message against the list above.
 Run it locally before pushing or opening a PR:
@@ -98,7 +98,7 @@ just pr-privacy                           # commit messages carry no personal de
 cargo fmt --all -- --check                # any Rust change
 cargo x deps --check                      # Cargo.toml or crate added/removed
 cargo x workflows --check                 # workflow generators changed
-cargo x kafka-topics --check              # macro_event_topics changed
+cargo x kafka-topics --check              # rox_event_topics changed
 ```
 
 GitHub Actions workflows are generated from Rust: edit

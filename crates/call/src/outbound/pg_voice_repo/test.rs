@@ -1,6 +1,6 @@
 use crate::domain::ports::VoiceRepository;
 use crate::outbound::pg_voice_repo::PgVoiceRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::{Uuid, uuid};
 
@@ -24,7 +24,7 @@ fn axis_unit_vector(axis: usize) -> Vec<f32> {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn upsert_voice_inserts_row(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -40,7 +40,7 @@ async fn upsert_voice_inserts_row(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn upsert_voice_reuses_existing_nearby_embedding(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -57,7 +57,7 @@ async fn upsert_voice_reuses_existing_nearby_embedding(pool: Pool<Postgres>) -> 
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn upsert_voice_inserts_distinct_id_for_different_embedding(
     pool: Pool<Postgres>,
@@ -73,7 +73,7 @@ async fn upsert_voice_inserts_distinct_id_for_different_embedding(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn link_user_voice_then_get_user_voices(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -87,7 +87,7 @@ async fn link_user_voice_then_get_user_voices(pool: Pool<Postgres>) -> anyhow::R
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn link_user_voice_idempotent_on_duplicate(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -103,7 +103,7 @@ async fn link_user_voice_idempotent_on_duplicate(pool: Pool<Postgres>) -> anyhow
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_user_voices_empty_for_user_without_links(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -115,7 +115,7 @@ async fn get_user_voices_empty_for_user_without_links(pool: Pool<Postgres>) -> a
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_user_by_voice_resolves_linked_user(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -128,7 +128,7 @@ async fn find_user_by_voice_resolves_linked_user(pool: Pool<Postgres>) -> anyhow
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_user_by_voice_returns_none_for_unlinked_voice(
     pool: Pool<Postgres>,
@@ -143,7 +143,7 @@ async fn find_user_by_voice_returns_none_for_unlinked_voice(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_nearest_user_matches_identical_embedding(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -158,7 +158,7 @@ async fn find_nearest_user_matches_identical_embedding(pool: Pool<Postgres>) -> 
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_nearest_user_returns_none_above_threshold(
     pool: Pool<Postgres>,
@@ -175,7 +175,7 @@ async fn find_nearest_user_returns_none_above_threshold(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_nearest_user_picks_closest_of_multiple(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -193,7 +193,7 @@ async fn find_nearest_user_picks_closest_of_multiple(pool: Pool<Postgres>) -> an
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_nearest_user_skips_unlinked_voices(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -215,7 +215,7 @@ async fn find_nearest_user_skips_unlinked_voices(pool: Pool<Postgres>) -> anyhow
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_nearest_user_for_voice_resolves_via_embedding_lookup(
     pool: Pool<Postgres>,
@@ -228,7 +228,7 @@ async fn find_nearest_user_for_voice_resolves_via_embedding_lookup(
     // Insert a separate transcript sample directly so this exercises the
     // lookup-by-voice path even though `upsert_voice` now deduplicates nearby
     // embeddings.
-    let segment_voice = macro_uuid::generate_uuid_v7();
+    let segment_voice = rox_uuid::generate_uuid_v7();
     sqlx::query("INSERT INTO voice (id, embedding) VALUES ($1, $2)")
         .bind(segment_voice)
         .bind(pgvector::Vector::from(axis_unit_vector(0)))
@@ -245,7 +245,7 @@ async fn find_nearest_user_for_voice_resolves_via_embedding_lookup(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_nearest_user_for_voice_returns_none_for_unknown_voice_id(
     pool: Pool<Postgres>,
@@ -259,7 +259,7 @@ async fn find_nearest_user_for_voice_returns_none_for_unknown_voice_id(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("voice_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_nearest_user_for_voice_returns_none_above_threshold(
     pool: Pool<Postgres>,

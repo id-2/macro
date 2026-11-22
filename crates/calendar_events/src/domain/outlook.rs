@@ -465,7 +465,7 @@ pub struct CalendarProjectionRelay<R, B, N> {
 }
 impl<
     R: CalendarProjectionOutbox,
-    B: macro_event_broker::MacroEventBroker,
+    B: rox_event_broker::RoxEventBroker,
     N: CalendarRefreshNotifier,
 > CalendarProjectionRelay<R, B, N>
 {

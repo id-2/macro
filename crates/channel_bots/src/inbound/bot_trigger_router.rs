@@ -9,7 +9,7 @@ use tracing::Instrument as _;
 use crate::domain::{
     models::BotEvent,
     ports::{AgentResponder, CommentMarks, ConversationAccess, TriggerDetector, UserTimeZones},
-    service::MacroAiHandler,
+    service::RoxAiHandler,
 };
 
 /// Resolves the bot invocations for a committed post and runs their handlers.
@@ -24,14 +24,14 @@ use crate::domain::{
 /// are notified of mentions out of process via the trigger topic and webhooks
 /// instead (see the `agent_trigger` and `webhook` crates).
 pub struct BotTriggerRouter<R, D, Z> {
-    macro_ai: Arc<MacroAiHandler<R, Z>>,
+    rox_ai: Arc<RoxAiHandler<R, Z>>,
     detector: Arc<D>,
 }
 
 impl<R, D, Z> Clone for BotTriggerRouter<R, D, Z> {
     fn clone(&self) -> Self {
         Self {
-            macro_ai: self.macro_ai.clone(),
+            rox_ai: self.rox_ai.clone(),
             detector: self.detector.clone(),
         }
     }
@@ -75,8 +75,8 @@ where
         admission: Arc<dyn ai_billing::AiAdmissionService>,
     ) -> Self {
         Self {
-            macro_ai: Arc::new(
-                MacroAiHandler::new(messages, access, responder, time_zones, marks)
+            rox_ai: Arc::new(
+                RoxAiHandler::new(messages, access, responder, time_zones, marks)
                     .with_admission(admission),
             ),
             detector,
@@ -121,8 +121,8 @@ where
             };
 
             // System bots are defined in code — no database lookup required.
-            if invocation.bot_id == bot_id::MACRO_AI_BOT_ID {
-                if let Err(err) = self.macro_ai.handle(&event).await {
+            if invocation.bot_id == bot_id::ROX_AI_BOT_ID {
+                if let Err(err) = self.rox_ai.handle(&event).await {
                     tracing::error!(error=?err, bot_id = %invocation.bot_id, "system bot handler failed");
                 }
             } else {

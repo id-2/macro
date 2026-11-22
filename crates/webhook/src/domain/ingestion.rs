@@ -24,8 +24,8 @@ use documents::domain::events::DocumentTopicEvent;
 use entity_access::domain::models::{AccessError, EntityType};
 use entity_access::domain::ports::EntityAccessService;
 use futures::future::join_all;
-use macro_event_broker::Event;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::Event;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::models::MessageParent;
 use messages::outbound::broker::MessageTopicEvent;
 use std::future::Future;
@@ -176,7 +176,7 @@ where
         &self,
         entity_id: &str,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, WebhookEventIngestionError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, WebhookEventIngestionError> {
         self.entity_access_service
             .get_users_by_entity(entity_id, entity_type)
             .await
@@ -382,7 +382,7 @@ pub(crate) fn normalized_channel_event(
 }
 
 /// The user a user fact is about.
-pub(crate) fn user_event_subject(event: &Event<UserTopicEvent>) -> MacroUserIdStr<'static> {
+pub(crate) fn user_event_subject(event: &Event<UserTopicEvent>) -> RoxUserIdStr<'static> {
     match &event.event {
         UserTopicEvent::PictureChanged(metadata) => metadata.user_id.clone(),
     }
@@ -392,7 +392,7 @@ pub(crate) fn user_event_subject(event: &Event<UserTopicEvent>) -> MacroUserIdSt
 /// they are also the only audience.
 pub(crate) fn normalized_user_event(
     event: &Event<UserTopicEvent>,
-) -> Result<(NormalizedWebhookEvent, MacroUserIdStr<'static>), WebhookEventIngestionError> {
+) -> Result<(NormalizedWebhookEvent, RoxUserIdStr<'static>), WebhookEventIngestionError> {
     let (event_name, user_id) = match &event.event {
         UserTopicEvent::PictureChanged(metadata) => {
             ("user.picture_changed", metadata.user_id.clone())
@@ -525,7 +525,7 @@ pub(crate) enum TriggerAudience {
         entity_type: EntityType,
     },
     /// Named people, when nothing was posted anywhere to hold access to.
-    People(Vec<MacroUserIdStr<'static>>),
+    People(Vec<RoxUserIdStr<'static>>),
 }
 
 impl TriggerAudience {
@@ -541,7 +541,7 @@ impl TriggerAudience {
     /// posted, so nobody else's access is in question. Their runtime, or
     /// their team's, is who serves it.
     fn requester(owner: &str) -> Result<Self, WebhookEventIngestionError> {
-        let owner = MacroUserIdStr::try_from(owner.to_owned()).map_err(|_| {
+        let owner = RoxUserIdStr::try_from(owner.to_owned()).map_err(|_| {
             WebhookEventIngestionError::InvalidEntityId {
                 entity_type: "user",
                 entity_id: owner.to_owned(),
@@ -642,7 +642,7 @@ pub(crate) enum LifecycleAudience {
     /// The session is gone: its owner, plus the channel or document it was
     /// opened from.
     Departed {
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         origin_parent: Option<MessageParent>,
     },
 }

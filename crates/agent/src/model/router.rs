@@ -23,7 +23,7 @@ use std::time::{Duration, Instant};
 use ai_toolset::RequestContext;
 use ai_usage::{UsageContext, UsageRecorder};
 use futures::StreamExt;
-use macro_env_var::{env_var, maybe_env_var};
+use rox_env_var::{env_var, maybe_env_var};
 use rig_agent::agent::{Agent, AgentBuilder, MultiTurnStreamItem};
 use rig_agent::streaming::StreamingPrompt;
 use rig_agent::tool::server::ToolServerHandle;

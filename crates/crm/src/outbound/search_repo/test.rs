@@ -7,7 +7,7 @@
 
 use super::{CrmSearchRepositoryImpl, escape_regex};
 use crate::domain::search_repo::{CrmCompanySearchCursor, CrmSearchRepository};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -16,21 +16,21 @@ use uuid::Uuid;
 // --------------------------------------------------------------------------
 
 async fn seed_team(pool: &PgPool, team_id: Uuid, owner_id: &str) -> sqlx::Result<()> {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)"#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(owner_id)
     .bind(owner_id)
-    .bind(format!("stripe_{macro_user_id}"))
+    .bind(format!("stripe_{rox_user_id}"))
     .execute(pool)
     .await?;
 
-    sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#)
+    sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#)
         .bind(owner_id)
         .bind(owner_id)
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .execute(pool)
         .await?;
 
@@ -131,7 +131,7 @@ fn escape_regex_escapes_metacharacters() {
 // search_company_names — matching
 // --------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_matches_by_directory_name(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -149,7 +149,7 @@ async fn search_matches_by_directory_name(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_matches_by_domain_when_no_directory(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -167,7 +167,7 @@ async fn search_matches_by_domain_when_no_directory(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_is_case_insensitive(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -181,7 +181,7 @@ async fn search_is_case_insensitive(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_matches_substring(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -195,7 +195,7 @@ async fn search_matches_substring(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_no_match_returns_empty(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -209,7 +209,7 @@ async fn search_no_match_returns_empty(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_matches_secondary_domain_but_names_from_primary(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -232,7 +232,7 @@ async fn search_matches_secondary_domain_but_names_from_primary(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_company_with_no_domains_never_matches(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -251,7 +251,7 @@ async fn search_company_with_no_domains_never_matches(pool: PgPool) -> anyhow::R
 // search_company_names — highlighting
 // --------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_highlights_matched_span(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -267,12 +267,12 @@ async fn search_highlights_matched_span(pool: PgPool) -> anyhow::Result<()> {
     // Case-insensitive match, original case preserved in the wrapped span.
     assert_eq!(
         results[0].name_highlighted,
-        "<macro_em>Acme</macro_em> Inc."
+        "<rox_em>Acme</rox_em> Inc."
     );
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_escapes_regex_metacharacters_in_highlight(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -289,7 +289,7 @@ async fn search_escapes_regex_metacharacters_in_highlight(pool: PgPool) -> anyho
         1,
         "literal '++' must match, not blow up the regex"
     );
-    assert_eq!(results[0].name_highlighted, "<macro_em>C++</macro_em> Corp");
+    assert_eq!(results[0].name_highlighted, "<rox_em>C++</rox_em> Corp");
     Ok(())
 }
 
@@ -307,7 +307,7 @@ async fn seed_visible_and_hidden(pool: &PgPool, team: Uuid) -> sqlx::Result<(Uui
     Ok((visible, hidden))
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_excludes_hidden_with_hidden_none(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -322,7 +322,7 @@ async fn search_excludes_hidden_with_hidden_none(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_visible_explicit_false_same_as_none(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -337,7 +337,7 @@ async fn search_visible_explicit_false_same_as_none(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_hidden_only_for_admin(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -353,7 +353,7 @@ async fn search_hidden_only_for_admin(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_hidden_requested_by_member_returns_empty(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -371,7 +371,7 @@ async fn search_hidden_requested_by_member_returns_empty(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_active_tab_ignores_capability(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -391,7 +391,7 @@ async fn search_active_tab_ignores_capability(pool: PgPool) -> anyhow::Result<()
 // search_company_names — scoping
 // --------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_scopes_to_team(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -413,7 +413,7 @@ async fn search_scopes_to_team(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_filters_by_company_ids_when_non_empty(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -433,7 +433,7 @@ async fn search_filters_by_company_ids_when_non_empty(pool: PgPool) -> anyhow::R
 // search_company_names — ordering, limit, pagination
 // --------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_orders_by_interaction_desc(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -453,7 +453,7 @@ async fn search_orders_by_interaction_desc(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_respects_limit(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -473,7 +473,7 @@ async fn search_respects_limit(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_paginates_past_cursor(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -526,7 +526,7 @@ async fn search_paginates_past_cursor(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_pagination_breaks_ties_on_id(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -579,7 +579,7 @@ async fn search_pagination_breaks_ties_on_id(pool: PgPool) -> anyhow::Result<()>
 // enrich_companies — hydration
 // --------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_hydrates_name_description_and_domains(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -598,7 +598,7 @@ async fn enrich_hydrates_name_description_and_domains(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_uses_primary_domain_for_directory(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -619,7 +619,7 @@ async fn enrich_uses_primary_domain_for_directory(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_negative_cache_directory_yields_none(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -635,7 +635,7 @@ async fn enrich_negative_cache_directory_yields_none(pool: PgPool) -> anyhow::Re
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_no_directory_yields_none_but_hydrates_domains(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -651,7 +651,7 @@ async fn enrich_no_directory_yields_none_but_hydrates_domains(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_company_with_no_domains(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -666,7 +666,7 @@ async fn enrich_company_with_no_domains(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_domains_ordered_by_created_at(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -689,7 +689,7 @@ async fn enrich_domains_ordered_by_created_at(pool: PgPool) -> anyhow::Result<()
 // enrich_companies — filtering, scoping, hidden gate
 // --------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_filters_by_company_ids(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -703,7 +703,7 @@ async fn enrich_filters_by_company_ids(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_scopes_to_team(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -718,7 +718,7 @@ async fn enrich_scopes_to_team(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_member_cannot_enrich_hidden(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -735,7 +735,7 @@ async fn enrich_member_cannot_enrich_hidden(pool: PgPool) -> anyhow::Result<()> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_admin_can_enrich_hidden(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -750,7 +750,7 @@ async fn enrich_admin_can_enrich_hidden(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_member_gets_only_visible_from_mixed_ids(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;
@@ -767,7 +767,7 @@ async fn enrich_member_gets_only_visible_from_mixed_ids(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrich_returns_all_requested_visible_companies(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|o@test.com").await?;

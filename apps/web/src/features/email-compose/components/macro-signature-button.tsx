@@ -1,14 +1,14 @@
-import { MACRO_EMAIL_SIGNATURE } from '@app/features/email-compose/core/constants';
+import { ROX_EMAIL_SIGNATURE } from '@app/features/email-compose/core/constants';
 import { Tooltip } from '@ui';
 import { Show } from 'solid-js';
 
-interface MacroSignatureButtonProps {
+interface RoxSignatureButtonProps {
   signature?: string;
   visible: boolean;
   onUpgrade?: () => void;
 }
 
-export const MacroSignatureButton = (props: MacroSignatureButtonProps) => {
+export const RoxSignatureButton = (props: RoxSignatureButtonProps) => {
   return (
     <Show when={props.visible}>
       <Tooltip label="Subscribe to remove watermark">
@@ -24,7 +24,7 @@ export const MacroSignatureButton = (props: MacroSignatureButtonProps) => {
             props.onUpgrade?.();
           }}
         >
-          {props.signature ?? MACRO_EMAIL_SIGNATURE}
+          {props.signature ?? ROX_EMAIL_SIGNATURE}
         </button>
       </Tooltip>
     </Show>

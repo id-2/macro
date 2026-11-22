@@ -146,7 +146,7 @@ pub fn is_searchable_file_type(file_type: &FileType) -> bool {
     matches!(
         file_type,
         FileType::Fig | FileType::Psd | FileType::Psb | FileType::Ai
-    ) || is_searchable_association(&file_type.macro_app_path())
+    ) || is_searchable_association(&file_type.rox_app_path())
 }
 
 /// Converted entity filters for the search service.

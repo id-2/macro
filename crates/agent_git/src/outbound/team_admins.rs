@@ -1,6 +1,6 @@
 //! Team roles through the teams domain's repository port.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use teams::domain::model::{TeamError, TeamRole};
 use teams::domain::team_repo::TeamRepository;
 use uuid::Uuid;
@@ -25,7 +25,7 @@ impl<Teams: TeamRepository> TeamAdmins for TeamRepositoryAdmins<Teams> {
     async fn is_team_admin(
         &self,
         team_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, TeamError> {
         let role = self.teams.get_team_role(&team_id, user_id).await?;
 

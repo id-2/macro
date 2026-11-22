@@ -5,7 +5,7 @@ const PROMPTER: &str = "macro|agent-session-prompter@example.com";
 /// Following a session records each person once, whoever owns it, and
 /// touches neither access nor history: listing it is Soup's job, and who may
 /// read it stays with `entity_access`.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn following_records_each_person_once_and_grants_nothing(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;

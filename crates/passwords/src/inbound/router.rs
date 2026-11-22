@@ -8,9 +8,9 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{delete, get, post, put},
 };
-use macro_authorization::{
-    CredentialOrigin, InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    CredentialOrigin, InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState, UserOnly,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -22,14 +22,14 @@ const CSRF_HEADER: &str = "x-rox-passwords";
 
 /// CSRF marker header earlier clients sent. Still accepted so a page loaded
 /// from a build before the rename can save a password.
-const LEGACY_CSRF_HEADER: &str = "x-macro-passwords";
+const LEGACY_CSRF_HEADER: &str = "x-rox-passwords";
 
 /// Composition-owned domain service and authenticated transport state.
 pub struct PasswordRouterState<A> {
     /// Vault use-case service; owns all product authorization decisions.
     pub service: Arc<PasswordService>,
     /// Shared Rox credential-validation boundary.
-    pub authorization: MacroAuthorizationState<A>,
+    pub authorization: RoxAuthorizationState<A>,
 }
 impl<A> Clone for PasswordRouterState<A> {
     fn clone(&self) -> Self {
@@ -39,14 +39,14 @@ impl<A> Clone for PasswordRouterState<A> {
         }
     }
 }
-impl<A> FromRef<PasswordRouterState<A>> for MacroAuthorizationState<A> {
+impl<A> FromRef<PasswordRouterState<A>> for RoxAuthorizationState<A> {
     fn from_ref(state: &PasswordRouterState<A>) -> Self {
         state.authorization.clone()
     }
 }
 
 /// Build authenticated vault routes with CSRF and no-store response protections.
-pub fn router<A: MacroAuthorizationService, T: Send + Sync + 'static>(
+pub fn router<A: RoxAuthorizationService, T: Send + Sync + 'static>(
     state: PasswordRouterState<A>,
 ) -> Router<T> {
     Router::new()
@@ -96,7 +96,7 @@ pub fn router<A: MacroAuthorizationService, T: Send + Sync + 'static>(
 }
 /// Internal lifecycle routes accept only authenticated service identities.
 /// They deliberately remain outside the public Swagger and human CSRF routes.
-pub fn internal_router<A: MacroAuthorizationService, T: Send + Sync + 'static>(
+pub fn internal_router<A: RoxAuthorizationService, T: Send + Sync + 'static>(
     state: PasswordRouterState<A>,
 ) -> Router<T> {
     Router::new()
@@ -105,8 +105,8 @@ pub fn internal_router<A: MacroAuthorizationService, T: Send + Sync + 'static>(
         .with_state(state)
 }
 #[tracing::instrument(skip_all,err,name="passwords.team.purge.internal",fields(team_id=%team))]
-async fn purge_team_internal<A: MacroAuthorizationService>(
-    _: MacroAuthorizationExtractor<A, InternalOnly>,
+async fn purge_team_internal<A: RoxAuthorizationService>(
+    _: RoxAuthorizationExtractor<A, InternalOnly>,
     State(state): State<PasswordRouterState<A>>,
     Path(team): Path<Uuid>,
 ) -> Result<StatusCode, ApiError> {
@@ -217,14 +217,14 @@ impl IntoResponse for ApiError {
         (status, Json(Failure { code })).into_response()
     }
 }
-fn actor<A: MacroAuthorizationService>(
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+fn actor<A: RoxAuthorizationService>(
+    user: RoxAuthorizationExtractor<A, UserOnly>,
 ) -> Result<Actor, ApiError> {
     if user.authorization.origin != CredentialOrigin::Session {
         return Err(ApiError(Error::Forbidden));
     }
     Ok(Actor {
-        user_id: user.authorization.macro_user_id,
+        user_id: user.authorization.rox_user_id,
     })
 }
 #[derive(Deserialize, utoipa::IntoParams)]
@@ -283,17 +283,17 @@ pub struct TotpBody {
 
 #[utoipa::path(operation_id = "passwords_teams",get,path="/passwords/teams",responses((status=200,body=Vec<TeamId>),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// List current teams available to the authenticated human.
-pub async fn teams<A: MacroAuthorizationService>(
+pub async fn teams<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
 ) -> Result<Json<Vec<TeamId>>, ApiError> {
     Ok(Json(state.service.teams(&actor(user)?).await?))
 }
 #[utoipa::path(operation_id = "passwords_list",get,path="/passwords/teams/{team}/items",params(("team"=Uuid,Path),Search),responses((status=200,body=Vec<ItemView>),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Search authorized metadata without resolving private values.
-pub async fn list<A: MacroAuthorizationService>(
+pub async fn list<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path(team): Path<Uuid>,
     Query(query): Query<Search>,
 ) -> Result<Json<Vec<ItemView>>, ApiError> {
@@ -310,9 +310,9 @@ pub async fn list<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_create",post,path="/passwords/teams/{team}/items",params(("team"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=WriteItem,responses((status=200,body=ItemView),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Create one item using an idempotent logical operation identifier.
-pub async fn create<A: MacroAuthorizationService>(
+pub async fn create<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path(team): Path<Uuid>,
     Json(command): Json<WriteItem>,
 ) -> Result<Json<ItemView>, ApiError> {
@@ -325,9 +325,9 @@ pub async fn create<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_detail",get,path="/passwords/teams/{team}/items/{item}",params(("team"=Uuid,Path),("item"=Uuid,Path)),responses((status=200,body=ItemView),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Read authorized item metadata only.
-pub async fn detail<A: MacroAuthorizationService>(
+pub async fn detail<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<ItemView>, ApiError> {
     Ok(Json(
@@ -339,9 +339,9 @@ pub async fn detail<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_username",get,path="/passwords/teams/{team}/items/{item}/username",params(("team"=Uuid,Path),("item"=Uuid,Path)),responses((status=200,body=Username),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Read only the current account identifier with normal human view authorization.
-pub async fn username<A: MacroAuthorizationService>(
+pub async fn username<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Username>, ApiError> {
     Ok(Json(
@@ -353,9 +353,9 @@ pub async fn username<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_copy_username",post,path="/passwords/teams/{team}/items/{item}/username/copy",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),responses((status=200,body=Username),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Read only the current account identifier and record an explicit clipboard action.
-pub async fn copy_username<A: MacroAuthorizationService>(
+pub async fn copy_username<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Username>, ApiError> {
     Ok(Json(
@@ -367,9 +367,9 @@ pub async fn copy_username<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_update",put,path="/passwords/teams/{team}/items/{item}",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=WriteItem,responses((status=200,body=ItemView),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Save a new protected value version and its metadata.
-pub async fn update<A: MacroAuthorizationService>(
+pub async fn update<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     Json(command): Json<WriteItem>,
 ) -> Result<Json<ItemView>, ApiError> {
@@ -382,9 +382,9 @@ pub async fn update<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_patch",patch,path="/passwords/teams/{team}/items/{item}",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=PatchItem,responses((status=200,body=ItemView),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Change metadata without resolving private values.
-pub async fn patch<A: MacroAuthorizationService>(
+pub async fn patch<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     Json(command): Json<PatchItem>,
 ) -> Result<Json<ItemView>, ApiError> {
@@ -397,9 +397,9 @@ pub async fn patch<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_remove",delete,path="/passwords/teams/{team}/items/{item}",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),responses((status=204),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Delete an owned item with a resumable provider fence.
-pub async fn remove<A: MacroAuthorizationService>(
+pub async fn remove<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, ApiError> {
     state
@@ -410,9 +410,9 @@ pub async fn remove<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_reveal",post,path="/passwords/teams/{team}/items/{item}/reveal",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=RevealBody,responses((status=200,body=Revealed),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Disclose a current or historical value with normal human-session item access.
-pub async fn reveal<A: MacroAuthorizationService>(
+pub async fn reveal<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     Json(body): Json<RevealBody>,
 ) -> Result<Json<Revealed>, ApiError> {
@@ -431,9 +431,9 @@ pub async fn reveal<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_copy",post,path="/passwords/teams/{team}/items/{item}/copy",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=RevealBody,responses((status=200,body=Revealed),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Disclose values for an explicitly audited clipboard action.
-pub async fn copy<A: MacroAuthorizationService>(
+pub async fn copy<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     Json(body): Json<RevealBody>,
 ) -> Result<Json<Revealed>, ApiError> {
@@ -446,9 +446,9 @@ pub async fn copy<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_history",get,path="/passwords/teams/{team}/items/{item}/history",params(("team"=Uuid,Path),("item"=Uuid,Path)),responses((status=200,body=Vec<Version>),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// List protected-value version metadata.
-pub async fn history<A: MacroAuthorizationService>(
+pub async fn history<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Vec<Version>>, ApiError> {
     Ok(Json(
@@ -460,9 +460,9 @@ pub async fn history<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_activity",get,path="/passwords/teams/{team}/items/{item}/activity",params(("team"=Uuid,Path),("item"=Uuid,Path)),responses((status=200,body=Vec<Activity>),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// List recorded activity for an authorized item.
-pub async fn activity<A: MacroAuthorizationService>(
+pub async fn activity<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Vec<Activity>>, ApiError> {
     Ok(Json(
@@ -474,9 +474,9 @@ pub async fn activity<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_grants",get,path="/passwords/teams/{team}/items/{item}/share",params(("team"=Uuid,Path),("item"=Uuid,Path)),responses((status=200,body=Vec<Grant>),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Read the owned item’s explicit recipient set.
-pub async fn grants<A: MacroAuthorizationService>(
+pub async fn grants<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Vec<Grant>>, ApiError> {
     Ok(Json(
@@ -488,9 +488,9 @@ pub async fn grants<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_share",put,path="/passwords/teams/{team}/items/{item}/share",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=ShareBody,responses((status=204),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Replace the owned item’s explicit recipient set.
-pub async fn share<A: MacroAuthorizationService>(
+pub async fn share<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     Json(body): Json<ShareBody>,
 ) -> Result<StatusCode, ApiError> {
@@ -502,9 +502,9 @@ pub async fn share<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_folders",get,path="/passwords/teams/{team}/folders",params(("team"=Uuid,Path)),responses((status=200,body=Vec<Folder>),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// List the authenticated team’s folders.
-pub async fn folders<A: MacroAuthorizationService>(
+pub async fn folders<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path(team): Path<Uuid>,
 ) -> Result<Json<Vec<Folder>>, ApiError> {
     Ok(Json(
@@ -513,9 +513,9 @@ pub async fn folders<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_create_folder",post,path="/passwords/teams/{team}/folders",params(("team"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=CreateFolderBody,responses((status=200,body=Folder),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Create a folder within the authenticated team.
-pub async fn create_folder<A: MacroAuthorizationService>(
+pub async fn create_folder<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path(team): Path<Uuid>,
     Json(body): Json<CreateFolderBody>,
 ) -> Result<Json<Folder>, ApiError> {
@@ -528,9 +528,9 @@ pub async fn create_folder<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_remove_folder",delete,path="/passwords/teams/{team}/folders/{folder}",params(("team"=Uuid,Path),("folder"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),responses((status=204),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Delete a folder within the authenticated team.
-pub async fn remove_folder<A: MacroAuthorizationService>(
+pub async fn remove_folder<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, folder)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, ApiError> {
     state
@@ -541,9 +541,9 @@ pub async fn remove_folder<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_set_totp",put,path="/passwords/teams/{team}/items/{item}/totp",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=TotpBody,responses((status=204),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Enroll or replace a verification-code seed with normal human-session edit access.
-pub async fn set_totp<A: MacroAuthorizationService>(
+pub async fn set_totp<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     Json(body): Json<TotpBody>,
 ) -> Result<StatusCode, ApiError> {
@@ -555,9 +555,9 @@ pub async fn set_totp<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_remove_totp",delete,path="/passwords/teams/{team}/items/{item}/totp",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),responses((status=204),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Remove a verification-code seed with normal human-session edit access.
-pub async fn remove_totp<A: MacroAuthorizationService>(
+pub async fn remove_totp<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, ApiError> {
     state
@@ -568,9 +568,9 @@ pub async fn remove_totp<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_totp",post,path="/passwords/teams/{team}/items/{item}/totp/code",params(("team"=Uuid,Path),("item"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),responses((status=200,body=TotpCode),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Resolve the current verification code with normal human-session item access.
-pub async fn totp<A: MacroAuthorizationService>(
+pub async fn totp<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<TotpCode>, ApiError> {
     Ok(Json(
@@ -583,9 +583,9 @@ pub async fn totp<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_rename_folder",put,path="/passwords/teams/{team}/folders/{folder}",params(("team"=Uuid,Path),("folder"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=FolderBody,responses((status=200,body=Folder),(status=403,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Rename a folder within the authenticated team.
-pub async fn rename_folder<A: MacroAuthorizationService>(
+pub async fn rename_folder<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, folder)): Path<(Uuid, Uuid)>,
     Json(body): Json<FolderBody>,
 ) -> Result<Json<Folder>, ApiError> {
@@ -598,9 +598,9 @@ pub async fn rename_folder<A: MacroAuthorizationService>(
 }
 #[utoipa::path(operation_id = "passwords_move_folder",put,path="/passwords/teams/{team}/folders/{folder}/parent",params(("team"=Uuid,Path),("folder"=Uuid,Path),("X-Rox-Passwords"=String,Header,description="Required CSRF header; send 1"),("X-Macro-Passwords"=String,Header,deprecated,description="Legacy CSRF header; still accepted")),request_body=MoveFolderBody,responses((status=200,body=Folder),(status=400,body=Failure),(status=403,body=Failure),(status=404,body=Failure),(status=409,body=Failure)),tag="passwords")]
 /// Move a folder under another folder of the team, or to the top level.
-pub async fn move_folder<A: MacroAuthorizationService>(
+pub async fn move_folder<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, folder)): Path<(Uuid, Uuid)>,
     Json(body): Json<MoveFolderBody>,
 ) -> Result<Json<Folder>, ApiError> {

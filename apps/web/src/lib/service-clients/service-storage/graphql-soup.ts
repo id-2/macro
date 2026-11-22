@@ -378,7 +378,7 @@ async function sendDssGraphqlRequest(
       const transportInit: RequestInit = {
         ...requestInit,
         headers: mergeHeaders(requestInit?.headers, traceHeaders, {
-          'x-macro-mail-cache-profile': mail.profile,
+          'x-rox-mail-cache-profile': mail.profile,
         }),
       };
       span.event('request_dispatch');

@@ -3,7 +3,7 @@ import { goalertWebhooks } from './goalert';
 import { notify, RENOTIFY_MINUTES } from './notify';
 
 // The only external probe of the product. It owns its own alert monitor
-// (19726068, "Macro App is Down") through `optionsList.monitorName` — that
+// (19726068, "Rox App is Down") through `optionsList.monitorName` — that
 // monitor is not a separate resource and must never be imported as one.
 //
 // `optionsList.monitorOptions` in the provider only models

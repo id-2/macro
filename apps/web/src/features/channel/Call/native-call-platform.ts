@@ -5,7 +5,7 @@ import { version } from '@tauri-apps/plugin-os';
 declare global {
   interface Window {
     /** Advertised by binaries that register the Android call-kit plugin. */
-    __MACRO_ANDROID_CALL_KIT__?: boolean;
+    __ROX_ANDROID_CALL_KIT__?: boolean;
   }
 }
 
@@ -16,7 +16,7 @@ export function isNativeCallEnabled(): boolean {
   // clients on browser media rather than invoking unavailable Telecom commands.
   return (
     isPlatform('android') &&
-    window.__MACRO_ANDROID_CALL_KIT__ === true &&
+    window.__ROX_ANDROID_CALL_KIT__ === true &&
     Number.parseInt(version(), 10) >= 8
   );
 }

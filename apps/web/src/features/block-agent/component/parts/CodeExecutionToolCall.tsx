@@ -6,7 +6,7 @@ import type {
 import { For, Show } from 'solid-js';
 import { programEnded } from '../../state/code-execution';
 import { isToolActive, ToolCard, type ToolStatus } from '../../ui';
-import { MacroToolCall } from './MacroToolCall';
+import { RoxToolCall } from './RoxToolCall';
 import type { ToolCallCommon, ToolCallContext } from './shared';
 
 /**
@@ -129,7 +129,7 @@ function RecordedCall(props: {
         : undefined,
   });
   return (
-    <MacroToolCall
+    <RoxToolCall
       detail={{
         kind: 'macro',
         input: props.call.input,

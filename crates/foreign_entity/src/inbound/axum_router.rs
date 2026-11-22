@@ -16,8 +16,8 @@ use entity_access::{
     domain::{models::ViewAccessLevel, ports::EntityAccessService},
     inbound::axum_extractors::ForeignEntityAccessLevelExtractor,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
     OptionalMacroAuthorizationExtractor,
 };
 use model_error_response::ErrorResponse;
@@ -32,7 +32,7 @@ use crate::domain::{
 pub struct ForeignEntityRouterState<S, AccessSvc, Auth> {
     service: Arc<S>,
     access_service: Arc<AccessSvc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, AccessSvc, Auth> Clone for ForeignEntityRouterState<S, AccessSvc, Auth> {
@@ -54,7 +54,7 @@ where
     pub fn new(
         service: Arc<S>,
         access_service: Arc<AccessSvc>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -71,7 +71,7 @@ impl<S, AccessSvc, Auth> FromRef<ForeignEntityRouterState<S, AccessSvc, Auth>> f
 }
 
 impl<S, AccessSvc, Auth> FromRef<ForeignEntityRouterState<S, AccessSvc, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &ForeignEntityRouterState<S, AccessSvc, Auth>) -> Self {
         state.authorization_state.clone()
@@ -92,7 +92,7 @@ pub fn foreign_entity_router<S, AccessSvc, Auth, T>(
 where
     S: ForeignEntityService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -132,7 +132,7 @@ pub async fn get_foreign_entity_handler<S, AccessSvc, Auth>(
 where
     S: ForeignEntityService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let foreign_entity = state
         .service
@@ -182,7 +182,7 @@ pub async fn get_foreign_entity_by_source_handler<S, AccessSvc, Auth>(
 where
     S: ForeignEntityService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let caller = lookup_caller(authorization.authorization.as_ref())?;
 
@@ -200,17 +200,17 @@ where
 
 /// Resolve the transport credential into the identity the lookup runs as.
 fn lookup_caller(
-    authorization: Option<&MacroAuthorization>,
+    authorization: Option<&RoxAuthorization>,
 ) -> Result<ForeignEntityLookupCaller, ForeignEntityError> {
     match authorization {
-        Some(MacroAuthorization::User(user)) | Some(MacroAuthorization::Internal(Some(user))) => {
-            Ok(ForeignEntityLookupCaller::User(user.macro_user_id.clone()))
+        Some(RoxAuthorization::User(user)) | Some(RoxAuthorization::Internal(Some(user))) => {
+            Ok(ForeignEntityLookupCaller::User(user.rox_user_id.clone()))
         }
-        Some(MacroAuthorization::Internal(None)) => Ok(ForeignEntityLookupCaller::Internal),
-        Some(MacroAuthorization::Harness(harness)) => Ok(ForeignEntityLookupCaller::User(
-            harness.acting_user.macro_user_id.clone(),
+        Some(RoxAuthorization::Internal(None)) => Ok(ForeignEntityLookupCaller::Internal),
+        Some(RoxAuthorization::Harness(harness)) => Ok(ForeignEntityLookupCaller::User(
+            harness.acting_user.rox_user_id.clone(),
         )),
-        Some(MacroAuthorization::Bot(_)) | None => Err(ForeignEntityError::Unauthorized),
+        Some(RoxAuthorization::Bot(_)) | None => Err(ForeignEntityError::Unauthorized),
     }
 }
 

@@ -9,11 +9,11 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationRejection, MacroAuthorizationService,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationRejection, RoxAuthorizationService,
     UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 
 use crate::domain::{model::TeamError, team_repo::TeamService};
@@ -24,7 +24,7 @@ use super::TeamRouterState;
 /// (has an active or trialing Stripe subscription).
 pub struct PremiumUserExtractor<Auth> {
     /// The authenticated premium user's id.
-    pub macro_user_id: MacroUserIdStr<'static>,
+    pub rox_user_id: RoxUserIdStr<'static>,
     /// The authenticated premium user's active or trialing Stripe subscription id.
     pub subscription_id: stripe::SubscriptionId,
     _authorization: PhantomData<fn() -> Auth>,
@@ -35,7 +35,7 @@ pub struct PremiumUserExtractor<Auth> {
 pub enum PremiumUserRejection {
     /// The request could not be authorized.
     #[error("authorization failed")]
-    Authorization(MacroAuthorizationRejection),
+    Authorization(RoxAuthorizationRejection),
     /// The user has no active or trialing subscription.
     #[error("active subscription required")]
     NotPremium,
@@ -66,8 +66,8 @@ impl IntoResponse for PremiumUserRejection {
     }
 }
 
-impl From<MacroAuthorizationRejection> for PremiumUserRejection {
-    fn from(rejection: MacroAuthorizationRejection) -> Self {
+impl From<RoxAuthorizationRejection> for PremiumUserRejection {
+    fn from(rejection: RoxAuthorizationRejection) -> Self {
         Self::Authorization(rejection)
     }
 }
@@ -76,7 +76,7 @@ impl<T, Eas, Auth> FromRequestParts<TeamRouterState<T, Eas, Auth>> for PremiumUs
 where
     T: TeamService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     type Rejection = PremiumUserRejection;
 
@@ -86,16 +86,16 @@ where
         state: &TeamRouterState<T, Eas, Auth>,
     ) -> Result<Self, Self::Rejection> {
         let authorization =
-            MacroAuthorizationExtractor::<Auth, UserOrInternal>::from_request_parts(parts, state)
+            RoxAuthorizationExtractor::<Auth, UserOrInternal>::from_request_parts(parts, state)
                 .await?;
         let user = &authorization.authorization.user;
-        let Some(subscription_id) = state.service.is_user_premium(&user.macro_user_id).await?
+        let Some(subscription_id) = state.service.is_user_premium(&user.rox_user_id).await?
         else {
             return Err(PremiumUserRejection::NotPremium);
         };
 
         Ok(Self {
-            macro_user_id: user.macro_user_id.clone(),
+            rox_user_id: user.rox_user_id.clone(),
             subscription_id,
             _authorization: PhantomData,
         })

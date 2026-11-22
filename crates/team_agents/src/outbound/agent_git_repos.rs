@@ -5,9 +5,9 @@ use std::sync::Arc;
 use agent_git::client::AgentGitClient;
 use agent_git::domain::template::PersonaSeed as RepoSeed;
 use agent_git::domain::voice::VoiceConfig;
-use macro_service_urls::AgentGitServiceUrl;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_service_urls::AgentGitServiceUrl;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{AgentRepo, PersonaSeed, TeamAgentError, VoiceModel};
@@ -36,7 +36,7 @@ impl AgentGitRepos {
         }
     }
 
-    fn clone_url(&self, agent: &MacroUserIdStr<'_>) -> Result<String, TeamAgentError> {
+    fn clone_url(&self, agent: &RoxUserIdStr<'_>) -> Result<String, TeamAgentError> {
         clone_url(&(self.clone_base_url)()?, agent)
     }
 }
@@ -55,7 +55,7 @@ fn repo_seed(seed: &PersonaSeed) -> RepoSeed {
 /// can reach, without credentials, query or fragment.
 fn clone_url(
     base: &AgentGitServiceUrl,
-    agent: &MacroUserIdStr<'_>,
+    agent: &RoxUserIdStr<'_>,
 ) -> Result<String, TeamAgentError> {
     let mut url = base.parse_url().map_err(TeamAgentError::internal)?;
     let host = url
@@ -93,7 +93,7 @@ impl AgentRepos for AgentGitRepos {
     #[tracing::instrument(name = "team_agents.repo.create", skip_all, err)]
     async fn create(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         team_id: Uuid,
         seed: &PersonaSeed,
     ) -> Result<AgentRepo, TeamAgentError> {
@@ -113,7 +113,7 @@ impl AgentRepos for AgentGitRepos {
     }
 
     #[tracing::instrument(name = "team_agents.repo.delete", skip_all, err)]
-    async fn delete(&self, agent: &MacroUserIdStr<'_>) -> Result<(), TeamAgentError> {
+    async fn delete(&self, agent: &RoxUserIdStr<'_>) -> Result<(), TeamAgentError> {
         self.client.delete_repo(agent).await.map_err(|error| {
             TeamAgentError::RepoUnavailable(rootcause::Report::new(error).into_dynamic())
         })
@@ -122,7 +122,7 @@ impl AgentRepos for AgentGitRepos {
     #[tracing::instrument(name = "team_agents.repo.voice", skip_all, err)]
     async fn voice(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> Result<Option<VoiceModel>, TeamAgentError> {
         let voice = self.client.voice(agent, team_id).await.map_err(|error| {
@@ -134,7 +134,7 @@ impl AgentRepos for AgentGitRepos {
     #[tracing::instrument(name = "team_agents.repo.set_voice", skip_all, err)]
     async fn set_voice(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         team_id: Uuid,
         voice: &VoiceModel,
     ) -> Result<(), TeamAgentError> {

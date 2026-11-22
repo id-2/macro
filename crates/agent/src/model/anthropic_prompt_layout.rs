@@ -25,7 +25,7 @@ use serde_json::{Map, Value, json};
 mod test;
 
 /// Where the request planner puts its [`PromptLayout`] in the request body.
-pub(crate) const PROMPT_LAYOUT_KEY: &str = "macro_prompt_layout";
+pub(crate) const PROMPT_LAYOUT_KEY: &str = "rox_prompt_layout";
 
 /// Anthropic's limit on `cache_control` markers per request, the top-level
 /// automatic one included.

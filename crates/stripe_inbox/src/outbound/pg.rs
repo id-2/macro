@@ -801,29 +801,29 @@ impl AuditRepo for PgInbox {
                     .unwrap_or(serde_json::Value::Null)
             })
             .collect();
-        let macro_values: Vec<serde_json::Value> = mismatches
+        let rox_values: Vec<serde_json::Value> = mismatches
             .iter()
             .map(|mismatch| {
                 mismatch
-                    .macro_value
+                    .rox_value
                     .clone()
                     .unwrap_or(serde_json::Value::Null)
             })
             .collect();
         sqlx::query!(
             r#"
-            INSERT INTO stripe_audit_mismatch (id, run_id, kind, object_id, stripe_value, macro_value)
+            INSERT INTO stripe_audit_mismatch (id, run_id, kind, object_id, stripe_value, rox_value)
             SELECT finding.id, $2, finding.kind::stripe_audit_mismatch_kind, finding.object_id,
-                NULLIF(finding.stripe_value, 'null'::jsonb), NULLIF(finding.macro_value, 'null'::jsonb)
+                NULLIF(finding.stripe_value, 'null'::jsonb), NULLIF(finding.rox_value, 'null'::jsonb)
             FROM UNNEST($1::uuid[], $3::text[], $4::text[], $5::jsonb[], $6::jsonb[])
-                AS finding(id, kind, object_id, stripe_value, macro_value)
+                AS finding(id, kind, object_id, stripe_value, rox_value)
             "#,
             &ids,
             run_id,
             &kinds,
             &objects,
             &stripe_values,
-            &macro_values,
+            &rox_values,
         )
         .execute(&self.pool)
         .await?;

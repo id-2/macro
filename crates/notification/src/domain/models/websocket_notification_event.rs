@@ -2,9 +2,9 @@
 
 use std::borrow::Cow;
 
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroNotificationsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxNotificationsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::prelude::{Report, ResultExt as _};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
@@ -18,7 +18,7 @@ pub struct WebSocketNotificationMetadata<T> {
     pub notifications: Vec<UserNotificationRow<T>>,
 }
 
-/// Events published to [`MacroNotificationsTopic`].
+/// Events published to [`RoxNotificationsTopic`].
 ///
 /// `T` is the notification metadata type carried inside each [`UserNotificationRow`], typically
 /// `NotifEvent` in application code.
@@ -32,7 +32,7 @@ pub enum NotificationTopicEvent<'a, T: Clone> {
     #[serde(rename = "notification.status_updated_for_users")]
     NotificationStatusUpdatedForUsers {
         /// Users who own the notification deletion.
-        users: Vec<MacroUserIdStr<'a>>,
+        users: Vec<RoxUserIdStr<'a>>,
         /// Notification deletion shared by the users.
         update: Box<NotificationDelete<Uuid>>,
     },
@@ -40,7 +40,7 @@ pub enum NotificationTopicEvent<'a, T: Clone> {
     #[serde(rename = "notification.statuses_updated_for_user")]
     NotificationStatusesUpdatedForUser {
         /// User who owns the notification updates.
-        user: MacroUserIdStr<'a>,
+        user: RoxUserIdStr<'a>,
         /// Notification row patches and deletions for the user.
         updates: Vec<PatchDelete<Uuid, Cow<'a, UserNotificationRow<T>>>>,
     },
@@ -122,7 +122,7 @@ where
 impl<'a, T: Clone + Serialize + DeserializeOwned + Send + Sync> TopicEvent
     for NotificationTopicEvent<'a, T>
 {
-    type Topic = MacroNotificationsTopic;
+    type Topic = RoxNotificationsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
@@ -136,7 +136,7 @@ pub struct NotificationMacroEvent<'a, T: Clone> {
 impl<'a, T: Clone + Serialize + DeserializeOwned + Send + Sync> NotificationMacroEvent<'a, T> {
     /// Creates an event for one notification deletion shared by several users.
     pub fn status_updated_for_users(
-        users: Vec<MacroUserIdStr<'a>>,
+        users: Vec<RoxUserIdStr<'a>>,
         update: Box<NotificationDelete<Uuid>>,
     ) -> Self {
         let event =
@@ -148,7 +148,7 @@ impl<'a, T: Clone + Serialize + DeserializeOwned + Send + Sync> NotificationMacr
 
     /// Creates an event for several notification status updates belonging to one user.
     pub fn statuses_updated_for_user(
-        user: MacroUserIdStr<'a>,
+        user: RoxUserIdStr<'a>,
         updates: Vec<PatchDelete<Uuid, Cow<'a, UserNotificationRow<T>>>>,
     ) -> Self {
         let event = Event::new(NotificationTopicEvent::NotificationStatusesUpdatedForUser {
@@ -187,7 +187,7 @@ impl<T: Clone + Serialize + DeserializeOwned + Send + Sync + 'static>
     }
 }
 
-impl<'a, T: Clone + Serialize + DeserializeOwned + Send + Sync> MacroEvent
+impl<'a, T: Clone + Serialize + DeserializeOwned + Send + Sync> RoxEvent
     for NotificationMacroEvent<'a, T>
 {
     type EventPayload = NotificationTopicEvent<'a, T>;

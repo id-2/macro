@@ -30,11 +30,11 @@ const jwtSecretKeyArn: pulumi.Output<string> = aws.secretsmanager
   .getSecretVersionOutput({ secretId: JWT_SECRET_KEY })
   .apply((secret) => secret.arn);
 
-let MACRO_API_TOKENS = getMacroApiToken();
+let ROX_API_TOKENS = getMacroApiToken();
 
 const secretKeyArns = [
   pulumi.interpolate`${jwtSecretKeyArn}`,
-  MACRO_API_TOKENS.macroApiTokenPublicKeyArn,
+  ROX_API_TOKENS.macroApiTokenPublicKeyArn,
 ];
 
 let containerEnvVars = [

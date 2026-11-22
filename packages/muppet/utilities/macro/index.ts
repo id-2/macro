@@ -3,7 +3,7 @@
  * `stayOnline` shows the account as online; chat is in its own directory
  * (`./chat`). A call's share lives in the agent (the starter agent's calls).
  *
- *     const apiKey = () => credentials.get("MACRO_API_KEY");
+ *     const apiKey = () => credentials.get("ROX_API_KEY");
  *     const macro = macroClient({ apiKey });
  *     const online = stayOnline({ apiKey });
  *     behavior().use(chat({ macro }))
@@ -86,7 +86,7 @@ export const stayOnline = ({
       (key) => {
         if (stopped) return;
         const socket = new WebSocket(url, {
-          headers: { 'x-macro-user-api-key': key },
+          headers: { 'x-rox-user-api-key': key },
         });
         current = socket;
         let pinging: ReturnType<typeof setInterval> | undefined;

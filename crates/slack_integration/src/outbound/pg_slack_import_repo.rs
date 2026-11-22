@@ -5,7 +5,7 @@
 use std::collections::{HashMap, HashSet};
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::de::DeserializeOwned;
 use sha2::{Digest, Sha256};
 use sqlx::{PgConnection, PgPool};
@@ -39,7 +39,7 @@ impl PgSlackImportRepo {
     pub async fn create(
         &self,
         team: TeamId,
-        admin: &MacroUserIdStr<'_>,
+        admin: &RoxUserIdStr<'_>,
         command: &CreateImport,
         limits: &ImportLimits,
     ) -> PortResult<ImportProgress> {

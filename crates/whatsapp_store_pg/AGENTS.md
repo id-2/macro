@@ -20,7 +20,7 @@ The threat model is the crate doc comment in `src/lib.rs`.
 - Owns: the `whatsapp_device`, `whatsapp_store_value`, `whatsapp_pre_key`,
   `whatsapp_app_state_mutation_mac`, `whatsapp_privacy_token`,
   `whatsapp_event_buffer` and `whatsapp_outgoing_event` tables
-  (`crates/macro_db_client/migrations/20261027062649_whatsapp_store.sql`).
+  (`crates/rox_db_client/migrations/20261027062649_whatsapp_store.sql`).
 - Not here: the account, pairing and lease rows → linked-domain migration
   `20261026000000_whatsapp_linked.sql`; taking leases and running clients →
   `services/whatsapp_session_service`.

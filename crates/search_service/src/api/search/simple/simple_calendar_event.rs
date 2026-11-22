@@ -18,7 +18,7 @@ pub(in crate::api::search) struct FilterCalendarEventResponse {
 /// Access is resolved here rather than taken from the request. In the own
 /// scope an event is visible when the caller owns its projection or the
 /// event's source link is one of their inboxes (own or delegated).
-/// `fetch_inboxes_for_macro_id` is the authority for that set, so a caller
+/// `fetch_inboxes_for_rox_id` is the authority for that set, so a caller
 /// cannot widen their own scope by passing link ids. The shared scope is the
 /// explicit set of events shared with the caller's channels, so it always
 /// searches by id.
@@ -53,7 +53,7 @@ pub(in crate::api::search) async fn filter_calendar_events(
 
     let response = match scope {
         CalendarEventSearchScope::Own => {
-            let inboxes = email_db_client::links::get::fetch_inboxes_for_macro_id(&ctx.db, user_id)
+            let inboxes = email_db_client::links::get::fetch_inboxes_for_rox_id(&ctx.db, user_id)
                 .await
                 .map_err(SearchError::InternalError)?;
             FilterCalendarEventResponse {
@@ -67,7 +67,7 @@ pub(in crate::api::search) async fn filter_calendar_events(
                 .iter()
                 .filter_map(|id| Uuid::parse_str(id).ok())
                 .collect();
-            let shared = macro_db_client::calendar_event::get_events_for_search::get_channel_shared_calendar_event_ids(
+            let shared = rox_db_client::calendar_event::get_events_for_search::get_channel_shared_calendar_event_ids(
                 &ctx.db, user_id,
             )
             .await

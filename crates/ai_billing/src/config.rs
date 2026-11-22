@@ -10,7 +10,7 @@
 //! | `AI_USAGE_MAX_INCLUDED_ALLOWANCE_CENTS` | In-plan AI per Max seat per period, cents at provider cost |
 //! | `AI_USAGE_OVERAGE_MARKUP_PERCENT` | Markup on paid usage past the allowance, a whole percent (0-99) |
 //!
-//! Hosts on MacroConfig declare them as required fields of their `Config`
+//! Hosts on RoxConfig declare them as required fields of their `Config`
 //! using [`IncludedAllowanceCents`] and [`OverageMarkupPercent`] directly, so a
 //! missing, malformed or out-of-range value fails config loading (and the
 //! Doppler CI validator) rather than a request. Hosts reading plain env vars
@@ -45,7 +45,7 @@ pub struct RawPlanAllowances<'a> {
     pub max: &'a str,
 }
 
-// Keep configuration deserialization outside the domain policy. MacroConfig
+// Keep configuration deserialization outside the domain policy. RoxConfig
 // parses the raw Doppler/environment value as a strict boolean.
 impl<'de> serde::Deserialize<'de> for AiUsageBilling {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -58,7 +58,7 @@ impl<'de> serde::Deserialize<'de> for AiUsageBilling {
     }
 }
 
-// The pricing newtypes deserialize from the raw Doppler number. MacroConfig
+// The pricing newtypes deserialize from the raw Doppler number. RoxConfig
 // parses the string value as an integer; anything malformed or out of range
 // fails config loading, and so startup. The same allowance type backs every
 // plan's key, so the message names the kind of value rather than one key.
@@ -91,7 +91,7 @@ fn parse_allowance(
 
 /// Build the pricing from the raw allowance and
 /// `AI_USAGE_OVERAGE_MARKUP_PERCENT` values a host read itself. Hosts on
-/// MacroConfig declare the typed fields instead and need no parsing.
+/// RoxConfig declare the typed fields instead and need no parsing.
 ///
 /// Every value is mandatory; the host must propagate an error to fail startup.
 pub fn parse_ai_pricing(
@@ -117,7 +117,7 @@ pub fn parse_ai_pricing(
 ///
 /// Missing means disabled. Only `true` and `false` are accepted when present;
 /// malformed or non-Unicode values return an error that the host must propagate
-/// to fail startup. Hosts using MacroConfig must call this loader as well, for
+/// to fail startup. Hosts using RoxConfig must call this loader as well, for
 /// the same reasons as [`ai_usage::config::load_ai_usage_enforcement`]. This
 /// policy does not enable quota admission or usage counting.
 pub fn load_ai_usage_billing() -> Result<AiUsageBilling, rootcause::Report> {

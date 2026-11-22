@@ -13,7 +13,7 @@ pub mod source_grants;
 pub mod team_share;
 
 pub use channel_share::get_direct_channel_grants;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 pub use model_entity::EntityType;
 use model_owner::Owner;
 pub use models_entity_access_management::EntityAccessSourceType;
@@ -33,7 +33,7 @@ use sqlx::{PgConnection, Postgres, QueryBuilder, Transaction};
 #[tracing::instrument(skip(transaction), err)]
 pub async fn insert_entity_access_row(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
     source_id: &str,
     source_type: EntityAccessSourceType,
@@ -90,7 +90,7 @@ impl OwnerGrantSource {
 #[tracing::instrument(skip(transaction), err)]
 pub async fn upsert_owner_grant(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
     owner: &Owner,
 ) -> Result<(), sqlx::Error> {
@@ -132,7 +132,7 @@ pub async fn upsert_owner_grant(
 #[tracing::instrument(skip(transaction), err)]
 pub async fn remove_non_owner_user_entity_access(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
     owner_id: &str,
 ) -> Result<(), sqlx::Error> {
@@ -169,15 +169,15 @@ pub async fn remove_non_owner_user_entity_access(
 #[tracing::instrument(skip(transaction), err)]
 pub async fn delete_user_entity_access_rows(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
-    user_ids: &[MacroUserIdStr<'_>],
+    user_ids: &[RoxUserIdStr<'_>],
 ) -> Result<(), sqlx::Error> {
     if user_ids.is_empty() {
         return Ok(());
     }
 
-    let macro_ids: Vec<String> = user_ids.iter().map(|id| id.to_string()).collect();
+    let rox_ids: Vec<String> = user_ids.iter().map(|id| id.to_string()).collect();
 
     let removed = sqlx::query!(
         r#"
@@ -192,7 +192,7 @@ pub async fn delete_user_entity_access_rows(
         entity_id,
         entity_type.as_ref(),
         EntityAccessSourceType::User as _,
-        macro_ids.as_slice(),
+        rox_ids.as_slice(),
     )
     .execute(transaction.as_mut())
     .await?;
@@ -204,7 +204,7 @@ pub async fn delete_user_entity_access_rows(
 #[tracing::instrument(skip(transaction), err)]
 pub async fn delete_entity_access_rows(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
 ) -> Result<(), sqlx::Error> {
     sqlx::query!(
@@ -228,8 +228,8 @@ pub async fn delete_entity_access_rows(
 /// preserves stronger grants. It does not commit the caller's transaction.
 pub async fn ensure_call_participant_comment_access(
     connection: &mut PgConnection,
-    call_id: &macro_uuid::Uuid,
-    user_id: MacroUserIdStr<'_>,
+    call_id: &rox_uuid::Uuid,
+    user_id: RoxUserIdStr<'_>,
 ) -> Result<(), sqlx::Error> {
     let grant = Grant {
         source_id: user_id.as_ref(),
@@ -262,8 +262,8 @@ pub async fn ensure_call_participant_comment_access(
 #[tracing::instrument(skip(connection), err)]
 pub async fn upsert_user_entity_access_bulk(
     connection: &mut PgConnection,
-    user_ids: &[MacroUserIdStr<'_>],
-    entity_id: &macro_uuid::Uuid,
+    user_ids: &[RoxUserIdStr<'_>],
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
     access_level: AccessLevel,
 ) -> anyhow::Result<()> {
@@ -280,7 +280,7 @@ pub async fn upsert_user_entity_access_bulk(
         .collect();
     refuse_added_access(&mut *connection, entity_id, entity_type, &grants).await?;
 
-    let macro_ids: Vec<String> = user_ids.iter().map(|s| s.to_string()).collect();
+    let rox_ids: Vec<String> = user_ids.iter().map(|s| s.to_string()).collect();
 
     sqlx::query!(
         r#"
@@ -295,7 +295,7 @@ pub async fn upsert_user_entity_access_bulk(
         entity_id,
         entity_type.as_ref(),
         access_level as _,
-        macro_ids.as_slice(),
+        rox_ids.as_slice(),
     )
     .execute(&mut *connection)
     .await?;
@@ -317,7 +317,7 @@ pub struct SimpleEntity {
 #[tracing::instrument(skip(transaction), err)]
 pub async fn get_nested_project_entities(
     transaction: &mut Transaction<'_, Postgres>,
-    project_id: &macro_uuid::Uuid,
+    project_id: &rox_uuid::Uuid,
 ) -> Result<Vec<SimpleEntity>, sqlx::Error> {
     let results = sqlx::query!(
             r#"
@@ -372,8 +372,8 @@ pub async fn get_nested_project_entities(
 #[tracing::instrument(skip(transaction), err)]
 pub async fn walk_up_project_tree(
     transaction: &mut Transaction<'_, Postgres>,
-    project_id: &macro_uuid::Uuid,
-) -> Result<Vec<macro_uuid::Uuid>, sqlx::Error> {
+    project_id: &rox_uuid::Uuid,
+) -> Result<Vec<rox_uuid::Uuid>, sqlx::Error> {
     let results = sqlx::query!(
         r#"
             WITH RECURSIVE parent_projects AS (
@@ -394,7 +394,7 @@ pub async fn walk_up_project_tree(
             "#,
         &project_id.to_string()
     )
-    .map(|p| macro_uuid::string_to_uuid(&p.id).unwrap()) // SAFETY: the project_id is always a uuid, we just haven't migrated the type to be that in the db schema
+    .map(|p| rox_uuid::string_to_uuid(&p.id).unwrap()) // SAFETY: the project_id is always a uuid, we just haven't migrated the type to be that in the db schema
     .fetch_all(transaction.as_mut())
     .await?;
 
@@ -406,7 +406,7 @@ pub async fn walk_up_project_tree(
 #[tracing::instrument(skip(transaction), err)]
 pub async fn update_entity_access_channel_share_permissions(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
     channel_perms: &[UpdateChannelSharePermission],
 ) -> Result<(), sqlx::Error> {
@@ -476,8 +476,8 @@ pub async fn update_entity_access_channel_share_permissions(
                     &remove_channel_ids,
                     &project_items
                         .iter()
-                        .map(|p| macro_uuid::string_to_uuid(&p.entity_id).unwrap())
-                        .collect::<Vec<macro_uuid::Uuid>>(),
+                        .map(|p| rox_uuid::string_to_uuid(&p.entity_id).unwrap())
+                        .collect::<Vec<rox_uuid::Uuid>>(),
                     &project_items
                         .iter()
                         .filter_map(|p| {
@@ -574,7 +574,7 @@ pub async fn update_entity_access_channel_share_permissions(
                     .iter()
                     .filter(|e| !(e.entity_type == "project" && e.entity_id == granted_from))
                     .filter_map(|e| {
-                        macro_uuid::string_to_uuid(&e.entity_id)
+                        rox_uuid::string_to_uuid(&e.entity_id)
                             .ok()
                             .map(|id| (id, e.entity_type.clone()))
                     })

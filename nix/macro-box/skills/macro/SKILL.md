@@ -6,7 +6,7 @@ description: Read and change the team's Macro workspace (documents, channels, em
 # Rox MCP and SDK
 
 - Sessions roxd starts already have the team's Rox MCP server; check
-  your tools for `mcp__macro__*`. With code mode, call `DescribeCodeTools`
+  your tools for `mcp__rox__*`. With code mode, call `DescribeCodeTools`
   with the task, read the symbols with `ReadCodeDocs`, then do the whole job in
   one `ExecuteCode` program.
 - For scripts and apps on this machine, use the SDK:

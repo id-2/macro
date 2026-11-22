@@ -31,8 +31,8 @@ use entity_access::domain::{
     },
     ports::ScheduledActionGrants,
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
-use macro_uuid::generate_uuid_v7;
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
+use rox_uuid::generate_uuid_v7;
 use model_owner::{CreationPrincipal, Owner};
 use serde_json::json;
 use std::sync::Mutex;
@@ -170,7 +170,7 @@ impl ScheduledActionRepo for FakeRepo {
 
     async fn get_owned_actions(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ScheduledAction>> {
         // Return every stored owner so cleanup can reject a foreign row.
         Ok(self.actions.lock().unwrap().clone())
@@ -319,7 +319,7 @@ impl FakeGrants {
 impl ScheduledActionGrants for FakeGrants {
     async fn accessible_scheduled_action_ids(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<Uuid>, AccessError> {
         if user_id.as_ref() != USER {
             return Ok(self
@@ -448,8 +448,8 @@ fn view_receipt(id: Uuid) -> EntityAccessReceipt<ViewAccessLevel> {
     )
 }
 
-pub(crate) fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(USER.to_owned()).unwrap()
+pub(crate) fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(USER.to_owned()).unwrap()
 }
 
 pub(crate) fn configuration(events: bool) -> ActionConfiguration {
@@ -495,7 +495,7 @@ async fn validates_before_persistence_and_rejects_cross_owner_selection() {
     .with_target_validation(TargetValidation::new(sessions.clone()));
     let mut config = configuration(false);
     config.task = agent_task();
-    let foreign = MacroUserIdStr::parse_from_str(FOREIGN_USER).unwrap();
+    let foreign = RoxUserIdStr::parse_from_str(FOREIGN_USER).unwrap();
     let error = svc
         .create_action(&CreationPrincipal::User(foreign), config.clone())
         .await
@@ -1621,14 +1621,14 @@ struct Linked(bool);
 impl github::domain::ports::GithubInstallationClaims for Linked {
     async fn is_linked(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<bool, github::domain::models::GithubError> {
         Ok(self.0)
     }
 
     async fn has_claim(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: u64,
     ) -> Result<bool, github::domain::models::GithubError> {
         Ok(self.0)

@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use model_owner::{Owner, OwnerType};
 use shared_entity_registry::{InsertOutcome, NewEntityRecord, RegisteredEntityType, WriteOutcome};
 use sqlx::{PgPool, Postgres, Transaction};
@@ -32,7 +32,7 @@ async fn insert(tx: &mut Transaction<'_, Postgres>, record: NewEntityRecord) -> 
     insert_entity(tx, record).await.unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_registers_a_row_for_each_registered_kind(pool: PgPool) {
     let owner = user_owner();
     let mut tx = pool.begin().await.unwrap();
@@ -57,7 +57,7 @@ async fn insert_registers_a_row_for_each_registered_kind(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_twice_is_a_no_op(pool: PgPool) {
     let id = Uuid::from_u128(1);
     let first = user_owner();
@@ -98,7 +98,7 @@ async fn insert_twice_is_a_no_op(pool: PgPool) {
     assert_eq!(rows[0].entity_type, "chat");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_encodes_user_bot_and_team_owners(pool: PgPool) {
     let cases = [
         (
@@ -146,7 +146,7 @@ async fn insert_encodes_user_bot_and_team_owners(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_without_timestamps_matches_transaction_now(pool: PgPool) {
     let id = Uuid::from_u128(1);
     let mut tx = pool.begin().await.unwrap();
@@ -176,7 +176,7 @@ async fn insert_without_timestamps_matches_transaction_now(pool: PgPool) {
     assert_eq!(row.updated_at, now);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_with_timestamps_stores_them(pool: PgPool) {
     let id = Uuid::from_u128(1);
     let created_at = ts("2024-03-15T12:00:00Z");
@@ -206,7 +206,7 @@ async fn insert_with_timestamps_stores_them(pool: PgPool) {
     assert_eq!(row.deleted_at, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mark_deleted_sets_the_instant_and_last_write_wins(pool: PgPool) {
     let id = Uuid::from_u128(1);
     let first = ts("2024-01-01T00:00:00Z");
@@ -253,7 +253,7 @@ async fn mark_deleted_sets_the_instant_and_last_write_wins(pool: PgPool) {
     assert_eq!(after_second.deleted_at, Some(second));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mark_deleted_on_missing_row_is_not_found_not_error(pool: PgPool) {
     let mut tx = pool.begin().await.unwrap();
     assert_eq!(
@@ -264,7 +264,7 @@ async fn mark_deleted_on_missing_row_is_not_found_not_error(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn clear_deleted_nulls_deleted_at(pool: PgPool) {
     let id = Uuid::from_u128(1);
     let mut tx = pool.begin().await.unwrap();
@@ -295,7 +295,7 @@ async fn clear_deleted_nulls_deleted_at(pool: PgPool) {
     assert_eq!(row.deleted_at, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn touch_updated_sets_updated_at_only(pool: PgPool) {
     let id = Uuid::from_u128(1);
     let created_at = ts("2024-03-15T12:00:00Z");
@@ -329,7 +329,7 @@ async fn touch_updated_sets_updated_at_only(pool: PgPool) {
     assert_eq!(row.deleted_at, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_entity_removes_the_row_and_reports_not_found_second_time(pool: PgPool) {
     let id = Uuid::from_u128(1);
     let mut tx = pool.begin().await.unwrap();
@@ -361,7 +361,7 @@ async fn delete_entity_removes_the_row_and_reports_not_found_second_time(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn helpers_never_commit(pool: PgPool) {
     let id = Uuid::from_u128(1);
     let mut tx = pool.begin().await.unwrap();
@@ -407,7 +407,7 @@ async fn deleted_at_by_id(
     .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mark_deleted_many_marks_only_the_listed_rows(pool: PgPool) {
     let at = ts("2024-01-01T00:00:00Z");
     let mut tx = pool.begin().await.unwrap();
@@ -446,7 +446,7 @@ async fn mark_deleted_many_marks_only_the_listed_rows(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn clear_deleted_many_restores_only_the_listed_rows(pool: PgPool) {
     let at = ts("2024-01-01T00:00:00Z");
     let mut tx = pool.begin().await.unwrap();
@@ -476,7 +476,7 @@ async fn clear_deleted_many_restores_only_the_listed_rows(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_entities_removes_only_the_listed_rows(pool: PgPool) {
     let mut tx = pool.begin().await.unwrap();
     for id in 1..=3 {

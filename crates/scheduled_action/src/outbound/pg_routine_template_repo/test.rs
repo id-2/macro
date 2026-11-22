@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 
 use super::*;
@@ -28,7 +28,7 @@ fn snapshot(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn resharing_replaces_the_snapshot_and_counts_activations(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -68,7 +68,7 @@ async fn resharing_replaces_the_snapshot_and_counts_activations(pool: PgPool) {
     assert_eq!(second.variables, first.variables);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stopping_or_deleting_the_source_removes_the_template_only(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;

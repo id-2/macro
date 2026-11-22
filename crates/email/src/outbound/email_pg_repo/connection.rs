@@ -4,7 +4,7 @@ use super::EmailPgRepo;
 use crate::domain::{
     mailbox::connection::ConnectionLinkLookup, models::UserProvider, ports::EmailRepo,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 impl ConnectionLinkLookup for EmailPgRepo {
@@ -13,9 +13,9 @@ impl ConnectionLinkLookup for EmailPgRepo {
     async fn by_identity(
         &self,
         owner: &str,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
     ) -> Result<Option<Uuid>, Self::Err> {
-        self.link_by_fusionauth_and_macro_id(owner, actor, UserProvider::Gmail)
+        self.link_by_fusionauth_and_rox_id(owner, actor, UserProvider::Gmail)
             .await
             .map(|link| link.map(|link| link.id))
     }

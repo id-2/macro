@@ -46,15 +46,15 @@ const webhookEventQueue = new Queue('webhook-event', {
 export const webhookEventQueueArn = webhookEventQueue.queue.arn;
 export const webhookEventQueueName = webhookEventQueue.queue.name;
 
-const MACRO_CACHE = aws.secretsmanager
+const ROX_CACHE = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require(`macro_cache_secret_key`),
+    secretId: config.require(`rox_cache_secret_key`),
   })
   .apply((secret) => secret.secretString);
 
 const DATABASE_URL_PROXY = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require(`macro_db_proxy_secret_key`),
+    secretId: config.require(`rox_db_proxy_secret_key`),
   })
   .apply((secret) => secret.secretString);
 
@@ -274,7 +274,7 @@ const deleteChatHandler = new DeleteChatHandler(
     envVars: {
       DATABASE_URL: pulumi.interpolate`${DATABASE_URL_PROXY}`,
       ENVIRONMENT: stack,
-      RUST_LOG: 'delete_chat_handler=info,macro_http_request=info',
+      RUST_LOG: 'delete_chat_handler=info,rox_http_request=info',
     },
     vpc: coparse_api_vpc,
     tags,
@@ -304,7 +304,7 @@ export const calendarReminderDispatchQueueArn =
 export const calendarReminderDispatchQueueName =
   calendarReminderDispatchQueue.queue.name;
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
 const GITHUB_WEBHOOK_SECRET_KEY = config.require('github_webhook_secret_key');
 const githubWebhookSecretKeyArn: pulumi.Output<string> = aws.secretsmanager
@@ -371,7 +371,7 @@ const cloudStorageService = new CloudStorageService(
       documentStoragePermissionsKeyArn,
       cloudfrontPrivateKeySecretArn,
       syncServiceAuthKeyArn,
-      MACRO_API_TOKENS.macroApiTokenPublicKeyArn,
+      ROX_API_TOKENS.macroApiTokenPublicKeyArn,
       githubWebhookSecretKeyArn,
       githubSyncAppPemArn,
       calWebhookSecretKeyArn,
@@ -423,9 +423,9 @@ const convertQueueArn: pulumi.Output<string> = convertServiceStack
 // ------------------------------------------- DOCX Unzip -------------------------------------------
 const docxUnzipHandlerEnvVars: DocxUnzipLambdaEnvVars = {
   DATABASE_URL: pulumi.interpolate`${DATABASE_URL_PROXY}`,
-  REDIS_URI: pulumi.interpolate`redis://${MACRO_CACHE}`,
+  REDIS_URI: pulumi.interpolate`redis://${ROX_CACHE}`,
   ENVIRONMENT: stack,
-  RUST_LOG: 'docx_unzip_handler=info,macro_http_request=info',
+  RUST_LOG: 'docx_unzip_handler=info,rox_http_request=info',
   DOCUMENT_STORAGE_BUCKET: pulumi.interpolate`${documentStorageBucketId}`,
   DOCX_DOCUMENT_UPLOAD_BUCKET: pulumi.interpolate`${docxUploadBucketName}`,
   WEB_SOCKET_RESPONSE_LAMBDA: pulumi.interpolate`${jobUpdateHandlerLambdaName}`,
@@ -455,7 +455,7 @@ const documentUploadFinalizerEnvVars: DocumentUploadFinalizerLambdaEnvVars = {
   LEXICAL_SERVICE_URL: getServiceUrl(ServiceUrl.LEXICAL_SERVICE_URL),
   SYNC_SERVICE_URL: getServiceUrl(ServiceUrl.SYNC_SERVICE_URL),
   RUST_LOG:
-    'document_upload_finalizer_handler=info,documents=info,macro_http_request=info',
+    'document_upload_finalizer_handler=info,documents=info,rox_http_request=info',
   // Selects the stack's convert queue.
   ENVIRONMENT: stack,
   DOCUMENT_STORAGE_BUCKET: pulumi.interpolate`${documentStorageBucketId}`,

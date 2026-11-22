@@ -6,7 +6,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use model_entity::EntityType;
 use notification::domain::item_preferences::ItemNotificationPreferenceError;
@@ -72,7 +72,7 @@ fn error_response(error: ItemNotificationPreferenceError) -> Response {
 #[tracing::instrument(skip(ctx, user, request))]
 pub async fn unsubscribe_items(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(request): Json<BulkSetItemsRequest>,
 ) -> Result<Response, Response> {
     let entities = request
@@ -82,7 +82,7 @@ pub async fn unsubscribe_items(
         .collect();
     ctx.item_preferences
         .set_bulk(
-            user.authorization.user.macro_user_id,
+            user.authorization.user.rox_user_id,
             entities,
             request.snoozed_until,
             chrono::Utc::now(),
@@ -108,7 +108,7 @@ pub async fn unsubscribe_items(
 #[tracing::instrument(skip(ctx, user, request))]
 pub async fn remove_unsubscribe_items(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(request): Json<BulkRemoveItemsRequest>,
 ) -> Result<Response, Response> {
     let entities = request
@@ -117,7 +117,7 @@ pub async fn remove_unsubscribe_items(
         .map(|item| item.item_type.with_entity_string(item.item_id))
         .collect();
     ctx.item_preferences
-        .remove_bulk(user.authorization.user.macro_user_id, entities)
+        .remove_bulk(user.authorization.user.rox_user_id, entities)
         .await
         .map_err(error_response)?;
     Ok((StatusCode::OK, Json(EmptyResponse {})).into_response())

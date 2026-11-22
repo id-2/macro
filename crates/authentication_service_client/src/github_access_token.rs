@@ -9,12 +9,12 @@ impl AuthServiceClient {
     #[tracing::instrument(skip(self), err)]
     pub async fn get_github_access_token(
         &self,
-        macro_user_id: &str,
+        rox_user_id: &str,
     ) -> Result<Option<GithubAccessToken>, AuthServiceClientError> {
         let res = self
             .client
             .get(format!("{}/internal/github_access_token", self.url))
-            .query(&[("macro_user_id", macro_user_id)])
+            .query(&[("rox_user_id", rox_user_id)])
             .send()
             .await
             .map_err(|e| AuthServiceClientError::RequestBuildError {

@@ -285,7 +285,7 @@ fn carries_geometry_and_images_over() {
 #[test]
 fn translates_records_between_schemas() {
     let src = Schema::decode(&crate::kiwi::schema_from_text(crate::testing::SCHEMA)).unwrap();
-    let dst = Schema::decode(&crate::kiwi::schema_from_text(crate::save::MACRO_SCHEMA)).unwrap();
+    let dst = Schema::decode(&crate::kiwi::schema_from_text(crate::save::ROX_SCHEMA)).unwrap();
     let node = src.def_index("NodeChange").unwrap();
     let mut m = Msg::new(node);
     m.set(&src, "name", Value::Str("Box".into()));

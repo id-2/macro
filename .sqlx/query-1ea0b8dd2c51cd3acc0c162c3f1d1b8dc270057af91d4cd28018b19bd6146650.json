@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, email_address, provider as \"provider: DbUserProvider\",\n               sync_generation, grant_generation\n        FROM email_links\n        WHERE macro_id = $1 AND is_sync_active AND NOT needs_reauth\n        ORDER BY created_at DESC\n        ",
+  "query": "\n        SELECT id, email_address, provider as \"provider: DbUserProvider\",\n               sync_generation, grant_generation\n        FROM email_links\n        WHERE rox_id = $1 AND is_sync_active AND NOT needs_reauth\n        ORDER BY created_at DESC\n        ",
   "describe": {
     "columns": [
       {

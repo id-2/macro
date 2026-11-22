@@ -9,7 +9,7 @@ schema = ["dep:utoipa"]
 
 [dependencies]
 bot_id = { path = "../bot_id" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 serde = { workspace = true }
 uuid = { workspace = true }
 utoipa = { workspace = true, optional = true }

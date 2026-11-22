@@ -1,11 +1,11 @@
 use super::*;
 use item_filters::{NotificationState, ast::EntityFilterAst};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{CursorVal, CursorWithValAndFilter, Frecency};
 use std::sync::Arc;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn frecency_fallback_keeps_calendar_events_with_aggregates(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -15,7 +15,7 @@ async fn frecency_fallback_keeps_calendar_events_with_aggregates(
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, 'calendar-frecency@example.com', 'GMAIL')
         "#,
@@ -63,7 +63,7 @@ async fn frecency_fallback_keeps_calendar_events_with_aggregates(
                 SimpleSortMethod::UpdatedAt,
                 Frecency,
             )),
-            user_id: MacroUserIdStr::parse_from_str(owner_id)?,
+            user_id: RoxUserIdStr::parse_from_str(owner_id)?,
         },
     )
     .await?;
@@ -79,7 +79,7 @@ async fn frecency_fallback_keeps_calendar_events_with_aggregates(
 /// A fired reminder counts as the event's latest activity: recency sorting
 /// must place the event at its delivery time, not at the older Google
 /// last-modified time that made reminder rows surface in the past.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recency_sort_uses_reminder_delivery_time(pool: PgPool) -> anyhow::Result<()> {
     let owner_id = "macro|calendar-fired@example.com";
     let link_id = Uuid::now_v7();
@@ -88,7 +88,7 @@ async fn recency_sort_uses_reminder_delivery_time(pool: PgPool) -> anyhow::Resul
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, 'calendar-fired@example.com', 'GMAIL')
         "#,
@@ -143,7 +143,7 @@ async fn recency_sort_uses_reminder_delivery_time(pool: PgPool) -> anyhow::Resul
         SimpleSortRequest {
             limit: 10,
             cursor: SimpleSortQuery::NoFilter(Query::Sort(SimpleSortMethod::UpdatedAt, ())),
-            user_id: MacroUserIdStr::parse_from_str(owner_id)?,
+            user_id: RoxUserIdStr::parse_from_str(owner_id)?,
         },
     )
     .await?;
@@ -196,14 +196,14 @@ async fn seed_unread(pool: &PgPool) -> anyhow::Result<UnreadFixture> {
         .execute(pool)
         .await?;
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+            r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
             user,
             macro_user,
         )
         .execute(pool)
         .await?;
         sqlx::query!(
-            "INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider) VALUES ($1, $2, $2, $3, 'GMAIL')",
+            "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider) VALUES ($1, $2, $2, $3, 'GMAIL')",
             link,
             user,
             user,
@@ -212,7 +212,7 @@ async fn seed_unread(pool: &PgPool) -> anyhow::Result<UnreadFixture> {
         .await?;
     }
     sqlx::query!(
-        "INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id) VALUES ($1, $2, $3)",
+        "INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ($1, $2, $3)",
         UNREAD_OWNER,
         UNREAD_CHILD,
         child_link,
@@ -349,7 +349,7 @@ fn owner_request(
     SimpleSortRequest {
         limit,
         cursor,
-        user_id: MacroUserIdStr::parse_from_str(UNREAD_OWNER).expect("valid user id"),
+        user_id: RoxUserIdStr::parse_from_str(UNREAD_OWNER).expect("valid user id"),
     }
 }
 
@@ -363,7 +363,7 @@ fn event_ids(items: &[SoupItem<()>]) -> Vec<Uuid> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unread_feed_lists_events_the_caller_holds_an_unseen_notification_for(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -396,7 +396,7 @@ async fn unread_feed_lists_events_the_caller_holds_an_unseen_notification_for(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unread_feed_pages_without_repeating_or_skipping(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed_unread(&pool).await?;
 
@@ -413,7 +413,7 @@ async fn unread_feed_pages_without_repeating_or_skipping(pool: PgPool) -> anyhow
 
 /// A notification literal under OR keeps the per-event fold; the semi-join
 /// over the caller's notifications must agree with it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn notified_semi_join_matches_the_per_event_fold(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed_unread(&pool).await?;
     let folded = Expr::or(

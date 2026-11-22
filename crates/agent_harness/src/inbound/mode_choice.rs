@@ -9,8 +9,8 @@ use axum::extract::{FromRef, Json, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -39,14 +39,14 @@ pub struct AgentModeChoiceResponse {
 /// Router state for Auto mode choice.
 pub struct AgentModeChoiceRouterState<Auth> {
     service: Arc<dyn ModeChoiceService>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Auth> AgentModeChoiceRouterState<Auth> {
     /// Build Auto mode choice route state.
     pub fn new(
         service: Arc<dyn ModeChoiceService>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -64,7 +64,7 @@ impl<Auth> Clone for AgentModeChoiceRouterState<Auth> {
     }
 }
 
-impl<Auth> FromRef<AgentModeChoiceRouterState<Auth>> for MacroAuthorizationState<Auth> {
+impl<Auth> FromRef<AgentModeChoiceRouterState<Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AgentModeChoiceRouterState<Auth>) -> Self {
         state.authorization.clone()
     }
@@ -73,7 +73,7 @@ impl<Auth> FromRef<AgentModeChoiceRouterState<Auth>> for MacroAuthorizationState
 /// Build `POST /agent-mode-choice`.
 pub fn agent_mode_choice_router<Auth, S>(state: AgentModeChoiceRouterState<Auth>) -> Router<S>
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -103,16 +103,16 @@ where
 )]
 pub async fn choose_agent_mode_handler<Auth>(
     State(state): State<AgentModeChoiceRouterState<Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOnly>,
     Json(request): Json<AgentModeChoiceRequest>,
 ) -> Response
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     match state
         .service
         .choose(
-            authorization.authorization.macro_user_id.clone(),
+            authorization.authorization.rox_user_id.clone(),
             &request.prompt,
         )
         .await

@@ -2,7 +2,7 @@ use super::support as delivery;
 use crate::domain::scheduled_delivery::identity::{reconcile_message, reconcile_sent_thread};
 use email_db_client::messages::update::mark_message_as_sent;
 use email_db_client::threads::provider_identity::lock_provider_thread;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{PgPool, types::Uuid};
 
 const LINK: Uuid = Uuid::from_u128(0x019a0000_0000_7000_8000_000000000001);
@@ -92,7 +92,7 @@ async fn complete(pool: &PgPool, claim: &delivery::DeliveryClaim) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("mark_message_as_sent")
@@ -102,7 +102,7 @@ async fn sync_before_completion_preserves_original_message_and_imported_dependen
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let claim = imported_delivery(&pool).await?;
-    let reply = macro_uuid::generate_uuid_v7();
+    let reply = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO email_messages (id, link_id, thread_id, replying_to_id) VALUES ($1, $2, $3, $4)",
         reply, LINK, THREAD, IMPORTED,
@@ -177,7 +177,7 @@ async fn sync_before_completion_preserves_original_message_and_imported_dependen
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("mark_message_as_sent")
@@ -187,7 +187,7 @@ async fn empty_original_thread_retains_row_and_redirects_all_its_aliases(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let claim = imported_delivery(&pool).await?;
-    let client_id = macro_uuid::generate_uuid_v7();
+    let client_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO email_thread_client_ids (client_id, link_id, thread_id) VALUES ($1, $2, $3)",
         client_id,
@@ -232,7 +232,7 @@ async fn empty_original_thread_retains_row_and_redirects_all_its_aliases(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("mark_message_as_sent")
@@ -242,8 +242,8 @@ async fn duplicate_attachment_references_survive_reconciliation(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let claim = imported_delivery(&pool).await?;
-    let duplicate = macro_uuid::generate_uuid_v7();
-    let sfs = macro_uuid::generate_uuid_v7();
+    let duplicate = rox_uuid::generate_uuid_v7();
+    let sfs = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO email_attachments (id, message_id, provider_attachment_id) VALUES ($1, $2, 'attachment')",
         duplicate, MESSAGE,
@@ -260,7 +260,7 @@ async fn duplicate_attachment_references_survive_reconciliation(
         sfs,
     ).execute(&pool).await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id)
+        r#"INSERT INTO "User" (id, email, rox_user_id)
            VALUES ('macro|sent-cache@example.com', 'sent-cache@example.com', $1)"#,
         sfs,
     )
@@ -320,7 +320,7 @@ async fn duplicate_attachment_references_survive_reconciliation(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("mark_message_as_sent")
@@ -334,7 +334,7 @@ async fn concurrent_reconciliation_completes_once(pool: PgPool) -> anyhow::Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("mark_message_as_sent")
@@ -369,7 +369,7 @@ async fn inbox_thread_sync_and_completion_converge_on_original_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("mark_message_as_sent")

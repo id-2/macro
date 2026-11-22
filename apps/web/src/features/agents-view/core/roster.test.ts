@@ -1,12 +1,12 @@
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { MACRO_AGENT_BOT_ID } from '@core/constant/macroAgent';
-import { MACRO_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
+import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
 import { describe, expect, it } from 'vitest';
 import { agentPickerGroups } from './agent-picker-groups';
 import {
   buildAgentRoster,
   kindForBot,
-  MACRO_PERSONA_ID,
+  ROX_PERSONA_ID,
   type PersistedAgentLike,
   type RosterInput,
   rosterForAgentPicker,
@@ -38,7 +38,7 @@ describe('buildAgentRoster', () => {
   it('leads with the first-party agents and coders', () => {
     const roster = buildAgentRoster(EMPTY);
     expect(roster.map((agent) => [agent.id, agent.kind])).toEqual([
-      [MACRO_PERSONA_ID, 'agent'],
+      [ROX_PERSONA_ID, 'agent'],
       [CURSOR_BOT_ID, 'coder'],
     ]);
     expect(roster[0]?.botId).toBeUndefined();
@@ -190,12 +190,12 @@ describe('rosterForAgentPicker and kindForBot', () => {
       persisted({ harness: 'future-runtime' }),
       persisted({
         harness: 'in-memory',
-        bot: { id: MACRO_AGENT_BOT_ID, name: 'Rox', handle: 'macro' },
+        bot: { id: ROX_AGENT_BOT_ID, name: 'Rox', handle: 'macro' },
       }),
       persisted({
         harness: 'in-memory',
         bot: {
-          id: `bot|${MACRO_AGENT_BOT_ID}`,
+          id: `bot|${ROX_AGENT_BOT_ID}`,
           name: 'Rox',
           handle: 'macro',
         },
@@ -231,7 +231,7 @@ describe('rosterForAgentPicker and kindForBot', () => {
 
   it('resolves a session bot to its kind, defaulting to Chat', () => {
     expect(kindForBot('bot-cursor', roster)).toBe('coder');
-    expect(kindForBot(`bot|${MACRO_CODER_BOT_ID}`, roster)).toBe('coder');
+    expect(kindForBot(`bot|${ROX_CODER_BOT_ID}`, roster)).toBe('coder');
     expect(kindForBot('bot-in-memory', roster)).toBe('agent');
     expect(kindForBot('someone-elses-bot', roster)).toBe('agent');
     expect(kindForBot(undefined, roster)).toBe('agent');

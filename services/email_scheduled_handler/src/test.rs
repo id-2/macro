@@ -1,15 +1,15 @@
 use crate::outbound::fetch_pending_scheduled_messages;
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn fetch_pending_returns_only_eligible_messages(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let results = fetch_pending_scheduled_messages(&pool).await?;
 
@@ -27,7 +27,7 @@ async fn fetch_pending_returns_only_eligible_messages(pool: Pool<Postgres>) -> R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn fetch_pending_excludes_future_send_time(pool: Pool<Postgres>) -> Result<()> {
@@ -42,7 +42,7 @@ async fn fetch_pending_excludes_future_send_time(pool: Pool<Postgres>) -> Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn fetch_pending_excludes_already_sent(pool: Pool<Postgres>) -> Result<()> {
@@ -57,7 +57,7 @@ async fn fetch_pending_excludes_already_sent(pool: Pool<Postgres>) -> Result<()>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn fetch_pending_recovers_only_admitted_graphql_immediate_sends(
@@ -99,7 +99,7 @@ async fn fetch_pending_recovers_only_admitted_graphql_immediate_sends(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn scanner_recovers_managed_rest_sends_without_resurrecting_legacy_sends(
@@ -154,7 +154,7 @@ async fn scanner_recovers_managed_rest_sends_without_resurrecting_legacy_sends(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn fetch_pending_returns_correct_link_ids(pool: Pool<Postgres>) -> Result<()> {
@@ -180,7 +180,7 @@ async fn fetch_pending_returns_correct_link_ids(pool: Pool<Postgres>) -> Result<
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_pending_returns_empty_when_no_scheduled_messages(
     pool: Pool<Postgres>,
 ) -> Result<()> {
@@ -193,7 +193,7 @@ async fn fetch_pending_returns_empty_when_no_scheduled_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn scanner_recovers_expired_preparation_submission_and_legacy_claims(
@@ -237,7 +237,7 @@ async fn scanner_recovers_expired_preparation_submission_and_legacy_claims(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn scanner_obeys_active_lease_and_preparation_backoff(pool: Pool<Postgres>) -> Result<()> {
@@ -262,7 +262,7 @@ async fn scanner_obeys_active_lease_and_preparation_backoff(pool: Pool<Postgres>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn scanner_does_not_restart_failed_delivery_after_expiry(pool: Pool<Postgres>) -> Result<()> {
@@ -284,7 +284,7 @@ async fn scanner_does_not_restart_failed_delivery_after_expiry(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn scanner_retries_unconfirmed_lookups_only_after_backoff(
@@ -316,7 +316,7 @@ async fn scanner_retries_unconfirmed_lookups_only_after_backoff(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "test/fixtures", scripts("fetch_pending_scheduled_messages"))
 )]
 async fn scanner_recovers_deferred_deletions_after_delivery_or_cancellation(

@@ -35,11 +35,11 @@ pub async fn get_user_unsubscribes(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
     use sqlx::{Pool, Postgres};
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("user_unsubscribes"))
     )]
     async fn test_get_user_unsubscribes(pool: Pool<Postgres>) {

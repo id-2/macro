@@ -18,7 +18,7 @@ use entity_access::{
     },
     outbound::PgAccessRepository,
 };
-use macro_event_broker::MacroEvent;
+use rox_event_broker::RoxEvent;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -33,7 +33,7 @@ impl InitiativeResources for UnusedProperties {
     }
     fn set_initial_properties(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: InitiativeId,
         _: Vec<crate::domain::models::InitialPropertyValue>,
     ) -> ResourceFuture<'_, ()> {
@@ -106,11 +106,11 @@ fn context_with_resources(
         )),
         access,
         resources,
-        actor: bot_id::MACRO_AI_BOT_ID,
+        actor: bot_id::ROX_AI_BOT_ID,
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sharing_tool_checks_actual_ownership_under_delegated_bot_receipt(
     pool: PgPool,
 ) -> anyhow::Result<()> {

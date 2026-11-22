@@ -57,11 +57,11 @@ fn skills_render_non_empty_titled_markdown() {
 fn compose_routines_finds_items_with_the_sdk_and_ends_with_the_code_step_text() {
     let content = compose_routines::SKILL.render_content();
     for rule in [
-        "macro.channels.search(name)",
+        "rox.channels.search(name)",
         "searchOn: 'name', matchType: 'exact'",
-        "macro.users.search(name)",
-        "macro.initiatives.summaries()",
-        "macro.routines.check(routine, { created })",
+        "rox.users.search(name)",
+        "rox.initiatives.summaries()",
+        "rox.routines.check(routine, { created })",
         "a code step never messages or emails the routine's owner",
         "This replaces what the routines guide says about ids in knobs.",
         "# Without code",
@@ -78,7 +78,7 @@ fn compose_routines_finds_items_with_the_sdk_and_ends_with_the_code_step_text() 
         code.trim_end()
             .ends_with(routine_program::CODE_STEPS.trim_end())
     );
-    assert!(code.contains("macro.routines.check(routine, { created })"));
+    assert!(code.contains("rox.routines.check(routine, { created })"));
     assert!(!code.contains("# Without code"));
     let direct = compose_routines::DIRECT.to_string();
     assert!(direct.contains("a code step never messages or emails the routine's owner"));

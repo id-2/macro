@@ -1,10 +1,10 @@
 import { match, P } from 'ts-pattern';
 
 /** Base for every error the SDK throws. */
-export class MacroError extends Error {
+export class RoxError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'MacroError';
+    this.name = 'RoxError';
   }
 }
 
@@ -29,7 +29,7 @@ function errorDetail(data: unknown): string {
  * The message includes the server's explanation, such as a validation error,
  * and `data` holds the parsed error body.
  */
-export class MacroApiError extends MacroError {
+export class RoxApiError extends RoxError {
   constructor(
     readonly status: number,
     readonly data: unknown,
@@ -40,7 +40,7 @@ export class MacroApiError extends MacroError {
         ? `Rox API error ${status}: ${detail}`
         : `Rox API error ${status}`,
     );
-    this.name = 'MacroApiError';
+    this.name = 'RoxApiError';
   }
 }
 
@@ -62,31 +62,31 @@ export class MacroApiError extends MacroError {
  * references an item), needs edit access to both: read `access.state()` on
  * each and request access on the one whose `accessLevel` is below `edit`.
  */
-export class MacroForbiddenError extends MacroApiError {
+export class RoxForbiddenError extends RoxApiError {
   constructor(data: unknown) {
     super(403, data);
-    this.name = 'MacroForbiddenError';
+    this.name = 'RoxForbiddenError';
   }
 }
 
 /** The API error class for an HTTP status. */
-function apiError(status: number, data: unknown): MacroApiError {
+function apiError(status: number, data: unknown): RoxApiError {
   return status === 403
-    ? new MacroForbiddenError(data)
-    : new MacroApiError(status, data);
+    ? new RoxForbiddenError(data)
+    : new RoxApiError(status, data);
 }
 
 /** The API succeeded but the addressed entity doesn't exist in the result. */
-export class MacroNotFoundError extends MacroError {
+export class RoxNotFoundError extends RoxError {
   constructor(message: string) {
     super(message);
-    this.name = 'MacroNotFoundError';
+    this.name = 'RoxNotFoundError';
   }
 }
 
 /**
  * Turn a hey-api `{ data, error, response? }` result into either the success
- * payload or a thrown MacroApiError (MacroForbiddenError for a 403).
+ * payload or a thrown RoxApiError (RoxForbiddenError for a 403).
  */
 export function unwrap<TData, TError>(res: {
   data?: TData;

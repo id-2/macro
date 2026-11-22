@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_authorization::{BotAuthentication, BotScope};
+use rox_authorization::{BotAuthentication, BotScope};
 
 use super::{ExtractorError, RequiredPermission};
 use crate::domain::{
@@ -21,7 +21,7 @@ pub(super) fn map_bot_access_scope(
             )?;
 
             Ok(BotAccessScope::User {
-                user_id: acting_user.macro_user_id.clone(),
+                user_id: acting_user.rox_user_id.clone(),
                 user_org_id: acting_user.user_context.organization_id.map(i64::from),
             })
         }

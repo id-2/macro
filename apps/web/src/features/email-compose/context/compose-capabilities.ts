@@ -230,7 +230,7 @@ export interface OutgoingEmail {
     | 'bcc'
     | 'subject'
     | 'body_text'
-    | 'body_macro'
+    | 'body_rox'
     | 'body_html_sanitized'
     | 'replying_to_id'
   >;

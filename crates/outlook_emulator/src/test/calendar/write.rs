@@ -22,7 +22,7 @@ fn guest(email: &str) -> CalendarAttendeeInput {
 }
 
 #[tokio::test]
-async fn an_event_created_from_macro_is_on_the_emulators_calendar() {
+async fn an_event_created_from_rox_is_on_the_emulators_calendar() {
     let (emulator, api) = start(SEED).await;
     let token = access_token(&emulator);
     let target = target(&emulator, ADA, "Calendar");
@@ -70,7 +70,7 @@ async fn an_event_created_from_macro_is_on_the_emulators_calendar() {
 }
 
 #[tokio::test]
-async fn changing_and_deleting_an_event_from_macro_reaches_the_emulator() {
+async fn changing_and_deleting_an_event_from_rox_reaches_the_emulator() {
     let (emulator, api) = start(SEED).await;
     let token = access_token(&emulator);
     let target = target(&emulator, ADA, "Calendar");
@@ -192,7 +192,7 @@ async fn one_occurrence_of_a_series_is_changed_deleted_and_the_series_cut_short(
 }
 
 #[tokio::test]
-async fn a_new_series_from_macro_expands_in_its_own_zone() {
+async fn a_new_series_from_rox_expands_in_its_own_zone() {
     let (emulator, api) = start(SEED).await;
     let token = access_token(&emulator);
     let target = target(&emulator, ADA, "Calendar");

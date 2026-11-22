@@ -1,5 +1,5 @@
 import type { UserProfilePicture } from '../../../generated/auth/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { StaticImage } from '../images/image';
 
 /**
@@ -38,7 +38,7 @@ const STATIC_FILE_PATH =
 
 /** Read a picture row; an empty URL means the user has no picture. */
 export function toProfilePicture(
-  client: MacroClient,
+  client: RoxClient,
   row: UserProfilePicture | undefined,
 ): ProfilePicture | undefined {
   const url = row?.url?.trim();

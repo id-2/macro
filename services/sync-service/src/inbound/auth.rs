@@ -1,5 +1,5 @@
 //! Session-scoped credentials for the worker runtime. These are document grants,
-//! not the application session credentials consumed by macro_authorization.
+//! not the application session credentials consumed by rox_authorization.
 use std::collections::HashMap;
 
 use axum::{
@@ -58,7 +58,7 @@ async fn document_id(parts: &mut Parts) -> Result<String, StatusCode> {
 fn internal(parts: &Parts, state: &Secrets) -> bool {
     parts
         .headers
-        .get(header_names::MACRO_INTERNAL_AUTH_KEY_HEADER_KEY)
+        .get(header_names::ROX_INTERNAL_AUTH_KEY_HEADER_KEY)
         .is_some_and(|key| bool::from(key.as_bytes().ct_eq(state.internal_api_secret.as_bytes())))
 }
 
@@ -193,7 +193,7 @@ where
     type Rejection = StatusCode;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        use macro_sync_service_jwt::session::{SessionIdentity, SessionKind};
+        use rox_sync_service_jwt::session::{SessionIdentity, SessionKind};
         let secrets = Secrets::from_ref(state);
         let Path(params) = Path::<HashMap<String, String>>::from_request_parts(parts, state)
             .await

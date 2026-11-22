@@ -45,7 +45,7 @@ fn task() -> EntityReference {
     EntityReference::new(Uuid::now_v7().to_string(), EntityType::Task)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unused_option_creation_can_be_undone(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (_, change) = add_option(&pool, &wedding).await;
@@ -55,7 +55,7 @@ async fn unused_option_creation_can_be_undone(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_persons_selection_refuses_undo_without_writing(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (row, _) = insert_guests(&pool, &wedding).await;
@@ -106,7 +106,7 @@ async fn another_persons_selection_refuses_undo_without_writing(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn usage_outside_the_database_also_refuses_undo(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (option, change) = add_option(&pool, &wedding).await;
@@ -133,7 +133,7 @@ async fn usage_outside_the_database_also_refuses_undo(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removal_waits_for_assignment_and_sees_its_committed_use(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (option, _) = add_option(&pool, &wedding).await;
@@ -167,7 +167,7 @@ async fn removal_waits_for_assignment_and_sees_its_committed_use(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn assignment_waits_for_removal_and_cannot_store_a_deleted_option(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (option, _) = add_option(&pool, &wedding).await;
@@ -204,7 +204,7 @@ async fn assignment_waits_for_removal_and_cannot_store_a_deleted_option(pool: Pg
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn creating_and_selecting_an_option_in_one_batch_can_be_undone(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (row, _) = insert_guests(&pool, &wedding).await;
@@ -236,7 +236,7 @@ async fn creating_and_selecting_an_option_in_one_batch_can_be_undone(pool: PgPoo
     assert_eq!(table_state(&pool, wedding.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn split_option_field_updates_do_not_overwrite_a_later_label(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let change = change_as(
@@ -289,7 +289,7 @@ async fn split_option_field_updates_do_not_overwrite_a_later_label(pool: PgPool)
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_an_option_then_its_row_restores_the_option_before_the_row(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (row, _) = insert_guests(&pool, &wedding).await;
@@ -320,7 +320,7 @@ async fn deleting_an_option_then_its_row_restores_the_option_before_the_row(pool
     assert_eq!(table_state(&pool, wedding.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ordinary_deletion_waits_before_cleaning_concurrent_assignments(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (option, _) = add_option(&pool, &wedding).await;
@@ -368,7 +368,7 @@ async fn ordinary_deletion_waits_before_cleaning_concurrent_assignments(pool: Pg
     assert!(values.iter().all(|(_, _, value)| !matches!(value, PropertyValue::SelectOption(ids) if ids.contains(option.as_uuid()))));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_inverse_is_refused_without_replaying_missing_metadata(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (_, change) = add_option(&pool, &wedding).await;
@@ -388,7 +388,7 @@ async fn legacy_inverse_is_refused_without_replaying_missing_metadata(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn shared_option_deletion_does_not_claim_a_complete_undo(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (option, _) = add_option(&pool, &wedding).await;

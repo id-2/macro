@@ -8,7 +8,7 @@ version = "0.1.0"
 default = []
 inbound = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:utoipa",
   "entity_access/axum",
@@ -16,7 +16,7 @@ inbound = [
 ]
 outbound = [
   "agent_git/client",
-  "dep:macro_service_urls",
+  "dep:rox_service_urls",
   "dep:sqlx",
   "dep:teams",
   "dep:user_api_key",
@@ -30,9 +30,9 @@ chrono = { workspace = true, features = ["serde"] }
 entity_access = { path = "../entity_access", default-features = false, features = ["ports"] }
 feature_flags = { path = "../feature_flags" }
 hosted_runtimes = { path = "../hosted_runtimes", default-features = false, features = ["ports"] }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = ["axum"] }
-macro_service_urls = { path = "../macro_service_urls", optional = true }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = ["axum"] }
+rox_service_urls = { path = "../rox_service_urls", optional = true }
+rox_user_id = { path = "../rox_user_id" }
 model-error-response = { path = "../model-error-response", optional = true }
 rootcause = { workspace = true }
 serde = { workspace = true }
@@ -47,7 +47,7 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 axum = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 sqlx = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 user_api_key = { path = "../user_api_key", features = ["postgres"] }

@@ -22,7 +22,7 @@ use entity_access::{
     },
     inbound::axum_extractors::DocumentAccessExtractor,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model::document::DocumentBasic;
 
 /// The body to write and the revision it was written against.
@@ -115,7 +115,7 @@ impl IntoResponse for DocumentMarkdownError {
 pub async fn get_markdown_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -156,7 +156,7 @@ pub async fn get_markdown_handler<
 pub async fn write_markdown_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

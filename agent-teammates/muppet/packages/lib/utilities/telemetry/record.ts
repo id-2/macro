@@ -33,7 +33,7 @@ export const Trigger = z.object({
 	source: z.string(),
 	/** What within the source, when it has a name, e.g. the schedule's. Low cardinality. */
 	name: z.string().optional(),
-	/** The ids of what it is about, by what they identify, e.g. `{ pr: "macro-inc/macro#10357" }`, `report`, `board_item`, `macro_message`, `schedule`. */
+	/** The ids of what it is about, by what they identify, e.g. `{ pr: "macro-inc/macro#10357" }`, `report`, `board_item`, `rox_message`, `schedule`. */
 	ids: z.record(z.string(), z.string()),
 	/** One line a person reads. */
 	summary: z.string().optional(),

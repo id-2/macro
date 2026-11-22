@@ -2,12 +2,12 @@
 
 use super::metadata_queries;
 use document_sub_type::DocumentSubType;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn document_sub_types_resolve_mixed_batch(pool: Pool<Postgres>) -> anyhow::Result<()> {

@@ -6,7 +6,7 @@ use crate::domain::{
     },
     ports::WebhookDeliveryRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 use std::{collections::BTreeMap, time::Duration};
@@ -110,7 +110,7 @@ async fn begin(
         .ok_or_else(|| anyhow::anyhow!("delivery should be ready"))
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn prepare_is_idempotent_and_snapshots_redacted_request_data(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -202,7 +202,7 @@ async fn prepare_is_idempotent_and_snapshots_redacted_request_data(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn prepare_returns_none_for_a_missing_webhook(pool: PgPool) -> anyhow::Result<()> {
     let repository = PgWebhookDeliveryRepository::new(pool.clone());
 
@@ -221,7 +221,7 @@ async fn prepare_returns_none_for_a_missing_webhook(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retry_scheduling_blocks_early_attempts_and_attempt_numbers_increase(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -317,7 +317,7 @@ async fn retry_scheduling_blocks_early_attempts_and_attempt_numbers_increase(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn soft_deleted_webhook_delivery_can_be_canceled_without_an_attempt(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -362,7 +362,7 @@ async fn soft_deleted_webhook_delivery_can_be_canceled_without_an_attempt(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn success_is_terminal_and_updates_success_aggregate_atomically(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -423,7 +423,7 @@ async fn success_is_terminal_and_updates_success_aggregate_atomically(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn permanent_failure_is_terminal_and_updates_failure_aggregate(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -499,7 +499,7 @@ async fn permanent_failure_is_terminal_and_updates_failure_aggregate(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn exhaustion_is_terminal_and_updates_failure_aggregate(pool: PgPool) -> anyhow::Result<()> {
     insert_webhook(&pool, false).await?;
     let repository = PgWebhookDeliveryRepository::new(pool.clone());
@@ -544,7 +544,7 @@ async fn exhaustion_is_terminal_and_updates_failure_aggregate(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn interrupted_attempt_is_recorded_and_recovered_monotonically(
     pool: PgPool,
 ) -> anyhow::Result<()> {

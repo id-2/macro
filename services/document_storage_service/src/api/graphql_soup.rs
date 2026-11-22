@@ -19,11 +19,11 @@ use complete_graph::{GraphqlRequestParts, MAIL_CACHE_PROFILE_HEADER, MailCachePr
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
 use graphql_soup::email_mutation_thread_loader;
-use macro_authorization::{
-    MacroUserAuthentication, OptionalMacroAuthorizationExtractor, UserOrInternalService,
+use rox_authorization::{
+    RoxUserAuthentication, OptionalMacroAuthorizationExtractor, UserOrInternalService,
     UserOrInternalServiceAuthorization,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 mod websocket;
@@ -73,7 +73,7 @@ async fn graphql_handler(
         let request = graphql_query_context_data(
             request,
             &state,
-            acting_user.map(|user| user.macro_user_id.clone()),
+            acting_user.map(|user| user.rox_user_id.clone()),
             acting_user.and_then(|user| user.user_context.organization_id.map(i64::from)),
             acting_user.and_then(opaque_viewer_id),
         );
@@ -114,24 +114,24 @@ async fn subscription_handler(
         )
             .into_response();
     };
-    let macro_user_id = acting_user.macro_user_id.clone();
+    let rox_user_id = acting_user.rox_user_id.clone();
     let organization_id = acting_user.user_context.organization_id.map(i64::from);
     let viewer_id = opaque_viewer_id(acting_user);
 
     let schema = state.graphql_soup_schema.clone();
-    let data = graphql_subscription_context_data(&state, macro_user_id, organization_id, viewer_id);
+    let data = graphql_subscription_context_data(&state, rox_user_id, organization_id, viewer_id);
     upgrade.serve(schema, data)
 }
 
 /// The viewer's opaque account id (`macro_user.id`, the FusionAuth user id),
 /// logged in place of the email-bearing Rox user id.
-fn opaque_viewer_id(user: &MacroUserAuthentication) -> Option<Uuid> {
+fn opaque_viewer_id(user: &RoxUserAuthentication) -> Option<Uuid> {
     Uuid::parse_str(&user.user_context.fusion_user_id).ok()
 }
 
 fn graphql_subscription_context_data(
     state: &ApiContext,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     organization_id: Option<i64>,
     viewer_id: Option<Uuid>,
 ) -> Data {
@@ -143,14 +143,14 @@ fn graphql_subscription_context_data(
 fn graphql_query_context_data(
     mut req: async_graphql::Request,
     state: &ApiContext,
-    macro_user_id: Option<MacroUserIdStr<'static>>,
+    rox_user_id: Option<RoxUserIdStr<'static>>,
     organization_id: Option<i64>,
     viewer_id: Option<Uuid>,
 ) -> async_graphql::Request {
     insert_graphql_context_data(
         &mut req.data,
         state,
-        macro_user_id,
+        rox_user_id,
         organization_id,
         viewer_id,
     );
@@ -160,7 +160,7 @@ fn graphql_query_context_data(
 fn insert_graphql_context_data(
     data: &mut Data,
     state: &ApiContext,
-    macro_user_id: Option<MacroUserIdStr<'static>>,
+    rox_user_id: Option<RoxUserIdStr<'static>>,
     organization_id: Option<i64>,
     viewer_id: Option<Uuid>,
 ) {
@@ -169,7 +169,7 @@ fn insert_graphql_context_data(
         state.saved_views.clone();
     data.insert(saved_views);
 
-    let Some(macro_user_id) = macro_user_id else {
+    let Some(rox_user_id) = rox_user_id else {
         return;
     };
 
@@ -180,19 +180,19 @@ fn insert_graphql_context_data(
     let property_writer = complete_graph::PropertiesEntityPropertyWriter::new(
         state.properties_service.clone(),
         state.entity_access_service.clone(),
-        macro_user_id.clone(),
+        rox_user_id.clone(),
     );
     let email_content_reader = complete_graph::EmailServiceEmailContentReader::new(
         state.soup_router_state.email_service(),
         state.entity_access_service.clone(),
     );
-    data.insert(macro_user_id.clone());
+    data.insert(rox_user_id.clone());
     data.insert(entity_mutation::EntityMutationActor {
-        user_id: macro_user_id.clone(),
+        user_id: rox_user_id.clone(),
         organization_id,
     });
     data.insert(favorites::domain::models::FavoritesMutationActor {
-        user_id: macro_user_id.clone(),
+        user_id: rox_user_id.clone(),
         organization_id,
     });
     data.insert(state.graphql_entity_mutation_service.clone());
@@ -216,11 +216,11 @@ fn insert_graphql_context_data(
     data.insert(state.graphql_primary_soup_item_loader.clone());
     data.insert(graphql_initiative::initiative_loader(
         state.graphql_initiative_context.clone(),
-        macro_user_id.clone(),
+        rox_user_id.clone(),
     ));
     data.insert(graphql_crm::pipeline_entries_loader(
         state.graphql_crm_context.clone(),
-        macro_user_id.clone(),
+        rox_user_id.clone(),
     ));
     data.insert(state.graphql_notification_reader.clone());
     data.insert(state.soup_router_state.email_service());
@@ -245,20 +245,20 @@ fn insert_graphql_context_data(
         ),
     ));
     data.insert(complete_graph::entity_properties_loader(
-        macro_user_id.clone(),
+        rox_user_id.clone(),
         property_reader,
     ));
     data.insert(complete_graph::email_content_loader(
-        macro_user_id.clone(),
+        rox_user_id.clone(),
         email_content_reader.clone(),
     ));
     data.insert(complete_graph::email_thread_metadata_loader(
-        macro_user_id.clone(),
+        rox_user_id.clone(),
         viewer_id,
         email_content_reader.clone(),
     ));
     data.insert(complete_graph::email_thread_mail_projection_loader(
-        macro_user_id.clone(),
+        rox_user_id.clone(),
         viewer_id,
         email_content_reader,
     ));
@@ -266,21 +266,21 @@ fn insert_graphql_context_data(
         state.email_focus_reader.clone(),
     ));
     data.insert(complete_graph::email_thread_focus_loader(
-        macro_user_id.clone(),
+        rox_user_id.clone(),
         state.email_focus_reader.clone(),
     ));
     data.insert(complete_graph::entity_favorite_loader(
-        macro_user_id.clone(),
+        rox_user_id.clone(),
         state.favorites_service.clone(),
     ));
     data.insert(complete_graph::entity_permission_loader(
-        macro_user_id.clone(),
+        rox_user_id.clone(),
         organization_id,
         state.entity_access_service.clone(),
     ));
     data.insert(property_writer);
     data.insert(complete_graph::entity_notifications_loader(
-        macro_user_id,
+        rox_user_id,
         state.graphql_notification_reader.clone(),
     ));
     // The feed resolver reads the reader directly; the edge goes through

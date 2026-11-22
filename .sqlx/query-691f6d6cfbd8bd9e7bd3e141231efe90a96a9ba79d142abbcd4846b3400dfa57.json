@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO macro_user_voice (macro_user_id, voice_id)\n            VALUES ($1, $2)\n            ON CONFLICT (macro_user_id, voice_id) DO NOTHING\n            ",
+  "query": "\n            INSERT INTO rox_user_voice (rox_user_id, voice_id)\n            VALUES ($1, $2)\n            ON CONFLICT (rox_user_id, voice_id) DO NOTHING\n            ",
   "describe": {
     "columns": [],
     "parameters": {

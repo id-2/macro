@@ -60,7 +60,7 @@ fn plus_aliases_remain_distinct_addresses() {
 }
 
 #[test]
-fn allowlist_policy_accepts_macro_domain_addresses() {
+fn allowlist_policy_accepts_rox_domain_addresses() {
     let policy =
         SignupPolicy::from_allowlist_json(r#"["person@example.test"]"#).expect("valid allowlist");
 
@@ -78,7 +78,7 @@ fn allowlist_policy_accepts_macro_domain_addresses() {
 }
 
 #[test]
-fn macro_domain_match_does_not_include_subdomains_or_similar_domains() {
+fn rox_domain_match_does_not_include_subdomains_or_similar_domains() {
     let policy =
         SignupPolicy::from_allowlist_json(r#"["person@example.test"]"#).expect("valid allowlist");
 

@@ -19,7 +19,7 @@ use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use tower::ServiceBuilder;
 
 /// Requires an authenticated acting user before the request proceeds.
@@ -33,7 +33,7 @@ use tower::ServiceBuilder;
 /// enabled, and that route's own `ChatAccessLevelExtractor` already grants
 /// anonymous callers `ViewAccessLevel` access in that case.
 async fn require_authenticated_user(
-    _user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    _user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     req: Request,
     next: Next,
 ) -> Response {
@@ -56,7 +56,7 @@ pub fn router(state: ApiContext) -> Router<ApiContext> {
             entity_access_management::outbound::PgRepository::new(state.db.clone()),
         ),
     )
-    .with_event_broker(state.macro_event_broker.clone());
+    .with_event_broker(state.rox_event_broker.clone());
     let chat_state = ChatRouterState::new(
         chat_service,
         access_service,
@@ -67,7 +67,7 @@ pub fn router(state: ApiContext) -> Router<ApiContext> {
 
     let ensure_chat_exists = axum::middleware::from_fn_with_state(
         state.clone(),
-        macro_middleware::cloud_storage::chat::ensure_chat_exists::handler,
+        rox_middleware::cloud_storage::chat::ensure_chat_exists::handler,
     );
     let require_user =
         axum::middleware::from_fn_with_state(state.clone(), require_authenticated_user);

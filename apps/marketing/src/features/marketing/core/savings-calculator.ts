@@ -7,7 +7,7 @@
  * 2026. Jira publishes a small-team per-user rate rather than an annual one.
  * Rox is compared at its Pro plan, a flat $40 per seat.
  */
-export const MACRO_SEAT_CENTS = 4000;
+export const ROX_SEAT_CENTS = 4000;
 export const MAX_SEATS = 10_000;
 
 export const PRICES_CHECKED = 'October 2026';
@@ -155,7 +155,7 @@ export function parseSeats(value: string): number | null {
 
 /** Yearly cost of Rox's Pro plan for a team. */
 export function macroAnnualCost(seats: number): number {
-  return seats * MACRO_SEAT_CENTS * 12;
+  return seats * ROX_SEAT_CENTS * 12;
 }
 
 /** Yearly team cost of the selected tools and of Rox. */

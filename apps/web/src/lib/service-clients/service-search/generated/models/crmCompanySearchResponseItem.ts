@@ -27,7 +27,7 @@ export interface CrmCompanySearchResponseItem {
   id: string;
   /** Display name from the primary domain's directory entry. */
   name?: CrmCompanySearchResponseItemName;
-  /** `name` with matched spans wrapped in `<macro_em>…</macro_em>`. */
+  /** `name` with matched spans wrapped in `<rox_em>…</rox_em>`. */
   nameHighlighted?: CrmCompanySearchResponseItemNameHighlighted;
   /** The id of the team that owns this company record. */
   teamId: string;

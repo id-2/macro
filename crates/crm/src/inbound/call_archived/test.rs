@@ -5,7 +5,7 @@ use call::domain::{
     models::{CallError, CallPeople, CallRecord, GetCallRecordsRequest},
 };
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -14,7 +14,7 @@ const CALL_RECORD_ID: Uuid = Uuid::from_u128(0x0198a1b2_c3d4_7e5f_8061_728394a5b
 
 fn people() -> CallPeople {
     CallPeople {
-        user_ids: vec![MacroUserIdStr::try_from_email("rep@ours.com").unwrap()],
+        user_ids: vec![RoxUserIdStr::try_from_email("rep@ours.com").unwrap()],
         invitee_emails: vec!["buyer@acme.com".to_string()],
     }
 }
@@ -105,12 +105,12 @@ fn archived() -> CallTopicEvent {
         channel_thread: false,
         call_id: CALL_RECORD_ID,
         channel_id: None,
-        created_by: MacroUserIdStr::try_from_email("rep@ours.com").unwrap(),
+        created_by: RoxUserIdStr::try_from_email("rep@ours.com").unwrap(),
         started_at: Utc::now(),
         ended_at: Utc::now(),
         duration_ms: Some(1_000),
         participant_count: 1,
-        participants: vec![MacroUserIdStr::try_from_email("rep@ours.com").unwrap()],
+        participants: vec![RoxUserIdStr::try_from_email("rep@ours.com").unwrap()],
         has_recording: false,
         archive_reason: CallArchiveReason::LastParticipantLeft,
     })

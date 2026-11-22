@@ -113,7 +113,7 @@ async fn real_sdk_nested_calls_are_authenticated_and_concurrent() {
                 assert!(
                     request
                         .to_ascii_lowercase()
-                        .contains("x-macro-code-execution: 1\r\n"),
+                        .contains("x-rox-code-execution: 1\r\n"),
                     "{request}"
                 );
                 assert!(

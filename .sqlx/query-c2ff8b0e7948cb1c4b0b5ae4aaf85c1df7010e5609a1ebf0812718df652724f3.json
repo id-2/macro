@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE microsoft_link_attempts a SET completed_at=now(),pkce_verifier='',oidc_nonce='',grant_id=$3\n            FROM in_progress_user_link p\n            WHERE a.id=$1 AND p.id=a.id AND p.macro_user_id=$2\n                AND p.email_provider='OUTLOOK' AND a.claimed_at IS NOT NULL\n                AND a.completed_at IS NULL AND a.expires_at > now()\n        ",
+  "query": "\n            UPDATE microsoft_link_attempts a SET completed_at=now(),pkce_verifier='',oidc_nonce='',grant_id=$3\n            FROM in_progress_user_link p\n            WHERE a.id=$1 AND p.id=a.id AND p.rox_user_id=$2\n                AND p.email_provider='OUTLOOK' AND a.claimed_at IS NOT NULL\n                AND a.completed_at IS NULL AND a.expires_at > now()\n        ",
   "describe": {
     "columns": [],
     "parameters": {

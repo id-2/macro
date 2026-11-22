@@ -1,7 +1,7 @@
 //! Public workspace MCP and OAuth, hosted on the harness's public listener.
 mod agent_keys;
 mod analytics;
-mod macro_api_tokens;
+mod rox_api_tokens;
 mod markdown_images;
 #[cfg(test)]
 mod test;
@@ -13,7 +13,7 @@ use analytics::McpAnalytics;
 use analytics_client::{AnalyticsClient, AnalyticsClientConfig, PostHogConfig};
 use anyhow::Context;
 use cursor_api_key::cipher::AwsKmsCiphertexts;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
 use mcp_auth_proxy::{
     domain::{
         redirect_uri::RedirectUriPolicy,
@@ -67,7 +67,7 @@ pub async fn router(
     code_mode: Option<PublicCodeMode>,
     rollout: crate::anthropic_gateway::brain::BrainRollout,
 ) -> anyhow::Result<axum::Router> {
-    let public_url = macro_service_urls::McpPublicUrl::new()?;
+    let public_url = rox_service_urls::McpPublicUrl::new()?;
     let (auth_proxy, backfill) = build_auth_proxy(
         config,
         secrets,
@@ -80,21 +80,21 @@ pub async fn router(
     // Agent teammates' brains authenticate with their own Rox API key; no
     // one else's user key is accepted here.
     let user_api_keys = Arc::new(agent_keys::AgentUserApiKeys::new(
-        macro_authorization::PgUserApiKeyAuthorizer::new(
-            macro_authorization::PgUserApiKeyAuthorizationRepo::new(db.clone()),
+        rox_authorization::PgUserApiKeyAuthorizer::new(
+            rox_authorization::PgUserApiKeyAuthorizationRepo::new(db.clone()),
         ),
         rollout,
     ));
     let analytics = build_analytics(config, db);
-    let item_base_url = macro_service_urls::AppServiceUrl::new()?.to_string();
+    let item_base_url = rox_service_urls::AppServiceUrl::new()?.to_string();
     let static_file_base_url =
-        url::Url::parse(macro_service_urls::StaticFileServiceUrl::new()?.as_ref())?;
+        url::Url::parse(rox_service_urls::StaticFileServiceUrl::new()?.as_ref())?;
     let mcp_public_host = public_url
         .parse_url()?
         .host_str()
         .context("public MCP URL has no host")?
         .to_owned();
-    let service_host = macro_service_urls::McpServiceUrl::new()?
+    let service_host = rox_service_urls::McpServiceUrl::new()?
         .parse_url()?
         .host_str()
         .context("MCP service URL has no host")?
@@ -158,7 +158,7 @@ pub async fn router(
         axum::routing::get(move || async move { openai_domain_verification_token }),
     )
     .layer(
-        macro_tower_layers::MacroRequestIdAndTracingLayer::new(std::time::Duration::from_millis(
+        rox_tower_layers::RoxRequestIdAndTracingLayer::new(std::time::Duration::from_millis(
             200,
         ))
         .into_inner(),
@@ -170,7 +170,7 @@ pub async fn router(
 async fn build_auth_proxy(
     config: &Config,
     secretsmanager_client: &secretsmanager_client::SecretsManager,
-    public_url: &macro_service_urls::McpPublicUrl,
+    public_url: &rox_service_urls::McpPublicUrl,
     db: sqlx::PgPool,
     kms: aws_sdk_kms::Client,
     jwt_args: JwtValidationArgs,
@@ -181,7 +181,7 @@ async fn build_auth_proxy(
     let mcp_public_url = public_url.to_string();
     let mcp_oauth_redirect_uri = format!("{mcp_public_url}/oauth/callback");
     let email_codes = AuthServiceEmailCodes::new(
-        &macro_service_urls::AuthServiceUrl::new()?,
+        &rox_service_urls::AuthServiceUrl::new()?,
         mcp_oauth_redirect_uri.clone(),
     )
     .context("failed to initialize MCP email sign-in")?;
@@ -229,11 +229,11 @@ async fn build_auth_proxy(
     let redis_client = redis::Client::open(config.redis_uri.as_ref().to_owned())
         .context("failed to initialize redis client for MCP auth proxy")?;
     let legacy_clients = Arc::new(RedisClientRegistry::new(redis_client.clone()));
-    let macro_api_tokens = macro_api_tokens::SignedMacroApiTokens {
-        signer: agent_egress::outbound::macro_mcp::MacroApiTokenSigner::new(
+    let rox_api_tokens = rox_api_tokens::SignedMacroApiTokens {
+        signer: agent_egress::outbound::rox_mcp::RoxApiTokenSigner::new(
             db.clone(),
-            config.macro_api_token_issuer.as_ref(),
-            config.macro_api_token_private_secret_key.as_ref(),
+            config.rox_api_token_issuer.as_ref(),
+            config.rox_api_token_private_secret_key.as_ref(),
         ),
         jwt_args,
     };
@@ -266,7 +266,7 @@ async fn build_auth_proxy(
     // The ChatGPT MCP server is its own Worker that the broker signs in for.
     let resources = McpResources::new(
         format!("{mcp_public_url}/mcp"),
-        format!("{}/mcp", macro_service_urls::McpChatgptServiceUrl::new()?),
+        format!("{}/mcp", rox_service_urls::McpChatgptServiceUrl::new()?),
     );
     let auth_proxy = McpAuthProxyServiceImpl::new(McpAuthProxyServiceDeps {
         public_url: mcp_public_url,
@@ -277,7 +277,7 @@ async fn build_auth_proxy(
         oauth_provider: Arc::new(auth_provider),
         email_codes: Arc::new(email_codes),
         resources,
-        macro_api_tokens: Arc::new(macro_api_tokens),
+        rox_api_tokens: Arc::new(rox_api_tokens),
     });
     Ok((auth_proxy, backfill))
 }

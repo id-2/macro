@@ -1,5 +1,5 @@
 const QUICK_START = `npm install @macro-inc/sdk
-export MACRO_API_KEY="<your token>"`;
+export ROX_API_KEY="<your token>"`;
 
 const PROFILE_SNIPPET = `const macro = new Macro({});
 const image = await macro.me.uploadProfilePicture(bytes, {

@@ -133,8 +133,8 @@ describe('highlightCommaSpaceSeparatedMatches', () => {
       'hutch,gab',
       'hutch, gab, eric'
     );
-    expect(result).toContain('<macro_em>hutch</macro_em>');
-    expect(result).toContain('<macro_em>gab</macro_em>');
+    expect(result).toContain('<rox_em>hutch</rox_em>');
+    expect(result).toContain('<rox_em>gab</rox_em>');
   });
 
   it('highlights space-separated query terms', () => {
@@ -142,8 +142,8 @@ describe('highlightCommaSpaceSeparatedMatches', () => {
       'hutch gab',
       'hutch, gab, eric'
     );
-    expect(result).toContain('<macro_em>hutch</macro_em>');
-    expect(result).toContain('<macro_em>gab</macro_em>');
+    expect(result).toContain('<rox_em>hutch</rox_em>');
+    expect(result).toContain('<rox_em>gab</rox_em>');
   });
 
   it('highlights terms in any order', () => {
@@ -151,8 +151,8 @@ describe('highlightCommaSpaceSeparatedMatches', () => {
       'jackson jacob',
       'jacob, jackson kustec, gabriel'
     );
-    expect(result).toContain('<macro_em>jacob</macro_em>');
-    expect(result).toContain('<macro_em>jackson</macro_em>');
+    expect(result).toContain('<rox_em>jacob</rox_em>');
+    expect(result).toContain('<rox_em>jackson</rox_em>');
   });
 
   it('highlights partial fuzzy matches', () => {
@@ -160,8 +160,8 @@ describe('highlightCommaSpaceSeparatedMatches', () => {
       'jac gab',
       'jacob, jackson kustec, gabriel'
     );
-    expect(result).toContain('<macro_em>jac</macro_em>');
-    expect(result).toContain('<macro_em>gab</macro_em>');
+    expect(result).toContain('<rox_em>jac</rox_em>');
+    expect(result).toContain('<rox_em>gab</rox_em>');
   });
 
   it('preserves comma separators in output', () => {
@@ -182,9 +182,9 @@ describe('highlightCommaSpaceSeparatedMatches', () => {
       'hutch',
       'hutch, gab, eric'
     );
-    expect(result).toContain('<macro_em>hutch</macro_em>');
-    expect(result).not.toContain('<macro_em>gab</macro_em>');
-    expect(result).not.toContain('<macro_em>eric</macro_em>');
+    expect(result).toContain('<rox_em>hutch</rox_em>');
+    expect(result).not.toContain('<rox_em>gab</rox_em>');
+    expect(result).not.toContain('<rox_em>eric</rox_em>');
   });
 });
 
@@ -202,8 +202,8 @@ describe('fuzzyMatch with delimiter-separated channel matching', () => {
     const results1 = fuzzyMatch('jackson jacob', items, (item) => item.name);
     expect(results1.length).toBe(1);
     expect(results1[0].item.id).toBe('1');
-    expect(results1[0].nameHighlight).toContain('<macro_em>jackson</macro_em>');
-    expect(results1[0].nameHighlight).toContain('<macro_em>jacob</macro_em>');
+    expect(results1[0].nameHighlight).toContain('<rox_em>jackson</rox_em>');
+    expect(results1[0].nameHighlight).toContain('<rox_em>jacob</rox_em>');
 
     const results2 = fuzzyMatch('jacob jackson', items, (item) => item.name);
     expect(results2.length).toBe(1);

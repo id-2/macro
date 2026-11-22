@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface MacroApiTokenResponse {
-  /** The newly created macro_api_token */
-  macro_api_token: string;
+export interface RoxApiTokenResponse {
+  /** The newly created rox_api_token */
+  rox_api_token: string;
 }

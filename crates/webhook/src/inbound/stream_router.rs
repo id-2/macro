@@ -20,8 +20,8 @@ use axum::{
     routing::get,
 };
 use futures::{Stream, StreamExt as _};
-use macro_authorization::{
-    ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 use model_error_response::ErrorResponse;
 use std::convert::Infallible;
@@ -35,7 +35,7 @@ const KEEP_ALIVE_INTERVAL: Duration = Duration::from_secs(20);
 /// State for the webhook event stream router.
 pub struct WebhookStreamRouterState<St, Auth> {
     stream_service: St,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<St: Clone, Auth> Clone for WebhookStreamRouterState<St, Auth> {
@@ -49,7 +49,7 @@ impl<St: Clone, Auth> Clone for WebhookStreamRouterState<St, Auth> {
 
 impl<St, Auth> WebhookStreamRouterState<St, Auth> {
     /// Create webhook event stream router state.
-    pub fn new(stream_service: St, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(stream_service: St, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             stream_service,
             authorization_state,
@@ -57,7 +57,7 @@ impl<St, Auth> WebhookStreamRouterState<St, Auth> {
     }
 }
 
-impl<St, Auth> FromRef<WebhookStreamRouterState<St, Auth>> for MacroAuthorizationState<Auth> {
+impl<St, Auth> FromRef<WebhookStreamRouterState<St, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &WebhookStreamRouterState<St, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -67,7 +67,7 @@ impl<St, Auth> FromRef<WebhookStreamRouterState<St, Auth>> for MacroAuthorizatio
 pub fn webhook_stream_router<St, Auth, T>(state: WebhookStreamRouterState<St, Auth>) -> Router<T>
 where
     St: WebhookEventStreamService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -111,9 +111,9 @@ fn parse_filters(filters: Option<String>) -> Result<WebhookFilters, WebhookStrea
     ),
     tag = "webhook"
 )]
-pub async fn stream_events<St: WebhookEventStreamService, Auth: MacroAuthorizationService>(
+pub async fn stream_events<St: WebhookEventStreamService, Auth: RoxAuthorizationService>(
     State(state): State<WebhookStreamRouterState<St, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, ActingUser>,
+    authorization: RoxAuthorizationExtractor<Auth, ActingUser>,
     Query(query): Query<StreamEventsQuery>,
 ) -> Result<
     Sse<impl Stream<Item = Result<Event, Infallible>> + Send + 'static>,
@@ -124,7 +124,7 @@ pub async fn stream_events<St: WebhookEventStreamService, Auth: MacroAuthorizati
     let events = state
         .stream_service
         .open_stream(
-            authorization.authorization.user.macro_user_id,
+            authorization.authorization.user.rox_user_id,
             query.scope,
             filters,
         )

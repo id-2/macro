@@ -33,9 +33,9 @@ pub struct AdoptOrSeedUserArgs {
     pub user_id: String,
     /// Derived uuid used when no `macro_user` row exists for the email.
     pub derived_macro_user_id: Uuid,
-    /// First name for `macro_user_info`.
+    /// First name for `rox_user_info`.
     pub first_name: String,
-    /// Last name for `macro_user_info`.
+    /// Last name for `rox_user_info`.
     pub last_name: String,
     /// Fabricated stripe customer id used on fresh inserts.
     pub stripe_customer_id: String,
@@ -126,9 +126,9 @@ impl SeedDb {
     #[tracing::instrument(skip(self), err)]
     pub async fn create_document<'a>(
         &self,
-        args: macro_db_client::document::v2::create::CreateDocumentArgs<'a>,
+        args: rox_db_client::document::v2::create::CreateDocumentArgs<'a>,
     ) -> anyhow::Result<DocumentMetadata> {
-        macro_db_client::document::v2::create::create_document(&self.inner, args).await
+        rox_db_client::document::v2::create::create_document(&self.inner, args).await
     }
 
     /// Create a channel in the database.
@@ -195,7 +195,7 @@ impl SeedDb {
         item_id: &str,
         item_type: &str,
     ) -> anyhow::Result<()> {
-        let share_permission_id = macro_db_client::share_permission::get::get_share_permission_id(
+        let share_permission_id = rox_db_client::share_permission::get::get_share_permission_id(
             &self.inner,
             item_id,
             item_type,
@@ -204,7 +204,7 @@ impl SeedDb {
 
         let channel_id_str = channel_id.to_string();
         if let Err(e) =
-            macro_db_client::share_permission::channel_permission::create::insert_channel_share_permission(
+            rox_db_client::share_permission::channel_permission::create::insert_channel_share_permission(
                 &self.inner,
                 &share_permission_id,
                 &channel_id_str,
@@ -218,7 +218,7 @@ impl SeedDb {
         let mut tx = self.inner.begin().await?;
         entity_access_db_utils::insert_entity_access_row(
             &mut tx,
-            &macro_uuid::string_to_uuid(item_id).unwrap(),
+            &rox_uuid::string_to_uuid(item_id).unwrap(),
             model_entity::EntityType::from_str(item_type).unwrap(),
             &channel_id.to_string(),
             entity_access_db_utils::EntityAccessSourceType::Channel,
@@ -308,7 +308,7 @@ impl SeedDb {
         access_level: AccessLevel,
         granted_from_project_id: Option<String>,
     ) -> anyhow::Result<()> {
-        let entity_uuid = macro_uuid::string_to_uuid(entity_id)
+        let entity_uuid = rox_uuid::string_to_uuid(entity_id)
             .map_err(|e| anyhow::anyhow!("entity id {entity_id} is not a uuid: {e:?}"))?;
         let conflict = if granted_from_project_id.is_some() {
             r#"(entity_id, entity_type, source_id, source_type, granted_from_project_id)
@@ -347,7 +347,7 @@ impl SeedDb {
         channel_id: &str,
         access_level: AccessLevel,
     ) -> anyhow::Result<()> {
-        match macro_db_client::share_permission::get::get_share_permission_id(
+        match rox_db_client::share_permission::get::get_share_permission_id(
             &self.inner,
             item_id,
             item_type,
@@ -356,7 +356,7 @@ impl SeedDb {
         {
             Ok(share_permission_id) => {
                 if let Err(e) =
-                    macro_db_client::share_permission::channel_permission::create::insert_channel_share_permission(
+                    rox_db_client::share_permission::channel_permission::create::insert_channel_share_permission(
                         &self.inner,
                         &share_permission_id,
                         channel_id,
@@ -433,7 +433,7 @@ impl SeedDb {
         share_permission: &SharePermissionV2,
     ) -> anyhow::Result<()> {
         let mut transaction = self.inner.begin().await?;
-        macro_db_client::share_permission::create::create_project_permission(
+        rox_db_client::share_permission::create::create_project_permission(
             &mut transaction,
             project_id,
             share_permission,
@@ -451,7 +451,7 @@ impl SeedDb {
         share_permission: &SharePermissionV2,
     ) -> anyhow::Result<()> {
         let mut transaction = self.inner.begin().await?;
-        macro_db_client::share_permission::create::create_chat_permission(
+        rox_db_client::share_permission::create::create_chat_permission(
             &mut transaction,
             chat_id,
             share_permission,
@@ -478,7 +478,7 @@ impl SeedDb {
         .execute(transaction.as_mut())
         .await?;
 
-        macro_db_client::share_permission::channel_permission::create::create_channel_share_permissions(
+        rox_db_client::share_permission::channel_permission::create::create_channel_share_permissions(
             &mut transaction,
             &args.share_permission_id,
             &vec![models_permissions::share_permission::channel_share_permission::ChannelSharePermission {
@@ -583,16 +583,16 @@ impl SeedDb {
     #[tracing::instrument(skip(self), err)]
     pub async fn insert_macro_user_link(
         &self,
-        primary_macro_id: &str,
-        child_macro_id: &str,
+        primary_rox_id: &str,
+        child_rox_id: &str,
         link_id: uuid::Uuid,
     ) -> anyhow::Result<()> {
         sqlx::query!(
-            r#"INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+            r#"INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
                VALUES ($1, $2, $3)
                ON CONFLICT DO NOTHING"#,
-            primary_macro_id,
-            child_macro_id,
+            primary_rox_id,
+            child_rox_id,
             link_id,
         )
         .execute(&self.inner)
@@ -624,7 +624,7 @@ impl SeedDb {
                 .fetch_optional(transaction.as_mut())
                 .await?;
 
-        let macro_user_id = match existing {
+        let rox_user_id = match existing {
             Some(id) => id,
             None => {
                 sqlx::query!(
@@ -642,39 +642,39 @@ impl SeedDb {
         };
 
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, "stripeCustomerId", macro_user_id, "tutorialComplete", "hasOnboardingDocuments")
+            r#"INSERT INTO "User" (id, email, "stripeCustomerId", rox_user_id, "tutorialComplete", "hasOnboardingDocuments")
                VALUES ($1, $2, $3, $4, true, true)
                ON CONFLICT (id) DO UPDATE SET
-                 macro_user_id = EXCLUDED.macro_user_id,
+                 rox_user_id = EXCLUDED.rox_user_id,
                  "tutorialComplete" = true,
                  "hasOnboardingDocuments" = true"#,
             user_id,
             email,
             stripe_customer_id,
-            macro_user_id,
+            rox_user_id,
         )
         .execute(transaction.as_mut())
         .await?;
 
         sqlx::query!(
-            r#"INSERT INTO macro_user_email_verification (macro_user_id, email, is_verified)
+            r#"INSERT INTO rox_user_email_verification (rox_user_id, email, is_verified)
                VALUES ($1, $2, true)
                ON CONFLICT (email) DO UPDATE SET
-                 macro_user_id = EXCLUDED.macro_user_id,
+                 rox_user_id = EXCLUDED.rox_user_id,
                  is_verified = true"#,
-            macro_user_id,
+            rox_user_id,
             email,
         )
         .execute(transaction.as_mut())
         .await?;
 
         sqlx::query!(
-            r#"INSERT INTO macro_user_info (macro_user_id, first_name, last_name)
+            r#"INSERT INTO rox_user_info (rox_user_id, first_name, last_name)
                VALUES ($1, $2, $3)
-               ON CONFLICT (macro_user_id) DO UPDATE SET
+               ON CONFLICT (rox_user_id) DO UPDATE SET
                  first_name = EXCLUDED.first_name,
                  last_name = EXCLUDED.last_name"#,
-            macro_user_id,
+            rox_user_id,
             first_name,
             last_name,
         )

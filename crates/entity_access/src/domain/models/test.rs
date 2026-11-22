@@ -4,8 +4,8 @@ fn bot_id() -> BotId {
     BotId::new_from_uuid(uuid::uuid!("00000000-0000-0000-0000-000000000123"))
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("bot-user@example.com").unwrap()
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("bot-user@example.com").unwrap()
 }
 
 fn document() -> Entity {

@@ -1,7 +1,7 @@
 //! Bot domain models.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -565,7 +565,7 @@ pub struct BotChannel {
 #[derive(Debug, Clone)]
 pub enum BotChannelListCaller {
     /// A directly authenticated Rox user.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
     /// An authenticated bot.
     Bot(BotId),
     /// An authenticated internal service, with or without an acting user.

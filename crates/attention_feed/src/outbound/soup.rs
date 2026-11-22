@@ -63,7 +63,7 @@ where
     async fn page(&self, request: CandidateRequest) -> Result<CandidatePage<Self::Entity>, Report> {
         let link_ids = self
             .email
-            .get_inboxes_for_macro_id(request.viewer.user.copied())
+            .get_inboxes_for_rox_id(request.viewer.user.copied())
             .await
             .map_err(|error| rootcause::report!("failed to list inboxes: {error}"))?
             .into_iter()

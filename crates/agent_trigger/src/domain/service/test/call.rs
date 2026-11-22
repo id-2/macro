@@ -48,7 +48,7 @@ async fn call_mentions_require_the_private_agents_owner_for_either_channel_scope
             let mut posted = call_message(false);
             if !is_owner {
                 posted.sender = ChannelSender::new_from_user(
-                    MacroUserIdStr::try_from_email("outsider@example.com").unwrap(),
+                    RoxUserIdStr::try_from_email("outsider@example.com").unwrap(),
                 );
             }
             let mut bots = MockAgentBotLookup::new();
@@ -98,7 +98,7 @@ async fn legacy_agent_backed_bots_in_calls_use_owner_authorization() {
         let mut posted = call_message(false);
         if !is_owner {
             posted.sender = ChannelSender::new_from_user(
-                MacroUserIdStr::try_from_email("outsider@example.com").unwrap(),
+                RoxUserIdStr::try_from_email("outsider@example.com").unwrap(),
             );
         }
         let mut bots = MockAgentBotLookup::new();

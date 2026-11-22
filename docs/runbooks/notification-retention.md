@@ -242,7 +242,7 @@ within 30 days; pagination of currently unbounded consumers remains separate wor
 Run from the repository root with local PostgreSQL and `SQLX_OFFLINE` unset:
 
 ```bash
-cargo test -p kafka_util -p macro_entrypoint -p notification -p notification_retention_handler -- --test-threads=8
+cargo test -p kafka_util -p rox_entrypoint -p notification -p notification_retention_handler -- --test-threads=8
 # Only if notification SQL or schema changed:
 nix develop --command just prepare_db
 just check

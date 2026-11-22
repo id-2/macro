@@ -11,7 +11,7 @@ use entity_access::outbound::get_user_source_ids;
 use filter_ast::Expr;
 use item_filters::SharedEmailFilter;
 use item_filters::ast::email::EmailLiteral;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Query, SimpleSortMethod};
 use owned_scope::OwnedRead;
 #[cfg(test)]
@@ -40,7 +40,7 @@ struct QueryParams {
     /// When `Some(team_id)`, the "Owned" candidate source expands from
     /// `t.link_id = ANY($link_ids)` to `t.link_id IN (primary links of every
     /// member of $team_id)`. A link is primary when its `email_address` is
-    /// the owning member's own macro_id email — connected secondary
+    /// the owning member's own rox_id email — connected secondary
     /// mailboxes never feed team-scoped results. Set only after CRM scope
     /// has been validated upstream.
     /// Also switches the candidate select into dedupe mode: team-member
@@ -171,7 +171,7 @@ fn push_source_scope(
             },
             // CRM-scoped query: expand to every primary email_link owned by
             // any member of the team. Non-primary links (connected secondary
-            // mailboxes, whose address differs from the owner's macro_id
+            // mailboxes, whose address differs from the owner's rox_id
             // email) are excluded. The receipt has already been validated
             // upstream, so the team_id is trusted here.
             //
@@ -192,7 +192,7 @@ fn push_source_scope(
                     r#"t.link_id IN (
                         SELECT el.id
                         FROM email_links el
-                        JOIN team_user tu ON tu.user_id = el.macro_id
+                        JOIN team_user tu ON tu.user_id = el.rox_id
                         WHERE tu.team_id = "#,
                 );
                 builder.push_bind(team_id);
@@ -748,7 +748,7 @@ fn push_page_head(
             c.email_address AS sender_email,
             COALESCE(lmp.from_name, c.name) AS sender_name,
             c.sfs_photo_url as sender_photo_url,
-            el.macro_id AS owner_id,
+            el.rox_id AS owner_id,
             el.id AS link_id
         FROM ("#,
     );
@@ -1371,7 +1371,7 @@ async fn read_page(
     let project_scope = if project_ids.is_empty() {
         None
     } else {
-        let user = MacroUserIdStr::parse_from_str(user_id).ok();
+        let user = RoxUserIdStr::parse_from_str(user_id).ok();
         match get_user_source_ids(pool, user.as_deref()).await {
             Ok(source_ids) => Some(ProjectScope {
                 project_ids,

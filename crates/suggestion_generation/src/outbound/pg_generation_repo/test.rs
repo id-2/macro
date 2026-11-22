@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use chrono::TimeDelta;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 
@@ -10,30 +10,30 @@ const OWNER: &str = "macro|generation-repo@rox.one";
 const OTHER: &str = "macro|generation-repo-other@rox.one";
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
 }
 
-fn person(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_owned()).unwrap()
+fn person(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_owned()).unwrap()
 }
 
-fn owner() -> MacroUserIdStr<'static> {
+fn owner() -> RoxUserIdStr<'static> {
     person(OWNER)
 }
 
@@ -168,7 +168,7 @@ fn new_generation(
 /// Every status write goes as the generation table says: an event moves a
 /// generation only out of the statuses it may leave, into the one it enters.
 /// Every status and trigger is storable.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ending_a_generation_follows_the_table(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -198,7 +198,7 @@ async fn ending_a_generation_follows_the_table(pool: PgPool) {
 }
 
 /// A heartbeat keeps only a running generation alive.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_heartbeat_reaches_only_a_running_generation(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -224,7 +224,7 @@ async fn a_heartbeat_reaches_only_a_running_generation(pool: PgPool) {
 /// The sweep marks interrupted exactly the generations the table lets a lost
 /// heartbeat end, and only once their heartbeat is older than the cut-off,
 /// longest silent first, at most a batch.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_sweep_interrupts_generations_whose_heartbeat_stopped(pool: PgPool) {
     let repo = PgGenerationRepo::new(pool.clone());
     let now = Utc::now();
@@ -317,7 +317,7 @@ async fn the_sweep_interrupts_generations_whose_heartbeat_stopped(pool: PgPool) 
 
 /// Admission reads whether any of the person's generations runs, and their
 /// latest of one trigger: other triggers and other people don't count.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_reads_the_running_one_and_the_latest_of_the_trigger(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     insert_user(&pool, OTHER).await;
@@ -400,7 +400,7 @@ async fn admission_reads_the_running_one_and_the_latest_of_the_trigger(pool: PgP
 /// A generation is stored only while what admission read still holds: none
 /// of the person's running, none of its trigger started since, and one
 /// onboarding generation per attempt.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_generation_is_stored_only_while_admission_holds(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -464,7 +464,7 @@ async fn a_generation_is_stored_only_while_admission_holds(pool: PgPool) {
 /// A session's cleanup goes as its table says: each event moves it only out
 /// of the states it may leave, an end records how the turn ended, and a
 /// failed delete counts one more attempt. Every ending is storable.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn session_cleanup_follows_the_table(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -545,7 +545,7 @@ async fn session_cleanup_follows_the_table(pool: PgPool) {
 }
 
 /// A session is open exactly while it has no ending.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_leaves_open_only_with_its_ending(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let now = Utc::now();
@@ -580,7 +580,7 @@ async fn a_session_leaves_open_only_with_its_ending(pool: PgPool) {
 /// Tools work for a session in exactly the states the table says take
 /// tools, and its code keeps a generation session's scope while it is not
 /// yet deleted.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn tools_and_scope_follow_the_cleanup_state(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -622,7 +622,7 @@ async fn tools_and_scope_follow_the_cleanup_state(pool: PgPool) {
 }
 
 /// A session opened through the repo is open, with its surfaces.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_opened_session_takes_its_tools(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -655,7 +655,7 @@ async fn an_opened_session_takes_its_tools(pool: PgPool) {
 /// The sweep ends, as interrupted, exactly the sessions the table lets an
 /// end leave, when their generation no longer runs or they opened before the
 /// cut-off; one of a running generation opened since is left running.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_sweep_ends_sessions_left_open(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     insert_user(&pool, OTHER).await;
@@ -738,7 +738,7 @@ async fn the_sweep_ends_sessions_left_open(pool: PgPool) {
 /// The sweep claims ended sessions left undeleted, exactly in the states a
 /// delete may leave, longest waiting first; a claimed one waits again before
 /// the next claim, and keeps its ending and failed attempts.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stuck_sessions_are_claimed_and_then_wait(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -822,7 +822,7 @@ async fn stuck_sessions_are_claimed_and_then_wait(pool: PgPool) {
 /// Someone is due from their next run, while nothing of theirs runs; out of
 /// the rotation, never, until seen again. A run set for the same zone stands
 /// when they are seen; a new zone moves it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_person_is_due_while_in_the_rotation(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -910,7 +910,7 @@ async fn a_person_is_due_while_in_the_rotation(pool: PgPool) {
 
 /// A run cut short records its outcome before the tick that started it does:
 /// the tick's older outcome changes nothing, so the person stays due at once.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_older_nightly_outcome_never_replaces_a_newer_one(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -952,7 +952,7 @@ async fn an_older_nightly_outcome_never_replaces_a_newer_one(pool: PgPool) {
 
 /// The routines cadence is kept for anyone: someone out of the rotation gets
 /// a row outside it, and someone in it keeps their next run.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_routines_cadence_is_kept_in_or_out_of_the_rotation(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     insert_user(&pool, OTHER).await;
@@ -993,7 +993,7 @@ async fn the_routines_cadence_is_kept_in_or_out_of_the_rotation(pool: PgPool) {
 
 /// The overview reads the running generation, the latest that ended and the
 /// latest manual one.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_overview_reads_the_running_the_ended_and_the_manual(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     insert_user(&pool, OTHER).await;
@@ -1058,7 +1058,7 @@ async fn the_overview_reads_the_running_the_ended_and_the_manual(pool: PgPool) {
 
 /// Routine suggestions read a generation that ended part way as ready, and
 /// one cut short as failed.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn routine_suggestions_read_the_latest_status(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());
@@ -1098,12 +1098,12 @@ struct Plans(bool);
 
 #[async_trait::async_trait]
 impl crate::domain::ports::Plans for Plans {
-    async fn paid(&self, _: &MacroUserIdStr<'static>) -> Result<bool, rootcause::Report> {
+    async fn paid(&self, _: &RoxUserIdStr<'static>) -> Result<bool, rootcause::Report> {
         Ok(self.0)
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_feed_counts_in_only_paid_readers_due_in_their_night(pool: PgPool) {
     use suggestions::domain::ports::SuggestionAudience;
 
@@ -1133,7 +1133,7 @@ async fn the_feed_counts_in_only_paid_readers_due_in_their_night(pool: PgPool) {
 
 /// The change log keeps entries for a while: pruning deletes the ones
 /// written before the cut-off, a batch at a time, and keeps the rest.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pruning_deletes_only_old_change_log_entries(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let repo = PgGenerationRepo::new(pool.clone());

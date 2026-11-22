@@ -13,8 +13,8 @@ use axum::{
     routing::{get, post},
 };
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use models_pagination::Base64Str;
 use serde::{Deserialize, Serialize};
@@ -33,7 +33,7 @@ use crate::domain::{
 /// Router state for authenticated calendar occurrence queries.
 pub struct CalendarRouterState<S, Auth> {
     service: Arc<S>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for CalendarRouterState<S, Auth> {
@@ -47,7 +47,7 @@ impl<S, Auth> Clone for CalendarRouterState<S, Auth> {
 
 impl<S, Auth> CalendarRouterState<S, Auth> {
     /// Create router state from a shared calendar service and authorization state.
-    pub fn new(service: Arc<S>, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<S>, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization_state,
@@ -55,7 +55,7 @@ impl<S, Auth> CalendarRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<CalendarRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<CalendarRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &CalendarRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -65,7 +65,7 @@ impl<S, Auth> FromRef<CalendarRouterState<S, Auth>> for MacroAuthorizationState<
 pub fn calendar_router<S, Auth, T>(state: CalendarRouterState<S, Auth>) -> Router<T>
 where
     S: CalendarOccurrenceService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -161,12 +161,12 @@ impl IntoResponse for CalendarApiError {
 )]
 pub async fn list_occurrences<S, Auth>(
     State(state): State<CalendarRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(query): Query<CalendarOccurrenceQuery>,
 ) -> Result<Json<CalendarOccurrenceResponse>, CalendarApiError>
 where
     S: CalendarOccurrenceService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let default_end_date = default_end_date(query.end);
     let range = OccurrenceRange {
@@ -186,7 +186,7 @@ where
     let mut occurrences = state
         .service
         .list_occurrences(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             range,
             cursor,
             repository_limit,
@@ -211,7 +211,7 @@ where
         })?;
     let sync_status = state
         .service
-        .sync_status(user.authorization.user.macro_user_id.as_ref())
+        .sync_status(user.authorization.user.rox_user_id.as_ref())
         .await
         .map_err(|error| {
             tracing::error!(error = ?error, "failed to query calendar sync status");
@@ -306,12 +306,12 @@ pub struct TeamOutOfOfficeResponse {
 )]
 pub async fn list_team_out_of_office<S, Auth>(
     State(state): State<CalendarRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(query): Query<TeamOutOfOfficeQuery>,
 ) -> Result<Json<TeamOutOfOfficeResponse>, CalendarApiError>
 where
     S: CalendarOccurrenceService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let default_end_date = default_end_date(query.end);
     let range = OccurrenceRange {
@@ -330,7 +330,7 @@ where
     let mut occurrences = state
         .service
         .list_team_out_of_office(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             range,
             repository_limit,
         )
@@ -438,16 +438,16 @@ pub struct CalendarMentionPreviewResponse {
 )]
 pub async fn event_ics<S, Auth>(
     State(state): State<CalendarRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(event_id): Path<Uuid>,
 ) -> Result<Response, CalendarApiError>
 where
     S: CalendarOccurrenceService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let ics = state
         .service
-        .event_ics(user.authorization.user.macro_user_id.as_ref(), event_id)
+        .event_ics(user.authorization.user.rox_user_id.as_ref(), event_id)
         .await
         .map_err(|error| {
             tracing::error!(error = ?error, "failed to export calendar event");
@@ -500,12 +500,12 @@ fn ics_disposition(title: &str) -> String {
 )]
 pub async fn mention_previews<S, Auth>(
     State(state): State<CalendarRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<CalendarMentionPreviewRequest>,
 ) -> Result<Json<CalendarMentionPreviewResponse>, CalendarApiError>
 where
     S: CalendarOccurrenceService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let requested_ids: Vec<Uuid> = request.items.iter().map(|item| item.event_id).collect();
     let items = request
@@ -518,7 +518,7 @@ where
         .collect();
     let previews = state
         .service
-        .mention_previews(user.authorization.user.macro_user_id.as_ref(), items)
+        .mention_previews(user.authorization.user.rox_user_id.as_ref(), items)
         .await
         .map_err(|error| {
             if error

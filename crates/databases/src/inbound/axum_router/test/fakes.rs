@@ -12,12 +12,12 @@ use entity_access::domain::models::{
     TeamRole, UserTeamInfo, ViewAccessLevel,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
+use rox_authorization::{
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
 use models_databases::{ColumnKind, OpResult};
 use models_permissions::share_permission::{SharePermissionV2, UpdateSharePermissionRequestV2};
 use rootcause::Report;
@@ -36,7 +36,7 @@ use crate::inbound::axum_router::ops::apply_ops_handler;
 use crate::inbound::axum_router::{DatabasesRouterState, databases_router};
 
 pub(super) const USER: &str = "macro|ops-router@rox.one";
-pub(super) const AGENT: BotId = bot_id::MACRO_AI_BOT_ID;
+pub(super) const AGENT: BotId = bot_id::ROX_AI_BOT_ID;
 
 /// Accepts the bearer token `valid` as [`USER`], and `agent`: [`USER`]'s SDK
 /// token carrying [`AGENT`]'s attribution, as code mode mints.
@@ -47,16 +47,16 @@ impl JwtValidator for ValidToken {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         let (origin, agent_id) = match jwt {
-            "valid" => (macro_authorization::CredentialOrigin::Session, None),
+            "valid" => (rox_authorization::CredentialOrigin::Session, None),
             "agent" => (
-                macro_authorization::CredentialOrigin::MacroApiJwt,
+                rox_authorization::CredentialOrigin::RoxApiJwt,
                 Some(AGENT),
             ),
-            _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         };
-        Ok(macro_authorization::ValidatedCredential {
+        Ok(rox_authorization::ValidatedCredential {
             origin,
             identity: ValidatedIdentity {
                 agent_id,
@@ -70,10 +70,10 @@ impl JwtValidator for ValidToken {
     }
 }
 
-type Authorization = MacroAuthorizationServiceImpl<ValidToken>;
+type Authorization = RoxAuthorizationServiceImpl<ValidToken>;
 
-fn authorization_state() -> MacroAuthorizationState<Authorization> {
-    MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
+fn authorization_state() -> RoxAuthorizationState<Authorization> {
+    RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
         ValidToken,
         InternalAuthConfig {
             api_key: "ops-router-internal-key".to_string(),
@@ -195,7 +195,7 @@ struct GrantingAccess(AccessLevel);
 impl EntityAccessService for GrantingAccess {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -215,7 +215,7 @@ impl EntityAccessService for GrantingAccess {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -224,7 +224,7 @@ impl EntityAccessService for GrantingAccess {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -243,7 +243,7 @@ impl EntityAccessService for GrantingAccess {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -255,7 +255,7 @@ impl EntityAccessService for GrantingAccess {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -266,7 +266,7 @@ impl EntityAccessService for GrantingAccess {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Ok(Vec::new())
     }
 
@@ -286,7 +286,7 @@ impl EntityAccessService for GrantingAccess {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(None)
     }
@@ -507,7 +507,7 @@ impl crate::domain::duplicate::DatabaseDuplicateService for RecordingService {
     async fn duplicate_database(
         &self,
         receipt: EntityAccessReceipt<ViewAccessLevel>,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         acting_bot: Option<BotId>,
         name: Option<String>,
     ) -> Result<Database, DatabaseError> {

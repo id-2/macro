@@ -206,7 +206,7 @@ impl SyncFixture {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn positive_to_point_sync_replaces_busy_without_changing_identity_or_source_grant(
     pool: PgPool,
 ) {
@@ -344,7 +344,7 @@ async fn positive_to_point_sync_replaces_busy_without_changing_identity_or_sourc
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_coverage_quiet_poll_stays_ready_but_partial_event_swap_withdraws_it(pool: PgPool) {
     let fixture = SyncFixture::new(pool, "swap").await;
     fixture.assert_coverage(true, 2).await;
@@ -457,7 +457,7 @@ async fn team_coverage_quiet_poll_stays_ready_but_partial_event_swap_withdraws_i
     fixture.assert_coverage(true, 2).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_coverage_withdraws_on_source_removal_calendar_removal_and_timezone_change(
     pool: PgPool,
 ) {

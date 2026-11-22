@@ -10,8 +10,8 @@ use axum::{
     routing::put,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService};
-use macro_uuid::Uuid;
+use rox_authorization::{ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService};
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -27,7 +27,7 @@ pub fn agent_session_task_router<Access, Auth, S>(
 ) -> Router<S>
 where
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -79,10 +79,10 @@ pub struct LinkedTaskResponse {
 #[tracing::instrument(skip_all, err(Debug))]
 pub async fn link_agent_session_task<
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<Arc<dyn SessionTasks>, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Path(session_id): Path<Uuid>,
     Json(request): Json<LinkTaskRequest>,
 ) -> Result<Json<LinkedTaskResponse>, SessionTaskApiError> {
@@ -90,7 +90,7 @@ pub async fn link_agent_session_task<
         .service
         .link_task(
             AgentSessionId::new_from_uuid(session_id),
-            &caller.authorization.user.macro_user_id,
+            &caller.authorization.user.rox_user_id,
             &request.task_id.to_string(),
         )
         .await?;

@@ -5,14 +5,14 @@ pub(crate) async fn folder_fixture(pool: PgPool) -> (PgRepository, Actor, Record
     let team = TeamId(Uuid::now_v7());
     let account = Uuid::now_v7();
     let actor = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|folder@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|folder@example.test")
             .expect("fixture")
             .into_owned(),
     };
     sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'folder@example.test','folder@example.test',$2)",account,format!("fixture-{account}"))
         .execute(&pool).await.expect("account");
     sqlx::query!(
-        r#"INSERT INTO "User"(id,email,macro_user_id) VALUES($1,'folder@example.test',$2)"#,
+        r#"INSERT INTO "User"(id,email,rox_user_id) VALUES($1,'folder@example.test',$2)"#,
         actor.user_id.as_ref(),
         account
     )
@@ -73,14 +73,14 @@ pub(crate) async fn another_team(pool: &PgPool) -> (TeamId, Actor) {
     let team = TeamId(Uuid::now_v7());
     let account = Uuid::now_v7();
     let actor = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|other-folder@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|other-folder@example.test")
             .expect("fixture")
             .into_owned(),
     };
     sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'other-folder@example.test','other-folder@example.test',$2)",account,format!("fixture-{account}"))
         .execute(pool).await.expect("other account");
     sqlx::query!(
-        r#"INSERT INTO "User"(id,email,macro_user_id) VALUES($1,'other-folder@example.test',$2)"#,
+        r#"INSERT INTO "User"(id,email,rox_user_id) VALUES($1,'other-folder@example.test',$2)"#,
         actor.user_id.as_ref(),
         account
     )

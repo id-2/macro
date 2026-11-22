@@ -880,7 +880,7 @@ export class Sdk extends HeyApiClient {
      * Handler for `POST /call/{channel_id}/transcript`.
      *
      * Receives transcript segments from the transcription agent.
-     * Authenticated via the `x-macro-internal-call` shared secret.
+     * Authenticated via the `x-rox-internal-call` shared secret.
      * Duplicate segments (same `segment_id`) are ignored.
      */
     public ingestTranscript<ThrowOnError extends boolean = false>(options: Options<IngestTranscriptData, ThrowOnError>): RequestResult<IngestTranscriptResponses, IngestTranscriptErrors, ThrowOnError> {

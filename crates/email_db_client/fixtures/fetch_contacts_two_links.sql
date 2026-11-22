@@ -2,7 +2,7 @@
 -- sent-to contact. Used to verify the multi-inbox /email/contacts union groups
 -- contacts by link id.
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('d1000000-0000-0000-0000-000000000001', 'macro|multi@test.com', 'fa-multi', 'multi@test.com', 'GMAIL', true, NOW() - INTERVAL '1 hour', NOW()),
     ('d2000000-0000-0000-0000-000000000002', 'macro|multi@test.com', 'fa-multi', 'multi.work@test.com', 'GMAIL', true, NOW(), NOW());

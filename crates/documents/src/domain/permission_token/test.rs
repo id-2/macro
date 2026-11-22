@@ -1,5 +1,5 @@
-use bot_id::{BotId, MACRO_AI_BOT_ID, NonSystemBotId};
-use macro_user_id::user_id::MacroUserIdStr;
+use bot_id::{BotId, ROX_AI_BOT_ID, NonSystemBotId};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::CreationPrincipal;
 use models_permissions::share_permission::access_level::AccessLevel;
 use uuid::Uuid;
@@ -8,8 +8,8 @@ use super::{decode_permission_token, encode_principal_permission_token};
 
 const SECRET: &str = "creation-token-secret";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|user@rox.one".to_string()).expect("valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|user@rox.one".to_string()).expect("valid user id")
 }
 
 fn identity_claims(principal: &CreationPrincipal) -> (Option<String>, Option<String>) {
@@ -40,7 +40,7 @@ fn user_token_names_the_user_without_an_actor() {
 #[test]
 fn bot_for_user_token_names_the_user_and_the_bot_actor() {
     let principal = CreationPrincipal::BotForUser {
-        bot: MACRO_AI_BOT_ID,
+        bot: ROX_AI_BOT_ID,
         user: user(),
     };
     assert_eq!(
@@ -71,7 +71,7 @@ fn team_bot_token_names_the_bot_actor_without_a_user() {
 async fn signed_document_grant_retains_invocation_attribution() {
     let id = Uuid::now_v7();
     let principal = CreationPrincipal::BotForUser {
-        bot: MACRO_AI_BOT_ID,
+        bot: ROX_AI_BOT_ID,
         user: user(),
     };
     let token = agent_correlation::context::scope(Some(id), async {

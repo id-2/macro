@@ -649,9 +649,9 @@ pub struct SetupNotice {
     /// The computer's name when the notice is sent.
     pub computer_name: String,
     /// Who bought the computer; for an agent teammate's, its inviter.
-    pub buyer: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub buyer: rox_user_id::user_id::RoxUserIdStr<'static>,
     /// The agent teammate the computer runs, if it was bought for one.
-    pub agent: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+    pub agent: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     /// Ready, or why setup failed.
     pub outcome: SetupOutcome,
 }

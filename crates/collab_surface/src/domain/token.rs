@@ -5,14 +5,14 @@
 //! the shared `document_permission_jwt` secret): the worker string-compares
 //! the `document_id` claim against its session key, so a surface id flows
 //! through the existing claim unchanged. Deliberately not lifted into
-//! `macro_sync_service_jwt` — that crate stays dependency-minimal because it
+//! `rox_sync_service_jwt` — that crate stays dependency-minimal because it
 //! also compiles to wasm for the sync-service worker.
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use entity_access::domain::models::EntityPermission;
-use macro_sync_service_jwt::{DocumentPermissionToken, ISSUER, TOKEN_TTL_SECS};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_sync_service_jwt::{DocumentPermissionToken, ISSUER, TOKEN_TTL_SECS};
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::DocumentPermissionsToken;
 use model_entity::EntityType;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -64,7 +64,7 @@ pub fn surface_access_level(
 
 /// Sign a sync-service connection token for `surface_id`.
 pub fn encode_surface_token(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     surface_id: String,
     access_level: AccessLevel,
     jwt_secret: &str,
@@ -74,7 +74,7 @@ pub fn encode_surface_token(
         .expect("system clock before unix epoch")
         .as_secs() as usize;
 
-    macro_sync_service_jwt::encode(
+    rox_sync_service_jwt::encode(
         &DocumentPermissionsToken {
             user_id: Some(user_id),
             document_id: surface_id,
@@ -104,7 +104,7 @@ pub fn encode_service_surface_token(
         .expect("system clock before unix epoch")
         .as_secs() as usize;
 
-    macro_sync_service_jwt::encode(
+    rox_sync_service_jwt::encode(
         &DocumentPermissionsToken {
             user_id: None,
             document_id: surface_id,

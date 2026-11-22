@@ -5,7 +5,7 @@ use entity_access::domain::models::{
     AccessLevel, BotReceiptScope, EntityAccessReceipt, EntityPermission, EntityType,
     ParticipantRole,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MockMessageServiceApi,
     events::MessagePostedMetadata,
@@ -35,7 +35,7 @@ impl Admission {
 impl ai_billing::AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        caller: &'a MacroUserIdStr<'_>,
+        caller: &'a RoxUserIdStr<'_>,
         feature: ai_billing::AiFeature,
     ) -> ai_billing::AdmissionFuture<'a> {
         assert_eq!(caller, &user());
@@ -52,7 +52,7 @@ pub(super) fn admission_failures() -> [ai_billing::AiAdmissionError; 2] {
     ]
 }
 
-pub(super) fn user() -> MacroUserIdStr<'static> {
+pub(super) fn user() -> RoxUserIdStr<'static> {
     "macro|person@example.com".to_string().try_into().unwrap()
 }
 pub(super) fn parent() -> MessageParent {
@@ -187,7 +187,7 @@ impl Access {
 impl ConversationAccess for Access {
     async fn user_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>, rootcause::Report> {
         let (entity, permission) = self.permission(parent)?;
@@ -199,12 +199,12 @@ impl ConversationAccess for Access {
     }
     async fn bot_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>, rootcause::Report> {
         let (entity, permission) = self.permission(parent)?;
         Ok(EntityAccessReceipt::try_new_bot(
-            bot_id::MACRO_AI_BOT_ID.into_storage_id(),
+            bot_id::ROX_AI_BOT_ID.into_storage_id(),
             BotReceiptScope::User {
                 acting_user: user.clone(),
             },

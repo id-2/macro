@@ -5,7 +5,7 @@ INSERT INTO
             'organization-one'
     );
 
-INSERT INTO public."macro_user" ("id", "username", "email", "stripe_customer_id") VALUES
+INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id") VALUES
     ('a1111111-1111-1111-1111-111111111111', 'user', 'user@user.com', 'stripe_id'),
     ('a2222222-2222-2222-2222-222222222222', 'teammate1', 'teammate1@user.com', 'stripe_id_t1'),
     ('a3333333-3333-3333-3333-333333333333', 'teammate2', 'teammate2@user.com', 'stripe_id_t2');
@@ -16,7 +16,7 @@ INSERT INTO
         "email",
         "stripeCustomerId",
         "organizationId",
-        "macro_user_id"
+        "rox_user_id"
     ) (
         SELECT
             'macro|user@user.com',
@@ -75,17 +75,17 @@ INSERT INTO
     );
 
 -- Additional users for team sharing tests
-INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "macro_user_id")
+INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
     (SELECT 'macro|teammate1@user.com', 'teammate1@user.com', 'stripe_id_t1', 1, 'a2222222-2222-2222-2222-222222222222');
 
-INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "macro_user_id")
+INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
     (SELECT 'macro|teammate2@user.com', 'teammate2@user.com', 'stripe_id_t2', 1, 'a3333333-3333-3333-3333-333333333333');
 
 -- A user that belongs to no team (team-share edge case tests)
-INSERT INTO public."macro_user" ("id", "username", "email", "stripe_customer_id") VALUES
+INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id") VALUES
     ('a4444444-4444-4444-4444-444444444444', 'noteam', 'no-team@user.com', 'stripe_id_nt');
 
-INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "macro_user_id")
+INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
     (SELECT 'macro|no-team@user.com', 'no-team@user.com', 'stripe_id_nt', 1, 'a4444444-4444-4444-4444-444444444444');
 
 -- Team and team_user for sharing tests

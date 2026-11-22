@@ -3,7 +3,7 @@ import { decodeBase64Utf8 } from './decode-base64';
 
 /**
  * Quoted-thread markup other mail clients write. The composer's own quotes
- * are a `.macro_quote` block or the editor's `md-quote` blockquotes.
+ * are a `.rox_quote` block or the editor's `md-quote` blockquotes.
  */
 const PROVIDER_QUOTE_SELECTOR = [
   '.gmail_quote',
@@ -48,7 +48,7 @@ export function draftEditorHtml(
 function carriesProviderQuote(html: string): boolean {
   const { body } = new DOMParser().parseFromString(html, 'text/html');
   // The composer's own quoted thread: it is imported and re-sent as is.
-  if (body.querySelector('.macro_quote')) return false;
+  if (body.querySelector('.rox_quote')) return false;
   if (body.querySelector(PROVIDER_QUOTE_SELECTOR)) return true;
   // A plain blockquote under an attribution line. Blockquotes the editor
   // wrote carry `md-quote` and are the user's own content.

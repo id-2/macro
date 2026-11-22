@@ -10,7 +10,7 @@ use email_api_client::domain::models::{
     Attention, EmailApiError, GateLimit, MailFolder, MailboxChangePage, MailboxMessage,
     MailboxState, ProviderId, RateLimitOrigin, StreamPosition, StreamToken,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::collections::VecDeque;
 use std::sync::Mutex;
@@ -136,7 +136,7 @@ fn invitation(link: Uuid, provider_id: &str) -> MailboxMessage {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_message_refused_outright_stops_after_three_attempts_until_it_changes(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -204,7 +204,7 @@ async fn a_message_refused_outright_stops_after_three_attempts_until_it_changes(
     assert_eq!(revived.attempts, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_forbidden_message_fails_on_its_own_instead_of_asking_for_reauth(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -238,7 +238,7 @@ async fn a_forbidden_message_fails_on_its_own_instead_of_asking_for_reauth(db: P
     assert!(row(&db, link, "denied").await.abandoned);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_provider_outage_backs_a_message_off_but_never_abandons_it(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -286,7 +286,7 @@ async fn a_provider_outage_backs_a_message_off_but_never_abandons_it(db: PgPool)
     assert!(telemetry.events("mailbox message abandoned").is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_provider_outage_leaves_the_message_waiting_thirty_minutes(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     queue(&db, link, "waiting", 49).await;
@@ -308,7 +308,7 @@ async fn a_provider_outage_leaves_the_message_waiting_thirty_minutes(db: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_message_that_keeps_failing_for_a_reason_of_its_own_stops_after_a_day(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -328,7 +328,7 @@ async fn a_message_that_keeps_failing_for_a_reason_of_its_own_stops_after_a_day(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mailbox_wide_refusals_do_not_bring_a_message_closer_to_abandonment(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     queue(&db, link, "throttled", 49).await;
@@ -346,7 +346,7 @@ async fn mailbox_wide_refusals_do_not_bring_a_message_closer_to_abandonment(db: 
     assert_eq!((throttled.abandoned, throttled.attempts), (false, 49));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_abandoned_import_message_does_not_hold_the_import_open(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -383,7 +383,7 @@ async fn an_abandoned_import_message_does_not_hold_the_import_open(db: PgPool) {
     assert_eq!(telemetry.events("outlook import completed").len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_invitation_waits_for_its_calendar_parts_then_imports_without_them(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -429,7 +429,7 @@ async fn an_invitation_waits_for_its_calendar_parts_then_imports_without_them(db
     assert_eq!(stored, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sync_claims_skip_a_mailbox_that_needs_reauth_until_it_is_cleared(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     sqlx::query!(

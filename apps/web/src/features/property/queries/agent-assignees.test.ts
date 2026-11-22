@@ -1,8 +1,8 @@
 import { CODEX_BOT_PRINCIPAL_ID } from '@core/constant/codexAgent';
 import { CURSOR_BOT_PRINCIPAL_ID } from '@core/constant/cursorAgent';
-import { MACRO_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
-import { MACRO_CODER_PRINCIPAL_ID } from '@core/constant/macroCoder';
-import { MACRO_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
+import { ROX_CODER_PRINCIPAL_ID } from '@core/constant/macroCoder';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
 import type { Agent } from '@service-storage/generated/schemas/agent';
 import type { Bot } from '@service-storage/generated/schemas/bot';
 import { createRoot } from 'solid-js';
@@ -130,12 +130,12 @@ describe('task agent assignees', () => {
     createRoot((dispose) => {
       const ids = useAgentAssignees(() => true)().map(({ id }) => id);
       expect(ids).toEqual([
-        MACRO_NEW_PRINCIPAL_ID,
+        ROX_NEW_PRINCIPAL_ID,
         CODEX_BOT_PRINCIPAL_ID,
         CURSOR_BOT_PRINCIPAL_ID,
       ]);
-      expect(ids).not.toContain(MACRO_AGENT_PRINCIPAL_ID);
-      expect(ids).not.toContain(MACRO_CODER_PRINCIPAL_ID);
+      expect(ids).not.toContain(ROX_AGENT_PRINCIPAL_ID);
+      expect(ids).not.toContain(ROX_CODER_PRINCIPAL_ID);
       dispose();
     });
   });

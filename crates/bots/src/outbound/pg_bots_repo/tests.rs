@@ -13,8 +13,8 @@ use entity_access::domain::models::{
     Entity, EntityAccessReceipt, EntityPermission, EntityType, MemberParticipantRole,
     ParticipantRole,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker, NoopMacroEventBroker};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker, NoopMacroEventBroker};
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
@@ -28,8 +28,8 @@ const TEAM_MEMBER: &str = "macro|bot-team-member@example.com";
 const TEAM_ADMIN: &str = "macro|bot-team-admin@example.com";
 const TEAM_OWNER: &str = "macro|bot-team-owner@example.com";
 const TEAM_OTHER: &str = "macro|bot-team-other@example.com";
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid macro user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid macro user id")
 }
 
 fn channel_member_receipt(
@@ -158,8 +158,8 @@ impl RecordingEventBroker {
     }
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -193,7 +193,7 @@ fn recording_service(
 }
 
 fn assert_event(event: &PublishedEvent, bot_id: BotId, event_type: &str, metadata: Value) {
-    assert_eq!(event.topic, "macro.bots");
+    assert_eq!(event.topic, "rox.bots");
     assert_eq!(event.key, bot_id.to_string());
     assert_eq!(event.payload["schema_version"], 1);
     assert_eq!(event.payload["event_type"], event_type);
@@ -224,9 +224,9 @@ fn assert_no_token_material(payload: &Value, known_token: Option<&str>) {
 }
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::new_v4();
+    let rox_user_id = Uuid::new_v4();
     let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
-    let stripe_customer_id = format!("stripe_{macro_user_id}");
+    let stripe_customer_id = format!("stripe_{rox_user_id}");
 
     sqlx::query(
         r#"
@@ -235,7 +235,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
         ON CONFLICT (id) DO NOTHING
         "#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(email)
     .bind(email)
     .bind(stripe_customer_id)
@@ -244,14 +244,14 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
 
     sqlx::query(
         r#"
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ($1, $2, $3)
         ON CONFLICT (id) DO NOTHING
         "#,
     )
     .bind(user_id)
     .bind(email)
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .execute(pool)
     .await?;
 
@@ -369,7 +369,7 @@ async fn token_last_used_at(
     Ok(last_used_at)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bot_active_in_channel_returns_true_for_active_membership(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -384,7 +384,7 @@ async fn bot_active_in_channel_returns_true_for_active_membership(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bot_active_in_channel_returns_false_for_non_member(pool: PgPool) -> anyhow::Result<()> {
     let channel_id = Uuid::new_v4();
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
@@ -396,7 +396,7 @@ async fn bot_active_in_channel_returns_false_for_non_member(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bot_active_in_channel_returns_false_for_soft_deleted_membership(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -412,7 +412,7 @@ async fn bot_active_in_channel_returns_false_for_soft_deleted_membership(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_user_owned_bot_records_user_owner(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
 
@@ -434,7 +434,7 @@ async fn create_user_owned_bot_records_user_owner(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_owner_profiles_returns_persisted_system_deleted_and_missing(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -446,7 +446,7 @@ async fn get_owner_profiles_returns_persisted_system_deleted_and_missing(
     let repo = PgBotsRepo::new(pool);
 
     let profiles = repo
-        .get_owner_profiles(&[bot.id, bot_id::MACRO_NEW_BOT_ID, missing])
+        .get_owner_profiles(&[bot.id, bot_id::ROX_NEW_BOT_ID, missing])
         .await?;
     let profile = profiles.get(&bot.id).expect("persisted bot owner profile");
     assert_eq!(profile.id, bot.id);
@@ -463,16 +463,16 @@ async fn get_owner_profiles_returns_persisted_system_deleted_and_missing(
         })
     );
     let system = profiles
-        .get(&bot_id::MACRO_NEW_BOT_ID)
+        .get(&bot_id::ROX_NEW_BOT_ID)
         .expect("system bot owner profile");
-    assert_eq!(system.name, bot_id::MACRO_AI_NAME);
+    assert_eq!(system.name, bot_id::ROX_AI_NAME);
     assert_eq!(system.avatar_url, None);
     assert_eq!(system.deleted_at, None);
     assert_eq!(system.owner, None);
     assert!(!profiles.contains_key(&missing));
 
     let ordered = service
-        .get_owner_profiles(&[bot.id, bot.id, bot_id::MACRO_NEW_BOT_ID])
+        .get_owner_profiles(&[bot.id, bot.id, bot_id::ROX_NEW_BOT_ID])
         .await?;
     assert_eq!(ordered.len(), 2);
     assert_eq!(ordered[0].id, bot.id);
@@ -483,8 +483,8 @@ async fn get_owner_profiles_returns_persisted_system_deleted_and_missing(
             user_id: USER_OWNER.to_string(),
         })
     );
-    assert_eq!(ordered[1].id, bot_id::MACRO_NEW_BOT_ID);
-    assert_eq!(ordered[1].name, bot_id::MACRO_AI_NAME);
+    assert_eq!(ordered[1].id, bot_id::ROX_NEW_BOT_ID);
+    assert_eq!(ordered[1].name, bot_id::ROX_AI_NAME);
     assert_eq!(ordered[1].avatar_url, None);
     assert_eq!(ordered[1].deleted_at, None);
     assert_eq!(ordered[1].owner, None);
@@ -504,7 +504,7 @@ async fn get_owner_profiles_returns_persisted_system_deleted_and_missing(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_owner_profiles_rejects_more_than_100_ids(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let id = BotId::new_from_uuid(Uuid::new_v4());
@@ -525,7 +525,7 @@ async fn get_owner_profiles_rejects_more_than_100_ids(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bot_profiles_batch_persisted_system_deleted_and_missing_bots(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -537,7 +537,7 @@ async fn bot_profiles_batch_persisted_system_deleted_and_missing_bots(
     let repo = PgBotsRepo::new(pool);
 
     let profiles = repo
-        .get_bot_profiles(&[bot.id, bot_id::MACRO_NEW_BOT_ID, missing])
+        .get_bot_profiles(&[bot.id, bot_id::ROX_NEW_BOT_ID, missing])
         .await?;
     let profile = profiles.get(&bot.id).expect("persisted bot profile");
     assert_eq!(profile.id, bot.id);
@@ -545,10 +545,10 @@ async fn bot_profiles_batch_persisted_system_deleted_and_missing_bots(
     assert_eq!(profile.avatar_url, bot.avatar_url);
     assert_eq!(
         profiles
-            .get(&bot_id::MACRO_NEW_BOT_ID)
+            .get(&bot_id::ROX_NEW_BOT_ID)
             .expect("system bot profile")
             .name,
-        bot_id::MACRO_AI_NAME
+        bot_id::ROX_AI_NAME
     );
     assert!(!profiles.contains_key(&missing));
 
@@ -563,7 +563,7 @@ async fn bot_profiles_batch_persisted_system_deleted_and_missing_bots(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn created_agent_round_trips_every_agent_field(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let created = service
@@ -604,7 +604,7 @@ async fn created_agent_round_trips_every_agent_field(pool: PgPool) -> anyhow::Re
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_team_agent_requires_membership_not_admin(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::new_v4();
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
@@ -627,7 +627,7 @@ async fn create_team_agent_requires_membership_not_admin(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_member_can_list_a_team_agent_created_by_someone_else(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -645,7 +645,7 @@ async fn team_member_can_list_a_team_agent_created_by_someone_else(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn channel_co_member_can_list_a_selected_agent_they_can_mention(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -677,7 +677,7 @@ async fn channel_co_member_can_list_a_selected_agent_they_can_mention(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn all_channel_private_agent_is_not_listed_for_a_channel_co_member(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -712,7 +712,7 @@ async fn all_channel_private_agent_is_not_listed_for_a_channel_co_member(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn updated_agent_replaces_every_field_and_selected_channel(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -766,7 +766,7 @@ async fn updated_agent_replaces_every_field_and_selected_channel(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn patched_agent_changes_only_what_the_patch_names(pool: PgPool) -> anyhow::Result<()> {
     let channel_id = Uuid::new_v4();
     insert_channel_member(&pool, channel_id, USER_OWNER).await?;
@@ -822,7 +822,7 @@ async fn patched_agent_changes_only_what_the_patch_names(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn patch_agent_refuses_an_mcp_slug_the_directory_does_not_list(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -876,7 +876,7 @@ async fn patch_agent_refuses_an_mcp_slug_the_directory_does_not_list(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn patch_agent_is_refused_for_strangers_and_plain_bots(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, USER_OTHER).await?;
     let service = service(&pool);
@@ -912,7 +912,7 @@ async fn patch_agent_is_refused_for_strangers_and_plain_bots(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn auto_accept_permissions_persists_each_of_its_three_states(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -948,7 +948,7 @@ async fn auto_accept_permissions_persists_each_of_its_three_states(
 
 /// The coding choice is the persona's own setting, stored as made and read
 /// back the same way from every path that returns an agent.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn is_coding_round_trips_through_create_and_update(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let repo = PgBotsRepo::new(pool.clone());
@@ -976,7 +976,7 @@ fn mcp_server(app_slug: &str, server_name: &str) -> AgentMcpServer {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn selected_mcp_servers_round_trip_and_are_replaced_wholesale(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1040,7 +1040,7 @@ async fn selected_mcp_servers_round_trip_and_are_replaced_wholesale(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mcp_server_selection_is_validated(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let selected = |servers: Vec<AgentMcpServer>| AgentMcpServers::Selected { servers };
@@ -1121,7 +1121,7 @@ fn agent_mcp_servers_serialize_as_a_tagged_union() {
     assert_eq!(parsed, AgentMcpServers::Selected { servers: vec![] });
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_member_creator_can_change_agent_share_between_private_and_team(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1155,7 +1155,7 @@ async fn team_member_creator_can_change_agent_share_between_private_and_team(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_member_can_update_team_agent_but_cannot_make_it_private(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1191,7 +1191,7 @@ async fn team_member_can_update_team_agent_but_cannot_make_it_private(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn selected_agent_is_created_atomically_in_authorized_channels(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1221,7 +1221,7 @@ async fn selected_agent_is_created_atomically_in_authorized_channels(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn selected_agent_rejects_channels_the_caller_cannot_access(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1240,7 +1240,7 @@ async fn selected_agent_rejects_channels_the_caller_cannot_access(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_bot_stores_requested_has_agent(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let mut request = create_req("agent-bot");
@@ -1259,7 +1259,7 @@ async fn create_bot_stores_requested_has_agent(pool: PgPool) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn patch_bot_toggles_has_agent_and_leaves_it_unchanged_when_omitted(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1318,7 +1318,7 @@ async fn patch_bot_toggles_has_agent_and_leaves_it_unchanged_when_omitted(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_team_owned_bot_requires_team_admin_or_owner(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let team_id = Uuid::new_v4();
@@ -1351,7 +1351,7 @@ async fn create_team_owned_bot_requires_team_admin_or_owner(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_admins_can_delete_agents_but_not_other_team_bots(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let team_id = Uuid::new_v4();
@@ -1412,7 +1412,7 @@ async fn team_admins_can_delete_agents_but_not_other_team_bots(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_team_owned_channel_scoped_bot_requires_team_admin(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1440,7 +1440,7 @@ async fn create_team_owned_channel_scoped_bot_requires_team_admin(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn add_remove_channel_bot_requires_bot_usability_and_soft_removes(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1505,7 +1505,7 @@ async fn add_remove_channel_bot_requires_bot_usability_and_soft_removes(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_bot_channels_requires_manageable_bot_and_returns_only_active_channels(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1565,7 +1565,7 @@ async fn list_bot_channels_requires_manageable_bot_and_returns_only_active_chann
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_channel_scoped_bot_creates_bot_participant_and_token(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1610,7 +1610,7 @@ async fn create_channel_scoped_bot_creates_bot_participant_and_token(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn authenticate_channel_token_rejects_wrong_channel_without_marking_used(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1639,7 +1639,7 @@ async fn authenticate_channel_token_rejects_wrong_channel_without_marking_used(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn authenticate_channel_token_rejects_revoked_token(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let channel_id = Uuid::new_v4();
@@ -1668,7 +1668,7 @@ async fn authenticate_channel_token_rejects_revoked_token(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn authenticate_channel_token_rejects_removed_channel_membership(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1699,7 +1699,7 @@ async fn authenticate_channel_token_rejects_removed_channel_membership(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn revoke_token_prevents_future_authentication(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let bot = service
@@ -1740,7 +1740,7 @@ async fn revoke_token_prevents_future_authentication(pool: PgPool) -> anyhow::Re
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_tokens_returns_prefix_not_raw_secret(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let bot = service
@@ -1770,7 +1770,7 @@ async fn list_tokens_returns_prefix_not_raw_secret(pool: PgPool) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn authenticate_channel_token_accepts_migrated_uuid_token(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1813,7 +1813,7 @@ async fn authenticate_channel_token_accepts_migrated_uuid_token(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rust_token_hash_matches_postgres_digest(pool: PgPool) -> anyhow::Result<()> {
     let raw = "mbot_aabbccddeeff_aabbccddeeffsecret";
     let rust_hash = bot_token::hash_token(raw);
@@ -1827,7 +1827,7 @@ async fn rust_token_hash_matches_postgres_digest(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lifecycle_creation_publishes_exact_sanitized_events(pool: PgPool) -> anyhow::Result<()> {
     let broker = RecordingEventBroker::default();
     let service = recording_service(&pool, broker.clone());
@@ -1913,7 +1913,7 @@ async fn lifecycle_creation_publishes_exact_sanitized_events(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn patch_and_delete_publish_requested_fields_and_team_owner(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1977,7 +1977,7 @@ async fn patch_and_delete_publish_requested_fields_and_team_owner(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn non_lifecycle_and_failed_operations_do_not_publish(pool: PgPool) -> anyhow::Result<()> {
     let broker = RecordingEventBroker::default();
     let service = recording_service(&pool, broker.clone());
@@ -2050,7 +2050,7 @@ async fn non_lifecycle_and_failed_operations_do_not_publish(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scheduling_failures_do_not_change_successful_mutations(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -2152,7 +2152,7 @@ fn roxd_agent_req(handle: &str, harness_id: Option<HarnessId>) -> CreateAgentReq
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn roxd_agents_require_a_registered_usable_harness(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     insert_user(&pool, USER_OWNER).await?;
@@ -2203,7 +2203,7 @@ async fn roxd_agents_require_a_registered_usable_harness(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn no_agent_is_bound_to_an_agent_teammates_computer(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, USER_OWNER).await?;
     let agent_computer = insert_harness(&pool, Some(USER_OWNER), None).await?;
@@ -2253,7 +2253,7 @@ async fn no_agent_is_bound_to_an_agent_teammates_computer(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn patching_settings_keeps_every_runtime(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     insert_user(&pool, USER_OWNER).await?;
@@ -2287,7 +2287,7 @@ async fn patching_settings_keeps_every_runtime(pool: PgPool) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_harness_leaves_its_agents_unbound_and_patchable(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -2381,7 +2381,7 @@ async fn deleting_a_harness_leaves_its_agents_unbound_and_patchable(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_harnesses_back_member_agents_but_not_team_agents_on_private_harnesses(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -2492,7 +2492,7 @@ async fn team_harnesses_back_member_agents_but_not_team_agents_on_private_harnes
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn persona_create_and_update_cannot_bypass_a_prompt_only_harness(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -2530,7 +2530,7 @@ async fn persona_create_and_update_cannot_bypass_a_prompt_only_harness(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_resident_reads_stopped_once_its_owner_loses_access_to_its_runtime(
     pool: PgPool,
 ) -> anyhow::Result<()> {

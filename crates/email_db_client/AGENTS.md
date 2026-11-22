@@ -9,7 +9,7 @@ backfill — plus legacy storage/workflow helpers that remain to be separated.
 ## Start here
 
 - `src/lib.rs`: the module list, one per table/feature area, mirroring
-  `macro_db_client`'s layout.
+  `rox_db_client`'s layout.
 - `src/parse/`: service↔DB type conversion (`db_to_service.rs`,
   `service_to_db.rs`) and column-length limits (`column_limits.rs`).
 - `README.md`: local test-database setup.
@@ -17,7 +17,7 @@ backfill — plus legacy storage/workflow helpers that remain to be separated.
 ## Scope
 
 - Owns: email-table statements, relational predicates and transaction-scoped
-  storage operations. The schema lives in `crates/macro_db_client/migrations/`.
+  storage operations. The schema lives in `crates/rox_db_client/migrations/`.
 - Put new workflow policy in `crates/email` and provider protocol implementations
   in `email_api_client`. Preserve SQL guards and lock order when extracting
   existing Rust decisions into domain services.
@@ -40,7 +40,7 @@ backfill — plus legacy storage/workflow helpers that remain to be separated.
 - Add a query to an existing table: the module in `src/<area>/` (e.g.
   `src/messages/get.rs`) → its `mod.rs` → a fixture under `fixtures/*.sql` if
   the test needs seed data.
-- Add a column or table: see `crates/macro_db_client/AGENTS.md` (this crate
+- Add a column or table: see `crates/rox_db_client/AGENTS.md` (this crate
   only owns queries, not migrations).
 
 ## Checks
@@ -108,13 +108,13 @@ Parsed message responses expose the draft generation captured in the same SQL sn
   claimed attachment the caller never sees is never uploaded, and the Outlook
   projection waits on its claim forever.
 - Quote and alias camelCase columns to Rust field names; check
-  `crates/macro_db_client/migrations/` for real column spelling, don't guess.
+  `crates/rox_db_client/migrations/` for real column spelling, don't guess.
 - A Rox draft (no provider id, or a live `email_mailbox_drafts` row) puts its
   thread in the inbox only when `email_threads.has_received_mail` is true.
   `recompute_thread_metadata` and the email crate's
   `thread_mail_projections_by_ids` restate this rule; change both together.
 
-`fetch_primary_link_by_macro_id` resolves CRM population and teardown through explicit `is_primary` ownership, which may be a Rox address rather than the legacy `macro|{email}` address.
+`fetch_primary_link_by_rox_id` resolves CRM population and teardown through explicit `is_primary` ownership, which may be a Rox address rather than the legacy `macro|{email}` address.
 
 ## Related
 

@@ -6,7 +6,7 @@
 use crate::domain::{models::GithubError, ports::GithubSyncRealtime};
 use connection_gateway_client::ConnectionGatewayClient;
 use foreign_entity::domain::models::ForeignEntity;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 
 /// Connection gateway publisher for saved GitHub PR mappings.
@@ -25,7 +25,7 @@ impl GithubSyncRealtime for ConnectionGatewayGithubRealtime {
     #[tracing::instrument(skip(self, recipients, entity), err)]
     async fn publish_pull_request(
         &self,
-        recipients: &[MacroUserIdStr<'static>],
+        recipients: &[RoxUserIdStr<'static>],
         entity: &ForeignEntity,
     ) -> Result<(), GithubError> {
         let message =

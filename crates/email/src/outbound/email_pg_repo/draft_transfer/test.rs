@@ -1,8 +1,8 @@
 use super::*;
 use crate::domain::{models::mailbox_operation::*, ports::EmailRepo};
 use email_api_client::domain::models::EmailApiError;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::collections::BTreeSet;
 
@@ -17,7 +17,7 @@ async fn fixture(db: &PgPool) -> (EmailPgRepo, DraftTransferRequest) {
         (source, "source@example.com", "OUTLOOK"),
         (target, "target@example.com", "GMAIL"),
     ] {
-        sqlx::query!("INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider,is_sync_active) VALUES($1,$2,'transfer-owner',$3,$4::text::email_user_provider_enum,true)",id,ACTOR,address,provider).execute(db).await.unwrap();
+        sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,is_sync_active) VALUES($1,$2,'transfer-owner',$3,$4::text::email_user_provider_enum,true)",id,ACTOR,address,provider).execute(db).await.unwrap();
     }
     sqlx::query!(
         "INSERT INTO email_threads(id,link_id) VALUES($1,$2)",
@@ -52,7 +52,7 @@ fn contacts() -> UpsertedContacts {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn transfer_preserves_uploads_and_fences_old_saves_deletes_and_delivery(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let upload = Uuid::now_v7();
@@ -127,7 +127,7 @@ async fn transfer_preserves_uploads_and_fences_old_saves_deletes_and_delivery(db
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stale_materialization_cannot_commit_over_newer_edits_or_replanned_transfer(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let original = prepare(&repo, &request).await;
@@ -150,7 +150,7 @@ async fn stale_materialization_cannot_commit_over_newer_edits_or_replanned_trans
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn transfer_rechecks_both_inboxes_and_refuses_a_scheduled_source(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     assert!(matches!(
@@ -160,7 +160,7 @@ async fn transfer_rechecks_both_inboxes_and_refuses_a_scheduled_source(db: PgPoo
     ));
     let plan = prepare(&repo, &request).await;
     sqlx::query!(
-        "UPDATE email_links SET macro_id='macro|another@example.com' WHERE id=$1",
+        "UPDATE email_links SET rox_id='macro|another@example.com' WHERE id=$1",
         request.destination_link_id
     )
     .execute(&db)
@@ -171,7 +171,7 @@ async fn transfer_rechecks_both_inboxes_and_refuses_a_scheduled_source(db: PgPoo
         Err(EmailErr::Unauthorized)
     ));
     sqlx::query!(
-        "UPDATE email_links SET macro_id=$2 WHERE id=$1",
+        "UPDATE email_links SET rox_id=$2 WHERE id=$1",
         request.destination_link_id,
         ACTOR
     )
@@ -186,7 +186,7 @@ async fn transfer_rechecks_both_inboxes_and_refuses_a_scheduled_source(db: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn disconnect_keeps_destination_blocked_until_explicit_duplicate_acknowledgement(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let plan = prepare(&repo, &request).await;
@@ -225,7 +225,7 @@ async fn disconnect_keeps_destination_blocked_until_explicit_duplicate_acknowled
     let decision = plan_resolution(facts, resolution).unwrap();
     super::super::draft_resolution::commit(
         &db,
-        &MacroUserIdStr::parse_from_str(ACTOR).unwrap(),
+        &RoxUserIdStr::parse_from_str(ACTOR).unwrap(),
         decision,
     )
     .await
@@ -236,7 +236,7 @@ async fn disconnect_keeps_destination_blocked_until_explicit_duplicate_acknowled
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn paused_outlook_writes_still_finish_gmail_moves_and_keep_outlook_originals_resolvable(
     db: PgPool,
 ) {
@@ -260,7 +260,7 @@ async fn paused_outlook_writes_still_finish_gmail_moves_and_keep_outlook_origina
         (gmail_target, "gmail-target@example.com", "GMAIL"),
         (outlook, "outlook@example.com", "OUTLOOK"),
     ] {
-        sqlx::query!("INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider,is_sync_active) VALUES($1,$2,'transfer-owner',$3,$4::text::email_user_provider_enum,true)",id,ACTOR,address,provider).execute(&db).await.unwrap();
+        sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,is_sync_active) VALUES($1,$2,'transfer-owner',$3,$4::text::email_user_provider_enum,true)",id,ACTOR,address,provider).execute(&db).await.unwrap();
     }
     let gmail_thread = Uuid::now_v7();
     let outlook_thread = Uuid::now_v7();
@@ -339,14 +339,14 @@ async fn paused_outlook_writes_still_finish_gmail_moves_and_keep_outlook_origina
     let decision = plan_resolution(reviewed, keep_original).unwrap();
     super::super::draft_resolution::commit(
         &db,
-        &MacroUserIdStr::parse_from_str(ACTOR).unwrap(),
+        &RoxUserIdStr::parse_from_str(ACTOR).unwrap(),
         decision,
     )
     .await
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn native_attachment_bytes_are_referenced_before_source_retirement(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let attachment = Uuid::now_v7();
@@ -403,7 +403,7 @@ async fn native_attachment_bytes_are_referenced_before_source_retirement(db: PgP
     assert!(message.is_draft);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recovery_before_a_delayed_request_prevents_it_from_committing(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     assert!(
@@ -429,7 +429,7 @@ async fn recovery_before_a_delayed_request_prevents_it_from_committing(db: PgPoo
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recovery_during_materialization_fences_the_delayed_commit(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let plan = prepare(&repo, &request).await;
@@ -458,7 +458,7 @@ async fn recovery_during_materialization_fences_the_delayed_commit(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_lost_commit_response_is_recoverable_after_the_source_disconnects(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let plan = prepare(&repo, &request).await;
@@ -487,7 +487,7 @@ async fn a_lost_commit_response_is_recoverable_after_the_source_disconnects(db: 
             .is_err()
     );
     sqlx::query!(
-        "UPDATE email_links SET macro_id='macro|stranger@example.com' WHERE id=$1",
+        "UPDATE email_links SET rox_id='macro|stranger@example.com' WHERE id=$1",
         request.destination_link_id
     )
     .execute(&db)
@@ -496,7 +496,7 @@ async fn a_lost_commit_response_is_recoverable_after_the_source_disconnects(db: 
     assert!(repo.recover_transfer(ACTOR, request.id).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn expired_or_replaced_cleanup_cannot_renew_or_complete(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let plan = prepare(&repo, &request).await;
@@ -531,7 +531,7 @@ async fn expired_or_replaced_cleanup_cannot_renew_or_complete(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn thread_pages_omit_deleted_and_moved_drafts(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let thread = sqlx::query_scalar!(
@@ -587,7 +587,7 @@ async fn thread_pages_omit_deleted_and_moved_drafts(db: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn returning_a_reply_to_its_original_inbox_never_rebinds_the_old_draft(db: PgPool) {
     let (repo, request) = fixture(&db).await;
     let parent = Uuid::now_v7();

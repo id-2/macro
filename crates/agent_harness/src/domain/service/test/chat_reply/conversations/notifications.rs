@@ -1,6 +1,6 @@
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_running_quiet_batch_leaves_the_next_conversation_message_queued(pool: sqlx::PgPool) {
     use crate::domain::conversation_turns::{ConversationTurnState, ConversationTurnStore};
     use agent_runtime_protocol::domain::notification::NotificationEvent;
@@ -58,7 +58,7 @@ async fn a_running_quiet_batch_leaves_the_next_conversation_message_queued(pool:
     service.inner.notification_batches.remove(&session);
     service.inner.busy.clear(session);
     sqlx::query!("UPDATE agent_session_notification SET lease_until = now() - interval '1 second' WHERE session_id = $1", session.as_uuid()).execute(&pool).await.unwrap();
-    let next_source = macro_uuid::generate_uuid_v7();
+    let next_source = rox_uuid::generate_uuid_v7();
     mention_origin_mut(&mut command).message_id = next_source;
     service
         .execute(

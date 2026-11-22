@@ -15,7 +15,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, put};
 use chrono::{DateTime, Utc};
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationState, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationState, UserOrInternal};
 use model::response::ErrorResponse;
 use saved_views::View;
 use saved_views::domain::{Cursor, Error, SavedViewApi, ShareChange, Update};
@@ -37,7 +37,7 @@ pub fn router<S>() -> Router<S>
 where
     S: Clone + Send + Sync + 'static,
     SavedViewDefinitionsState: FromRef<S>,
-    MacroAuthorizationState<AuthorizationService>: FromRef<S>,
+    RoxAuthorizationState<AuthorizationService>: FromRef<S>,
 {
     Router::new()
         .route("/", get(list_handler).post(create_handler))
@@ -50,7 +50,7 @@ where
         )
 }
 
-type Viewer = MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>;
+type Viewer = RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>;
 
 /// A saved filter definition, not a snapshot of matching entities.
 #[derive(Serialize, Deserialize, Debug, ToSchema)]
@@ -249,7 +249,7 @@ pub async fn list_handler(
     let after = params.after.as_deref().map(decode_cursor).transpose()?;
     let page = service
         .list(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             params.kind.as_deref(),
             after,
             first,
@@ -282,7 +282,7 @@ pub async fn get_handler(
 ) -> Result<Json<SavedViewDefinition>, SavedViewDefinitionErr> {
     let view = service
         .get(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             path.saved_view_id,
         )
         .await?;
@@ -315,7 +315,7 @@ pub async fn create_handler(
     agent_correlation::context::refuse_sharing(request.shared_team_id.is_some())?;
     let view = service
         .create(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             request.id.unwrap_or_else(Uuid::now_v7),
             request.name,
             request.config,
@@ -361,7 +361,7 @@ pub async fn update_handler(
     };
     let view = service
         .update(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             path.saved_view_id,
             request.expected_revision,
             Update {
@@ -401,7 +401,7 @@ pub async fn delete_handler(
 ) -> Result<StatusCode, SavedViewDefinitionErr> {
     service
         .delete(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             path.saved_view_id,
             params.expected_revision,
         )
@@ -431,7 +431,7 @@ pub async fn reorder_handler(
 ) -> Result<Json<Vec<SavedViewDefinition>>, SavedViewDefinitionErr> {
     let views = service
         .reorder(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             &request.kind,
             request.ids,
         )

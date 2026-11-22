@@ -5,7 +5,7 @@ use std::{collections::HashMap, sync::Arc};
 use async_graphql::{Context, Enum, SimpleObject, dataloader::DataLoader, dataloader::Loader};
 use email::domain::focus::{FocusCategory, FocusQueries, FocusStore, ImportanceTrend, ThreadFocus};
 use futures::future::BoxFuture;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Instrument;
 use uuid::Uuid;
 
@@ -21,14 +21,14 @@ pub trait EmailFocusReader: Send + Sync + 'static {
     /// newest first by latest message time, in either direction.
     fn focus_thread_ids<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'static>,
+        user: &'a RoxUserIdStr<'static>,
         window_days: u16,
     ) -> BoxFuture<'a, Result<Vec<Uuid>, rootcause::Report>>;
 
     /// Stored classifications for the viewer's threads among `thread_ids`.
     fn focus_for_threads<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'static>,
+        user: &'a RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> BoxFuture<'a, Result<HashMap<Uuid, ThreadFocus>, rootcause::Report>>;
 }
@@ -36,7 +36,7 @@ pub trait EmailFocusReader: Send + Sync + 'static {
 impl<S: FocusStore> EmailFocusReader for FocusQueries<S> {
     fn focus_thread_ids<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'static>,
+        user: &'a RoxUserIdStr<'static>,
         window_days: u16,
     ) -> BoxFuture<'a, Result<Vec<Uuid>, rootcause::Report>> {
         Box::pin(FocusQueries::focus_thread_ids(self, user, window_days))
@@ -44,7 +44,7 @@ impl<S: FocusStore> EmailFocusReader for FocusQueries<S> {
 
     fn focus_for_threads<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'static>,
+        user: &'a RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> BoxFuture<'a, Result<HashMap<Uuid, ThreadFocus>, rootcause::Report>> {
         Box::pin(async move { FocusQueries::focus_for_threads(self, user, &thread_ids).await })
@@ -160,7 +160,7 @@ impl From<ThreadFocus> for GraphqlEmailThreadFocus {
 
 /// DataLoader for the viewer's stored Focus classifications.
 pub struct EmailThreadFocusLoader {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     reader: Arc<dyn EmailFocusReader>,
 }
 
@@ -182,7 +182,7 @@ impl Loader<Uuid> for EmailThreadFocusLoader {
 
 /// Build a Focus DataLoader scoped to the requesting user.
 pub fn email_thread_focus_loader(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     reader: Arc<dyn EmailFocusReader>,
 ) -> DataLoader<EmailThreadFocusLoader> {
     let loader = DataLoader::new(EmailThreadFocusLoader { user_id, reader }, |batch| {
@@ -214,7 +214,7 @@ pub async fn load_email_thread_focus(
 /// here.
 pub async fn load_email_focus_thread_ids(
     ctx: &Context<'_>,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     window_days: u16,
 ) -> async_graphql::Result<Vec<Uuid>> {
     let Some(EmailFocusContext(reader)) = ctx.data_opt::<EmailFocusContext>() else {

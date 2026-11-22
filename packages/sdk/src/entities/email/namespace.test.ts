@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
 import { EmailDraft } from './draft';
 import { Link } from './link';
@@ -27,7 +27,7 @@ describe('email.sendConfirmed', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
     const workInbox = Link.byId(client, 'work-link');
 
     const sent = await new EmailNamespace(client).sendConfirmed({
@@ -65,7 +65,7 @@ describe('email.sendConfirmed', () => {
       cognition: {
         sendConfirmedEmail: async () => ({ data: 'userEdited' }),
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     await expect(
       new EmailNamespace(client).sendConfirmed({
@@ -129,7 +129,7 @@ describe('EmailMessage.forwardConfirmed', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const sent = await EmailMessage.byId(
       client,
@@ -183,7 +183,7 @@ describe('EmailDraft.send', () => {
           return { data: {} };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
     const before = Date.now();
 
     await EmailDraft.byId(client, 'draft').send({

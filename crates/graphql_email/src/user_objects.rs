@@ -6,7 +6,7 @@ use email::domain::models::{
     UserEmailLink, UserEmailLinkSettings, UserProvider,
 };
 use email::domain::ports::EmailUserService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 mod senders;
@@ -159,7 +159,7 @@ pub struct GraphqlEmailLink<S: EmailUserService> {
     #[graphql(skip)]
     service: Arc<S>,
     #[graphql(skip)]
-    viewer: MacroUserIdStr<'static>,
+    viewer: RoxUserIdStr<'static>,
     #[graphql(skip)]
     link_id: Uuid,
     /// Whether drafts from this account's own sender are classified as Signal.
@@ -167,7 +167,7 @@ pub struct GraphqlEmailLink<S: EmailUserService> {
     /// Stable email link identifier.
     id: ID,
     /// Rox user that owns the inbox.
-    macro_id: String,
+    rox_id: String,
     /// Provider email address for the inbox.
     email_address: String,
     /// SFS URL of the inbox's self-contact photo, when available.
@@ -198,14 +198,14 @@ pub struct GraphqlEmailLink<S: EmailUserService> {
 
 impl<S: EmailUserService> GraphqlEmailLink<S> {
     /// Attach the authenticated identity for lazy sender discovery.
-    pub fn new(link: UserEmailLink, service: Arc<S>, viewer: MacroUserIdStr<'static>) -> Self {
+    pub fn new(link: UserEmailLink, service: Arc<S>, viewer: RoxUserIdStr<'static>) -> Self {
         Self {
             service,
             viewer,
             link_id: link.id,
             draft_is_signal: link.draft_is_signal,
             id: ID(link.id.to_string()),
-            macro_id: link.macro_id.to_string(),
+            rox_id: link.rox_id.to_string(),
             email_address: link.email_address.0.as_ref().to_owned(),
             photo_url: link.photo_url,
             provider: link.provider.into(),

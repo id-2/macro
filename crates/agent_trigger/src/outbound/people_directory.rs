@@ -74,8 +74,8 @@ impl<Bots> PgPeopleDirectory<Bots> {
         let rows = sqlx::query!(
             r#"
         SELECT u.id as user_profile_id, mui.first_name, mui.last_name
-        FROM macro_user_info mui
-        JOIN "User" u ON mui.macro_user_id = u.macro_user_id
+        FROM rox_user_info mui
+        JOIN "User" u ON mui.rox_user_id = u.rox_user_id
         WHERE u.id = ANY($1)
         "#,
             &user_ids

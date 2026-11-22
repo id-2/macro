@@ -12,13 +12,13 @@ use aws_lambda_events::event::eventbridge::EventBridgeEvent;
 use config::Config;
 use handler::handler;
 use lambda_runtime::{Error, LambdaEvent, run, service_fn};
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     let config = Config::from_env().context("all necessary env vars should be available")?;
 
@@ -30,9 +30,9 @@ async fn main() -> Result<(), Error> {
         .await
         .context("could not connect to db")?;
 
-    let email_scheduled_queue = macro_queues::EmailScheduledQueue::new();
+    let email_scheduled_queue = rox_queues::EmailScheduledQueue::new();
     let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(
-        &macro_aws_config::get_macro_aws_config().await,
+        &rox_aws_config::get_rox_aws_config().await,
     ))
     .email_scheduled_queue(&email_scheduled_queue);
 

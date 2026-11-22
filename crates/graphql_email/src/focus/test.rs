@@ -16,7 +16,7 @@ struct FakeReader {
 impl EmailFocusReader for FakeReader {
     fn focus_thread_ids<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'static>,
+        user: &'a RoxUserIdStr<'static>,
         window_days: u16,
     ) -> BoxFuture<'a, Result<Vec<Uuid>, rootcause::Report>> {
         self.calls
@@ -28,7 +28,7 @@ impl EmailFocusReader for FakeReader {
 
     fn focus_for_threads<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'static>,
+        user: &'a RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> BoxFuture<'a, Result<HashMap<Uuid, ThreadFocus>, rootcause::Report>> {
         self.calls
@@ -47,8 +47,8 @@ impl EmailFocusReader for FakeReader {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("viewer@acme.example").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("viewer@acme.example").unwrap()
 }
 
 fn focus(importance: u8) -> ThreadFocus {

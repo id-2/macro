@@ -4,7 +4,7 @@ use calendar_events::domain::replacement::*;
 use chrono::{DateTime, Duration, NaiveDate};
 
 const STEP_ID: &str =
-    "String {81f532e3-7ace-4e0b-bae9-312ce0d50c8c} Name MacroCalendarReplacementStep";
+    "String {81f532e3-7ace-4e0b-bae9-312ce0d50c8c} Name RoxCalendarReplacementStep";
 
 fn changed() -> CalendarProviderError {
     unsupported(

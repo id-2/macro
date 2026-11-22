@@ -7,8 +7,8 @@ use crate::cognition::service::structured_completion::{
     ToolFreeCompletion, ToolFreeCompletionError, ToolFreeRequest,
 };
 use axum::{Router, routing::post};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use std::sync::Mutex;
 use tower::ServiceExt;
@@ -23,7 +23,7 @@ struct OneShot(
 impl ToolFreeCompletion for OneShot {
     async fn complete(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: ToolFreeRequest,
     ) -> Result<serde_json::Value, ToolFreeCompletionError> {
         assert_eq!(request.model, chat::domain::models::FREE_MODEL);
@@ -38,7 +38,7 @@ impl ToolFreeCompletion for OneShot {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn tool_free_requests_call_one_completion_without_an_agent_or_discovery(pool: sqlx::PgPool) {
     let mut state = (*test_api_context(pool).await).clone();
     let one_shot = Arc::new(OneShot::default());
@@ -86,7 +86,7 @@ async fn tool_free_requests_call_one_completion_without_an_agent_or_discovery(po
 /// A generation session's completion is its own work: recorded with the
 /// session as non-billable, never checked against the person's allowance,
 /// and tool free.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_generation_sessions_completion_is_its_own_and_never_billed(pool: sqlx::PgPool) {
     use agent_correlation::context::{Attribution, scope_attribution};
     use agent_correlation::scope::SessionScope;
@@ -159,7 +159,7 @@ async fn a_generation_sessions_completion_is_its_own_and_never_billed(pool: sqlx
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invalid_schema_is_a_client_error_before_admission_for_every_toolset(pool: sqlx::PgPool) {
     let mut state = (*test_api_context(pool).await).clone();
     let admission = TestAdmission::rejecting(ai_billing::AiAdmissionError::Unavailable);
@@ -286,7 +286,7 @@ fn request_body() -> serde_json::Value {
     })
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_rejects_before_tool_discovery_and_both_provider_phases(pool: sqlx::PgPool) {
     let ctx = test_api_context(pool).await;
     for error in admission_errors() {
@@ -319,7 +319,7 @@ async fn admission_rejects_before_tool_discovery_and_both_provider_phases(pool: 
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unauthorized_request_does_not_disclose_quota(pool: sqlx::PgPool) {
     let mut state = (*test_api_context(pool).await).clone();
     let admission = TestAdmission::rejecting(ai_billing::AiAdmissionError::Unavailable);

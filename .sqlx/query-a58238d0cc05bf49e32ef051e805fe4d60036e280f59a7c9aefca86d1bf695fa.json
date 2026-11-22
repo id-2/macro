@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT LOWER(github_username) AS \"login!\", macro_id\n            FROM github_links\n            WHERE LOWER(github_username) = ANY($1::text[])\n            ",
+  "query": "\n            SELECT LOWER(github_username) AS \"login!\", rox_id\n            FROM github_links\n            WHERE LOWER(github_username) = ANY($1::text[])\n            ",
   "describe": {
     "columns": [
       {
@@ -10,7 +10,7 @@
       },
       {
         "ordinal": 1,
-        "name": "macro_id",
+        "name": "rox_id",
         "type_info": "Text"
       }
     ],

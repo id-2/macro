@@ -1489,7 +1489,7 @@ describe('code execution results', () => {
     };
     const rendered = render(() => (
       <ToolCallPart
-        part={codePart('macro_internal')}
+        part={codePart('rox_internal')}
         context={context(false)}
       />
     ));
@@ -1525,7 +1525,7 @@ describe('code execution results', () => {
         { id: 2, label: 'Search email', status: 'running' },
       ],
     };
-    const part = codePart('macro_internal');
+    const part = codePart('rox_internal');
     part.status = 'running';
     const rendered = render(() => (
       <ToolCallPart part={part} context={context(true)} />
@@ -1540,7 +1540,7 @@ describe('code execution results', () => {
   });
 
   it('loads trusted records and keeps custom components after a failed run', () => {
-    const part = codePart('macro_internal');
+    const part = codePart('rox_internal');
     const rendered = render(() => (
       <ToolCallPart part={part} context={context(false)} />
     ));
@@ -1555,7 +1555,7 @@ describe('code execution results', () => {
   });
 
   it('recovers completed inner results after Stop drops the final receipt', () => {
-    const part = codePart('macro_internal');
+    const part = codePart('rox_internal');
     part.status = 'failed';
     if (part.detail.kind === 'other') {
       part.detail.result = null;
@@ -1575,7 +1575,7 @@ describe('code execution results', () => {
     };
     const rendered = render(() => (
       <ToolCallPart
-        part={codePart('macro_internal')}
+        part={codePart('rox_internal')}
         context={context(false)}
       />
     ));
@@ -1587,7 +1587,7 @@ describe('code execution results', () => {
   });
 
   it('loads the record by the receipt ID when the agent omitted one', () => {
-    const part = codePart('macro_internal');
+    const part = codePart('rox_internal');
     if (part.detail.kind === 'other') {
       part.detail.input = { source: 'return { count: 1 };' };
     }
@@ -1600,7 +1600,7 @@ describe('code execution results', () => {
 
   it('loads server-accepted UUIDs with reserved variant bits', () => {
     const id = '35e6f7a8-b9c0-4d1e-2f3a-4b5c6d7e8f90';
-    const part = codePart('macro_internal');
+    const part = codePart('rox_internal');
     if (part.detail.kind === 'other') {
       part.detail.input = { execution_id: id, source: 'return { count: 1 };' };
       part.detail.result = null;
@@ -1627,7 +1627,7 @@ describe('code execution results', () => {
 describe('ACP review presentations', () => {
   const reviewId = '019a0000-0000-7000-8000-000000000005';
   const part = (
-    server = 'macro_internal',
+    server = 'rox_internal',
     callId = `review_${reviewId}`
   ): ToolUsePart => ({
     kind: 'tool_use',
@@ -1653,7 +1653,7 @@ describe('ACP review presentations', () => {
   it('does not duplicate the card for the ordinary tool invocation', () => {
     const view = render(() => (
       <ToolCallPart
-        part={part('macro_internal', 'ordinary-call')}
+        part={part('rox_internal', 'ordinary-call')}
         context={context(false)}
       />
     ));
@@ -1684,8 +1684,8 @@ describe('code-mode lookups', () => {
   });
   it('renders nothing for the agent finding its way around its own tools', () => {
     for (const name of [
-      { kind: 'mcp', server: 'macro_internal', tool: 'DescribeCodeTools' },
-      { kind: 'mcp', server: 'macro_internal', tool: 'ReadCodeDocs' },
+      { kind: 'mcp', server: 'rox_internal', tool: 'DescribeCodeTools' },
+      { kind: 'mcp', server: 'rox_internal', tool: 'ReadCodeDocs' },
       { kind: 'mcp', server: 'macro', tool: 'SearchTools' },
       { kind: 'native', name: 'LoadTools' },
     ] as const) {

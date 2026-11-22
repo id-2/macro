@@ -3,7 +3,7 @@ use crate::domain::companies_repo::*;
 use crate::domain::service::{CrmService, CrmServiceImpl};
 use crate::outbound::companies_repo::*;
 use crate::outbound::no_op_resolver::NoOpCompanyMetadataResolver;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ async fn deliver(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_populate_contact_skips_when_domain_matches_user_domain(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -68,7 +68,7 @@ async fn service_populate_contact_skips_when_domain_matches_user_domain(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_populate_contact_same_domain_check_is_case_insensitive(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -105,7 +105,7 @@ async fn service_populate_contact_same_domain_check_is_case_insensitive(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_populate_contact_refreshes_existing_company_and_contact_updated_at(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -188,7 +188,7 @@ async fn service_populate_contact_refreshes_existing_company_and_contact_updated
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_populate_contact_writes_when_domain_differs(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|user@rox.one";
@@ -223,7 +223,7 @@ async fn service_populate_contact_writes_when_domain_differs(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn precheck_is_available_when_legacy_settings_missing(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let owner = "macro|user@rox.one";
@@ -240,7 +240,7 @@ async fn precheck_is_available_when_legacy_settings_missing(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn precheck_resolves_domain_with_company_state(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let owner = "macro|user@rox.one";
@@ -277,7 +277,7 @@ async fn precheck_resolves_domain_with_company_state(pool: PgPool) -> anyhow::Re
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn precheck_reports_hidden_and_email_sync_disabled_companies(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -302,7 +302,7 @@ async fn precheck_reports_hidden_and_email_sync_disabled_companies(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn precheck_address_resolves_contact_within_team(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let owner = "macro|user@rox.one";
@@ -343,7 +343,7 @@ async fn precheck_address_resolves_contact_within_team(pool: PgPool) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn precheck_address_does_not_leak_other_team_contacts(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -368,7 +368,7 @@ async fn precheck_address_does_not_leak_other_team_contacts(pool: PgPool) -> any
 
 /// Received-direction populate for an unknown `(team, domain)` is a
 /// no-op: only sent-direction may create a new `crm_companies` row.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_is_sent_false_skips_when_no_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|user@rox.one";
@@ -408,7 +408,7 @@ async fn populate_contact_is_sent_false_skips_when_no_company(pool: PgPool) -> a
 /// Brand-new company + contact INSERT writes `first_interaction` and
 /// `last_interaction` directly from the payload's distinct `first_at` /
 /// `last_at` (covers the historical-seed range, e.g. 2020→2024).
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_insert_seeds_first_and_last_from_payload(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -465,7 +465,7 @@ async fn populate_contact_insert_seeds_first_and_last_from_payload(
 /// `first_interaction` via `LEAST` (older message pulls it back) and
 /// `last_interaction` via `GREATEST` (newer message pushes it forward),
 /// on both the company and contact rows.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_is_sent_true_merges_first_least_and_last_greatest(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -561,7 +561,7 @@ async fn populate_contact_is_sent_true_merges_first_least_and_last_greatest(
 /// `first_interaction` backwards — even with an older timestamp — but
 /// still GREATEST-merges `last_interaction` when newer. Asserts both
 /// company and contact.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_is_sent_false_leaves_first_interaction_unchanged(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -664,7 +664,7 @@ async fn populate_contact_is_sent_false_leaves_first_interaction_unchanged(
 /// `crm_contacts` row (seeded with both timestamps) and a
 /// `crm_contact_sources` row — verifying sources now track
 /// interactions in both directions.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_is_sent_false_inserts_contact_at_existing_company(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -742,7 +742,7 @@ async fn populate_contact_is_sent_false_inserts_contact_at_existing_company(
 
 /// Missing individual consent short-circuits populate in both directions
 /// before any rows are written.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_without_consent_noops_both_directions(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -794,7 +794,7 @@ async fn populate_contact_without_consent_noops_both_directions(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_respects_legacy_company_block(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|user@rox.one";
@@ -856,7 +856,7 @@ async fn populate_contact_respects_legacy_company_block(pool: PgPool) -> anyhow:
 /// already-tracked row expands the stored range outward: `first` pulls
 /// back via LEAST and `last` pushes forward via GREATEST in the same
 /// call.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_seed_style_range_merges_into_existing(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -928,7 +928,7 @@ async fn populate_contact_seed_style_range_merges_into_existing(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_sync_disable_then_re_enable_requires_eligible_backfill(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1019,7 +1019,7 @@ async fn email_sync_disable_then_re_enable_requires_eligible_backfill(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_into_hidden_company_inserts_hidden_contact(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1067,7 +1067,7 @@ async fn populate_contact_into_hidden_company_inserts_hidden_contact(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_contact_upsert_does_not_overwrite_individual_hide(
     pool: PgPool,
 ) -> anyhow::Result<()> {

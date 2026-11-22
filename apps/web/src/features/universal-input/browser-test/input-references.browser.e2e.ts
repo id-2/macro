@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
     const url = new URL(route.request().url());
     if (
       ['127.0.0.1', 'localhost'].includes(url.hostname) &&
-      !url.pathname.startsWith('/__macro_dev/')
+      !url.pathname.startsWith('/__rox_dev/')
     )
       await route.continue();
     else await route.abort('blockedbyclient');

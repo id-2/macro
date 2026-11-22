@@ -1,5 +1,5 @@
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::*;
 use bot_id::BotId;
@@ -7,8 +7,8 @@ use entity_access::domain::models::{
     AccessError, AccessLevel, CallChannelInfo, Entity, EntityPermission, EntityType,
     RequiredPermission, TeamRole, UserTeamInfo,
 };
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::RoxUserId;
 use messages::domain::models::Message;
 
 fn announcement() -> SessionAnnouncement {
@@ -26,7 +26,7 @@ fn announcement() -> SessionAnnouncement {
             agent_session::domain::model::AuthorKind::User,
         ),
         prompted_content: "@claude fix the failing test".to_owned(),
-        triggered_by: MacroUserIdStr::try_from_email("user@example.com").unwrap(),
+        triggered_by: RoxUserIdStr::try_from_email("user@example.com").unwrap(),
     }
 }
 
@@ -258,7 +258,7 @@ struct EditingAccess;
 impl EntityAccessService for EditingAccess {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
         _: Option<i64>,
         _: &str,
         _: EntityType,
@@ -286,7 +286,7 @@ impl EntityAccessService for EditingAccess {
     }
     async fn get_access_level(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -294,7 +294,7 @@ impl EntityAccessService for EditingAccess {
     }
     async fn check_access(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: AccessLevel,
@@ -311,7 +311,7 @@ impl EntityAccessService for EditingAccess {
     }
     async fn get_entity_permission(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: Option<i64>,
@@ -320,7 +320,7 @@ impl EntityAccessService for EditingAccess {
     }
     async fn get_crm_entity_permission_with_team(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -330,7 +330,7 @@ impl EntityAccessService for EditingAccess {
         &self,
         _: &str,
         _: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unimplemented!("the announcer only mints bot receipts")
     }
     async fn get_call_channel(&self, _: &Uuid) -> Result<Option<CallChannelInfo>, AccessError> {
@@ -344,7 +344,7 @@ impl EntityAccessService for EditingAccess {
     }
     async fn get_user_team(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!("the announcer only mints bot receipts")
     }
@@ -385,7 +385,7 @@ async fn an_answer_the_thread_may_not_carry_points_at_the_session() {
         parent: parent.clone(),
         thread_id: Some(Uuid::from_u128(2)),
         sender_id: channel_sender::ChannelSender::new_from_user(
-            MacroUserIdStr::try_from_email("user@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("user@example.com").unwrap(),
         ),
         triggered_via: None,
         triggered_by: None,
@@ -427,7 +427,7 @@ async fn an_answer_the_thread_may_not_carry_points_at_the_session() {
             is_coding: false,
             message_id: reply_id,
             origin_parent: parent,
-            triggered_by: MacroUserIdStr::try_from_email("user@example.com").unwrap(),
+            triggered_by: RoxUserIdStr::try_from_email("user@example.com").unwrap(),
             outcome: ReplyOutcome::Answered("Your emails: <m-document-mention/>".to_owned()),
             turn: agent_fold::domain::model::TurnId(0),
             segments: Vec::new(),
@@ -505,7 +505,7 @@ async fn shared_thread_and_dm_snapshots_omit_raw_tool_details() {
                     parent: message_parent.clone(),
                     thread_id: thread,
                     sender_id: channel_sender::ChannelSender::new_from_user(
-                        MacroUserIdStr::try_from_email("user@example.com").unwrap(),
+                        RoxUserIdStr::try_from_email("user@example.com").unwrap(),
                     ),
                     triggered_via: None,
                     triggered_by: None,
@@ -531,7 +531,7 @@ async fn shared_thread_and_dm_snapshots_omit_raw_tool_details() {
             .present(ReplyPresentation {
                 session_id: SESSION,
                 bot_id: BotId::TEST_A,
-                triggered_by: MacroUserIdStr::try_from_email("user@example.com").unwrap(),
+                triggered_by: RoxUserIdStr::try_from_email("user@example.com").unwrap(),
                 parent,
                 thread_id: thread,
                 message_id: Uuid::from_u128(3),

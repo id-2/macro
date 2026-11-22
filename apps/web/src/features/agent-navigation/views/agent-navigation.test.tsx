@@ -56,7 +56,7 @@ vi.mock('@core/mobile/isTouchDevice', () => ({
 const router = { routes: appRoutesManifest(), settled: async () => {} };
 
 // The tab's id from an earlier prompt in this tab.
-sessionStorage.setItem('macro.ui-client-id', TAB);
+sessionStorage.setItem('rox.ui-client-id', TAB);
 
 /** An agent's open for the document, addressed to this person and tab. */
 const FRAME_FOR_THIS_TAB: FromWebsocketMessage = {

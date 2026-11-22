@@ -1,4 +1,4 @@
-use crate::domain::models::{CallToolResultExt, Error, MacroUserIdStr, McpServer, McpServerRecord};
+use crate::domain::models::{CallToolResultExt, Error, RoxUserIdStr, McpServer, McpServerRecord};
 use crate::domain::ports::{McpConnector, McpServerHttp, McpServerStore};
 use ai_toolset::{
     AsyncToolCollection, RequestContext, RequestSchema, SearchableTool, ToolCallError, ToolInfo,
@@ -164,7 +164,7 @@ pub struct McpToolSet {
     _connections: Vec<McpServer>,
     /// The owning user, for correlating tool-call failures in logs. All
     /// records passed to [`McpToolSet::new`] belong to one user in practice.
-    user_id: Option<MacroUserIdStr<'static>>,
+    user_id: Option<RoxUserIdStr<'static>>,
 }
 
 impl McpToolSet {

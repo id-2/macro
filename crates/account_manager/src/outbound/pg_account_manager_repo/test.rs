@@ -1,6 +1,6 @@
 use chrono::{Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -9,8 +9,8 @@ use super::*;
 const AGENT: &str = "macro|agent@example.com";
 const PERSON: &str = "macro|person@example.com";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 async fn seed_users(pool: &PgPool) {
@@ -18,21 +18,21 @@ async fn seed_users(pool: &PgPool) {
         (AGENT, "agent@example.com", true),
         (PERSON, "person@example.com", false),
     ] {
-        let macro_user_id = Uuid::now_v7();
+        let rox_user_id = Uuid::now_v7();
         sqlx::query!(
             "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
-            macro_user_id,
+            rox_user_id,
             email,
-            format!("stripe_{macro_user_id}"),
+            format!("stripe_{rox_user_id}"),
         )
         .execute(pool)
         .await
         .unwrap();
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, macro_user_id, "isAgent") VALUES ($1, $2, $3, $4)"#,
+            r#"INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES ($1, $2, $3, $4)"#,
             id,
             email,
-            macro_user_id,
+            rox_user_id,
             is_agent,
         )
         .execute(pool)
@@ -66,7 +66,7 @@ async fn approve(repo: &PgAccountManagerRepo, id: Uuid) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn is_agent_reads_the_account_flag(pool: PgPool) {
     seed_users(&pool).await;
     let repo = PgAccountManagerRepo::new(pool);
@@ -81,7 +81,7 @@ async fn is_agent_reads_the_account_flag(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_pending_request_per_pair_until_it_expires(pool: PgPool) {
     seed_users(&pool).await;
     let repo = PgAccountManagerRepo::new(pool.clone());
@@ -106,7 +106,7 @@ async fn one_pending_request_per_pair_until_it_expires(pool: PgPool) {
     assert_eq!(lapsed.status, AccountManagerGrantStatus::Expired);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_lapsed_request_cannot_be_approved(pool: PgPool) {
     seed_users(&pool).await;
     let repo = PgAccountManagerRepo::new(pool);
@@ -121,7 +121,7 @@ async fn a_lapsed_request_cannot_be_approved(pool: PgPool) {
     assert!(response.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_claim_works_once_and_replaces_the_pairs_earlier_credential(pool: PgPool) {
     seed_users(&pool).await;
     let repo = PgAccountManagerRepo::new(pool);
@@ -157,7 +157,7 @@ async fn a_claim_works_once_and_replaces_the_pairs_earlier_credential(pool: PgPo
     assert_eq!(replaced.status, AccountManagerGrantStatus::Revoked);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn racing_claims_issue_exactly_one_credential(pool: PgPool) {
     seed_users(&pool).await;
     let repo = PgAccountManagerRepo::new(pool.clone());
@@ -184,7 +184,7 @@ async fn racing_claims_issue_exactly_one_credential(pool: PgPool) {
     assert_eq!(stored.as_deref(), Some(expected));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn revoking_clears_the_credential_hash_and_list_hides_it(pool: PgPool) {
     seed_users(&pool).await;
     let repo = PgAccountManagerRepo::new(pool.clone());
@@ -215,7 +215,7 @@ async fn revoking_clears_the_credential_hash_and_list_hides_it(pool: PgPool) {
     assert!(repo.revoke(grant.id).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_either_account_removes_the_grant(pool: PgPool) {
     seed_users(&pool).await;
     let repo = PgAccountManagerRepo::new(pool.clone());

@@ -12,10 +12,10 @@ use axum::{
     routing::{get, post, put},
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 use std::sync::Arc;
 use tracing::Level;
@@ -26,7 +26,7 @@ pub struct AccessRequestsRouterState<R, A, C, Auth> {
     /// Domain service.
     pub service: Arc<AccessRequestService<R, A, C>>,
     /// Authenticated user boundary.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 impl<R, A, C, Auth> Clone for AccessRequestsRouterState<R, A, C, Auth> {
     fn clone(&self) -> Self {
@@ -37,7 +37,7 @@ impl<R, A, C, Auth> Clone for AccessRequestsRouterState<R, A, C, Auth> {
     }
 }
 impl<R, A, C, Auth> FromRef<AccessRequestsRouterState<R, A, C, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &AccessRequestsRouterState<R, A, C, Auth>) -> Self {
         state.authorization_state.clone()
@@ -49,7 +49,7 @@ where
     R: RequestRepository,
     A: EntityAccessService,
     C: Clock,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()
@@ -98,15 +98,15 @@ impl TargetPath {
     /// takes the owner in person: an agent or API token can ask, never decide.
     fn require_decider(
         &self,
-        authorization: &macro_authorization::MacroUserAuthentication,
+        authorization: &rox_authorization::RoxUserAuthentication,
     ) -> Result<(), RequestError> {
         if self.entity_type == ShareEntityType::Harness && !authorization.is_human_session() {
             return Err(RequestError::Forbidden);
         }
         Ok(())
     }
-    fn recipient(&self) -> Result<MacroUserIdStr<'static>, RequestError> {
-        MacroUserIdStr::try_from(self.user_id.clone().ok_or(RequestError::NotFound)?)
+    fn recipient(&self) -> Result<RoxUserIdStr<'static>, RequestError> {
+        RoxUserIdStr::try_from(self.user_id.clone().ok_or(RequestError::NotFound)?)
             .map_err(|_| RequestError::NotFound)
     }
 }
@@ -155,7 +155,7 @@ impl IntoResponse for RequestError {
 #[tracing::instrument(err(level = Level::INFO), skip_all)]
 pub async fn state_handler<R, A, C, Auth>(
     State(state): State<AccessRequestsRouterState<R, A, C, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<TargetPath>,
     Query(page): Query<Page>,
 ) -> Result<Json<AccessRequestState>, RequestError>
@@ -163,12 +163,12 @@ where
     R: RequestRepository,
     A: EntityAccessService,
     C: Clock,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
             .service
-            .state(user.authorization.macro_user_id, path.entity(), page.offset)
+            .state(user.authorization.rox_user_id, path.entity(), page.offset)
             .await?,
     ))
 }
@@ -180,7 +180,7 @@ where
 #[tracing::instrument(err(level = Level::INFO), skip_all)]
 pub async fn submit_handler<R, A, C, Auth>(
     State(state): State<AccessRequestsRouterState<R, A, C, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<TargetPath>,
 
     Json(body): Json<RequestAccess>,
@@ -189,13 +189,13 @@ where
     R: RequestRepository,
     A: EntityAccessService,
     C: Clock,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
             .service
             .submit(
-                user.authorization.macro_user_id,
+                user.authorization.rox_user_id,
                 path.entity(),
                 body,
                 user.authorization.agent_id.map(|agent| agent.as_uuid()),
@@ -211,7 +211,7 @@ where
 #[tracing::instrument(err(level = Level::INFO), skip_all)]
 pub async fn cancel_handler<R, A, C, Auth>(
     State(state): State<AccessRequestsRouterState<R, A, C, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<TargetPath>,
     Query(revision): Query<Revision>,
 ) -> Result<Json<()>, RequestError>
@@ -219,13 +219,13 @@ where
     R: RequestRepository,
     A: EntityAccessService,
     C: Clock,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
             .service
             .cancel(
-                user.authorization.macro_user_id,
+                user.authorization.rox_user_id,
                 path.entity(),
                 revision.revision,
             )
@@ -240,7 +240,7 @@ where
 #[tracing::instrument(err(level = Level::INFO), skip_all)]
 pub async fn resolve_handler<R, A, C, Auth>(
     State(state): State<AccessRequestsRouterState<R, A, C, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<TargetPath>,
 
     Json(body): Json<ResolveRequest>,
@@ -249,14 +249,14 @@ where
     R: RequestRepository,
     A: EntityAccessService,
     C: Clock,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     path.require_decider(&user.authorization)?;
     Ok(Json(
         state
             .service
             .resolve(
-                user.authorization.macro_user_id,
+                user.authorization.rox_user_id,
                 path.entity(),
                 path.request_id.ok_or(RequestError::NotFound)?,
                 body,
@@ -272,19 +272,19 @@ where
 #[tracing::instrument(err(level = Level::INFO), skip_all)]
 pub async fn direct_handler<R, A, C, Auth>(
     State(state): State<AccessRequestsRouterState<R, A, C, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<TargetPath>,
 ) -> Result<Json<Vec<DirectAccess>>, RequestError>
 where
     R: RequestRepository,
     A: EntityAccessService,
     C: Clock,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
             .service
-            .direct_access(user.authorization.macro_user_id, path.entity())
+            .direct_access(user.authorization.rox_user_id, path.entity())
             .await?,
     ))
 }
@@ -296,7 +296,7 @@ where
 #[tracing::instrument(err(level = Level::INFO), skip_all)]
 pub async fn set_direct_handler<R, A, C, Auth>(
     State(state): State<AccessRequestsRouterState<R, A, C, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<TargetPath>,
 
     Json(body): Json<SetDirectAccess>,
@@ -305,14 +305,14 @@ where
     R: RequestRepository,
     A: EntityAccessService,
     C: Clock,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     path.require_decider(&user.authorization)?;
     Ok(Json(
         state
             .service
             .set_direct_access(
-                user.authorization.macro_user_id,
+                user.authorization.rox_user_id,
                 path.entity(),
                 path.recipient()?,
                 body.access_level,
@@ -328,21 +328,21 @@ where
 #[tracing::instrument(err(level = Level::INFO), skip_all)]
 pub async fn remove_direct_handler<R, A, C, Auth>(
     State(state): State<AccessRequestsRouterState<R, A, C, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<TargetPath>,
 ) -> Result<Json<()>, RequestError>
 where
     R: RequestRepository,
     A: EntityAccessService,
     C: Clock,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     path.require_decider(&user.authorization)?;
     Ok(Json(
         state
             .service
             .set_direct_access(
-                user.authorization.macro_user_id,
+                user.authorization.rox_user_id,
                 path.entity(),
                 path.recipient()?,
                 None,

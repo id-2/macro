@@ -38,7 +38,7 @@ vi.mock('@core/constant/featureFlags', () => ({
   enableCalendarUi: false,
   enableReminders: false,
   isFeatureEnabled: vi.fn(),
-  USE_MACRO_PR_SUMMARY_BLOCK: true,
+  USE_ROX_PR_SUMMARY_BLOCK: true,
 }));
 vi.mock('@core/mobile/isTouchDevice', () => ({
   isTouchDevice: () => fixture.touch,

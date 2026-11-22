@@ -1,6 +1,6 @@
 use async_graphql::{EmptyMutation, EmptySubscription, Object, Schema};
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::TaskAssignedMetadata;
 use notification::domain::models::UserNotificationRow;
@@ -21,7 +21,7 @@ impl Query {
 
 fn raw_notification(metadata: serde_json::Value) -> UserNotificationRow<serde_json::Value> {
     UserNotificationRow {
-        owner_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        owner_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
         notification_id: uuid::Uuid::from_u128(1),
         notification_event_type: "task_assigned".to_string(),
         entity: EntityType::Document.with_entity_string("document-1".to_string()),
@@ -38,7 +38,7 @@ fn raw_notification(metadata: serde_json::Value) -> UserNotificationRow<serde_js
 
 #[tokio::test]
 async fn metadata_is_the_typed_notification_union() {
-    let assigned_by = MacroUserIdStr::parse_from_str("macro|assigner@example.com").unwrap();
+    let assigned_by = RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap();
     let metadata = TaskAssignedMetadata {
         task_id: "task-1".to_string(),
         task_name: Some("Test task".to_string()),

@@ -17,7 +17,7 @@ use std::collections::HashSet;
 
 use chrono::{DateTime, Duration, Utc};
 use harness_id::HarnessId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Instrument;
 use uuid::Uuid;
 
@@ -67,8 +67,8 @@ pub struct ClaudeSignIn {
     pub team_id: Uuid,
     /// The computer's name as the team sees it.
     pub computer_name: String,
-    /// Who signed Claude in through Macro; `None` once that user is deleted.
-    pub signed_in_by: Option<MacroUserIdStr<'static>>,
+    /// Who signed Claude in through Rox; `None` once that user is deleted.
+    pub signed_in_by: Option<RoxUserIdStr<'static>>,
     /// When the sign-in was recorded.
     pub signed_in_at: DateTime<Utc>,
     /// When the credential stops working, as harnessd last reported it;
@@ -154,14 +154,14 @@ pub trait ClaudeSignInNotices: Send + Sync + 'static {
     fn team_admins(
         &self,
         team_id: Uuid,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Self::Err>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Self::Err>> + Send;
 
     /// Deliver `expiry` to `recipients`. Delivering the same expiry again
     /// must not notify twice.
     fn send(
         &self,
         expiry: SignInExpiry,
-        recipients: HashSet<MacroUserIdStr<'static>>,
+        recipients: HashSet<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 }
 

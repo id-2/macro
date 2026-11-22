@@ -81,11 +81,11 @@ describe('structured references', () => {
   it('protects references while other references move, then restores them', () => {
     const references = protectStructuredReferences('=[@Qty]*B2+Sales[Qty]');
     expect(references.formula).toBe(
-      '="__macro_table_reference_0"*B2+"__macro_table_reference_1"'
+      '="__rox_table_reference_0"*B2+"__rox_table_reference_1"'
     );
     expect(
       references.restore(
-        '="__macro_table_reference_0"*B3+"__macro_table_reference_1"'
+        '="__rox_table_reference_0"*B3+"__rox_table_reference_1"'
       )
     ).toBe('=[@Qty]*B3+Sales[Qty]');
   });

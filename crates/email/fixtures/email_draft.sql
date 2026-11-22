@@ -2,7 +2,7 @@
 -- get_simple_message, get_draft_replying_to, upsert_contacts, insert_draft_message
 
 -- Insert test link
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'macro|user1@test.com', 'fa-user-1', 'user1@test.com', 'GMAIL', true, NOW(), NOW());
 
@@ -42,7 +42,7 @@ INSERT INTO email_message_recipients (message_id, contact_id, recipient_type, na
 VALUES
     ('ee000001-0000-0000-0000-000000000001', 'c0000002-0000-0000-0000-000000000002', 'TO', NULL);
 
--- msg2: A draft in thread 1 replying to msg1, identified by Macro-In-Reply-To header
+-- msg2: A draft in thread 1 replying to msg1, identified by Rox-In-Reply-To header
 INSERT INTO email_messages (id, thread_id, provider_thread_id, link_id, from_contact_id, replying_to_id, subject, is_read, is_sent, is_draft, has_attachments, headers_jsonb, created_at, updated_at)
 VALUES
     ('ee000002-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'provider-thread-1', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
@@ -74,7 +74,7 @@ VALUES
 
 -- A second inbox (cccc) + msg5: a reply draft to msg1 that was moved here by
 -- switching the sender (lives in a different thread) — for cross_inbox_reply_drafts.
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'macro|user1@test.com', 'fa-user-1', 'user1-alt@test.com', 'GMAIL', true, NOW(), NOW());
 

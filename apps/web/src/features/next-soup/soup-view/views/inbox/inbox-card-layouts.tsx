@@ -2,7 +2,7 @@ import { ListPropertyValue } from '@app/features/next-soup/soup-view/views/tasks
 import { formatCallDuration } from '@block-call/utils';
 import { channelListName } from '@channel/group-chat-name';
 import { BotIcon } from '@channel/Message/BotIcon';
-import { MACRO_AI_BOT_ID, MACRO_AI_NAME } from '@channel/macroAi';
+import { ROX_AI_BOT_ID, ROX_AI_NAME } from '@channel/macroAi';
 import { EntityIcon, getEntityIconType } from '@core/component/EntityIcon';
 import {
   firstPartyBotMark,
@@ -445,7 +445,7 @@ const createSenderDisplayName = (
     if (parsed.type !== 'bot') return undefined;
 
     if (parsed.name) return parsed.name;
-    return parsed.id === MACRO_AI_BOT_ID ? MACRO_AI_NAME : 'Bot';
+    return parsed.id === ROX_AI_BOT_ID ? ROX_AI_NAME : 'Bot';
   };
 
   return () => {

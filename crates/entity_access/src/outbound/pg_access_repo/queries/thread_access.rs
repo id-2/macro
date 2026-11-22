@@ -10,8 +10,8 @@ use crate::{
     outbound::pg_access_repo::queries::list_entity_access_grants,
 };
 #[cfg(feature = "explain_binary")]
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 #[cfg(feature = "explain_binary")]
 use model_entity::EntityType;
 use sqlx::PgPool;
@@ -31,7 +31,7 @@ struct OwnedEmailThreadRow {
 pub async fn get_owned_email_thread_ids(
     pool: &PgPool,
     thread_ids: &[Uuid],
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<Uuid>, sqlx::Error> {
     let rows = sqlx::query_as::<_, OwnedEmailThreadRow>(
         r#"
@@ -40,12 +40,12 @@ pub async fn get_owned_email_thread_ids(
         JOIN email_links l ON l.id = t.link_id
         WHERE t.id = ANY($1)
           AND (
-              l.macro_id = $2
+              l.rox_id = $2
               OR EXISTS (
                   SELECT 1
-                  FROM macro_user_links mul
+                  FROM rox_user_links mul
                   WHERE mul.link_id = l.id
-                    AND mul.primary_macro_id = $2
+                    AND mul.primary_rox_id = $2
               )
           )
         "#,
@@ -64,11 +64,11 @@ pub async fn get_thread_access(
     pool: &PgPool,
     thread_id: &Uuid,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Option<AccessLevel>, sqlx::Error> {
     let user_id_str = user_id.map(AsRef::as_ref).unwrap_or("");
 
-    // Thread-specific: the caller owns the thread's inbox, or a macro_user_links
+    // Thread-specific: the caller owns the thread's inbox, or a rox_user_links
     // edge delegates that inbox to the caller (the caller is its primary).
     let is_owner = sqlx::query_scalar!(
         r#"
@@ -78,12 +78,12 @@ pub async fn get_thread_access(
                 JOIN public.email_links l ON l.id = t.link_id
                 WHERE t.id = $1::uuid
                   AND (
-                      l.macro_id = $2
+                      l.rox_id = $2
                       OR EXISTS (
                           SELECT 1
-                          FROM public.macro_user_links mul
+                          FROM public.rox_user_links mul
                           WHERE mul.link_id = l.id
-                            AND mul.primary_macro_id = $2
+                            AND mul.primary_rox_id = $2
                       )
                   )
             ) AS "exists!"
@@ -150,7 +150,7 @@ pub async fn get_thread_access(
                         SELECT 1
                         FROM email_threads t
                         JOIN email_links l ON l.id = t.link_id
-                        JOIN team_user owner_tu ON owner_tu.user_id = l.macro_id
+                        JOIN team_user owner_tu ON owner_tu.user_id = l.rox_id
                         WHERE t.id = $1::uuid
                           AND owner_tu.team_id::text = ANY($2)
                     )
@@ -194,7 +194,7 @@ pub async fn get_thread_access(
     let crm_fut = sqlx::query_scalar!(
         r#"
         WITH thread_owner AS (
-            SELECT el.macro_id
+            SELECT el.rox_id
             FROM email_threads t
             JOIN email_links el ON el.id = t.link_id
             WHERE t.id = $1::uuid
@@ -204,7 +204,7 @@ pub async fn get_thread_access(
             SELECT requester.team_id, requester.team_role
             FROM team_user requester
             JOIN team_user owner_member ON owner_member.team_id = requester.team_id
-            JOIN thread_owner o ON o.macro_id = owner_member.user_id
+            JOIN thread_owner o ON o.rox_id = owner_member.user_id
             WHERE requester.user_id = $2
               AND crm_email_thread_allowed(requester.team_id, $1::uuid)
         ),
@@ -278,7 +278,7 @@ pub async fn explain_thread_access(
     pool: &PgPool,
     thread_id: &Uuid,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let mut grants = Vec::new();
     if let Some(user_id) = user_id {
@@ -301,24 +301,24 @@ pub async fn explain_thread_access(
 async fn explain_thread_inbox(
     pool: &PgPool,
     thread_id: &Uuid,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let user_id_str = user_id.as_ref();
     let row = sqlx::query!(
         r#"
         SELECT
-            l.macro_id AS "mailbox_owner!",
-            (l.macro_id = $2) AS "is_owner!"
+            l.rox_id AS "mailbox_owner!",
+            (l.rox_id = $2) AS "is_owner!"
         FROM public.email_threads t
         JOIN public.email_links l ON l.id = t.link_id
         WHERE t.id = $1::uuid
           AND (
-              l.macro_id = $2
+              l.rox_id = $2
               OR EXISTS (
                   SELECT 1
-                  FROM public.macro_user_links mul
+                  FROM public.rox_user_links mul
                   WHERE mul.link_id = l.id
-                    AND mul.primary_macro_id = $2
+                    AND mul.primary_rox_id = $2
               )
           )
         "#,
@@ -335,7 +335,7 @@ async fn explain_thread_inbox(
     if row.is_owner {
         Ok(vec![AccessGrant::InboxOwner])
     } else {
-        let mailbox_owner = MacroUserIdStr::try_from(row.mailbox_owner)
+        let mailbox_owner = RoxUserIdStr::try_from(row.mailbox_owner)
             .map_err(|error| sqlx::Error::Decode(error.into()))?;
         Ok(vec![AccessGrant::InboxDelegate { mailbox_owner }])
     }
@@ -393,7 +393,7 @@ async fn explain_thread_link_shares(
               FROM email_threads t
               JOIN email_links l ON l.id = t.link_id
               WHERE t.id = $3::uuid
-                AND owner_tu.user_id = l.macro_id
+                AND owner_tu.user_id = l.rox_id
           )
         "#,
         &thread_id_str,
@@ -444,13 +444,13 @@ async fn explain_thread_containing_project(
 async fn explain_thread_crm(
     pool: &PgPool,
     thread_id: &Uuid,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let user_id_str = user_id.as_ref();
     let rows = sqlx::query!(
         r#"
         WITH thread_owner AS (
-            SELECT el.macro_id
+            SELECT el.rox_id
             FROM email_threads t
             JOIN email_links el ON el.id = t.link_id
             WHERE t.id = $1::uuid
@@ -459,7 +459,7 @@ async fn explain_thread_crm(
             SELECT requester.team_id, requester.team_role
             FROM team_user requester
             JOIN team_user owner_member ON owner_member.team_id = requester.team_id
-            JOIN thread_owner o ON o.macro_id = owner_member.user_id
+            JOIN thread_owner o ON o.rox_id = owner_member.user_id
             WHERE requester.user_id = $2
               AND crm_email_thread_allowed(requester.team_id, $1::uuid)
         ),

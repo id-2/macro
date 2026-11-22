@@ -60,7 +60,7 @@ fn sharer_copy(link_id: Uuid, provider: (Uuid, Uuid)) -> CalendarEventUpsert {
 
 async fn delegate(pool: &PgPool, primary: &str, child: &str, link_id: Uuid) {
     sqlx::query!(
-        "INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id) VALUES ($1, $2, $3)",
+        "INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ($1, $2, $3)",
         primary,
         child,
         link_id,
@@ -70,7 +70,7 @@ async fn delegate(pool: &PgPool, primary: &str, child: &str, link_id: Uuid) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_request_reaches_the_inbox_holding_the_shared_copy_once(pool: PgPool) {
     let sharer_id = "macro|ask-sharer@example.com";
     let member_id = "macro|ask-member@example.com";
@@ -151,7 +151,7 @@ async fn a_new_request_reaches_the_inbox_holding_the_shared_copy_once(pool: PgPo
     assert_eq!(refresh.nudges.lock().unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn join_requests_open_once_and_resolve_once(pool: PgPool) {
     let sharer_id = "macro|join-sharer@example.com";
     let member_id = "macro|join-member@example.com";
@@ -359,7 +359,7 @@ pub(super) async fn recipient_holds(pool: &PgPool, notification_id: Uuid) -> boo
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_join_request_notification_goes_with_the_last_copy_of_its_event(pool: PgPool) {
     let sharer_id = "macro|join-copies@example.com";
     let member_id = "macro|join-copies-member@example.com";
@@ -448,7 +448,7 @@ async fn a_join_request_notification_goes_with_the_last_copy_of_its_event(pool: 
     assert!(recipient_holds(&pool, asked_elsewhere).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_cancelled_occurrence_keeps_the_join_request_notification_and_a_cancelled_series_drops_it(
     pool: PgPool,
 ) {
@@ -527,7 +527,7 @@ async fn a_cancelled_occurrence_keeps_the_join_request_notification_and_a_cancel
     assert!(!recipient_holds(&pool, asked).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_the_calendar_or_the_inbox_removes_join_request_notifications(pool: PgPool) {
     let sharer_id = "macro|join-inbox@example.com";
     let member_id = "macro|join-inbox-member@example.com";
@@ -685,7 +685,7 @@ async fn stored_notifications(pool: &PgPool) -> i64 {
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_join_request_notification_is_not_stored_after_its_event_went(pool: PgPool) {
     let request = open_request(&pool).await;
     let event_id = request.event_id;
@@ -708,7 +708,7 @@ async fn a_queued_join_request_notification_is_not_stored_after_its_event_went(p
     assert_eq!(stored_notifications(&pool).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_insert_waits_for_a_cancellation_then_stores_nothing(pool: PgPool) {
     let request = open_request(&pool).await;
     let event_id = request.event_id;
@@ -734,7 +734,7 @@ async fn a_queued_insert_waits_for_a_cancellation_then_stores_nothing(pool: PgPo
     assert_eq!(stored_notifications(&pool).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_insert_waits_for_a_delete_then_stores_nothing(pool: PgPool) {
     let request = open_request(&pool).await;
     let event_id = request.event_id;
@@ -757,7 +757,7 @@ async fn a_queued_insert_waits_for_a_delete_then_stores_nothing(pool: PgPool) {
     assert_eq!(stored_notifications(&pool).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_delete_waits_for_a_queued_insert_then_retires_it(pool: PgPool) {
     let request = open_request(&pool).await;
     let event_id = request.event_id;
@@ -791,7 +791,7 @@ async fn answer_within(transaction: &mut Transaction<'_, Postgres>, request: &Ca
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn answering_a_join_request_retires_its_notification_for_every_recipient(pool: PgPool) {
     let accepted = open_request(&pool).await;
     let declined = another_open_request(&pool, &accepted).await;
@@ -834,7 +834,7 @@ async fn answering_a_join_request_retires_its_notification_for_every_recipient(p
     assert!(recipient_holds(&pool, reminder).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn answering_one_join_request_keeps_the_notification_of_another_still_open(pool: PgPool) {
     let answered = open_request(&pool).await;
     let still_open = another_open_request(&pool, &answered).await;
@@ -862,7 +862,7 @@ async fn answering_one_join_request_keeps_the_notification_of_another_still_open
     assert!(!recipient_holds(&pool, about_still_open).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_join_request_notification_is_not_stored_after_its_request_was_answered(
     pool: PgPool,
 ) {
@@ -890,7 +890,7 @@ async fn a_queued_join_request_notification_is_not_stored_after_its_request_was_
     assert_eq!(stored_notifications(&pool).await, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_join_request_notification_is_not_stored_without_its_request(pool: PgPool) {
     let request = open_request(&pool).await;
     sqlx::query!(
@@ -905,7 +905,7 @@ async fn a_queued_join_request_notification_is_not_stored_without_its_request(po
     assert_eq!(stored_notifications(&pool).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_insert_waits_for_an_answer_then_stores_nothing(pool: PgPool) {
     let request = open_request(&pool).await;
     let mut answering = pool.begin().await.unwrap();
@@ -924,7 +924,7 @@ async fn a_queued_insert_waits_for_an_answer_then_stores_nothing(pool: PgPool) {
     assert_eq!(stored_notifications(&pool).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_insert_is_stored_when_the_answer_it_waited_for_rolls_back(pool: PgPool) {
     let request = open_request(&pool).await;
     let mut answering = pool.begin().await.unwrap();
@@ -943,7 +943,7 @@ async fn a_queued_insert_is_stored_when_the_answer_it_waited_for_rolls_back(pool
     assert_eq!(stored_notifications(&pool).await, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_answer_waits_for_a_queued_insert_then_retires_it(pool: PgPool) {
     let request = open_request(&pool).await;
     let mut arriving = pool.begin().await.unwrap();
@@ -976,7 +976,7 @@ async fn delete_account(
         .map(|_| ())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_the_requesters_account_retires_their_requests_notification(pool: PgPool) {
     let removed = open_request(&pool).await;
     let still_open = another_open_request(&pool, &removed).await;
@@ -1023,7 +1023,7 @@ async fn deleting_the_requesters_account_retires_their_requests_notification(poo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_the_event_retires_each_join_request_notification_once(pool: PgPool) {
     let first = open_request(&pool).await;
     let second = another_open_request(&pool, &first).await;
@@ -1062,7 +1062,7 @@ async fn deleting_the_event_retires_each_join_request_notification_once(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_insert_waits_for_an_account_delete_then_stores_nothing(pool: PgPool) {
     let request = open_request(&pool).await;
     let mut deleting = pool.begin().await.unwrap();
@@ -1081,7 +1081,7 @@ async fn a_queued_insert_waits_for_an_account_delete_then_stores_nothing(pool: P
     assert_eq!(stored_notifications(&pool).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_queued_insert_is_stored_when_the_account_delete_it_waited_for_rolls_back(pool: PgPool) {
     let request = open_request(&pool).await;
     let mut deleting = pool.begin().await.unwrap();
@@ -1100,7 +1100,7 @@ async fn a_queued_insert_is_stored_when_the_account_delete_it_waited_for_rolls_b
     assert_eq!(stored_notifications(&pool).await, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_account_delete_waits_for_a_queued_insert_then_retires_it(pool: PgPool) {
     let request = open_request(&pool).await;
     let mut arriving = pool.begin().await.unwrap();
@@ -1118,7 +1118,7 @@ async fn an_account_delete_waits_for_a_queued_insert_then_retires_it(pool: PgPoo
     assert_eq!(stored_notifications(&pool).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_event_delete_waits_for_an_account_delete_and_both_retire_once(pool: PgPool) {
     let request = open_request(&pool).await;
     let event_id = request.event_id;

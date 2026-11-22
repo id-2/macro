@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "DELETE FROM team_joined_macro_email WHERE team_id = $1 AND email = $2",
+  "query": "DELETE FROM team_joined_rox_email WHERE team_id = $1 AND email = $2",
   "describe": {
     "columns": [],
     "parameters": {

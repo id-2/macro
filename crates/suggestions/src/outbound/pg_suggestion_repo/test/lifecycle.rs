@@ -14,7 +14,7 @@ fn after(from: SuggestionState, event: LifecycleEvent) -> SuggestionState {
     transition(from, event).unwrap_or(from)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn state_moves_follow_the_table(pool: PgPool) {
     let f = fixture(pool).await;
     for (event, to) in [
@@ -44,7 +44,7 @@ async fn state_moves_follow_the_table(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn moves_as_shown_follow_the_table_and_the_card(pool: PgPool) {
     let f = fixture(pool).await;
     for (event, to) in [
@@ -87,7 +87,7 @@ async fn moves_as_shown_follow_the_table_and_the_card(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_starts_only_as_the_table_says_and_once(pool: PgPool) {
     let f = fixture(pool).await;
     for from in SuggestionState::iter() {
@@ -118,7 +118,7 @@ async fn a_run_starts_only_as_the_table_says_and_once(pool: PgPool) {
 
 /// The unique index keeps one unsettled run per suggestion even past the
 /// guard.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_database_keeps_one_unsettled_run_per_suggestion(pool: PgPool) {
     let f = fixture(pool).await;
     let id = f.prompt(None).await;
@@ -147,7 +147,7 @@ async fn the_database_keeps_one_unsettled_run_per_suggestion(pool: PgPool) {
     assert!(mismatched.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_finished_run_makes_only_an_accepted_suggestion_done(pool: PgPool) {
     let f = fixture(pool).await;
     for from in SuggestionState::iter() {
@@ -169,7 +169,7 @@ async fn a_finished_run_makes_only_an_accepted_suggestion_done(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn resolving_follows_the_table(pool: PgPool) {
     let f = fixture(pool).await;
     for from in SuggestionState::iter() {
@@ -239,7 +239,7 @@ async fn routine_in(f: &Fixture, state: SuggestionState) -> (Uuid, Uuid) {
 /// suggestion (`RoutineSuggestionState::card` in `crates/scheduled_action`),
 /// through `suggestions_db_utils::move_routine_card`, from exactly the state
 /// that transition read it in, whatever state it is in.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_routine_suggestion_moves_only_from_the_state_named(pool: PgPool) {
     let f = fixture(pool).await;
     for named in SuggestionState::iter() {
@@ -276,7 +276,7 @@ async fn a_routine_suggestion_moves_only_from_the_state_named(pool: PgPool) {
 
 /// Only a suggestion dismissed at or after the window's start comes back, and
 /// only from the states the table allows.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undismissing_follows_the_table_within_its_window(pool: PgPool) {
     let f = fixture(pool).await;
     for from in SuggestionState::iter() {
@@ -308,7 +308,7 @@ async fn undismissing_follows_the_table_within_its_window(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_draft_attaches_only_as_the_table_says(pool: PgPool) {
     let f = fixture(pool).await;
     let draft = Target {
@@ -341,7 +341,7 @@ async fn a_draft_attaches_only_as_the_table_says(pool: PgPool) {
 /// A rewrite keeps an open suggestion's state and a restore reopens a closed
 /// one, as the table says; either written from a state the suggestion left
 /// meanwhile is refused.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replacing_follows_the_table_from_the_state_read(pool: PgPool) {
     let f = fixture(pool).await;
     for from in SuggestionState::iter() {
@@ -390,7 +390,7 @@ async fn replacing_follows_the_table_from_the_state_read(pool: PgPool) {
 
 /// Closing a suggestion without doing it cancels its unsettled run as the run
 /// state machine says, in the same write; being done doesn't.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn closing_a_suggestion_cancels_its_run_as_the_machine_says(pool: PgPool) {
     let f = fixture(pool).await;
     let close: [(&str, LifecycleEvent, SuggestionState); 4] = [

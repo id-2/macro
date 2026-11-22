@@ -13,7 +13,7 @@ use crate::domain::ports::WebhookWorkspaceResolver;
 use crate::domain::stream::StreamCandidateEvent;
 use crate::topics::DeclaredMacroEvent;
 use kafka_util::{InitialOffset, KafkaEventConsumer, Ungrouped};
-use macro_event_broker::{KafkaConsumerAdapter, MacroEvent as _, MacroEventConsumerService};
+use rox_event_broker::{KafkaConsumerAdapter, RoxEvent as _, RoxEventConsumerService};
 use std::time::Duration;
 use tokio::sync::broadcast;
 
@@ -22,7 +22,7 @@ const METADATA_TIMEOUT: Duration = Duration::from_secs(10);
 
 type WebhookStreamKafkaAdapter = KafkaConsumerAdapter<Ungrouped, DeclaredMacroEvent>;
 type WebhookStreamKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, WebhookStreamKafkaAdapter>;
+    RoxEventConsumerService<DeclaredMacroEvent, WebhookStreamKafkaAdapter>;
 
 /// Consume broker events from now onward and publish normalized stream candidates.
 ///
@@ -105,7 +105,7 @@ async fn candidate_from<R: WebhookWorkspaceResolver>(
 #[tracing::instrument(name = "webhook.stream.resolve_user_teams", skip_all, fields(user_id = %user))]
 async fn user_team_workspace_ids<R: WebhookWorkspaceResolver>(
     workspace_resolver: &R,
-    user: macro_user_id::user_id::MacroUserIdStr<'static>,
+    user: rox_user_id::user_id::RoxUserIdStr<'static>,
 ) -> Vec<String> {
     let personal = user.as_ref().to_string();
     match workspace_resolver.resolve_workspace_ids(vec![user]).await {

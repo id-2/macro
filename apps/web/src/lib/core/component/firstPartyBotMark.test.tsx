@@ -3,9 +3,9 @@ import {
   CURSOR_BOT_ID,
   CURSOR_BOT_PRINCIPAL_ID,
 } from '@core/constant/cursorAgent';
-import { MACRO_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
-import { MACRO_CODER_PRINCIPAL_ID } from '@core/constant/macroCoder';
-import { MACRO_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
+import { ROX_CODER_PRINCIPAL_ID } from '@core/constant/macroCoder';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
 import { RoxMark } from '@core/component/RoxMark';
 import CodexIcon from '@icon/wide-codex-ide.svg';
 import CursorIcon from '@icon/wide-cursor-ide.svg';
@@ -40,9 +40,9 @@ afterEach(cleanup);
 describe('firstPartyBotMark', () => {
   it('gives both Rox bots and the coder the Rox logo', () => {
     for (const id of [
-      MACRO_AGENT_PRINCIPAL_ID,
-      MACRO_NEW_PRINCIPAL_ID,
-      MACRO_CODER_PRINCIPAL_ID,
+      ROX_AGENT_PRINCIPAL_ID,
+      ROX_NEW_PRINCIPAL_ID,
+      ROX_CODER_PRINCIPAL_ID,
     ]) {
       expect(firstPartyBotMark(id)).toEqual({
         Icon: RoxMark,
@@ -99,7 +99,7 @@ describe('UserIcon for first-party bots', () => {
 
   it('draws the Rox eye for the agent-session Rox bot', () => {
     const { container: macro } = render(() => (
-      <UserIcon id={MACRO_NEW_PRINCIPAL_ID} />
+      <UserIcon id={ROX_NEW_PRINCIPAL_ID} />
     ));
     expect(macro.querySelector('img')?.getAttribute('src')).toContain(
       'rox-mark.png'

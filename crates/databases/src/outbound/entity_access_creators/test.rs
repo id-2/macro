@@ -6,8 +6,8 @@ use std::sync::Arc;
 use entity_access::domain::models::{AccessLevel, EntityPermission};
 use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use properties::outbound::properties_pg_repo::PropertiesPgRepo;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -17,33 +17,33 @@ use crate::domain::models::{CreateDatabase, FirstTable};
 use crate::domain::ports::DatabasesRepo;
 use crate::outbound::pg_databases_repo::PgDatabasesRepo;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_owner_gets_an_edit_receipt_and_a_stranger_none(pool: PgPool) {
     let owner_id = format!("macro|creators-owner-{}@rox.one", Uuid::new_v4());
     let stranger_id = format!("macro|creators-stranger-{}@rox.one", Uuid::new_v4());
     for user_id in [&owner_id, &stranger_id] {
-        let macro_user_id = macro_uuid::generate_uuid_v7();
+        let rox_user_id = rox_uuid::generate_uuid_v7();
         sqlx::query!(
             r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-            macro_user_id,
+            rox_user_id,
             user_id,
         )
         .execute(&pool)
         .await
         .unwrap();
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+            r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
             user_id,
-            macro_user_id,
+            rox_user_id,
         )
         .execute(&pool)
         .await
         .unwrap();
     }
-    let owner = MacroUserIdStr::parse_from_str(&owner_id)
+    let owner = RoxUserIdStr::parse_from_str(&owner_id)
         .unwrap()
         .into_owned();
-    let stranger = MacroUserIdStr::parse_from_str(&stranger_id)
+    let stranger = RoxUserIdStr::parse_from_str(&stranger_id)
         .unwrap()
         .into_owned();
     let database = PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool.clone()))

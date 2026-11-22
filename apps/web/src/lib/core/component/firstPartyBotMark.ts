@@ -17,7 +17,7 @@ export type FirstPartyBotMark = {
   tone: 'accent' | 'ink';
 };
 
-const MACRO_MARK: FirstPartyBotMark = { Icon: RoxMark, tone: 'accent' };
+const ROX_MARK: FirstPartyBotMark = { Icon: RoxMark, tone: 'accent' };
 const CURSOR_MARK: FirstPartyBotMark = { Icon: CursorIcon, tone: 'ink' };
 const CODEX_MARK: FirstPartyBotMark = { Icon: CodexIcon, tone: 'ink' };
 const CLAUDE_MARK: FirstPartyBotMark = { Icon: ClaudeIcon, tone: 'ink' };
@@ -46,7 +46,7 @@ export function firstPartyBotMark(
     isMacroCoderId(id) ||
     isMacroSystemId(id)
   ) {
-    return MACRO_MARK;
+    return ROX_MARK;
   }
   if (isCursorBotId(id)) return CURSOR_MARK;
   if (isCodexBotId(id)) return CODEX_MARK;

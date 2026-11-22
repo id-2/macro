@@ -2,9 +2,9 @@
 
 use std::collections::HashSet;
 
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroSoupRealtimeTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxSoupRealtimeTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use serde::{Deserialize, Serialize};
 
@@ -68,7 +68,7 @@ pub struct SharedAccess {
     /// Entities each of these users can currently access.
     pub entities: Vec<Entity<'static>>,
     /// Current accessors of every one of the entities.
-    pub users: Vec<MacroUserIdStr<'static>>,
+    pub users: Vec<RoxUserIdStr<'static>>,
 }
 
 /// What publishing one batch of patches reached.
@@ -76,7 +76,7 @@ pub struct SharedAccess {
 pub struct Delivery {
     /// Each distinct, non-empty set of recipients among the batch's patches,
     /// with its users sorted.
-    pub recipient_sets: HashSet<Vec<MacroUserIdStr<'static>>>,
+    pub recipient_sets: HashSet<Vec<RoxUserIdStr<'static>>>,
     /// Number of recipient-targeted patches published.
     pub publish_count: usize,
 }
@@ -85,26 +85,26 @@ pub struct Delivery {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SoupRealtimeMessage {
     /// User to whom the patch is addressed.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Entity patch addressed to the user.
     pub patch: Patch<Entity<'static>>,
 }
 
 impl SoupRealtimeMessage {
     /// Creates a patch addressed to a recipient.
-    pub fn new(user_id: MacroUserIdStr<'static>, patch: Patch<Entity<'static>>) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>, patch: Patch<Entity<'static>>) -> Self {
         Self { user_id, patch }
     }
 }
 
-/// Wire payload for [`MacroSoupRealtimeTopic`].
+/// Wire payload for [`RoxSoupRealtimeTopic`].
 ///
 /// The recipient is included in the patch payload and repeated as the Kafka
 /// key so consumers can route without hydrating a Soup item.
-pub type SoupTopicEvent = Patch<(MacroUserIdStr<'static>, Entity<'static>)>;
+pub type SoupTopicEvent = Patch<(RoxUserIdStr<'static>, Entity<'static>)>;
 
 impl TopicEvent for SoupTopicEvent {
-    type Topic = MacroSoupRealtimeTopic;
+    type Topic = RoxSoupRealtimeTopic;
 
     const SCHEMA_VERSION: u8 = 2;
 }
@@ -145,7 +145,7 @@ impl SoupMacroEvent {
     }
 }
 
-impl MacroEvent for SoupMacroEvent {
+impl RoxEvent for SoupMacroEvent {
     type EventPayload = SoupTopicEvent;
 
     fn key(&self) -> &str {

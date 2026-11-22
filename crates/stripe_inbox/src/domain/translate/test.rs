@@ -306,7 +306,7 @@ fn a_failed_overage_invoice_has_no_subscription_and_keeps_its_purpose() {
     assert!(!failed.paid);
     assert_eq!(failed.subscription, None);
     assert_eq!(
-        failed.metadata.get("macro_purpose").map(String::as_str),
+        failed.metadata.get("rox_purpose").map(String::as_str),
         Some("ai_overage")
     );
 }
@@ -322,7 +322,7 @@ fn a_checkout_session_translates_its_payment_and_metadata() {
     assert!(checkout.paid);
     assert_eq!(checkout.amount_total, Some(2500));
     assert_eq!(
-        checkout.metadata.get("macro_user_id").map(String::as_str),
+        checkout.metadata.get("rox_user_id").map(String::as_str),
         Some("macro|buyer@example.com")
     );
 }

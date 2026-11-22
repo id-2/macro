@@ -3,8 +3,8 @@ use bot_id::BotId;
 use chrono::{DateTime, Duration, Utc};
 use chrono_tz::Tz;
 use cron::Schedule as CronSchedule;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityAppearance;
 use model_owner::{Owner, OwnerType};
 use serde::{Deserialize, Serialize};
@@ -146,7 +146,7 @@ impl<'a> ResolvedTaskTarget<'a> {
     /// Explicit agent selections keep their own runtime and optional model override.
     pub fn session_target(self) -> (BotId, Option<&'a str>) {
         match self {
-            Self::Model { model } => (bot_id::MACRO_NEW_BOT_ID, Some(model)),
+            Self::Model { model } => (bot_id::ROX_NEW_BOT_ID, Some(model)),
             Self::Agent { bot_id, model } => (bot_id, model),
         }
     }
@@ -523,7 +523,7 @@ impl ScheduledAction {
     /// creating a chat in their account, reading their memory, spending their
     /// AI budget, notifying them. Asking here fails typed for a bot or team
     /// instead of treating one as a person.
-    pub fn owner_user(&self) -> Result<&MacroUserIdStr<'static>, OwnerNotUserError> {
+    pub fn owner_user(&self) -> Result<&RoxUserIdStr<'static>, OwnerNotUserError> {
         self.owner.as_user().ok_or(OwnerNotUserError {
             owner_type: self.owner.owner_type(),
         })
@@ -730,7 +730,7 @@ pub enum DispatchEvent {
 pub enum ScheduledActionUpdate {
     Started {
         #[schema(value_type = String)]
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         #[schema(value_type = String, format = Uuid)]
         action_id: Uuid,
         chat_id: Option<String>,
@@ -739,7 +739,7 @@ pub enum ScheduledActionUpdate {
     },
     Stopped {
         #[schema(value_type = String)]
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         #[schema(value_type = String, format = Uuid)]
         action_id: Uuid,
         chat_id: Option<String>,
@@ -750,7 +750,7 @@ pub enum ScheduledActionUpdate {
 }
 
 impl ScheduledActionUpdate {
-    pub fn owner(&self) -> &MacroUserIdStr<'static> {
+    pub fn owner(&self) -> &RoxUserIdStr<'static> {
         match self {
             ScheduledActionUpdate::Started { owner, .. } => owner,
             ScheduledActionUpdate::Stopped { owner, .. } => owner,

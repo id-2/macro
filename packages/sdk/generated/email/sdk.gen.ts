@@ -159,7 +159,7 @@ export class Sdk extends HeyApiClient {
     }
 
     /**
-     * Durably remove Macro-managed sender blocking in the selected inbox.
+     * Durably remove Rox-managed sender blocking in the selected inbox.
      */
     public unblockSender<ThrowOnError extends boolean = false>(options: Options<UnblockSenderData, ThrowOnError>): RequestResult<UnblockSenderResponses, UnblockSenderErrors, ThrowOnError> {
         return (options.client ?? this.client).post<UnblockSenderResponses, UnblockSenderErrors, ThrowOnError>({
@@ -397,7 +397,7 @@ export class Sdk extends HeyApiClient {
      *
      * For an inbox the caller owns this enqueues a full cascade teardown
      * (`LinkManagerMessage::DeleteLink`). For an inbox reached via delegation it
-     * only drops the `macro_user_links` edge, leaving the owner's data intact.
+     * only drops the `rox_user_links` edge, leaving the owner's data intact.
      */
     public deleteLink<ThrowOnError extends boolean = false>(options: Options<DeleteLinkData, ThrowOnError>): RequestResult<DeleteLinkResponses, DeleteLinkErrors, ThrowOnError> {
         return (options.client ?? this.client).delete<DeleteLinkResponses, DeleteLinkErrors, ThrowOnError>({ url: '/email/links/{link_id}', ...options });
@@ -506,7 +506,7 @@ export class Sdk extends HeyApiClient {
      * which may be an inbox the caller only reaches through delegation. Removal
      * therefore follows the same policy as `DELETE /email/links/{link_id}`: an
      * owner's inbox is torn down, while a delegate only loses their
-     * `macro_user_links` edge and the owner's data stays intact.
+     * `rox_user_links` edge and the owner's data stays intact.
      */
     public disableSync<ThrowOnError extends boolean = false>(options?: Options<DisableSyncData, ThrowOnError>): RequestResult<DisableSyncResponses, DisableSyncErrors, ThrowOnError> {
         return (options?.client ?? this.client).delete<DisableSyncResponses, DisableSyncErrors, ThrowOnError>({ url: '/email/sync', ...options });

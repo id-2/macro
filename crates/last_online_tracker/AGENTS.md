@@ -24,8 +24,8 @@ and notification decisions.
 
 ## Boundaries
 
-- Depends on: `macro_user_id`, `redis` (via its own client, not
-  `macro_redis`).
+- Depends on: `rox_user_id`, `redis` (via its own client, not
+  `rox_redis`).
 - Used by: `notification`.
 
 ## Checks

@@ -22,7 +22,7 @@ test('a child gets only where to export, never anything else of this process', (
   expect(
     telemetryEnvironment({
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://otel:4318',
-      MACRO_API_KEY: 'mak_secret',
+      ROX_API_KEY: 'mak_secret',
       OTEL_DEPLOYMENT_ENVIRONMENT: 'local',
     })
   ).toEqual({

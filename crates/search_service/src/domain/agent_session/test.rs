@@ -1,11 +1,11 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 struct Source;
 impl AgentSessionSearchSource for Source {
     async fn accessible(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         _: &[Uuid],
     ) -> Result<Vec<AgentSessionSearchMetadata>, Report> {
         if user.as_ref() == "macro|stranger@example.com" {
@@ -14,7 +14,7 @@ impl AgentSessionSearchSource for Source {
         Ok(vec![AgentSessionSearchMetadata {
             id: Uuid::from_u128(1),
             name: "Shared session".into(),
-            owner_id: MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+            owner_id: RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
             bot_id: Uuid::from_u128(2),
             created_at: chrono::Utc::now(),
             updated_at: chrono::Utc::now(),
@@ -25,7 +25,7 @@ impl AgentSessionSearchSource for Source {
 #[tokio::test]
 async fn grants_allow_channel_viewers_without_requiring_ownership() {
     let service = AgentSessionSearchService(Source);
-    let viewer = MacroUserId::parse_from_str("macro|viewer@example.com")
+    let viewer = RoxUserId::parse_from_str("macro|viewer@example.com")
         .unwrap()
         .lowercase();
     assert_eq!(
@@ -36,7 +36,7 @@ async fn grants_allow_channel_viewers_without_requiring_ownership() {
             .len(),
         1
     );
-    let stranger = MacroUserId::parse_from_str("macro|stranger@example.com")
+    let stranger = RoxUserId::parse_from_str("macro|stranger@example.com")
         .unwrap()
         .lowercase();
     assert!(
@@ -51,7 +51,7 @@ async fn grants_allow_channel_viewers_without_requiring_ownership() {
 #[tokio::test]
 async fn exclusion_requested_ids_owners_and_tags_cannot_broaden_access() {
     let service = AgentSessionSearchService(Source);
-    let viewer = MacroUserId::parse_from_str("macro|viewer@example.com")
+    let viewer = RoxUserId::parse_from_str("macro|viewer@example.com")
         .unwrap()
         .lowercase();
     for (ids, owners, enabled, tags) in [

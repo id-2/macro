@@ -83,15 +83,15 @@ export function useEmailLinksQuery(enabled: Accessor<boolean> = queryEnabled) {
 
 /**
  * The link id of the user's primary inbox — their own `is_primary` link.
- * Delegated inboxes are primary for their own account, hence the macro_id
+ * Delegated inboxes are primary for their own account, hence the rox_id
  * guard. `undefined` until links load or if none match.
  */
 export function findPrimaryEmailLinkId(
-  links: readonly { id: string; is_primary: boolean; macro_id: string }[],
+  links: readonly { id: string; is_primary: boolean; rox_id: string }[],
   userId: string | undefined
 ): string | undefined {
   if (!userId) return undefined;
-  return links.find((link) => link.is_primary && link.macro_id === userId)?.id;
+  return links.find((link) => link.is_primary && link.rox_id === userId)?.id;
 }
 
 export function usePrimaryEmailLinkId() {

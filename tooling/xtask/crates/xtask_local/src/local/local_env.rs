@@ -385,7 +385,7 @@ impl InfraEnv {
         // the calling container. Callers like the authentication service's
         // signup hook (starter docs) then fail with a connection error.
         // `DOCUMENT_STORAGE_SERVICE_URL` (from Doppler) only covers the older
-        // call sites that read that var directly, not `macro_service_urls`.
+        // call sites that read that var directly, not `rox_service_urls`.
         env.insert(
             "OVERRIDE_DOCUMENT_STORAGE_SERVICE_URL".into(),
             "http://document-storage-service:8080".into(),
@@ -439,7 +439,7 @@ impl InfraEnv {
         // first-inbox provisioning (auth-service → `/email/init`) and Gmail
         // token fetches (email-service → `/internal/google_access_token`)
         // fail with connection errors. (Plain `EMAIL_SERVICE_URL` in Doppler
-        // is ignored — macro_service_urls only honors the `OVERRIDE_` prefix.)
+        // is ignored — rox_service_urls only honors the `OVERRIDE_` prefix.)
         env.insert(
             "OVERRIDE_EMAIL_SERVICE_URL".into(),
             "http://email-service:8080".into(),
@@ -588,7 +588,7 @@ impl MailEnv {
         MailEnv {
             smtp_host: "mailpit",
             smtp_port: "1025",
-            sender_base_address: "macro.local",
+            sender_base_address: "rox.local",
         }
     }
 
@@ -614,7 +614,7 @@ impl MailEnv {
 ///
 /// Two managed bots: `@coder` (`HARNESS_BOT_ID`) gets a sandbox from the
 /// local Docker provider, and `@macro` runs in-process on the in-memory ACP
-/// runtime. Only the first is configured - `@macro` is `bot_id::MACRO_AI_BOT_ID`
+/// runtime. Only the first is configured - `@macro` is `bot_id::ROX_AI_BOT_ID`
 /// in code, served wherever `ENVIRONMENT` is not production.
 struct AgentHarnessEnv {
     bot_id: &'static str,
@@ -639,7 +639,7 @@ struct AgentHarnessEnv {
 impl AgentHarnessEnv {
     fn local(instance: &Instance, egress_public_url: Option<&str>) -> Self {
         AgentHarnessEnv {
-            // bot_id::MACRO_CODER_BOT_ID, a first-party bot with no row.
+            // bot_id::ROX_CODER_BOT_ID, a first-party bot with no row.
             bot_id: "00000000-0000-0000-0000-00000000a9e7",
             snapshot: "macro-agent-harness",
             image: super::sandbox_image::DEFAULT_LOCAL_TAG,
@@ -776,7 +776,7 @@ impl FusionAuthEnv {
             "FUSIONAUTH_API_KEY".into(),
             identity::FUSIONAUTH_API_KEY.into(),
         );
-        // Canonical name read by auth_service (MacroConfig serde field) + seed_cli.
+        // Canonical name read by auth_service (RoxConfig serde field) + seed_cli.
         env.insert(
             "FUSIONAUTH_API_KEY_SECRET_KEY".into(),
             identity::FUSIONAUTH_API_KEY.into(),
@@ -793,14 +793,14 @@ impl FusionAuthEnv {
             "FUSIONAUTH_OAUTH_REDIRECT_URI".into(),
             self.oauth_redirect_uri.clone(),
         );
-        // macro_auth JWT claim validation.
+        // rox_auth JWT claim validation.
         env.insert("AUDIENCE".into(), identity::APPLICATION_ID.into());
         env.insert("ISSUER".into(), identity::ISSUER.into());
         env.insert("JWT_SECRET_KEY".into(), identity::JWT_SECRET.into());
     }
 }
 
-/// Values the services' `macro_config` loaders require but that only exist in
+/// Values the services' `rox_config` loaders require but that only exist in
 /// Doppler's `lcl_personal` config. Without these a `--no-doppler` stack's
 /// containers crash at startup ("missing required value") before any of the
 /// integration the value backs is ever exercised. Entries are deterministic
@@ -834,7 +834,7 @@ impl BootStubEnv {
         env.insert("PUSHES_PER_MINUTE".into(), "30".into());
         // email_service / connection_gateway open their own Postgres pool.
         env.insert(
-            "MACRO_DB_URL".into(),
+            "ROX_DB_URL".into(),
             "postgres://user:password@postgres:5432/macrodb".into(),
         );
         // The harness requires Pipedream credentials even when integrations
@@ -948,16 +948,16 @@ impl BootStubEnv {
         // Browser clients exchange FusionAuth sessions for Rox API tokens
         // for actions such as enabling CRM. Both issuance and validation need
         // the same usable local key pair, even without Doppler.
-        env.insert("MACRO_API_TOKEN_ISSUER".into(), "local".into());
+        env.insert("ROX_API_TOKEN_ISSUER".into(), "local".into());
         env.insert(
-            "MACRO_API_TOKEN_PUBLIC_KEY".into(),
-            identity::MACRO_API_TOKEN_PUBLIC_KEY.into(),
+            "ROX_API_TOKEN_PUBLIC_KEY".into(),
+            identity::ROX_API_TOKEN_PUBLIC_KEY.into(),
         );
         env.insert(
-            "MACRO_API_TOKEN_PRIVATE_SECRET_KEY".into(),
-            identity::MACRO_API_TOKEN_PRIVATE_KEY.into(),
+            "ROX_API_TOKEN_PRIVATE_SECRET_KEY".into(),
+            identity::ROX_API_TOKEN_PRIVATE_KEY.into(),
         );
-        env.insert("MACRO_API_TOKEN_EXPIRY_SECONDS".into(), "3600".into());
+        env.insert("ROX_API_TOKEN_EXPIRY_SECONDS".into(), "3600".into());
         // email_service's GCP pubsub queue (gmail watch notifications) and
         // its own CloudFront signer for attachment presigned URLs.
         env.insert("GMAIL_GCP_QUEUE".into(), "gmail-gcp-queue-local".into());

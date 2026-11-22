@@ -1,10 +1,10 @@
 use super::helpers::seed_team;
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn writer_protects_parent_without_requiring_email_settings(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -38,7 +38,7 @@ async fn writer_protects_parent_without_requiring_email_settings(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn missing_parent_cannot_admit_a_writer(pool: PgPool) -> anyhow::Result<()> {
     let mut writer = pool.begin().await?;
     assert!(!CompaniesRepositoryImpl::team_exists(&mut writer, &Uuid::now_v7()).await?);

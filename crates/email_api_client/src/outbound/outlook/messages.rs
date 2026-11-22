@@ -22,7 +22,7 @@ const MESSAGE_FIELDS: &str = "id,conversationId,parentFolderId,changeKey,interne
 const RECENT_MESSAGE_FIELDS: &str = "id,conversationId,parentFolderId,subject,bodyPreview,from,toRecipients,ccRecipients,isRead,isDraft,flag,categories,inferenceClassification,receivedDateTime,sentDateTime";
 
 const ARCHIVE_ROLE_PROPERTY: &str =
-    "String {81f532e3-7ace-4e0b-bae9-312ce0d50c8c} Name MacroFolderRole";
+    "String {81f532e3-7ace-4e0b-bae9-312ce0d50c8c} Name RoxFolderRole";
 
 impl OutlookApiClientRepository {
     async fn archive_destination(&self, token: &AccessToken) -> Result<ProviderId, EmailApiError> {
@@ -443,7 +443,7 @@ pub(super) fn normalize(
         labels: Vec::new(),
         body_text,
         body_html_sanitized,
-        body_macro: None,
+        body_rox: None,
         attachments,
         attachments_draft: Vec::new(),
         attachments_forwarded: Vec::new(),

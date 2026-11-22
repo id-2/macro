@@ -18,8 +18,8 @@ use http::{HeaderValue, Method};
 use http_body_util::BodyExt;
 use http_body_util::Full;
 use http_body_util::combinators::UnsyncBoxBody;
-use macro_user_id::email::ReadEmailParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::email::ReadEmailParts;
+use rox_user_id::user_id::RoxUserIdStr;
 use rand::RngCore;
 use sha2::{Digest, Sha256};
 use std::fmt;
@@ -220,7 +220,7 @@ const STAFF_EMAIL_DOMAIN: &str = "rox.one";
 /// trust, "owned by somebody @rox.one" is the whole admission policy. In
 /// the domain rather than deployment configuration so it cannot be switched
 /// off by an unset env var.
-pub fn is_macro_staff(user: &MacroUserIdStr<'_>) -> bool {
+pub fn is_rox_staff(user: &RoxUserIdStr<'_>) -> bool {
     user.email_part().domain_part() == STAFF_EMAIL_DOMAIN
 }
 
@@ -236,7 +236,7 @@ pub struct SessionGrant {
     /// The session the sandbox is running.
     pub session: AgentSessionId,
     /// Whose connected servers it may reach.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The agent the session is bound to. Rox's own tools write as it,
     /// never as a bot the sandbox names.
     pub agent: bot_id::BotId,
@@ -806,7 +806,7 @@ pub enum McpDestination {
 }
 
 /// The route Rox's own MCP server is served on.
-pub const MACRO_MCP_PATH: &str = "/mcp-macro";
+pub const ROX_MCP_PATH: &str = "/mcp-macro";
 
 /// The route prefix a connected app's slug follows.
 pub const CONNECTED_MCP_PATH_PREFIX: &str = "/mcp/";
@@ -824,7 +824,7 @@ impl McpDestination {
         if path == "/mcp-preview" {
             return Some(Self::Preview);
         }
-        if path == MACRO_MCP_PATH {
+        if path == ROX_MCP_PATH {
             return Some(Self::Macro);
         }
         if let Some(key) = path.strip_prefix(CUSTOM_MCP_PATH_PREFIX) {

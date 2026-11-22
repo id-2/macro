@@ -36,7 +36,7 @@ impl SlowFlags {
 }
 
 impl FeatureFlags for SlowFlags {
-    async fn load(&self, _: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, rootcause::Report> {
+    async fn load(&self, _: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, rootcause::Report> {
         self.loads.fetch_add(1, Ordering::SeqCst);
         tokio::time::sleep(PROVIDER_DELAY).await;
         if !self.reachable {
@@ -49,8 +49,8 @@ impl FeatureFlags for SlowFlags {
     }
 }
 
-fn caller(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn caller(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 /// Lets a started refresh finish: the paused clock runs the provider's

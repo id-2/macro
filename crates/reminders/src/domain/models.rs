@@ -4,7 +4,7 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ pub struct DueReminder {
     /// Email subject captured when the snooze was scheduled.
     pub description: String,
     /// Only recipient of this notification.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// Claimed delivery time; edits invalidate messages for earlier times.
     pub scheduled_for: DateTime<Utc>,
 }

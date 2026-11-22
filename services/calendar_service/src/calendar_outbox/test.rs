@@ -1,6 +1,6 @@
 use super::*;
 use chrono::DateTime;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use opentelemetry::trace::{SpanId, TracerProvider as _};
 use opentelemetry_sdk::trace::{InMemorySpanExporter, SdkTracerProvider, SpanData};
 use rootcause::Report;
@@ -53,7 +53,7 @@ fn attribute(span: &SpanData, key: &str) -> Option<String> {
 
 /// A span wrapping the whole loop never closes, so its rounds never formed a
 /// finished trace; each round must be its own root span.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn each_scheduler_round_is_its_own_finished_root_span(db: PgPool) {
     let exporter = InMemorySpanExporter::default();
     let provider = SdkTracerProvider::builder()

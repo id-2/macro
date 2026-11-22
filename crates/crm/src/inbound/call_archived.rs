@@ -15,8 +15,8 @@ use call::domain::{
     ports::CallRecordQueryService,
 };
 use kafka_util::{GroupName, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection, RoxEventConsumerService,
 };
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message as _};
@@ -33,7 +33,7 @@ mod test;
 mod source {
     use super::CallMacroEvent;
 
-    macro_event_broker::declare_topics!(CallSourceEvent: CallMacroEvent);
+    rox_event_broker::declare_topics!(CallSourceEvent: CallMacroEvent);
 }
 use source::CallSourceEvent;
 
@@ -118,7 +118,7 @@ impl<Q: CallRecordQueryService, L: CallRecordLinkStore> CallArchivedConsumer<Q, 
         let consumer = KafkaConsumerAdapter::<CrmCallLinksGroup, ()>::new(consumer)
             .subscribe::<CallSourceEvent>()
             .context("failed to subscribe to the call topic")?;
-        let consumer = MacroEventConsumerService::<CallSourceEvent, _>::new(consumer);
+        let consumer = RoxEventConsumerService::<CallSourceEvent, _>::new(consumer);
         tracing::info!(
             topics = ?CallSourceEvent::topics(),
             group = CrmCallLinksGroup::GROUP_NAME,
@@ -172,8 +172,8 @@ impl<Q: CallRecordQueryService, L: CallRecordLinkStore> CallArchivedConsumer<Q, 
     }
 }
 
-fn commit_logged<C: MacroEventCollection + 'static>(
-    consumer: &MacroEventConsumerService<C, KafkaConsumerAdapter<CrmCallLinksGroup, C>>,
+fn commit_logged<C: RoxEventCollection + 'static>(
+    consumer: &RoxEventConsumerService<C, KafkaConsumerAdapter<CrmCallLinksGroup, C>>,
     message: &BorrowedMessage<'_>,
 ) {
     if let Err(error) = consumer.inner().commit_message(message, CommitMode::Async) {

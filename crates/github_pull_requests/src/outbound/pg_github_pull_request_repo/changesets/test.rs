@@ -1,5 +1,5 @@
 use git_patch::FileChangeKind;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -49,7 +49,7 @@ fn changeset(head_sha: &str) -> GithubPullRequestChangeset {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_changeset_reads_back_as_stored_and_is_stored_once(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool);
     let stored = changeset("head-1");

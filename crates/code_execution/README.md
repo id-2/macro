@@ -2,7 +2,7 @@
 
 `ExecuteCode` accepts a JavaScript ES module exporting `main`. The agent harness
 starts a fresh Deno 2.9.6 child for each execution; there is no separate runner
-service. Macro SDK and Handlebars imports are bundled ahead of time, with no
+service. Rox SDK and Handlebars imports are bundled ahead of time, with no
 per-run package download or TypeScript compilation.
 
 ```js
@@ -21,7 +21,7 @@ export async function main({ macro, session, execution }) {
 ```
 
 The context also exposes `token`, `hosts` and `webAppUrl` for explicitly
-constructing `new Macro({ token, hosts, webAppUrl })` after importing `Macro`
+constructing `new Rox({ token, hosts, webAppUrl })` after importing `Rox`
 from `@macro-inc/sdk`. `webAppUrl` is the deployment's web app origin, so
 `webUrl()` links point at the environment the run is in.
 `session` and `execution` are handles supplied by the authenticated host.
@@ -116,7 +116,7 @@ child before deleting scratch. API writes already accepted by a service may
 complete afterward and must not be blindly retried. SDK operation events carry only an operation name, request identity and status.
 They are bounded diagnostics, not proof of a committed action. Console output
 and progress are program-authored and may be incomplete. W3C trace context and
-`x-macro-code-execution: 1` are sent to configured service origins on
+`x-rox-code-execution: 1` are sent to configured service origins on
 authenticated requests only.
 
 Deno shares the harness container. The heap setting does not hard-limit native

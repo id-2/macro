@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::ports::BotRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 const TEAM: Uuid = Uuid::from_u128(0x91000000_0000_0000_0000_000000000011);
@@ -13,7 +13,7 @@ fn bot(n: u128) -> BotId {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("team_roster"))
 )]
 async fn team_bot_ids_include_soft_deleted_bots_and_exclude_other_owners(pool: PgPool) {

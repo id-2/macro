@@ -8,7 +8,7 @@ use crate::testing::InMemoryAgentSessionRepo;
 
 fn coding_preferences_router() -> Router {
     let repo = InMemoryAgentSessionRepo::new();
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".into(),
@@ -28,7 +28,7 @@ fn coding_preferences_router() -> Router {
             ReplicaId::mint(),
         ),
         Arc::new(entity_access::domain::ports::NoOpEntityAccessService),
-        MacroAuthorizationState::new(Arc::new(auth)),
+        RoxAuthorizationState::new(Arc::new(auth)),
     ))
 }
 

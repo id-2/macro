@@ -1,5 +1,5 @@
 use crate::domain::models::{TaggedContent, UserNotificationRow};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde::Deserialize;
 use std::time::Duration;
@@ -10,7 +10,7 @@ pub trait UserExistenceChecker: Send + Sync + 'static {
     /// does the user exist in the database?
     fn user_exists<'a>(
         &self,
-        id: MacroUserIdStr<'a>,
+        id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<bool, Report>> + Send;
 }
 
@@ -18,7 +18,7 @@ pub trait UserExistenceChecker: Send + Sync + 'static {
 #[derive(Debug)]
 pub struct DigestBatch {
     /// The user to send the digest to.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The notifications to include in the digest.
     pub notifications: Vec<UserNotificationRow<TaggedContent<serde_json::Value>>>,
 }
@@ -83,7 +83,7 @@ pub trait PushNotificationChecker: Send + Sync + 'static {
     /// does the user have push notifications enabled?
     fn push_notification_enabled<'a>(
         &self,
-        user: MacroUserIdStr<'a>,
+        user: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<bool, Report>> + Send;
 }
 
@@ -92,7 +92,7 @@ pub trait LastOnlineChecker: Send + Sync + 'static {
     /// return the duration since the last known online time of the user
     fn last_online_checker<'a>(
         &self,
-        user: MacroUserIdStr<'a>,
+        user: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Duration, Report>> + Send;
 }
 
@@ -108,7 +108,7 @@ pub trait MessageReceiptRepo: Send + Sync + 'static {
     fn record_message_id(
         &self,
         message_id: MessageId,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
@@ -116,12 +116,12 @@ pub trait MessageReceiptRepo: Send + Sync + 'static {
     fn mark_message_failed(
         &self,
         message_id: MessageId,
-    ) -> impl Future<Output = Result<(MacroUserIdStr<'static>, Uuid), Report>> + Send;
+    ) -> impl Future<Output = Result<(RoxUserIdStr<'static>, Uuid), Report>> + Send;
 
     /// given the user_notification FK, check if all messages for this notification have failed
     fn did_all_messages_fail(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> impl Future<Output = Result<bool, Report>> + Send;
 }

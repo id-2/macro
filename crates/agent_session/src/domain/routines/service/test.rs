@@ -12,8 +12,8 @@ use crate::testing::{InMemoryAgentSessionRepo, test_agent_session};
 use agent_fold::domain::service::FoldedMessageService;
 use agent_runtime_protocol::domain::schema::v0::ToRuntimeMessage;
 use bots::domain::models::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use shared_entity_registry::OwnedPurgeOutcome;
 use std::sync::{Arc, Mutex};
 
@@ -45,12 +45,12 @@ impl BotDirectory for Directory {
     async fn bot_facts(&self, _: BotId) -> SessionResult<Option<BotFacts>> {
         Ok(self.0.lock().unwrap().clone())
     }
-    async fn user_has_team(&self, _: MacroUserIdStr<'static>, _: Uuid) -> SessionResult<bool> {
+    async fn user_has_team(&self, _: RoxUserIdStr<'static>, _: Uuid) -> SessionResult<bool> {
         Ok(false)
     }
     async fn user_shares_channel_with_bot(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: BotId,
     ) -> SessionResult<bool> {
         Ok(false)
@@ -132,7 +132,7 @@ impl AgentSessionNotificationRecipient for Controls {
     async fn queued_controls(&self, _: AgentSessionId) -> SessionResult<Vec<QueuedControl>> {
         Ok(self.queued.lock().unwrap().clone())
     }
-    async fn delete_user_sessions(&self, _: MacroUserIdStr<'static>) -> SessionResult<()> {
+    async fn delete_user_sessions(&self, _: RoxUserIdStr<'static>) -> SessionResult<()> {
         panic!("not a routine capability")
     }
     async fn session_deleted(&self, _: AgentSessionId) -> SessionResult<()> {
@@ -150,7 +150,7 @@ impl AgentSessionNotificationRecipient for Controls {
         _: AgentSessionId,
         _: AgentActionId,
         _: String,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         panic!("not a routine capability")
     }
@@ -158,7 +158,7 @@ impl AgentSessionNotificationRecipient for Controls {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         panic!("not a routine capability")
     }
@@ -166,7 +166,7 @@ impl AgentSessionNotificationRecipient for Controls {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         panic!("not a routine capability")
     }
@@ -187,7 +187,7 @@ struct Apps(Arc<Mutex<Vec<String>>>);
 impl ConnectedApps for Apps {
     async fn connected_app_slugs(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
     ) -> anyhow::Result<Vec<String>> {
         Ok(self.0.lock().unwrap().clone())
     }
@@ -390,8 +390,8 @@ async fn validation_does_not_open_runtime_and_preparation_reauthorizes() {
     }
 }
 
-fn other_owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("other@example.com").unwrap()
+fn other_owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("other@example.com").unwrap()
 }
 
 #[tokio::test]
@@ -429,7 +429,7 @@ async fn rejects_mismatched_external_owner_bot_session_and_model() {
         let mut response = fx.session.clone();
         match field {
             "owner" => response.owner_id = Owner::User(other_owner()),
-            "bot" => response.bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7()),
+            "bot" => response.bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7()),
             "session" => response.id = AgentSessionId::new(),
             "model" => response.model = "wrong-model".into(),
             _ => unreachable!(),
@@ -466,7 +466,7 @@ async fn every_subsequent_operation_checks_owner_and_persona_before_controls_or_
         if change_owner {
             action.owner = other_owner();
         } else {
-            action.bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+            action.bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
         }
         assert_eq!(
             fx.service.status(action.clone()).await.unwrap_err(),
@@ -833,7 +833,7 @@ fn log_frame(
     content["type"] = serde_json::json!("acp");
     content["jsonrpc"] = serde_json::json!("2.0");
     crate::domain::model::StoredAgentSessionLog {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         created_at: chrono::Utc::now(),
         entry: agent_fold::testing::parse_log(
             &serde_json::json!({"direction": direction, "content": content}).to_string(),

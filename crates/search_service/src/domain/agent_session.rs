@@ -1,7 +1,7 @@
 //! Search scoping uses current grants, including shared channel sessions.
 
 use agent_session::domain::search::AgentSessionSearchMetadata;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use rootcause::Report;
 use uuid::Uuid;
 
@@ -12,7 +12,7 @@ mod test;
 pub(crate) trait AgentSessionSearchSource {
     fn accessible(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         requested: &[Uuid],
     ) -> impl Future<Output = Result<Vec<AgentSessionSearchMetadata>, Report>> + Send;
 }
@@ -23,7 +23,7 @@ pub(crate) struct AgentSessionSearchService<S>(pub S);
 impl<S: AgentSessionSearchSource> AgentSessionSearchService<S> {
     pub async fn scope(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         requested: &[Uuid],
         owners: &[String],
         enabled: bool,

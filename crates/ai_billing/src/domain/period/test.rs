@@ -18,14 +18,14 @@ fn billing_identities_and_rollout_configuration_are_validated() {
     assert!(invalid.validate().is_err());
 }
 
-struct Bindings(Option<Vec<MacroUserIdStr<'static>>>);
+struct Bindings(Option<Vec<RoxUserIdStr<'static>>>);
 
 impl PeriodBindingSource for Bindings {
     async fn seats(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: &SubscriptionPeriod,
-    ) -> Result<Option<Vec<MacroUserIdStr<'static>>>> {
+    ) -> Result<Option<Vec<RoxUserIdStr<'static>>>> {
         Ok(self.0.clone())
     }
 }
@@ -49,7 +49,7 @@ impl PeriodRepo for Observations {
 
 #[tokio::test]
 async fn unresolved_bindings_are_quarantined_without_inventing_seats() {
-    let payer = MacroUserIdStr::try_from("macro|payer@example.com".to_owned()).unwrap();
+    let payer = RoxUserIdStr::try_from("macro|payer@example.com".to_owned()).unwrap();
     for bindings in [None, Some(vec![])] {
         let repo = Observations::default();
         let service = PeriodService::new(Bindings(bindings), repo.clone(), rollout()).unwrap();
@@ -59,7 +59,7 @@ async fn unresolved_bindings_are_quarantined_without_inventing_seats() {
         assert!(!observations[0].1);
         assert_eq!(observations[0].0.payer, payer);
     }
-    let seat = MacroUserIdStr::try_from("macro|seat@example.com".to_owned()).unwrap();
+    let seat = RoxUserIdStr::try_from("macro|seat@example.com".to_owned()).unwrap();
     let repo = Observations::default();
     let service =
         PeriodService::new(Bindings(Some(vec![seat.clone()])), repo.clone(), rollout()).unwrap();

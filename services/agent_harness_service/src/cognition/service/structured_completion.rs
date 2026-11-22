@@ -6,7 +6,7 @@ use agent::{
 };
 use ai_usage::{AiFeature, UsageContext, UsageRecorder};
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 use std::{future::Future, sync::Arc, time::Duration};
 use tokio::sync::Semaphore;
@@ -47,7 +47,7 @@ pub enum ToolFreeCompletionError {
 pub trait ToolFreeCompletion: Send + Sync + 'static {
     async fn complete(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: ToolFreeRequest,
     ) -> Result<Value, ToolFreeCompletionError>;
 }
@@ -106,7 +106,7 @@ impl ToolFreeCompletionService {
 impl ToolFreeCompletion for ToolFreeCompletionService {
     async fn complete(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: ToolFreeRequest,
     ) -> Result<Value, ToolFreeCompletionError> {
         let recorder = self.recorder.clone();

@@ -11,11 +11,11 @@ use axum::{
     extract::{FromRef, FromRequest, FromRequestParts, Request},
     http::request::Parts,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
     OptionalMacroAuthorizationExtractor,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::de::DeserializeOwned;
 use tracing::Level;
 
@@ -49,8 +49,8 @@ where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -74,7 +74,7 @@ where
 
         if matches!(
             authorization.authorization.as_ref(),
-            Some(MacroAuthorization::Internal(None))
+            Some(RoxAuthorization::Internal(None))
         ) {
             return Ok(Self {
                 entity_access_receipt: project_access_receipt(
@@ -88,16 +88,16 @@ where
             });
         }
 
-        let macro_user_id = match authorization.authorization.as_ref() {
-            Some(MacroAuthorization::User(user))
-            | Some(MacroAuthorization::Internal(Some(user))) => Some(user.macro_user_id.clone()),
-            Some(MacroAuthorization::Bot(_))
-            | Some(MacroAuthorization::Harness(_))
-            | Some(MacroAuthorization::Internal(None))
+        let rox_user_id = match authorization.authorization.as_ref() {
+            Some(RoxAuthorization::User(user))
+            | Some(RoxAuthorization::Internal(Some(user))) => Some(user.rox_user_id.clone()),
+            Some(RoxAuthorization::Bot(_))
+            | Some(RoxAuthorization::Harness(_))
+            | Some(RoxAuthorization::Internal(None))
             | None => None,
         };
 
-        if let Some(ref user_id) = macro_user_id
+        if let Some(ref user_id) = rox_user_id
             && project_context.user_id.is_user(user_id)
         {
             return Ok(Self {
@@ -112,7 +112,7 @@ where
             });
         }
 
-        if let Some(MacroAuthorization::Bot(bot)) = authorization.authorization.as_ref() {
+        if let Some(RoxAuthorization::Bot(bot)) = authorization.authorization.as_ref() {
             let entity_access_receipt = generate_bot_entity_access_receipt::<T>(
                 service.as_ref(),
                 bot,
@@ -148,7 +148,7 @@ where
         }
 
         let entity_access_receipt =
-            get_project_access_receipt(service.as_ref(), macro_user_id, &project_context.id)
+            get_project_access_receipt(service.as_ref(), rox_user_id, &project_context.id)
                 .await?;
 
         Ok(Self {
@@ -267,8 +267,8 @@ where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
     V: DeserializeOwned,
 {
@@ -301,7 +301,7 @@ enum ProjectBodyAccessOutcome<T: RequiredPermission, V> {
 async fn extract_project_body_access<T, V, Svc>(
     req: Request,
     service: Arc<Svc>,
-    authorization: Option<MacroAuthorization>,
+    authorization: Option<RoxAuthorization>,
 ) -> Result<ProjectBodyAccessOutcome<T, V>, ExtractorError>
 where
     T: RequiredPermission,
@@ -328,14 +328,14 @@ where
     }
 
     let entity_access_receipt = match authorization {
-        Some(MacroAuthorization::Internal(None)) => project_access_receipt(
+        Some(RoxAuthorization::Internal(None)) => project_access_receipt(
             project.id(),
             EntityAccessAuth::Internal,
             EntityPermission::AccessLevel {
                 access_level: AccessLevel::Owner,
             },
         ),
-        Some(MacroAuthorization::Bot(bot)) => {
+        Some(RoxAuthorization::Bot(bot)) => {
             generate_bot_entity_access_receipt::<T>(
                 service.as_ref(),
                 &bot,
@@ -344,11 +344,11 @@ where
             )
             .await?
         }
-        Some(MacroAuthorization::User(user)) | Some(MacroAuthorization::Internal(Some(user))) => {
-            get_project_access_receipt(service.as_ref(), Some(user.macro_user_id), project.id())
+        Some(RoxAuthorization::User(user)) | Some(RoxAuthorization::Internal(Some(user))) => {
+            get_project_access_receipt(service.as_ref(), Some(user.rox_user_id), project.id())
                 .await?
         }
-        Some(MacroAuthorization::Harness(_)) => return Err(ExtractorError::Unauthorized),
+        Some(RoxAuthorization::Harness(_)) => return Err(ExtractorError::Unauthorized),
         None => get_project_access_receipt(service.as_ref(), None, project.id()).await?,
     };
 
@@ -361,11 +361,11 @@ where
 
 async fn get_project_access_receipt<T: RequiredPermission>(
     service: &impl EntityAccessService,
-    macro_user_id: Option<MacroUserIdStr<'static>>,
+    rox_user_id: Option<RoxUserIdStr<'static>>,
     project_id: &str,
 ) -> Result<EntityAccessReceipt<T>, ExtractorError> {
     let access_level = service
-        .get_access_level(macro_user_id.as_deref(), project_id, EntityType::Project)
+        .get_access_level(rox_user_id.as_deref(), project_id, EntityType::Project)
         .await
         .map_err(ExtractorError::from)?
         .ok_or(ExtractorError::Unauthorized)?;
@@ -373,7 +373,7 @@ async fn get_project_access_receipt<T: RequiredPermission>(
     if !permission.satisfies::<T>() {
         return Err(ExtractorError::Unauthorized);
     }
-    let auth = macro_user_id
+    let auth = rox_user_id
         .map(EntityAccessAuth::Authenticated)
         .unwrap_or(EntityAccessAuth::Unauthenticated);
 

@@ -22,11 +22,11 @@ futures = { workspace = true }
 reqwest = { workspace = true }
 database_env_vars = { path = "../../crates/database_env_vars" }
 doppler-config = { workspace = true }
-macro_aws_config = { path = "../../crates/macro_aws_config" }
-macro_config = { path = "../../crates/macro_config" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env = { path = "../../crates/macro_env" }
-macro_service_urls = { path = "../../crates/macro_service_urls" }
+rox_aws_config = { path = "../../crates/rox_aws_config" }
+rox_config = { path = "../../crates/rox_config" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env = { path = "../../crates/rox_env" }
+rox_service_urls = { path = "../../crates/rox_service_urls" }
 nom = { workspace = true }
 rootcause = { workspace = true }
 rustls = { workspace = true }
@@ -46,7 +46,7 @@ external_chat = { path = "../../crates/external_chat", features = ["outbound"] }
 workspace-hack = { version = "0.1", path = "../../crates/workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../../crates/macro_db_migrator" }
+rox_db_migrator = { path = "../../crates/rox_db_migrator" }
 sha2 = { workspace = true }
 tracing-subscriber = { workspace = true }
 whatsapp_fake_server = { path = "../../crates/whatsapp_fake_server" }

@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use databases::domain::models::{DatabaseError, OpRefusal};
 use entity_access::domain::models::{EntityAccessReceipt, EntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{CellValue, CellWrite, ColumnId, ColumnKind, DatabaseId, RowId, TableId};
 use serde_json::json;
 use uuid::Uuid;
@@ -22,8 +22,8 @@ const MEETINGS: TableId = TableId::from_uuid(Uuid::from_u128(10));
 const TITLE: ColumnId = ColumnId::from_uuid(Uuid::from_u128(20));
 const DURATION: ColumnId = ColumnId::from_uuid(Uuid::from_u128(21));
 
-fn alice() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(ALICE).unwrap()
+fn alice() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(ALICE).unwrap()
 }
 
 fn alice_edits(database: DatabaseId) -> EntityAccessReceipt<EditAccessLevel> {

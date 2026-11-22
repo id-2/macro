@@ -3,15 +3,15 @@ import type {
   PairingDetails,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { Team } from '../teams/team';
 import { Harness } from './harness';
 
 /** A short lived host pairing, addressed by its displayed code. */
-export class HarnessPairing extends MacroEntity<PairingDetails> {
+export class HarnessPairing extends RoxEntity<PairingDetails> {
   /** Construct a lazy pairing from a pairing code. */
-  static byId(client: MacroClient, code: string): HarnessPairing {
+  static byId(client: RoxClient, code: string): HarnessPairing {
     return new HarnessPairing(client, code);
   }
 
@@ -54,13 +54,13 @@ export class HarnessPairing extends MacroEntity<PairingDetails> {
 /** Device side pairing identity. Keep the device secret outside the handle. */
 export class DevicePairing {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Pairing identifier. */
     readonly id: string,
   ) {}
 
   /** Construct the device side handle. */
-  static byId(client: MacroClient, id: string): DevicePairing {
+  static byId(client: RoxClient, id: string): DevicePairing {
     return new DevicePairing(client, id);
   }
 

@@ -78,7 +78,7 @@ describe('prepareEmailBody in Node, without a DOM', () => {
   });
   it('removes recognized quotes on fallback and restores the full body on request', () => {
     const input = {
-      html: '<p>New</p><div class="macro_quote">Old</div><div class="macro-email-signature">Me</div>',
+      html: '<p>New</p><div class="rox_quote">Old</div><div class="macro-email-signature">Me</div>',
     };
     expect(prepareEmailBody(input)).toMatchObject({
       html: '<p>New</p>',
@@ -151,7 +151,7 @@ describe('prepareEmailBody in Node, without a DOM', () => {
     'does not mistake a class containing %j for a signature or quote',
     (separator) => {
       const body = prepareEmailBody({
-        html: `<p class="gmail_signature${separator}main">Message body</p><div class="macro_quote${separator}main">More content</div>`,
+        html: `<p class="gmail_signature${separator}main">Message body</p><div class="rox_quote${separator}main">More content</div>`,
       });
       expect(body.html).toContain('Message body');
       expect(body.html).toContain('More content');

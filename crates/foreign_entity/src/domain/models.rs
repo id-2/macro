@@ -1,7 +1,7 @@
 //! Domain models for foreign entity records.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -109,7 +109,7 @@ pub enum ForeignEntityLookupCaller {
     /// An internally authenticated service with no acting user.
     Internal,
     /// An authenticated Rox user. Every candidate record is access checked.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
 }
 
 /// Errors that can occur during foreign entity operations.

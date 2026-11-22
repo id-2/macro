@@ -2,7 +2,7 @@
 //!
 //! Follows the canonical pattern in `documents/src/domain/events.rs`:
 //! per-variant metadata structs, a [`TopicEvent`] enum tagged by `event_type`,
-//! and a [`MacroEvent`] wrapper keyed by link (inbox) id.
+//! and a [`RoxEvent`] wrapper keyed by link (inbox) id.
 //!
 //! Every event is keyed by `link_id` so consumers get per-inbox total order:
 //! account lifecycle events are ordered against the inbox's content events,
@@ -31,9 +31,9 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroEmailTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxEmailTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -101,7 +101,7 @@ pub struct LinkConnectedMetadata {
     /// The id of the connected link (inbox).
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Address of the connected inbox.
     pub email_address: String,
     /// Email provider (e.g. `GMAIL`).
@@ -118,7 +118,7 @@ pub struct LinkDisconnectedMetadata {
     /// The id of the disconnected link.
     pub link_id: Uuid,
     /// The Rox user who owned the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Address of the disconnected inbox.
     pub email_address: String,
     /// Why the link was disconnected.
@@ -131,7 +131,7 @@ pub struct LinkReauthRequiredMetadata {
     /// The id of the link needing re-authentication.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Address of the inbox needing re-authentication.
     pub email_address: String,
     /// When the dead grant was observed.
@@ -144,7 +144,7 @@ pub struct MessageReceivedMetadata {
     /// The link (inbox) that received the message.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Rox's message row id.
     pub message_id: Uuid,
     /// Provider (Gmail) message id.
@@ -177,7 +177,7 @@ pub struct MessageDraftSyncedMetadata {
     /// The link (inbox) containing the draft.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Rox's message row id.
     pub message_id: Uuid,
     /// Provider (Gmail) message id.
@@ -196,10 +196,10 @@ pub struct MessageSentMetadata {
     /// The link (inbox) the message was sent from.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who sent the message; `None` when the send was
     /// first observed from the provider (sent from another client).
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's message row id.
     pub message_id: Uuid,
     /// Provider (Gmail) message id.
@@ -227,7 +227,7 @@ pub struct MessageDeletedMetadata {
     /// The link (inbox) the message belonged to.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Rox's message row id.
     pub message_id: Uuid,
     /// Provider (Gmail) message id.
@@ -242,9 +242,9 @@ pub struct MessageSendQueuedMetadata {
     /// The link (inbox) the message will be sent from.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who queued the send.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's message row id.
     pub message_id: Uuid,
     /// Rox's thread row id.
@@ -262,9 +262,9 @@ pub struct MessageSendCancelledMetadata {
     /// The link (inbox) the message would have been sent from.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who cancelled the send.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's message row id.
     pub message_id: Uuid,
     /// Rox's thread row id.
@@ -279,10 +279,10 @@ pub struct ThreadArchivedMetadata {
     /// The link (inbox) containing the thread.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who changed the state; `None` for
     /// provider-initiated changes.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's thread row id.
     pub thread_id: Uuid,
     /// New state: `true` = archived, `false` = moved back to the inbox.
@@ -297,10 +297,10 @@ pub struct ThreadTrashedMetadata {
     /// The link (inbox) containing the thread.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who changed the state; `None` for
     /// provider-initiated changes.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's thread row id.
     pub thread_id: Uuid,
     /// New state: `true` = trashed, `false` = restored.
@@ -315,10 +315,10 @@ pub struct ThreadReadMetadata {
     /// The link (inbox) containing the thread.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who changed the state; `None` for
     /// provider-initiated changes.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's thread row id.
     pub thread_id: Uuid,
     /// New state: `true` = read, `false` = unread.
@@ -333,10 +333,10 @@ pub struct ThreadStarredMetadata {
     /// The link (inbox) containing the thread.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who changed the state; `None` for
     /// provider-initiated changes.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's thread row id.
     pub thread_id: Uuid,
     /// New state: `true` = starred, `false` = unstarred.
@@ -351,10 +351,10 @@ pub struct ThreadSpamChangedMetadata {
     /// The link (inbox) containing the thread.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who changed the state; `None` for
     /// provider-initiated changes.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's thread row id.
     pub thread_id: Uuid,
     /// New state: `true` = marked spam, `false` = unmarked.
@@ -369,9 +369,9 @@ pub struct ThreadProjectChangedMetadata {
     /// The link (inbox) containing the thread.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who changed the project.
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
     /// Rox's thread row id.
     pub thread_id: Uuid,
     /// Project id before the change, when any.
@@ -392,10 +392,10 @@ pub struct ThreadLabelsUpdatedMetadata {
     /// The link (inbox) containing the thread.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The authenticated user who changed the labels; `None` for
     /// provider-initiated changes.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Rox's thread row id.
     pub thread_id: Uuid,
     /// Labels added to the thread's messages.
@@ -412,7 +412,7 @@ pub struct ThreadBackfilledMetadata {
     /// The link (inbox) containing the thread.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Rox's thread row id.
     pub thread_id: Uuid,
 }
@@ -423,14 +423,14 @@ pub struct ThreadsReindexRequestedMetadata {
     /// The link (inbox) containing the threads.
     pub link_id: Uuid,
     /// The Rox user who owns the link.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Thread row ids to reindex. Producers must chunk to at most 50 ids.
     pub thread_ids: Vec<Uuid>,
     /// Why the reindex was requested.
     pub reason: ThreadsReindexReason,
 }
 
-/// Events that can be published to [`MacroEmailTopic`].
+/// Events that can be published to [`RoxEmailTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum EmailTopicEvent {
@@ -524,12 +524,12 @@ pub enum EmailTopicEvent {
 }
 
 impl TopicEvent for EmailTopicEvent {
-    type Topic = MacroEmailTopic;
+    type Topic = RoxEmailTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroEmailTopic`], keyed by link (inbox) id.
+/// Publishable event for [`RoxEmailTopic`], keyed by link (inbox) id.
 pub struct EmailMacroEvent {
     key: String,
     event: Event<EmailTopicEvent>,
@@ -692,8 +692,8 @@ impl EmailMacroEvent {
     /// `thread_labels_updated` diff.
     pub fn thread_label_change(
         link_id: Uuid,
-        owner: MacroUserIdStr<'static>,
-        actor: Option<MacroUserIdStr<'static>>,
+        owner: RoxUserIdStr<'static>,
+        actor: Option<RoxUserIdStr<'static>>,
         thread_id: Uuid,
         label: LabelRef,
         added: bool,
@@ -780,7 +780,7 @@ impl EmailMacroEvent {
     }
 }
 
-impl MacroEvent for EmailMacroEvent {
+impl RoxEvent for EmailMacroEvent {
     type EventPayload = EmailTopicEvent;
 
     fn key(&self) -> &str {

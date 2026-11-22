@@ -5,7 +5,7 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 
 use agent_session::domain::model::AgentSessionId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::error::{HarnessError, Result};
 use crate::domain::ports::PromptMentions;
@@ -14,7 +14,7 @@ use crate::domain::ports::PromptMentions;
 /// fails every time. Finds nobody by default. Cloning shares one script.
 #[derive(Clone, Default)]
 pub struct PromptMentionsMock {
-    mentioned: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    mentioned: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
     failure: Arc<Mutex<Option<String>>>,
     prompts: Arc<Mutex<Vec<String>>>,
 }
@@ -27,7 +27,7 @@ impl PromptMentionsMock {
     }
 
     /// Answer every prompt with `users` from now on.
-    pub fn mentions(&self, users: Vec<MacroUserIdStr<'static>>) {
+    pub fn mentions(&self, users: Vec<RoxUserIdStr<'static>>) {
         *self
             .mentioned
             .lock()
@@ -56,9 +56,9 @@ impl PromptMentions for PromptMentionsMock {
     fn share_with_mentioned<'a>(
         &'a self,
         _session_id: AgentSessionId,
-        _actor: Option<&'a MacroUserIdStr<'static>>,
+        _actor: Option<&'a RoxUserIdStr<'static>>,
         prompt_markdown: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send + 'a>> {
         self.prompts
             .lock()
             .expect("mentions mock prompts lock should not be poisoned")

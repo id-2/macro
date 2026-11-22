@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::models::NotificationAction;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("user_notifications"))
 )]
 async fn persisted_transitions_match_domain_policy(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -76,7 +76,7 @@ async fn persisted_transitions_match_domain_policy(pool: Pool<Postgres>) -> Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn entity_updates_skip_noops_and_retries(pool: Pool<Postgres>) -> Result<(), Report> {
     let user = test_user("entity-transitions@test.com");
     let original_viewed_at = chrono::DateTime::parse_from_rfc3339("2020-01-01T00:00:00Z")
@@ -160,7 +160,7 @@ async fn entity_updates_skip_noops_and_retries(pool: Pool<Postgres>) -> Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("user_notifications"))
 )]
 async fn concurrent_seen_and_done_do_not_reopen(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -181,7 +181,7 @@ async fn concurrent_seen_and_done_do_not_reopen(pool: Pool<Postgres>) -> Result<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("user_notifications"))
 )]
 async fn done_without_a_view_is_not_digest_eligible(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -207,7 +207,7 @@ async fn done_without_a_view_is_not_digest_eligible(pool: Pool<Postgres>) -> Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("user_notifications"))
 )]
 async fn mark_seen_preserves_the_original_view_time(pool: Pool<Postgres>) -> Result<(), Report> {

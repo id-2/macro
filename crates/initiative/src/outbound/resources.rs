@@ -7,7 +7,7 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::property_value::PropertyValue;
 use properties::{PropertiesErr, PropertiesService};
 use std::{collections::HashMap, sync::Arc};
@@ -56,7 +56,7 @@ impl<P: PropertiesService, S: SystemPropertiesService, A: EntityAccessService> I
     }
     fn set_initial_properties(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         id: InitiativeId,
         values: Vec<InitialPropertyValue>,
     ) -> ResourceFuture<'_, ()> {

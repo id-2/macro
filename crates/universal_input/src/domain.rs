@@ -5,7 +5,7 @@ use ai_billing::{AiAdmissionError, AiAdmissionService};
 use ai_usage::{AiFeature, UsageContext};
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use jev::domain::{YesNoClassifier, YesNoQuestion};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -275,7 +275,7 @@ impl<C: YesNoClassifier, E: FieldExtractor> UniversalInputService<C, E> {
         fields(revision = input.revision, draft_chars = input.text.chars().count(), input.prompt_version = crate::telemetry::PROMPT_VERSION, input.recipe_version = crate::telemetry::RECIPE_VERSION))]
     pub async fn classify(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         input: ClassifyInputRequest,
     ) -> Result<ClassifyInputResponse, InputError> {
         validate_text(&input.text)?;
@@ -318,7 +318,7 @@ impl<C: YesNoClassifier, E: FieldExtractor> UniversalInputService<C, E> {
         fields(input.intent = input.intent.telemetry_name(), revision = input.revision, draft_chars = input.text.chars().count(), input.prompt_version = crate::telemetry::PROMPT_VERSION, input.recipe_version = crate::telemetry::RECIPE_VERSION))]
     pub async fn extract(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         input: ExtractInputRequest,
     ) -> Result<ExtractInputResponse, InputError> {
         validate_text(&input.text)?;

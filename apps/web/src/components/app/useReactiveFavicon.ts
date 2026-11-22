@@ -17,7 +17,7 @@ type BadgeMessage = {
 
 const badgeBus = createCrossTabBus<BadgeMessage>({
   channelName: 'macro-favicon-badge',
-  storageKey: 'macro.favicon-badge',
+  storageKey: 'rox.favicon-badge',
   parse: (value) =>
     match(value)
       .with({ hasBadge: P.boolean }, ({ hasBadge }) => ({ hasBadge }))

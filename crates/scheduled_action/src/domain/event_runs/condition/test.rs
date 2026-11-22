@@ -12,7 +12,7 @@ pub struct Content(pub Result<Value, &'static str>);
 impl EventContentReader for Content {
     async fn read(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &AuthorizedEventRun,
     ) -> Result<Value, Report> {
         self.0

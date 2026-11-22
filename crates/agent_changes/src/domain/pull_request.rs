@@ -6,7 +6,7 @@ use github_pull_requests::domain::models::{
     GithubPullRequestChangesError, GithubPullRequestDiffError,
 };
 use github_pull_requests::domain::ports::GithubPullRequestChangesets;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use super::error::ExtractError;
 use super::model::{ExtractedChangeset, PullRequestRef};

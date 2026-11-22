@@ -11,8 +11,8 @@ use axum::{
     routing::{get, post},
 };
 use external_chat::inbound::router::{ApiError, authority, no_store};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -23,7 +23,7 @@ pub struct WhatsAppRouterState<Auth> {
     /// Use cases.
     pub service: Arc<WhatsAppService>,
     /// Standard authentication provider.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<Auth> Clone for WhatsAppRouterState<Auth> {
@@ -35,7 +35,7 @@ impl<Auth> Clone for WhatsAppRouterState<Auth> {
     }
 }
 
-impl<Auth> FromRef<WhatsAppRouterState<Auth>> for MacroAuthorizationState<Auth> {
+impl<Auth> FromRef<WhatsAppRouterState<Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &WhatsAppRouterState<Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -72,7 +72,7 @@ pub struct LookupRequest {
 /// The caller's WhatsApp account, pairing and chat list, under `/whatsapp`.
 pub fn whatsapp_router<Auth, S>(state: WhatsAppRouterState<Auth>) -> Router<S>
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     no_store(
@@ -92,30 +92,30 @@ where
 
 /// The caller's own account.
 #[utoipa::path(get, path = "/whatsapp/account", operation_id = "whatsapp_account", responses((status = 200, body = AccountView)))]
-pub async fn account<Auth: MacroAuthorizationService>(
+pub async fn account<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
 ) -> Result<Json<AccountView>, ApiError> {
     Ok(Json(AccountView {
         account: state
             .service
-            .account(&auth.authorization.macro_user_id)
+            .account(&auth.authorization.rox_user_id)
             .await?,
     }))
 }
 
 /// Start or resume the caller's pairing transaction.
 #[utoipa::path(post, path = "/whatsapp/connect", operation_id = "whatsapp_connect", request_body = Connect, responses((status = 200, body = Pairing)))]
-pub async fn connect<Auth: MacroAuthorizationService>(
+pub async fn connect<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     Json(body): Json<Connect>,
 ) -> Result<Json<Pairing>, ApiError> {
     Ok(Json(
         state
             .service
             .connect(
-                &auth.authorization.macro_user_id,
+                &auth.authorization.rox_user_id,
                 body.replace,
                 authority(&auth.authorization),
             )
@@ -125,16 +125,16 @@ pub async fn connect<Auth: MacroAuthorizationService>(
 
 /// Poll the caller's pairing transaction, including its current QR code.
 #[utoipa::path(get, path = "/whatsapp/pairing/{id}", operation_id = "whatsapp_pairing", params(("id" = Uuid, Path)), responses((status = 200, body = PairState)))]
-pub async fn pairing<Auth: MacroAuthorizationService>(
+pub async fn pairing<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<PairState>, ApiError> {
     Ok(Json(
         state
             .service
             .pair_state(
-                &auth.authorization.macro_user_id,
+                &auth.authorization.rox_user_id,
                 id,
                 authority(&auth.authorization),
             )
@@ -144,15 +144,15 @@ pub async fn pairing<Auth: MacroAuthorizationService>(
 
 /// Cancel the caller's pairing transaction.
 #[utoipa::path(delete, path = "/whatsapp/pairing/{id}", operation_id = "whatsapp_cancel_pairing", params(("id" = Uuid, Path)), responses((status = 204)))]
-pub async fn cancel<Auth: MacroAuthorizationService>(
+pub async fn cancel<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, ApiError> {
     state
         .service
         .cancel(
-            &auth.authorization.macro_user_id,
+            &auth.authorization.rox_user_id,
             id,
             authority(&auth.authorization),
         )
@@ -162,16 +162,16 @@ pub async fn cancel<Auth: MacroAuthorizationService>(
 
 /// Forward the owner's WebAuthn assertion to the pairing replica.
 #[utoipa::path(post, path = "/whatsapp/pairing/{id}/passkey", operation_id = "whatsapp_passkey", params(("id" = Uuid, Path)), request_body = Object, responses((status = 204)))]
-pub async fn passkey<Auth: MacroAuthorizationService>(
+pub async fn passkey<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(id): Path<Uuid>,
     Json(body): Json<serde_json::Value>,
 ) -> Result<StatusCode, ApiError> {
     state
         .service
         .passkey(
-            &auth.authorization.macro_user_id,
+            &auth.authorization.rox_user_id,
             id,
             &body,
             authority(&auth.authorization),
@@ -182,16 +182,16 @@ pub async fn passkey<Auth: MacroAuthorizationService>(
 
 /// End the caller's observation consent.
 #[utoipa::path(post, path = "/whatsapp/disconnect", operation_id = "whatsapp_disconnect", request_body = DisconnectRequest, responses((status = 200, body = Disconnect)))]
-pub async fn disconnect<Auth: MacroAuthorizationService>(
+pub async fn disconnect<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     Json(body): Json<DisconnectRequest>,
 ) -> Result<Json<Disconnect>, ApiError> {
     Ok(Json(
         state
             .service
             .disconnect(
-                &auth.authorization.macro_user_id,
+                &auth.authorization.rox_user_id,
                 body.authorization_generation,
                 authority(&auth.authorization),
             )
@@ -202,14 +202,14 @@ pub async fn disconnect<Auth: MacroAuthorizationService>(
 /// The caller's WhatsApp chat list (groups and direct chats), newest
 /// activity first, with what can be added to Rox.
 #[utoipa::path(get, path = "/whatsapp/chats", operation_id = "whatsapp_chats", responses((status = 200, body = ChatList)))]
-pub async fn chats<Auth: MacroAuthorizationService>(
+pub async fn chats<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
 ) -> Result<Json<ChatList>, ApiError> {
     Ok(Json(
         state
             .service
-            .chats(&auth.authorization.macro_user_id)
+            .chats(&auth.authorization.rox_user_id)
             .await?,
     ))
 }
@@ -218,16 +218,16 @@ pub async fn chats<Auth: MacroAuthorizationService>(
 /// with it; poll the lookup until it is no longer `pending`. Found numbers
 /// join the chat list, so `POST /external-chats` adds them.
 #[utoipa::path(post, path = "/whatsapp/lookups", operation_id = "whatsapp_start_lookup", request_body = LookupRequest, responses((status = 200, body = Lookup)))]
-pub async fn start_lookup<Auth: MacroAuthorizationService>(
+pub async fn start_lookup<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     Json(body): Json<LookupRequest>,
 ) -> Result<Json<Lookup>, ApiError> {
     Ok(Json(
         state
             .service
             .lookup(
-                &auth.authorization.macro_user_id,
+                &auth.authorization.rox_user_id,
                 &body.phone_number,
                 authority(&auth.authorization),
             )
@@ -238,15 +238,15 @@ pub async fn start_lookup<Auth: MacroAuthorizationService>(
 /// Import earlier messages of the caller's chats that wait for their phone
 /// (`backfill.state` `waiting_for_phone`). WhatsApp must be open on the phone.
 #[utoipa::path(post, path = "/whatsapp/history-import", operation_id = "whatsapp_import_history", responses((status = 200, body = HistoryImport)))]
-pub async fn import_history<Auth: MacroAuthorizationService>(
+pub async fn import_history<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
 ) -> Result<Json<HistoryImport>, ApiError> {
     Ok(Json(
         state
             .service
             .import_history(
-                &auth.authorization.macro_user_id,
+                &auth.authorization.rox_user_id,
                 authority(&auth.authorization),
             )
             .await?,
@@ -255,16 +255,16 @@ pub async fn import_history<Auth: MacroAuthorizationService>(
 
 /// Poll the caller's phone-number lookup.
 #[utoipa::path(get, path = "/whatsapp/lookups/{id}", operation_id = "whatsapp_lookup", params(("id" = Uuid, Path)), responses((status = 200, body = Lookup)))]
-pub async fn lookup<Auth: MacroAuthorizationService>(
+pub async fn lookup<Auth: RoxAuthorizationService>(
     State(state): State<WhatsAppRouterState<Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Lookup>, ApiError> {
     Ok(Json(
         state
             .service
             .lookup_state(
-                &auth.authorization.macro_user_id,
+                &auth.authorization.rox_user_id,
                 id,
                 authority(&auth.authorization),
             )

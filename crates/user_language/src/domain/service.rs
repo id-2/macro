@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::Language;
 
 use crate::domain::models::UserLanguageError;
@@ -26,7 +26,7 @@ impl<R: UserLanguageRepo> UserLanguageService for UserLanguageServiceImpl<R> {
     #[tracing::instrument(err, skip_all)]
     async fn get_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<Language>, UserLanguageError> {
         self.repo
             .get_language(user_id)
@@ -38,7 +38,7 @@ impl<R: UserLanguageRepo> UserLanguageService for UserLanguageServiceImpl<R> {
     #[tracing::instrument(err, skip_all, fields(language = language.map(Language::as_str)))]
     async fn set_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         language: Option<Language>,
     ) -> Result<(), UserLanguageError> {
         let updated = self

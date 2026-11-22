@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::item_preferences::ItemNotificationPreference;
 use ai_toolset::schema::generate_validated_input_schema;
 use chrono::Duration;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use rootcause::Report;
 use std::sync::{Arc, Mutex};
@@ -19,12 +19,12 @@ struct RecordingRepository {
 }
 
 impl ItemNotificationPreferenceRepository for RecordingRepository {
-    async fn list(&self, _: MacroUserIdStr<'_>) -> Result<Vec<ItemNotificationPreference>, Report> {
+    async fn list(&self, _: RoxUserIdStr<'_>) -> Result<Vec<ItemNotificationPreference>, Report> {
         Ok(vec![])
     }
     async fn set(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entity: Entity<'_>,
         until: Option<DateTime<Utc>>,
     ) -> Result<(), Report> {
@@ -34,7 +34,7 @@ impl ItemNotificationPreferenceRepository for RecordingRepository {
             .push((user.to_string(), entity.entity_id.to_string(), until));
         Ok(())
     }
-    async fn remove(&self, user: MacroUserIdStr<'_>, entity: Entity<'_>) -> Result<(), Report> {
+    async fn remove(&self, user: RoxUserIdStr<'_>, entity: Entity<'_>) -> Result<(), Report> {
         self.removes
             .lock()
             .unwrap()
@@ -43,7 +43,7 @@ impl ItemNotificationPreferenceRepository for RecordingRepository {
     }
     async fn set_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
         until: Option<DateTime<Utc>>,
     ) -> Result<(), Report> {
@@ -54,7 +54,7 @@ impl ItemNotificationPreferenceRepository for RecordingRepository {
     }
     async fn remove_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
     ) -> Result<(), Report> {
         for entity in entities {
@@ -76,7 +76,7 @@ fn context() -> (
 }
 
 fn request() -> RequestContext {
-    RequestContext::new(MacroUserIdStr::try_from(USER.to_owned()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from(USER.to_owned()).unwrap())
 }
 
 fn tool(action: MuteAction, snooze_until: Option<DateTime<Utc>>) -> MuteNotifications {

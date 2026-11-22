@@ -11,7 +11,7 @@ Compatibility helpers for encrypted Microsoft OAuth envelopes in the legacy
 - Keep encryption, decryption, authorization, and OAuth policy in the caller.
 - Staged grant versions and refresh leases belong to
   `services/authentication_service/src/outbound/microsoft/`.
-- Schema changes belong in `../macro_db_client/migrations/`.
+- Schema changes belong in `../rox_db_client/migrations/`.
 
 ## Checks
 

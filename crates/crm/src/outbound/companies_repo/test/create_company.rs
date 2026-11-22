@@ -3,11 +3,11 @@ use crate::domain::companies_repo::CompaniesRepository;
 use crate::domain::model::CrmError;
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_inserts_company_and_domain(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -45,7 +45,7 @@ async fn create_company_inserts_company_and_domain(pool: PgPool) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_without_domain(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -64,7 +64,7 @@ async fn create_company_without_domain(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_name_overrides_directory_name(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -101,7 +101,7 @@ async fn create_company_name_overrides_directory_name(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_rejects_duplicate_domain(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -123,7 +123,7 @@ async fn create_company_rejects_duplicate_domain(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_allows_same_domain_on_another_team(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -141,7 +141,7 @@ async fn create_company_allows_same_domain_on_another_team(pool: PgPool) -> anyh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_company_is_available_without_email_consent(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -160,7 +160,7 @@ async fn create_company_is_available_without_email_consent(pool: PgPool) -> anyh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn populate_reuses_manually_created_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner = "macro|owner@example.com";
@@ -205,7 +205,7 @@ async fn populate_reuses_manually_created_company(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn soup_listing_uses_name_override(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -244,7 +244,7 @@ async fn soup_listing_uses_name_override(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn name_only_company_accepts_personal_email_without_inference(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -299,7 +299,7 @@ async fn name_only_company_accepts_personal_email_without_inference(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn name_only_company_does_not_require_contribution(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;

@@ -1,7 +1,7 @@
 use crate::domain::models::page::{ContactCursor, ContactPageSize};
 use crate::domain::ports::{ContactsPageRepository, UserPictureNotifier};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::{Report, report};
 use std::collections::HashSet;
 use tracing::Instrument as _;
@@ -25,8 +25,8 @@ pub struct FanoutSummary {
 /// beyond the user id (clients refetch the current picture), so the latest
 /// event for a user needs no more than one fan-out.
 pub fn coalesce_users(
-    users: impl IntoIterator<Item = MacroUserIdStr<'static>>,
-) -> Vec<MacroUserIdStr<'static>> {
+    users: impl IntoIterator<Item = RoxUserIdStr<'static>>,
+) -> Vec<RoxUserIdStr<'static>> {
     let mut seen = HashSet::new();
     users
         .into_iter()
@@ -55,7 +55,7 @@ impl<R: ContactsPageRepository, N: UserPictureNotifier> UserPictureFanout<R, N> 
     /// message per page, so memory and query cost stay constant however large
     /// the contact list is. A failed page aborts with an error; the caller may
     /// retry, which re-notifies earlier pages harmlessly (clients just refetch).
-    pub async fn fan_out(&self, user_id: &MacroUserIdStr<'_>) -> Result<FanoutSummary, Report> {
+    pub async fn fan_out(&self, user_id: &RoxUserIdStr<'_>) -> Result<FanoutSummary, Report> {
         let span = tracing::info_span!(
             "contacts.user_picture_fanout",
             user_id = %user_id.as_ref(),
@@ -78,7 +78,7 @@ impl<R: ContactsPageRepository, N: UserPictureNotifier> UserPictureFanout<R, N> 
         result
     }
 
-    async fn fan_out_pages(&self, user_id: &MacroUserIdStr<'_>) -> Result<FanoutSummary, Report> {
+    async fn fan_out_pages(&self, user_id: &RoxUserIdStr<'_>) -> Result<FanoutSummary, Report> {
         let mut summary = FanoutSummary::default();
         let mut cursor: Option<ContactCursor> = None;
         loop {

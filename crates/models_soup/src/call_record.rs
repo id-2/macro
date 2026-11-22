@@ -4,7 +4,7 @@ use item_filters::CallStatus;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-/// A Macro-account participant in a call record, as displayed in Soup.
+/// A Rox-account participant in a call record, as displayed in Soup.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
@@ -65,7 +65,7 @@ pub struct SoupCallRecord<T = ()> {
     /// Whether the requesting user attended this call. Kept for compatibility
     /// and derived from `status == ATTENDED`.
     pub attended: bool,
-    /// Macro-account participants in the call.
+    /// Rox-account participants in the call.
     pub participants: Vec<SoupCallRecordParticipant>,
     /// Non-account guests in the call.
     pub guests: Vec<SoupCallRecordGuest>,

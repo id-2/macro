@@ -6,8 +6,8 @@ use axum::{Json, extract::State};
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::ProjectBodyAccessLevelExtractorV2;
 use entity_registry::CreationPrincipalExtractor;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal, UserOrInternalCaller,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal, UserOrInternalCaller,
 };
 use model::document::response::CreateDocumentRequest;
 use model::document::{FileType, FileTypeExt};
@@ -44,7 +44,7 @@ use crate::domain::response::CreateDocumentResponse;
 pub async fn create_document_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
     CreationPrincipalExtractor { principal, .. }: CreationPrincipalExtractor<Auth>,
@@ -72,19 +72,19 @@ pub async fn create_document_handler<
 ///
 /// Creates a document owned by the calling or acting user. Only an internal
 /// caller may import an email attachment.
-#[tracing::instrument(skip(state, caller, project), fields(user_id=?caller.authorization.user.macro_user_id))]
+#[tracing::instrument(skip(state, caller, project), fields(user_id=?caller.authorization.user.rox_user_id))]
 pub async fn create_document_internal_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    caller: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     project: ProjectBodyAccessLevelExtractorV2<EditAccessLevel, CreateDocumentRequest, Svc, Auth>,
 ) -> Result<Json<CreateDocumentResponse>, DocumentError> {
     let req = project.into_inner();
     let is_internal = caller.authorization.caller == UserOrInternalCaller::Internal;
-    let user = caller.authorization.user.macro_user_id;
+    let user = caller.authorization.user.rox_user_id;
 
     let response_data = match req.email_attachment_id {
         Some(email_attachment_id) if is_internal => {

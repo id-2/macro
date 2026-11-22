@@ -12,7 +12,7 @@ use crate::domain::{
 };
 use crm::domain::service::NoOpCrmService;
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
-use macro_event_broker::NoopMacroEventBroker;
+use rox_event_broker::NoopMacroEventBroker;
 
 const PRIMARY_INBOX: Uuid = Uuid::from_u128(0xa1111111_1111_1111_1111_111111111111);
 const ALT_INBOX: Uuid = Uuid::from_u128(0xa2222222_2222_2222_2222_222222222222);
@@ -35,7 +35,7 @@ fn service(
         enqueuer: NoOpEnqueuer,
         crm_service: NoOpCrmService,
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        rox_event_broker: NoopMacroEventBroker,
         sent_undo_delay_secs: 0,
         sender_provider: std::sync::Arc::new(
             crate::domain::senders::UnavailableEmailSenderProvider,
@@ -46,8 +46,8 @@ fn service(
     }
 }
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 
 fn reply_to(replying_to_id: Uuid) -> SendingInboxRequest<'static> {
@@ -77,7 +77,7 @@ fn reply_input(replying_to_id: Uuid) -> CreateDraftInput {
         bcc: vec![],
         body_text: Some("Thanks".to_owned()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: None,
@@ -88,7 +88,7 @@ fn reply_input(replying_to_id: Uuid) -> CreateDraftInput {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn a_reply_is_sent_from_the_inbox_that_received_it(
@@ -130,7 +130,7 @@ async fn a_reply_is_sent_from_the_inbox_that_received_it(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn a_new_email_is_sent_from_the_primary_inbox(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -144,7 +144,7 @@ async fn a_new_email_is_sent_from_the_primary_inbox(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn an_explicit_sender_overrides_the_reply_target(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -166,7 +166,7 @@ async fn an_explicit_sender_overrides_the_reply_target(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn an_address_that_is_no_inbox_of_the_callers_is_refused(
@@ -202,7 +202,7 @@ async fn an_address_that_is_no_inbox_of_the_callers_is_refused(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn a_reply_target_the_caller_cannot_reach_falls_back_to_the_default(
@@ -219,7 +219,7 @@ async fn a_reply_target_the_caller_cannot_reach_falls_back_to_the_default(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_user_with_no_connected_inbox_cannot_send(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let Err(error) = service(pool)
         .resolve_sending_inbox_impl(caller(), SendingInboxRequest::default())
@@ -239,7 +239,7 @@ async fn a_user_with_no_connected_inbox_cannot_send(pool: Pool<Postgres>) -> any
 /// the two in the same inbox, but the accessible set still has to be passed
 /// through for the case where the user switches the sender by hand.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn a_reply_cannot_find_a_target_outside_the_inboxes_it_is_given(
@@ -280,7 +280,7 @@ async fn a_reply_cannot_find_a_target_outside_the_inboxes_it_is_given(
 /// A same-inbox reply is the ordinary case and must keep working: nothing
 /// about deriving the sender changes where it threads.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn a_reply_in_the_primary_inbox_still_resolves_to_it(
@@ -326,7 +326,7 @@ impl crate::domain::senders::EmailSenderProvider for AltInboxAliases {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn a_verified_alias_sends_from_its_inbox_under_the_alias(
@@ -369,7 +369,7 @@ async fn a_verified_alias_sends_from_its_inbox_under_the_alias(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn an_unverified_alias_is_refused_naming_its_inbox(
@@ -404,7 +404,7 @@ async fn an_unverified_alias_is_refused_naming_its_inbox(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_sending_inbox"))
 )]
 async fn an_address_that_is_no_alias_is_unknown_even_when_a_lookup_fails(

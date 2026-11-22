@@ -4,7 +4,7 @@ use crate::outbound::postgres::test::{
     OWNER, create_session, create_test_bot, insert_originating_thread_fixture, new_session,
     test_repo,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_permissions::share_permission::channel_share_permission::{
     UpdateChannelSharePermission, UpdateOperation,
 };
@@ -13,7 +13,7 @@ use sqlx::{PgPool, Row};
 async fn migrate_for_test(pool: &PgPool) {
     // Keep both colliding migration bodies in the isolated test database,
     // remapping only the mailbox migration's in-memory version.
-    let migrations = MACRO_DB_MIGRATIONS
+    let migrations = ROX_DB_MIGRATIONS
         .iter()
         .map(|migration| {
             let mut migration = migration.clone();
@@ -42,8 +42,8 @@ fn request() -> UpdateSharePermissionRequestV2 {
     }
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()
 }
 
 #[sqlx::test(migrations = false)]
@@ -82,7 +82,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
     assert_eq!(audits[0].get::<String, _>("result"), "success");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn existing_channel_grants_are_visible_before_settings_are_created(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -100,12 +100,12 @@ async fn existing_channel_grants_are_visible_before_settings_are_created(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settings_and_channel_grants_round_trip_without_promoting_viewers(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
     let session = create_session(&repo, new_session(bot, None, None)).await;
-    let channel = macro_uuid::generate_uuid_v7().to_string();
+    let channel = rox_uuid::generate_uuid_v7().to_string();
     let initial = repo.permissions(session.id).await.unwrap();
     assert_eq!(initial.link_share, None);
     assert_eq!(initial.channel_share_permissions, Some(vec![]));
@@ -187,7 +187,7 @@ async fn settings_and_channel_grants_round_trip_without_promoting_viewers(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn link_scopes_levels_and_resets_persist(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;

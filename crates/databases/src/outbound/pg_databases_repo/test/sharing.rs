@@ -4,10 +4,10 @@ use models_permissions::share_permission::channel_share_permission::{
     UpdateChannelSharePermission, UpdateOperation,
 };
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn database_channel_grants_can_be_changed_and_revoked_without_touching_owner(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
-    let channel_id = macro_uuid::generate_uuid_v7().to_string();
+    let channel_id = rox_uuid::generate_uuid_v7().to_string();
     for (operation, level) in [
         (UpdateOperation::Add, Some(AccessLevel::View)),
         (UpdateOperation::Replace, Some(AccessLevel::Edit)),
@@ -57,10 +57,10 @@ async fn database_channel_grants_can_be_changed_and_revoked_without_touching_own
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sharing_a_reference_does_not_downgrade_existing_channel_access(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
-    let channel_id = macro_uuid::generate_uuid_v7();
+    let channel_id = rox_uuid::generate_uuid_v7();
     repo.update_sharing(
         table.database_id,
         &[UpdateChannelSharePermission {

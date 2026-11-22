@@ -87,24 +87,24 @@ development CA as `just local`; trust `infra/local/certs/ca.pem` once on the
 machine running the browser. See the [certificate README](../../infra/local/certs/README.md).
 The visiting machine must resolve the hostname and reach that port. No Docker
 proxy or Tailscale is needed. Vite forwards hosted development API and WebSocket
-requests through `/__macro_dev/` on this same origin, so arbitrary machine
+requests through `/__rox_dev/` on this same origin, so arbitrary machine
 hostnames do not need to be added to the deployed CORS allowlist. Authentication
 cookies are scoped to the visiting hostname; sign in with an email code on that
 hostname rather than relying on an existing `.rox.one` cookie. Google/SSO
 redirects still use the hosted authentication service’s redirect allowlist, which
 does not currently include arbitrary development hostnames.
 
-Use `MACRO_DEV_HTTPS=false bun run dev` for an HTTP-only workflow. Tauri and the
+Use `ROX_DEV_HTTPS=false bun run dev` for an HTTP-only workflow. Tauri and the
 local stack's internal Vite server keep using HTTP automatically; the stack
 provides HTTPS through its proxy. Builds and preview servers are unchanged.
-`MACRO_DEV_PROXY=false` opts out of the hosted API proxy.
+`ROX_DEV_PROXY=false` opts out of the hosted API proxy.
 
 The dev server speaks HTTP/2, gzips module responses, and links each module's
 source map (`/@macro-sourcemap/<hash>.map`) instead of inlining it; browsers only
 fetch maps while DevTools is open. On a slow link this is the difference between
 ~100 MB and ~13 MB per load. Trust the CA rather than clicking through the
 certificate warning: Chrome caches nothing from a site with a certificate error.
-`MACRO_DEV_COMPRESSION=false` and `MACRO_DEV_INLINE_SOURCEMAPS=true` restore
+`ROX_DEV_COMPRESSION=false` and `ROX_DEV_INLINE_SOURCEMAPS=true` restore
 Vite's defaults.
 
 ## Run the local stack
@@ -374,7 +374,7 @@ A `--no-doppler` stack supplies deterministic stubs for required configuration. 
 | Stripe billing | `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID` | Checkout and subscription endpoints fail. Signup skips Stripe and leaves profile billing unset, so free-team creation works. Only the required legacy account field stores a local placeholder. |
 | CloudFront signed URLs | `DOCUMENT_STORAGE_SERVICE_CLOUDFRONT_DISTRIBUTION_URL`, `DOCUMENT_STORAGE_SERVICE_CLOUDFRONT_SIGNER_PUBLIC_KEY_ID`, `DOCUMENT_STORAGE_SERVICE_CLOUDFRONT_SIGNER_PRIVATE_KEY` | Document download URLs are unsigned (fine against local S3) |
 
-The other stubbed keys (`REDIS_HOST`, `MACRO_DB_URL`, `INTERNAL_API_KEY`, `AUTHENTICATION_SERVICE_SECRET_KEY`, `ACCOUNT_LINK_STATE_SECRET`, `OPENSEARCH_USERNAME`, `OPENSEARCH_PASSWORD`) are internal plumbing with correct local values — you never need to override them.
+The other stubbed keys (`REDIS_HOST`, `ROX_DB_URL`, `INTERNAL_API_KEY`, `AUTHENTICATION_SERVICE_SECRET_KEY`, `ACCOUNT_LINK_STATE_SECRET`, `OPENSEARCH_USERNAME`, `OPENSEARCH_PASSWORD`) are internal plumbing with correct local values — you never need to override them.
 
 To turn on an integration, create a `local.env` with the real values. Then pass it
 to `run_local`:
@@ -435,7 +435,7 @@ APIs) and the browser-debugging workflow.
 For agent turns, use Tempo's TraceQL query
 `{span.gen_ai.operation.name="invoke_agent"}`. The session actor records the
 ACP prompt, output and tool activity on that trace and sends its context in
-`params._meta["macro.dev/trace-context"]`. Macro's in-process runtime restores
+`params._meta["rox.dev/trace-context"]`. Rox's in-process runtime restores
 that context so its model calls and backend work appear in the same trace.
 Other runtimes must explicitly consume this metadata to correlate their
 internal spans; their ACP activity is still traced by the session actor.
@@ -575,7 +575,7 @@ Instances on one machine do not share sessions, even though browsers ignore the
 port when they scope cookies. The HTTPS proxy stores each instance's cookies
 under its own prefix, after any `__Host-` or `__Secure-`
 (`macro-<instance>--local-macro-access-token`,
-`__Host-macro-<instance>--macro_mcp_oauth`). It forwards a service only that
+`__Host-macro-<instance>--rox_mcp_oauth`). It forwards a service only that
 instance's cookies, under their real names, so services and the app behave as
 usual on `localhost`, the machine hostname, a tailnet name, or a tunnel. Every
 other cookie stays in the browser: other instances' cookies, and unprefixed ones
@@ -633,7 +633,7 @@ An SSH forward to the HTTP Vite port still works for localhost-only access:
 `http://localhost:3000/app/`. HMR follows the page's host, port, and protocol.
 
 The launcher sets `VITE_LOCAL_BACKEND_ORIGIN=same-origin` and supplies Vite's
-server-only `MACRO_LOCAL_BACKEND_PROXY` and `MACRO_LOCAL_BACKEND_ROUTES` from the
+server-only `ROX_LOCAL_BACKEND_PROXY` and `ROX_LOCAL_BACKEND_ROUTES` from the
 selected instance and backend inventory. The proxy preserves paths, query
 strings, cookies, streaming responses and WebSocket upgrades. AI-editing and
 enabled browser telemetry also use same-origin paths. Bare `bun run dev` without
@@ -658,7 +658,7 @@ missing values fail startup with the variable name. With no attached fleet, omit
 `COMPUTERS_FLEET` and every `COMPUTERS_*` setting. Local orchestration emits none when
 computers are off. Each enrollment carries a typed deployment (agent harness,
 document storage, app and egress URLs) that the harness resolves through
-`macro_service_urls` when it issues the enrollment; xtask sets the harness's
+`rox_service_urls` when it issues the enrollment; xtask sets the harness's
 `OVERRIDE_*` values to the addresses the fleet's guests reach.
 
 `COMPUTER_RETENTION_DAYS` (default `14`) and `COMPUTER_PAST_DUE_GRACE_DAYS`
@@ -850,7 +850,7 @@ The Rust services are built on the host with one `cargo build` in the Nix shell,
 
 A Nix garbage collection can delete libraries a running stack's binaries use; rebuild with `r` or `just stack update` if a service then fails to start.
 
-A new worktree's first build reuses the registry dependencies another worktree on the machine already compiled. After a build, those dependencies are copied to `~/.cache/macro/local-deps/<key>` (override with `MACRO_LOCAL_DEP_CACHE_DIR`). The key covers `Cargo.lock`, the toolchain, the build arguments and the compiler flags. A build into a `target/` that has none of those dependencies yet, as in a new worktree, copies the matching entry in first and compiles little more than the workspace crates. A `target/` that already built some of them is left alone, since crates built in different worktrees can't be mixed. xtask builds itself into `target/xtask` so that it doesn't count. Cargo still checks every copied unit, so a stale one is rebuilt rather than used. The three most recently used entries are kept, at about 7 GB each. Delete the directory to drop them.
+A new worktree's first build reuses the registry dependencies another worktree on the machine already compiled. After a build, those dependencies are copied to `~/.cache/macro/local-deps/<key>` (override with `ROX_LOCAL_DEP_CACHE_DIR`). The key covers `Cargo.lock`, the toolchain, the build arguments and the compiler flags. A build into a `target/` that has none of those dependencies yet, as in a new worktree, copies the matching entry in first and compiles little more than the workspace crates. A `target/` that already built some of them is left alone, since crates built in different worktrees can't be mixed. xtask builds itself into `target/xtask` so that it doesn't count. Cargo still checks every copied unit, so a stale one is rebuilt rather than used. The three most recently used entries are kept, at about 7 GB each. Delete the directory to drop them.
 
 Press `r`, or run `just run_local rebuild`, to rebuild the binaries. Only services
 whose binary is newer than their container restart, so a build that failed partway
@@ -922,7 +922,7 @@ only localhost. `run_local rebuild` reuses the recorded file; pass it again to
 - Waits for the FusionAuth kickstart
 - Creates the search indices
 
-It saves these volumes as an init snapshot, and clean starts restore it. A detached start over existing volumes keeps them and doesn't use a snapshot. The snapshot is content-addressed and stored in `~/.cache/macro-local/stack-snapshots`, shared by every worktree and instance on the machine (`MACRO_STACK_SNAPSHOT_DIR` overrides it). Later runs restore the snapshot and skip the initialization. The key covers the migrations, compose files, search mappings and the FusionAuth kickstart, but not the instance's ports: each start writes its own redirect URLs into FusionAuth instead. An input change causes a cache miss and a normal full init — the key *is* the definition of clean state, so the full-delete/full-create guarantee is unchanged. Snapshots unused for 14 days are deleted when a new one is saved.
+It saves these volumes as an init snapshot, and clean starts restore it. A detached start over existing volumes keeps them and doesn't use a snapshot. The snapshot is content-addressed and stored in `~/.cache/macro-local/stack-snapshots`, shared by every worktree and instance on the machine (`ROX_STACK_SNAPSHOT_DIR` overrides it). Later runs restore the snapshot and skip the initialization. The key covers the migrations, compose files, search mappings and the FusionAuth kickstart, but not the instance's ports: each start writes its own redirect URLs into FusionAuth instead. An input change causes a cache miss and a normal full init — the key *is* the definition of clean state, so the full-delete/full-create guarantee is unchanged. Snapshots unused for 14 days are deleted when a new one is saved.
 
 Useful commands:
 
@@ -970,11 +970,11 @@ just reset_local --instance agent-a
 ### Finding out where a bring-up spent its time
 
 Every run prints its slowest stages before the summary. To compare runs, point
-`MACRO_LOCAL_TIMINGS` at a file — each run appends one JSON line of every stage
+`ROX_LOCAL_TIMINGS` at a file — each run appends one JSON line of every stage
 and its duration:
 
 ```bash
-MACRO_LOCAL_TIMINGS=/tmp/run-local-timings.jsonl just run_local
+ROX_LOCAL_TIMINGS=/tmp/run-local-timings.jsonl just run_local
 ```
 
 For the default instance, omit `--instance`.
@@ -986,7 +986,7 @@ send their timings to Loki and Tempo, as CI does, for the `Rox run_local`
 dashboard. This is on by default. To turn it off, either:
 
 ```bash
-export MACRO_LOCAL_TELEMETRY=off          # this shell, or put it in your profile
+export ROX_LOCAL_TELEMETRY=off          # this shell, or put it in your profile
 ```
 
 ```toml
@@ -994,7 +994,7 @@ export MACRO_LOCAL_TELEMETRY=off          # this shell, or put it in your profil
 enabled = false
 ```
 
-It is also off when `CI` is set (`MACRO_LOCAL_TELEMETRY=on` overrides that).
+It is also off when `CI` is set (`ROX_LOCAL_TELEMETRY=on` overrides that).
 Opted out, nothing is written or sent, and the next `--traces lgtm` bring-up
 stops sending [your stacks' telemetry](#your-stacks-telemetry-in-grafana-opt-in).
 
@@ -1082,7 +1082,7 @@ is tagged `host.name` = the machine name, `deployment.environment` = `local`
 second.
 
 **Turning it off.** Delete the line, set `services = false`, or turn local
-telemetry off (`MACRO_LOCAL_TELEMETRY=off`, `CI`): the next bring-up with
+telemetry off (`ROX_LOCAL_TELEMETRY=off`, `CI`): the next bring-up with
 `--traces lgtm` removes the forwarder, recreates the collector without the copy, and then removes the
 forwarder's copy of the token, which is kept mode 0600 in
 `~/.local/state/macro/local-telemetry/forwarder/` and mounted read-only. A

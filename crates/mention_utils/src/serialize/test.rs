@@ -1,4 +1,4 @@
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 use crate::parse::{ParsedDocumentMention, ParsedLink, ParsedUserMention, XmlTaggedParsed};
@@ -31,7 +31,7 @@ fn native_links_and_channels_round_trip_untrusted_labels() {
         let (rest, parsed) = ParsedDocumentMention::parse(&task).unwrap();
         assert!(rest.is_empty());
         assert_eq!(parsed.document_name, label);
-        let bot = bot_mention(bot_id::MACRO_AI_BOT_ID, label).unwrap();
+        let bot = bot_mention(bot_id::ROX_AI_BOT_ID, label).unwrap();
         let (rest, parsed) = ParsedUserMention::parse(&bot).unwrap();
         assert!(rest.is_empty());
         assert_eq!(parsed.email.as_deref(), Some(label));
@@ -105,7 +105,7 @@ fn channel_navigation_matches_lexical_field_names_and_defaults() {
 
 #[test]
 fn serializes_user_mention() {
-    let user_id = MacroUserIdStr::try_from_email("new.user@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("new.user@example.com").unwrap();
 
     assert_eq!(
         user_mention(&user_id).unwrap(),
@@ -116,7 +116,7 @@ fn serializes_user_mention() {
 #[test]
 fn serializes_bot_mention() {
     assert_eq!(
-        bot_mention(bot_id::MACRO_AI_BOT_ID, bot_id::MACRO_AI_NAME).unwrap(),
+        bot_mention(bot_id::ROX_AI_BOT_ID, bot_id::ROX_AI_NAME).unwrap(),
         "<m-user-mention>{\"userId\":\"bot|00000000-0000-0000-0000-00000000a1a1\",\"email\":\"Rox\"}</m-user-mention>"
     );
 }

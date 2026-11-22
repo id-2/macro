@@ -43,9 +43,9 @@ fn config_values() -> serde_json::Value {
         "PIPEDREAM_CLIENT_ID": "pipedream-client-id",
         "PIPEDREAM_CLIENT_SECRET": "pipedream-client-secret",
         "PIPEDREAM_PROJECT_ID": "pipedream-project-id",
-        "MACRO_API_TOKEN_PRIVATE_SECRET_KEY": "signing-secret-name",
+        "ROX_API_TOKEN_PRIVATE_SECRET_KEY": "signing-secret-name",
         "MCP_CREDENTIALS_KEY_SECRET_NAME": "mcp-secret-name",
-        "MACRO_API_TOKEN_ISSUER": "test-issuer",
+        "ROX_API_TOKEN_ISSUER": "test-issuer",
         "AGENT_SESSION_CHANGES_BUCKET": "test-bucket",
         "GITHUB_PULL_REQUEST_PATCH_BUCKET": "test-bucket",
         "GITHUB_SYNC_APP_CLIENT_ID": "github-client-id",
@@ -156,9 +156,9 @@ fn values() -> serde_json::Value {
         "PIPEDREAM_CLIENT_ID",
         "PIPEDREAM_CLIENT_SECRET",
         "PIPEDREAM_PROJECT_ID",
-        "MACRO_API_TOKEN_PRIVATE_SECRET_KEY",
+        "ROX_API_TOKEN_PRIVATE_SECRET_KEY",
         "MCP_CREDENTIALS_KEY_SECRET_NAME",
-        "MACRO_API_TOKEN_ISSUER",
+        "ROX_API_TOKEN_ISSUER",
         "AGENT_SESSION_CHANGES_BUCKET",
         "GITHUB_PULL_REQUEST_PATCH_BUCKET",
         "GITHUB_SYNC_APP_CLIENT_ID",
@@ -172,7 +172,7 @@ fn values() -> serde_json::Value {
 
 // Run the real environment loader in a child process so these complete, dummy
 // deployment configurations cannot race any other test's environment.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 struct FleetProbe {
     fleet_probe: Option<bool>,
@@ -180,7 +180,7 @@ struct FleetProbe {
 
 #[test]
 fn fleet_loader_process() {
-    let probe: FleetProbe = macro_config::load().unwrap();
+    let probe: FleetProbe = rox_config::load().unwrap();
     if probe.fleet_probe != Some(true) {
         return;
     }

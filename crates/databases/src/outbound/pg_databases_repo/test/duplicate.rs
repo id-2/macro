@@ -4,8 +4,8 @@
 use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessReceipt, EntityPermission, EntityType, ViewAccessLevel,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::views::{LaneKey, NewView, ViewLayout, ViewQuery};
 use models_databases::{
     CellValue, CellWrite, ColumnChange, ColumnKind, DatabaseOp, NewColumn, OpResult, OptionRef,
@@ -26,8 +26,8 @@ use crate::domain::ports::{CellStore, ColumnDefinitionStore, DatabasesService};
 
 const DUPLICATOR: &str = "macro|duplicator@rox.one";
 
-fn duplicator() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(DUPLICATOR)
+fn duplicator() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(DUPLICATOR)
         .unwrap()
         .into_owned()
 }
@@ -59,7 +59,7 @@ fn inserted(results: &[OpResult]) -> Vec<RowId> {
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_duplicate_copies_tables_columns_rows_relations_and_boards(pool: PgPool) {
     let guests = guests(&pool).await;
     insert_named_user(&pool, DUPLICATOR).await;
@@ -313,7 +313,7 @@ async fn a_duplicate_copies_tables_columns_rows_relations_and_boards(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_refused_duplicate_leaves_no_database_behind(pool: PgPool) {
     let guests = guests(&pool).await;
     insert_named_user(&pool, DUPLICATOR).await;

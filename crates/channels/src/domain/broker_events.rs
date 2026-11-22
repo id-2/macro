@@ -2,16 +2,16 @@
 //!
 //! Follows the canonical pattern in `documents/src/domain/events.rs`:
 //! per-variant metadata structs, a [`TopicEvent`] enum tagged by `event_type`,
-//! and a [`MacroEvent`] wrapper keyed by channel id.
+//! and a [`RoxEvent`] wrapper keyed by channel id.
 
 #[cfg(test)]
 mod test;
 
 use channel_sender::ChannelSender;
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroChannelsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxChannelsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -42,13 +42,13 @@ pub struct ChannelCreatedMetadata {
     pub actor: ChannelSender<'static>,
     /// User the actor created the channel for, when the actor is a bot.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
     /// Type of channel that was created.
     pub channel_type: ChannelType,
     /// Stored channel name; `None` for direct message / unnamed channels.
     pub channel_name: Option<String>,
     /// Active participants after creation (including the owner).
-    pub participant_user_ids: Vec<MacroUserIdStr<'static>>,
+    pub participant_user_ids: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Metadata for [`ChannelTopicEvent::Updated`].
@@ -58,7 +58,7 @@ pub struct ChannelUpdatedMetadata {
     /// The id of the updated channel.
     pub channel_id: Uuid,
     /// The user who updated the channel.
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
     /// Stored channel name before the update.
     pub previous_name: Option<String>,
     /// New channel name.
@@ -72,7 +72,7 @@ pub struct ChannelPictureChangedMetadata {
     /// Channel whose picture changed.
     pub channel_id: Uuid,
     /// User who changed the picture.
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
 }
 
 /// Metadata for [`ChannelTopicEvent::Deleted`].
@@ -128,7 +128,7 @@ pub struct ChannelParticipantAddedMetadata {
     /// self-service join.
     pub added_by: ChannelSender<'static>,
     /// Users added by this mutation.
-    pub added_user_ids: Vec<MacroUserIdStr<'static>>,
+    pub added_user_ids: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Metadata for [`ChannelTopicEvent::ParticipantRemoved`].
@@ -141,9 +141,9 @@ pub struct ChannelParticipantRemovedMetadata {
     pub channel_type: ChannelType,
     /// Actor who removed the participants; equals the sole removed user for a
     /// self-service leave.
-    pub removed_by: MacroUserIdStr<'static>,
+    pub removed_by: RoxUserIdStr<'static>,
     /// Users removed by this mutation.
-    pub removed_user_ids: Vec<MacroUserIdStr<'static>>,
+    pub removed_user_ids: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Metadata for [`ChannelTopicEvent::AccessRequested`].
@@ -155,14 +155,14 @@ pub struct ChannelAccessRequestedMetadata {
     /// The attempt; channel participants read its current outcome by id.
     pub request_id: Uuid,
     /// Person asking to join.
-    pub requester_id: MacroUserIdStr<'static>,
+    pub requester_id: RoxUserIdStr<'static>,
     /// The requester's profile name when they asked, if they had one. Absent
     /// on events from before it was added.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub requester_name: Option<String>,
 }
 
-/// Events that can be published to [`MacroChannelsTopic`].
+/// Events that can be published to [`RoxChannelsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 #[cfg_attr(feature = "schema", derive(utoipa::ToSchema))]
@@ -191,12 +191,12 @@ pub enum ChannelTopicEvent {
 }
 
 impl TopicEvent for ChannelTopicEvent {
-    type Topic = MacroChannelsTopic;
+    type Topic = RoxChannelsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroChannelsTopic`], keyed by channel id.
+/// Publishable event for [`RoxChannelsTopic`], keyed by channel id.
 pub struct ChannelMacroEvent {
     key: String,
     event: Event<ChannelTopicEvent>,
@@ -263,7 +263,7 @@ impl ChannelMacroEvent {
     }
 }
 
-impl MacroEvent for ChannelMacroEvent {
+impl RoxEvent for ChannelMacroEvent {
     type EventPayload = ChannelTopicEvent;
 
     fn key(&self) -> &str {

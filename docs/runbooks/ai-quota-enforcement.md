@@ -190,7 +190,7 @@ returned as errors (the app asks the buyer to try again), never reported as a
 declined card; the row keeps any invoice it opened, so the next attempt retries
 it. If the collector dies after Stripe finalized an invoice but before the row
 recorded it, the `invoice.paid` webhook matches the row by the
-`macro_reload_id` stamped on the invoice and books the credits; such a stale
+`rox_reload_id` stamped on the invoice and books the credits; such a stale
 pending purchase stops counting toward the monthly limit after 10 minutes.
 Purchase credits are labelled `Credit purchase` in `ai_credit_ledger`. Automatic reloads and the settlement sweep
 only consider `kind = 'automatic'` rows. Before reserving, a purchase checks
@@ -206,7 +206,7 @@ collect them on top of the checkout payment; one Stripe collected first is
 booked instead. Checkout purchases are booked by the webhook and are not
 counted against the monthly limit. Each reload is one `ai_credit_reload` row reserved under the
 payer lock and collected as a one-off Stripe invoice stamped
-`macro_purpose = ai_credit_reload`; a paid invoice books an `ai_credit_ledger`
+`rox_purpose = ai_credit_reload`; a paid invoice books an `ai_credit_ledger`
 purchase, idempotent on the invoice id. A declined invoice stays pending, which
 blocks further reloads, until the Stripe webhook reports it paid (credits are
 booked) or failed (reloads are suspended). A provider failure marks the reload
@@ -401,8 +401,8 @@ No hosted configuration change or collection activation is authorized by this
 procedure. Operators must approve and record each release gate.
 
 1. **Compatible schema first.** Apply
-   [the default-false column migration](../../crates/macro_db_client/migrations/20260930145625_add_ai_usage_count_usage.sql)
-   and [the concurrent partial-index migration](../../crates/macro_db_client/migrations/20260930145626_ai_usage_counted_user_created_at_idx.sql).
+   [the default-false column migration](../../crates/rox_db_client/migrations/20260930145625_add_ai_usage_count_usage.sql)
+   and [the concurrent partial-index migration](../../crates/rox_db_client/migrations/20260930145626_ai_usage_counted_user_created_at_idx.sql).
    Keep the full analytics/old-service index. Verify historical rows and old
    inserts remain false. Verify `pg_index.indisvalid` and `pg_get_indexdef` for
    `ai_usage_counted_user_created_at_idx`: `(user_id, created_at DESC) WHERE

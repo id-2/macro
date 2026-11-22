@@ -1,6 +1,6 @@
 import type { CreatePairingRequest } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { AgentSession } from '../agent-sessions/agent-session';
 import { Agent } from '../agents/agent';
 import { Harness } from './harness';
@@ -12,7 +12,7 @@ import { DevicePairing, HarnessPairing } from './pairing';
  * @routing Use when listing, pairing or removing the machines (hosts) that run the user's agents; not changing an agent persona's setup (`macro.agents`).
  */
 export class HarnessNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a lazy host handle. */
   byId(id: string): Harness {

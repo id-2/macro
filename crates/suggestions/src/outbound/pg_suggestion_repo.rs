@@ -5,8 +5,8 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use sqlx::{PgConnection, PgPool};
 
@@ -84,7 +84,7 @@ impl PgSuggestionRepo {
     /// each plan uses its own index.
     async fn load(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         read: Read<'_>,
     ) -> Result<Vec<Suggestion>, PgSuggestionRepoError> {
         let mut tx = self.pool.begin().await?;
@@ -347,7 +347,7 @@ fn run(row: RunRow) -> Result<StoredRun, PgSuggestionRepoError> {
     Ok(StoredRun {
         session: row.session_id,
         suggestion: row.suggestion_id,
-        user: MacroUserIdStr::try_from(row.user_id)
+        user: RoxUserIdStr::try_from(row.user_id)
             .map_err(|_| PgSuggestionRepoError::Decode("a run's user".to_owned()))?,
         agent: row
             .agent_id
@@ -450,7 +450,7 @@ fn open_states() -> Vec<String> {
 /// lock, which this takes.
 async fn locked_room(
     conn: &mut PgConnection,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     generation: Uuid,
     limits: Limits,
 ) -> Result<Written, sqlx::Error> {
@@ -497,7 +497,7 @@ async fn insert_targets(
 
 async fn log(
     conn: &mut PgConnection,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     suggestion: Uuid,
     change: &Change,
 ) -> Result<(), sqlx::Error> {
@@ -536,7 +536,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn shown(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         done_since: DateTime<Utc>,
     ) -> Result<Vec<Suggestion>, Self::Err> {
         self.load(user, Read::Shown { done_since }).await
@@ -544,7 +544,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn feed_viewed_at(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<DateTime<Utc>>, Self::Err> {
         Ok(sqlx::query_scalar!(
             "SELECT viewed_at FROM suggestion_feed_view WHERE user_id = $1",
@@ -556,7 +556,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn feed_viewed(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         at: DateTime<Utc>,
     ) -> Result<(), Self::Err> {
         sqlx::query!(
@@ -573,7 +573,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn for_review(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         closed: u32,
     ) -> Result<Vec<Suggestion>, Self::Err> {
         self.load(
@@ -587,7 +587,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn suggestion(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<Option<Suggestion>, Self::Err> {
         Ok(self.load(user, Read::Id(id)).await?.into_iter().next())
@@ -595,7 +595,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn by_dedup_key(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         dedup_key: &str,
     ) -> Result<Option<Suggestion>, Self::Err> {
         Ok(self
@@ -841,7 +841,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn create(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         kind: &NewKind,
         content: &SuggestionContent,
@@ -914,7 +914,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn replace(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         content: &SuggestionContent,
         from: SuggestionState,
@@ -1008,7 +1008,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn set_state(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         from: &[SuggestionState],
         to: SuggestionState,
@@ -1045,7 +1045,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn set_draft(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         draft: &Target,
         preview: Option<&str>,
@@ -1090,7 +1090,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn set_state_as_shown(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         from: &[SuggestionState],
         to: SuggestionState,
@@ -1118,7 +1118,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn undismiss(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         dismissed_since: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -1180,7 +1180,7 @@ impl SuggestionRepo for PgSuggestionRepo {
                     .transpose()?;
                 Ok(OpenTarget {
                     suggestion: row.id,
-                    user: MacroUserIdStr::try_from(row.user_id)
+                    user: RoxUserIdStr::try_from(row.user_id)
                         .map_err(|_| PgSuggestionRepoError::Decode("a suggestion's user".to_owned()))?,
                     created_at: row.created_at,
                     reply: action == Some(EntityAction::Reply),
@@ -1199,7 +1199,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn resolve(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         reason: ResolveReason,
         now: DateTime<Utc>,

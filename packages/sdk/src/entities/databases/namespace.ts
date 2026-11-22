@@ -1,4 +1,4 @@
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { type CreateDatabaseOptions, Database } from './database';
 import {
   type DatabaseQueryOptions,
@@ -72,7 +72,7 @@ import { SavedQuery, type SaveQueryOptions } from './saved-query';
  * **Answers.** Answer a question about the data, or a request for a chart, with a saved live query block beside a sentence stating the answer, never with a block you wrote or edited yourself: run the `SELECT` with `database.query`, save exactly that SQL with `database.saveQuery` (or `macro.databases.saveQuery` when it spans databases), and put its `toBlock()` in the document. Restyle an answer with `withView`; to ask something else, save a new question. A query result, a saved question, and a document containing its block are different outcomes: say which happened.
  */
 export class DatabaseNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Run one SQL statement over the caller's visible databases. Writes execute once.

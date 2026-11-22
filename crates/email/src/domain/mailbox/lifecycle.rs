@@ -4,7 +4,7 @@
 
 use super::*;
 use crate::domain::models::UserProvider;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::pubsub::DeletionReason;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -27,7 +27,7 @@ pub enum InboxLifecycleError {
 }
 #[derive(Clone)]
 pub struct InboxActor {
-    pub macro_id: MacroUserIdStr<'static>,
+    pub rox_id: RoxUserIdStr<'static>,
     pub credential_owner: String,
 }
 
@@ -181,7 +181,7 @@ impl<R, E> InboxLifecycleService<R, E> {
 impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> InboxLifecycleService<R, E> {
     pub async fn remove(&self, actor: &InboxActor, link: Uuid) -> Result<(), InboxLifecycleError> {
         let snapshot = self.repo.snapshot(link).await?;
-        if !snapshot.accessible(actor.macro_id.as_ref()) {
+        if !snapshot.accessible(actor.rox_id.as_ref()) {
             return Err(InboxLifecycleError::Forbidden);
         }
         let decision = removal(&snapshot, actor);
@@ -200,7 +200,7 @@ impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> InboxLifecycleServic
         link: Uuid,
     ) -> Result<InboxResync, InboxLifecycleError> {
         let snapshot = self.repo.snapshot(link).await?;
-        if !snapshot.accessible(actor.macro_id.as_ref()) {
+        if !snapshot.accessible(actor.rox_id.as_ref()) {
             return Err(InboxLifecycleError::Forbidden);
         }
         if snapshot.disconnecting {
@@ -214,17 +214,17 @@ impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> InboxLifecycleServic
         // Detach custody before an owner disconnect makes subsequent removals
         // no-ops. Repository row order must not decide which cleanup runs.
         bindings.sort_unstable_by(|left, right| {
-            (left.link_id, left.kind, left.actor.macro_id.as_ref()).cmp(&(
+            (left.link_id, left.kind, left.actor.rox_id.as_ref()).cmp(&(
                 right.link_id,
                 right.kind,
-                right.actor.macro_id.as_ref(),
+                right.actor.rox_id.as_ref(),
             ))
         });
 
         // A self-custodian matches both roles, but still has only one removal.
         let mut seen_bindings = HashSet::new();
         bindings.retain(|binding| {
-            seen_bindings.insert((binding.link_id, binding.actor.macro_id.clone()))
+            seen_bindings.insert((binding.link_id, binding.actor.rox_id.clone()))
         });
 
         for DeletedUserBinding {
@@ -257,7 +257,7 @@ impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> InboxLifecycleServic
             return self.repo.ready_for_delete(link).await;
         }
         let actor = InboxActor {
-            macro_id: MacroUserIdStr::try_from(snapshot.owner.clone())
+            rox_id: RoxUserIdStr::try_from(snapshot.owner.clone())
                 .map_err(|_| InboxLifecycleError::Unavailable)?,
             credential_owner: snapshot.credential_owner.clone(),
         };
@@ -269,7 +269,7 @@ impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> InboxLifecycleServic
     pub async fn publish_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repo
-            .claim_effect(macro_uuid::generate_uuid_v7())
+            .claim_effect(rox_uuid::generate_uuid_v7())
             .await?
         else {
             return Ok(false);
@@ -281,12 +281,12 @@ impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> InboxLifecycleServic
 }
 
 fn removal(snapshot: &InboxLifecycleSnapshot, actor: &InboxActor) -> InboxRemoval {
-    if snapshot.owner == actor.macro_id.as_ref()
+    if snapshot.owner == actor.rox_id.as_ref()
         || (snapshot.promoted
             && !snapshot
                 .delegates
                 .iter()
-                .any(|delegate| delegate != actor.macro_id.as_ref()))
+                .any(|delegate| delegate != actor.rox_id.as_ref()))
     {
         return InboxRemoval::Disconnect;
     }
@@ -298,7 +298,7 @@ fn removal(snapshot: &InboxLifecycleSnapshot, actor: &InboxActor) -> InboxRemova
                 .custodians
                 .iter()
                 .find(|candidate| {
-                    candidate.actor_id != actor.macro_id.as_ref()
+                    candidate.actor_id != actor.rox_id.as_ref()
                         && snapshot.accessible(&candidate.actor_id)
                 })
                 .cloned()

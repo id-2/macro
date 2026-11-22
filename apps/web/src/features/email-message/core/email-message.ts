@@ -62,7 +62,7 @@ export interface EmailMessage {
   attachments_forwarded: EmailForwardedAttachment[];
   bcc: EmailContact[];
   body_html_sanitized?: string | null;
-  body_macro?: string | null;
+  body_rox?: string | null;
   body_replyless?: string | null;
   body_text?: string | null;
   cc: EmailContact[];

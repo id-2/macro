@@ -318,7 +318,7 @@ impl Forwarder {
         // Messages are read in the chat as the page names it; the page is
         // reported under the chat Rox knows (by phone number).
         let phone_chat = page.chat_jid.clone();
-        page.chat_jid = events::macro_chat(self.store.as_ref(), &page.chat_jid).await;
+        page.chat_jid = events::rox_chat(self.store.as_ref(), &page.chat_jid).await;
         let Some(client) = self.client.upgrade() else {
             return;
         };

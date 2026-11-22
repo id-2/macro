@@ -191,7 +191,7 @@ fn every_tool_schema_is_valid() {
 fn query_schema_teaches_the_dialect() {
     let validated =
         generate_validated_input_schema::<QueryDatabase>().expect("schema should validate");
-    for expected in ["row_id", "HAS", "DescribeDatabase", "macro.people"] {
+    for expected in ["row_id", "HAS", "DescribeDatabase", "rox.people"] {
         assert!(
             validated.description.contains(expected),
             "description is missing {expected}: {}",
@@ -312,7 +312,7 @@ async fn a_write_runs_as_the_agent_for_the_user_and_guards_its_base_versions() {
     let response = request
         .call(
             ServiceContext(
-                DatabasesSqlToolContext::new(sql(&world)).with_actor(bot_id::MACRO_AI_BOT_ID),
+                DatabasesSqlToolContext::new(sql(&world)).with_actor(bot_id::ROX_AI_BOT_ID),
             ),
             RequestContext::new(user(OWNER)),
         )
@@ -327,7 +327,7 @@ async fn a_write_runs_as_the_agent_for_the_user_and_guards_its_base_versions() {
         vec![AppliedOps {
             database: OFFSITE,
             level: AccessLevel::Owner,
-            acting_bot: Some(bot_id::MACRO_AI_BOT_ID),
+            acting_bot: Some(bot_id::ROX_AI_BOT_ID),
             ops: vec![DatabaseOp::Rows {
                 table: GUESTS,
                 change: RowsChange::Update {

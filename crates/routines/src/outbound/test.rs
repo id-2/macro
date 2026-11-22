@@ -149,7 +149,7 @@ async fn requests_forward_authenticated_identity_and_preserve_target_and_activat
         requests
     });
     let client = RoutineClient::new(&url, "test-internal-key").unwrap();
-    let user = MacroUserIdStr::parse_from_str("macro|routine@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|routine@example.com").unwrap();
     let config = RoutineConfiguration {
         name: "Check in".into(),
         triggers: vec![RoutineTrigger::Once {
@@ -256,7 +256,7 @@ async fn delete_and_run_now_call_the_owner_routes() {
         vec![("204 No Content", String::new()), ("200 OK", execution)],
     );
     let client = RoutineClient::new(&url, "test-internal-key").unwrap();
-    let user = MacroUserIdStr::parse_from_str("macro|routine@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|routine@example.com").unwrap();
 
     client
         .delete(&user, id)
@@ -282,7 +282,7 @@ async fn run_now_explains_an_exhausted_ai_allowance() {
     let url = format!("http://{}/scheduled-action", listener.local_addr().unwrap());
     let server = serve_responses(listener, vec![("402 Payment Required", "{}".to_owned())]);
     let client = RoutineClient::new(&url, "test-internal-key").unwrap();
-    let user = MacroUserIdStr::parse_from_str("macro|routine@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|routine@example.com").unwrap();
 
     let error = client
         .run_now(&user, Uuid::from_u128(7))
@@ -368,7 +368,7 @@ async fn create_rejections_carry_the_scheduler_reason() {
             .collect(),
     );
     let client = RoutineClient::new(&url, "test-internal-key").unwrap();
-    let user = MacroUserIdStr::parse_from_str("macro|routine@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|routine@example.com").unwrap();
     let config = RoutineConfiguration {
         name: "Stuck tickets".into(),
         triggers: vec![RoutineTrigger::Cron {

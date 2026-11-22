@@ -14,8 +14,8 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use favorites::domain::ports::{FavoriteView, FavoritesService};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document_storage_service_internal::{
     InitializeStarterDocsResponse, StarterDocHowToGuide,
 };
@@ -31,7 +31,7 @@ use system_properties::{PriorityOption, StatusOption, SystemPropertyKey};
 /// Also the name `get_starter_docs` resolves the guide by, so the two stay in
 /// sync from one definition.
 pub(in crate::api) const HOW_TO_GUIDE_NAME: &str = "Rox how to guide";
-const HOW_TO_GUIDE_TEMPLATE: &str = include_str!("./template/macro_how_to_guide.md");
+const HOW_TO_GUIDE_TEMPLATE: &str = include_str!("./template/rox_how_to_guide.md");
 
 /// A starter task the templates can mention. Mention tags embed the target's
 /// document id and name, which don't exist at authoring time, so templates
@@ -97,7 +97,7 @@ const STARTER_DOC_ID_NAMESPACE: uuid::Uuid =
 /// duplicate webhook delivery — computes the same id, so the primary key
 /// dedupes creation instead of a rerun seeding a document twice.
 pub(in crate::api) fn starter_doc_id(
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     document_name: &str,
 ) -> uuid::Uuid {
     uuid::Uuid::new_v5(
@@ -112,7 +112,7 @@ pub(in crate::api) fn starter_doc_id(
 /// rerun that got this far before failing) is reused, never duplicated.
 async fn resolve_docs_tag(
     state: &ApiContext,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
 ) -> Option<(uuid::Uuid, uuid::Uuid)> {
     let tag_set = state
         .properties_service
@@ -164,16 +164,16 @@ fn internal_error(message: &str) -> Response {
 /// favorites. Called by the authentication service when a new user signs up.
 /// Safe to retry: deterministic per-user ids dedupe concurrent duplicate
 /// deliveries, and a create conflict means that document was already seeded.
-#[tracing::instrument(skip(state, user_context), fields(user_id=?user_context.authorization.user.macro_user_id))]
+#[tracing::instrument(skip(state, user_context), fields(user_id=?user_context.authorization.user.rox_user_id))]
 pub async fn handler(
     State(state): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, Response> {
     tracing::info!("initialize starter docs");
 
-    let user_id = &user_context.authorization.user.macro_user_id;
+    let user_id = &user_context.authorization.user.rox_user_id;
     let system_for_user = &CreationPrincipal::BotForUser {
-        bot: bot_id::MACRO_SYSTEM_BOT_ID,
+        bot: bot_id::ROX_SYSTEM_BOT_ID,
         user: user_id.clone(),
     };
 
@@ -227,7 +227,7 @@ pub async fn handler(
         let receipt = state
             .entity_access_service
             .generate_bot_entity_access_receipt::<EditAccessLevel>(
-                bot_id::MACRO_SYSTEM_BOT_ID,
+                bot_id::ROX_SYSTEM_BOT_ID,
                 BotAccessScope::User {
                     user_id: user_id.clone(),
                     user_org_id: organization_id,
@@ -412,7 +412,7 @@ pub async fn handler(
         .conn_gateway_client
         .send_message(
             EntityType::User
-                .with_entity_str(user_context.authorization.user.macro_user_id.as_ref()),
+                .with_entity_str(user_context.authorization.user.rox_user_id.as_ref()),
             STARTER_DOCS_INITIALIZED_MESSAGE_TYPE.to_string(),
             serde_json::json!({}),
         )

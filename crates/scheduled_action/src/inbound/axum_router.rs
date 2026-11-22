@@ -27,12 +27,12 @@ use entity_access::domain::models::{EditAccessLevel, OwnerAccessLevel, ViewAcces
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::ScheduledActionAccessExtractor;
 use entity_registry::{CreationPrincipalExtractor, NonUserOwners, OwnedPurgeOutcome};
-use macro_authorization::{
-    InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
     UserOnly, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model::response::EmptyResponse;
 use model_entity::EntityAppearance;
 use model_owner::Owner;
@@ -144,7 +144,7 @@ impl From<ListedRun> for ExecutionRecordResponse {
 pub struct ScheduledActionRouterState<S, Svc, Auth> {
     pub service: Arc<S>,
     pub access_service: Arc<Svc>,
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Svc, Auth> Clone for ScheduledActionRouterState<S, Svc, Auth> {
@@ -164,7 +164,7 @@ impl<S, Svc, Auth> FromRef<ScheduledActionRouterState<S, Svc, Auth>> for Arc<Svc
 }
 
 impl<S, Svc, Auth> FromRef<ScheduledActionRouterState<S, Svc, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &ScheduledActionRouterState<S, Svc, Auth>) -> Self {
         state.authorization_state.clone()
@@ -187,7 +187,7 @@ pub fn scheduled_action_router<S, Svc, Auth, St>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Send + Sync,
 {
     Router::new()
@@ -243,12 +243,12 @@ where
 
 async fn delete_user_actions<S, Svc, Auth>(
     State(state): State<ScheduledActionRouterState<S, Svc, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
-    Path(user_id): Path<MacroUserIdStr<'static>>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
+    Path(user_id): Path<RoxUserIdStr<'static>>,
 ) -> Result<StatusCode, ScheduledActionApiError>
 where
     S: ScheduledActionService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state.service.delete_user_actions(user_id).await?;
     Ok(StatusCode::NO_CONTENT)
@@ -266,13 +266,13 @@ struct OwnerQuery {
 #[tracing::instrument(skip_all, fields(%id, owner.kind = ?owner.owner_type()))]
 async fn purge_owned_action<S, Svc, Auth>(
     State(state): State<ScheduledActionRouterState<S, Svc, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Path(id): Path<Uuid>,
     Query(OwnerQuery { owner }): Query<OwnerQuery>,
 ) -> StatusCode
 where
     S: ScheduledActionService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     match state.service.purge_owned_action(id, &owner).await {
         Ok(OwnedPurgeOutcome::Purged) => StatusCode::NO_CONTENT,
@@ -336,7 +336,7 @@ pub async fn check_action<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(CheckRoutineRequest { routine, created }) =
         body.map_err(ScheduledActionApiError::InvalidRequest)?;
@@ -380,7 +380,7 @@ pub async fn create_action<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(req) = body.map_err(ScheduledActionApiError::InvalidRequest)?;
     let created = match query.suggestion_id {
@@ -439,17 +439,17 @@ where
 )]
 pub async fn list_actions<S, Svc, Auth>(
     State(state): State<ScheduledActionRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(query): Query<ListActionsQuery>,
 ) -> Result<impl IntoResponse, ScheduledActionApiError>
 where
     S: ScheduledActionService + Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let actions = state
         .service
         .get_actions(
-            user.authorization.user.macro_user_id.clone(),
+            user.authorization.user.rox_user_id.clone(),
             query.include_events.unwrap_or(false),
             match (query.parent, query.include_children.unwrap_or(false)) {
                 (Some(parent), _) => ListScope::ChildrenOf(parent),
@@ -489,7 +489,7 @@ pub async fn get_action<S, Svc, Auth>(
 where
     S: ScheduledActionService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let action = state.service.get_action(&entity_access_receipt).await?;
     Ok(Json(action.into()))
@@ -522,7 +522,7 @@ pub async fn update_action<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(req) = body.map_err(ScheduledActionApiError::InvalidRequest)?;
     let updated = state
@@ -552,7 +552,7 @@ pub async fn set_appearance<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(appearance) = body.map_err(ScheduledActionApiError::InvalidRequest)?;
     Ok(Json(
@@ -590,7 +590,7 @@ pub async fn set_action_enabled<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(req) = body.map_err(ScheduledActionApiError::InvalidRequest)?;
     let action = state
@@ -623,7 +623,7 @@ pub async fn delete_action<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state.service.delete_action(entity_access_receipt).await?;
     Ok(StatusCode::NO_CONTENT)
@@ -655,7 +655,7 @@ pub async fn detach_action<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let action = state.service.detach_action(entity_access_receipt).await?;
     Ok(Json(ScheduledActionResponse::from(action)))
@@ -688,7 +688,7 @@ pub async fn execute_action<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let execution = state
         .service
@@ -720,7 +720,7 @@ pub async fn list_history<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let records = state
         .service
@@ -757,7 +757,7 @@ pub async fn list_code_upgrades<S, Svc, Auth>(
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let upgrades = state
         .service
@@ -789,13 +789,13 @@ pub struct CatalogQuery {
 )]
 pub async fn catalog<S, Svc, Auth>(
     State(state): State<ScheduledActionRouterState<S, Svc, Auth>>,
-    _user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    _user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(query): Query<CatalogQuery>,
 ) -> Json<Vec<CatalogEntry>>
 where
     S: ScheduledActionService + Send + Sync + 'static,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Json(state.service.catalog(query.timezone))
 }

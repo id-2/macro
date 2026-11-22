@@ -41,16 +41,16 @@ where
     E: BackfillEffects,
     C: BackfillCrm,
 {
-    let macro_user_id = link.macro_id.to_string();
+    let rox_user_id = link.rox_id.to_string();
 
     let team_id = ctx
         .crm
-        .get_team_id_for_user(&macro_user_id)
+        .get_team_id_for_user(&rox_user_id)
         .await
         .map_err(|e| {
             ProcessingError::Retryable(DetailedError {
                 reason: FailureReason::DatabaseQueryFailed,
-                source: anyhow::Error::from(e).context("Failed to look up team for link.macro_id"),
+                source: anyhow::Error::from(e).context("Failed to look up team for link.rox_id"),
             })
         })?;
 

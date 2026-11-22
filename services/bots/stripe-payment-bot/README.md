@@ -2,7 +2,7 @@
 
 Posts to every Rox channel containing the bot when Stripe reports a new
 payment or a subscription cancellation. It can be deployed from any Cloudflare
-account; it has no dependency on a Macro-owned Worker or domain.
+account; it has no dependency on a Rox-owned Worker or domain.
 
 The bot handles paid Checkout sessions, delayed payment methods, the first
 successful invoice after a free trial, `customer.subscription.deleted`, and
@@ -21,7 +21,7 @@ Stripe webhook ──POST /webhook──> Cloudflare Worker
 ```
 
 The destinations do not come from the Stripe event or Worker configuration.
-`MACRO_BOT_TOKEN` authenticates the SDK request, and every channel where that
+`ROX_BOT_TOKEN` authenticates the SDK request, and every channel where that
 bot is an active participant receives the notification. Adding or removing the
 bot from a channel changes the destinations automatically.
 
@@ -29,9 +29,9 @@ bot from a channel changes the destinations automatically.
 
 All deployment-specific values are Worker bindings:
 
-- `MACRO_BOT_TOKEN`: API key for a team-owned Macro bot.
-- `MACRO_ENV`: `dev`, `prod`, or `local`.
-- `MACRO_STORAGE_URL`: optional storage API base URL override for a custom
+- `ROX_BOT_TOKEN`: API key for a team-owned Rox bot.
+- `ROX_ENV`: `dev`, `prod`, or `local`.
+- `ROX_STORAGE_URL`: optional storage API base URL override for a custom
   Rox deployment.
 - `STRIPE_API_KEY`: restricted or secret Stripe API key.
 - `STRIPE_WEBHOOK_SECRET`: signing secret for this deployment's Stripe webhook
@@ -42,8 +42,8 @@ All deployment-specific values are Worker bindings:
 From this directory:
 
 ```bash
-printf '%s' 'mbot_...' | wrangler secret put MACRO_BOT_TOKEN
-printf '%s' 'prod' | wrangler secret put MACRO_ENV
+printf '%s' 'mbot_...' | wrangler secret put ROX_BOT_TOKEN
+printf '%s' 'prod' | wrangler secret put ROX_ENV
 printf '%s' 'rk_live_...' | wrangler secret put STRIPE_API_KEY
 printf '%s' 'whsec_...' | wrangler secret put STRIPE_WEBHOOK_SECRET
 bun run deploy
@@ -53,7 +53,7 @@ For a nonstandard Rox storage endpoint, also set:
 
 ```bash
 printf '%s' 'https://your-storage-api.example.com' | \
-  wrangler secret put MACRO_STORAGE_URL
+  wrangler secret put ROX_STORAGE_URL
 ```
 
 `STRIPE_API_KEY` can be a restricted key with read access to subscriptions and

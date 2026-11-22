@@ -169,7 +169,7 @@ export const enableEntityAppearance = defineFlag({
  */
 export const macroConnect = defineFlag({
   key: 'macro-connect',
-  env: 'ENABLE_MACRO_CONNECT',
+  env: 'ENABLE_ROX_CONNECT',
 });
 
 /** HTML artifact nodes on Canvas, including running their scripts in a sandbox. */
@@ -210,7 +210,7 @@ export const enableSlackArchiveImport = defineFlag({
  */
 export const enableMacroComputers = defineFlag({
   key: 'enable-macro-computers',
-  env: 'ENABLE_MACRO_COMPUTERS',
+  env: 'ENABLE_ROX_COMPUTERS',
 });
 
 /**
@@ -490,8 +490,8 @@ export const ENABLE_PR_DISCUSSION_INPUT = defineFlag({
   default: false,
 }).enabled;
 
-export const USE_MACRO_PR_SUMMARY_BLOCK = defineFlag({
-  env: 'USE_MACRO_PR_SUMMARY_BLOCK',
+export const USE_ROX_PR_SUMMARY_BLOCK = defineFlag({
+  env: 'USE_ROX_PR_SUMMARY_BLOCK',
   default: true,
 }).enabled;
 

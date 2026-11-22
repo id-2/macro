@@ -1,10 +1,10 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 async fn insert_link(pool: &Pool<Postgres>, link_id: Uuid) {
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
         link_id,
         "macro|cleanup@corp.test",
@@ -15,7 +15,7 @@ async fn insert_link(pool: &Pool<Postgres>, link_id: Uuid) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_candidates_dedupes_pairs(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     insert_link(&pool, link_id).await;
@@ -40,7 +40,7 @@ async fn insert_candidates_dedupes_pairs(pool: Pool<Postgres>) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_candidates_refreshes_created_at_on_repeat(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -68,7 +68,7 @@ async fn insert_candidates_refreshes_created_at_on_repeat(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_candidates_empty_is_noop(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     insert_link(&pool, link_id).await;
@@ -80,7 +80,7 @@ async fn insert_candidates_empty_is_noop(pool: Pool<Postgres>) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_candidates_page_keyset_survives_deletes(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     insert_link(&pool, link_id).await;
@@ -110,7 +110,7 @@ async fn list_candidates_page_keyset_survives_deletes(pool: Pool<Postgres>) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_candidates_page_respects_max_id_snapshot(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     insert_link(&pool, link_id).await;
@@ -128,7 +128,7 @@ async fn list_candidates_page_respects_max_id_snapshot(pool: Pool<Postgres>) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn claim_candidate_is_idempotent(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     insert_link(&pool, link_id).await;

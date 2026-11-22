@@ -13,7 +13,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     pub(super) async fn copy_into_calendar(
@@ -53,7 +53,7 @@ where
             ));
         }
         // A channel share shares the meeting, not a way into its call.
-        let snapshot = source.snapshot().without_macro_call();
+        let snapshot = source.snapshot().without_rox_call();
         self.add_snapshot(requester_id, snapshot, calendar_id).await
     }
 
@@ -131,7 +131,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(

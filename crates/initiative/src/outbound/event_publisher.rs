@@ -1,6 +1,6 @@
 //! Initiative event publication through Rox's shared event broker.
 
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use std::{future::Future, pin::Pin};
 
 use crate::domain::{
@@ -20,7 +20,7 @@ impl<B> BrokerInitiativeEventPublisher<B> {
     }
 }
 
-impl<B: MacroEventBroker + 'static> InitiativeEventPublisher for BrokerInitiativeEventPublisher<B> {
+impl<B: RoxEventBroker + 'static> InitiativeEventPublisher for BrokerInitiativeEventPublisher<B> {
     /// Resolves once the broker has the event. Like document, chat and team events,
     /// delivery continues in the broker's own task, which logs failures, so a slow
     /// broker (bounded only by its publish timeout) never delays the mutation.

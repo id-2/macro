@@ -12,7 +12,7 @@ import {
   requestComputerSetup,
 } from '../primitives/setup-request';
 import { GetComputerEntry } from './get-computer-entry';
-import { MacroComputers } from './MacroComputers';
+import { RoxComputers } from './RoxComputers';
 
 /** Machines as Harness lays it out: Get a computer on top, the list below. */
 function Machines() {
@@ -20,7 +20,7 @@ function Machines() {
   return (
     <>
       <GetComputerEntry onGet={() => setBuying(true)} />
-      <MacroComputers
+      <RoxComputers
         harnesses={[]}
         buying={buying()}
         onBuyingChange={setBuying}
@@ -473,7 +473,7 @@ it('offers Finish setup until setup is done, and nothing once Claude is signed i
   };
   mocks.computers = [computer];
   const first = render(() => (
-    <MacroComputers
+    <RoxComputers
       harnesses={[harness]}
       buying={false}
       onBuyingChange={() => {}}
@@ -487,7 +487,7 @@ it('offers Finish setup until setup is done, and nothing once Claude is signed i
 
   mocks.computers = [{ ...computer, setupCompletedAt: '2026-01-02T00:00:00Z' }];
   const second = render(() => (
-    <MacroComputers
+    <RoxComputers
       harnesses={[harness]}
       buying={false}
       onBuyingChange={() => {}}
@@ -501,8 +501,8 @@ it('offers Finish setup until setup is done, and nothing once Claude is signed i
   second.unmount();
 
   render(() => (
-    <MacroComputers
-      harnesses={[{ ...harness, claude_mode: 'macro_credits' }]}
+    <RoxComputers
+      harnesses={[{ ...harness, claude_mode: 'rox_credits' }]}
       buying={false}
       onBuyingChange={() => {}}
     />

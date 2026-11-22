@@ -1,13 +1,13 @@
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use uuid::Uuid;
 
 use super::*;
 use crate::domain::models::{Action, CommonAction, PropertyChange};
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn activity(action: CommonAction) -> Activity {

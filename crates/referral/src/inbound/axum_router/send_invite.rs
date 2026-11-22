@@ -6,11 +6,11 @@ use axum::http::StatusCode;
 use axum::{Json, extract::State};
 use axum_extra::extract::Cached;
 use ip_extractor::ClientIp;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationRejection, MacroAuthorizationService,
-    MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationRejection, RoxAuthorizationService,
+    RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 use rate_limit::inbound::RateLimitExtractable;
 use rate_limit::{RateLimitConfig, RateLimitKey};
 use serde::Deserialize;
@@ -46,29 +46,29 @@ pub struct SendInviteBody {
 pub async fn post_referral_invite_handler<
     T: ReferralService,
     R,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ReferralRouterState<T, R, Auth>>,
-    Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Json(SendInviteBody { recipient }): Json<SendInviteBody>,
 ) -> Result<StatusCode, ReferralError> {
     let user = authorization.authorization.user;
     let () = state
         .service
-        .send_referral_invite(user.macro_user_id.clone(), recipient)
+        .send_referral_invite(user.rox_user_id.clone(), recipient)
         .await?;
 
     Ok(StatusCode::NO_CONTENT)
 }
 
 /// the rate limit definition for the per-user rate limit on referring new users
-pub struct PerUserReferralRateLimit<Auth>(MacroAuthorizationExtractor<Auth, UserOrInternal>);
+pub struct PerUserReferralRateLimit<Auth>(RoxAuthorizationExtractor<Auth, UserOrInternal>);
 
 impl<S, Auth> RateLimitExtractable<S> for PerUserReferralRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     fn config() -> rate_limit::RateLimitConfig {
         // The fixed window rate limit config for the number of invites a user can send to others
@@ -80,7 +80,7 @@ where
 
     fn key(&self) -> rate_limit::RateLimitKey {
         RateLimitKey::builder(&"per-user-referral")
-            .append(&self.0.authorization.user.macro_user_id.as_ref())
+            .append(&self.0.authorization.user.rox_user_id.as_ref())
             .finish()
     }
 }
@@ -88,16 +88,16 @@ where
 impl<S, Auth> FromRequestParts<S> for PerUserReferralRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
-    type Rejection = MacroAuthorizationRejection;
+    type Rejection = RoxAuthorizationRejection;
 
     async fn from_request_parts(
         parts: &mut axum::http::request::Parts,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>> =
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>> =
             parts.extract_with_state(state).await?;
         Ok(Self(authorization))
     }

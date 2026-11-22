@@ -57,7 +57,7 @@ async fn discovery_names_the_calendars_in_the_mailbox_time_zone() {
 }
 
 #[tokio::test]
-async fn a_mailbox_time_zone_macro_cannot_map_does_not_fail_discovery() {
+async fn a_mailbox_time_zone_rox_cannot_map_does_not_fail_discovery() {
     let (emulator, api) = start(SEED).await;
     emulator.set_time_zone(ADA, "Customized Time Zone").unwrap();
 
@@ -265,7 +265,7 @@ async fn a_secondary_calendar_is_read_as_a_view_of_its_occurrences() {
 }
 
 #[tokio::test]
-async fn one_event_macro_cannot_read_is_named_and_the_rest_still_reads() {
+async fn one_event_rox_cannot_read_is_named_and_the_rest_still_reads() {
     let (emulator, api) = start(SEED).await;
     let token = access_token(&emulator);
     let target = target(&emulator, ADA, "Calendar");

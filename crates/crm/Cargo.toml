@@ -8,7 +8,7 @@ version = "0.1.0"
 ai_tools = [
   "dep:ai_toolset",
   "dep:async-trait",
-  "dep:macro_user_id",
+  "dep:rox_user_id",
   "dep:models_properties",
   "dep:properties",
   "dep:schemars",
@@ -19,8 +19,8 @@ axum = [
   "dep:agent_correlation",
   "dep:axum",
   "dep:messages",
-  "dep:macro_authorization",
-  "dep:macro_uuid",
+  "dep:rox_authorization",
+  "dep:rox_uuid",
   "dep:model-error-response",
   "dep:models_pagination",
   "dep:utoipa",
@@ -33,13 +33,13 @@ axum = [
 call_link = [
   "dep:call",
   "dep:kafka_util",
-  "dep:macro_event_broker",
+  "dep:rox_event_broker",
   "dep:models_properties",
   "dep:rdkafka",
   "dep:rootcause",
   "dep:sqlx",
   "dep:tokio",
-  "macro_event_broker/outbound",
+  "rox_event_broker/outbound",
   "ports",
 ]
 default = ["ai_tools", "call_link", "inbound", "lookup", "outbound", "ports"]
@@ -50,7 +50,7 @@ outbound = [
   "dep:opentelemetry",
   "dep:tracing-opentelemetry",
   "dep:entity_access_db_utils",
-  "dep:macro_user_id",
+  "dep:rox_user_id",
   "dep:models_properties",
   "dep:properties",
   "dep:readonly_pool",
@@ -58,7 +58,7 @@ outbound = [
   "dep:unfurl",
   "ports",
 ]
-ports = ["dep:bot_id", "dep:csv", "dep:databases", "dep:futures", "dep:models_databases", "dep:models_permissions", "dep:models_properties", "dep:macro_user_id", "dep:macro_uuid", "dep:rootcause", "dep:utoipa", "dep:properties", "entity_access/ports"]
+ports = ["dep:bot_id", "dep:csv", "dep:databases", "dep:futures", "dep:models_databases", "dep:models_permissions", "dep:models_properties", "dep:rox_user_id", "dep:rox_uuid", "dep:rootcause", "dep:utoipa", "dep:properties", "entity_access/ports"]
 # Read-only CRM search (name/domain). Pulls only sqlx + ports — no
 # unfurl/axum — so search consumers stay lightweight.
 search = ["dep:sqlx", "ports"]
@@ -85,7 +85,7 @@ uuid = { workspace = true }
 call = { path = "../call", default-features = false, features = ["ports"], optional = true }
 entity_access = { path = "../entity_access", default-features = false }
 kafka_util = { path = "../kafka_util", optional = true }
-macro_event_broker = { path = "../macro_event_broker", default-features = false, optional = true }
+rox_event_broker = { path = "../rox_event_broker", default-features = false, optional = true }
 messages = { path = "../messages", default-features = false, features = ["ports"], optional = true }
 rdkafka = { workspace = true, optional = true }
 rootcause = { workspace = true, optional = true }
@@ -94,7 +94,7 @@ tokio = { workspace = true, optional = true }
 # AI toolset dependencies
 ai_toolset = { path = "../ai_toolset", optional = true }
 async-trait = { workspace = true, optional = true }
-macro_user_id = { path = "../macro_user_id", optional = true }
+rox_user_id = { path = "../rox_user_id", optional = true }
 models_properties = { path = "../models_properties", optional = true }
 properties = { path = "../properties", default-features = false, features = [
   "ports",
@@ -104,8 +104,8 @@ system_properties = { path = "../system_properties" }
 
 # Axum / inbound dependencies
 axum = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = ["axum"] }
-macro_uuid = { path = "../macro_uuid", optional = true }
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = ["axum"] }
+rox_uuid = { path = "../rox_uuid", optional = true }
 model-error-response = { path = "../model-error-response", optional = true }
 models_pagination = { path = "../models_pagination", optional = true }
 utoipa = { workspace = true, optional = true }
@@ -123,11 +123,11 @@ agent_correlation = { path = "../agent_correlation" }
 databases = { path = "../databases", features = ["postgres", "gateway"] }
 entity_access = { path = "../entity_access", default-features = false, features = ["outbound"] }
 harness_id = { path = "../harness_id" }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
 
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 messages = { path = "../messages", default-features = false, features = ["outbound", "test-utils"] }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model_user = { path = "../model_user" }
 properties = { path = "../properties", default-features = false, features = [
   "outbound",

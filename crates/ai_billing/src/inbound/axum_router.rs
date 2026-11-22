@@ -16,12 +16,12 @@ use axum::{
     routing::{get, patch, post},
 };
 use chrono::{DateTime, Utc};
-use macro_authorization::{
-    InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
     UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use teams::domain::model::SeatPlan;
@@ -255,7 +255,7 @@ pub struct AiBillingRouterState<B, P, Auth> {
     /// The pricing the host composed the billing service with.
     pub pricing: AiPricing,
     /// Authorization state for the request extractors.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<B, P, Auth> Clone for AiBillingRouterState<B, P, Auth> {
@@ -281,7 +281,7 @@ impl<B, P, Auth> FromRef<AiBillingRouterState<B, P, Auth>> for Arc<B> {
     }
 }
 
-impl<B, P, Auth> FromRef<AiBillingRouterState<B, P, Auth>> for MacroAuthorizationState<Auth> {
+impl<B, P, Auth> FromRef<AiBillingRouterState<B, P, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AiBillingRouterState<B, P, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -292,7 +292,7 @@ pub fn ai_billing_router<B, P, Auth, S>(state: AiBillingRouterState<B, P, Auth>)
 where
     B: BillingService,
     P: PaymentGateway,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -365,12 +365,12 @@ fn error_response(e: BillingError) -> Response {
     ),
     tag = "ai_billing"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn get_summary_handler<B: BillingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn get_summary_handler<B: BillingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<B>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Response {
-    let user_id = &user.authorization.user.macro_user_id;
+    let user_id = &user.authorization.user.rox_user_id;
     if let Err(e) = service.settle(user_id).await {
         // Collection problems show up in the snapshot; don't fail the read.
         tracing::warn!(error = ?e, "settlement before summary failed");
@@ -434,15 +434,15 @@ pub async fn get_plans_handler(State(pricing): State<AiPricing>) -> Json<PlanCat
     ),
     tag = "ai_billing"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn update_overage_handler<B: BillingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn update_overage_handler<B: BillingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<B>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<UpdateOverageRequest>,
 ) -> Response {
     match service
         .update_overage(
-            &user.authorization.user.macro_user_id,
+            &user.authorization.user.rox_user_id,
             req.enabled,
             req.limit_cents,
         )
@@ -471,15 +471,15 @@ pub async fn update_overage_handler<B: BillingService, Auth: MacroAuthorizationS
     ),
     tag = "ai_billing"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn update_auto_reload_handler<B: BillingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn update_auto_reload_handler<B: BillingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<B>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<UpdateAutoReloadRequest>,
 ) -> Response {
     match service
         .update_auto_reload(
-            &user.authorization.user.macro_user_id,
+            &user.authorization.user.rox_user_id,
             req.enabled,
             AutoReloadThresholds::from(&req),
         )
@@ -530,13 +530,13 @@ pub struct CreditPurchaseResponse {
     ),
     tag = "ai_billing"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id, cents = req.amount_cents))]
-pub async fn purchase_credits_handler<B: BillingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id, cents = req.amount_cents))]
+pub async fn purchase_credits_handler<B: BillingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<B>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<CreditPurchaseRequestBody>,
 ) -> Response {
-    let user_id = &user.authorization.user.macro_user_id;
+    let user_id = &user.authorization.user.rox_user_id;
     let purchase = match service.purchase_credits(user_id, req.amount_cents).await {
         Ok(purchase) => purchase,
         Err(e) => return error_response(e),
@@ -572,10 +572,10 @@ pub async fn purchase_credits_handler<B: BillingService, Auth: MacroAuthorizatio
     ),
     tag = "ai_billing"
 )]
-#[tracing::instrument(skip(service, user, req), fields(user_id = %user.authorization.user.macro_user_id, cents = req.amount_cents))]
-pub async fn create_credit_checkout_handler<B: BillingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user, req), fields(user_id = %user.authorization.user.rox_user_id, cents = req.amount_cents))]
+pub async fn create_credit_checkout_handler<B: BillingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<B>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
     Json(req): Json<CreditCheckoutRequestBody>,
 ) -> Response {
@@ -584,7 +584,7 @@ pub async fn create_credit_checkout_handler<B: BillingService, Auth: MacroAuthor
     }
     match service
         .create_credit_checkout(
-            &user.authorization.user.macro_user_id,
+            &user.authorization.user.rox_user_id,
             req.amount_cents,
             req.success_url,
             req.cancel_url,
@@ -612,12 +612,12 @@ pub async fn create_credit_checkout_handler<B: BillingService, Auth: MacroAuthor
     tag = "ai_billing"
 )]
 #[tracing::instrument(skip(service, _internal), fields(user_id = %req.user_id))]
-pub async fn settle_handler<B: BillingService, Auth: MacroAuthorizationService>(
+pub async fn settle_handler<B: BillingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<B>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Json(req): Json<SettleRequest>,
 ) -> Response {
-    let user_id = match MacroUserIdStr::try_from(req.user_id) {
+    let user_id = match RoxUserIdStr::try_from(req.user_id) {
         Ok(id) => id,
         Err(e) => {
             return (
@@ -660,13 +660,13 @@ pub async fn settle_handler<B: BillingService, Auth: MacroAuthorizationService>(
 #[tracing::instrument(skip(state, _internal))]
 pub async fn subscription_period_handler<B, P, Auth>(
     State(state): State<AiBillingRouterState<B, P, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Query(query): Query<SubscriptionPeriodQuery>,
 ) -> Response
 where
     B: BillingService,
     P: PaymentGateway,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     match state
         .payments

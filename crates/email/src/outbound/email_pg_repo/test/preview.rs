@@ -3,7 +3,7 @@ use super::*;
 // ── previews_for_view_cursor: sent routing ──────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_multi_inbox")
@@ -29,7 +29,7 @@ async fn test_sent_view_without_filter_routes_to_dynamic_multi_inbox(
     let results = repo
         .previews_for_view_cursor(
             query,
-            MacroUserIdStr::parse_from_str("macro|user1@test.com")?.to_owned(),
+            RoxUserIdStr::parse_from_str("macro|user1@test.com")?.to_owned(),
         )
         .await?;
 
@@ -49,7 +49,7 @@ async fn test_sent_view_without_filter_routes_to_dynamic_multi_inbox(
 // ── attachments_by_thread_ids ───────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_attachments_by_thread_ids_single_thread(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -76,7 +76,7 @@ async fn test_attachments_by_thread_ids_single_thread(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_attachments_by_thread_ids_multiple_threads(
@@ -98,7 +98,7 @@ async fn test_attachments_by_thread_ids_multiple_threads(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_attachments_by_thread_ids_no_attachments(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -156,7 +156,7 @@ fn index_conds(node: &serde_json::Value) -> String {
 /// keep reading attachments by message id however many messages a thread
 /// looks to hold.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_attachments_by_thread_ids_reads_attachments_by_message_id(
@@ -222,7 +222,7 @@ async fn test_attachments_by_thread_ids_reads_attachments_by_message_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_attachments_by_thread_ids_empty_input(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -237,7 +237,7 @@ async fn test_attachments_by_thread_ids_empty_input(pool: Pool<Postgres>) -> any
 // ── contacts_by_thread_ids ──────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_contacts_by_thread_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -271,7 +271,7 @@ async fn test_contacts_by_thread_ids(pool: Pool<Postgres>) -> anyhow::Result<()>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_contacts_by_thread_ids_no_from_contact(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -290,7 +290,7 @@ async fn test_contacts_by_thread_ids_no_from_contact(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_contacts_by_thread_ids_multiple_threads(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -323,7 +323,7 @@ async fn test_contacts_by_thread_ids_multiple_threads(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_contacts_by_thread_ids_empty_input(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -336,7 +336,7 @@ async fn test_contacts_by_thread_ids_empty_input(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn returned_thread_without_message_timestamps_has_created_at(
@@ -370,7 +370,7 @@ async fn returned_thread_without_message_timestamps_has_created_at(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_dynamic_query_multi_inbox")

@@ -6,8 +6,8 @@ use channels::{
     outbound::pg_channels_repo::PgChannelsRepo,
 };
 use database_env_vars::DatabaseUrl;
-use macro_entrypoint::MacroEntrypoint;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_entrypoint::RoxEntrypoint;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::postgres::PgPoolOptions;
 use teams::{domain::team_repo::TeamRepository, outbound::team_repo::TeamRepositoryImpl};
 
@@ -23,7 +23,7 @@ struct Progress {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     let database_url = DatabaseUrl::new().context("DATABASE_URL must be provided")?;
     let db = PgPoolOptions::new()
@@ -60,7 +60,7 @@ async fn main() -> anyhow::Result<()> {
                     continue;
                 }
             };
-            let owner = MacroUserIdStr::try_from(team_with_members.team.owner_id().to_string())
+            let owner = RoxUserIdStr::try_from(team_with_members.team.owner_id().to_string())
                 .context("team owner id is invalid")?;
             let roster = std::iter::once(owner)
                 .chain(

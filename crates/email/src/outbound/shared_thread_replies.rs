@@ -4,7 +4,7 @@ use entity_access::domain::{
     models::{AccessError, EditAccessLevel},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -32,7 +32,7 @@ impl<A: EntityAccessService + 'static> SharedThreadReplyAccess
 {
     fn reply_target_inbox<'a>(
         &'a self,
-        actor: &'a MacroUserIdStr<'static>,
+        actor: &'a RoxUserIdStr<'static>,
         message_id: Uuid,
     ) -> ReplyTargetInboxFuture<'a> {
         Box::pin(async move {

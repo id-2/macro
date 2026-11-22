@@ -1,11 +1,11 @@
 use super::*;
-use crate::config::{HarnessCredentials, MacroApi};
+use crate::config::{HarnessCredentials, RoxApi};
 use harness_id::HarnessId;
 use webhook::domain::models::WebhookFilter;
 
 fn test_client(storage_url: &str) -> EventStreamClient {
     EventStreamClient::new(
-        &MacroApi {
+        &RoxApi {
             egress_url: None,
             api_url: "http://unused".to_owned(),
             storage_url: storage_url.to_owned(),
@@ -56,7 +56,7 @@ async fn presence_check_tells_the_service_a_connection_is_held() {
 
     let request = server.await.unwrap();
     assert!(request.starts_with("get /harnesses/me "));
-    assert!(request.contains("x-macro-harness-runtime-connected: true"));
+    assert!(request.contains("x-rox-harness-runtime-connected: true"));
 }
 
 #[tokio::test]

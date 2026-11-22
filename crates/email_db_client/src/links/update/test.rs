@@ -1,16 +1,16 @@
 use super::*;
 use crate::links::get::fetch_link_by_id;
 use crate::links::insert::upsert_link;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::email::EmailStr;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::email::EmailStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::service::link::{Link, UserProvider};
 use sqlx::{Pool, Postgres};
 
 async fn insert_test_link(pool: &Pool<Postgres>, email: &str) -> anyhow::Result<Uuid> {
     let link = Link {
-        id: macro_uuid::generate_uuid_v7(),
-        macro_id: MacroUserIdStr::try_from(format!("macro|{email}"))?,
+        id: rox_uuid::generate_uuid_v7(),
+        rox_id: RoxUserIdStr::try_from(format!("macro|{email}"))?,
         fusionauth_user_id: "22222222-2222-2222-2222-222222222222".to_string(),
         email_address: EmailStr::try_from(email.to_string())?,
         provider: UserProvider::Gmail,
@@ -26,7 +26,7 @@ async fn insert_test_link(pool: &Pool<Postgres>, email: &str) -> anyhow::Result<
     Ok(inserted.id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_needs_reauth_is_edge_triggered(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let id = insert_test_link(&pool, "edge@reauth.test").await?;
 
@@ -43,7 +43,7 @@ async fn set_needs_reauth_is_edge_triggered(pool: Pool<Postgres>) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn clear_needs_reauth_resets_health(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let id = insert_test_link(&pool, "clear@reauth.test").await?;
 
@@ -57,7 +57,7 @@ async fn clear_needs_reauth_resets_health(pool: Pool<Postgres>) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_sync_status_skips_row_when_already_set(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let id = insert_test_link(&pool, "guard@sync.test").await?;
 
@@ -74,11 +74,11 @@ async fn update_sync_status_skips_row_when_already_set(pool: Pool<Postgres>) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_needs_reauth_on_missing_link_is_not_a_transition(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let missing = macro_uuid::generate_uuid_v7();
+    let missing = rox_uuid::generate_uuid_v7();
     assert!(!set_link_needs_reauth(&pool, missing).await?);
     Ok(())
 }

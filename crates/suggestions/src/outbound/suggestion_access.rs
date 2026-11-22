@@ -3,8 +3,8 @@
 
 use entity_access::domain::models::{AccessError, AccessLevel};
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use sqlx::PgPool;
 
@@ -39,7 +39,7 @@ impl<S: EntityAccessService> SuggestionAccess for EntitySuggestionAccess<S> {
 
     async fn can_view(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> Result<bool, Self::Err> {
         match self

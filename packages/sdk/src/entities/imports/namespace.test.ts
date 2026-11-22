@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 // Load the SDK first: documents/document.ts and tasks/task.ts import each other.
 import '../../macro';
 import type { ImportEntity } from '../../../generated/cognition/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
 import { Task } from '../tasks/task';
 import { ImportNamespace } from './namespace';
@@ -60,7 +60,7 @@ function importsClient() {
         };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, requests };
 }
 

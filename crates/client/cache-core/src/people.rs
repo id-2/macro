@@ -5,7 +5,7 @@ pub mod sql;
 pub mod sync;
 
 use crate::{engine::HydrationScope, value::EntityKey};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -57,7 +57,7 @@ pub struct PersonFactPatch {
         any(test, feature = "schema"),
         schemars(with = "String", length(min = 1, max = 1024))
     )]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Complete replacement of this person's local facts.
     pub facts: PersonFacts,
 }
@@ -126,7 +126,7 @@ pub struct PeopleSearch {
     pub query: String,
     /// Explicit exclusions, applied before ranking (for example self).
     #[cfg_attr(any(test, feature = "schema"), schemars(with = "Vec<String>", length(max = MAX_PEOPLE_BATCH)))]
-    pub excluded: Vec<MacroUserIdStr<'static>>,
+    pub excluded: Vec<RoxUserIdStr<'static>>,
     /// Retained wire input for older hosts; policy 5 has no domain boost.
     pub sender_domain: Option<String>,
     /// At most 500 winners.
@@ -148,7 +148,7 @@ pub struct PersonHit {
     pub record_key: EntityKey<'static>,
     /// Target user identity.
     #[cfg_attr(any(test, feature = "schema"), schemars(with = "String"))]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Visible resolved contact name, with local-part email fallback.
     pub name: String,
     /// Target email address.

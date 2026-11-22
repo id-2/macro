@@ -3,16 +3,16 @@ use agent_code_mode::domain::{
     CodeModeError, ExecutionCredentials, ExecutionIdentity, UserExecutionCredentials,
 };
 use agent_correlation::domain::{CorrelationRepository, SessionScope};
-use agent_egress::outbound::macro_mcp::{MacroApiTokenSigner, SignedCorrelation};
+use agent_egress::outbound::rox_mcp::{RoxApiTokenSigner, SignedCorrelation};
 use agent_inmem::domain::tool_gate::{NativeToolGate, NativeToolVerdict};
 use async_trait::async_trait;
 use code_execution::domain::{RunEnvironment, SdkEndpoints};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{collections::BTreeMap, sync::Arc};
 use tokio_util::sync::CancellationToken;
 
 pub struct RunCredentials {
-    pub signer: MacroApiTokenSigner,
+    pub signer: RoxApiTokenSigner,
     pub correlations: agent_correlation::outbound::PgCorrelationRepository,
     pub gate: Arc<dyn NativeToolGate>,
     pub endpoints: SdkEndpoints,
@@ -170,7 +170,7 @@ impl ExecutionCredentials for RunCredentials {
 /// tools give. The MCP client asks the user before each tool call, so there is
 /// no owner gate.
 pub struct UserRunCredentials {
-    pub signer: MacroApiTokenSigner,
+    pub signer: RoxApiTokenSigner,
     pub correlations: agent_correlation::outbound::PgCorrelationRepository,
     pub endpoints: SdkEndpoints,
     pub scopes: Arc<dyn SessionScopes>,
@@ -180,14 +180,14 @@ pub struct UserRunCredentials {
 impl UserExecutionCredentials for UserRunCredentials {
     async fn issue(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: &ai_toolset::ToolCaller,
         session: Option<uuid::Uuid>,
     ) -> Result<RunEnvironment, CodeModeError> {
         let agent = match caller {
             ai_toolset::ToolCaller::Agent(agent) => *agent,
             ai_toolset::ToolCaller::McpClient { .. } | ai_toolset::ToolCaller::ApiKey => {
-                bot_id::MACRO_AI_BOT_ID
+                bot_id::ROX_AI_BOT_ID
             }
         };
         let correlation = match session {
@@ -235,7 +235,7 @@ impl UserExecutionCredentials for UserRunCredentials {
 /// The current trace context, for the SDK to forward on authenticated requests.
 pub(crate) fn trace_headers() -> BTreeMap<String, String> {
     let mut headers = axum::http::HeaderMap::new();
-    macro_tower_layers::inject_trace_headers(&mut headers);
+    rox_tower_layers::inject_trace_headers(&mut headers);
     headers
         .iter()
         .filter_map(|(name, value)| {
@@ -247,7 +247,7 @@ pub(crate) fn trace_headers() -> BTreeMap<String, String> {
         .collect()
 }
 
-macro_env_var::env_var! { struct DocumentStorageServiceCloudfrontDistributionUrl; }
+rox_env_var::env_var! { struct DocumentStorageServiceCloudfrontDistributionUrl; }
 
 /// A host code mode's SDK reaches, named as the SDK names it. The test
 /// `every_sdk_host_holds_a_scoped_credential_to_its_scope` says how each
@@ -280,7 +280,7 @@ enum SdkHost {
 impl SdkHost {
     /// Its base URL in this environment.
     fn url(self) -> anyhow::Result<String> {
-        use macro_service_urls::*;
+        use rox_service_urls::*;
         Ok(match self {
             Self::DocumentContent => {
                 DocumentStorageServiceCloudfrontDistributionUrl::new()?.to_string()
@@ -312,7 +312,7 @@ pub fn sdk_endpoints() -> anyhow::Result<SdkEndpoints> {
         .collect::<anyhow::Result<_>>()?;
     Ok(SdkEndpoints {
         hosts,
-        web_app_url: macro_service_urls::AppServiceUrl::new()?.to_string(),
+        web_app_url: rox_service_urls::AppServiceUrl::new()?.to_string(),
     })
 }
 
@@ -325,7 +325,7 @@ async fn approve_run(
     identity: &ExecutionIdentity,
     source: &str,
     cancel: &CancellationToken,
-) -> Result<macro_user_id::user_id::MacroUserIdStr<'static>, CodeModeError> {
+) -> Result<rox_user_id::user_id::RoxUserIdStr<'static>, CodeModeError> {
     let args = serde_json::json!({"source": source, "acting_as": identity.acting_as, "turn_id": identity.turn});
     let verdict = tokio::select! {
         biased;

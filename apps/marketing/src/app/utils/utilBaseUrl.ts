@@ -46,7 +46,7 @@ const ATTRIBUTION_PARAMS = [
   'rdt_cid',
 ];
 
-const ATTRIBUTION_STORAGE_KEY = 'macro_attribution_params';
+const ATTRIBUTION_STORAGE_KEY = 'rox_attribution_params';
 
 // Captured at module load: SPA navigation drops the query string, but the CTA
 // click can come many route changes after the ad landing.

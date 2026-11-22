@@ -62,7 +62,7 @@ import {
  */
 export const LARGE_PASTE_CHAR_THRESHOLD = 1500;
 
-type MacroAppUrlParsed = {
+type RoxAppUrlParsed = {
   isValid: boolean;
   id: string | undefined;
   block: BlockName | BlockAlias | undefined;
@@ -80,7 +80,7 @@ const IgnoredParams = new Set(['referral_code']);
 
 const ValidBlockNames = [...BlockRegistry, ...BlockAliasRegistry];
 
-export function parseMacroAppUrl(text: string): MacroAppUrlParsed {
+export function parseMacroAppUrl(text: string): RoxAppUrlParsed {
   try {
     const url: URL = new URL(text);
     if (

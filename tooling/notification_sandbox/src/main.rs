@@ -8,9 +8,9 @@ use std::time::Duration;
 
 use email_formatting::EmailDigestNotification;
 use hmac::{Hmac, Mac};
-use macro_env::Environment;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_env::Environment;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::ChannelMessageSendMetadata;
 use notification::domain::models::email_notification_digest::ports::MessageId;
@@ -101,7 +101,7 @@ async fn main() -> Result<(), Report> {
     let user_email = inquire::Text::new("Recipient email?")
         .with_default("sandbox-user@test.com")
         .prompt()?;
-    let user_id = MacroUserIdStr::try_from_email(&user_email)?;
+    let user_id = RoxUserIdStr::try_from_email(&user_email)?;
 
     let queue = MpscQueue::new();
 
@@ -133,7 +133,7 @@ async fn main() -> Result<(), Report> {
         NotificationIngressService::new(sandbox_repo, queue.clone(), state_machine_a);
 
     // Egress: interactive mobile push, SES email, real state machine B
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
     let (prompt_tx, mut prompt_rx) = tokio::sync::mpsc::unbounded_channel::<PushPromptRequest>();
     let mobile_sender = match &config.sns_mode {
         SnsMode::Mock => SandboxMobileSender::Interactive(InteractiveMobileSender { prompt_tx }),
@@ -292,7 +292,7 @@ fn prompt_push_result(req: PushPromptRequest) {
 
 /// Create a notification via the ingress service. The background egress task delivers it.
 async fn run_notification_cycle<I: NotificationIngress>(
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     ingress: &I,
 ) -> Result<(), Report> {
     println!("\n--- Ingress: Creating notification ---\n");
@@ -302,7 +302,7 @@ async fn run_notification_cycle<I: NotificationIngress>(
             .with_entity_string(uuid::Uuid::now_v7().to_string()),
         secondary_notification_entity: None,
         notification: ChannelMessageSendMetadata {
-            sender: Some(MacroUserIdStr::try_from_email("fake-user@example.com").unwrap()),
+            sender: Some(RoxUserIdStr::try_from_email("fake-user@example.com").unwrap()),
             sender_display_name: None,
             message_content: "This is a message".to_string(),
             message_id: uuid::Uuid::now_v7().to_string(),
@@ -402,9 +402,9 @@ async fn poll_email_digests(egress: &impl NotificationEgress) -> Result<(), Repo
 
 /// Build sandbox device endpoints based on the config wizard.
 fn build_device_endpoints(
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     config: &SandboxConfig,
-) -> HashMap<MacroUserIdStr<'static>, Vec<DeviceEndpoint>> {
+) -> HashMap<RoxUserIdStr<'static>, Vec<DeviceEndpoint>> {
     let endpoints: Vec<DeviceEndpoint> = match &config.sns_mode {
         SnsMode::Mock => (1..=config.num_endpoints)
             .map(|i| {
@@ -451,7 +451,7 @@ async fn run_config_wizard() -> Result<SandboxConfig, Report> {
 
     let sns_mode = if sns_choice == "Real (AWS)" {
         let endpoint_arn = inquire::Text::new("SNS endpoint ARN?").prompt()?;
-        let aws_config = macro_aws_config::get_macro_aws_config().await;
+        let aws_config = rox_aws_config::get_rox_aws_config().await;
         SnsMode::Real {
             sns_client: aws_sdk_sns::Client::new(&aws_config),
             endpoint_arn,

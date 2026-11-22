@@ -4,8 +4,8 @@ use ai_billing::DisabledAiAdmissionService;
 use ai_toolset::{AsyncTool, RequestContext, ServiceContext};
 use ai_usage::{UsageEvent, UsageRecorder};
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::WebToolContext;
 use crate::domain::models::{
@@ -48,8 +48,8 @@ impl UsageRecorder for Recorder {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|web-tool@example.com".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|web-tool@example.com".to_owned()).unwrap()
 }
 
 #[tokio::test]

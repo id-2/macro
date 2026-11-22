@@ -4,7 +4,7 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
@@ -96,7 +96,7 @@ impl PgChannelLabelsRepo {
         &self,
         scope: &ChannelLabelsScope,
         label_id: Option<Uuid>,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
     ) -> Result<Vec<ChannelLabel>, ChannelLabelsRepoErr> {
         let scope_key = scope.key();
         // Section members see every viewable channel in their verified team;
@@ -176,7 +176,7 @@ impl ChannelLabelsRepo for PgChannelLabelsRepo {
     async fn list_labels(
         &self,
         scope: &ChannelLabelsScope,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
     ) -> Result<Vec<ChannelLabel>, Self::Err> {
         self.load_labels(scope, None, viewer).await
     }
@@ -186,7 +186,7 @@ impl ChannelLabelsRepo for PgChannelLabelsRepo {
         &self,
         scope: &ChannelLabelsScope,
         label_id: Uuid,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
     ) -> Result<Option<ChannelLabel>, Self::Err> {
         Ok(self.load_labels(scope, Some(label_id), viewer).await?.pop())
     }
@@ -197,7 +197,7 @@ impl ChannelLabelsRepo for PgChannelLabelsRepo {
         scope: &ChannelLabelsScope,
         name: &str,
         channel_ids: &[Uuid],
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         rule: Option<&ChannelLabelRule>,
     ) -> Result<LabelWriteOutcome, Self::Err> {
         let scope_key = scope.key();
@@ -262,7 +262,7 @@ impl ChannelLabelsRepo for PgChannelLabelsRepo {
         scope: &ChannelLabelsScope,
         label_id: Uuid,
         name: &str,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         rule: Option<&ChannelLabelRule>,
     ) -> Result<LabelWriteOutcome, Self::Err> {
         let scope_key = scope.key();
@@ -313,7 +313,7 @@ impl ChannelLabelsRepo for PgChannelLabelsRepo {
         target: &ChannelLabelsScope,
         label_id: Uuid,
         name: &str,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         rule: Option<&ChannelLabelRule>,
     ) -> Result<LabelWriteOutcome, Self::Err> {
         let source_key = source.key();
@@ -459,7 +459,7 @@ impl ChannelLabelsRepo for PgChannelLabelsRepo {
         scope: &ChannelLabelsScope,
         channel_id: Uuid,
         label_id: Option<Uuid>,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> Result<SetChannelLabelOutcome, Self::Err> {
         let scope_key = scope.key();
         let mut tx = self.pool.begin().await?;
@@ -519,7 +519,7 @@ impl ChannelLabelsRepo for PgChannelLabelsRepo {
     async fn preview_smart_tag(
         &self,
         scope: &ChannelLabelsScope,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         rule: &ChannelLabelRule,
         limit: u16,
     ) -> Result<SmartTagPreview, Self::Err> {
@@ -567,7 +567,7 @@ impl ChannelLabelsRepo for PgChannelLabelsRepo {
 async fn validate_channels(
     tx: &mut Transaction<'_, Postgres>,
     channel_ids: &[Uuid],
-    actor: &MacroUserIdStr<'_>,
+    actor: &RoxUserIdStr<'_>,
     assignment_scope: Option<&ChannelLabelsScope>,
     visibility_scope: &ChannelLabelsScope,
     sections: bool,

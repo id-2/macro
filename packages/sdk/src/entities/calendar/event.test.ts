@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test';
 import type { CalendarEvent as CalendarEventRecord } from '../../../generated/calendar/types.gen';
-import { MacroError } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { CalendarEvent } from './event';
 
-const client = new Proxy({} as MacroClient, {
+const client = new Proxy({} as RoxClient, {
   get() {
     throw new Error('Seeded state access must not fetch');
   },
@@ -68,7 +68,7 @@ describe('CalendarEvent', () => {
   test('a bare byId handle has no fetch endpoint', async () => {
     const event = CalendarEvent.byId(client, 'event-2');
     expect(event.id).toBe('event-2');
-    await expect(event.title()).rejects.toBeInstanceOf(MacroError);
+    await expect(event.title()).rejects.toBeInstanceOf(RoxError);
   });
 });
 
@@ -87,7 +87,7 @@ function recordingClient() {
       deleteCalendarEvent: echo('delete'),
       inviteCalendarEventGuests: echo('invite'),
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, requests };
 }
 

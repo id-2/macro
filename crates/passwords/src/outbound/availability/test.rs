@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 // Deliberately implements only the per-user port: no service identity is needed.
@@ -8,7 +8,7 @@ struct UserFlags {
     loads: AtomicUsize,
 }
 impl FeatureFlags for UserFlags {
-    async fn load(&self, user: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, rootcause::Report> {
+    async fn load(&self, user: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, rootcause::Report> {
         assert_eq!(user.as_ref(), "macro|human@example.test");
         self.loads.fetch_add(1, Ordering::SeqCst);
         self.result
@@ -48,7 +48,7 @@ async fn per_user_rollout_fails_closed_without_service_evaluation() {
                 provider_configured: configured,
             };
             let actor = Actor {
-                user_id: MacroUserIdStr::parse_from_str("macro|human@example.test")
+                user_id: RoxUserIdStr::parse_from_str("macro|human@example.test")
                     .unwrap()
                     .into_owned(),
             };

@@ -4,7 +4,7 @@
 mod test;
 
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use user_api_key::domain::models::UserApiKey;
 use uuid::Uuid;
 
@@ -41,7 +41,7 @@ where
     /// for a grant that doesn't exist.
     async fn load(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<(AccountManagerGrant, AccountManagerRole), AccountManagerError> {
         let grant = self
@@ -64,8 +64,8 @@ where
     #[tracing::instrument(err, skip_all, fields(role = %caller_role, grant_id = tracing::field::Empty))]
     async fn request(
         &self,
-        caller: &MacroUserIdStr<'static>,
-        counterparty: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
+        counterparty: &RoxUserIdStr<'static>,
         caller_role: AccountManagerRole,
     ) -> Result<AccountManagerGrant, AccountManagerError> {
         if caller.as_ref() == counterparty.as_ref() {
@@ -127,7 +127,7 @@ where
     #[tracing::instrument(err, skip(self, caller))]
     async fn get(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<AccountManagerGrant, AccountManagerError> {
         let (grant, _) = self.load(caller, id).await?;
@@ -137,7 +137,7 @@ where
     #[tracing::instrument(err, skip_all)]
     async fn list_managers(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
     ) -> Result<Vec<AccountManagerGrant>, AccountManagerError> {
         let grants = self.repo.list_for_managed(caller).await.map_err(internal)?;
         let now = Utc::now();
@@ -151,7 +151,7 @@ where
     #[tracing::instrument(err, skip(self, caller))]
     async fn respond(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
         decision: AccountManagerDecision,
     ) -> Result<AccountManagerGrant, AccountManagerError> {
@@ -190,7 +190,7 @@ where
     #[tracing::instrument(err, skip(self, caller))]
     async fn claim(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<ClaimedCredential, AccountManagerError> {
         let (_, role) = self.load(caller, id).await?;
@@ -216,7 +216,7 @@ where
     #[tracing::instrument(err, skip(self, caller))]
     async fn revoke(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<AccountManagerGrant, AccountManagerError> {
         self.load(caller, id).await?;

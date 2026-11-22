@@ -6,13 +6,13 @@ publish = false
 
 [features]
 default = []
-http = ["dep:axum", "dep:macro_auth", "dep:serde_urlencoded"]
+http = ["dep:axum", "dep:rox_auth", "dep:serde_urlencoded"]
 postgres = ["dep:sqlx"]
 
 [dependencies]
 async-trait = { workspace = true }
 axum = { workspace = true, optional = true }
-macro_auth = { path = "../macro_auth", optional = true }
+rox_auth = { path = "../rox_auth", optional = true }
 rootcause = { workspace = true }
 serde = { workspace = true }
 serde_urlencoded = { workspace = true, optional = true }
@@ -25,7 +25,7 @@ uuid = { workspace = true }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_auth = { path = "../macro_auth", features = ["testing"] }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_auth = { path = "../rox_auth", features = ["testing"] }
+rox_db_migrator = { path = "../rox_db_migrator" }
 serde_json = { workspace = true }
 tower = { workspace = true, features = ["util"] }

@@ -12,7 +12,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     let messages = match ctx.gmail.thread(link_id, provider_thread_id).await {
         Ok(fetched) => fetched.into_iter().map(|fetched| fetched.message).collect(),

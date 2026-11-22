@@ -21,9 +21,9 @@ use entity_access::{
     },
     outbound::PgAccessRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_event_broker::NoopMacroEventBroker;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::*;
 use properties::PropertiesPgRepo;
 use serde_json::json;
@@ -89,8 +89,8 @@ impl StageDefinitionStore for Stages {
         panic!("must not edit the template")
     }
 }
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 fn team_receipt(team: Uuid, id: &str) -> CrmTeamReceipt<MemberTeamRole> {
     CrmTeamReceipt::from_team_receipt(
@@ -130,7 +130,7 @@ async fn fixture(pool: &PgPool) -> (Service, Arc<DatabaseService>, Arc<Access>, 
         .await
         .unwrap();
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1,$1,$2)"#,
+            r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1,$1,$2)"#,
             id,
             uid
         )
@@ -244,7 +244,7 @@ fn inserted(result: &[OpResult]) -> RowId {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn private_defaults_team_sharing_and_revocation_cover_database_and_rows(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -399,7 +399,7 @@ async fn private_defaults_team_sharing_and_revocation_cover_database_and_rows(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn primary_record_is_required_and_protected_but_can_repeat(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -488,7 +488,7 @@ async fn primary_record_is_required_and_protected_but_can_repeat(pool: PgPool) {
     write(&s, &a, &p, vec![insert(&p, company)]).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn generic_pipeline_holds_free_form_rows_without_record_references(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = s
@@ -528,7 +528,7 @@ async fn generic_pipeline_holds_free_form_rows_without_record_references(pool: P
     // It shows in navigation, and never as a place a CRM record is tracked.
     let listed = s.list(team_receipt(team, OWNER)).await.unwrap();
     assert!(listed.iter().any(|entry| entry.pipeline.id == p.id));
-    let owner = MacroUserIdStr::try_from(OWNER.to_string()).unwrap();
+    let owner = RoxUserIdStr::try_from(OWNER.to_string()).unwrap();
     assert!(
         s.entries(&owner, PipelineRecordType::Company, &[company])
             .await
@@ -571,7 +571,7 @@ async fn generic_pipeline_holds_free_form_rows_without_record_references(pool: P
     write(&s, &a, &p, vec![row]).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn references_can_cross_teams_only_when_the_editor_has_record_access(pool: PgPool) {
     let (s, _, a, team, _) = fixture(&pool).await;
     let other_team = Uuid::now_v7();
@@ -619,7 +619,7 @@ async fn references_can_cross_teams_only_when_the_editor_has_record_access(pool:
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn custom_columns_use_core_validation_and_preserve_values(pool: PgPool) {
     let (s, _, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -675,7 +675,7 @@ async fn custom_columns_use_core_validation_and_preserve_values(pool: PgPool) {
     }))]).await, Err(PipelineError::Database(DatabaseError::InvalidOp(_)))));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn contact_pipelines_and_lifecycle_preserve_crm_records(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let contact = Uuid::now_v7();
@@ -748,7 +748,7 @@ async fn contact_pipelines_and_lifecycle_preserve_crm_records(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pipeline_storage_is_available_without_email_consent(pool: PgPool) {
     let (s, _, _, team, _) = fixture(&pool).await;
     assert!(
@@ -778,7 +778,7 @@ async fn pipeline_storage_is_available_without_email_consent(pool: PgPool) {
     assert_eq!(count, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn migration_rollback_preserves_records_and_grants(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -796,7 +796,7 @@ async fn migration_rollback_preserves_records_and_grants(pool: PgPool) {
         .unwrap();
     // Execute the actual rollback DDL in this disposable test database.
     sqlx::raw_sql(include_str!(
-        "../../macro_db_client/migrations/20261007172434_crm_pipeline_entities.down.sql"
+        "../../rox_db_client/migrations/20261007172434_crm_pipeline_entities.down.sql"
     ))
     .execute(&pool)
     .await
@@ -829,7 +829,7 @@ async fn migration_rollback_preserves_records_and_grants(pool: PgPool) {
 }
 
 #[cfg(feature = "inbound")]
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn http_creation_listing_schema_and_records_use_pipeline_access(pool: PgPool) {
     use axum::{
         Router,
@@ -837,9 +837,9 @@ async fn http_creation_listing_schema_and_records_use_pipeline_access(pool: PgPo
         http::{Request, StatusCode},
     };
     use crm::inbound::pipelines::{PipelineRouterState, router};
-    use macro_authorization::{
-        InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-        MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
+    use rox_authorization::{
+        InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+        RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
     };
     use tower::ServiceExt;
     #[derive(Clone)]
@@ -849,16 +849,16 @@ async fn http_creation_listing_schema_and_records_use_pipeline_access(pool: PgPo
             &self,
             jwt: &str,
         ) -> Result<
-            macro_authorization::ValidatedCredential,
-            rootcause::Report<MacroAuthorizationError>,
+            rox_authorization::ValidatedCredential,
+            rootcause::Report<RoxAuthorizationError>,
         > {
             if jwt != "owner" && jwt != "outsider" {
                 return Err(rootcause::Report::new(
-                    MacroAuthorizationError::InvalidCredentials,
+                    RoxAuthorizationError::InvalidCredentials,
                 ));
             }
-            Ok(macro_authorization::ValidatedCredential {
-                origin: macro_authorization::CredentialOrigin::Session,
+            Ok(rox_authorization::ValidatedCredential {
+                origin: rox_authorization::CredentialOrigin::Session,
                 identity: ValidatedIdentity {
                     agent_id: None,
                     agent_via: None,
@@ -876,8 +876,8 @@ async fn http_creation_listing_schema_and_records_use_pipeline_access(pool: PgPo
         router(PipelineRouterState {
             service: Arc::new(service),
             access,
-            authorization: MacroAuthorizationState::new(Arc::new(
-                MacroAuthorizationServiceImpl::new(
+            authorization: RoxAuthorizationState::new(Arc::new(
+                RoxAuthorizationServiceImpl::new(
                     Token,
                     InternalAuthConfig {
                         api_key: "test-only".into(),
@@ -1025,7 +1025,7 @@ async fn http_creation_listing_schema_and_records_use_pipeline_access(pool: PgPo
     assert_eq!(body.as_array().unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn queried_rows_filter_and_sort_before_paging_and_retain_hidden_records(pool: PgPool) {
     use databases::domain::storage::StorageRowsQuery;
     use models_properties::service::property_value::PropertyValue;
@@ -1114,7 +1114,7 @@ async fn fresh_user(pool: &PgPool, team: Option<Uuid>) -> String {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1,$1,$2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1,$1,$2)"#,
         id,
         uid
     )
@@ -1182,7 +1182,7 @@ fn channel_grants(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn editors_share_with_people_and_only_the_owner_changes_team_access(pool: PgPool) {
     let (s, _db, a, team, _) = fixture(&pool).await;
     let owner = fresh_user(&pool, Some(team)).await;
@@ -1367,7 +1367,7 @@ async fn editors_share_with_people_and_only_the_owner_changes_team_access(pool: 
 #[path = "pipelines/requirements.rs"]
 mod requirements;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn board_positions_survive_reads_and_stay_with_the_authorized_pipeline(pool: PgPool) {
     use databases::domain::storage::DatabaseStorageService;
 

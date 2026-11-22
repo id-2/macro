@@ -21,16 +21,16 @@ doppler-config = { workspace = true }
 email = { path = "../../crates/email", default-features = false, features = ["outbound", "ports"] }
 jev = { path = "../../crates/jev", features = ["outbound"] }
 kafka_util = { path = "../../crates/kafka_util" }
-macro_auth = { path = "../../crates/macro_auth" }
-macro_authorization = { path = "../../crates/macro_authorization", default-features = false, features = ["axum"] }
-macro_config = { path = "../../crates/macro_config" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env = { path = "../../crates/macro_env" }
-macro_env_var = { path = "../../crates/macro_env_var" }
-macro_event_broker = { path = "../../crates/macro_event_broker", features = ["outbound"] }
-macro_service_urls = { path = "../../crates/macro_service_urls" }
-macro_tower_layers = { path = "../../crates/macro_tower_layers" }
-macro_user_id = { path = "../../crates/macro_user_id" }
+rox_auth = { path = "../../crates/rox_auth" }
+rox_authorization = { path = "../../crates/rox_authorization", default-features = false, features = ["axum"] }
+rox_config = { path = "../../crates/rox_config" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env = { path = "../../crates/rox_env" }
+rox_env_var = { path = "../../crates/rox_env_var" }
+rox_event_broker = { path = "../../crates/rox_event_broker", features = ["outbound"] }
+rox_service_urls = { path = "../../crates/rox_service_urls" }
+rox_tower_layers = { path = "../../crates/rox_tower_layers" }
+rox_user_id = { path = "../../crates/rox_user_id" }
 memory = { path = "../../crates/memory" }
 models_email = { path = "../../crates/models_email" }
 opentelemetry = { workspace = true, features = ["trace"] }
@@ -48,5 +48,5 @@ uuid = { workspace = true }
 workspace-hack = { version = "0.1", path = "../../crates/workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../../crates/macro_db_migrator" }
+rox_db_migrator = { path = "../../crates/rox_db_migrator" }
 wiremock = { workspace = true }

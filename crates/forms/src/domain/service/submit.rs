@@ -10,8 +10,8 @@ use chrono::{DateTime, DurationRound, TimeDelta, Utc};
 use databases::domain::models::{DatabaseError, OpBatch, TableDetail, Viewer};
 use databases::domain::ports::{DatabaseMetadataReads, DatabaseRowReads, DatabasesService};
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt, ViewAccessLevel};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{
     CellValue, CellWrite, DatabaseOp, EntityKind, EntityRef, OpResult, RowChange, RowChanges,
     RowsChange, RowsResult,
@@ -37,7 +37,7 @@ use crate::domain::ports::{
 /// Who a response's row is written as: the respondent, or the form's owner
 /// for an anonymous visitor or on an anonymous form, so the row's author and
 /// its history name nobody.
-fn row_author(form: &Form, respondent: &Respondent) -> Result<MacroUserIdStr<'static>, FormError> {
+fn row_author(form: &Form, respondent: &Respondent) -> Result<RoxUserIdStr<'static>, FormError> {
     match respondent {
         Respondent::Member(user) if !form.anonymous => Ok(user.clone()),
         Respondent::Member(_) | Respondent::Anonymous => owner_of(form),
@@ -185,7 +185,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {
@@ -214,7 +214,7 @@ where
     async fn write(
         &self,
         form: &Form,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         ops: Vec<DatabaseOp>,
         answered: &[AnsweredQuestion],
     ) -> Result<Vec<OpResult>, FormError> {
@@ -424,7 +424,7 @@ where
     async fn rewrite_row(
         &self,
         form: &Form,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         row: RowId,
         answered: &[AnsweredQuestion],
     ) -> Result<(), FormError> {
@@ -458,7 +458,7 @@ where
         &self,
         form: &Form,
         columns: &HashMap<ColumnId, QuestionColumn>,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         entry: &FormResponse,
         answered: &[AnsweredQuestion],
         now: DateTime<Utc>,

@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::{Pool, Postgres};
 
 use crate::domain::models::GithubLink;
@@ -7,13 +7,13 @@ use crate::domain::ports::GithubRepo;
 use crate::outbound::pg_github_repo::PgGithubRepo;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_get_github_link_by_user_id(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned();
     let link = repo
@@ -22,7 +22,7 @@ async fn test_get_github_link_by_user_id(pool: Pool<Postgres>) {
         .unwrap()
         .expect("fixture user has a github link");
 
-    assert_eq!(link.macro_id.as_ref(), "macro|user@user.com");
+    assert_eq!(link.rox_id.as_ref(), "macro|user@user.com");
     assert_eq!(link.github_username, "testuser");
     assert_eq!(link.github_user_id, "12345");
     assert_eq!(
@@ -32,13 +32,13 @@ async fn test_get_github_link_by_user_id(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_get_github_link_by_user_id_not_found(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|nonexistent@user.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|nonexistent@user.com")
         .unwrap()
         .into_owned();
     let result = repo.get_github_link_by_user_id(&user_id.0).await;
@@ -47,7 +47,7 @@ async fn test_get_github_link_by_user_id_not_found(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_get_github_link_by_github_user_id(pool: Pool<Postgres>) {
@@ -59,13 +59,13 @@ async fn test_get_github_link_by_github_user_id(pool: Pool<Postgres>) {
         .unwrap()
         .expect("fixture github account is linked");
 
-    assert_eq!(link.macro_id.as_ref(), "macro|user@user.com");
+    assert_eq!(link.rox_id.as_ref(), "macro|user@user.com");
     assert_eq!(link.github_username, "testuser");
     assert_eq!(link.github_user_id, "12345");
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_get_github_link_by_github_user_id_not_found(pool: Pool<Postgres>) {
@@ -77,7 +77,7 @@ async fn test_get_github_link_by_github_user_id_not_found(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_get_github_link_by_id(pool: Pool<Postgres>) {
@@ -86,13 +86,13 @@ async fn test_get_github_link_by_id(pool: Pool<Postgres>) {
     let id = uuid::Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa").unwrap();
     let link = repo.get_github_link_by_id(&id).await.unwrap();
 
-    assert_eq!(link.macro_id.as_ref(), "macro|user@user.com");
+    assert_eq!(link.rox_id.as_ref(), "macro|user@user.com");
     assert_eq!(link.github_username, "testuser");
     assert_eq!(link.github_user_id, "12345");
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_get_github_link_by_id_not_found(pool: Pool<Postgres>) {
@@ -105,7 +105,7 @@ async fn test_get_github_link_by_id_not_found(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_insert_test_data"))
 )]
 async fn test_insert_github_link(pool: Pool<Postgres>) {
@@ -114,7 +114,7 @@ async fn test_insert_github_link(pool: Pool<Postgres>) {
     let now = chrono::Utc::now();
     let link = GithubLink {
         id: uuid::Uuid::parse_str("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee").unwrap(),
-        macro_id: MacroUserIdStr::parse_from_str("macro|new@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("macro|new@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::parse_str("ffffffff-ffff-ffff-ffff-ffffffffffff").unwrap(),
@@ -128,13 +128,13 @@ async fn test_insert_github_link(pool: Pool<Postgres>) {
 
     // Verify it was inserted by reading it back
     let fetched = repo.get_github_link_by_id(&link.id).await.unwrap();
-    assert_eq!(fetched.macro_id.as_ref(), "macro|new@user.com");
+    assert_eq!(fetched.rox_id.as_ref(), "macro|new@user.com");
     assert_eq!(fetched.github_username, "newuser");
     assert_eq!(fetched.github_user_id, "67890");
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_insert_github_link_shared_github_user_id_succeeds(pool: Pool<Postgres>) {
@@ -145,7 +145,7 @@ async fn test_insert_github_link_shared_github_user_id_succeeds(pool: Pool<Postg
     let link = GithubLink {
         id,
         // Different macro user than the fixture owner of github_user_id 12345.
-        macro_id: MacroUserIdStr::parse_from_str("macro|sharer@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -156,45 +156,45 @@ async fn test_insert_github_link_shared_github_user_id_succeeds(pool: Pool<Postg
     };
 
     // A different macro user may now link the same github_user_id, since the
-    // unique constraint is on (macro_id, github_user_id) rather than github_user_id.
+    // unique constraint is on (rox_id, github_user_id) rather than github_user_id.
     let result = repo.insert_github_link(&link).await;
     assert!(result.is_ok());
 
     // Confirm the row was actually persisted.
     let fetched = repo.get_github_link_by_id(&id).await.unwrap();
-    assert_eq!(fetched.macro_id.as_ref(), "macro|sharer@user.com");
+    assert_eq!(fetched.rox_id.as_ref(), "macro|sharer@user.com");
     assert_eq!(fetched.github_user_id, "12345");
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
-async fn test_insert_github_link_duplicate_macro_and_github_user_id_fails(pool: Pool<Postgres>) {
+async fn test_insert_github_link_duplicate_rox_and_github_user_id_fails(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
 
     let now = chrono::Utc::now();
     let link = GithubLink {
         id: uuid::Uuid::new_v4(),
         // Existing fixture user who already owns github_user_id 12345.
-        macro_id: MacroUserIdStr::parse_from_str("macro|user@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("macro|user@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
         github_username: "testuser".to_string(),
-        github_user_id: "12345".to_string(), // same (macro_id, github_user_id) as fixture
+        github_user_id: "12345".to_string(), // same (rox_id, github_user_id) as fixture
         created_at: now,
         updated_at: now,
     };
 
-    // Re-using the same (macro_id, github_user_id) pair must violate the
+    // Re-using the same (rox_id, github_user_id) pair must violate the
     // composite unique constraint.
     let result = repo.insert_github_link(&link).await;
     assert!(result.is_err());
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_get_github_link_by_github_user_id_returns_owner(pool: Pool<Postgres>) {
@@ -206,7 +206,7 @@ async fn test_get_github_link_by_github_user_id_returns_owner(pool: Pool<Postgre
     let later = chrono::Utc::now() + chrono::Duration::days(1);
     let sharer_link = GithubLink {
         id: uuid::Uuid::new_v4(),
-        macro_id: MacroUserIdStr::parse_from_str("macro|sharer@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -224,13 +224,13 @@ async fn test_get_github_link_by_github_user_id_returns_owner(pool: Pool<Postgre
         .unwrap()
         .expect("fixture github account is linked");
 
-    assert_eq!(link.macro_id.as_ref(), "macro|user@user.com");
+    assert_eq!(link.rox_id.as_ref(), "macro|user@user.com");
     assert_eq!(link.github_username, "testuser");
     assert_eq!(link.github_user_id, "12345");
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_count_github_links_by_github_user_id(pool: Pool<Postgres>) {
@@ -247,7 +247,7 @@ async fn test_count_github_links_by_github_user_id(pool: Pool<Postgres>) {
     let now = chrono::Utc::now();
     let sharer_link = GithubLink {
         id: uuid::Uuid::new_v4(),
-        macro_id: MacroUserIdStr::parse_from_str("macro|sharer@user.com")
+        rox_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -273,7 +273,7 @@ async fn test_count_github_links_by_github_user_id(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_delete_in_progress_user_link(pool: Pool<Postgres>) {
@@ -292,7 +292,7 @@ async fn test_delete_in_progress_user_link(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn test_delete_github_link(pool: Pool<Postgres>) {
@@ -310,7 +310,7 @@ async fn test_delete_github_link(pool: Pool<Postgres>) {
     assert!(row.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_delete_in_progress_user_link_nonexistent(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
 
@@ -321,7 +321,7 @@ async fn test_delete_in_progress_user_link_nonexistent(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_test_data"))
 )]
 async fn reassign_grant_moves_all_sharers_without_overwriting_other_accounts_or_repairs(
@@ -337,7 +337,7 @@ async fn reassign_grant_moves_all_sharers_without_overwriting_other_accounts_or_
     let new_owner = uuid::Uuid::from_u128(42);
     let mut sharer = original.clone();
     sharer.id = uuid::Uuid::from_u128(43);
-    sharer.macro_id = MacroUserIdStr::parse_from_str("macro|sharer@user.com")
+    sharer.rox_id = RoxUserIdStr::parse_from_str("macro|sharer@user.com")
         .unwrap()
         .into_owned();
     repo.insert_github_link(&sharer).await.unwrap();
@@ -377,7 +377,7 @@ async fn reassign_grant_moves_all_sharers_without_overwriting_other_accounts_or_
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn link_guard_holds_user_and_shared_account_locks_until_operation_finishes(
     pool: Pool<Postgres>,
 ) {
@@ -414,7 +414,7 @@ async fn link_guard_holds_user_and_shared_account_locks_until_operation_finishes
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn contended_link_locks_time_out_and_release_the_waiters_user_lock(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
     let mut owner = repo

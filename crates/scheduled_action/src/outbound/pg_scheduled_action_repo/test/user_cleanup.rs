@@ -3,15 +3,15 @@ use crate::domain::models::InProgressExecution;
 use crate::domain::ports::{ScheduledActionExecutor, ScheduledActionService};
 use crate::domain::service::ScheduledActionServiceImpl;
 use entity_access::domain::{models::AccessError, ports::ScheduledActionGrants};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use std::sync::Arc;
 
 struct UnusedGrants;
 impl ScheduledActionGrants for UnusedGrants {
     async fn accessible_scheduled_action_ids(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
-    ) -> std::result::Result<Vec<macro_uuid::Uuid>, AccessError> {
+        _user_id: &RoxUserId<Lowercase<'_>>,
+    ) -> std::result::Result<Vec<rox_uuid::Uuid>, AccessError> {
         Ok(Vec::new())
     }
 }
@@ -24,7 +24,7 @@ impl ScheduledActionExecutor for NeverExecutor {
 }
 
 /// Both User rows remain throughout, ruling out ON DELETE CASCADE entirely.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deletes_user_actions_without_cascade_and_preserves_other_users(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;

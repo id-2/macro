@@ -3,8 +3,8 @@ use super::{configuration, user};
 use crate::domain::event_runs::ClaimToken;
 use crate::domain::models::ActionExecutionRecord;
 use entity_access::domain::{models::AccessError, ports::ScheduledActionGrants};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
-use macro_uuid::Uuid;
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
+use rox_uuid::Uuid;
 use model_owner::Owner;
 use std::sync::Mutex;
 
@@ -12,7 +12,7 @@ struct UnusedGrants;
 impl ScheduledActionGrants for UnusedGrants {
     async fn accessible_scheduled_action_ids(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<Uuid>, AccessError> {
         Ok(Vec::new())
     }
@@ -65,7 +65,7 @@ impl ScheduledActionRepo for FakeRepo {
 
     async fn get_owned_actions(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ScheduledAction>> {
         Ok(self
             .actions
@@ -140,7 +140,7 @@ pub(super) fn action(owner: Owner, events: bool) -> ScheduledAction {
     let now = Utc::now();
     let config = configuration(events);
     ScheduledAction {
-        id: Some(macro_uuid::generate_uuid_v7()),
+        id: Some(rox_uuid::generate_uuid_v7()),
         owner,
         name: config.name,
         next_run_at: next_run(&config.trigger, now, |_| false).unwrap(),
@@ -171,7 +171,7 @@ async fn deletes_disabled_and_claimed_actions_not_other_owners_and_retries_empty
     claimed.claimed = Some(Utc::now());
     let event = action(Owner::User(user()), true);
     let other = action(
-        Owner::User(MacroUserIdStr::try_from_email("other@example.com").unwrap()),
+        Owner::User(RoxUserIdStr::try_from_email("other@example.com").unwrap()),
         false,
     );
     *repo.actions.lock().unwrap() = vec![

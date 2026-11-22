@@ -23,9 +23,9 @@ use entity_access::{
     domain::{models::*, service::EntityAccessServiceImpl},
     outbound::PgAccessRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_event_broker::NoopMacroEventBroker;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use properties::PropertiesPgRepo;
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -90,8 +90,8 @@ impl StageDefinitionStore for Stages {
 
 fn viewer(id: &str) -> Viewer {
     Viewer {
-        user_id: MacroUserIdStr::parse_from_str(id).unwrap().into_owned(),
-        acting_bot: Some(bot_id::MACRO_AI_BOT_ID),
+        user_id: RoxUserIdStr::parse_from_str(id).unwrap().into_owned(),
+        acting_bot: Some(bot_id::ROX_AI_BOT_ID),
     }
 }
 
@@ -117,7 +117,7 @@ async fn fixture(pool: &PgPool) -> Fixture {
         .await
         .unwrap();
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1,$1,$2)"#,
+            r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1,$1,$2)"#,
             id,
             uid
         )
@@ -254,7 +254,7 @@ async fn sales(workflows: &Workflows, sharing: PipelineSharing) -> PipelineOverv
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deals_are_added_found_moved_and_removed_by_name(pool: PgPool) {
     let Fixture {
         workflows,
@@ -422,7 +422,7 @@ async fn deals_are_added_found_moved_and_removed_by_name(pool: PgPool) {
     assert!(!changes.is_empty());
     for change in changes {
         assert_eq!(change.actor.as_deref(), Some(OWNER));
-        assert_eq!(change.acting_bot, Some(bot_id::MACRO_AI_BOT_ID.to_string()));
+        assert_eq!(change.acting_bot, Some(bot_id::ROX_AI_BOT_ID.to_string()));
     }
     // A write based on a stale read is refused.
     assert!(matches!(
@@ -500,7 +500,7 @@ async fn deals_are_added_found_moved_and_removed_by_name(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn contacts_are_added_by_email_and_a_record_with_two_deals_needs_an_entry_id(pool: PgPool) {
     let Fixture {
         workflows,
@@ -599,7 +599,7 @@ async fn contacts_are_added_by_email_and_a_record_with_two_deals_needs_an_entry_
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pipelines_are_created_with_stages_and_edited_by_name(pool: PgPool) {
     let Fixture { workflows, .. } = fixture(&pool).await;
     let owner = viewer(OWNER);
@@ -720,7 +720,7 @@ mod commercial;
 #[path = "pipeline_workflows/requirements.rs"]
 mod requirements;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_generic_pipeline_takes_entries_by_their_fields(pool: PgPool) {
     let Fixture { workflows, .. } = fixture(&pool).await;
     let owner = viewer(OWNER);
@@ -849,7 +849,7 @@ async fn a_generic_pipeline_takes_entries_by_their_fields(pool: PgPool) {
     assert!(edited.field("Name").is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_tracked_pipeline_still_requires_a_record(pool: PgPool) {
     let Fixture { workflows, .. } = fixture(&pool).await;
     let deals = sales(&workflows, PipelineSharing::Private).await;

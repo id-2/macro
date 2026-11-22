@@ -3,7 +3,7 @@ use crate::domain::ports::MockGithubSyncRepo;
 
 #[tokio::test]
 async fn links_one_task_to_the_pull_request() {
-    let task = MacroTaskId::from_short_uuid("2BuyvtY3ae").unwrap();
+    let task = RoxTaskId::from_short_uuid("2BuyvtY3ae").unwrap();
     let mut repo = MockGithubSyncRepo::new();
     let expected = task.clone();
     repo.expect_upsert_task_ids()
@@ -29,7 +29,7 @@ async fn reports_a_failed_write() {
     let result = PullRequestTaskLinkService::new(repo)
         .link(
             GithubKey::new("macro-inc", "macro", 7),
-            MacroTaskId::from_short_uuid("2BuyvtY3ae").unwrap(),
+            RoxTaskId::from_short_uuid("2BuyvtY3ae").unwrap(),
         )
         .await;
     assert!(matches!(result, Err(GithubError::Internal(_))));

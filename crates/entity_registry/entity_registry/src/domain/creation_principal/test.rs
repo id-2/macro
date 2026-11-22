@@ -1,26 +1,26 @@
 use super::*;
 use bot_id::{BotId, SYSTEM_BOTS};
 use harness_id::HarnessId;
-use macro_authorization::{
-    HarnessAuthentication, HarnessAuthorizationOwner, MacroUserAuthentication,
+use rox_authorization::{
+    HarnessAuthentication, HarnessAuthorizationOwner, RoxUserAuthentication,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 const ROW_BOT: BotId = BotId::new_from_uuid(Uuid::from_u128(0xB07A));
 const TEAM: Uuid = Uuid::from_u128(0x7EA3);
 const GATES: [NonUserOwners; 2] = [NonUserOwners::Disabled, NonUserOwners::Enabled];
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
 }
 
-fn user() -> MacroUserAuthentication {
-    MacroUserAuthentication {
-        origin: macro_authorization::CredentialOrigin::Session,
+fn user() -> RoxUserAuthentication {
+    RoxUserAuthentication {
+        origin: rox_authorization::CredentialOrigin::Session,
         agent_id: None,
         agent_via: None,
-        macro_user_id: user_id(),
+        rox_user_id: user_id(),
         user_context: Default::default(),
     }
 }
@@ -29,9 +29,9 @@ fn bot(
     bot_id: BotId,
     bot_scope: BotScope,
     team_id: Option<Uuid>,
-    acting_user: Option<MacroUserAuthentication>,
-) -> MacroAuthorization {
-    MacroAuthorization::Bot(BotAuthentication {
+    acting_user: Option<RoxUserAuthentication>,
+) -> RoxAuthorization {
+    RoxAuthorization::Bot(BotAuthentication {
         bot_id,
         token_id: Uuid::from_u128(1),
         bot_scope,
@@ -40,19 +40,19 @@ fn bot(
     })
 }
 
-fn harness() -> MacroAuthorization {
-    MacroAuthorization::Harness(HarnessAuthentication {
+fn harness() -> RoxAuthorization {
+    RoxAuthorization::Harness(HarnessAuthentication {
         harness_id: HarnessId::new_from_uuid(Uuid::from_u128(2)),
         token_id: Uuid::from_u128(3),
         owner: HarnessAuthorizationOwner::User {
-            user_id: user().macro_user_id.to_string(),
+            user_id: user().rox_user_id.to_string(),
         },
         acting_user: user(),
     })
 }
 
 fn resolve(
-    authorization: MacroAuthorization,
+    authorization: RoxAuthorization,
     gate: NonUserOwners,
 ) -> Result<CreationPrincipal, CreationPrincipalError> {
     resolve_creation_principal(&authorization, gate)
@@ -62,17 +62,17 @@ fn resolve(
 fn gate_independent_principals_resolve_the_same_either_way() {
     for gate in GATES {
         assert_eq!(
-            resolve(MacroAuthorization::User(user()), gate),
+            resolve(RoxAuthorization::User(user()), gate),
             Ok(CreationPrincipal::User(user_id())),
             "user under {gate:?}"
         );
         assert_eq!(
-            resolve(MacroAuthorization::Internal(Some(user())), gate),
+            resolve(RoxAuthorization::Internal(Some(user())), gate),
             Ok(CreationPrincipal::User(user_id())),
             "internal for a user under {gate:?}"
         );
         assert_eq!(
-            resolve(MacroAuthorization::Internal(None), gate),
+            resolve(RoxAuthorization::Internal(None), gate),
             Err(CreationPrincipalError::InternalWithoutUser),
             "internal without a user under {gate:?}"
         );
@@ -223,7 +223,7 @@ fn invalid_gate_value_is_rejected() {
 #[test]
 fn a_token_signed_for_an_agent_creates_as_that_agent_for_its_user() {
     let agent = BotId::TEST_A;
-    let authorization = MacroAuthorization::User(MacroUserAuthentication {
+    let authorization = RoxAuthorization::User(RoxUserAuthentication {
         agent_id: Some(agent),
         ..user()
     });

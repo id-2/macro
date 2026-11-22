@@ -809,7 +809,7 @@ where
 
         let inboxes = service_context
             .email_service
-            .get_inboxes_for_macro_id(request_context.user_id.copied())
+            .get_inboxes_for_rox_id(request_context.user_id.copied())
             .await
             .map_err(|e| ToolCallError {
                 description: format!("Failed to resolve email links: {e}"),
@@ -826,10 +826,10 @@ where
             .filter(|s| !s.is_empty())
         {
             Some(inbox) => {
-                let caller_macro_id = request_context.user_id.to_string();
+                let caller_rox_id = request_context.user_id.to_string();
                 let link = email::inbound::toolset::resolve_inbox_selector(
                     &inboxes,
-                    &caller_macro_id,
+                    &caller_rox_id,
                     Some(inbox),
                 )?;
                 vec![link.id]

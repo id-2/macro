@@ -3,7 +3,7 @@ import type {
   MemoryEdit,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 export type { ExplicitMemory, MemoryEdit };
 
@@ -20,7 +20,7 @@ export type { ExplicitMemory, MemoryEdit };
  * before retrying. Private or sensitive additions are rejected with 422.
  */
 export class MemoryNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Read the acting user's explicit memory and its revision; `content` is

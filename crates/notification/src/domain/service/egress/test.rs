@@ -18,7 +18,7 @@ fn ios_delivery_binds_the_destination_to_each_receiving_account() {
         }),
     };
     for email in ["alice@example.com", "bob@example.com"] {
-        let recipient = MacroUserIdStr::try_from_email(email).unwrap();
+        let recipient = RoxUserIdStr::try_from_email(email).unwrap();
         let payload = serde_json::to_value(ios_notification(&template, &recipient)).unwrap();
         assert_eq!(payload["recipientId"], recipient.as_ref());
         assert_eq!(
@@ -52,7 +52,7 @@ fn notification(alert: Option<Alert>, push_type: PushType) -> FCMMessage<serde_j
             },
             ios_device_endpoints: Default::default(),
         },
-        MacroUserIdStr::parse_from_str("macro|alice@example.com")
+        RoxUserIdStr::parse_from_str("macro|alice@example.com")
             .unwrap()
             .into_owned(),
     )

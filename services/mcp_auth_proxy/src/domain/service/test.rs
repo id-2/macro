@@ -1416,7 +1416,7 @@ async fn the_harness_resource_gets_the_upstream_access_token() {
 /// is a Rox API token for the same user, labelled with the client's name and
 /// expiring when the upstream token would.
 #[tokio::test]
-async fn the_chatgpt_resource_gets_a_macro_api_token_naming_the_client() {
+async fn the_chatgpt_resource_gets_a_rox_api_token_naming_the_client() {
     let harness = Harness::new();
     let client_id = harness.register(&[TRUSTED_REDIRECT_URI]).await;
     let code = harness

@@ -14,7 +14,7 @@ import { match, P } from 'ts-pattern';
  */
 
 const CALL_RESOLUTION_CHANNEL = 'macro-call-resolution';
-const CALL_RESOLUTION_STORAGE_KEY = 'macro.call-resolution';
+const CALL_RESOLUTION_STORAGE_KEY = 'rox.call-resolution';
 
 export type CallResolution =
   | {

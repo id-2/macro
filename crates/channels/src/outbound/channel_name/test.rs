@@ -29,7 +29,7 @@ fn unnamed_private_channel_lists_people_and_bots_but_not_the_viewer() {
     ];
     let mut user_names = NameLookup::new();
     user_names.insert(
-        MacroUserIdStr::try_from("macro|gabriel@test.com".to_string()).unwrap(),
+        RoxUserIdStr::try_from("macro|gabriel@test.com".to_string()).unwrap(),
         "Gabriel Birman".to_string(),
     );
     let bot_names = HashMap::from([(bot_id::CODEX_BOT_ID, "Codex".to_string())]);

@@ -5,7 +5,7 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use chrono::{DateTime, Duration, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{
@@ -342,7 +342,7 @@ where
     async fn authorize(
         &self,
         context: &ClaimedConversation,
-        members: &HashSet<MacroUserIdStr<'static>>,
+        members: &HashSet<RoxUserIdStr<'static>>,
         facts: &TargetFacts,
     ) -> PortResult<()> {
         if !compatible(context, members, facts) {
@@ -455,7 +455,7 @@ where
 
 fn compatible(
     context: &ClaimedConversation,
-    members: &HashSet<MacroUserIdStr<'static>>,
+    members: &HashSet<RoxUserIdStr<'static>>,
     facts: &TargetFacts,
 ) -> bool {
     match (context.metadata.kind, facts.kind) {

@@ -37,7 +37,7 @@ export function appendAttachmentLinks(
         .getChildren()
         .find(
           (node) =>
-            $isClassedBlockNode(node) && node.__classes.includes('macro_quote')
+            $isClassedBlockNode(node) && node.__classes.includes('rox_quote')
         );
       for (const document of documents) {
         const paragraph = $createParagraphNode().append(

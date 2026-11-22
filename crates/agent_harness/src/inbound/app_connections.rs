@@ -18,8 +18,8 @@ use axum::routing::post;
 use entity_access::domain::models::EditAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::AgentSessionAccessLevelExtractor;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
-use macro_uuid::Uuid;
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
+use rox_uuid::Uuid;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
@@ -43,7 +43,7 @@ pub struct AppConnectedRequest {
 pub struct AppConnectionsRouterState<Sessions, Apps, Notifications, Access, Auth> {
     continuation: Arc<AppConnectedContinuation<Sessions, Apps, Notifications>>,
     entity_access: Arc<Access>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Sessions, Apps, Notifications, Access, Auth>
@@ -53,7 +53,7 @@ impl<Sessions, Apps, Notifications, Access, Auth>
     pub fn new(
         continuation: Arc<AppConnectedContinuation<Sessions, Apps, Notifications>>,
         entity_access: Arc<Access>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             continuation,
@@ -77,7 +77,7 @@ impl<Sessions, Apps, Notifications, Access, Auth> Clone
 
 impl<Sessions, Apps, Notifications, Access, Auth>
     FromRef<AppConnectionsRouterState<Sessions, Apps, Notifications, Access, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(
         state: &AppConnectionsRouterState<Sessions, Apps, Notifications, Access, Auth>,
@@ -106,7 +106,7 @@ where
     Apps: ConnectedApps,
     Notifications: SessionNotifications,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -164,7 +164,7 @@ where
     Apps: ConnectedApps,
     Notifications: SessionNotifications,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let user = access
         .entity_access_receipt

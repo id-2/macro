@@ -92,7 +92,7 @@ async fn flat(
     Ok(expanded_dynamic_cursor_soup_with_projection(
         pool,
         ExpandedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str(&user_id)?,
+            user_id: RoxUserIdStr::parse_from_str(&user_id)?,
             limit,
             cursor,
             exclude_frecency: false,
@@ -111,7 +111,7 @@ async fn grouped(
     Ok(expanded_dynamic_cursor_soup_grouped(
         pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str(&user_id)?,
+            user_id: RoxUserIdStr::parse_from_str(&user_id)?,
             limit,
             cursor,
             exclude_frecency: false,
@@ -128,10 +128,10 @@ async fn grouped(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn name_pages_are_alphabetical_regardless_of_case(pool: PgPool) -> anyhow::Result<()> {
     rename_documents(&pool).await?;
@@ -163,10 +163,10 @@ async fn name_pages_are_alphabetical_regardless_of_case(pool: PgPool) -> anyhow:
 /// punctuation and page the other way.
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn name_pages_follow_icu_root_order(pool: PgPool) -> anyhow::Result<()> {
     for (id, name) in [
@@ -201,10 +201,10 @@ async fn name_pages_follow_icu_root_order(pool: PgPool) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_name_pages_rank_within_their_bin(pool: PgPool) -> anyhow::Result<()> {
     rename_documents(&pool).await?;
@@ -238,10 +238,10 @@ async fn grouped_name_pages_rank_within_their_bin(pool: PgPool) -> anyhow::Resul
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn equal_names_page_without_repeating_or_skipping(pool: PgPool) -> anyhow::Result<()> {
     for id in [A, B, C, D, UNSET] {

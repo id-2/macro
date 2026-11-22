@@ -228,14 +228,14 @@ fn runs_against_local_backend() -> bool {
 }
 
 /// Tauri plugin that manages OTA bundle updates.
-pub struct MacroBundleUpdaterPlugin {
+pub struct RoxBundleUpdaterPlugin {
     base_url: Url,
     embedded_bundle_build: u64,
     bundle_routes: BundleRoutes,
     auto_update: bool,
 }
 
-impl MacroBundleUpdaterPlugin {
+impl RoxBundleUpdaterPlugin {
     /// Create the plugin targeting the given update server URL.
     pub fn new(base_url: Url, embedded_bundle_build: u64, bundle_routes: BundleRoutes) -> Self {
         Self {
@@ -484,7 +484,7 @@ pub async fn clear_bundle<R: Runtime>(
     Ok(())
 }
 
-impl<R: Runtime> Plugin<R> for MacroBundleUpdaterPlugin {
+impl<R: Runtime> Plugin<R> for RoxBundleUpdaterPlugin {
     fn name(&self) -> &'static str {
         "macro-bundle-updater"
     }

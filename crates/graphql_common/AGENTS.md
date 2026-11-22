@@ -12,7 +12,7 @@ schema types (entity type, owner type, property filters).
   per-request context every resolver pulls from, and its Axum extraction.
 - `src/authorization.rs`: `require_authenticated_user` /
   `require_authorized_user` — the two checks resolvers call before touching data.
-- `src/filter_input.rs`: `IntoFilterExpr`, `parse_id`/`parse_uuid`/`parse_macro_user_id`
+- `src/filter_input.rs`: `IntoFilterExpr`, `parse_id`/`parse_uuid`/`parse_rox_user_id`
   — shared GraphQL-input-to-domain-type conversions.
 - `src/entity_type.rs`, `src/owner_type.rs`, `src/property_filter.rs`: schema
   types reused across domain crates so two adapters don't define incompatible
@@ -26,7 +26,7 @@ schema types (entity type, owner type, property filters).
 
 ## Boundaries
 
-- Depends on: `macro_authorization` (axum), `filter_ast`, `item_filters`,
+- Depends on: `rox_authorization` (axum), `filter_ast`, `item_filters`,
   `model-entity`, `model_owner`, `models_properties`.
 - Used by: every `graphql_*` domain adapter crate (favorite, initiative,
   calendar, email, notification, soup_filter_input, entity_mutation,

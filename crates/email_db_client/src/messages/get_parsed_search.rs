@@ -27,7 +27,7 @@ pub async fn get_parsed_search_message_by_id(
             m.from_contact_id, m.sent_at, m.has_attachments, m.is_read, m.is_starred, m.is_sent, m.is_draft,
             m.body_text as body_text,
             m.body_html_sanitized as body_html_sanitized,
-            NULL::TEXT as body_macro,
+            NULL::TEXT as body_rox,
             m.headers_jsonb, m.created_at, m.updated_at
         FROM email_messages m
         JOIN email_links l ON m.link_id = l.id
@@ -108,7 +108,7 @@ pub async fn get_parsed_search_messages_by_thread_ids(
             updated_at,
             body_text as body_text,
             body_html_sanitized as body_html_sanitized,
-            NULL::TEXT as body_macro
+            NULL::TEXT as body_rox
         FROM email_messages
         WHERE thread_id = ANY($1)
         ORDER BY internal_date_ts DESC NULLS LAST
@@ -198,7 +198,7 @@ pub async fn get_paginated_parsed_search_messages_by_thread_id(
             -- No body attributes
             body_text as body_text,
             body_html_sanitized as body_html_sanitized,
-            NULL::TEXT as body_macro
+            NULL::TEXT as body_rox
         FROM email_messages
         WHERE thread_id = $1
         ORDER BY internal_date_ts DESC NULLS LAST

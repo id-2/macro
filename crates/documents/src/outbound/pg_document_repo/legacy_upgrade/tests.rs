@@ -1,6 +1,6 @@
 use entity_registry::{EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use model_owner::Owner;
 use sqlx::{Pool, Postgres};
 
@@ -48,7 +48,7 @@ async fn file_type(pool: &Pool<Postgres>) -> Option<String> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn new_instance_becomes_the_latest_version(pool: Pool<Postgres>) {
@@ -87,7 +87,7 @@ async fn new_instance_becomes_the_latest_version(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn bom_can_be_created_and_removed(pool: Pool<Postgres>) {
@@ -111,7 +111,7 @@ async fn bom_can_be_created_and_removed(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn swap_only_changes_the_expected_type(pool: Pool<Postgres>) {
@@ -143,7 +143,7 @@ async fn swap_only_changes_the_expected_type(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn swap_matches_uppercase_stored_types(pool: Pool<Postgres>) {
@@ -159,7 +159,7 @@ async fn swap_matches_uppercase_stored_types(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn swap_on_a_missing_document_reports_no_change(pool: Pool<Postgres>) {
@@ -178,7 +178,7 @@ async fn swap_on_a_missing_document_reports_no_change(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn content_is_persisted(pool: Pool<Postgres>) {

@@ -49,7 +49,7 @@ through the same service.
 ## Boundaries
 
 - Depends on: `notification_state`, `kafka_util`, `rate_limit`,
-  `macro_authorization`.
+  `rox_authorization`.
 - Used by: most feature crates that need to notify a user (`properties`,
   `channels`, `reminders`, `teams`, `messages`, `calendar_events`, ...) and
   `services/notification_service`, `services/agent_harness_service`,
@@ -107,7 +107,7 @@ through the same service.
   stale/unknown measurements from zero; they are not client-delivery ACKs.
 - `EmailContent` is queued as JSON, so its optional `text`, `from_name` and
   `reply_to` carry `#[serde(default)]`. `EmailAdapter` turns `from_name` into an
-  `"<name> (via Macro)"` display name on Macro's own From address (quoted when
+  `"<name> (via Rox)"` display name on Rox's own From address (quoted when
   ASCII, RFC 2047 encoded otherwise) and sends `text` as the plain-text part.
   Unsubscribe placeholders are signed in the HTML `body` only.
 - `EmailAdapter` takes an optional SES configuration set; with one, every send

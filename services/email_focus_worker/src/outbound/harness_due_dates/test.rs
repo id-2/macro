@@ -7,8 +7,8 @@ use super::*;
 
 const MAIL: &str = "Please send the signed contract by Friday.";
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@acme.example").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@acme.example").unwrap()
 }
 
 fn input() -> DueDateInput {
@@ -32,7 +32,7 @@ async fn asks_as_the_owner_and_reads_the_date_back() {
         ))
         .and(matchers::header(INTERNAL_API_KEY_HEADER, "internal-key"))
         .and(matchers::header(
-            INTERNAL_MACRO_USER_ID_HEADER,
+            INTERNAL_ROX_USER_ID_HEADER,
             owner().as_ref(),
         ))
         .and(matchers::body_json(json!({

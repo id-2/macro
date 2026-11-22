@@ -164,7 +164,7 @@ pub(super) fn render_pairing(
     app: &App,
     created: &harnesses::domain::models::CreatedPairing,
 ) {
-    let url = app.config.macro_api.pairing_approval_url(&created.code);
+    let url = app.config.rox_api.pairing_approval_url(&created.code);
     let available_width = frame.area().width.saturating_sub(2);
     let desired_width = url.chars().count() as u16 + 12;
     let width = desired_width.min(available_width).max(1);

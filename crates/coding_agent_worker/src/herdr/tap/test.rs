@@ -8,12 +8,12 @@ fn line(value: Value) -> String {
 }
 
 #[test]
-fn session_new_answer_opens_the_session_with_its_macro_id() {
+fn session_new_answer_opens_the_session_with_its_rox_id() {
     let mut tap = WireTap::default();
-    let macro_id = "0195d2dd-5de9-71f2-9d59-5d9734f1adb7";
+    let rox_id = "0195d2dd-5de9-71f2-9d59-5d9734f1adb7";
     let request = line(json!({
         "jsonrpc": "2.0", "id": 7, "method": "session/new",
-        "params": {"cwd": "/repo", "mcpServers": [], "_meta": {MACRO_AGENT_SESSION_META_KEY: macro_id}}
+        "params": {"cwd": "/repo", "mcpServers": [], "_meta": {ROX_AGENT_SESSION_META_KEY: rox_id}}
     }));
     assert!(tap.observe(&request, Stdin).is_empty());
 
@@ -22,8 +22,8 @@ fn session_new_answer_opens_the_session_with_its_macro_id() {
         tap.observe(&answer, Stdout),
         [TapEvent::Opened {
             session: "acp-1".to_owned(),
-            macro_session: Some(AgentSessionId::new_from_uuid(
-                uuid::Uuid::parse_str(macro_id).unwrap()
+            rox_session: Some(AgentSessionId::new_from_uuid(
+                uuid::Uuid::parse_str(rox_id).unwrap()
             )),
         }]
     );
@@ -45,7 +45,7 @@ fn session_new_without_meta_opens_an_unnamed_session() {
         ),
         [TapEvent::Opened {
             session: "acp-2".to_owned(),
-            macro_session: None,
+            rox_session: None,
         }]
     );
 }
@@ -64,7 +64,7 @@ fn load_names_the_session_directly() {
         events,
         [TapEvent::Opened {
             session: "acp-3".to_owned(),
-            macro_session: None,
+            rox_session: None,
         }]
     );
 }

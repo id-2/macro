@@ -1,6 +1,6 @@
 use super::super::*;
-use macro_event_broker::{EventBrokerError, MacroEvent};
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_event_broker::{EventBrokerError, RoxEvent};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::{db, service};
 use std::collections::{HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
@@ -135,7 +135,7 @@ pub(super) fn input(operation: InboxSyncOperation) -> InboxSyncPubsubMessage {
 pub(super) fn link() -> Link {
     Link {
         id: LINK,
-        macro_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
         fusionauth_user_id: "fixture-owner".into(),
         email_address: EmailStr::try_from("Owner@example.com".to_string()).unwrap(),
         provider: service::link::UserProvider::Gmail,
@@ -391,8 +391,8 @@ impl InboxSyncQueue for Fake {
     }
 }
 
-impl MacroEventBroker for Fake {
-    fn send_event<T: MacroEvent + ?Sized>(
+impl RoxEventBroker for Fake {
+    fn send_event<T: RoxEvent + ?Sized>(
         &self,
         event: &T,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -415,7 +415,7 @@ impl InboxSyncRefresher for Fake {
                 .link
                 .as_ref()
                 .unwrap()
-                .macro_id
+                .rox_id
                 .as_ref()
         );
         let deleted = match event {

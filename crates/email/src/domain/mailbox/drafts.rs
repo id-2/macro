@@ -49,7 +49,7 @@ impl<R: DraftRepository, G: DraftGateway, M: DraftMaterializer> MailboxDraftServ
     pub async fn execute_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repo
-            .claim_draft(macro_uuid::generate_uuid_v7(), self.claim_mode)
+            .claim_draft(rox_uuid::generate_uuid_v7(), self.claim_mode)
             .await
             .map_err(|error| super::telemetry::claim_failed("drafts", error))?
         else {

@@ -1,11 +1,11 @@
-INSERT INTO macro_user (id, username, email, stripe_customer_id)
+INSERT INTO rox_user (id, username, email, stripe_customer_id)
 VALUES
     ('b1111111-1111-1111-1111-111111111111', 'team-scope@user.com', 'team-scope@user.com', 'cus_team_scope'),
     ('b2222222-2222-2222-2222-222222222222', 'public-scope@user.com', 'public-scope@user.com', 'cus_public_scope'),
     ('b3333333-3333-3333-3333-333333333333', 'off-scope@user.com', 'off-scope@user.com', 'cus_off_scope'),
     ('b4444444-4444-4444-4444-444444444444', 'no-team@user.com', 'no-team@user.com', 'cus_no_team');
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES
     ('macro|team-scope@user.com', 'team-scope@user.com', 'Team Scope', 'b1111111-1111-1111-1111-111111111111'),
     ('macro|public-scope@user.com', 'public-scope@user.com', 'Public Scope', 'b2222222-2222-2222-2222-222222222222'),

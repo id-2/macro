@@ -41,7 +41,7 @@ async fn paired_roster(session: &SessionService, alice: SessionScope, customer_n
     session.update_groups(alice, &[info], true).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_lid_only_sender_with_a_push_name_shows_it(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     paired_roster(&session, alice, None).await;
@@ -54,7 +54,7 @@ async fn a_lid_only_sender_with_a_push_name_shows_it(pool: PgPool) {
     assert_eq!(sender_names(&linked, &binding).await, vec!["Ana"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unnamed_sender_shows_their_number_until_a_message_names_them(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     paired_roster(&session, alice, None).await;
@@ -96,7 +96,7 @@ async fn an_unnamed_sender_shows_their_number_until_a_message_names_them(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_group_sync_names_people_stored_without_a_name(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     paired_roster(&session, alice, None).await;
@@ -138,7 +138,7 @@ async fn a_group_sync_names_people_stored_without_a_name(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_owners_chat_with_an_unnamed_sender_names_them(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     session
@@ -163,7 +163,7 @@ async fn the_owners_chat_with_an_unnamed_sender_names_them(pool: PgPool) {
     assert_eq!(sender_names(&linked, &binding).await, vec!["Ana Smith"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sender_known_only_by_lid_and_no_name_is_a_generic_participant(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     // The LID is paired by the message itself, with another LID: no number.

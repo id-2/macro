@@ -14,7 +14,7 @@ pub async fn dial(
     let mut request = gateway_url.into_client_request()?;
     let headers = request.headers_mut();
     let token = harness_token.parse().map_err(bad_header)?;
-    headers.insert("x-macro-harness-token", token);
+    headers.insert("x-rox-harness-token", token);
     let (stream, _response) = tokio_tungstenite::connect_async(request).await?;
     Ok(connect_runtime(stream))
 }

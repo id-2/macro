@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::{
-    AppJwt, GithubAppInstallationSource, GithubKey, MacroTaskId, ResolvedTeamTaskReference,
+    AppJwt, GithubAppInstallationSource, GithubKey, RoxTaskId, ResolvedTeamTaskReference,
     TeamTaskReference,
 };
 use std::collections::HashMap;
@@ -12,8 +12,8 @@ const TEST_PEM: &str = include_str!("../installation_tokens/test_key.pem");
 const PERSONAL_INSTALLATION: &str = "42";
 const TEAM_INSTALLATION: &str = "77";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
 }
 
 fn config() -> InstallationTokenConfig {
@@ -46,13 +46,13 @@ struct FakeRepo {
 impl GithubSyncRepo for FakeRepo {
     type Err = anyhow::Error;
 
-    async fn get_user_team_ids(&self, _macro_id: &str) -> Result<Vec<uuid::Uuid>, Self::Err> {
+    async fn get_user_team_ids(&self, _rox_id: &str) -> Result<Vec<uuid::Uuid>, Self::Err> {
         Ok(self.teams.clone())
     }
 
     async fn get_installation_ids_for_sources(
         &self,
-        macro_id: &str,
+        rox_id: &str,
         team_ids: &[uuid::Uuid],
     ) -> Result<Vec<String>, Self::Err> {
         Ok(self
@@ -60,7 +60,7 @@ impl GithubSyncRepo for FakeRepo {
             .iter()
             .filter(|(_, sources)| {
                 sources.iter().any(|source| match source {
-                    GithubAppInstallationSource::User(user) => user == macro_id,
+                    GithubAppInstallationSource::User(user) => user == rox_id,
                     GithubAppInstallationSource::Team(team) => team_ids.contains(team),
                 })
             })
@@ -75,14 +75,14 @@ impl GithubSyncRepo for FakeRepo {
         unimplemented!("listing goes from user to installations, not the other way")
     }
 
-    async fn get_task_ids(&self, _github_key: GithubKey) -> Result<Vec<MacroTaskId>, Self::Err> {
+    async fn get_task_ids(&self, _github_key: GithubKey) -> Result<Vec<RoxTaskId>, Self::Err> {
         unimplemented!("listing repositories does not read tasks")
     }
 
     async fn upsert_task_ids(
         &self,
         _github_key: GithubKey,
-        _task_ids: &[MacroTaskId],
+        _task_ids: &[RoxTaskId],
     ) -> Result<(), Self::Err> {
         unimplemented!("listing repositories does not write tasks")
     }
@@ -90,8 +90,8 @@ impl GithubSyncRepo for FakeRepo {
     async fn filter_duplicate_tasks(
         &self,
         _github_key: GithubKey,
-        _task_ids: &[MacroTaskId],
-    ) -> Result<Vec<MacroTaskId>, Self::Err> {
+        _task_ids: &[RoxTaskId],
+    ) -> Result<Vec<RoxTaskId>, Self::Err> {
         unimplemented!("listing repositories does not read tasks")
     }
 
@@ -103,14 +103,14 @@ impl GithubSyncRepo for FakeRepo {
         unimplemented!("listing repositories does not resolve task references")
     }
 
-    async fn get_macro_ids_by_github_user_ids(
+    async fn get_rox_ids_by_github_user_ids(
         &self,
         _github_user_ids: &[String],
     ) -> Result<HashMap<String, Vec<String>>, Self::Err> {
         unimplemented!("listing repositories does not map github users")
     }
 
-    async fn get_macro_ids_by_github_logins(
+    async fn get_rox_ids_by_github_logins(
         &self,
         _github_logins: &[String],
     ) -> Result<HashMap<String, Vec<String>>, Self::Err> {
@@ -120,7 +120,7 @@ impl GithubSyncRepo for FakeRepo {
     async fn get_team_member_ids(
         &self,
         _team_id: uuid::Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         unimplemented!("listing repositories does not list team members")
     }
 

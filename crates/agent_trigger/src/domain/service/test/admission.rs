@@ -19,7 +19,7 @@ impl Admission {
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        caller: &'a MacroUserIdStr<'_>,
+        caller: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         // The sender, not the existing session's different owner, pays for inference.

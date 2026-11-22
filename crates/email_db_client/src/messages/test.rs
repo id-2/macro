@@ -1,17 +1,17 @@
 use crate::messages::get::{draft_exists_with_id, filter_existing_provider_message_ids};
 use crate::messages::scheduled::get::get_scheduled_db_messages_by_link_id;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("draft_exists_with_id"))
 )]
 async fn draft_exists_with_id_returns_true_for_existing_draft(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-000000000e01")?;
     let draft_id = Uuid::parse_str("00000000-0000-0000-0000-00000000e501")?;
 
@@ -23,7 +23,7 @@ async fn draft_exists_with_id_returns_true_for_existing_draft(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("draft_exists_with_id"))
 )]
 async fn draft_exists_with_id_returns_false_for_non_draft_message(
@@ -40,7 +40,7 @@ async fn draft_exists_with_id_returns_false_for_non_draft_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("draft_exists_with_id"))
 )]
 async fn draft_exists_with_id_returns_false_for_wrong_link_id(
@@ -57,7 +57,7 @@ async fn draft_exists_with_id_returns_false_for_wrong_link_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("draft_exists_with_id"))
 )]
 async fn draft_exists_with_id_returns_false_for_nonexistent_message(
@@ -74,7 +74,7 @@ async fn draft_exists_with_id_returns_false_for_nonexistent_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_returns_unsent_only(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -108,7 +108,7 @@ async fn get_scheduled_db_messages_returns_unsent_only(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_excludes_sent_messages(
@@ -130,7 +130,7 @@ async fn get_scheduled_db_messages_excludes_sent_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_excludes_non_scheduled_messages(
@@ -152,7 +152,7 @@ async fn get_scheduled_db_messages_excludes_non_scheduled_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_excludes_immediate_send_undo_rows(
@@ -178,7 +178,7 @@ async fn get_scheduled_db_messages_excludes_immediate_send_undo_rows(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_isolates_by_link_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -198,7 +198,7 @@ async fn get_scheduled_db_messages_isolates_by_link_id(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_orders_by_created_at_desc(
@@ -225,7 +225,7 @@ async fn get_scheduled_db_messages_orders_by_created_at_desc(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_respects_limit(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -250,7 +250,7 @@ async fn get_scheduled_db_messages_respects_limit(pool: Pool<Postgres>) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_respects_offset(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -271,7 +271,7 @@ async fn get_scheduled_db_messages_respects_offset(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_pagination_works(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -309,7 +309,7 @@ async fn get_scheduled_db_messages_pagination_works(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_scheduled_db_messages"))
 )]
 async fn get_scheduled_db_messages_returns_empty_for_nonexistent_link(
@@ -339,7 +339,7 @@ async fn fetch_is_read(pool: &Pool<Postgres>, message_id: Uuid) -> anyhow::Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("message_read_status"))
 )]
 async fn update_message_read_status_batch_marks_messages_read(
@@ -372,7 +372,7 @@ async fn update_message_read_status_batch_marks_messages_read(
 /// update by anything other than the link silently matched zero rows, leaving
 /// `is_read` diverged from the labels and the denormalized thread flag.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("message_read_status"))
 )]
 async fn update_message_read_status_batch_scopes_to_owning_link(
@@ -398,7 +398,7 @@ async fn update_message_read_status_batch_scopes_to_owning_link(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("message_read_status"))
 )]
 async fn update_message_read_status_batch_leaves_other_inboxes_untouched(
@@ -422,7 +422,7 @@ async fn update_message_read_status_batch_leaves_other_inboxes_untouched(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("message_read_status"))
 )]
 async fn update_message_read_status_ignores_wrong_link(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -445,7 +445,7 @@ async fn update_message_read_status_ignores_wrong_link(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("draft_exists_with_id"))
 )]
 async fn filter_existing_provider_message_ids_partitions_known_and_missing(
@@ -474,7 +474,7 @@ async fn filter_existing_provider_message_ids_partitions_known_and_missing(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("draft_exists_with_id"))
 )]
 async fn parsed_reads_preserve_restored_draft_generation(
@@ -509,13 +509,13 @@ async fn parsed_reads_preserve_restored_draft_generation(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_message_sender_and_pretty_sender_skips_messages_without_sender_contact(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000301")?;
     let with_contact_id = Uuid::parse_str("00000000-0000-0000-0000-0000000e0601")?;

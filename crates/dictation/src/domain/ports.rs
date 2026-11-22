@@ -2,7 +2,7 @@
 
 use super::models::{DictationError, LanguageHint, Recording, Transcript};
 use bytes::Bytes;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{future::Future, time::Duration};
 
 /// Media inspection without coupling the use case to a container parser.
@@ -35,7 +35,7 @@ pub trait DictationService: Send + Sync + 'static {
     /// usage metering. Dictation never consumes chat credits or checks plans.
     fn transcribe(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         audio: Bytes,
         language: Option<LanguageHint>,
     ) -> impl Future<Output = Result<Transcript, DictationError>> + Send;

@@ -16,7 +16,7 @@ carry a W3C `traceparent` header. That trace ID is the join key:
 4. `tempo_get-trace` with `trace_id` and `datasourceUid: "tempo"`.
 
 Expected shape today: a `web-app` CLIENT span (`http POST /dss/...`, attributes include
-`usr.id`) parenting one Rust SERVER span (`http.request` from `macro_tower_layers`, with
+`usr.id`) parenting one Rust SERVER span (`http.request` from `rox_tower_layers`, with
 `http.route`, `url.path`, `http.response.status_code`, `latency_ms`, `request.id`).
 
 Secondary key: the HTTP response header `x-request-id` equals the server span's `request.id`
@@ -69,7 +69,7 @@ trace context — timestamps + service are the only join for those.
   applying and message fan-out remain untraced. Call joining and sharing now have
   user-action traces; see below.
 - `email_service` wraps its routes in tower-http's default `TraceLayer`, not
-  `macro_tower_layers`. Its request span is DEBUG level, below the INFO trace
+  `rox_tower_layers`. Its request span is DEBUG level, below the INFO trace
   filter. The span also ignores `traceparent`, so browser traces of email_service
   requests end at the `http` client span. The gap is read from the code and not
   yet confirmed in Tempo.

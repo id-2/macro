@@ -344,7 +344,7 @@ impl<R: MailboxSyncRepository, P: MailboxGateway, I: MailboxIngest> MailboxSyncS
     pub async fn discover_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repo
-            .claim_catalog(macro_uuid::generate_uuid_v7())
+            .claim_catalog(rox_uuid::generate_uuid_v7())
             .await
             .map_err(|error| claim_failed("discover", error))?
         else {
@@ -421,7 +421,7 @@ impl<R: MailboxSyncRepository, P: MailboxGateway, I: MailboxIngest> MailboxSyncS
     pub async fn enumerate_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repo
-            .claim_stream(macro_uuid::generate_uuid_v7())
+            .claim_stream(rox_uuid::generate_uuid_v7())
             .await
             .map_err(|error| claim_failed("enumerate", error))?
         else {
@@ -518,7 +518,7 @@ impl<R: MailboxSyncRepository, P: MailboxGateway, I: MailboxIngest> MailboxSyncS
     pub async fn reconcile_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repo
-            .claim_message(macro_uuid::generate_uuid_v7())
+            .claim_message(rox_uuid::generate_uuid_v7())
             .await
             .map_err(|error| claim_failed("reconcile", error))?
         else {

@@ -24,8 +24,8 @@ import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { z } from 'zod';
 
-const STORAGE_KEY = 'macro.ui-client-id';
-const CHANNEL = 'macro.ui-client';
+const STORAGE_KEY = 'rox.ui-client-id';
+const CHANNEL = 'rox.ui-client';
 
 /** A phone screen's short side is narrower than this, in CSS pixels. */
 const PHONE_SHORT_SIDE_PX = 640;

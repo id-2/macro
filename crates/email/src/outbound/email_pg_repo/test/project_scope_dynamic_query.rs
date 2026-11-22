@@ -53,7 +53,7 @@ async fn run_query(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -84,7 +84,7 @@ async fn project_access_widens_to_other_users_threads(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -129,7 +129,7 @@ async fn widened_rows_carry_owning_link_metadata(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -154,7 +154,7 @@ async fn team_sourced_project_grant_widens(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -185,7 +185,7 @@ async fn no_project_access_returns_only_own_threads(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -212,7 +212,7 @@ async fn view_filters_apply_to_widened_threads(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -238,7 +238,7 @@ async fn negated_project_filter_does_not_widen(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -271,7 +271,7 @@ async fn shared_include_and_project_scope_do_not_duplicate(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -298,7 +298,7 @@ async fn unparseable_user_id_skips_widening(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")
@@ -332,7 +332,7 @@ async fn shared_only_with_project_scope_excludes_owned_threads(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "email_project_scope")

@@ -13,14 +13,14 @@
 --     domain) plus a thread on alice's link from a different sender,
 --     plus a thread on carol's link that must be excluded.
 
--- == macro_user / User rows ==
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+-- == rox_user / User rows ==
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES
     ('a1111111-1111-1111-1111-111111111111', 'alice@team.example.com', 'alice@team.example.com', 'stripe_alice'),
     ('b1111111-1111-1111-1111-111111111111', 'bob@team.example.com',   'bob@team.example.com',   'stripe_bob'),
     ('c1111111-1111-1111-1111-111111111111', 'carol@team.example.com', 'carol@team.example.com', 'stripe_carol');
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES
     ('macro|alice@team.example.com', 'alice@team.example.com', 'Alice', 'a1111111-1111-1111-1111-111111111111'),
     ('macro|bob@team.example.com',   'bob@team.example.com',   'Bob',   'b1111111-1111-1111-1111-111111111111'),
@@ -46,7 +46,7 @@ VALUES
     ('e0000001-0000-0000-0000-000000000001', TRUE);
 
 -- == Email links (one per user) ==
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('a0000001-0000-0000-0000-000000000001', 'macro|alice@team.example.com', 'fa_alice', 'alice@team.example.com', 'GMAIL', true, NOW(), NOW()),
     ('a0000002-0000-0000-0000-000000000002', 'macro|bob@team.example.com',   'fa_bob',   'bob@team.example.com',   'GMAIL', true, NOW(), NOW()),
@@ -55,7 +55,7 @@ VALUES
 -- Each team contributor has explicitly consented to this primary mailbox.
 INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled)
 SELECT tu.team_id, tu.user_id, l.id, TRUE FROM team_user tu
-JOIN email_links l ON l.macro_id = tu.user_id AND l.is_primary;
+JOIN email_links l ON l.rox_id = tu.user_id AND l.is_primary;
 
 -- == Contacts ==
 -- Each link has its own row for the SAME external address. This is the
@@ -203,10 +203,10 @@ VALUES
     ('33330003-0000-0000-0000-000000000001', '11110003-0000-0000-0000-000000000001');
 
 -- == Alice's connected secondary (non-primary) link ==
--- Same macro_id as alice's primary link but a different email_address — a
+-- Same rox_id as alice's primary link but a different email_address — a
 -- personal mailbox connected as an extra inbox. Team-scoped queries must
 -- never read it: its threads, contacts, and labels stay out of CRM scope.
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('a0000004-0000-0000-0000-000000000004', 'macro|alice@team.example.com', 'fa_alice_personal', 'alice.personal@example.com', 'GMAIL', true, NOW(), NOW());
 

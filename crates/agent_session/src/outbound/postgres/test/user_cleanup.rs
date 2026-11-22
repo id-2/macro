@@ -8,7 +8,7 @@ use std::sync::Arc;
 
 /// The user is deliberately never deleted: no User cascade can make this pass.
 /// Harness tests separately prove every selected row goes through teardown first.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cleanup_batches_remove_all_session_rows_without_a_user_cascade(pool: PgPool) {
     const OTHER: &str = "macro|cleanup-other@example.com";
     let repo = test_repo(&pool);

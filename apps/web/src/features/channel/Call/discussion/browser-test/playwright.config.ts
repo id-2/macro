@@ -25,7 +25,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `MACRO_DEV_HTTPS=false bunx vite ${fullHost ? '--config src/features/channel/Call/discussion/browser-test/overlay.vite.config.ts' : ''} --port ${port} --strictPort`,
+    command: `ROX_DEV_HTTPS=false bunx vite ${fullHost ? '--config src/features/channel/Call/discussion/browser-test/overlay.vite.config.ts' : ''} --port ${port} --strictPort`,
     cwd: fileURLToPath(new URL('../../../../../../', import.meta.url)),
     url: `http://localhost:${port}/app/`,
     reuseExistingServer: false,

@@ -1,7 +1,7 @@
 //! Lifecycle events trigger an authoritative reread, including deletion.
 
 use ::agent_session::domain::events::AgentSessionLifecycleMacroEvent;
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 
 use super::{EventOutcome, KafkaProcessingContext, MAX_PROCESSING_ATTEMPTS, retry_processing};
 

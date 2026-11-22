@@ -1,5 +1,5 @@
 use super::get_all_jobs_by_fusionauth_user_id;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::email::db::backfill::BackfillJobStatus as DbStatus;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
@@ -18,7 +18,7 @@ async fn insert_job(pool: &Pool<Postgres>, fusion: &str, status: DbStatus, hours
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn all_jobs_returns_users_jobs_any_status_newest_first(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -47,7 +47,7 @@ async fn all_jobs_returns_users_jobs_any_status_newest_first(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn all_jobs_caps_at_100(pool: Pool<Postgres>) -> anyhow::Result<()> {
     const FUSION: &str = "fusion-cap-user";
 

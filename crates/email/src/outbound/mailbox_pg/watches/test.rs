@@ -1,6 +1,6 @@
 use super::*;
 use email_api_client::domain::models::EmailApiError;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sha2::{Digest, Sha256};
 
 async fn setup(db: &PgPool) -> (PgMailboxSync, Uuid, WatchLease, Uuid) {
@@ -27,7 +27,7 @@ fn notification(state: &str, subscription: &str, hint: WatchHint) -> WatchNotifi
         hint,
     }
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_a_matching_verifier_can_bind_an_unknown_create_and_wake_the_mailbox(db: PgPool) {
     let (repo, link, _, id) = setup(&db).await;
     sqlx::query!(
@@ -81,7 +81,7 @@ async fn only_a_matching_verifier_can_bind_an_unknown_create_and_wake_the_mailbo
         "sub"
     );
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn notification_during_a_delta_page_is_not_erased_by_its_checkpoint(db: PgPool) {
     let (repo, _, _, id) = setup(&db).await;
     let stream = repo.claim_stream(Uuid::new_v4()).await.unwrap().unwrap();
@@ -97,7 +97,7 @@ async fn notification_during_a_delta_page_is_not_erased_by_its_checkpoint(db: Pg
         "the authenticated wakeup must survive the page commit"
     );
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lifecycle_event_during_renewal_survives_worker_release(db: PgPool) {
     let (repo, _, lease, id) = setup(&db).await;
     MailboxWatchNotifications(repo.clone())
@@ -110,7 +110,7 @@ async fn lifecycle_event_during_renewal_survives_worker_release(db: PgPool) {
     repo.release_watch(&lease, 43200).await.unwrap();
     assert!(repo.claim_watch(Uuid::new_v4()).await.unwrap().is_some());
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconnect_rejects_old_notification_and_worker_but_keeps_attempt_for_remote_cleanup(
     db: PgPool,
 ) {
@@ -204,7 +204,7 @@ impl MailboxWatchGateway for Gateway {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subscription_upkeep_records_what_it_did_and_a_failed_renewal_is_an_error(db: PgPool) {
     let telemetry = crate::telemetry_capture::Telemetry::default();
     let _guard = telemetry.install();
@@ -257,7 +257,7 @@ async fn subscription_upkeep_records_what_it_did_and_a_failed_renewal_is_an_erro
     assert!(failed.contains_key("otel.status_description"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lifecycle_events_are_logged_with_the_mailbox_and_counted_on_the_span(db: PgPool) {
     let telemetry = crate::telemetry_capture::Telemetry::default();
     let _guard = telemetry.install();

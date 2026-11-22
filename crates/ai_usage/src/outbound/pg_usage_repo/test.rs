@@ -4,7 +4,7 @@ use crate::domain::{
     AiFeature, CompletionUsage, SYSTEM_USER_ID, Usage, UsageApiParams, UsageContext,
 };
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 fn completion(feature: AiFeature, model: &str, input: u64, output: u64) -> CompletionUsage {
@@ -28,7 +28,7 @@ fn completion(feature: AiFeature, model: &str, input: u64, output: u64) -> Compl
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn seeded_pricing_is_available(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     let price = repo.get_pricing("claude-opus-4-8").await.unwrap();
@@ -99,7 +99,7 @@ async fn seeded_pricing_is_available(pool: PgPool) {
 
 /// Usage on an agent's own key references that key, and forgetting the key
 /// keeps the usage while dropping the reference.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn usage_references_the_agent_key_that_paid_for_it(pool: PgPool) {
     let key_id = sqlx::query_scalar!(
         r#"
@@ -108,7 +108,7 @@ async fn usage_references_the_agent_key_that_paid_for_it(pool: PgPool) {
             VALUES (gen_random_uuid(), 'owner@example.com', 'owner@example.com', 'stripe_owner')
             RETURNING id
         ), owner_profile AS (
-            INSERT INTO "User" ("id", "email", "macro_user_id")
+            INSERT INTO "User" ("id", "email", "rox_user_id")
             SELECT 'macro|owner@example.com', 'owner@example.com', id FROM owner_identity
             RETURNING "id"
         ), agent AS (
@@ -145,12 +145,12 @@ async fn usage_references_the_agent_key_that_paid_for_it(pool: PgPool) {
 
 /// What an agent session's turns and titles spend is recorded against the
 /// session, so it sums per session; usage outside any session names none.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn agent_session_usage_rows_carry_their_session(pool: PgPool) {
     let service = UsageServiceImpl::new(PgUsageRepo::new(pool.clone()));
-    let owner = MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
-    let session = macro_uuid::generate_uuid_v7();
-    let other_session = macro_uuid::generate_uuid_v7();
+    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
+    let session = rox_uuid::generate_uuid_v7();
+    let other_session = rox_uuid::generate_uuid_v7();
     let one_million_input = UsageAmount::Tokens {
         input: 1_000_000,
         output: 0,
@@ -201,7 +201,7 @@ async fn agent_session_usage_rows_carry_their_session(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_and_query_roundtrips(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
 
@@ -234,7 +234,7 @@ async fn insert_and_query_roundtrips(pool: PgPool) {
     assert!((priced.cost.price.as_ref().unwrap().total - 30.0).abs() < 1e-3);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn gemini_3_8_flash_is_priced_like_deepseek_v4p1_flash(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
 
@@ -249,7 +249,7 @@ async fn gemini_3_8_flash_is_priced_like_deepseek_v4p1_flash(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_pricing_recomputes_existing_rows_at_the_discounted_rate(pool: PgPool) {
     let repo = PgUsageRepo::new(pool.clone());
     repo.set_pricing(
@@ -299,7 +299,7 @@ async fn set_pricing_recomputes_existing_rows_at_the_discounted_rate(pool: PgPoo
     assert!((price.total - 7.0).abs() < 1e-3);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_pricing_recomputes_existing_rows(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
 
@@ -340,7 +340,7 @@ async fn set_pricing_recomputes_existing_rows(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn counting_decisions_survive_repricing_and_remain_visible_to_analytics(pool: PgPool) {
     let repo = PgUsageRepo::new(pool.clone());
     let model = "counting-test-model";
@@ -351,7 +351,7 @@ async fn counting_decisions_survive_repricing_and_remain_visible_to_analytics(po
     sqlx::query!(
         r#"INSERT INTO ai_usage (id, feature, user_id, model, input_tokens, output_tokens)
            VALUES ($1, 'chat', $2, $3, 1000000, 0)"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         row.user.as_ref(),
         model,
     )
@@ -400,12 +400,12 @@ async fn counting_decisions_survive_repricing_and_remain_visible_to_analytics(po
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn query_filters_by_user(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
 
     let mut other = completion(AiFeature::Chat, "claude-opus-4-8", 1, 1);
-    other.user = MacroUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap();
+    other.user = RoxUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap();
     repo.insert_usage(&other, true).await.unwrap();
     repo.insert_usage(&completion(AiFeature::Chat, "claude-opus-4-8", 1, 1), false)
         .await
@@ -414,7 +414,7 @@ async fn query_filters_by_user(pool: PgPool) {
     let only_other = repo
         .query_usage(&UsageApiParams {
             include_users: vec![
-                MacroUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap(),
+                RoxUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap(),
             ],
             ..Default::default()
         })
@@ -424,7 +424,7 @@ async fn query_filters_by_user(pool: PgPool) {
     assert_eq!(only_other[0].user.as_ref(), "macro|someone@example.com");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pricing_resolves_provider_qualified_ids(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     assert_eq!(
@@ -456,7 +456,7 @@ async fn pricing_resolves_provider_qualified_ids(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn duration_usage_roundtrips_and_reprices_without_affecting_tokens(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     let mut audio = completion(AiFeature::Dictation, "whisper-1", 0, 0);
@@ -533,7 +533,7 @@ async fn duration_usage_roundtrips_and_reprices_without_affecting_tokens(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn repricing_cannot_apply_audio_rates_to_token_usage(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     repo.insert_usage(
@@ -562,7 +562,7 @@ async fn repricing_cannot_apply_audio_rates_to_token_usage(pool: PgPool) {
     assert_eq!(rows[0].cost.price.unwrap().total, 2.0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cached_token_usage_roundtrips_with_its_cache_rates(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     let amount = UsageAmount::Tokens {
@@ -613,7 +613,7 @@ async fn cached_token_usage_roundtrips_with_its_cache_rates(pool: PgPool) {
     assert!((price.total - 0.1425).abs() < 1e-6);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn repricing_bills_cache_tokens_and_unprices_them_without_a_cache_rate(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     repo.insert_usage(
@@ -682,7 +682,7 @@ async fn repricing_bills_cache_tokens_and_unprices_them_without_a_cache_rate(poo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn accelerated_and_long_context_prices_remain_distinct(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     for (model, input, output, cache_read, cache_write) in [
@@ -708,7 +708,7 @@ async fn accelerated_and_long_context_prices_remain_distinct(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn credit_usage_roundtrips_and_reprices_without_affecting_tokens(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     let mut search = completion(AiFeature::WebSearch, "tavily", 0, 0);
@@ -792,7 +792,7 @@ async fn credit_usage_roundtrips_and_reprices_without_affecting_tokens(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn repricing_cannot_apply_credit_rates_to_token_usage(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
     repo.insert_usage(

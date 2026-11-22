@@ -14,7 +14,7 @@
 
    Also maps the profile claims onto the user: assigning a reconcile lambda
    replaces FusionAuth's default one, so without this the user is created with
-   no name and the user.create webhook has nothing to seed the Macro profile
+   no name and the user.create webhook has nothing to seed the Rox profile
    with.
 
    BLOCK comments only in this file, as in reconcile_secondary_idp_link.js:
@@ -59,7 +59,7 @@ function reconcile(user, registration, jwt, id_token, tokens) {
   }
 
   /* Only fill what's missing: this runs on every login, and the user may have
-     since changed their name in Macro. */
+     since changed their name in Rox. */
   if (!user.firstName) {
     user.firstName = claim('given_name');
   }

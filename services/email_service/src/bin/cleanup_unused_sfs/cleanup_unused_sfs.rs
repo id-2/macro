@@ -25,7 +25,7 @@ use std::time::Instant;
 
 use anyhow::Context;
 use futures::stream::{StreamExt as FuturesStreamExt, TryStreamExt};
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 
@@ -86,7 +86,7 @@ async fn main() -> anyhow::Result<()> {
     println!("=== Cleanup Unused SFS Files ===\n");
 
     // Initialize and load configuration
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = load_and_print_config()?;
 
     // Count UUIDs to delete

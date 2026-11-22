@@ -78,16 +78,16 @@ pub struct InviteMeetingRequest {
     params(("token" = String, Path)), request_body = InviteMeetingRequest,
     responses((status = 204), (status = 400, body = ErrorResponse), (status = 403, body = ErrorResponse))) ]
 #[tracing::instrument(err, skip_all)]
-pub async fn invite<S: CallService, Svc: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn invite<S: CallService, Svc: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     Path(token): Path<String>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<InviteMeetingRequest>,
 ) -> Result<StatusCode, CallError> {
     state
         .service
         .invite_to_meeting(
-            actor.authorization.user.macro_user_id.clone(),
+            actor.authorization.user.rox_user_id.clone(),
             MeetingToken::try_from(token)?,
             request.email,
         )
@@ -103,17 +103,17 @@ pub async fn invite<S: CallService, Svc: EntityAccessService, Auth: MacroAuthori
 pub async fn invite_permissions<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     Path(token): Path<String>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<MeetingInvitePermissions>, CallError> {
     Ok(Json(
         state
             .service
             .get_meeting_invite_permissions(
-                actor.authorization.user.macro_user_id.clone(),
+                actor.authorization.user.rox_user_id.clone(),
                 MeetingToken::try_from(token)?,
             )
             .await?,
@@ -128,17 +128,17 @@ pub async fn invite_permissions<
 pub async fn invite_users<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     Path(token): Path<String>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<InviteMeetingUsersRequest>,
 ) -> Result<StatusCode, CallError> {
     state
         .service
         .invite_users_to_meeting(
-            actor.authorization.user.macro_user_id.clone(),
+            actor.authorization.user.rox_user_id.clone(),
             MeetingToken::try_from(token)?,
             request,
         )
@@ -150,14 +150,14 @@ pub async fn invite_users<
 #[utoipa::path(post, operation_id = "meeting_prepare", path = "/call/meetings/prepare",
     responses((status = 200, body = crate::domain::meetings::MeetingPreparation), (status = 401, body = ErrorResponse)))]
 #[tracing::instrument(err, skip_all)]
-pub async fn prepare<S: CallService, Svc: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn prepare<S: CallService, Svc: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<CallRouterState<S, Svc, Auth>>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<crate::domain::meetings::MeetingPreparation>, CallError> {
     Ok(Json(
         state
             .service
-            .prepare_meeting(actor.authorization.user.macro_user_id.clone())
+            .prepare_meeting(actor.authorization.user.rox_user_id.clone())
             .await?,
     ))
 }
@@ -169,15 +169,15 @@ pub async fn prepare<S: CallService, Svc: EntityAccessService, Auth: MacroAuthor
 pub async fn cancel_preparation<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     Path(id): Path<Uuid>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<StatusCode, CallError> {
     state
         .service
-        .cancel_meeting_preparation(actor.authorization.user.macro_user_id.clone(), id)
+        .cancel_meeting_preparation(actor.authorization.user.rox_user_id.clone(), id)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -187,15 +187,15 @@ pub async fn cancel_preparation<
     request_body = CreateMeetingRequest,
     responses((status = 200, body = Meeting), (status = 400, body = ErrorResponse), (status = 401, body = ErrorResponse), (status = 403, body = ErrorResponse), (status = 404, body = ErrorResponse))) ]
 #[tracing::instrument(err, skip_all)]
-pub async fn create<S: CallService, Svc: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn create<S: CallService, Svc: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<CallRouterState<S, Svc, Auth>>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<CreateMeetingRequest>,
 ) -> Result<Json<Meeting>, CallError> {
     Ok(Json(
         state
             .service
-            .create_meeting(actor.authorization.user.macro_user_id.clone(), request)
+            .create_meeting(actor.authorization.user.rox_user_id.clone(), request)
             .await?,
     ))
 }
@@ -204,13 +204,13 @@ pub async fn create<S: CallService, Svc: EntityAccessService, Auth: MacroAuthori
 #[utoipa::path(get, operation_id = "meeting_list", path = "/call/meetings",
     responses((status = 200, body = MeetingsResponse), (status = 400, body = ErrorResponse), (status = 401, body = ErrorResponse), (status = 403, body = ErrorResponse), (status = 404, body = ErrorResponse))) ]
 #[tracing::instrument(err, skip_all)]
-pub async fn list<S: CallService, Svc: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn list<S: CallService, Svc: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<CallRouterState<S, Svc, Auth>>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<MeetingsResponse>, CallError> {
     let meetings = state
         .service
-        .list_meetings(actor.authorization.user.macro_user_id.clone())
+        .list_meetings(actor.authorization.user.rox_user_id.clone())
         .await?;
     Ok(Json(MeetingsResponse { meetings }))
 }
@@ -222,14 +222,14 @@ pub async fn list<S: CallService, Svc: EntityAccessService, Auth: MacroAuthoriza
 pub async fn list_active<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<ActiveMeetingsResponse>, CallError> {
     let meetings = state
         .service
-        .list_active_meetings(actor.authorization.user.macro_user_id.clone())
+        .list_active_meetings(actor.authorization.user.rox_user_id.clone())
         .await?;
     Ok(Json(ActiveMeetingsResponse { meetings }))
 }
@@ -239,14 +239,14 @@ pub async fn list_active<
     params(("meeting_id" = Uuid, Path)),
     responses((status = 204), (status = 400, body = ErrorResponse), (status = 401, body = ErrorResponse), (status = 403, body = ErrorResponse), (status = 404, body = ErrorResponse))) ]
 #[tracing::instrument(err, skip_all)]
-pub async fn cancel<S: CallService, Svc: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn cancel<S: CallService, Svc: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     Path(meeting_id): Path<Uuid>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<StatusCode, CallError> {
     state
         .service
-        .cancel_meeting(actor.authorization.user.macro_user_id.clone(), &meeting_id)
+        .cancel_meeting(actor.authorization.user.rox_user_id.clone(), &meeting_id)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -256,7 +256,7 @@ pub async fn cancel<S: CallService, Svc: EntityAccessService, Auth: MacroAuthori
     params(("call_id" = Uuid, Path)),
     responses((status = 200, body = Meeting), (status = 400, body = ErrorResponse), (status = 401, body = ErrorResponse), (status = 403, body = ErrorResponse), (status = 404, body = ErrorResponse))) ]
 #[tracing::instrument(err, skip_all)]
-pub async fn share<S: CallService, Svc: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn share<S: CallService, Svc: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallAccessLevelExtractor<ViewAccessLevel, Svc, Auth>,
 ) -> Result<Json<Meeting>, CallError> {
@@ -274,10 +274,10 @@ pub async fn share<S: CallService, Svc: EntityAccessService, Auth: MacroAuthoriz
     request_body(content = ref("#/components/schemas/JoinCallRequest"), content_type = "application/json"),
     responses((status = 200, body = CallTokenResponse), (status = 400, body = ErrorResponse), (status = 401, body = ErrorResponse), (status = 403, body = ErrorResponse), (status = 404, body = ErrorResponse))) ]
 #[tracing::instrument(err, skip_all)]
-pub async fn join<S: CallService, Svc: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn join<S: CallService, Svc: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     Path(token): Path<String>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
     MeetingJoinBody(request): MeetingJoinBody,
 ) -> Result<Json<CallTokenResponse>, CallError> {
@@ -289,7 +289,7 @@ pub async fn join<S: CallService, Svc: EntityAccessService, Auth: MacroAuthoriza
         Some(body)
             if state
                 .service
-                .programmatic_calls_enabled(actor.authorization.user.macro_user_id.clone())
+                .programmatic_calls_enabled(actor.authorization.user.rox_user_id.clone())
                 .await =>
         {
             (
@@ -304,7 +304,7 @@ pub async fn join<S: CallService, Svc: EntityAccessService, Auth: MacroAuthoriza
             .service
             .join_meeting_with_options(
                 MeetingToken::try_from(token)?,
-                actor.authorization.user.macro_user_id.clone(),
+                actor.authorization.user.rox_user_id.clone(),
                 request,
                 is_program,
                 actor.authorization.user.agent_id.is_some(),
@@ -402,17 +402,17 @@ pub async fn leave<S: CallService>(
     params(("meeting_id" = Uuid, Path)), request_body = UpdateMeetingRequest,
     responses((status = 200, body = Meeting), (status = 400, body = ErrorResponse), (status = 403, body = ErrorResponse))) ]
 #[tracing::instrument(err, skip_all)]
-pub async fn update<S: CallService, Svc: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn update<S: CallService, Svc: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     Path(meeting_id): Path<Uuid>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<UpdateMeetingRequest>,
 ) -> Result<Json<Meeting>, CallError> {
     Ok(Json(
         state
             .service
             .update_meeting(
-                actor.authorization.user.macro_user_id.clone(),
+                actor.authorization.user.rox_user_id.clone(),
                 &meeting_id,
                 request,
             )
@@ -428,18 +428,18 @@ pub async fn update<S: CallService, Svc: EntityAccessService, Auth: MacroAuthori
 pub async fn participants<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     Path(token): Path<String>,
-    actor: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    actor: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<crate::domain::meetings::MeetingParticipants>, CallError> {
     Ok(Json(
         state
             .service
             .get_meeting_participants(
                 MeetingToken::try_from(token)?,
-                Some(actor.authorization.user.macro_user_id.clone()),
+                Some(actor.authorization.user.rox_user_id.clone()),
             )
             .await?,
     ))

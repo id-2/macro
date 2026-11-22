@@ -5,7 +5,7 @@ use crate::domain::{
 };
 use crate::outbound::PgUsageRepo;
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 fn publication() -> RatePublication {
     let effective_at = DateTime::from_timestamp(1_800_000_000, 0).unwrap();
@@ -94,7 +94,7 @@ async fn prepare(repo: &PgFinancialUsageRepo) -> AuthorizedInvocation {
     admission(request, publication.snapshot)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rate_publications_are_immutable_qualified_and_expire_closed(pool: PgPool) {
     let repo = PgFinancialUsageRepo::new(pool.clone());
     let original = publication();
@@ -186,7 +186,7 @@ async fn rate_publications_are_immutable_qualified_and_expire_closed(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lost_acknowledgements_and_concurrent_replays_write_once(pool: PgPool) {
     let repo = PgFinancialUsageRepo::new(pool);
     let admission = prepare(&repo).await;
@@ -233,13 +233,13 @@ async fn lost_acknowledgements_and_concurrent_replays_write_once(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn conflicting_replays_and_direct_mutation_cannot_replace_facts(pool: PgPool) {
     let repo = PgFinancialUsageRepo::new(pool.clone());
     let admission = prepare(&repo).await;
     repo.admit(admission.clone()).await.unwrap();
     let mut changed = admission.request.clone();
-    changed.user = MacroUserIdStr::try_from("macro|other@example.com".to_owned()).unwrap();
+    changed.user = RoxUserIdStr::try_from("macro|other@example.com".to_owned()).unwrap();
     assert!(matches!(
         repo.prepare(changed, admission.rate.clone()).await,
         Err(FinancialError::ReplayConflict {
@@ -293,7 +293,7 @@ async fn conflicting_replays_and_direct_mutation_cannot_replace_facts(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn interrupted_and_unpriced_invocations_remain_recoverable_with_bounded_scans(pool: PgPool) {
     let repo = PgFinancialUsageRepo::new(pool);
     let first = prepare(&repo).await;
@@ -359,7 +359,7 @@ async fn interrupted_and_unpriced_invocations_remain_recoverable_with_bounded_sc
     assert!(repo.pending(query).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_analytics_writes_and_repricing_leave_financial_evidence_unchanged(pool: PgPool) {
     let repo = PgFinancialUsageRepo::new(pool.clone());
     let admission = prepare(&repo).await;

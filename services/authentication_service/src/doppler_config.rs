@@ -1,5 +1,5 @@
 use authentication_service::Config;
-use macro_env::Environment;
+use rox_env::Environment;
 
 const DOPPLER_PROJECT: &str = "authentication-service";
 

@@ -4,7 +4,7 @@ async fn assert_membership(pool: &Pool<Postgres>) -> anyhow::Result<()> {
     let items = expanded_dynamic_cursor_soup_grouped(
         pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
             limit: 2,
             cursor: Query::Sort(
                 SimpleSortMethod::UpdatedAt.into(),
@@ -72,10 +72,10 @@ async fn assert_membership(pool: &Pool<Postgres>) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn inherited_and_direct_grants_without_owner_fallback(
     pool: Pool<Postgres>,
@@ -85,11 +85,11 @@ async fn inherited_and_direct_grants_without_owner_fallback(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
     fixtures(path = ".", scripts("access")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn source_membership_deduplicates_grants(pool: Pool<Postgres>) -> anyhow::Result<()> {
     assert_membership(&pool).await?;
@@ -97,7 +97,7 @@ async fn source_membership_deduplicates_grants(pool: Pool<Postgres>) -> anyhow::
     let items = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
             limit: 50,
             cursor: Query::Sort(
                 SimpleSortMethod::UpdatedAt.into(),
@@ -144,7 +144,7 @@ pub(super) async fn seed_calendar_access(pool: &Pool<Postgres>) -> anyhow::Resul
         let link = uuid::Uuid::now_v7();
         let id = uuid::Uuid::now_v7();
         sqlx::query!(
-            "INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider) VALUES ($1, $2, $2, $3, 'GMAIL') ON CONFLICT DO NOTHING",
+            "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider) VALUES ($1, $2, $2, $3, 'GMAIL') ON CONFLICT DO NOTHING",
             link, owner, format!("calendar-{index}@test.com"),
         ).execute(pool).await?;
         sqlx::query!(
@@ -153,7 +153,7 @@ pub(super) async fn seed_calendar_access(pool: &Pool<Postgres>) -> anyhow::Resul
         ).execute(pool).await?;
         if index == 1 {
             sqlx::query!(
-                "INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id) VALUES ('macro|user-1@test.com', 'macro|other@test.com', $1) ON CONFLICT DO NOTHING",
+                "INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ('macro|user-1@test.com', 'macro|other@test.com', $1) ON CONFLICT DO NOTHING",
                 link,
             ).execute(pool).await?;
         }
@@ -164,11 +164,11 @@ pub(super) async fn seed_calendar_access(pool: &Pool<Postgres>) -> anyhow::Resul
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
     fixtures(path = ".", scripts("access")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn calendar_owner_or_linked_account_only(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let ids = seed_calendar_access(&pool).await?;
@@ -176,7 +176,7 @@ async fn calendar_owner_or_linked_account_only(pool: Pool<Postgres>) -> anyhow::
         let items = expanded_dynamic_cursor_soup_grouped(
             &pool,
             GroupedDynamicCursorArgs {
-                user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com")?,
+                user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
                 limit: 50,
                 cursor: Query::Sort(SimpleSortMethod::ViewedAt.into(), filter),
                 exclude_frecency: false,

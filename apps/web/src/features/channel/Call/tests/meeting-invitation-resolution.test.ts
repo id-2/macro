@@ -38,7 +38,7 @@ it('publishes account-scoped meeting resolutions locally and across tabs', async
   );
   expect(
     JSON.parse(
-      localStorage.getItem('macro.meeting-invitation-resolution') ?? ''
+      localStorage.getItem('rox.meeting-invitation-resolution') ?? ''
     )
   ).toEqual(resolution);
   BroadcastChannelStub.instance?.handler?.({ data: resolution });
@@ -62,7 +62,7 @@ it('accepts storage fallback delivery and rejects malformed resolutions', async 
   };
   window.dispatchEvent(
     new StorageEvent('storage', {
-      key: 'macro.meeting-invitation-resolution',
+      key: 'rox.meeting-invitation-resolution',
       newValue: JSON.stringify(resolution),
     })
   );

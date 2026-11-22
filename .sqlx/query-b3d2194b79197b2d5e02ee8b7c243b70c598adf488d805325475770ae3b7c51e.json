@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                u.id,\n                u.\"stripeCustomerId\" as \"stripe_customer_id\"\n            FROM \"User\" u\n            WHERE u.\"macro_user_id\" IS NULL\n                AND u.id > $1\n            ORDER BY u.id ASC\n            LIMIT $2\n        ",
+  "query": "\n            SELECT\n                u.id,\n                u.\"stripeCustomerId\" as \"stripe_customer_id\"\n            FROM \"User\" u\n            WHERE u.\"rox_user_id\" IS NULL\n                AND u.id > $1\n            ORDER BY u.id ASC\n            LIMIT $2\n        ",
   "describe": {
     "columns": [
       {

@@ -62,7 +62,7 @@ impl utoipa::Modify for Security {
         components.add_security_scheme(
             "internal_key",
             SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new(
-                crate::constants::header_names::MACRO_INTERNAL_AUTH_KEY_HEADER_KEY,
+                crate::constants::header_names::ROX_INTERNAL_AUTH_KEY_HEADER_KEY,
             ))),
         );
     }

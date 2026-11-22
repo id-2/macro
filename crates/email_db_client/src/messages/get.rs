@@ -203,7 +203,7 @@ pub async fn fetch_messages_metadata(
             -- No body attributes
             NULL as "body_text?",
             NULL as "body_html_sanitized?",
-            NULL as "body_macro?"
+            NULL as "body_rox?"
         FROM email_messages
         WHERE thread_id = $1
         ORDER BY internal_date_ts DESC NULLS LAST
@@ -279,7 +279,7 @@ pub async fn fetch_messages_with_labels(
             -- No body attributes
             NULL as "body_text?",
             NULL as "body_html_sanitized?",
-            NULL as "body_macro?"
+            NULL as "body_rox?"
         FROM email_messages
         WHERE thread_id = $1 and link_id = $2
         ORDER BY internal_date_ts DESC NULLS LAST
@@ -402,7 +402,7 @@ pub async fn get_message_to_send(
             is_draft,
             body_text,
             body_html_sanitized,
-            body_macro,
+            body_rox,
             headers_jsonb,
             created_at,
             updated_at

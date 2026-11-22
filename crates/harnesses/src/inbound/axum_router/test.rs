@@ -22,7 +22,7 @@ fn harness(connected: bool) -> Harness {
         last_connected_at: None,
         computer_id: None,
         team_agent_user_id: None,
-        claude_mode: ClaudeMode::MacroCredits,
+        claude_mode: ClaudeMode::RoxCredits,
     }
 }
 

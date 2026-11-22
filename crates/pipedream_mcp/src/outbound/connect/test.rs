@@ -14,8 +14,8 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 const KEY: &str = "ck_test_macro";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("caller@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("caller@example.com").unwrap()
 }
 
 fn adapter(base: &str) -> ConnectAdapter {

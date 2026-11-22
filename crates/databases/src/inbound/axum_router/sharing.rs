@@ -19,7 +19,7 @@ pub async fn get_permissions_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService + DatabaseSharingService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service
@@ -48,7 +48,7 @@ pub async fn update_permissions_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService + DatabaseSharingService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service

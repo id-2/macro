@@ -15,13 +15,13 @@
 --   Dave: td2(Z,11:00), td1(X,10:00), te2(Y,09:00), td3(W,07:00)
 --   Erin: te3(W,12:00), td2(Z,11:00), te2(Y,09:00), te1(X,08:00)
 
--- == macro_user / User rows ==
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+-- == rox_user / User rows ==
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES
     ('d1111111-1111-1111-1111-111111111111', 'dave@beta.com', 'dave@beta.com', 'stripe_dave'),
     ('e1111111-1111-1111-1111-111111111111', 'erin@beta.com', 'erin@beta.com', 'stripe_erin');
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES
     ('macro|dave@beta.com', 'dave@beta.com', 'Dave', 'd1111111-1111-1111-1111-111111111111'),
     ('macro|erin@beta.com', 'erin@beta.com', 'Erin', 'e1111111-1111-1111-1111-111111111111');
@@ -41,7 +41,7 @@ VALUES
     ('e0000002-0000-0000-0000-000000000002', TRUE);
 
 -- == Email links ==
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('d0000001-0000-0000-0000-000000000001', 'macro|dave@beta.com', 'fa_dave', 'dave@beta.com', 'GMAIL', true, NOW(), NOW()),
     ('d0000002-0000-0000-0000-000000000002', 'macro|erin@beta.com', 'fa_erin', 'erin@beta.com', 'GMAIL', true, NOW(), NOW());
@@ -49,7 +49,7 @@ VALUES
 -- Each team contributor has explicitly consented to this primary mailbox.
 INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled)
 SELECT tu.team_id, tu.user_id, l.id, TRUE FROM team_user tu
-JOIN email_links l ON l.macro_id = tu.user_id AND l.is_primary;
+JOIN email_links l ON l.rox_id = tu.user_id AND l.is_primary;
 
 -- == Contacts — vendor@acme.example.com, one row per link ==
 INSERT INTO email_contacts (id, link_id, email_address, name, created_at, updated_at)

@@ -64,7 +64,7 @@ export function useMailAccountsQuery(enabled: Accessor<boolean> = () => true) {
           email_address: link.emailAddress,
           provider: link.provider,
           photo_url: link.photoUrl,
-          macro_id: link.macroId,
+          rox_id: link.macroId,
           is_primary: link.isPrimary,
           needs_reauth: link.needsReauth,
           draft_is_signal: link.draftIsSignal,

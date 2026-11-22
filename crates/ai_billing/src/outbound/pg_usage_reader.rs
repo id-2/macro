@@ -7,7 +7,7 @@ use crate::domain::plan_change::{
     PlanChange, PlanUsageSegment, RecordedPlanChange, meter_plan_usage,
 };
 use crate::domain::{BillingError, BillingPeriod, PlanTier, Result, SeatUsage, UsageReader};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::collections::HashMap;
 
@@ -41,7 +41,7 @@ impl PgUsageReader {
 impl UsageReader for PgUsageReader {
     async fn usage_cost_cents_by_user(
         &self,
-        users: &[MacroUserIdStr<'static>],
+        users: &[RoxUserIdStr<'static>],
         period: BillingPeriod,
     ) -> Result<Vec<SeatUsage>> {
         if users.is_empty() {
@@ -113,7 +113,7 @@ impl UsageReader for PgUsageReader {
                 continue;
             }
             result.push(SeatUsage {
-                user: MacroUserIdStr::try_from(id).map_err(|e| BillingError::Storage(e.into()))?,
+                user: RoxUserIdStr::try_from(id).map_err(|e| BillingError::Storage(e.into()))?,
                 used_cents: usage.used_cents,
                 chargeable_cost_cents: (!history.is_empty()).then_some(usage.chargeable_cents),
             });

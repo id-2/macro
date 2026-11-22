@@ -7,7 +7,7 @@ publish = false
 [dependencies]
 async-trait = { workspace = true }
 http = { workspace = true }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 pipedream_mcp = { path = "../pipedream_mcp" }
 rootcause = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

@@ -13,7 +13,7 @@ use email::domain::{
 use crate::loaders::EmailContentMessage;
 use crate::objects::GraphqlSoupEmailMessage;
 use graphql_common::{parse_id, require_authenticated_user};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 mod send;
@@ -56,20 +56,20 @@ pub trait EmailMutationService: Send + Sync + 'static {
     /// Resolve an owned/delegated message's conflict or uncertain delivery.
     fn resolve_email_message_operation(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         request: email::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> impl Future<Output = Result<Uuid, EmailErr>> + Send;
     /// Apply provider-neutral state to an inbox owned by or delegated to the actor.
     fn set_email_thread_state(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         action: email::domain::models::mailbox_action::MailboxAction,
     ) -> impl Future<Output = Result<(), EmailErr>> + Send;
     /// Send from a caller-accessible inbox, with server-side sender validation.
     fn send_email_message(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         link_id: Option<Uuid>,
         input: CreateDraftInput,
     ) -> impl Future<Output = Result<CreatedDraft, EmailErr>> + Send;
@@ -77,21 +77,21 @@ pub trait EmailMutationService: Send + Sync + 'static {
     /// Mark an accessible email thread as seen by the authenticated user.
     fn mark_email_thread_seen(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> impl Future<Output = Result<(), EmailErr>> + Send;
 
     /// Mark an accessible email thread unread, resolving its inbox's label server-side.
     fn mark_email_thread_unread(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> impl Future<Output = Result<(), EmailErr>> + Send;
 
     /// Archive or unarchive an owned/delegated thread through its owning inbox.
     fn set_email_thread_archived(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> impl Future<Output = Result<(), EmailErr>> + Send;
@@ -99,7 +99,7 @@ pub trait EmailMutationService: Send + Sync + 'static {
     /// Archive or unarchive owned/delegated threads with one provider write per inbox.
     fn set_email_threads_archived(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
         archived: bool,
     ) -> impl Future<Output = Result<SetThreadsArchivedResult, EmailErr>> + Send;
@@ -107,7 +107,7 @@ pub trait EmailMutationService: Send + Sync + 'static {
     /// Add or remove one label from every message in an accessible email thread.
     fn update_email_thread_label(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         label_id: Uuid,
         value: bool,
@@ -117,7 +117,7 @@ pub trait EmailMutationService: Send + Sync + 'static {
     /// sending inbox from `link_id` (or the caller's primary inbox).
     fn save_email_draft(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         link_id: Option<Uuid>,
         input: CreateDraftInput,
     ) -> impl Future<Output = Result<SavedUserDraft, EmailErr>> + Send;
@@ -126,7 +126,7 @@ pub trait EmailMutationService: Send + Sync + 'static {
     /// is already gone is a successful no-op.
     fn delete_email_draft(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         draft_id: Uuid,
 
         expected_generation: i32,
@@ -139,14 +139,14 @@ where
 {
     async fn resolve_email_message_operation(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         request: email::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> Result<Uuid, EmailErr> {
         self.resolve_message_operation(user_id, request).await
     }
     async fn set_email_thread_state(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         action: email::domain::models::mailbox_action::MailboxAction,
     ) -> Result<(), EmailErr> {
@@ -156,7 +156,7 @@ where
     }
     async fn send_email_message(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         link_id: Option<Uuid>,
         input: CreateDraftInput,
     ) -> Result<CreatedDraft, EmailErr> {
@@ -165,7 +165,7 @@ where
 
     async fn mark_email_thread_seen(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<(), EmailErr> {
         self.mark_thread_seen(user_id, thread_id).await
@@ -173,7 +173,7 @@ where
 
     async fn mark_email_thread_unread(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<(), EmailErr> {
         self.mark_thread_unread(user_id, thread_id).await
@@ -181,7 +181,7 @@ where
 
     async fn set_email_thread_archived(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> Result<(), EmailErr> {
@@ -190,7 +190,7 @@ where
 
     async fn set_email_threads_archived(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
         archived: bool,
     ) -> Result<SetThreadsArchivedResult, EmailErr> {
@@ -200,7 +200,7 @@ where
 
     async fn update_email_thread_label(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         label_id: Uuid,
         value: bool,
@@ -211,7 +211,7 @@ where
 
     async fn save_email_draft(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         link_id: Option<Uuid>,
         input: CreateDraftInput,
     ) -> Result<SavedUserDraft, EmailErr> {
@@ -220,7 +220,7 @@ where
 
     async fn delete_email_draft(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         draft_id: Uuid,
 
         expected_generation: i32,
@@ -245,7 +245,7 @@ pub trait EmailThreadMutationOutput: Send + Sync + 'static {
     /// Reload the mutated thread for the authenticated viewer.
     fn load_email_thread<'ctx>(
         ctx: &'ctx Context<'_>,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> EmailThreadMutationLoadFuture<'ctx, Self::Thread>;
 }
@@ -401,7 +401,7 @@ pub struct SaveEmailDraftInput {
     /// and sanitizes it before storing.
     pub body_html: Option<String>,
     /// Rox body.
-    pub body_macro: Option<String>,
+    pub body_rox: Option<String>,
     /// Scheduled send time (RFC 3339), when the draft is scheduled.
     pub send_time: Option<String>,
 }
@@ -563,7 +563,7 @@ fn saved_draft_message(saved: SavedUserDraft) -> Message {
         labels,
         body_text: draft.body_text,
         body_html_sanitized: draft.body_html,
-        body_macro: draft.body_macro,
+        body_rox: draft.body_rox,
         body_replyless,
         calendar_invitations: Default::default(),
         attachments,
@@ -649,7 +649,7 @@ fn mutation_error(error: &EmailErr) -> async_graphql::Error {
 
 async fn reload_thread<O: EmailThreadMutationOutput>(
     ctx: &Context<'_>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     thread_id: Uuid,
 ) -> async_graphql::Result<O::Thread> {
     O::load_email_thread(ctx, user_id, thread_id)
@@ -1015,7 +1015,7 @@ pub(crate) fn draft_input_from_graphql(
         sender_email: input
             .sender_email
             .map(|address| {
-                macro_user_id::email::EmailStr::try_from(address)
+                rox_user_id::email::EmailStr::try_from(address)
                     .map_err(|_| draft_mutation_error(&EmailErr::InvalidSender))
             })
             .transpose()?,
@@ -1036,7 +1036,7 @@ pub(crate) fn draft_input_from_graphql(
         bcc: contacts_from_inputs(input.bcc),
         body_text: input.body_text,
         body_html: input.body_html,
-        body_macro: input.body_macro,
+        body_rox: input.body_rox,
         headers_json: None,
         send_time,
         include_signature: None,

@@ -5,12 +5,12 @@ where
     R: PropertiesRepo,
     P: PermissionService,
     N: NotificationService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<R::Err>,
 {
     pub(super) async fn prepare_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         request: &AddPropertyOptionRequest,

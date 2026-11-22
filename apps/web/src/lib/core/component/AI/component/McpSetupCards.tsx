@@ -5,8 +5,8 @@ import { Button, cn } from '@ui';
 import { createSignal, For, Show } from 'solid-js';
 import {
   CLI_COMMANDS,
-  MACRO_MCP_CONFIG,
-  MACRO_MCP_URL,
+  ROX_MCP_CONFIG,
+  ROX_MCP_URL,
   WEB_CLIENTS,
 } from './mcpConstants';
 import { useClipboardCopy } from './useClipboardCopy';
@@ -98,7 +98,7 @@ export function McpSetupCards(props: { class?: string }) {
             label={item.label}
             hint={item.hint}
             copyKey={item.key}
-            copyValue={MACRO_MCP_URL}
+            copyValue={ROX_MCP_URL}
             copiedKey={copiedKey}
             onCopy={copy}
           />
@@ -108,7 +108,7 @@ export function McpSetupCards(props: { class?: string }) {
       <CollapsibleCard
         label="IDE"
         copyKey="json"
-        copyValue={MACRO_MCP_CONFIG}
+        copyValue={ROX_MCP_CONFIG}
         copiedKey={copiedKey}
         onCopy={copy}
       />

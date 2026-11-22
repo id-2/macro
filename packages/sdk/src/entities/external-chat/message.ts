@@ -1,13 +1,13 @@
 import type { ExternalChatMessage as ExternalChatMessageRecord } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { ExternalChat } from './chat';
 
 /** Message in an added external chat. */
-export class ExternalChatMessage extends MacroEntity<ExternalChatMessageRecord> {
+export class ExternalChatMessage extends RoxEntity<ExternalChatMessageRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** The chat this message is in. */
     readonly chat: ExternalChat,
     id: string,
@@ -18,7 +18,7 @@ export class ExternalChatMessage extends MacroEntity<ExternalChatMessageRecord> 
 
   /** Reference a message within its original chat. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     chat: ExternalChat,
     id: string,
   ): ExternalChatMessage {
@@ -27,7 +27,7 @@ export class ExternalChatMessage extends MacroEntity<ExternalChatMessageRecord> 
 
   /** Seed a message handle from a timeline response. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     chat: ExternalChat,
     record: ExternalChatMessageRecord,
   ): ExternalChatMessage {

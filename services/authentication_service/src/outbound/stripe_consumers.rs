@@ -13,8 +13,8 @@ use ai_billing::outbound::stripe_gateway::{
 };
 use analytics_client::{AnalyticsClient, MetaActionSource, MetaUserData};
 use gtm_invite::domain::ports::GtmInviteService;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use roles_and_permissions::domain::model::SubscriptionStatus as RoleStatus;
 use roles_and_permissions::domain::port::UserRolesAndPermissionsService;
 use serde::Serialize;
@@ -171,7 +171,7 @@ where
     async fn customer_user(
         &self,
         customer: &CustomerId,
-    ) -> Result<Option<MacroUserIdStr<'static>>, ApplyError> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, ApplyError> {
         if let Some(user) = self
             .identity
             .user_for_customer(customer)
@@ -183,7 +183,7 @@ where
         let facts = self.customers.fetch(customer).await?;
         let Some(user) = facts
             .email
-            .and_then(|email| MacroUserIdStr::try_from_email(&email.to_lowercase()).ok())
+            .and_then(|email| RoxUserIdStr::try_from_email(&email.to_lowercase()).ok())
             .map(|user| user.into_owned())
         else {
             return Ok(None);
@@ -202,7 +202,7 @@ where
     async fn subscriber(
         &self,
         customer: &CustomerId,
-    ) -> Result<MacroUserIdStr<'static>, ApplyError> {
+    ) -> Result<RoxUserIdStr<'static>, ApplyError> {
         self.customer_user(customer).await?.ok_or_else(|| {
             ApplyError::Reject(
                 rootcause::report!("stripe customer {customer} belongs to no account")
@@ -318,7 +318,7 @@ where
         &self,
         delivery: &Delivery,
         customer: &CustomerId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         update: PersonalUpdate,
     ) -> Result<(), ApplyError> {
         if update.started_trial {
@@ -367,7 +367,7 @@ where
 
     async fn sync_periods(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period: Option<ai_billing::domain::BillingPeriod>,
         verified: Vec<ai_billing::domain::period::SubscriptionPeriod>,
     ) -> Result<(), ApplyError> {
@@ -683,7 +683,7 @@ where
                 let reload_id = invoice
                     .metadata
                     .get(RELOAD_METADATA_KEY)
-                    .and_then(|id| macro_uuid::string_to_uuid(id).ok());
+                    .and_then(|id| rox_uuid::string_to_uuid(id).ok());
                 self.billing
                     .mark_credit_reload_invoice(invoice.id.as_str(), reload_id, invoice.paid)
                     .await
@@ -713,7 +713,7 @@ where
             .metadata
             .get(PAYER_METADATA_KEY)
             .cloned()
-            .and_then(|payer| MacroUserIdStr::try_from(payer).ok())
+            .and_then(|payer| RoxUserIdStr::try_from(payer).ok())
             .ok_or_else(|| {
                 ApplyError::Reject(
                     rootcause::report!("credit checkout session has no valid payer").into_dynamic(),

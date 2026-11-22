@@ -1,13 +1,13 @@
 //! Handler for `GET /system-status/history`.
 
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 
 use super::{SystemStatusHistory, SystemStatusRouterState};
 use crate::domain::models::SystemStatusError;
 use crate::domain::ports::SystemStatusService;
 
-/// Recent status updates, newest first, with who set each. Macro staff only.
+/// Recent status updates, newest first, with who set each. Rox staff only.
 #[utoipa::path(
     tag = "system_status",
     get,
@@ -21,11 +21,11 @@ use crate::domain::ports::SystemStatusService;
     )
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: SystemStatusService, Auth: MacroAuthorizationService>(
+pub async fn handler<T: SystemStatusService, Auth: RoxAuthorizationService>(
     State(state): State<SystemStatusRouterState<T, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<SystemStatusHistory>, SystemStatusError> {
-    let caller = &authorization.authorization.user.macro_user_id;
+    let caller = &authorization.authorization.user.rox_user_id;
     let updates = state.service.history(caller).await?;
     Ok(Json(SystemStatusHistory { updates }))
 }

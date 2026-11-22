@@ -19,8 +19,8 @@ use item_filters::{
         project::ProjectLiteral,
     },
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use models_pagination::Identify;
 use models_pagination::{Frecency, PaginateOn, Query, SimpleSortMethod};
@@ -38,7 +38,7 @@ use uuid::Uuid;
 /// against the replacement.
 async fn expanded_generic_cursor_soup(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     limit: u16,
     cursor: Query<Uuid, SimpleSortMethod, ()>,
 ) -> Result<Vec<SoupItem<()>>, sqlx::Error> {
@@ -58,7 +58,7 @@ async fn expanded_generic_cursor_soup(
 
 async fn no_frecency_expanded_generic_soup(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     limit: u16,
     cursor: Query<Uuid, SimpleSortMethod, Frecency>,
 ) -> Result<Vec<SoupItem<()>>, sqlx::Error> {
@@ -102,13 +102,13 @@ macro_rules! unwrap_enum {
 // 2 items have no viewing history, so they should be last in the response when sorting by viewed_at
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_viewed_at_orders_nulls_last(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -201,14 +201,14 @@ async fn test_viewed_at_orders_nulls_last(pool: Pool<Postgres>) -> anyhow::Resul
 
 // testing that the cursor based pagination works
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     )
 )]
 async fn test_get_user_items_expanded_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let result = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -272,14 +272,14 @@ async fn test_get_user_items_expanded_cursor(pool: Pool<Postgres>) -> anyhow::Re
 
 // testing the sorting methods work as expected
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("sorting_expanded_items")
     )
 )]
 async fn test_expanded_generic_sorting_methods(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // --- Helper to extract IDs for easy comparison ---
     let get_item_ids =
@@ -384,14 +384,14 @@ async fn test_expanded_generic_sorting_methods(pool: Pool<Postgres>) -> anyhow::
 
 // Test that expanded_soup_by_ids includes items with implicit access
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     )
 )]
 async fn test_expanded_soup_by_ids(pool: Pool<Postgres>) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Request specific items, including some we have implicit access to through projects
     let entities = [
@@ -441,14 +441,14 @@ async fn test_expanded_soup_by_ids(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     )
 )]
 async fn it_should_be_empty(pool: Pool<Postgres>) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     // Test with non-existent items
     let non_existent_entities = [
         EntityType::Document.with_entity_str("00000000-0000-0000-0000-000000000000"), // non-existent-doc
@@ -482,16 +482,16 @@ async fn it_should_be_empty(pool: Pool<Postgres>) {
 
 // Test that no_frecency_expanded_generic_soup excludes items with frecency records
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("no_frecency_items")
     )
 )]
 async fn test_no_frecency_expanded_filters_out_frecency_items(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Test with UpdatedAt sort - should return only items without frecency
     let items = no_frecency_expanded_generic_soup(
@@ -548,14 +548,14 @@ async fn test_no_frecency_expanded_filters_out_frecency_items(
 
 // Test sorting methods work correctly for no_frecency query
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("no_frecency_items")
     )
 )]
 async fn test_no_frecency_expanded_sorting_methods(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let get_item_ids =
         |items: &[SoupItem]| -> Vec<Uuid> { items.iter().map(|item| item.id()).collect() };
@@ -646,14 +646,14 @@ async fn test_no_frecency_expanded_sorting_methods(pool: Pool<Postgres>) -> anyh
 
 // Test cursor-based pagination for no_frecency query
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("no_frecency_items")
     )
 )]
 async fn test_no_frecency_expanded_cursor_pagination(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Get first page with limit of 2
     let result = no_frecency_expanded_generic_soup(
@@ -744,13 +744,13 @@ async fn test_no_frecency_expanded_cursor_pagination(pool: Pool<Postgres>) -> an
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn empty_ast_returns_same_as_static_query(db: PgPool) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let ast_res = expanded_dynamic_cursor_soup(
         &db,
         ExpandedDynamicCursorArgs {
@@ -789,15 +789,15 @@ async fn empty_ast_returns_same_as_static_query(db: PgPool) {
 // Test filtering by document file type
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_by_document_file_type(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for only PDF documents
     let entity_filters = EntityFilters {
@@ -861,15 +861,15 @@ async fn test_filter_by_document_file_type(db: PgPool) -> anyhow::Result<()> {
 // Test filtering by specific document IDs
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_by_document_ids(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for specific document IDs
     let entity_filters = EntityFilters {
@@ -941,15 +941,15 @@ async fn test_filter_by_document_ids(db: PgPool) -> anyhow::Result<()> {
 // Test filtering by project ID (documents)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_documents_by_project_id(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter documents in project-A only
     let entity_filters = EntityFilters {
@@ -1013,15 +1013,15 @@ async fn test_filter_documents_by_project_id(db: PgPool) -> anyhow::Result<()> {
 // Test filtering chats by project ID
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_chats_by_project_id(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter chats in project-B
     let entity_filters = EntityFilters {
@@ -1085,15 +1085,15 @@ async fn test_filter_chats_by_project_id(db: PgPool) -> anyhow::Result<()> {
 // Test filtering by specific chat IDs
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_by_chat_ids(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for specific chat IDs
     let entity_filters = EntityFilters {
@@ -1168,15 +1168,15 @@ async fn test_filter_by_chat_ids(db: PgPool) -> anyhow::Result<()> {
 // Test filtering projects by specific project IDs
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_by_project_ids(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for specific project IDs
     let entity_filters = EntityFilters {
@@ -1251,15 +1251,15 @@ async fn test_filter_by_project_ids(db: PgPool) -> anyhow::Result<()> {
 // Test filtering projects by specific project IDs with include_root=true
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_by_project_ids_include_root(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let entity_filters = EntityFilters {
         project_filters: ProjectFilters {
@@ -1315,13 +1315,13 @@ async fn test_filter_by_project_ids_include_root(db: PgPool) -> anyhow::Result<(
 // have a NULL parentId, so the negated equality must not drop them.
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_negated_project_id_filter_includes_root_projects(db: PgPool) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Mirror the folders-view request: docs and chats excluded via nil-id
     // literals, projects included via a negated nil parent-id literal.
@@ -1374,15 +1374,15 @@ async fn test_negated_project_id_filter_includes_root_projects(db: PgPool) -> an
 // Test combined filters across multiple entity types
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_combined_entity_filters(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, DocumentFilters, EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for:
     // - Documents in project-A OR project-B
@@ -1471,15 +1471,15 @@ async fn test_combined_entity_filters(db: PgPool) -> anyhow::Result<()> {
 // Test filtering by multiple criteria on documents (AND logic)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_multiple_filter_criteria_documents(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for documents: specific IDs AND in specific projects AND specific file type
     // This uses AND logic across different filter criteria
@@ -1558,15 +1558,15 @@ async fn test_multiple_filter_criteria_documents(db: PgPool) -> anyhow::Result<(
 // Test that inaccessible items are filtered out
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filters_respect_access_control(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Try to request doc-isolated (which user doesn't have access to)
     let entity_filters = EntityFilters {
@@ -1623,15 +1623,15 @@ async fn test_filters_respect_access_control(db: PgPool) -> anyhow::Result<()> {
 // Test filtering by owner
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_by_owner(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter documents by owner
     let entity_filters = EntityFilters {
@@ -1690,15 +1690,15 @@ async fn test_filter_by_owner(db: PgPool) -> anyhow::Result<()> {
 // Test filtering for non-existent items returns empty
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_non_existent_items(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for non-existent chat IDs
     let entity_filters = EntityFilters {
@@ -1752,15 +1752,15 @@ async fn test_filter_non_existent_items(db: PgPool) -> anyhow::Result<()> {
 // Test cursor-based pagination with document filters
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_cursor_pagination_with_document_filter(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for only PDF documents
     let entity_filters = EntityFilters {
@@ -1869,15 +1869,15 @@ async fn test_cursor_pagination_with_document_filter(db: PgPool) -> anyhow::Resu
 // Test cursor-based pagination with multiple entity filters
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_cursor_pagination_with_combined_filters(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for documents in specific projects AND specific chats
     let entity_filters = EntityFilters {
@@ -1971,15 +1971,15 @@ async fn test_cursor_pagination_with_combined_filters(db: PgPool) -> anyhow::Res
 // Test cursor pagination maintains filter consistency across pages
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_cursor_pagination_filter_consistency(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for documents by specific IDs
     let entity_filters = EntityFilters {
@@ -2076,15 +2076,15 @@ async fn test_cursor_pagination_filter_consistency(db: PgPool) -> anyhow::Result
 // Test cursor pagination with empty filter results on subsequent pages
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_cursor_pagination_with_single_item_filter(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for a single chat ID
     let entity_filters = EntityFilters {
@@ -2169,9 +2169,9 @@ async fn test_cursor_pagination_with_single_item_filter(db: PgPool) -> anyhow::R
 
 // Test that exclude_frecency=true works together with AST filters
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("no_frecency_items")
     )
 )]
@@ -2180,7 +2180,7 @@ async fn test_dynamic_query_with_ast_and_frecency_exclusion(
 ) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, DocumentFilters, EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Create an AST filter that only returns specific document IDs
     // We'll filter for two docs without frecency and one with frecency
@@ -2315,15 +2315,15 @@ async fn test_dynamic_query_with_ast_and_frecency_exclusion(
 //   standalone doc: not a task (important)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_documents_by_importance(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // importance=true: non-tasks + tasks assigned to user
     {
@@ -2442,15 +2442,15 @@ async fn test_filter_documents_by_importance(db: PgPool) -> anyhow::Result<()> {
 // importance=false short-circuits to match nothing (1=0)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_chats_by_importance(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // importance=true: no-op, should return all chats
     {
@@ -2542,15 +2542,15 @@ async fn test_filter_chats_by_importance(db: PgPool) -> anyhow::Result<()> {
 // importance=false short-circuits to match nothing (1=0)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_filter_projects_by_importance(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // importance=true: no-op, should return all projects
     {
@@ -2645,16 +2645,16 @@ async fn test_filter_projects_by_importance(db: PgPool) -> anyhow::Result<()> {
 
 /// Test that system properties are populated on SoupItems (Documents and Projects)
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
 async fn test_bulk_populate_properties_enriches_raw_soup_items(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let items = expanded_dynamic_cursor_soup(
         &pool,
@@ -2760,14 +2760,14 @@ fn uuid(s: &str) -> Uuid {
 
 /// Deleted documents and chats must not appear in results
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_deleted_items_excluded(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2793,16 +2793,16 @@ async fn test_exhaustive_deleted_items_excluded(pool: Pool<Postgres>) -> anyhow:
 /// Items in isolated project must not appear for user-1.
 /// Isolated project, doc, and chat should all be excluded.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_access_control_excludes_isolated(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2831,14 +2831,14 @@ async fn test_exhaustive_access_control_excludes_isolated(
 
 /// User-2 only has access to the isolated project and its children.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_user_isolation(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-2@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-2@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2865,14 +2865,14 @@ async fn test_exhaustive_user_isolation(pool: Pool<Postgres>) -> anyhow::Result<
 /// Documents 3 levels deep in the hierarchy (root -> mid -> deep) are accessible
 /// through inherited project permissions.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_deep_hierarchy_access(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2922,16 +2922,16 @@ async fn test_exhaustive_deep_hierarchy_access(pool: Pool<Postgres>) -> anyhow::
 /// - Task with no status property -> Some(Task { is_completed: false })
 /// - Non-task documents -> sub_type is None
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_task_completion_status(pool: Pool<Postgres>) -> anyhow::Result<()> {
     use models_soup::document::SoupDocumentSubType;
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2989,14 +2989,14 @@ async fn test_exhaustive_task_completion_status(pool: Pool<Postgres>) -> anyhow:
 /// Test UpdatedAt sort ordering.
 /// Items sorted by updatedAt DESC, tiebreaker by updatedAt DESC.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_sort_updated_at(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3045,14 +3045,14 @@ async fn test_exhaustive_sort_updated_at(pool: Pool<Postgres>) -> anyhow::Result
 
 /// Test CreatedAt sort ordering.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_sort_created_at(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3103,14 +3103,14 @@ async fn test_exhaustive_sort_created_at(pool: Pool<Postgres>) -> anyhow::Result
 /// Items with history sorted by UserHistory.updatedAt DESC.
 /// Items without history get sort_ts = epoch, tiebroken by id DESC.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_sort_viewed_at(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3163,14 +3163,14 @@ async fn test_exhaustive_sort_viewed_at(pool: Pool<Postgres>) -> anyhow::Result<
 /// This means items without history use their updatedAt, which produces a
 /// different ordering than ViewedAt for items with high updatedAt but no history.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_sort_viewed_updated(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3235,14 +3235,14 @@ async fn test_exhaustive_sort_viewed_updated(pool: Pool<Postgres>) -> anyhow::Re
 /// Walking through all items one at a time with limit=1 should yield every item
 /// exactly once, in the correct order, with no duplicates.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_paginate_one_at_a_time(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let sort = SimpleSortMethod::UpdatedAt;
 
     let mut all_ids: Vec<Uuid> = Vec::new();
@@ -3299,14 +3299,14 @@ async fn test_exhaustive_paginate_one_at_a_time(pool: Pool<Postgres>) -> anyhow:
 /// Full pagination walk with page size of 3. Verifies no duplicates
 /// and correct total count across all pages for each sort method.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_paginate_all_sort_methods(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let page_size: u16 = 3;
 
     for sort in [
@@ -3369,14 +3369,14 @@ async fn test_exhaustive_paginate_all_sort_methods(pool: Pool<Postgres>) -> anyh
 
 /// Limit larger than total items returns everything in one page.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_limit_larger_than_total(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3396,16 +3396,16 @@ async fn test_exhaustive_limit_larger_than_total(pool: Pool<Postgres>) -> anyhow
 
 /// Standalone items (no project) are correctly returned with project_id = None.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_standalone_items_have_no_project(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3437,14 +3437,14 @@ async fn test_exhaustive_standalone_items_have_no_project(
 /// Documents in projects should carry the correct project_id, and projects
 /// in the hierarchy should carry the correct parent_id.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_hierarchy_project_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3482,14 +3482,14 @@ async fn test_exhaustive_hierarchy_project_ids(pool: Pool<Postgres>) -> anyhow::
 /// Items correctly report their viewed_at from UserHistory.
 /// Items without history should have viewed_at = None.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_viewed_at_values(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3538,14 +3538,14 @@ async fn test_exhaustive_viewed_at_values(pool: Pool<Postgres>) -> anyhow::Resul
 
 /// Documents should carry their file_type and sha from the latest DocumentInstance.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_document_fields(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3575,14 +3575,14 @@ async fn test_exhaustive_document_fields(pool: Pool<Postgres>) -> anyhow::Result
 
 /// All returned items should have the correct entity type variant.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("expanded_cursor_soup_exhaustive")
     )
 )]
 async fn test_exhaustive_entity_type_counts(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3646,7 +3646,7 @@ async fn dyn_fetch(
     filters: EntityFilterAst,
     exclude_frecency: bool,
 ) -> Result<Vec<SoupItem>, sqlx::Error> {
-    let user_id = MacroUserIdStr::parse_from_str(user).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(user).unwrap();
     expanded_dynamic_cursor_soup(
         db,
         ExpandedDynamicCursorArgs {
@@ -3663,9 +3663,9 @@ async fn dyn_fetch(
 
 /// 1. Verify UpdatedAt sort order through the dynamic query.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -3723,9 +3723,9 @@ async fn test_dyn_sort_updated_at(db: PgPool) -> anyhow::Result<()> {
 
 /// 2. Verify CreatedAt sort order through the dynamic query.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -3783,9 +3783,9 @@ async fn test_dyn_sort_created_at(db: PgPool) -> anyhow::Result<()> {
 
 /// 3. Verify ViewedAt sort order through the dynamic query.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -3844,9 +3844,9 @@ async fn test_dyn_sort_viewed_at(db: PgPool) -> anyhow::Result<()> {
 
 /// 4. Verify ViewedUpdated sort order through the dynamic query.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -3906,9 +3906,9 @@ async fn test_dyn_sort_viewed_updated(db: PgPool) -> anyhow::Result<()> {
 
 /// 5. Deleted doc and chat never appear in dynamic query results.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -3939,9 +3939,9 @@ async fn test_dyn_deleted_items_excluded(db: PgPool) -> anyhow::Result<()> {
 
 /// 6. Isolated project/doc/chat excluded for user-1 in dynamic query.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -3976,9 +3976,9 @@ async fn test_dyn_access_control_excludes_isolated(db: PgPool) -> anyhow::Result
 
 /// 7. User-2 only sees isolated items through the dynamic query.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4012,9 +4012,9 @@ async fn test_dyn_user_isolation(db: PgPool) -> anyhow::Result<()> {
 
 /// 8. Filter documents by owner (user-2) returns only doc-shared-md.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4070,9 +4070,9 @@ async fn test_dyn_filter_doc_by_owner(db: PgPool) -> anyhow::Result<()> {
 
 /// 9. Filter documents by project ID returns only docs in that project.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4116,9 +4116,9 @@ async fn test_dyn_filter_doc_by_project(db: PgPool) -> anyhow::Result<()> {
 
 /// 10. Filter documents by multiple file types (pdf + docx).
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4171,9 +4171,9 @@ async fn test_dyn_filter_multiple_file_types(db: PgPool) -> anyhow::Result<()> {
 // ---- Notification + task include filters (3 tests) ----
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4240,9 +4240,9 @@ async fn test_dyn_filter_notification_done_false(db: PgPool) -> anyhow::Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4297,9 +4297,9 @@ async fn test_dyn_filter_notification_done_and_seen_false(db: PgPool) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4356,9 +4356,9 @@ async fn test_dyn_task_include_cbm_atm_nc_bypasses_document_filters(
 
 /// 11. Task documents should have correct is_completed values.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4426,9 +4426,9 @@ async fn test_dyn_task_completion_status(db: PgPool) -> anyhow::Result<()> {
 
 /// 12. Document fields (sha, file_type, viewed_at, project_id) populated correctly.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4486,14 +4486,14 @@ async fn test_dyn_document_fields(db: PgPool) -> anyhow::Result<()> {
 
 /// 13. Walk all items limit=1, verify no dupes, matches bulk fetch order.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
 async fn test_dyn_paginate_one_at_a_time(db: PgPool) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let sort = SimpleSortMethod::UpdatedAt;
     let filters = EntityFilterAst::mock_empty();
 
@@ -4563,16 +4563,16 @@ async fn test_dyn_paginate_one_at_a_time(db: PgPool) -> anyhow::Result<()> {
 
 /// 14. Paginate through filtered results, verify filter consistency and no dupes.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
 async fn test_dyn_paginate_with_filters(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let sort = SimpleSortMethod::CreatedAt;
     let page_size: u16 = 3;
 
@@ -4660,9 +4660,9 @@ async fn test_dyn_paginate_with_filters(db: PgPool) -> anyhow::Result<()> {
 
 /// 15. exclude_frecency=true removes items with frecency records.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4707,9 +4707,9 @@ async fn test_dyn_exclude_frecency(db: PgPool) -> anyhow::Result<()> {
 
 /// 16. exclude_frecency works with all 4 sort methods.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4761,9 +4761,9 @@ async fn test_dyn_exclude_frecency_all_sort_methods(db: PgPool) -> anyhow::Resul
 
 /// 17. All 3 entity types filtered to nothing returns empty vec.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4810,9 +4810,9 @@ async fn test_dyn_all_types_filtered_to_empty(db: PgPool) -> anyhow::Result<()> 
 /// The `chat_filters.owners` filter generates `c.owner` but the Chat table
 /// uses `"userId"` as its owner column, not `owner`.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("dynamic_query_exhaustive")
     )
 )]
@@ -4874,9 +4874,9 @@ async fn test_all_filter_types_combined(db: PgPool) -> anyhow::Result<()> {
 
 // Test filtering documents by a single property select option (Priority = Low)
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
@@ -4929,9 +4929,9 @@ async fn test_property_filter_by_select_option(db: Pool<Postgres>) -> anyhow::Re
 
 // Test filtering by a property value that only matches one document
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
@@ -4984,9 +4984,9 @@ async fn test_property_filter_by_status_completed(db: Pool<Postgres>) -> anyhow:
 
 // Test AND-ing multiple property filters (Priority = Low AND Status = Completed)
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
@@ -5047,9 +5047,9 @@ async fn test_property_filter_multiple_and(db: Pool<Postgres>) -> anyhow::Result
 
 // Test that a non-matching property filter returns no documents
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
@@ -5090,9 +5090,9 @@ async fn test_property_filter_no_match(db: Pool<Postgres>) -> anyhow::Result<()>
 
 // Test OR-ing multiple option values within a single property filter
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
@@ -5149,9 +5149,9 @@ async fn test_property_filter_multiple_options_or(db: Pool<Postgres>) -> anyhow:
 
 // Test filtering without entity_type matches across all entity types
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
@@ -5208,9 +5208,9 @@ async fn test_property_filter_without_entity_type(db: Pool<Postgres>) -> anyhow:
 
 // Test that specifying entity_type scopes the filter to only that type
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
@@ -5275,15 +5275,15 @@ async fn test_property_filter_scoped_entity_type(db: Pool<Postgres>) -> anyhow::
 // Test filtering documents by sub_type = task
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_dyn_filter_by_document_sub_type_task(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let entity_filters = EntityFilters {
         document_filters: DocumentFilters {
@@ -5340,15 +5340,15 @@ async fn test_dyn_filter_by_document_sub_type_task(db: PgPool) -> anyhow::Result
 // Test filtering documents by sub_type combined with file_type
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_dyn_filter_by_sub_type_and_file_type(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for task documents that are also PDFs
     let entity_filters = EntityFilters {
@@ -5405,7 +5405,7 @@ async fn document_ids_for_phase0_membership_filter(
     let filters: EntityFilterAst = serde_json::from_value(serde_json::json!({
         "df": document_filter
     }))?;
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_dynamic_cursor_soup(
         db,
         ExpandedDynamicCursorArgs {
@@ -5430,10 +5430,10 @@ async fn document_ids_for_phase0_membership_filter(
 // Documents tab before soup-flat-v2 introduces equivalent local facts.
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests", "soup_projection_phase0")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn production_documents_presets_have_authoritative_membership(
     db: PgPool,
@@ -5538,15 +5538,15 @@ async fn production_documents_presets_have_authoritative_membership(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn projection_hydration_carries_viewer_relative_facts_from_flat_and_by_id_rows(
     db: PgPool,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let flat = expanded_dynamic_cursor_soup_with_projection(
         &db,
         ExpandedDynamicCursorArgs {
@@ -5666,10 +5666,10 @@ async fn projection_hydration_carries_viewer_relative_facts_from_flat_and_by_id_
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn projection_status_extraction_treats_non_array_values_as_empty(
     db: PgPool,
@@ -5692,7 +5692,7 @@ async fn projection_status_extraction_treats_non_array_values_as_empty(
     .execute(&db)
     .await?;
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let flat = expanded_dynamic_cursor_soup_with_projection(
         &db,
         ExpandedDynamicCursorArgs {
@@ -5734,15 +5734,15 @@ async fn projection_status_extraction_treats_non_array_values_as_empty(
 // Test filtering documents by is_email_attachment = true (only email attachments)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_dyn_filter_is_email_attachment_true(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let entity_filters = EntityFilters {
         document_filters: DocumentFilters {
@@ -5804,15 +5804,15 @@ async fn test_dyn_filter_is_email_attachment_true(db: PgPool) -> anyhow::Result<
 // Test filtering documents by is_email_attachment = false (only non-email attachments)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_dyn_filter_is_email_attachment_false(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let entity_filters = EntityFilters {
         document_filters: DocumentFilters {
@@ -5867,13 +5867,13 @@ async fn test_dyn_filter_is_email_attachment_false(db: PgPool) -> anyhow::Result
 // Test filtering documents by NOT sub_type = task (excludes tasks, includes non-tasks with NULL sub_type)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_dyn_filter_by_not_document_sub_type_task(db: PgPool) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Construct an AST with NOT(sub_type = task) via JSON deserialization
     // This tests the fix for NULL handling: NOT (dt.sub_type IS NOT NULL AND dt.sub_type = 'task')
@@ -5978,7 +5978,7 @@ async fn run_and_count(
     db: &PgPool,
     ast: EntityFilterAst,
 ) -> anyhow::Result<(Vec<SoupItem>, usize, usize, usize)> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_dynamic_cursor_soup(
         db,
         ExpandedDynamicCursorArgs {
@@ -6005,10 +6005,10 @@ async fn run_and_count(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_document_created_at_gt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6041,10 +6041,10 @@ async fn test_date_filter_document_created_at_gt(db: PgPool) -> anyhow::Result<(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_document_created_at_lt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6077,10 +6077,10 @@ async fn test_date_filter_document_created_at_lt(db: PgPool) -> anyhow::Result<(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_chat_created_at_gt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6113,10 +6113,10 @@ async fn test_date_filter_chat_created_at_gt(db: PgPool) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_project_created_at_gt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6150,10 +6150,10 @@ async fn test_date_filter_project_created_at_gt(db: PgPool) -> anyhow::Result<()
 // document / createdAt / AND(gt, lt)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_document_created_at_range(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6195,10 +6195,10 @@ async fn test_date_filter_document_created_at_range(db: PgPool) -> anyhow::Resul
 // document / updatedAt / gt
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_document_updated_at_gt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6227,10 +6227,10 @@ async fn test_date_filter_document_updated_at_gt(db: PgPool) -> anyhow::Result<(
 // document / updatedAt / lt
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_document_updated_at_lt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6258,10 +6258,10 @@ async fn test_date_filter_document_updated_at_lt(db: PgPool) -> anyhow::Result<(
 // document / updatedAt / AND(gt, lt)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_document_updated_at_range(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6298,10 +6298,10 @@ async fn test_date_filter_document_updated_at_range(db: PgPool) -> anyhow::Resul
 // chat / createdAt / lt
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_chat_created_at_lt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6333,10 +6333,10 @@ async fn test_date_filter_chat_created_at_lt(db: PgPool) -> anyhow::Result<()> {
 // chat / createdAt / AND(gt, lt)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_chat_created_at_range(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6374,10 +6374,10 @@ async fn test_date_filter_chat_created_at_range(db: PgPool) -> anyhow::Result<()
 // chat / updatedAt / gt
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_chat_updated_at_gt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6408,10 +6408,10 @@ async fn test_date_filter_chat_updated_at_gt(db: PgPool) -> anyhow::Result<()> {
 // chat / updatedAt / AND(gt, lt)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_chat_updated_at_range(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6448,10 +6448,10 @@ async fn test_date_filter_chat_updated_at_range(db: PgPool) -> anyhow::Result<()
 // project / createdAt / lt
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_project_created_at_lt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6483,10 +6483,10 @@ async fn test_date_filter_project_created_at_lt(db: PgPool) -> anyhow::Result<()
 // project / createdAt / AND(gt, lt)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_project_created_at_range(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6527,10 +6527,10 @@ async fn test_date_filter_project_created_at_range(db: PgPool) -> anyhow::Result
 // project / updatedAt / gt
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_project_updated_at_gt(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6561,10 +6561,10 @@ async fn test_date_filter_project_updated_at_gt(db: PgPool) -> anyhow::Result<()
 // project / updatedAt / AND(gt, lt)
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_date_filter_project_updated_at_range(db: PgPool) -> anyhow::Result<()> {
     use chrono::DateTime;
@@ -6658,7 +6658,7 @@ async fn run_notification_filter(
     db: &PgPool,
     ast: EntityFilterAst,
 ) -> anyhow::Result<HashSet<Uuid>> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_dynamic_cursor_soup(
         db,
         ExpandedDynamicCursorArgs {
@@ -6675,10 +6675,10 @@ async fn run_notification_filter(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_notification_optimization_preserves_access_control(db: PgPool) -> anyhow::Result<()> {
     let user_id = "macro|user-1@test.com";
@@ -6780,10 +6780,10 @@ async fn test_notification_optimization_preserves_access_control(db: PgPool) -> 
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_optimized_notification_filter_matches_unoptimized_equivalent(
     db: PgPool,
@@ -7040,10 +7040,10 @@ fn ids(values: &[&str]) -> HashSet<String> {
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn crm_document_literals_match_attachments_and_associations(
     db: PgPool,
@@ -7052,7 +7052,7 @@ async fn crm_document_literals_match_attachments_and_associations(
         email::Email,
         properties::{EntityRefId, PropertiesLiteral, PropertyMatchValue},
     };
-    use macro_user_id::email::EmailStr;
+    use rox_user_id::email::EmailStr;
 
     let company = Uuid::now_v7();
     seed_crm_document_associations(&db, company).await?;
@@ -7103,9 +7103,9 @@ async fn crm_document_literals_match_attachments_and_associations(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("soup_items_with_properties")
     )
 )]
@@ -7242,10 +7242,10 @@ async fn date_property_boundaries_presence_and_clearing(db: Pool<Postgres>) -> a
 /// of an equivalent tree the stripper leaves alone.
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("entity_filter_tests")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn test_unread_conjunction_matches_unoptimized_equivalent(db: PgPool) -> anyhow::Result<()> {
     use item_filters::NotificationState::{Seen, Unseen};

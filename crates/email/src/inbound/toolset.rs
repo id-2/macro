@@ -21,7 +21,7 @@ use ai_toolset::{AsyncToolCollection, ToolCallError};
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 pub use get_thread::{GetThread, GetThreadResponse};
@@ -33,16 +33,16 @@ pub use set_sender_policy::{SetSenderPolicy, SetSenderPolicyResponse, ToolSender
 pub use update_thread_labels::{UpdateThreadLabels, UpdateThreadLabelsResponse};
 
 /// The caller's default inbox: the primary link they own. Falls back to any
-/// link they own, then any accessible inbox. `caller_macro_id` is the caller's
+/// link they own, then any accessible inbox. `caller_rox_id` is the caller's
 /// own macro id (e.g. `macro|user@example.com`).
-pub fn caller_primary_inbox<'a>(inboxes: &'a [Link], caller_macro_id: &str) -> Option<&'a Link> {
+pub fn caller_primary_inbox<'a>(inboxes: &'a [Link], caller_rox_id: &str) -> Option<&'a Link> {
     inboxes
         .iter()
-        .find(|l| l.is_primary && l.macro_id.to_string() == caller_macro_id)
+        .find(|l| l.is_primary && l.rox_id.to_string() == caller_rox_id)
         .or_else(|| {
             inboxes
                 .iter()
-                .find(|l| l.macro_id.to_string() == caller_macro_id)
+                .find(|l| l.rox_id.to_string() == caller_rox_id)
         })
         .or_else(|| inboxes.first())
 }
@@ -53,11 +53,11 @@ pub fn caller_primary_inbox<'a>(inboxes: &'a [Link], caller_macro_id: &str) -> O
 /// scope to an inbox they don't have.
 pub fn resolve_inbox_selector<'a>(
     inboxes: &'a [Link],
-    caller_macro_id: &str,
+    caller_rox_id: &str,
     requested: Option<&str>,
 ) -> Result<&'a Link, ToolCallError> {
     let Some(addr) = requested.map(str::trim).filter(|s| !s.is_empty()) else {
-        return caller_primary_inbox(inboxes, caller_macro_id).ok_or_else(|| ToolCallError {
+        return caller_primary_inbox(inboxes, caller_rox_id).ok_or_else(|| ToolCallError {
             description: "No email account is linked for this user.".to_string(),
             internal_error: anyhow::anyhow!("no accessible inboxes"),
         });
@@ -158,11 +158,11 @@ impl<T: EmailService, G: GmailTokenProvider, E: EntityAccessService> EmailToolCo
     /// connected addresses, which is exactly the correction it needs.
     pub async fn resolve_sending_inbox(
         &self,
-        macro_id: MacroUserIdStr<'_>,
+        rox_id: RoxUserIdStr<'_>,
         request: SendingInboxRequest<'_>,
     ) -> Result<ResolvedSendingInbox, ToolCallError> {
         self.service
-            .resolve_sending_inbox(macro_id, request)
+            .resolve_sending_inbox(rox_id, request)
             .await
             .map_err(|e| ToolCallError {
                 description: match e {

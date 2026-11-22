@@ -151,7 +151,7 @@ export function isCodeExecution(part: MessagePart): boolean {
   return (
     part.kind === 'tool_use' &&
     part.name.kind === 'mcp' &&
-    part.name.server === 'macro_internal' &&
+    part.name.server === 'rox_internal' &&
     part.name.tool === 'ExecuteCode'
   );
 }
@@ -163,7 +163,7 @@ export function presentedReviewId(part: MessagePart): string | undefined {
   if (
     part.kind !== 'tool_use' ||
     part.name.kind !== 'mcp' ||
-    part.name.server !== 'macro_internal' ||
+    part.name.server !== 'rox_internal' ||
     part.name.tool !== 'PresentReview' ||
     !('input' in part.detail)
   )

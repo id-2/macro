@@ -9,8 +9,8 @@ use wiremock::{
 const DEFAULT_MODEL: &str = "google/gemini-3.8-flash";
 const TEST_KEY: &str = "local-test-key";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|cognition-test@macro.local".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|cognition-test@macro.local".to_owned()).unwrap()
 }
 
 fn client(base: &str) -> CognitionClient {
@@ -65,7 +65,7 @@ async fn generation_forwards_authenticated_owner_and_forces_no_tools() {
     Mock::given(method("POST"))
         .and(path("/cognition/structured-completion"))
         .and(header(INTERNAL_API_KEY_HEADER, TEST_KEY))
-        .and(header(INTERNAL_MACRO_USER_ID_HEADER, user().as_ref()))
+        .and(header(INTERNAL_ROX_USER_ID_HEADER, user().as_ref()))
         .and(body_json(json!({
             "prompt": request.prompt,
             "model": DEFAULT_MODEL,
@@ -115,7 +115,7 @@ async fn decisions_reuse_shared_contract_and_authenticated_owner() {
     Mock::given(method("POST"))
         .and(path("/decisions"))
         .and(header(INTERNAL_API_KEY_HEADER, TEST_KEY))
-        .and(header(INTERNAL_MACRO_USER_ID_HEADER, user().as_ref()))
+        .and(header(INTERNAL_ROX_USER_ID_HEADER, user().as_ref()))
         .and(body_json(serde_json::to_value(decisions()).unwrap()))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({
             "probabilities": { "needsReply": 0.9 },

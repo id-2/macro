@@ -5,7 +5,7 @@ import type {
   DataType,
   PropertyDefinitionWithOptions,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError } from '../../utils';
+import { RoxNotFoundError } from '../../utils';
 import type {
   ChangeColumnTypeOptions,
   ConvertIntoNewColumnOptions,
@@ -45,7 +45,7 @@ export class DatabaseColumn {
     const { columns } = await this.table.detail();
     const found = columns.find((column) => column.column.id === this.id);
     if (!found) {
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `column ${this.id} is not on table ${this.table.id}`,
       );
     }

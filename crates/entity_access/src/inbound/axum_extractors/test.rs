@@ -5,7 +5,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::MacroAuthorizationRejection;
+use rox_authorization::RoxAuthorizationRejection;
 
 use super::ExtractorError;
 
@@ -22,7 +22,7 @@ async fn response_parts(response: Response) -> (StatusCode, String) {
 
 #[tokio::test]
 async fn authorization_rejection_preserves_status_and_owned_message() {
-    let rejection = MacroAuthorizationRejection {
+    let rejection = RoxAuthorizationRejection {
         status: StatusCode::FORBIDDEN,
         message: Cow::Owned("access forbidden".to_string()),
     };
@@ -36,7 +36,7 @@ async fn authorization_rejection_preserves_status_and_owned_message() {
 
 #[tokio::test]
 async fn authorization_rejection_preserves_jwt_expired_response() {
-    let rejection = MacroAuthorizationRejection {
+    let rejection = RoxAuthorizationRejection {
         status: StatusCode::UNAUTHORIZED,
         message: Cow::Borrowed("jwt expired"),
     };

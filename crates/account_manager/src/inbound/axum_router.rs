@@ -9,11 +9,11 @@ use axum::{
     response::IntoResponse,
     routing::{get, post},
 };
-use macro_authorization::{
-    AccountHolderOrInternal, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    AccountHolderOrInternal, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -28,7 +28,7 @@ use crate::domain::{
 /// Router state for account manager endpoints.
 pub struct AccountManagerRouterState<S, Auth> {
     service: Arc<S>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for AccountManagerRouterState<S, Auth> {
@@ -42,7 +42,7 @@ impl<S, Auth> Clone for AccountManagerRouterState<S, Auth> {
 
 impl<S, Auth> AccountManagerRouterState<S, Auth> {
     /// Create router state from a shared service and authorization state.
-    pub fn new(service: Arc<S>, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<S>, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization_state,
@@ -50,7 +50,7 @@ impl<S, Auth> AccountManagerRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<AccountManagerRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<AccountManagerRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AccountManagerRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -61,7 +61,7 @@ impl<S, Auth> FromRef<AccountManagerRouterState<S, Auth>> for MacroAuthorization
 pub fn account_manager_router<S, Auth, T>(state: AccountManagerRouterState<S, Auth>) -> Router<T>
 where
     S: AccountManagerService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -92,7 +92,7 @@ where
 pub struct RequestAccountManagerBody {
     /// The other account (`macro|...`).
     #[schema(value_type = String)]
-    pub counterparty_id: MacroUserIdStr<'static>,
+    pub counterparty_id: RoxUserIdStr<'static>,
     /// The side the caller takes.
     pub caller_role: AccountManagerRole,
 }
@@ -149,17 +149,17 @@ pub struct AccountManagerGrantParams {
 #[tracing::instrument(err, skip_all)]
 pub async fn request_account_manager_handler<S, Auth>(
     State(state): State<AccountManagerRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     Json(body): Json<RequestAccountManagerBody>,
 ) -> Result<Json<AccountManagerGrant>, AccountManagerError>
 where
     S: AccountManagerService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let grant = state
         .service
         .request(
-            &user.authorization.user.macro_user_id,
+            &user.authorization.user.rox_user_id,
             &body.counterparty_id,
             body.caller_role,
         )
@@ -183,15 +183,15 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn list_account_managers_handler<S, Auth>(
     State(state): State<AccountManagerRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
 ) -> Result<Json<AccountManagersList>, AccountManagerError>
 where
     S: AccountManagerService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let grants = state
         .service
-        .list_managers(&user.authorization.user.macro_user_id)
+        .list_managers(&user.authorization.user.rox_user_id)
         .await?;
     Ok(Json(AccountManagersList { grants }))
 }
@@ -214,16 +214,16 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn get_account_manager_grant_handler<S, Auth>(
     State(state): State<AccountManagerRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     Path(params): Path<AccountManagerGrantParams>,
 ) -> Result<Json<AccountManagerGrant>, AccountManagerError>
 where
     S: AccountManagerService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let grant = state
         .service
-        .get(&user.authorization.user.macro_user_id, params.id)
+        .get(&user.authorization.user.rox_user_id, params.id)
         .await?;
     Ok(Json(grant))
 }
@@ -248,18 +248,18 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn respond_to_account_manager_request_handler<S, Auth>(
     State(state): State<AccountManagerRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     Path(params): Path<AccountManagerGrantParams>,
     Json(body): Json<RespondToAccountManagerRequestBody>,
 ) -> Result<Json<AccountManagerGrant>, AccountManagerError>
 where
     S: AccountManagerService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let grant = state
         .service
         .respond(
-            &user.authorization.user.macro_user_id,
+            &user.authorization.user.rox_user_id,
             params.id,
             body.decision,
         )
@@ -287,16 +287,16 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn claim_account_manager_token_handler<S, Auth>(
     State(state): State<AccountManagerRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     Path(params): Path<AccountManagerGrantParams>,
 ) -> Result<Json<ClaimedAccountManagerToken>, AccountManagerError>
 where
     S: AccountManagerService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let claimed = state
         .service
-        .claim(&user.authorization.user.macro_user_id, params.id)
+        .claim(&user.authorization.user.rox_user_id, params.id)
         .await?;
     Ok(Json(ClaimedAccountManagerToken {
         grant: claimed.grant,
@@ -323,16 +323,16 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn revoke_account_manager_grant_handler<S, Auth>(
     State(state): State<AccountManagerRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     Path(params): Path<AccountManagerGrantParams>,
 ) -> Result<Json<AccountManagerGrant>, AccountManagerError>
 where
     S: AccountManagerService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let grant = state
         .service
-        .revoke(&user.authorization.user.macro_user_id, params.id)
+        .revoke(&user.authorization.user.rox_user_id, params.id)
         .await?;
     Ok(Json(grant))
 }

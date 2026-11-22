@@ -40,7 +40,7 @@ export function toCalendarAccounts(
 ): CalendarAccount[] {
   return links
     .filter(isExternalEmailLink)
-    .filter((link) => link.macro_id === userId)
+    .filter((link) => link.rox_id === userId)
     .sort((a, b) => Number(b.is_primary) - Number(a.is_primary))
     .map((link) => ({
       linkId: link.id,

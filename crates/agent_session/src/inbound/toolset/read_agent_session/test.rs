@@ -1,7 +1,7 @@
 use super::*;
 use crate::testing::InMemoryAgentSessionRepo;
 use entity_access::domain::ports::NoOpEntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[tokio::test]
 async fn failed_access_check_never_reads_session_metadata_or_history() {
@@ -19,7 +19,7 @@ async fn failed_access_check_never_reads_session_metadata_or_history() {
     }
     .call(
         context,
-        RequestContext::new(MacroUserIdStr::try_from_email("viewer@example.com").expect("viewer")),
+        RequestContext::new(RoxUserIdStr::try_from_email("viewer@example.com").expect("viewer")),
     )
     .await;
     assert!(result.is_err());

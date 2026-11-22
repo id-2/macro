@@ -15,13 +15,13 @@ Statuspage webhook ──POST──> /webhook/{WEBHOOK_SECRET}
                                  │ parse + format (incident | component)
                                  ▼
               @macro-inc/sdk → POST /channels/{CHANNEL_ID}/webhook
-              headers: x-macro-bot-token: BOT_TOKEN, x-macro-bot-scope: user
+              headers: x-rox-bot-token: BOT_TOKEN, x-rox-bot-scope: user
               body: {"content": "🟡 [Anthropic Status] ..."}
 ```
 
 Channel delivery uses the [Rox SDK](../../../packages/sdk)
 (`Macro._client.storage.postChannelBotWebhook`) with bot auth
-(`x-macro-bot-token`, user scope) — the endpoint's preferred auth. The bot
+(`x-rox-bot-token`, user scope) — the endpoint's preferred auth. The bot
 must be a participant of `CHANNEL_ID`.
 
 Statuspage webhooks carry one of two payload shapes (verified against the
@@ -64,10 +64,10 @@ Subscribe on status.claude.com with webhook URL:
 | ---------------- | -------- | ---------------------------------- | -------------------------------------------- |
 | Variable         | Required | Default | Description                              |
 | ---------------- | -------- | ------- | ---------------------------------------- |
-| `BOT_TOKEN`      | yes      |         | Bot API key (`mbot_...`, sent as `x-macro-bot-token`) |
+| `BOT_TOKEN`      | yes      |         | Bot API key (`mbot_...`, sent as `x-rox-bot-token`) |
 | `CHANNEL_ID`     | yes      |         | Channel UUID to post to                  |
 | `WEBHOOK_SECRET` | yes      |         | Secret path segment for the webhook URL  |
-| `MACRO_ENV`      | no       | `prod`  | SDK environment (`prod`/`dev`/`local`)   |
+| `ROX_ENV`      | no       | `prod`  | SDK environment (`prod`/`dev`/`local`)   |
 | `PORT`           | no       | `8088`  | Listen port (local Bun server only)      |
 
 ## Development

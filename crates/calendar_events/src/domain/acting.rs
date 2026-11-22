@@ -47,7 +47,7 @@ impl OwnedInbox {
 /// its attendee row is the one a viewer sees marked `(you)`, and whether it
 /// organizes or attends decides what the clicker may do with the copy. The
 /// set is non-empty, lowercased, and deduplicated. Constructors only accept
-/// inboxes the requester owns (`email_links.macro_id = requester`), so a
+/// inboxes the requester owns (`email_links.rox_id = requester`), so a
 /// calendar owner's address cannot enter this type unless the clicker owns
 /// that inbox too.
 #[derive(Clone, Debug, PartialEq, Eq)]

@@ -3,7 +3,7 @@ use crate::messages::scheduled::get::{
 };
 use anyhow::Result;
 use chrono::{TimeZone, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
@@ -15,7 +15,7 @@ fn claim_identity() -> (Uuid, Uuid) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("get_process_scheduled_messages"))
 )]
 async fn claim_returns_owned_processing_row_and_duplicate_skips(
@@ -37,7 +37,7 @@ async fn claim_returns_owned_processing_row_and_duplicate_skips(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("get_process_scheduled_messages"))
 )]
 async fn processing_and_sent_rows_are_not_claimed_or_changed(pool: Pool<Postgres>) -> Result<()> {
@@ -64,7 +64,7 @@ async fn processing_and_sent_rows_are_not_claimed_or_changed(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("get_process_scheduled_messages"))
 )]
 async fn wrong_inbox_and_missing_rows_are_not_claimed(pool: Pool<Postgres>) -> Result<()> {
@@ -88,7 +88,7 @@ async fn wrong_inbox_and_missing_rows_are_not_claimed(pool: Pool<Postgres>) -> R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("get_process_scheduled_messages"))
 )]
 async fn future_rows_are_not_marked_processing(pool: Pool<Postgres>) -> Result<()> {
@@ -111,7 +111,7 @@ async fn future_rows_are_not_marked_processing(pool: Pool<Postgres>) -> Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("get_process_scheduled_messages"))
 )]
 async fn immediate_send_undo_rows_remain_claimable(pool: Pool<Postgres>) -> Result<()> {
@@ -131,7 +131,7 @@ async fn immediate_send_undo_rows_remain_claimable(pool: Pool<Postgres>) -> Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("get_process_scheduled_messages"))
 )]
 async fn concurrent_workers_have_exactly_one_winner(pool: Pool<Postgres>) -> Result<()> {
@@ -156,7 +156,7 @@ async fn concurrent_workers_have_exactly_one_winner(pool: Pool<Postgres>) -> Res
 // ============================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_scheduled_messages_in_bulk")
@@ -178,7 +178,7 @@ async fn fetch_scheduled_messages_in_bulk_returns_unsent_messages_grouped_by_mes
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_scheduled_messages_in_bulk")
@@ -206,7 +206,7 @@ async fn fetch_scheduled_messages_in_bulk_returns_correct_fields(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_scheduled_messages_in_bulk")
@@ -227,7 +227,7 @@ async fn fetch_scheduled_messages_in_bulk_includes_processing_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_scheduled_messages_in_bulk")
@@ -250,7 +250,7 @@ async fn fetch_scheduled_messages_in_bulk_excludes_sent_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_scheduled_messages_in_bulk")
@@ -274,7 +274,7 @@ async fn fetch_scheduled_messages_in_bulk_excludes_unscheduled_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_scheduled_messages_in_bulk")
@@ -291,7 +291,7 @@ async fn fetch_scheduled_messages_in_bulk_returns_empty_for_empty_input(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_scheduled_messages_in_bulk")

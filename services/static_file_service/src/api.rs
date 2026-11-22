@@ -11,9 +11,9 @@ use crate::api::context::{AppState, AuthorizationService};
 use anyhow::Context;
 use axum::Router;
 use axum::extract::DefaultBodyLimit;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState};
-use macro_service_urls::StaticFilePublicUrl;
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState};
+use rox_service_urls::StaticFilePublicUrl;
 use std::sync::Arc;
 use tower_http::limit::RequestBodyLimitLayer;
 use utoipa::OpenApi;
@@ -22,13 +22,13 @@ use utoipa_swagger_ui::SwaggerUi;
 static MAX_REQUEST_SIZE: usize = 4096;
 
 /// Identity assumed for internal service callers that don't forward an acting user.
-pub const MACRO_INTERNAL_USER_ID: &str = "macro|INTERNAL@rox.one";
+pub const ROX_INTERNAL_USER_ID: &str = "macro|INTERNAL@rox.one";
 
 pub async fn setup_and_serve(
     config: Config,
     jwt_validation_args: JwtValidationArgs,
 ) -> anyhow::Result<()> {
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
 
     let metadata_client = DynamodbClient::new(
         &aws_config,
@@ -39,20 +39,20 @@ pub async fn setup_and_serve(
     );
 
     let sqs_client = aws_sdk_sqs::Client::new(&aws_config);
-    let inner_client = macro_aws_config::s3_client().await;
+    let inner_client = rox_aws_config::s3_client().await;
     let storage_client = S3Client::new(
         inner_client,
         config.static_storage_bucket.as_ref().to_owned(),
     );
 
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(jwt_validation_args.clone()),
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(jwt_validation_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.as_ref().to_string(),
-            default_user_id: Some(MACRO_INTERNAL_USER_ID.to_string()),
+            default_user_id: Some(ROX_INTERNAL_USER_ID.to_string()),
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     )));
 
     let state = AppState {
@@ -89,7 +89,7 @@ pub async fn setup_and_serve(
 }
 
 /// Every route the service serves. Authentication is enforced per handler by
-/// `MacroAuthorizationExtractor`, which accepts user credentials (JWT) as well
+/// `RoxAuthorizationExtractor`, which accepts user credentials (JWT) as well
 /// as the internal service key. A code-mode credential is refused outside the
 /// session scope it signs before any handler runs: this service has no
 /// database to look its correlation up in, so it checks the signed claim.
@@ -114,7 +114,7 @@ fn app(state: AppState, jwt_validation_args: JwtValidationArgs) -> Router {
             jwt_validation_args,
             agent_correlation::inbound::enforce_signed_scope,
         ))
-        .layer(macro_cors::cors_layer())
+        .layer(rox_cors::cors_layer())
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(MAX_REQUEST_SIZE)) // 1GB
 }

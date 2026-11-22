@@ -6,23 +6,23 @@
  * routes there. Mentions still land, because `msg` embeds `<m-*>` tags in the
  * content and the backend parses them back out.
  *
- * usage: MACRO_WEBHOOK_TOKEN=mbot_... bun examples/channel-webhook.ts <channel-id> [mention-user-id]
+ * usage: ROX_WEBHOOK_TOKEN=mbot_... bun examples/channel-webhook.ts <channel-id> [mention-user-id]
  */
 import type { Env } from '../src/config';
 import { here, msg, Rox } from '../src/macro';
 
-const token = process.env.MACRO_WEBHOOK_TOKEN;
+const token = process.env.ROX_WEBHOOK_TOKEN;
 const [channelId, mentionUserId] = process.argv.slice(2);
 
 if (!token || !channelId) {
   console.error(
-    'usage: MACRO_WEBHOOK_TOKEN=mbot_... bun examples/channel-webhook.ts <channel-id> [mention-user-id]',
+    'usage: ROX_WEBHOOK_TOKEN=mbot_... bun examples/channel-webhook.ts <channel-id> [mention-user-id]',
   );
   process.exit(1);
 }
 
 const macro = new Rox({
-  env: (process.env.MACRO_ENV ?? 'dev') as Env,
+  env: (process.env.ROX_ENV ?? 'dev') as Env,
   auth: { type: 'bot', token },
 });
 const channel = macro.channels.byId(channelId);

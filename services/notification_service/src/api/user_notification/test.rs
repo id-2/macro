@@ -1,7 +1,7 @@
 use super::*;
 use chrono::Utc;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::{ChannelMentionMetadata, GithubPrEventAction, GithubPrEventStatus};
 use notification::domain::models::UserNotificationRow;
@@ -13,7 +13,7 @@ fn make_row(
     metadata: serde_json::Value,
 ) -> UserNotificationRow<serde_json::Value> {
     UserNotificationRow {
-        owner_id: MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap(),
+        owner_id: RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap(),
         notification_id: uuid::Uuid::nil(),
         notification_event_type: event_type.to_string(),
         entity: EntityType::Document.with_entity_string("entity-1".to_string()),
@@ -25,7 +25,7 @@ fn make_row(
         deleted_at: None,
         notification_metadata: metadata,
         sender_id: Some(
-            MacroUserIdStr::parse_from_str("macro|sender@example.com")
+            RoxUserIdStr::parse_from_str("macro|sender@example.com")
                 .unwrap()
                 .into_owned(),
         ),
@@ -360,7 +360,7 @@ fn to_typed_row_preserves_row_fields() {
 
     assert_eq!(
         typed.owner_id,
-        MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap()
+        RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap()
     );
     assert_eq!(typed.notification_id, uuid::Uuid::nil());
     assert_eq!(typed.notification_event_type, "task_assigned");
@@ -407,7 +407,7 @@ fn api_user_notification_and_realtime_notif_metadata_serialize_identically() {
 
     // Create ApiUserNotification (used by HTTP API)
     let api_notif = ApiUserNotification {
-        owner_id: MacroUserIdStr::parse_from_str("macro|user@example.com")
+        owner_id: RoxUserIdStr::parse_from_str("macro|user@example.com")
             .unwrap()
             .into_owned(),
         notification_id,
@@ -421,7 +421,7 @@ fn api_user_notification_and_realtime_notif_metadata_serialize_identically() {
         deleted_at: None,
         notification_metadata: NotifEvent::ChannelMention(notif_metadata.clone()),
         sender_id: Some(
-            MacroUserIdStr::parse_from_str("macro|sender@example.com")
+            RoxUserIdStr::parse_from_str("macro|sender@example.com")
                 .unwrap()
                 .into_owned(),
         ),
@@ -440,7 +440,7 @@ fn api_user_notification_and_realtime_notif_metadata_serialize_identically() {
         deleted_at: None,
         notification_metadata: TaggedContent::new(notif_metadata),
         sender_id: Some(
-            MacroUserIdStr::parse_from_str("macro|sender@example.com")
+            RoxUserIdStr::parse_from_str("macro|sender@example.com")
                 .unwrap()
                 .into_owned(),
         ),

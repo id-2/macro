@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::UserProvider;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
@@ -79,12 +79,12 @@ impl SfsPhotoUploader for Fake {
 }
 
 impl PhotoSyncedNotifier for Fake {
-    async fn photo_synced(&self, macro_id: &str, link_id: Uuid) {
+    async fn photo_synced(&self, rox_id: &str, link_id: Uuid) {
         self.0
             .lock()
             .unwrap()
             .calls
-            .push(Call::Notify(macro_id.into(), link_id));
+            .push(Call::Notify(rox_id.into(), link_id));
     }
 }
 
@@ -97,7 +97,7 @@ fn setup() -> (SfsPhotoUploadService<Fake, Fake, Fake, Fake>, Fake) {
         uploaded: Some((UPLOADED_SOURCE.into(), DESTINATION.into())),
         link: Some(Link {
             id: LINK,
-            macro_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+            rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
             fusionauth_user_id: "owner".into(),
             email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
             provider: UserProvider::Gmail,

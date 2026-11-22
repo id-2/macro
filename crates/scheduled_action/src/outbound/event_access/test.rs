@@ -3,8 +3,8 @@ use entity_access::domain::models::{
     AccessLevel, BotAccessScope, BotId, CallChannelInfo, Entity, EntityAccessReceipt,
     EntityPermission, RequiredPermission, TeamRole, UserTeamInfo,
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
+use rox_uuid::{Uuid, generate_uuid_v7};
 use serde_json::json;
 use std::sync::{Arc, Mutex};
 
@@ -16,7 +16,7 @@ struct AccessService {
 impl EntityAccessService for AccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         org: Option<i64>,
         id: &str,
         kind: EntityType,
@@ -27,7 +27,7 @@ impl EntityAccessService for AccessService {
             .unwrap()
             .push((user.as_ref().to_string(), id.into(), kind));
         EntityAccessReceipt::try_new_authenticated_user(
-            MacroUserIdStr::try_from(user.as_ref().to_string()).unwrap(),
+            RoxUserIdStr::try_from(user.as_ref().to_string()).unwrap(),
             Entity {
                 entity_id: id.into(),
                 entity_type: kind,
@@ -46,7 +46,7 @@ impl EntityAccessService for AccessService {
     }
     async fn get_access_level(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -54,7 +54,7 @@ impl EntityAccessService for AccessService {
     }
     async fn check_access(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: AccessLevel,
@@ -71,7 +71,7 @@ impl EntityAccessService for AccessService {
     }
     async fn get_entity_permission(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: Option<i64>,
@@ -80,7 +80,7 @@ impl EntityAccessService for AccessService {
     }
     async fn get_crm_entity_permission_with_team(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -90,7 +90,7 @@ impl EntityAccessService for AccessService {
         &self,
         _: &str,
         _: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unreachable!()
     }
     async fn get_call_channel(&self, _: &Uuid) -> Result<Option<CallChannelInfo>, AccessError> {
@@ -104,7 +104,7 @@ impl EntityAccessService for AccessService {
     }
     async fn get_user_team(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unreachable!()
     }
@@ -112,7 +112,7 @@ impl EntityAccessService for AccessService {
 
 #[tokio::test]
 async fn mints_entity_specific_receipts_for_exact_owner_and_entity() {
-    let owner = MacroUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
     for (name, kind, permission) in [
         (
             "email.message_received",
@@ -183,7 +183,7 @@ async fn mints_entity_specific_receipts_for_exact_owner_and_entity() {
 
 #[tokio::test]
 async fn wrong_permission_family_is_denied_not_reinterpreted() {
-    let owner = MacroUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
     for (name, permission) in [
         ("document.updated", EntityPermission::ChannelViewOnly),
         ("call.started", EntityPermission::ChannelViewOnly),
@@ -230,14 +230,14 @@ struct Claims(bool);
 impl GithubInstallationClaims for Claims {
     async fn is_linked(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<bool, github::domain::models::GithubError> {
         Ok(self.0)
     }
 
     async fn has_claim(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: u64,
     ) -> Result<bool, github::domain::models::GithubError> {
         Ok(self.0)
@@ -255,7 +255,7 @@ fn github_event(installation_id: u64) -> EventReference {
 
 #[tokio::test]
 async fn github_deliveries_follow_the_installation_claim_and_bind_to_it() {
-    let owner = MacroUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
     let service = AccessService {
         permission: EntityPermission::AccessLevel {
             access_level: AccessLevel::View,
@@ -268,7 +268,7 @@ async fn github_deliveries_follow_the_installation_claim_and_bind_to_it() {
     let capability = claimed.authorize(&owner, &event).await.unwrap().unwrap();
     assert!(capability.authorizes(&owner, &event));
     assert!(!capability.authorizes(&owner, &github_event(8)));
-    let stranger = MacroUserIdStr::parse_from_str("macro|stranger@rox.one").unwrap();
+    let stranger = RoxUserIdStr::parse_from_str("macro|stranger@rox.one").unwrap();
     assert!(!capability.authorizes(&stranger, &event));
 
     let unclaimed = EventAccessAdapter::new(service.clone(), Claims(false));

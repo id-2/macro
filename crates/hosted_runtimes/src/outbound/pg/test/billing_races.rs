@@ -285,7 +285,7 @@ fn purchase_request(key: &str) -> PurchaseRequest {
         billing: PurchaseBilling::Stripe,
         purchase_key: PurchaseKey::try_new(key.to_owned()).unwrap(),
         team_id: TEAM,
-        created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
         size: ComputerSize::Standard,
         name: None,
         extra_items: vec![],
@@ -314,7 +314,7 @@ async fn billing_of(repo: &PgComputerRepo, id: ComputerId) -> Billing {
 /// Blocker B3: two admins restore the same computer at once. The second
 /// waits for the first under the computer's billing guard, then finds it
 /// already restored, so it never charges: one item, one charge.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_restores_charge_once(pool: PgPool) {
     let stripe = Arc::new(Stripe::default());
     let (service, repo, clock) = service(pool, stripe.clone()).await;
@@ -361,7 +361,7 @@ async fn concurrent_restores_charge_once(pool: PgPool) {
 /// Blocker B2: Cancel then Undo before the queued removal runs. Undo keeps
 /// the item still on the subscription, and the removal, deciding under the
 /// billing guard, sees the computer billed on it again and leaves it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undo_before_the_queued_removal_keeps_the_item(pool: PgPool) {
     let stripe = Arc::new(Stripe::default());
     let (service, repo, _clock) = service(pool, stripe.clone()).await;
@@ -391,7 +391,7 @@ async fn undo_before_the_queued_removal_keeps_the_item(pool: PgPool) {
 /// retry replays the same key rather than minting a new one, so the change
 /// ends (here as never applied, then charged once by the replay), and a later
 /// change is never refused because of it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_lost_restore_answer_is_retried_on_the_same_key(pool: PgPool) {
     let stripe = Arc::new(Stripe::default());
     let (service, repo, clock) = service(pool, stripe.clone()).await;
@@ -425,7 +425,7 @@ async fn a_lost_restore_answer_is_retried_on_the_same_key(pool: PgPool) {
 /// Should-fix S7 and team deletion mid-purchase: the team is deleted while
 /// the purchase is charging. The deleted reservation never becomes a
 /// computer, and the purchase answers Confirming, never an error after a charge.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_deletion_during_a_charge_leaves_no_computer(pool: PgPool) {
     let stripe = Arc::new(Stripe::default());
     let gate = stripe.gate();
@@ -452,7 +452,7 @@ async fn team_deletion_during_a_charge_leaves_no_computer(pool: PgPool) {
 /// Should-fix S1 and S2: an expired reservation keeps holding capacity
 /// until it settles, and settling it fences its charge, so a send still on
 /// its way (another replica) cannot charge after the reservation is gone.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_expired_reservation_settles_fenced_and_holds_capacity_until_then(pool: PgPool) {
     let stripe = Arc::new(Stripe::default());
     let (service, repo, clock) = service(pool, stripe.clone()).await;
@@ -495,7 +495,7 @@ async fn an_expired_reservation_settles_fenced_and_holds_capacity_until_then(poo
 /// that is not billed on them (a duplicate, or one left by a restore whose
 /// event was refused) and items naming no live computer, but never the item
 /// a computer is billed on.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconcile_removes_items_no_computer_is_billed_on(pool: PgPool) {
     let stripe = Arc::new(Stripe::default());
     let (service, repo, clock) = service(pool, stripe.clone()).await;
@@ -560,7 +560,7 @@ async fn reconcile_removes_items_no_computer_is_billed_on(pool: PgPool) {
 /// Wolf's rule: computers are for paying teams. A trialing team's purchase
 /// is refused before anything is reserved or charged, and so are undo and
 /// restore, even when an item is still on the subscription to reuse.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_trialing_team_cannot_buy_undo_or_restore(pool: PgPool) {
     use std::sync::atomic::Ordering;
     let stripe = Arc::new(Stripe::default());
@@ -620,7 +620,7 @@ async fn a_trialing_team_cannot_buy_undo_or_restore(pool: PgPool) {
 
 /// Review 2, NS2: a computer whose row no longer decodes (quarantined) still
 /// has its queued item removal run, and it never stops the rest of the pass.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_quarantined_computer_neither_keeps_billing_nor_blocks_the_pass(pool: PgPool) {
     let stripe = Arc::new(Stripe::default());
     let (service, repo, _clock) = service(pool.clone(), stripe.clone()).await;
@@ -654,7 +654,7 @@ async fn a_quarantined_computer_neither_keeps_billing_nor_blocks_the_pass(pool: 
 /// Review 2, NS1: a Restore whose charge went through but whose request was
 /// dropped before the event applied. The webhook finishes the restore from
 /// the paid item instead of stripping it, so a retry never charges again.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_dropped_restore_is_finished_by_reconcile_not_charged_twice(pool: PgPool) {
     let stripe = Arc::new(Stripe::default());
     let (service, repo, clock) = service(pool, stripe.clone()).await;

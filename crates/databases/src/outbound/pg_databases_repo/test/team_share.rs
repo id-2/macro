@@ -10,9 +10,9 @@ use entity_access::domain::models::{
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_event_broker::NoopMacroEventBroker;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::{CellValue, CellWrite, DatabaseOp, OpResult, RowsChange, RowsResult};
 use models_permissions::share_permission::UpdateSharePermissionRequestV2;
 use models_permissions::share_permission::access_level::AccessLevel as ShareAccessLevel;
@@ -29,25 +29,25 @@ use crate::wiring::build_service;
 use properties::outbound::properties_pg_repo::PropertiesPgRepo;
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> Viewer {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let rox_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         user_id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     Viewer {
-        user_id: MacroUserIdStr::parse_from_str(user_id)
+        user_id: RoxUserIdStr::parse_from_str(user_id)
             .unwrap()
             .into_owned(),
         acting_bot: None,
@@ -63,7 +63,7 @@ fn team_share(level: Option<ShareAccessLevel>) -> UpdateSharePermissionRequestV2
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_teammate_reads_and_writes_a_team_shared_database_until_it_is_unshared(pool: PgPool) {
     let run = Uuid::now_v7();
     let owner = insert_user(&pool, &format!("macro|team-share-owner-{run}@rox.one")).await;

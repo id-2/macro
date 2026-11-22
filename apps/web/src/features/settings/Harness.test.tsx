@@ -47,8 +47,8 @@ vi.mock('./components/pending-requests-section', () => ({
   PendingRequestsSection: () => null,
 }));
 
-vi.mock('./computers/views/MacroComputers', () => ({
-  MacroComputers: () => null,
+vi.mock('./computers/views/RoxComputers', () => ({
+  RoxComputers: () => null,
 }));
 
 vi.mock('./computers/views/get-computer-entry', () => ({

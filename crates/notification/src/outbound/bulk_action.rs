@@ -4,7 +4,7 @@
 use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use rootcause::Report;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -57,7 +57,7 @@ impl ActionRow {
     fn into_domain(self) -> Result<BulkAction, Report> {
         Ok(BulkAction {
             id: self.id,
-            user_id: MacroUserIdStr::parse_from_str(&self.user_id)
+            user_id: RoxUserIdStr::parse_from_str(&self.user_id)
                 .map(CowLike::into_owned)
                 .map_err(|error| rootcause::report!("invalid bulk action user id: {error}"))?,
             scope: self.scope,
@@ -224,7 +224,7 @@ impl BulkActionStore for PgBulkActions {
 
     async fn request_undo(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<Option<UndoRequested>, Report> {
         let token = Uuid::now_v7();
@@ -446,7 +446,7 @@ impl BulkActionStore for PgBulkActions {
 
     async fn get(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<Option<BulkAction>, Report> {
         sqlx::query_as!(
@@ -466,7 +466,7 @@ impl BulkActionStore for PgBulkActions {
         .transpose()
     }
 
-    async fn running(&self, user_id: &MacroUserIdStr<'_>) -> Result<Vec<BulkAction>, Report> {
+    async fn running(&self, user_id: &RoxUserIdStr<'_>) -> Result<Vec<BulkAction>, Report> {
         sqlx::query_as!(
             ActionRow,
             r#"

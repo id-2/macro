@@ -6,7 +6,7 @@
  */
 
 /**
- * The type of an entity in Macro
+ * The type of an entity in Rox
  */
 export type ListFavoritesEntityTypeItem =
   (typeof ListFavoritesEntityTypeItem)[keyof typeof ListFavoritesEntityTypeItem];

@@ -1,10 +1,10 @@
 use crate::links::get::{
-    fetch_inbox_details_for_macro_id, fetch_inboxes_for_macro_id, fetch_link_by_email,
-    fetch_owned_link_for_message, fetch_owned_link_for_thread, fetch_primary_link_by_macro_id,
+    fetch_inbox_details_for_rox_id, fetch_inboxes_for_rox_id, fetch_link_by_email,
+    fetch_owned_link_for_message, fetch_owned_link_for_thread, fetch_primary_link_by_rox_id,
     fetch_readable_owned_inboxes,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::db;
 use models_email::service::backfill::BackfillJobStatus;
 use models_email::service::link::UserProvider;
@@ -15,41 +15,41 @@ const CHILD: &str = "macro|sharedbox@corp.test"; // owns the inbox
 const PRIMARY: &str = "macro|primary@corp.test"; // delegate
 const STRANGER: &str = "macro|stranger@corp.test"; // no relationship
 
-fn macro_id(s: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::try_from(s).unwrap()
+fn rox_id(s: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::try_from(s).unwrap()
 }
 
-/// macro_user + "User" rows so macro_user_links FKs resolve.
-async fn insert_user(pool: &Pool<Postgres>, macro_id: &str, email: &str) {
-    let macro_uuid = Uuid::new_v4();
+/// macro_user + "User" rows so rox_user_links FKs resolve.
+async fn insert_user(pool: &Pool<Postgres>, rox_id: &str, email: &str) {
+    let rox_uuid = Uuid::new_v4();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $3, $4)"#,
-        macro_uuid,
-        macro_id,
+        rox_uuid,
+        rox_id,
         email,
-        macro_id,
+        rox_id,
     )
     .execute(pool)
     .await
     .unwrap();
 
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
-        macro_id,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
+        rox_id,
         email,
-        macro_uuid,
+        rox_uuid,
     )
     .execute(pool)
     .await
     .unwrap();
 }
 
-/// A link owned by `macro_id` with one thread and one message on it.
+/// A link owned by `rox_id` with one thread and one message on it.
 /// Returns `(link_id, thread_id, message_id)`.
 async fn insert_inbox_with_thread_and_message(
     pool: &Pool<Postgres>,
-    macro_id: &str,
+    rox_id: &str,
     email: &str,
 ) -> (Uuid, Uuid, Uuid) {
     let link_id = Uuid::new_v4();
@@ -58,10 +58,10 @@ async fn insert_inbox_with_thread_and_message(
     let message_id = Uuid::new_v4();
 
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
         link_id,
-        macro_id,
+        rox_id,
         email,
     )
     .execute(pool)
@@ -124,7 +124,7 @@ async fn insert_settings(
 async fn insert_backfill_job(
     pool: &Pool<Postgres>,
     link_id: Uuid,
-    macro_id: &str,
+    rox_id: &str,
     status: db::backfill::BackfillJobStatus,
     age_minutes: i32,
 ) {
@@ -133,7 +133,7 @@ async fn insert_backfill_job(
            VALUES ($1, $2, $3, $4, now() - make_interval(mins => $5))"#,
         Uuid::new_v4(),
         link_id,
-        macro_id,
+        rox_id,
         status as _,
         age_minutes,
     )
@@ -175,7 +175,7 @@ async fn insert_contact_with_photo(
 
 async fn insert_delegation(pool: &Pool<Postgres>, primary: &str, child: &str, link_id: Uuid) {
     sqlx::query!(
-        r#"INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        r#"INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
            VALUES ($1, $2, $3)"#,
         primary,
         child,
@@ -186,7 +186,7 @@ async fn insert_delegation(pool: &Pool<Postgres>, primary: &str, child: &str, li
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn resolves_inbox_for_owner_and_delegate(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
     insert_user(&pool, PRIMARY, "primary@corp.test").await;
@@ -219,7 +219,7 @@ async fn resolves_inbox_for_owner_and_delegate(pool: Pool<Postgres>) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn resolves_nothing_for_unrelated_caller(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
     insert_user(&pool, PRIMARY, "primary@corp.test").await;
@@ -243,7 +243,7 @@ async fn resolves_nothing_for_unrelated_caller(pool: Pool<Postgres>) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scoped_delegation_sees_only_its_link(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
     insert_user(&pool, PRIMARY, "primary@corp.test").await;
@@ -256,7 +256,7 @@ async fn scoped_delegation_sees_only_its_link(pool: Pool<Postgres>) -> anyhow::R
     let (link_b, thread_b, message_b) =
         insert_inbox_with_thread_and_message(&pool, CHILD, "second@corp.test").await;
 
-    let inbox_ids: Vec<Uuid> = fetch_inboxes_for_macro_id(&pool, PRIMARY)
+    let inbox_ids: Vec<Uuid> = fetch_inboxes_for_rox_id(&pool, PRIMARY)
         .await?
         .into_iter()
         .map(|l| l.id)
@@ -275,7 +275,7 @@ async fn scoped_delegation_sees_only_its_link(pool: Pool<Postgres>) -> anyhow::R
     );
 
     // The child still owns both inboxes.
-    let mut child_inboxes: Vec<Uuid> = fetch_inboxes_for_macro_id(&pool, CHILD)
+    let mut child_inboxes: Vec<Uuid> = fetch_inboxes_for_rox_id(&pool, CHILD)
         .await?
         .into_iter()
         .map(|l| l.id)
@@ -288,7 +288,7 @@ async fn scoped_delegation_sees_only_its_link(pool: Pool<Postgres>) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_joins_settings_backfill_and_photo(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -331,7 +331,7 @@ async fn fetch_inbox_details_joins_settings_backfill_and_photo(
     )
     .await;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert_eq!(details.len(), 1);
     let inbox = &details[0];
     assert_eq!(inbox.link.id, link_id);
@@ -347,7 +347,7 @@ async fn fetch_inbox_details_joins_settings_backfill_and_photo(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_reads_google_scopes_from_side_table(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -374,7 +374,7 @@ async fn fetch_inbox_details_reads_google_scopes_from_side_table(
     .execute(&pool)
     .await?;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert_eq!(details.len(), 1);
     assert_eq!(details[0].provider_granted_scopes, granted_scopes);
     assert!(!details[0].calendar_disabled);
@@ -386,7 +386,7 @@ async fn fetch_inbox_details_reads_google_scopes_from_side_table(
     .execute(&pool)
     .await?;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert!(
         details[0].calendar_disabled,
         "an opted-out inbox reads as deliberately disabled, not merely ungranted"
@@ -399,7 +399,7 @@ async fn fetch_inbox_details_reads_google_scopes_from_side_table(
     .execute(&pool)
     .await?;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert_eq!(details.len(), 1);
     assert!(details[0].provider_granted_scopes.is_empty());
     assert!(!details[0].calendar_disabled);
@@ -407,7 +407,7 @@ async fn fetch_inbox_details_reads_google_scopes_from_side_table(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_includes_delegated_inbox_with_optional_fields_absent(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -420,7 +420,7 @@ async fn fetch_inbox_details_includes_delegated_inbox_with_optional_fields_absen
 
     // No backfill jobs and no self-contact — the delegate still sees the inbox,
     // with the optional details absent.
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(PRIMARY)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(PRIMARY)).await?;
     assert_eq!(details.len(), 1);
     let inbox = &details[0];
     assert_eq!(inbox.link.id, link_id);
@@ -432,7 +432,7 @@ async fn fetch_inbox_details_includes_delegated_inbox_with_optional_fields_absen
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_orders_newest_first_and_pairs_rows_per_inbox(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -463,7 +463,7 @@ async fn fetch_inbox_details_orders_newest_first_and_pairs_rows_per_inbox(
     )
     .await;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     let ids: Vec<Uuid> = details.iter().map(|d| d.link.id).collect();
     assert_eq!(ids, vec![link_b, link_a]);
 
@@ -484,7 +484,7 @@ async fn fetch_inbox_details_orders_newest_first_and_pairs_rows_per_inbox(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_dedupes_inbox_that_is_both_owned_and_delegated(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -494,19 +494,19 @@ async fn fetch_inbox_details_dedupes_inbox_that_is_both_owned_and_delegated(
         insert_inbox_with_thread_and_message(&pool, CHILD, "sharedbox@corp.test").await;
     insert_settings(&pool, link_id, false, None).await;
 
-    // CHILD owns the inbox AND appears as its delegate via macro_user_links
+    // CHILD owns the inbox AND appears as its delegate via rox_user_links
     // (the check constraint forbids self-rows, so the grant's child is another
     // user). Both UNION branches match and must collapse to one row.
     insert_delegation(&pool, CHILD, PRIMARY, link_id).await;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert_eq!(details.len(), 1);
     assert_eq!(details[0].link.id, link_id);
 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_photo_ignores_matching_email_on_other_link(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -529,14 +529,14 @@ async fn fetch_inbox_details_photo_ignores_matching_email_on_other_link(
     )
     .await;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert_eq!(details.len(), 1);
     assert!(details[0].photo_url.is_none());
 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_photo_absent_when_self_contact_has_no_photo(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -548,14 +548,14 @@ async fn fetch_inbox_details_photo_absent_when_self_contact_has_no_photo(
     // Self-contact row exists but has no SFS photo yet.
     insert_contact_with_photo(&pool, link_id, "sharedbox@corp.test", None).await;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert_eq!(details.len(), 1);
     assert!(details[0].photo_url.is_none());
 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_maps_each_backfill_status(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
 
@@ -592,7 +592,7 @@ async fn fetch_inbox_details_maps_each_backfill_status(pool: Pool<Postgres>) -> 
         expected_by_link.push((link_id, expected));
     }
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert_eq!(details.len(), expected_by_link.len());
     for (link_id, expected) in expected_by_link {
         let inbox = details.iter().find(|d| d.link.id == link_id).unwrap();
@@ -602,19 +602,19 @@ async fn fetch_inbox_details_maps_each_backfill_status(pool: Pool<Postgres>) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_empty_for_user_without_inboxes(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert!(details.is_empty());
 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_defaults_settings_when_row_missing(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -624,7 +624,7 @@ async fn fetch_inbox_details_defaults_settings_when_row_missing(
 
     // A legacy link with no email_settings row must still be listed, with
     // default settings.
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert_eq!(details.len(), 1);
     let inbox = &details[0];
     assert_eq!(inbox.link.id, link_id);
@@ -635,27 +635,27 @@ async fn fetch_inbox_details_defaults_settings_when_row_missing(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_link_by_email_finds_link_owned_by_another_macro_user(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     // A shared external mailbox connected by one macro user as a data-source link
-    // (owner's macro_id, mailbox email). A second user connecting the same mailbox
-    // discovers it across all macro_ids — the trigger for the 409 / shared-inbox promote.
+    // (owner's rox_id, mailbox email). A second user connecting the same mailbox
+    // discovers it across all rox_ids — the trigger for the 409 / shared-inbox promote.
     insert_user(&pool, CHILD, "support@external.test").await;
     let (link_id, _, _) =
         insert_inbox_with_thread_and_message(&pool, CHILD, "support@external.test").await;
 
     let found = fetch_link_by_email(&pool, "support@external.test", UserProvider::Gmail).await?;
     assert_eq!(
-        found.map(|l| (l.id, l.macro_id.as_ref().to_string())),
+        found.map(|l| (l.id, l.rox_id.as_ref().to_string())),
         Some((link_id, CHILD.to_string()))
     );
 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_link_by_email_none_when_mailbox_unconnected(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -666,14 +666,14 @@ async fn fetch_link_by_email_none_when_mailbox_unconnected(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_primary_link_uses_first_party_address_not_legacy_user_id(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
     let (external, _, _) =
         insert_inbox_with_thread_and_message(&pool, CHILD, "sharedbox@corp.test").await;
-    let rox_address = format!("ada@{macro_user_id::handle::ROX_MAIL_DOMAIN}");
+    let rox_address = format!("ada@{rox_user_id::handle::ROX_MAIL_DOMAIN}");
     let (rox, _, _) = insert_inbox_with_thread_and_message(&pool, CHILD, &rox_address).await;
     sqlx::query!(
         "UPDATE email_links SET is_primary = (id = $1), provider = CASE WHEN id = $1 THEN 'ROX' ELSE provider END",
@@ -682,20 +682,20 @@ async fn fetch_primary_link_uses_first_party_address_not_legacy_user_id(
         .execute(&pool)
         .await?;
 
-    let found = fetch_primary_link_by_macro_id(&pool, CHILD).await?;
+    let found = fetch_primary_link_by_rox_id(&pool, CHILD).await?;
     assert_eq!(found.map(|link| link.id), Some(rox));
     assert_ne!(rox, external);
 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_primary_link_ignores_external_imports(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
     insert_inbox_with_thread_and_message(&pool, CHILD, "delegated@corp.test").await;
 
     assert!(
-        fetch_primary_link_by_macro_id(&pool, CHILD)
+        fetch_primary_link_by_rox_id(&pool, CHILD)
             .await?
             .is_none()
     );
@@ -706,7 +706,7 @@ async fn fetch_primary_link_ignores_external_imports(pool: Pool<Postgres>) -> an
 /// Removing an inbox's calendar data has to stay reachable no matter what the
 /// recorded scopes say, so the flag tracks the account row rather than the
 /// grant: a calendar synced under an older scope set still reads as present.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fetch_inbox_details_reports_calendar_data_from_the_account_row(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -714,7 +714,7 @@ async fn fetch_inbox_details_reports_calendar_data_from_the_account_row(
     let (link_id, _, _) =
         insert_inbox_with_thread_and_message(&pool, CHILD, "sharedbox@corp.test").await;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert!(!details[0].has_calendar_data);
 
     sqlx::query!(
@@ -731,7 +731,7 @@ async fn fetch_inbox_details_reports_calendar_data_from_the_account_row(
     .execute(&pool)
     .await?;
 
-    let details = fetch_inbox_details_for_macro_id(&pool, &macro_id(CHILD)).await?;
+    let details = fetch_inbox_details_for_rox_id(&pool, &rox_id(CHILD)).await?;
     assert!(details[0].has_calendar_data);
     assert!(
         details[0].provider_granted_scopes.is_empty(),
@@ -741,7 +741,7 @@ async fn fetch_inbox_details_reports_calendar_data_from_the_account_row(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn readable_owned_inboxes_skip_delegated_inactive_and_reauth_links(pool: Pool<Postgres>) {
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
     insert_user(&pool, PRIMARY, "primary@corp.test").await;
@@ -786,7 +786,7 @@ async fn readable_owned_inboxes_skip_delegated_inactive_and_reauth_links(pool: P
     .await
     .unwrap();
 
-    let inboxes = fetch_readable_owned_inboxes(&pool, &macro_id(PRIMARY))
+    let inboxes = fetch_readable_owned_inboxes(&pool, &rox_id(PRIMARY))
         .await
         .unwrap();
 

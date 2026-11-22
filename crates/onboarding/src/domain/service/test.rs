@@ -3,8 +3,8 @@ use crate::domain::models::OnboardingStatus;
 use mcp_client::domain::models::{McpServerRecord, StoredCredentials};
 use std::sync::Mutex;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|tester@rox.one".to_string()).expect("valid test user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|tester@rox.one".to_string()).expect("valid test user id")
 }
 
 fn active_row() -> OnboardingRow {
@@ -33,14 +33,14 @@ impl MockRepo {
 }
 
 impl OnboardingRepo for MockRepo {
-    async fn ensure_row(&self, _user: &MacroUserIdStr<'static>) -> Result<OnboardingRow> {
+    async fn ensure_row(&self, _user: &RoxUserIdStr<'static>) -> Result<OnboardingRow> {
         Ok(OnboardingRow {
             status: self.status,
             ..active_row()
         })
     }
 
-    async fn get_row(&self, _user: &MacroUserIdStr<'static>) -> Result<Option<OnboardingRow>> {
+    async fn get_row(&self, _user: &RoxUserIdStr<'static>) -> Result<Option<OnboardingRow>> {
         Ok(Some(OnboardingRow {
             status: self.status,
             ..active_row()
@@ -49,7 +49,7 @@ impl OnboardingRepo for MockRepo {
 
     async fn complete(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         skipped: bool,
     ) -> Result<OnboardingRow> {
         self.completions.lock().unwrap().push(skipped);
@@ -61,17 +61,17 @@ impl OnboardingRepo for MockRepo {
         })
     }
 
-    async fn delete_row(&self, _user: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn delete_row(&self, _user: &RoxUserIdStr<'static>) -> Result<()> {
         Ok(())
     }
 
-    async fn dismissed_prompts(&self, _user: &MacroUserIdStr<'static>) -> Result<Vec<String>> {
+    async fn dismissed_prompts(&self, _user: &RoxUserIdStr<'static>) -> Result<Vec<String>> {
         Ok(self.dismissed.lock().unwrap().clone())
     }
 
     async fn dismiss_prompt(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         prompt: &PromptId,
     ) -> Result<()> {
         let mut dismissed = self.dismissed.lock().unwrap();
@@ -95,7 +95,7 @@ impl McpServerStore for MockStore {
 
     async fn load(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _url: &str,
     ) -> std::result::Result<Option<McpServerRecord>, ()> {
         Ok(None)
@@ -103,7 +103,7 @@ impl McpServerStore for MockStore {
 
     async fn delete(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _url: &str,
     ) -> std::result::Result<(), ()> {
         Ok(())
@@ -111,7 +111,7 @@ impl McpServerStore for MockStore {
 
     async fn list(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
     ) -> std::result::Result<Vec<McpServerRecord>, ()> {
         Ok(self.records.clone())
     }
@@ -165,7 +165,7 @@ fn suggested_team_domain_offers_custom_domains_only() {
 
     // Generic consumer provider: no domain team to suggest.
     let gmail =
-        MacroUserIdStr::try_from("macro|tester@gmail.com".to_string()).expect("valid test user id");
+        RoxUserIdStr::try_from("macro|tester@gmail.com".to_string()).expect("valid test user id");
     assert_eq!(suggested_team_domain(&gmail), None);
 }
 

@@ -6,7 +6,7 @@ use crate::domain::{
     },
     ports::{ContactDirectory, ContactNameReader, ContactsPageService},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::{collections::HashMap, sync::Arc};
 
@@ -26,8 +26,8 @@ impl<P, N> ContactsDirectoryService<P, N> {
 impl<P: ContactsPageService, N: ContactNameReader> ContactsDirectoryService<P, N> {
     async fn enrich(
         &self,
-        viewer: MacroUserIdStr<'_>,
-        ids: Vec<MacroUserIdStr<'static>>,
+        viewer: RoxUserIdStr<'_>,
+        ids: Vec<RoxUserIdStr<'static>>,
     ) -> Result<Vec<Contact>, Report> {
         if ids.len() > usize::from(MAX_CONTACT_PAGE_SIZE) {
             return Err(rootcause::report!("contact enrichment exceeded its bound"));
@@ -62,7 +62,7 @@ impl<P: ContactsPageService, N: ContactNameReader> ContactDirectory
     #[tracing::instrument(name = "contacts.directory.page", skip_all, fields(limit = i64::from(limit.get()), has_cursor = after.is_some()), err)]
     async fn contact_page(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> Result<ContactPage, Report> {
@@ -87,7 +87,7 @@ impl<P: ContactsPageService, N: ContactNameReader> ContactDirectory
     #[tracing::instrument(name = "contacts.directory.lookup", skip_all, fields(count = lookup.ids().len() as i64), err)]
     async fn lookup_contacts(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
     ) -> Result<Vec<Contact>, Report> {
         if lookup.ids().is_empty() {
@@ -106,7 +106,7 @@ impl<P: ContactsPageService, N: ContactNameReader> ContactDirectory
     #[tracing::instrument(name = "contacts.directory.search", skip_all, fields(limit = i64::from(limit.get()), has_cursor = after.is_some(), query_bytes = search.as_str().len() as i64), err)]
     async fn search_contacts(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         search: &ContactSearch,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,

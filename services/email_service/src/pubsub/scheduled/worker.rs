@@ -21,7 +21,7 @@ pub fn context(
     >,
     s3_client: s3_client::S3,
     attachment_bucket: String,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     read_receipts: crate::composition::ReadReceipts,
 ) -> ScheduledContext {
     let adapter = crate::outbound::scheduled_delivery::ScheduledDeliveryAdapter {
@@ -34,7 +34,7 @@ pub fn context(
         attachment_bytes,
         s3_client,
         attachment_bucket,
-        macro_event_broker,
+        rox_event_broker,
         read_receipts,
     };
     ScheduledContext {
@@ -59,7 +59,7 @@ pub async fn run_worker(
     >,
     s3_client: s3_client::S3,
     attachment_bucket: String,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     read_receipts: crate::composition::ReadReceipts,
 ) {
     run_worker_with_cancellation(
@@ -70,7 +70,7 @@ pub async fn run_worker(
             attachment_bytes,
             s3_client,
             attachment_bucket,
-            macro_event_broker,
+            rox_event_broker,
             read_receipts,
         ),
         CancellationToken::new(),

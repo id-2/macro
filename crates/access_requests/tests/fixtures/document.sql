@@ -1,8 +1,8 @@
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
 ('00000000-0000-0000-0000-000000000001', 'owner@requests.test', 'owner@requests.test', 'owner'),
 ('00000000-0000-0000-0000-000000000002', 'reader@requests.test', 'reader@requests.test', 'reader'),
 ('00000000-0000-0000-0000-000000000003', 'outsider@requests.test', 'outsider@requests.test', 'outsider');
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
 ('macro|owner@requests.test', 'owner@requests.test', '00000000-0000-0000-0000-000000000001'),
 ('macro|reader@requests.test', 'reader@requests.test', '00000000-0000-0000-0000-000000000002'),
 ('macro|outsider@requests.test', 'outsider@requests.test', '00000000-0000-0000-0000-000000000003');

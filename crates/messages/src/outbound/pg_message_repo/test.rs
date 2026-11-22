@@ -3,7 +3,7 @@ use crate::domain::service::MessageService;
 use crate::domain::service::guest_chat::{
     GuestCallAccess, GuestCallAuthorizer, GuestChatApi, GuestChatPost, GuestChatService,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::sync::Arc;
 
 const USER: &str = "macro|message-test@example.com";
@@ -12,7 +12,7 @@ mod initiative;
 mod schema_drop;
 
 async fn setup(pool: &PgPool) {
-    let user_id = macro_uuid::generate_uuid_v7();
+    let user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'message-test', 'message-test@example.com', 'message-test')"#,
@@ -21,7 +21,7 @@ async fn setup(pool: &PgPool) {
     .execute(pool)
     .await
     .unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, 'message-test@example.com', $2)"#, USER, user_id)
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, 'message-test@example.com', $2)"#, USER, user_id)
         .execute(pool).await.unwrap();
     for id in ["message-doc-a", "message-doc-b"] {
         sqlx::query!(
@@ -58,7 +58,7 @@ fn command(document: &str, root: Option<Uuid>, content: &str) -> CreateMessage {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn shared_reads_preserve_system_and_deleted_bot_profiles(pool: PgPool) {
     setup(&pool).await;
     let deleted_bot = Uuid::new_v4();
@@ -74,8 +74,8 @@ async fn shared_reads_preserve_system_and_deleted_bot_profiles(pool: PgPool) {
     let repo = PgMessageRepository::new(pool);
     for (bot_id, name, avatar_url) in [
         (
-            bot_id::MACRO_AI_BOT_ID,
-            bot_id::system_bot(bot_id::MACRO_AI_BOT_ID).unwrap().name,
+            bot_id::ROX_AI_BOT_ID,
+            bot_id::system_bot(bot_id::ROX_AI_BOT_ID).unwrap().name,
             None,
         ),
         (
@@ -108,7 +108,7 @@ async fn shared_reads_preserve_system_and_deleted_bot_profiles(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn thread_identity_tombstones_and_parent_isolation(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
@@ -181,7 +181,7 @@ async fn thread_identity_tombstones_and_parent_isolation(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_deleted_discussion_reads_back_as_a_root_tombstone_without_replies(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
@@ -202,7 +202,7 @@ async fn a_deleted_discussion_reads_back_as_a_root_tombstone_without_replies(poo
     assert!(repo.replies(&parent, root.id).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleted_markdown_threads_keep_paged_cleanup_identity(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
@@ -282,7 +282,7 @@ async fn deleted_markdown_threads_keep_paged_cleanup_identity(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_markdown_anchor_stores_the_marked_text_beside_its_mark(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool);
@@ -303,7 +303,7 @@ async fn a_markdown_anchor_stores_the_marked_text_beside_its_mark(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reactions_attachments_and_resolution_use_shared_message_data(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool);
@@ -373,7 +373,7 @@ async fn reactions_attachments_and_resolution_use_shared_message_data(pool: PgPo
     assert!(state.resolved);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detaching_a_mark_retains_the_complete_thread_and_makes_it_unanchored(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
@@ -433,7 +433,7 @@ async fn detaching_a_mark_retains_the_complete_thread_and_makes_it_unanchored(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn soft_deleted_parents_disappear_and_cursor_does_not_repeat_roots(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
@@ -478,11 +478,11 @@ async fn soft_deleted_parents_disappear_and_cursor_does_not_repeat_roots(pool: P
     assert!(!repo.parent_exists(&root.parent).await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pdf_root_tombstone_keeps_anchor_and_thread_deletion_removes_placeable(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
-    let anchor_id = macro_uuid::generate_uuid_v7();
+    let anchor_id = rox_uuid::generate_uuid_v7();
     let mut create = command("message-doc-a", None, "PDF discussion");
     create.input.anchor = Some(NewThreadAnchor::PdfPlaceable {
         anchor_id,
@@ -516,13 +516,13 @@ async fn pdf_root_tombstone_keeps_anchor_and_thread_deletion_removes_placeable(p
         .fetch_one(&pool).await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn highlight_attachment_is_scoped_and_explicit_thread_deletion_preserves_highlight(
     pool: PgPool,
 ) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
-    let anchor_id = macro_uuid::generate_uuid_v7();
+    let anchor_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"INSERT INTO "PdfHighlightAnchor"
         (uuid, "documentId", owner, page, red, green, blue, alpha, type, text, "pageViewportWidth", "pageViewportHeight")
         VALUES ($1, 'message-doc-a', $2, 1, 255, 255, 0, 0.5, 1, 'selected text', 600, 800)"#, anchor_id, USER)
@@ -563,11 +563,11 @@ async fn highlight_attachment_is_scoped_and_explicit_thread_deletion_preserves_h
     assert_ne!(replacement.id, root.id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn placeable_anchor_creation_is_atomic_with_its_root(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
-    let anchor_id = macro_uuid::generate_uuid_v7();
+    let anchor_id = rox_uuid::generate_uuid_v7();
     let placeable = |content: &str| {
         let mut create = command("message-doc-a", None, content);
         create.input.anchor = Some(NewThreadAnchor::PdfPlaceable {
@@ -611,7 +611,7 @@ async fn placeable_anchor_creation_is_atomic_with_its_root(pool: PgPool) {
     assert_eq!(threads, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn roots_get_thread_rows_without_the_bookkeeping_trigger(pool: PgPool) {
     setup(&pool).await;
     sqlx::query!("DROP TRIGGER trg_initialize_comms_message_thread ON comms_messages")
@@ -637,10 +637,10 @@ async fn roots_get_thread_rows_without_the_bookkeeping_trigger(pool: PgPool) {
     assert_eq!(reply.thread_id, Some(root.id));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn channel_and_document_attachments_use_message_parent_identity(pool: PgPool) {
     setup(&pool).await;
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels(id, channel_type, owner_id) VALUES ($1, 'private', $2)",
         channel,
@@ -680,7 +680,7 @@ async fn channel_and_document_attachments_use_message_parent_identity(pool: PgPo
 }
 
 #[cfg(feature = "delivery")]
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn discussion_delivery_context_reads_document_assignees_and_thread_authors(pool: PgPool) {
     use crate::{
         domain::delivery::DiscussionContextReader,
@@ -701,7 +701,7 @@ async fn discussion_delivery_context_reads_document_assignees_and_thread_authors
     sqlx::query!(
         r#"INSERT INTO entity_properties(id, entity_id, entity_type, property_definition_id, values)
         VALUES ($1, 'message-doc-a', 'TASK', $2, $3)"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         system_properties::SystemPropertyKey::Assignees.uuid(),
         serde_json::json!({
             "type": "EntityReference", "value": [{"entity_type": "USER", "entity_id": USER}]
@@ -720,7 +720,7 @@ async fn discussion_delivery_context_reads_document_assignees_and_thread_authors
     assert_eq!(context.participants, vec![USER]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_mark_identifies_one_live_discussion_per_document(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool);
@@ -739,7 +739,7 @@ async fn a_mark_identifies_one_live_discussion_per_document(pool: PgPool) {
     assert_ne!(other.id, first.id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn agent_context_stays_in_the_document_thread_and_omits_tombstones(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool);
@@ -792,7 +792,7 @@ async fn agent_context_stays_in_the_document_thread_and_omits_tombstones(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replacement_attachments_preserve_retained_ids_and_remove_only_missing_items(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool);
@@ -838,7 +838,7 @@ async fn replacement_attachments_preserve_retained_ids_and_remove_only_missing_i
     assert!(removed.attachments.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn attachments_read_back_in_the_order_they_were_sent(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool);
@@ -869,10 +869,10 @@ async fn attachments_read_back_in_the_order_they_were_sent(pool: PgPool) {
     assert_eq!(order, sent);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn both_parents_use_bounded_previews_and_bidirectional_windows(pool: PgPool) {
     setup(&pool).await;
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels(id, channel_type, owner_id) VALUES ($1, 'private', $2)",
         channel,
@@ -1131,7 +1131,7 @@ async fn both_parents_use_bounded_previews_and_bidirectional_windows(pool: PgPoo
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_ids_resolve_through_the_import_mapping_tables(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
@@ -1186,7 +1186,7 @@ async fn legacy_ids_resolve_through_the_import_mapping_tables(pool: PgPool) {
     // Mappings cannot point at messages that were never written.
     let dangling = sqlx::query!(
         "INSERT INTO migrated_comment_id (comment_id, message_id, document_id) VALUES (12, $1, 'message-doc-a')",
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
@@ -1197,11 +1197,11 @@ async fn legacy_ids_resolve_through_the_import_mapping_tables(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn client_supplied_ids_are_kept_and_never_reused(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool);
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let mut first = command("message-doc-a", None, "first");
     first.input.id = Some(id);
     assert_eq!(repo.create(first).await.unwrap().id, id);
@@ -1220,7 +1220,7 @@ async fn client_supplied_ids_are_kept_and_never_reused(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn highlight_threads_read_the_text_the_highlight_covers(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
@@ -1228,7 +1228,7 @@ async fn highlight_threads_read_the_text_the_highlight_covers(pool: PgPool) {
     let highlight = |text: &'static str| {
         let pool = pool.clone();
         async move {
-            let anchor_id = macro_uuid::generate_uuid_v7();
+            let anchor_id = rox_uuid::generate_uuid_v7();
             sqlx::query!(r#"INSERT INTO "PdfHighlightAnchor"
                 (uuid, "documentId", owner, page, red, green, blue, alpha, type, text, "pageViewportWidth", "pageViewportHeight")
                 VALUES ($1, 'message-doc-a', $2, 1, 255, 255, 0, 0.5, 1, $3, 600, 800)"#, anchor_id, USER, text)
@@ -1320,7 +1320,7 @@ async fn highlight_threads_read_the_text_the_highlight_covers(pool: PgPool) {
     assert_eq!(patched.anchor, anchor(covered, Some("edited words")));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn parent_of_names_only_a_live_message_parent(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
@@ -1343,7 +1343,7 @@ async fn parent_of_names_only_a_live_message_parent(pool: PgPool) {
     assert_eq!(repo.parent_of(Uuid::now_v7()).await.unwrap(), None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn spreadsheet_threads_round_trip_resolve_and_delete(pool: PgPool) {
     setup(&pool).await;
     sqlx::query!(r#"UPDATE "Document" SET "fileType" = 'spreadsheet' WHERE id = 'message-doc-a'"#)
@@ -1408,7 +1408,7 @@ async fn spreadsheet_threads_round_trip_resolve_and_delete(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fig_threads_round_trip_on_layers_and_the_canvas(pool: PgPool) {
     // The repository stores what the service validated; the service owns the
     // design-file check, so the document's file type does not matter here.
@@ -1494,9 +1494,9 @@ async fn fig_threads_round_trip_on_layers_and_the_canvas(pool: PgPool) {
 
 async fn setup_call_chat(pool: &PgPool) -> Uuid {
     setup(pool).await;
-    let call_id = macro_uuid::generate_uuid_v7();
-    let channel_id = macro_uuid::generate_uuid_v7();
-    let permission_id = macro_uuid::generate_uuid_v7().to_string();
+    let call_id = rox_uuid::generate_uuid_v7();
+    let channel_id = rox_uuid::generate_uuid_v7();
+    let permission_id = rox_uuid::generate_uuid_v7().to_string();
     sqlx::query!(
         r#"INSERT INTO comms_channels (id, name, channel_type, owner_id)
         VALUES ($1, 'Call chat test', 'public', $2)"#,
@@ -1534,7 +1534,7 @@ fn call_message(call_id: Uuid, content: &str) -> CreateMessage {
     command
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_first_call_messages_share_one_thread(pool: PgPool) {
     let call_id = setup_call_chat(&pool).await;
     let repo = PgMessageRepository::new(pool);
@@ -1580,7 +1580,7 @@ async fn concurrent_first_call_messages_share_one_thread(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn guests_and_members_share_the_persisted_call_discussion(pool: PgPool) {
     let call_id = setup_call_chat(&pool).await;
     let repo = PgMessageRepository::new(pool);
@@ -1629,7 +1629,7 @@ impl GuestCallAuthorizer for CallGuestAccess {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn guest_service_reads_before_and_after_first_post_and_then_replies(pool: PgPool) {
     let call_id = setup_call_chat(&pool).await;
     let guest_id = Uuid::now_v7();
@@ -1693,19 +1693,19 @@ async fn guest_service_reads_before_and_after_first_post_and_then_replies(pool: 
     assert_eq!(thread.replies[0].id, reply.id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn call_chat_survives_archiving_and_is_removed_with_the_record(pool: PgPool) {
     let call_id = setup_call_chat(&pool).await;
     verify_call_chat_archive(pool, call_id).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn quick_call_chat_survives_archiving(pool: PgPool) {
     let call_id = setup_meeting_chat(&pool, false).await;
     verify_call_chat_archive(pool, call_id).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scheduled_call_chat_survives_archiving(pool: PgPool) {
     let call_id = setup_meeting_chat(&pool, true).await;
     verify_call_chat_archive(pool, call_id).await;
@@ -1713,7 +1713,7 @@ async fn scheduled_call_chat_survives_archiving(pool: PgPool) {
 
 async fn setup_meeting_chat(pool: &PgPool, scheduled: bool) -> Uuid {
     let call_id = setup_call_chat(pool).await;
-    let meeting_id = macro_uuid::generate_uuid_v7();
+    let meeting_id = rox_uuid::generate_uuid_v7();
     let start = scheduled.then(chrono::Utc::now);
     let end = start.map(|start| start + chrono::Duration::hours(1));
     sqlx::query!(
@@ -1776,12 +1776,12 @@ async fn verify_call_chat_archive(pool: PgPool, call_id: Uuid) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retrying_first_call_message_cannot_append_it_twice(pool: PgPool) {
     let call_id = setup_call_chat(&pool).await;
     let repo = PgMessageRepository::new(pool);
     let mut input = call_message(call_id, "First message");
-    input.input.id = Some(macro_uuid::generate_uuid_v7());
+    input.input.id = Some(rox_uuid::generate_uuid_v7());
     let client_message_id = input.input.id.unwrap();
     let actor = input.actor.clone();
     let parent = input.parent.clone();
@@ -1806,7 +1806,7 @@ async fn retrying_first_call_message_cannot_append_it_twice(pool: PgPool) {
     assert_eq!(recovered.content, "First message");
     for (parent, actor) in [
         (
-            MessageParent::Call(macro_uuid::generate_uuid_v7()),
+            MessageParent::Call(rox_uuid::generate_uuid_v7()),
             actor.clone(),
         ),
         (
@@ -1831,7 +1831,7 @@ async fn retrying_first_call_message_cannot_append_it_twice(pool: PgPool) {
     assert!(deleted.content.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn imported_call_discussion_needs_no_native_session(pool: PgPool) {
     setup(&pool).await;
     let call_id = Uuid::now_v7();

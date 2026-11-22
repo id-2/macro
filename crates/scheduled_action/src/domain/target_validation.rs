@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use agent_session::domain::routines::{RoutineSessions, ValidateRoutineSession};
 use anyhow::Result;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use routine_program::{ProgramError, RoutineProgram};
 use serde_json::Value;
 
@@ -33,7 +33,7 @@ pub enum TargetValidationError {
 pub struct ModelOnlyTargets;
 
 impl TaskTargetValidator for ModelOnlyTargets {
-    async fn validate_task(&self, task: &Value, _owner: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn validate_task(&self, task: &Value, _owner: &RoxUserIdStr<'static>) -> Result<()> {
         let program = parse_program(task)?;
         // Agents and required apps need the session domain to authorize them.
         let agent = program.agent_steps().into_iter().any(|step| {
@@ -63,7 +63,7 @@ impl<Sessions> TargetValidation<Sessions> {
 }
 
 impl<Sessions: RoutineSessions> TaskTargetValidator for TargetValidation<Sessions> {
-    async fn validate_task(&self, task: &Value, owner: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn validate_task(&self, task: &Value, owner: &RoxUserIdStr<'static>) -> Result<()> {
         let program = parse_program(task)?;
         for step in program.agent_steps() {
             let (bot_id, model) = ResolvedTaskTarget::of(step)?.session_target();

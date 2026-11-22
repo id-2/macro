@@ -31,7 +31,7 @@ const cloudStorageClusterName: pulumi.Output<string> = cloudStorageStack
   .getOutput('cloudStorageClusterName')
   .apply((arn) => arn as string);
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
 const containerEnvVars = [
   {
@@ -60,7 +60,7 @@ const staticFileService = new StaticFileService(`${SERVICE_NAME}-${stack}`, {
     family: 'linux',
     architecture: 'amd64',
   },
-  secretKeyArns: [jwtSecretKeyArn, MACRO_API_TOKENS.macroApiTokenPublicKeyArn],
+  secretKeyArns: [jwtSecretKeyArn, ROX_API_TOKENS.macroApiTokenPublicKeyArn],
   healthCheckPath: '/api/health',
   serviceContainerPort: 8080,
   tags,

@@ -24,7 +24,7 @@ pub fn session_config_options(
             )
             .meta(super::models::supports_images(model).map(|supported| {
                 serde_json::Map::from_iter([(
-                    "macro.supportsImages".to_owned(),
+                    "rox.supportsImages".to_owned(),
                     serde_json::Value::Bool(supported),
                 )])
             }))

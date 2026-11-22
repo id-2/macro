@@ -1,7 +1,7 @@
 //! A source-neutral snapshot of projects and issues, retained in the import ledger.
 
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 /// A source identifier, safe to use as a URL path segment.
@@ -192,7 +192,7 @@ pub trait TrackerConnections: Send + Sync + 'static {
     /// Inventory through the user's enabled grant, reporting discovered counts.
     async fn inventory(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         progress: &(dyn Fn(usize, usize) + Send + Sync),
     ) -> Result<Inventory, TrackerError>;
 }

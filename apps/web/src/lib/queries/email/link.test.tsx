@@ -53,7 +53,7 @@ vi.mock('../client', () => ({
 const link = (id: string): EmailLink =>
   ({
     id,
-    macro_id: 'macro|self',
+    rox_id: 'macro|self',
     email_address: `${id}@example.com`,
     needs_calendar_permission: false,
     calendar_disabled: false,

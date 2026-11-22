@@ -21,7 +21,7 @@ updating them: update checks and version negotiation.
 
 ## Boundaries
 
-- Depends on: `macro_env_var` for config.
+- Depends on: `rox_env_var` for config.
 - Used by: `services/authentication_service` (mounts the router with
   `axum::Router::with_state`).
 

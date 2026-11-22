@@ -161,7 +161,7 @@ encodes its caret/selection as a Loro cursor and broadcasts it over the
 ephemeral awareness channel, so the website renders a remote cursor walking
 through the text. The cursor's label is the editor `POST /edit` names
 (`editor: { name }`): the agent or persona that asked for the edit, so a
-`Macro` or `Grunk` session's edits read `Rox (AI)` / `Grunk (AI)` on every
+`Rox` or `Grunk` session's edits read `Rox (AI)` / `Grunk (AI)` on every
 cursor they draw (`PeerPool.forEditor`). A request that names nobody labels its
 cursors `Rox (AI)` (`DEFAULT_EDITOR_NAME`), never a person's name. Every label ends in
 `(AI)`; the website keys off that suffix to keep AI name tags pinned. Each
@@ -196,7 +196,7 @@ thread anchored to it, removing the mark again if the post fails.
 `POST /canvas` reads an initialized Canvas room or performs a natural-language
 edit. Documents' `ReadCanvas`, `RenderCanvas`, `ApplyCanvasEdits` and `EditCanvas` tools authorize native canvas
 documents, mint view/edit tokens naming the actor, and apply existing AI
-admission and usage metering. The app's **Ask Macro** action in the standalone toolbar and Drive detail header attaches
+admission and usage metering. The app's **Ask Rox** action in the standalone toolbar and Drive detail header attaches
 the canvas to that tool-enabled conversation on desktop and mobile.
 
 The model calls the ergonomic `CanvasEditor` SDK through `runCode`. QuickJS has

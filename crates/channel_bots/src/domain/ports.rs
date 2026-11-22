@@ -2,7 +2,7 @@
 
 use async_trait::async_trait;
 use entity_access::domain::models::EntityAccessReceipt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     events::MessagePostedMetadata, models::MessageParent, service::MessageWrite,
 };
@@ -53,7 +53,7 @@ pub trait InferredTriggerClassifier: Send + Sync {
     /// to respond. `requesting_user` is the author of that message.
     async fn expects_response(
         &self,
-        requesting_user: &MacroUserIdStr<'static>,
+        requesting_user: &RoxUserIdStr<'static>,
         thread: &[TranscriptMessage],
     ) -> anyhow::Result<bool>;
 }
@@ -66,7 +66,7 @@ pub trait ConversationAccess: Send + Sync {
     /// gets no history read on their behalf either.
     async fn user_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>, rootcause::Report>;
 
@@ -74,7 +74,7 @@ pub trait ConversationAccess: Send + Sync {
     /// before a reply is persisted, so a revoked membership stops the reply.
     async fn bot_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>, rootcause::Report>;
 }

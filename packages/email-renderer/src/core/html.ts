@@ -279,7 +279,7 @@ export function prepareEmailBody(
   }
   const images = options.images ?? IMAGES_ALLOWED;
   const { body, styles } = documentParts(input.html, IMAGES_ALLOWED);
-  const quote = elements(body).find((node) => hasClass(node, 'macro_quote'));
+  const quote = elements(body).find((node) => hasClass(node, 'rox_quote'));
   if (quote) remove(quote);
   // Missing replyless data must still display a newly received/sent message.
   const replyless =

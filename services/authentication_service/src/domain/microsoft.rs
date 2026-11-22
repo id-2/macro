@@ -2,7 +2,7 @@
 
 use chrono::{DateTime, Duration, Utc};
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -242,7 +242,7 @@ pub trait MicrosoftAuth: Send + Sync {
     /// Whether `user` may start a new Outlook connection: the deployment
     /// switch, then their [`OUTLOOK_FLAG`]. Records `outlook.flag` on the
     /// current span when the flag is read.
-    async fn new_connections_enabled(&self, user: &MacroUserIdStr<'_>) -> bool;
+    async fn new_connections_enabled(&self, user: &RoxUserIdStr<'_>) -> bool;
     /// Where an administrator grants Rox's delegated permissions for their
     /// whole directory, for users whose consent attempt needs admin approval.
     fn admin_consent_url(
@@ -267,7 +267,7 @@ pub trait MicrosoftAuth: Send + Sync {
     async fn start_link(
         &self,
         owner: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         redirect_uri: String,
         return_uri: Option<String>,
         calendar_requested: bool,
@@ -343,7 +343,7 @@ impl<R, P, F> MicrosoftAuthService<R, P, F> {
 }
 
 impl<R, P, F: FeatureFlags> MicrosoftAuthService<R, P, F> {
-    async fn outlook_flag(&self, user: &MacroUserIdStr<'_>) -> OutlookFlag {
+    async fn outlook_flag(&self, user: &RoxUserIdStr<'_>) -> OutlookFlag {
         let flag = match &self.feature_flags {
             None => OutlookFlag::Unconfigured,
             Some(feature_flags) => match feature_flags.load(user).await {
@@ -363,7 +363,7 @@ impl<R, P, F: FeatureFlags> MicrosoftAuthService<R, P, F> {
         flag
     }
 
-    async fn admits_new_connection(&self, user: &MacroUserIdStr<'_>) -> bool {
+    async fn admits_new_connection(&self, user: &RoxUserIdStr<'_>) -> bool {
         self.connections_enabled && self.outlook_flag(user).await.admits()
     }
 }
@@ -414,7 +414,7 @@ fn has_required_scopes(scopes: &[String]) -> bool {
 impl<R: MicrosoftGrantRepository, P: MicrosoftIdentityProvider, F: FeatureFlags> MicrosoftAuth
     for MicrosoftAuthService<R, P, F>
 {
-    async fn new_connections_enabled(&self, user: &MacroUserIdStr<'_>) -> bool {
+    async fn new_connections_enabled(&self, user: &RoxUserIdStr<'_>) -> bool {
         self.admits_new_connection(user).await
     }
     fn admin_consent_url(
@@ -458,7 +458,7 @@ impl<R: MicrosoftGrantRepository, P: MicrosoftIdentityProvider, F: FeatureFlags>
     async fn start_link(
         &self,
         owner: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         redirect_uri: String,
         return_uri: Option<String>,
         calendar_requested: bool,
@@ -476,7 +476,7 @@ impl<R: MicrosoftGrantRepository, P: MicrosoftIdentityProvider, F: FeatureFlags>
         let verifier = URL_SAFE_NO_PAD.encode(rand::random::<[u8; 32]>());
         let nonce = URL_SAFE_NO_PAD.encode(rand::random::<[u8; 32]>());
         let attempt = LinkAttempt {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             owner,
             identity_provider_id: self.provider.identity_provider_id().await?,
             redirect_uri,
@@ -533,7 +533,7 @@ impl<R: MicrosoftGrantRepository, P: MicrosoftIdentityProvider, F: FeatureFlags>
                     &attempt,
                     &identity,
                     &envelope,
-                    macro_uuid::generate_uuid_v7(),
+                    rox_uuid::generate_uuid_v7(),
                 )
                 .await?;
             Ok(attempt.return_uri.clone())
@@ -600,7 +600,7 @@ impl<R: MicrosoftGrantRepository, P: MicrosoftIdentityProvider, F> MicrosoftAuth
                 cached: true,
             });
         }
-        let lease = macro_uuid::generate_uuid_v7();
+        let lease = rox_uuid::generate_uuid_v7();
         if !self.repo.acquire_refresh(&grant, lease).await? {
             return Err(MicrosoftAuthError::Busy);
         }

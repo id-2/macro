@@ -13,9 +13,9 @@ use documents::domain::events::DocumentMacroEvent;
 use email::domain::events::EmailMacroEvent;
 use github::broker::GithubWebhookMacroEvent;
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    EventBrokerError, EventConsumer, KafkaConsumerAdapter, MacroEvent as _,
-    MacroEventCollection as _, MacroEventConsumerService, MessageWrapper,
+use rox_event_broker::{
+    EventBrokerError, EventConsumer, KafkaConsumerAdapter, RoxEvent as _,
+    RoxEventCollection as _, RoxEventConsumerService, MessageWrapper,
 };
 use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
 use properties::domain::events::PropertyMacroEvent;
@@ -27,7 +27,7 @@ use tracing::Instrument as _;
 use crate::domain::event_runs::{EventIngestion, EventIngestionResult};
 use crate::domain::event_trigger::{EventPayload, IncomingEvent, MessageFact};
 
-macro_event_broker::declare_topics!(
+rox_event_broker::declare_topics!(
     DeclaredMacroEvent: DocumentMacroEvent,
     ChannelMacroEvent,
     MessageMacroEvent,
@@ -205,7 +205,7 @@ async fn process_message<C: CommittingConsumer>(
         Ok(event) => {
             let event = incoming_event(event);
             tracing::Span::current()
-                .record("macro.event.id", tracing::field::display(event.event_id));
+                .record("rox.event.id", tracing::field::display(event.event_id));
             ingest_with_retry(service, &event, base_delay).await?;
         }
         Err(error) => {
@@ -235,7 +235,7 @@ where
     C: CommittingConsumer,
     for<'a> C::MessageType<'a>: Message,
 {
-    let consumer = MacroEventConsumerService::new(consumer);
+    let consumer = RoxEventConsumerService::new(consumer);
     let mut shutdown = std::pin::pin!(shutdown);
     loop {
         let message = tokio::select! {

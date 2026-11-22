@@ -17,8 +17,8 @@ use crate::domain::{
     ports::AccessRepository,
 };
 use bot_id::BotIdStr;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId, user_id::MacroUserIdStr};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -44,7 +44,7 @@ impl PgAccessRepository {
 }
 
 fn foreign_entity_source_pairs(
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
     user_team: Option<UserTeamInfo>,
 ) -> (Vec<String>, Vec<String>) {
     let mut source_ids = vec![user_id.as_ref().to_string()];
@@ -73,7 +73,7 @@ fn team_foreign_entity_source_pairs(
 /// check's cost.
 async fn user_source_ids(
     pool: &PgPool,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<SourceIds, AccessError> {
     let source_ids = queries::get_user_source_ids(pool, user_id)
         .await
@@ -100,7 +100,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_document_access(
         &self,
         document_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let source_ids = user_source_ids(&self.pool, user_id).await?;
         let Ok(document_uuid) = document_id.parse::<Uuid>() else {
@@ -129,7 +129,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_documents_access(
         &self,
         document_ids: &[String],
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<HashMap<String, AccessLevel>, AccessError> {
         let mut levels = HashMap::with_capacity(document_ids.len());
         if document_ids.is_empty() {
@@ -181,7 +181,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_chat_access(
         &self,
         chat_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let chat_uuid = chat_id
             .parse::<Uuid>()
@@ -194,7 +194,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_project_access(
         &self,
         project_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let project_uuid = project_id
             .parse::<Uuid>()
@@ -210,7 +210,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_thread_access(
         &self,
         thread_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let thread_uuid = thread_id
             .parse::<Uuid>()
@@ -229,7 +229,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_calendar_event_access(
         &self,
         event_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let event_id = event_id
             .parse::<Uuid>()
@@ -248,9 +248,9 @@ impl AccessRepository for PgAccessRepository {
                 event.owner_id = $2 AS "is_owner!",
                 EXISTS (
                     SELECT 1
-                    FROM macro_user_links link
+                    FROM rox_user_links link
                     WHERE link.link_id = event.source_link_id
-                      AND link.primary_macro_id = $2
+                      AND link.primary_rox_id = $2
                 ) AS "is_linked!",
                 (
                     event.status <> 'cancelled'
@@ -294,7 +294,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_owned_email_thread_ids(
         &self,
         thread_ids: &[Uuid],
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<Uuid>, AccessError> {
         Ok(
             queries::thread_access::get_owned_email_thread_ids(&self.pool, thread_ids, user_id)
@@ -306,7 +306,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_call_access(
         &self,
         call_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let call_uuid = call_id
             .parse::<Uuid>()
@@ -364,7 +364,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_agent_session_access(
         &self,
         agent_session_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let agent_session_uuid = agent_session_id
             .parse::<Uuid>()
@@ -382,7 +382,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_initiative_access(
         &self,
         initiative_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let initiative_uuid = initiative_id
             .parse::<Uuid>()
@@ -400,7 +400,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_pipeline_access(
         &self,
         id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let id = id
             .parse::<Uuid>()
@@ -412,7 +412,7 @@ impl AccessRepository for PgAccessRepository {
     #[tracing::instrument(err, skip(self, user_id), fields(source_id_count = tracing::field::Empty))]
     async fn list_pipeline_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         let sources = user_source_ids(&self.pool, Some(user_id)).await?;
         Ok(queries::pipeline_access::list_pipeline_access(&self.pool, &sources).await?)
@@ -422,7 +422,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_pipelines_access(
         &self,
         ids: &[Uuid],
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<HashMap<Uuid, AccessLevel>, AccessError> {
         if ids.is_empty() {
             return Ok(HashMap::new());
@@ -435,7 +435,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_database_access(
         &self,
         database_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let database_uuid = database_id
             .parse::<Uuid>()
@@ -450,7 +450,7 @@ impl AccessRepository for PgAccessRepository {
     #[tracing::instrument(err, skip(self, user_id), fields(source_id_count = tracing::field::Empty))]
     async fn list_database_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         let source_ids = user_source_ids(&self.pool, Some(user_id)).await?;
         Ok(queries::database_access::list_database_access(&self.pool, &source_ids).await?)
@@ -459,7 +459,7 @@ impl AccessRepository for PgAccessRepository {
     #[tracing::instrument(err, skip(self, user_id), fields(source_id_count = tracing::field::Empty))]
     async fn list_form_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         let source_ids = user_source_ids(&self.pool, Some(user_id)).await?;
         Ok(queries::form_access::list_form_access(&self.pool, &source_ids).await?)
@@ -469,7 +469,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_form_access(
         &self,
         form_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let form_uuid = form_id
             .parse::<Uuid>()
@@ -482,7 +482,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_harness_access(
         &self,
         harness_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let harness_uuid = harness_id
             .parse::<Uuid>()
@@ -503,7 +503,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_external_chat_access(
         &self,
         group_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let group_uuid = group_id
             .parse::<Uuid>()
@@ -521,7 +521,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_database_row_access(
         &self,
         row_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let row_uuid = row_id
             .parse::<Uuid>()
@@ -539,7 +539,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_database_rows_access(
         &self,
         row_ids: &[Uuid],
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<std::collections::HashMap<Uuid, AccessLevel>, AccessError> {
         if row_ids.is_empty() {
             return Ok(std::collections::HashMap::new());
@@ -559,7 +559,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_scheduled_action_access(
         &self,
         scheduled_action_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let Ok(scheduled_action_uuid) = scheduled_action_id.parse::<Uuid>() else {
             return Ok(None);
@@ -578,7 +578,7 @@ impl AccessRepository for PgAccessRepository {
     #[tracing::instrument(err, skip(self, user_id), fields(source_id_count = tracing::field::Empty))]
     async fn accessible_scheduled_action_ids(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<Uuid>, AccessError> {
         let source_ids = user_source_ids(&self.pool, Some(user_id)).await?;
         Ok(
@@ -596,7 +596,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_reminder_access(
         &self,
         reminder_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let reminder_uuid = reminder_id
             .parse::<Uuid>()
@@ -818,7 +818,7 @@ impl AccessRepository for PgAccessRepository {
     async fn has_foreign_entity_access(
         &self,
         foreign_entity_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<bool, AccessError> {
         let foreign_entity_uuid = foreign_entity_id
             .parse::<Uuid>()
@@ -844,7 +844,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_crm_company_access(
         &self,
         company_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<CrmEntityAccess>, AccessError> {
         let company_uuid = company_id
             .parse::<Uuid>()
@@ -862,7 +862,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_crm_contact_access(
         &self,
         contact_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<CrmEntityAccess>, AccessError> {
         let contact_uuid = contact_id
             .parse::<Uuid>()
@@ -879,7 +879,7 @@ impl AccessRepository for PgAccessRepository {
     #[tracing::instrument(err, skip(self, user_id))]
     async fn check_user_channel_membership(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         channel_ids: &[Uuid],
     ) -> Result<Vec<Uuid>, AccessError> {
         Ok(queries::channel_membership::check_user_channel_membership(
@@ -894,7 +894,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_channel_role(
         &self,
         channel_id: &Uuid,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         user_org_id: Option<i64>,
     ) -> Result<ChannelRoleResult, AccessError> {
         Ok(queries::channel_role::get_channel_role(
@@ -911,7 +911,7 @@ impl AccessRepository for PgAccessRepository {
         &self,
         entity_id: &uuid::Uuid,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         if matches!(entity_type, EntityType::CrmCompany | EntityType::CrmContact) {
             return queries::crm_entity_users::get_crm_entity_users(
                 &self.pool,
@@ -942,7 +942,7 @@ impl AccessRepository for PgAccessRepository {
         &self,
         entity_id: &Uuid,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         let users = sqlx::query_scalar!(
             "SELECT source_id FROM entity_access WHERE entity_id = $1 AND entity_type = $2 AND source_type = 'user' AND granted_from_project_id IS NULL",
             entity_id,
@@ -953,7 +953,7 @@ impl AccessRepository for PgAccessRepository {
         users
             .into_iter()
             .map(|user| {
-                MacroUserIdStr::parse_from_str(&user)
+                RoxUserIdStr::parse_from_str(&user)
                     .map(|user| user.into_owned())
                     .map_err(|error| anyhow_access_error(anyhow::anyhow!(error)))
             })
@@ -964,7 +964,7 @@ impl AccessRepository for PgAccessRepository {
     async fn get_channel_users(
         &self,
         channel_id: &Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         queries::channel_users::get_channel_users(&self.pool, channel_id)
             .await
             .map_err(AccessError::from)
@@ -1003,7 +1003,7 @@ impl AccessRepository for PgAccessRepository {
     #[tracing::instrument(err, skip(self, user_id))]
     async fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(queries::team_access::get_user_team(&self.pool, user_id).await?)
     }

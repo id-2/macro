@@ -16,19 +16,19 @@ import { Sdk as UnfurlSdk } from '../../generated/unfurl/sdk.gen';
 import {
   type Env,
   HOSTS,
-  type MacroAuth,
-  type MacroOpts,
+  type RoxAuth,
+  type RoxOpts,
   type ServiceName,
   type TokenSource,
   WEB_APP_URLS,
 } from '../config';
 import { BotsNamespace } from '../entities/bots/namespace';
 import { User } from '../entities/users/user';
-import { MacroEvents } from '../events/receiver';
+import { RoxEvents } from '../events/receiver';
 import { type LocalPortmap, resolveLocalPortmap } from '../local-portmap';
 import { observeSdk } from './activity';
 
-const USER_API_KEY_HEADER = 'x-macro-user-api-key';
+const USER_API_KEY_HEADER = 'x-rox-user-api-key';
 
 const USER_API_KEY_PREFIX = 'mak_';
 
@@ -40,7 +40,7 @@ function userCredentialHeader(secret: string): CredentialHeader {
   return match(secret)
     .with(P.string.startsWith(BOT_TOKEN_PREFIX), () => {
       throw new Error(
-        "bot token passed as a user credential. Use auth: { type: 'bot', token } or MACRO_BOT_TOKEN.",
+        "bot token passed as a user credential. Use auth: { type: 'bot', token } or ROX_BOT_TOKEN.",
       );
     })
     .with(
@@ -57,7 +57,7 @@ async function resolveToken(source: TokenSource): Promise<string> {
 }
 
 export async function requestAuthHeaders(
-  auth: MacroAuth,
+  auth: RoxAuth,
   requestedAs?: string,
   existing?: { hasBotScope?: boolean },
 ): Promise<ReadonlyArray<readonly [string, string]>> {
@@ -66,27 +66,27 @@ export async function requestAuthHeaders(
       const tok = await resolveToken(botAuth.token);
       if (!tok.startsWith(BOT_TOKEN_PREFIX)) {
         throw new Error(
-          "user API key passed as a bot token. Use auth: { type: 'user', apiKey } or MACRO_API_KEY.",
+          "user API key passed as a bot token. Use auth: { type: 'user', apiKey } or ROX_API_KEY.",
         );
       }
       const headers: Array<readonly [string, string]> = [
-        ['x-macro-bot-token', tok],
+        ['x-rox-bot-token', tok],
       ];
       if (!existing?.hasBotScope) {
         headers.push([
-          'x-macro-bot-scope',
+          'x-rox-bot-scope',
           botAuth.scope ?? (requestedAs ? 'user' : 'team'),
         ]);
       }
       if (requestedAs) {
-        headers.push(['x-macro-bot-for-macro-user-id', requestedAs]);
+        headers.push(['x-rox-bot-for-macro-user-id', requestedAs]);
       }
       return headers;
     })
     .with({ type: 'user', apiKey: P.string }, ({ apiKey }) => {
       if (apiKey.startsWith(BOT_TOKEN_PREFIX)) {
         throw new Error(
-          "bot token passed as a user credential. Use auth: { type: 'bot', token } or MACRO_BOT_TOKEN.",
+          "bot token passed as a user credential. Use auth: { type: 'bot', token } or ROX_BOT_TOKEN.",
         );
       }
       return [[USER_API_KEY_HEADER, apiKey] as const];
@@ -98,7 +98,7 @@ export async function requestAuthHeaders(
     .exhaustive();
 }
 
-export class MacroClient {
+export class RoxClient {
   readonly scheduledAction: ScheduledActionSdk;
 
   readonly unfurl: UnfurlSdk;
@@ -127,10 +127,10 @@ export class MacroClient {
 
   readonly wsVerify?: string;
 
-  readonly events: MacroEvents;
+  readonly events: RoxEvents;
 
   /** Resolved authentication config (distinct from `auth`, the auth-service SDK). */
-  readonly authConfig: MacroAuth;
+  readonly authConfig: RoxAuth;
 
   /** Resolved service base urls: env defaults, then the local-stack portmap,
    * then `opts.hosts` overrides. */
@@ -145,14 +145,14 @@ export class MacroClient {
 
   private selfPrincipal?: Promise<string>;
 
-  constructor(opts: MacroOpts) {
+  constructor(opts: RoxOpts) {
     const env = resolveEnv(opts);
     const localPortmap = env === 'local' ? resolveLocalPortmap() : undefined;
     const hosts = { ...HOSTS[env], ...localPortmap?.hosts, ...opts.hosts };
     this.hosts = hosts;
     this.localPortmap = localPortmap;
     const envWebUrl =
-      typeof process !== 'undefined' ? process.env.MACRO_WEB_URL : undefined;
+      typeof process !== 'undefined' ? process.env.ROX_WEB_URL : undefined;
     this.webAppUrl =
       opts.webAppUrl ??
       envWebUrl ??
@@ -244,10 +244,10 @@ export class MacroClient {
 
     const envWebhookSecret =
       typeof process !== 'undefined'
-        ? process.env.MACRO_WEBHOOK_SECRET
+        ? process.env.ROX_WEBHOOK_SECRET
         : undefined;
     const webhookSecret = opts.webhookSecret ?? envWebhookSecret;
-    this.events = new MacroEvents(this, webhookSecret);
+    this.events = new RoxEvents(this, webhookSecret);
   }
 
   /** Whether requests have a user identity accepted by acting-user endpoints. */
@@ -291,7 +291,7 @@ export class MacroClient {
       const headers = await requestAuthHeaders(
         this.authConfig,
         this.requestedAs,
-        { hasBotScope: request.headers.has('x-macro-bot-scope') },
+        { hasBotScope: request.headers.has('x-rox-bot-scope') },
       );
       for (const [name, value] of headers) {
         request.headers.set(name, value);
@@ -318,29 +318,29 @@ function throwOnUnfilledPath(request: Request): void {
     );
 }
 
-function resolveEnv(opts: MacroOpts): Env {
+function resolveEnv(opts: RoxOpts): Env {
   if (opts.env) return opts.env;
   const fromEnv =
-    typeof process !== 'undefined' ? process.env.MACRO_ENV : undefined;
+    typeof process !== 'undefined' ? process.env.ROX_ENV : undefined;
   if (!fromEnv) return 'prod';
   if (!(fromEnv in HOSTS)) {
     throw new Error(
-      `invalid MACRO_ENV "${fromEnv}" — expected local, dev, or prod`,
+      `invalid ROX_ENV "${fromEnv}" — expected local, dev, or prod`,
     );
   }
   return fromEnv as Env;
 }
 
-function resolveAuth(opts: MacroOpts): MacroAuth {
+function resolveAuth(opts: RoxOpts): RoxAuth {
   if (opts.auth) return opts.auth;
   if (opts.token) return { type: 'user', token: opts.token };
   const envApiKey =
-    typeof process !== 'undefined' ? process.env.MACRO_API_KEY : undefined;
+    typeof process !== 'undefined' ? process.env.ROX_API_KEY : undefined;
   const envBotToken =
-    typeof process !== 'undefined' ? process.env.MACRO_BOT_TOKEN : undefined;
+    typeof process !== 'undefined' ? process.env.ROX_BOT_TOKEN : undefined;
   if (envApiKey && envBotToken) {
     throw new Error(
-      'both MACRO_API_KEY and MACRO_BOT_TOKEN are set — pass auth to new Rox() to pick one',
+      'both ROX_API_KEY and ROX_BOT_TOKEN are set — pass auth to new Rox() to pick one',
     );
   }
   if (envBotToken) return { type: 'bot', token: envBotToken };
@@ -350,7 +350,7 @@ function resolveAuth(opts: MacroOpts): MacroAuth {
       envApiKey ??
       (() => {
         throw new Error(
-          'no Macro credential. Set MACRO_API_KEY (API key or bearer token) or MACRO_BOT_TOKEN, or pass token/auth to new Rox().',
+          'no Macro credential. Set ROX_API_KEY (API key or bearer token) or ROX_BOT_TOKEN, or pass token/auth to new Rox().',
         );
       }),
   };

@@ -10,9 +10,9 @@ use agent_trigger::domain::broker_events::{
 };
 use agent_trigger::domain::task_assignment::assignment_instructions;
 use bot_id::BotId;
-use macro_event_broker::Event;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_event_broker::Event;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use strum::IntoEnumIterator as _;
 use trigger_context::{TriggerContext, TriggerOrigin};
 use webhook::domain::models::WebhookFilter;
@@ -36,7 +36,7 @@ pub enum TriggerWork {
         /// agents, so the daemon must name the bot when creating the session.
         bot: BotId,
         /// Who asked; owns the session and authors the prompt.
-        sender: MacroUserIdStr<'static>,
+        sender: RoxUserIdStr<'static>,
         /// Channel or document the mention was posted in.
         parent: messages::domain::models::MessageParent,
         /// Thread the mention roots.
@@ -62,7 +62,7 @@ pub enum TriggerWork {
         /// The agent the session runs for.
         bot: BotId,
         /// Who asked; owns the session.
-        sender: MacroUserIdStr<'static>,
+        sender: RoxUserIdStr<'static>,
         /// What opened the session, copied onto its create request.
         origin: TriggerOrigin,
     },
@@ -76,7 +76,7 @@ pub enum TriggerWork {
         /// The session to feed.
         session: AgentSessionId,
         /// Who sent the message.
-        sender: MacroUserIdStr<'static>,
+        sender: RoxUserIdStr<'static>,
         /// The message's text.
         content: String,
         /// Why the agent was called, forwarded with the prompt.
@@ -109,7 +109,7 @@ pub fn trigger_to_work(event: AgentTriggerTopicEvent) -> Result<TriggerWork, Ski
                 runtime_user: _,
             },
         )) => {
-            let sender = MacroUserIdStr::try_from(owner).map_err(|_| Skipped::NotFromUser)?;
+            let sender = RoxUserIdStr::try_from(owner).map_err(|_| Skipped::NotFromUser)?;
             Ok(TriggerWork::OpenRequested {
                 repo_url,
                 session: session_id,

@@ -1,17 +1,17 @@
 use super::*;
 use crate::domain::models::UserProvider;
 use chrono::Utc;
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 
 fn link(owner: &str, address: &str) -> Link {
     Link {
         id: uuid::Uuid::now_v7(),
-        macro_id: MacroUserIdStr::try_from_email(owner).unwrap(),
+        rox_id: RoxUserIdStr::try_from_email(owner).unwrap(),
         fusionauth_user_id: "fa-user".to_owned(),
         email_address: EmailStr::try_from(address.to_owned()).unwrap(),
         provider: UserProvider::Gmail,
         is_sync_active: true,
-        // Generated in the database from macro_id and email_address; mirrored
+        // Generated in the database from rox_id and email_address; mirrored
         // here so a fixture cannot claim a primary inbox it would not have.
         is_primary: owner == address,
         created_at: Utc::now(),
@@ -19,8 +19,8 @@ fn link(owner: &str, address: &str) -> Link {
     }
 }
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("user@test.com").unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("user@test.com").unwrap()
 }
 
 #[test]

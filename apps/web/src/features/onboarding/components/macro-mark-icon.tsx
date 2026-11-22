@@ -1,7 +1,7 @@
 import { RoxMark } from '@core/component/RoxMark';
 import type { JSX } from 'solid-js';
 
-export function MacroMarkIcon(props: {
+export function RoxMarkIcon(props: {
   style?: JSX.CSSProperties;
   class?: string;
 }) {

@@ -13,13 +13,13 @@
 -- Participants: owner, admin, member (active), left_user (left)
 
 -- Team channels for bulk membership tests.
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'team-owner-a', 'team-owner-a@test.com', 'cus_team_a'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'team-owner-b', 'team-owner-b@test.com', 'cus_team_b'),
   ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'left-user', 'left-user@test.com', 'cus_left_user'),
   ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'user-d', 'user-d@test.com', 'cus_user_d');
 
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
   ('macro|team-owner-a@test.com', 'team-owner-a@test.com', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
   ('macro|team-owner-b@test.com', 'team-owner-b@test.com', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
   ('macro|left-user@test.com', 'left-user@test.com', 'cccccccc-cccc-cccc-cccc-cccccccccccc'),

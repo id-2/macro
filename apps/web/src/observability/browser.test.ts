@@ -48,7 +48,7 @@ vi.mock('./desktop', () => ({
   readDesktopDiagnostics: vi.fn(),
   desktopResourceAttributes: () => ({
     'service.instance.id': 'launch-1',
-    'macro.recording.id': 'recording-1',
+    'rox.recording.id': 'recording-1',
   }),
   createDesktopMemoryRecording: () => ({
     attributes: () => ({}),
@@ -97,7 +97,7 @@ it('explicit native recording overrides the normal enablement gate and exporter 
     'app.runtime': 'tauri',
     frontend_instance_id: frontendInstanceId,
     'service.instance.id': 'launch-1',
-    'macro.recording.id': 'recording-1',
+    'rox.recording.id': 'recording-1',
   });
   expect(config.spanAttributes?.()).toMatchObject({
     frontend_instance_id: frontendInstanceId,

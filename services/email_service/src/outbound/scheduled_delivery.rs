@@ -18,9 +18,9 @@ use email::domain::scheduled_delivery::{
 };
 use email::domain::send_attempt::{PreparedSendContentUnavailable, SendSnapshot};
 use email_api_client::domain::models::{EmailApiError, PreparedSendMessage, SendRequest, SentIds};
-use macro_event_broker::{KafkaEventPublisher, MacroEventBroker, MacroEventBrokerService};
-use macro_user_id::cowlike::CowLike as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBroker, RoxEventBrokerService};
+use rox_user_id::cowlike::CowLike as _;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{attachment::AttachmentDraft, link::Link, message::MessageToSend};
 use std::time::Instant;
 use tokio_util::task::TaskTracker;
@@ -41,7 +41,7 @@ pub struct ScheduledDeliveryAdapter {
         std::sync::Arc<dyn email::domain::attachment_access::AuthorizedAttachmentBytes>,
     pub s3_client: s3_client::S3,
     pub attachment_bucket: String,
-    pub macro_event_broker: MacroEventBrokerService<KafkaEventPublisher, TaskTracker>,
+    pub rox_event_broker: RoxEventBrokerService<KafkaEventPublisher, TaskTracker>,
     pub read_receipts: email::domain::read_receipts::ReadReceiptService<
         email::outbound::read_receipts_pg::ReadReceiptPgRepository,
     >,
@@ -75,9 +75,9 @@ impl ScheduledDeliveryRepo for ScheduledDeliveryAdapter {
             )
             .await?
         {
-            let _ = self.macro_event_broker.send_event(&EmailMacroEvent::message_deleted(MessageDeletedMetadata {
+            let _ = self.rox_event_broker.send_event(&EmailMacroEvent::message_deleted(MessageDeletedMetadata {
                 link_id,
-                owner: link.macro_id,
+                owner: link.rox_id,
                 message_id,
                 provider_message_id: deleted.provider_id,
                 thread_id: deleted.thread_id,
@@ -197,7 +197,7 @@ impl ScheduledDeliveryRepo for ScheduledDeliveryAdapter {
                 let actor = scheduled_message
                     .actor_id
                     .as_deref()
-                    .and_then(|raw| MacroUserIdStr::parse_from_str(raw).ok())
+                    .and_then(|raw| RoxUserIdStr::parse_from_str(raw).ok())
                     .map(|actor| actor.into_owned());
                 if let (Some(message_db_id), Some(thread_db_id)) =
                     (message_to_send.db_id, message_to_send.thread_db_id)
@@ -206,10 +206,10 @@ impl ScheduledDeliveryRepo for ScheduledDeliveryAdapter {
                         scheduled_message.agent_correlation_id,
                         async {
                             let _ = ctx
-                        .macro_event_broker
+                        .rox_event_broker
                         .send_event(&EmailMacroEvent::message_sent(MessageSentMetadata {
                             link_id: link.id,
-                            owner: link.macro_id.clone(),
+                            owner: link.rox_id.clone(),
                             actor,
                             message_id: message_db_id,
                             thread_id: thread_db_id,
@@ -362,7 +362,7 @@ impl ScheduledDeliveryAdapter {
         let actor = data
             .actor_id
             .as_deref()
-            .and_then(|actor| MacroUserIdStr::parse_from_str(actor).ok());
+            .and_then(|actor| RoxUserIdStr::parse_from_str(actor).ok());
         self.forwarded_attachments
             .for_delivery(actor.as_ref(), claim.link.id, data.message_id)
             .await?;
@@ -372,7 +372,7 @@ impl ScheduledDeliveryAdapter {
             self.attachment_bytes.as_ref(),
             data.actor_id
                 .as_deref()
-                .unwrap_or_else(|| claim.link.macro_id.as_ref()),
+                .unwrap_or_else(|| claim.link.rox_id.as_ref()),
             &self.attachment_bucket,
             &mut message,
             Some(&approved),

@@ -7,7 +7,7 @@ test.beforeEach(async ({ page, baseURL }) => {
     const type = route.request().resourceType();
     if (
       url.origin !== new URL(baseURL!).origin ||
-      url.pathname.includes('__macro_dev') ||
+      url.pathname.includes('__rox_dev') ||
       type === 'xhr' ||
       (type === 'fetch' && !/\.(wasm|br)$/.test(url.pathname))
     )

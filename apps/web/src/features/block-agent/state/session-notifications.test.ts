@@ -53,7 +53,7 @@ it('folds notification frames into timeline metadata without manufacturing user 
                   },
                 ],
                 _meta: {
-                  'macro.dev/notifications': {
+                  'rox.dev/notifications': {
                     systemTurn: true,
                     notifications: [
                       {
@@ -171,7 +171,7 @@ it('suppresses review events only when their trusted card is in the thread', () 
       {
         kind: 'tool_use',
         id: `review_${reviewId}`,
-        name: { kind: 'mcp', server: 'macro_internal', tool: 'PresentReview' },
+        name: { kind: 'mcp', server: 'rox_internal', tool: 'PresentReview' },
         status: 'completed',
         detail: {
           kind: 'other',

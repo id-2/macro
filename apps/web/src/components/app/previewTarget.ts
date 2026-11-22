@@ -17,7 +17,7 @@ import {
   isBlockAlias,
   resolveBlockAlias,
 } from '@core/constant/allBlocks';
-import { USE_MACRO_PR_SUMMARY_BLOCK } from '@core/constant/featureFlags';
+import { USE_ROX_PR_SUMMARY_BLOCK } from '@core/constant/featureFlags';
 import type {
   DocumentCommentTarget,
   DocumentEntity,
@@ -125,7 +125,7 @@ export function previewBlockTarget(
     })
     .with({ type: 'foreign' }, (foreignEntity) => ({
       blockType:
-        USE_MACRO_PR_SUMMARY_BLOCK &&
+        USE_ROX_PR_SUMMARY_BLOCK &&
         foreignEntity.foreignSource === 'github_pull_request'
           ? 'pr'
           : 'unknown',

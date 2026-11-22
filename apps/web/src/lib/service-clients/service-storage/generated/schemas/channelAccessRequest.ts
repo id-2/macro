@@ -8,7 +8,7 @@
 import type { ChannelAccessRequestResolvedAt } from './channelAccessRequestResolvedAt';
 import type { ChannelAccessRequestResolvedBy } from './channelAccessRequestResolvedBy';
 import type { ChannelAccessRequestStatus } from './channelAccessRequestStatus';
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './macroUserIdStr';
 
 /**
  * One attempt to join a channel. Attempts are never reused, so each timeline
@@ -22,7 +22,7 @@ export interface ChannelAccessRequest {
   /** Attempt id. */
   id: string;
   /** Person asking to join. */
-  requester_id: MacroUserIdStr;
+  requester_id: RoxUserIdStr;
   /** When the attempt stopped being pending. */
   resolved_at?: ChannelAccessRequestResolvedAt;
   resolved_by?: ChannelAccessRequestResolvedBy;

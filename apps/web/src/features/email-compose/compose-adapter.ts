@@ -571,7 +571,7 @@ export function createEmailComposeContext(
                 bcc: contacts(draft.bcc),
                 subject: draft.subject,
                 body_text: draft.bodyText,
-                body_macro: draft.bodyMacro,
+                body_rox: draft.bodyMacro,
                 body_html_sanitized: draft.optimisticBodyHtml,
                 replying_to_id:
                   draft.replyingToId == null

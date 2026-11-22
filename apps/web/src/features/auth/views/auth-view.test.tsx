@@ -366,7 +366,7 @@ describe('single sign-on', () => {
   });
 
   // The desktop app is already parked on the signed-out route when the
-  // `macro://` auth callback comes back, so the session code arrives as a
+  // `rox://` auth callback comes back, so the session code arrives as a
   // query-only navigation that never remounts this view.
   it('redeems a session code that arrives after mount', async () => {
     const { setToken } = setupWithTokenSignal({

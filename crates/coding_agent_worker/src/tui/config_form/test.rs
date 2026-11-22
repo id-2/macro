@@ -48,15 +48,15 @@ fn creates_a_valid_production_config() {
     assert_eq!(config.harness.args, ["acp"]);
     assert_eq!(config.workspace.path, directory.path());
     assert_eq!(
-        config.macro_api.api_url,
+        config.rox_api.api_url,
         "https://gateway.rox.one/agent-harness"
     );
     assert_eq!(
-        config.macro_api.gateway_url(),
+        config.rox_api.gateway_url(),
         "wss://gateway.rox.one/agent-harness/runtime/ws"
     );
     assert_eq!(
-        config.macro_api.storage_url,
+        config.rox_api.storage_url,
         "https://gateway.rox.one/dss"
     );
     assert_eq!(config.credentials, None);
@@ -74,15 +74,15 @@ fn creates_a_dev_config_when_dev_mode_is_set() {
     let config = Config::load(&path).expect("load generated config");
 
     assert_eq!(
-        config.macro_api.api_url,
+        config.rox_api.api_url,
         "https://dev-gateway.rox.one/agent-harness"
     );
     assert_eq!(
-        config.macro_api.gateway_url(),
+        config.rox_api.gateway_url(),
         "wss://dev-gateway.rox.one/agent-harness/runtime/ws"
     );
-    assert_eq!(config.macro_api.storage_url, DEV_STORAGE_URL);
-    assert_eq!(config.macro_api.web_url, DEV_WEB_URL);
+    assert_eq!(config.rox_api.storage_url, DEV_STORAGE_URL);
+    assert_eq!(config.rox_api.web_url, DEV_WEB_URL);
 }
 
 #[test]
@@ -165,9 +165,9 @@ fn quickstart_edits_preserve_existing_deployment_and_comments() {
     form.save().expect("save Quickstart changes");
 
     let config = Config::load(&path).expect("load edited config");
-    assert_eq!(config.macro_api.api_url, "https://custom-api");
-    assert_eq!(config.macro_api.storage_url, "https://custom-storage");
-    assert_eq!(config.macro_api.web_url, "https://custom-web");
+    assert_eq!(config.rox_api.api_url, "https://custom-api");
+    assert_eq!(config.rox_api.storage_url, "https://custom-storage");
+    assert_eq!(config.rox_api.web_url, "https://custom-web");
     assert_eq!(config.harness.command, "hermes");
     assert_eq!(config.workspace.path, workspace);
     assert!(

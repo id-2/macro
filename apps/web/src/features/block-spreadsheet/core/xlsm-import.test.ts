@@ -16,7 +16,7 @@ import { decodeXlsx, encodeXlsx } from './xlsx-codec';
 
 const VBA_WARNING =
   'VBA macros are not imported. Cells, formulas and formatting are; the macros do not run in Rox.';
-const MACRO_SHEET_WARNING = 'Excel 4.0 macro sheets are not imported.';
+const ROX_SHEET_WARNING = 'Excel 4.0 macro sheets are not imported.';
 const CONTROLS_WARNING = 'Form and ActiveX controls are not imported.';
 
 const fixture = (name: string) =>
@@ -100,7 +100,7 @@ describe('macro-enabled workbook import', () => {
     expect(imported.sheets[0].cells.B4.value).toBe('=SUM(B2:B3)');
     expect(imported.sheets[0].cells.A1.bold).toBe(true);
     expect(imported.warnings).toContain(VBA_WARNING);
-    expect(imported.warnings).not.toContain(MACRO_SHEET_WARNING);
+    expect(imported.warnings).not.toContain(ROX_SHEET_WARNING);
     expect(imported.warnings).not.toContain(CONTROLS_WARNING);
   });
 
@@ -118,7 +118,7 @@ describe('macro-enabled workbook import', () => {
     expect(imported.warnings).toEqual(
       expect.arrayContaining([
         VBA_WARNING,
-        MACRO_SHEET_WARNING,
+        ROX_SHEET_WARNING,
         CONTROLS_WARNING,
       ])
     );

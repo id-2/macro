@@ -17,7 +17,7 @@ export default defineConfig({
     { name: 'desktop', use: { viewport: { width: 1280, height: 900 } } },
   ],
   webServer: {
-    command: `MACRO_DEV_HTTPS=false bunx vite --port ${port} --strictPort`,
+    command: `ROX_DEV_HTTPS=false bunx vite --port ${port} --strictPort`,
     cwd: fileURLToPath(new URL('../../../../../', import.meta.url)),
     url: `http://localhost:${port}/app/`,
     reuseExistingServer: false,

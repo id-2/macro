@@ -14,10 +14,10 @@ chrono-tz = { workspace = true }
 futures = { workspace = true }
 schemars = { workspace = true }
 jev = { path = "../jev" }
-macro_authorization = { path = "../macro_authorization" }
-macro_env_var = { path = "../macro_env_var" }
-macro_tower_layers = { path = "../macro_tower_layers" }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization" }
+rox_env_var = { path = "../rox_env_var" }
+rox_tower_layers = { path = "../rox_tower_layers" }
+rox_user_id = { path = "../rox_user_id" }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }

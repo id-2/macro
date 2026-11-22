@@ -5,8 +5,8 @@ use crate::domain::{
 use anyhow::{Context, Result, bail, ensure};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use macro_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_ROX_USER_ID_HEADER};
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::{Client, Method, Url, header::HeaderValue};
 use serde::Deserialize;
 use serde_json::Value;
@@ -68,7 +68,7 @@ impl RoutineClient {
     }
     async fn request<T: serde::de::DeserializeOwned>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         method: Method,
         path: &str,
         body: Option<Value>,
@@ -78,19 +78,19 @@ impl RoutineClient {
     }
     async fn request_bytes(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         method: Method,
         path: &str,
         body: Option<Value>,
     ) -> Result<Vec<u8>> {
         let mut trace_headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut trace_headers);
+        rox_tower_layers::inject_trace_headers(&mut trace_headers);
         let mut request = self
             .client
             .request(method, self.base.join(path)?)
             .headers(trace_headers)
             .header(INTERNAL_API_KEY_HEADER, self.key.clone())
-            .header(INTERNAL_MACRO_USER_ID_HEADER, user.as_ref());
+            .header(INTERNAL_ROX_USER_ID_HEADER, user.as_ref());
         if let Some(body) = body {
             request = request.json(&body);
         }
@@ -161,7 +161,7 @@ impl From<WireRoutine> for RoutineInfo {
 impl RoutineService for RoutineClient {
     async fn create(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         config: &RoutineConfiguration,
     ) -> Result<RoutineInfo> {
         let mut body = configuration_body(config, Utc::now(), None)?;
@@ -171,7 +171,7 @@ impl RoutineService for RoutineClient {
             .await?
             .into())
     }
-    async fn list(&self, user: &MacroUserIdStr<'static>) -> Result<Vec<RoutineInfo>> {
+    async fn list(&self, user: &RoxUserIdStr<'static>) -> Result<Vec<RoutineInfo>> {
         Ok(self
             .request::<Vec<WireRoutine>>(
                 user,
@@ -185,7 +185,7 @@ impl RoutineService for RoutineClient {
             .map(Into::into)
             .collect())
     }
-    async fn read(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<RoutineDetails> {
+    async fn read(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<RoutineDetails> {
         let routine = self
             .request::<WireRoutine>(user, Method::GET, &format!("scheduled-actions/{id}"), None)
             .await?
@@ -205,7 +205,7 @@ impl RoutineService for RoutineClient {
     }
     async fn update(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         config: &RoutineConfiguration,
     ) -> Result<RoutineInfo> {
@@ -227,7 +227,7 @@ impl RoutineService for RoutineClient {
     }
     async fn set_enabled(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         enabled: bool,
     ) -> Result<RoutineInfo> {
@@ -241,7 +241,7 @@ impl RoutineService for RoutineClient {
             .await?
             .into())
     }
-    async fn delete(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<()> {
+    async fn delete(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<()> {
         self.request_bytes(
             user,
             Method::DELETE,
@@ -251,7 +251,7 @@ impl RoutineService for RoutineClient {
         .await?;
         Ok(())
     }
-    async fn run_now(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<RoutineRunStarted> {
+    async fn run_now(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<RoutineRunStarted> {
         let execution = self
             .request::<WireExecution>(
                 user,

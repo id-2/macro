@@ -53,8 +53,8 @@ async fn startup_without_agents_serves_model_probes_and_stop_closes_the_runtime(
     let gateway = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let storage = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let mut config: Config = toml::from_str(include_str!("../../config.example.toml")).unwrap();
-    config.macro_api.api_url = format!("http://{}", gateway.local_addr().unwrap());
-    config.macro_api.storage_url = format!("http://{}", storage.local_addr().unwrap());
+    config.rox_api.api_url = format!("http://{}", gateway.local_addr().unwrap());
+    config.rox_api.storage_url = format!("http://{}", storage.local_addr().unwrap());
     config.workspace.path = std::env::current_dir().unwrap();
     config.harness.command = "python3".to_owned();
     config.harness.args = vec!["-c".to_owned(), include_str!("test_acp.py").to_owned()];
@@ -81,7 +81,7 @@ async fn startup_without_agents_serves_model_probes_and_stop_closes_the_runtime(
         socket,
         |request: &tokio_tungstenite::tungstenite::handshake::server::Request, response| {
             assert_eq!(request.uri().path(), "/runtime/ws");
-            assert_eq!(request.headers()["x-macro-harness-token"], "mhns_test");
+            assert_eq!(request.headers()["x-rox-harness-token"], "mhns_test");
             Ok(response)
         },
     )
@@ -168,8 +168,8 @@ async fn a_handed_off_agent_keeps_running_and_streaming_under_the_next_daemon() 
     let gateway = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let storage = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let mut config: Config = toml::from_str(include_str!("../../config.example.toml")).unwrap();
-    config.macro_api.api_url = format!("http://{}", gateway.local_addr().unwrap());
-    config.macro_api.storage_url = format!("http://{}", storage.local_addr().unwrap());
+    config.rox_api.api_url = format!("http://{}", gateway.local_addr().unwrap());
+    config.rox_api.storage_url = format!("http://{}", storage.local_addr().unwrap());
     config.workspace.path = std::env::current_dir().unwrap();
     config.harness.command = "python3".to_owned();
     config.harness.args = vec!["-c".to_owned(), include_str!("test_ticker.py").to_owned()];

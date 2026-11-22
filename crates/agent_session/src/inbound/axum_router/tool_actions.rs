@@ -1,13 +1,13 @@
 //! Internal tool calls cannot impersonate a human approval or omit the acting user.
 use super::*;
 use crate::domain::tool_actions::SessionAction;
-use macro_authorization::{InternalOnly, UserOrInternal};
+use rox_authorization::{InternalOnly, UserOrInternal};
 
 /// Session controls for authenticated services acting for a verified user.
 pub fn agent_session_tool_actions_router<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     state: AgentSessionControlState<R, Access, Auth>,
 ) -> Router {
@@ -23,10 +23,10 @@ pub fn agent_session_tool_actions_router<
 async fn delete_session<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
-    _user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
+    _user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     _access: AgentSessionAccessLevelExtractor<OwnerAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
     Path(id): Path<Uuid>,
@@ -41,10 +41,10 @@ async fn delete_session<
 async fn control<
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
     Path(id): Path<Uuid>,
@@ -67,7 +67,7 @@ async fn control<
                 None,
                 None,
                 crate::domain::control::ControlPrincipal::Runtime(Some(
-                    user.authorization.user.macro_user_id,
+                    user.authorization.user.rox_user_id,
                 )),
                 access.entity_access_receipt,
             )?,

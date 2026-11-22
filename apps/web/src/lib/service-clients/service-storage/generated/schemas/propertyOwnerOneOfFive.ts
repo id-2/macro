@@ -7,7 +7,7 @@
 import type { PropertyOwnerOneOfFiveScope } from './propertyOwnerOneOfFiveScope';
 
 /**
- * Database-scoped property: the definition is a column of one Macro
+ * Database-scoped property: the definition is a column of one Rox
 database and is invisible to the shared user/team property namespace.
  */
 export type PropertyOwnerOneOfFive = {

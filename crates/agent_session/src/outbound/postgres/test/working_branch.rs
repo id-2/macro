@@ -6,7 +6,7 @@ use crate::domain::working_branch::{
 };
 use crate::testing::RecordingRealtime;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn runtime_branch_survives_without_pr_and_respects_owner_repository_and_fence(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;

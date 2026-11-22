@@ -52,7 +52,7 @@ where
                     stripe_value: Some(
                         serde_json::json!({ "status": subscription.status.as_str() }),
                     ),
-                    macro_value: None,
+                    rox_value: None,
                 }]
             }
         })
@@ -97,7 +97,7 @@ where
                 "team_id": team_id,
                 "status": subscription.status.as_str(),
             })),
-            macro_value: Some(serde_json::json!({
+            rox_value: Some(serde_json::json!({
                 "subscription_id": bound.map(|id| id.to_string()),
                 "paying": paying,
             })),
@@ -132,7 +132,7 @@ where
             kind: MismatchKind::PersonalPlan,
             object_id: subscription.id.to_string(),
             stripe_value: Some(serde_json::json!({ "status": subscription.status.as_str() })),
-            macro_value: Some(serde_json::json!({ "professional_subscriber": false })),
+            rox_value: Some(serde_json::json!({ "professional_subscriber": false })),
         }))
     }
 }

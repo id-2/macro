@@ -7,14 +7,14 @@ version = "0.1.0"
 [features]
 default = []
 # Adapter implementations are added separately; models remain usable alone.
-inbound = ["dep:axum", "dep:utoipa", "dep:macro_authorization", "entity_access/inbound", "ports"]
+inbound = ["dep:axum", "dep:utoipa", "dep:rox_authorization", "entity_access/inbound", "ports"]
 outbound = ["ports"]
 ports = ["dep:entity_access", "dep:futures", "dep:rootcause", "dep:tracing"]
 gateway = ["dep:connection_gateway_client", "outbound"]
 ledger = ["dep:import", "outbound"]
 postgres = ["dep:sqlx", "ledger"]
-s3 = ["dep:aws-sdk-s3", "dep:base64", "dep:macro_aws_config", "dep:s3_key", "dep:tokio", "outbound"]
-sqs = ["dep:aws-sdk-sqs", "dep:macro_queues", "outbound"]
+s3 = ["dep:aws-sdk-s3", "dep:base64", "dep:rox_aws_config", "dep:s3_key", "dep:tokio", "outbound"]
+sqs = ["dep:aws-sdk-sqs", "dep:rox_queues", "outbound"]
 search = ["dep:reqwest", "outbound"]
 worker = ["dep:tokio", "dep:tokio-util", "ports"]
 
@@ -28,10 +28,10 @@ connection_gateway_client = { path = "../connection_gateway_client", optional = 
 entity_access = { path = "../entity_access", optional = true, default-features = false }
 futures = { workspace = true, optional = true }
 import = { path = "../import", optional = true }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = ["axum"], optional = true }
-macro_aws_config = { path = "../macro_aws_config", optional = true }
-macro_queues = { path = "../macro_queues", optional = true }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", default-features = false, features = ["axum"], optional = true }
+rox_aws_config = { path = "../rox_aws_config", optional = true }
+rox_queues = { path = "../rox_queues", optional = true }
+rox_user_id = { path = "../rox_user_id" }
 mention_utils = { path = "../mention_utils" }
 reqwest = { workspace = true, optional = true }
 rootcause = { workspace = true, optional = true }

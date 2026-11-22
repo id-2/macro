@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT EXISTS(SELECT 1 FROM email_links l WHERE l.id=$1 AND (l.macro_id=$2 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=l.id AND u.primary_macro_id=$2))) AS \"allowed!\"",
+  "query": "SELECT EXISTS(SELECT 1 FROM email_links l WHERE l.id=$1 AND (l.rox_id=$2 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=l.id AND u.primary_rox_id=$2))) AS \"allowed!\"",
   "describe": {
     "columns": [
       {

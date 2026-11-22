@@ -199,7 +199,7 @@ fn runtime(
     CodexRuntime {
         provider,
         connections,
-        owner: MacroUserIdStr::try_from(owner.to_owned()).unwrap(),
+        owner: RoxUserIdStr::try_from(owner.to_owned()).unwrap(),
         binding: RuntimeIdentity {
             connection_id: connection,
             account_id: owner.into(),
@@ -278,7 +278,7 @@ impl agent_session::domain::pull_request::SessionPullRequests for PullRequests {
     fn set_pull_request<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         url: &'a str,
         claim: Option<agent_session::domain::model::SessionClaim>,
     ) -> std::pin::Pin<
@@ -336,7 +336,7 @@ async fn pr_publication_passes_the_activated_claim_and_rejects_disconnected_owne
 #[tokio::test]
 async fn connection_preflight_distinguishes_missing_account_and_environment() {
     let connections = Connections::default();
-    let owner = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     assert_eq!(
         connection_preflight(&connections, &owner).await.unwrap(),
         Some(SessionBlocker::CodexNotConnected)

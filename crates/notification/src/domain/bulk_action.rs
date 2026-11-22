@@ -16,7 +16,7 @@
 use std::future::Future;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use uuid::Uuid;
 
@@ -50,7 +50,7 @@ pub struct BulkAction {
     /// The caller-generated id.
     pub id: Uuid,
     /// Whose notifications it changes.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// What it covers, frozen at creation; the caller's own encoding.
     pub scope: serde_json::Value,
     /// Only notifications created at or before this time are changed.
@@ -78,7 +78,7 @@ pub struct BulkActionLease {
     /// The action.
     pub action_id: Uuid,
     /// Whose notifications it changes.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The token the action must still hold.
     pub token: Uuid,
 }
@@ -89,7 +89,7 @@ pub struct NewBulkAction {
     /// The caller-generated id; creating the same id again changes nothing.
     pub id: Uuid,
     /// Whose notifications it changes.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// What it covers.
     pub scope: serde_json::Value,
 }
@@ -190,7 +190,7 @@ pub trait BulkActionStore: Send + Sync + 'static {
     /// user has no such action.
     fn request_undo(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> impl Future<Output = Result<Option<UndoRequested>, Report>> + Send;
 
@@ -219,14 +219,14 @@ pub trait BulkActionStore: Send + Sync + 'static {
     /// The user's action `id`.
     fn get(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> impl Future<Output = Result<Option<BulkAction>, Report>> + Send;
 
     /// The user's actions still running, oldest first.
     fn running(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<BulkAction>, Report>> + Send;
 
     /// Delete up to `limit` actions that finished before `before`, with

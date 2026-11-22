@@ -7,7 +7,7 @@ use crate::domain::pictures::PicturePacing;
 const FIRST: &str = "5550001@lid";
 const SECOND: &str = "5550002@lid";
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn checks_are_spaced_and_pause_after_a_rate_limit(pool: PgPool) {
     let (account, _pairing) = insert_pairing_account(&pool).await;
     sqlx::query!(

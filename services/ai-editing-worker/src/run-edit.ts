@@ -64,7 +64,7 @@ export type ResolvedModels = {
 
 /** Who readers see editing: the agent or persona the edit runs as. */
 export type Editor = {
-  /** Display name, e.g. `Macro`; every cursor this edit draws carries it. */
+  /** Display name, e.g. `Rox`; every cursor this edit draws carries it. */
   name: string;
 };
 

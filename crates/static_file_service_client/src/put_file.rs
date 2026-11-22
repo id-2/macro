@@ -155,7 +155,7 @@ impl StaticFileServiceClient {
         let res = self
             .client
             .put(&full_url)
-            .header(crate::INTERNAL_MACRO_USER_ID_HEADER, owner_id)
+            .header(crate::INTERNAL_ROX_USER_ID_HEADER, owner_id)
             .json(&PutFileRequest {
                 file_name: file_name.to_string(),
                 content_type: Some(content_type.to_string()),
@@ -191,7 +191,7 @@ impl StaticFileServiceClient {
         let full_url = format!("{}/internal/file", self.url);
         let mut request = self.client.put(&full_url).json(&body);
         if let Some(owner_id) = owner_id {
-            request = request.header(crate::INTERNAL_MACRO_USER_ID_HEADER, owner_id);
+            request = request.header(crate::INTERNAL_ROX_USER_ID_HEADER, owner_id);
         }
         let res = request.send().await?;
 
@@ -216,7 +216,7 @@ impl StaticFileServiceClient {
         // use LocalStack's own hostname to reach the same object. No-op
         // outside local AWS.
         let presigned_url =
-            macro_aws_config::transform_aws_url_for_internal_fetch(&put_file_data.upload_url);
+            rox_aws_config::transform_aws_url_for_internal_fetch(&put_file_data.upload_url);
 
         let upload_response = self
             .client

@@ -10,7 +10,7 @@ fn work_request<'a>(
     only: Option<&'a [model_entity::Entity<'static>]>,
 ) -> AttentionCandidateRequest<'a> {
     AttentionCandidateRequest {
-        user_id: MacroUserIdStr::parse_from_str(USER_1).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER_1).unwrap(),
         limit: 50,
         own_work,
         keying: AttentionKeying::ThreadScoped,
@@ -27,7 +27,7 @@ fn work_request<'a>(
 
 #[sqlx::test(
     fixtures(path = "../../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn hidden_contexts_with_notifications_and_activity_stay_out_of_broad_feeds(
     pool: Pool<Postgres>,
@@ -115,7 +115,7 @@ async fn hidden_contexts_with_notifications_and_activity_stay_out_of_broad_feeds
 /// attention, and a feed that does not exclude them still shows them.
 #[sqlx::test(
     fixtures(path = "../../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn unlisted_runs_with_notifications_stay_out_of_feeds_that_exclude_them(
     pool: Pool<Postgres>,
@@ -164,7 +164,7 @@ async fn unlisted_runs_with_notifications_stay_out_of_feeds_that_exclude_them(
 /// itself) is back in Home's notified and work feeds for them.
 #[sqlx::test(
     fixtures(path = "../../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn followed_hidden_sessions_return_to_broad_feeds(
     pool: Pool<Postgres>,

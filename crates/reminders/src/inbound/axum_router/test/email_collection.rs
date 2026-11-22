@@ -12,7 +12,7 @@ use email::domain::{
     models::EmailErr,
 };
 use entity_access::domain::models::ViewAccessLevel;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::collections::HashSet;
 
@@ -24,7 +24,7 @@ struct Mailbox {
 impl EmailFollowupMailbox for Mailbox {
     async fn reminder_threads(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
         _: &ReminderThreadFilter,
     ) -> Result<Vec<Uuid>, EmailErr> {
@@ -43,14 +43,14 @@ impl EmailFollowupMailbox for Mailbox {
     }
     async fn followup_thread(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
     ) -> Result<Option<FollowupThread>, EmailErr> {
         unreachable!()
     }
     async fn set_followup_inbox(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
         _: Uuid,
         _: bool,
@@ -67,7 +67,7 @@ impl Clock for FixedClock {
 }
 fn viewer() -> EmailReminderViewer {
     EmailReminderViewer {
-        user_id: MacroUserIdStr::parse_from_str(USER_ID).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER_ID).unwrap(),
         org_id: None,
     }
 }
@@ -82,19 +82,19 @@ async fn setup(
     pool: PgPool,
     count: usize,
 ) -> (PgRemindersRepo, FakeEntityAccessService, Vec<Uuid>) {
-    let macro_id = Uuid::now_v7();
+    let rox_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$2)"#,
-        macro_id,
+        rox_id,
         USER_ID
     )
     .execute(&pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id,email,macro_user_id) VALUES ($1,$1,$2)"#,
+        r#"INSERT INTO "User" (id,email,rox_user_id) VALUES ($1,$1,$2)"#,
         USER_ID,
-        macro_id
+        rox_id
     )
     .execute(&pool)
     .await
@@ -143,7 +143,7 @@ async fn setup(
     (repo, access, ids)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scan_fills_past_long_denied_and_filtered_prefix_without_reordering(pool: PgPool) {
     let (repo, access, ids) = setup(pool, 260).await;
     for id in &ids[..125] {
@@ -190,7 +190,7 @@ async fn scan_fills_past_long_denied_and_filtered_prefix_without_reordering(pool
     assert!(next.next_cursor.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scan_budget_returns_empty_advancing_continuation_and_reauthorizes(pool: PgPool) {
     let (repo, access, ids) = setup(pool, 507).await;
     access
@@ -251,7 +251,7 @@ async fn scan_budget_returns_empty_advancing_continuation_and_reauthorizes(pool:
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scan_mid_batch_and_exact_boundary_never_skip_overflow(pool: PgPool) {
     let (repo, access, ids) = setup(pool, 203).await;
     let mut cursor = None;
@@ -298,7 +298,7 @@ async fn scan_mid_batch_and_exact_boundary_never_skip_overflow(pool: PgPool) {
     assert_eq!(second.items[0].thread_id, ids[100]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scan_fails_retryably_on_access_or_hydration_failure(pool: PgPool) {
     let (repo, mut access, ids) = setup(pool, 3).await;
     let error = service::list(

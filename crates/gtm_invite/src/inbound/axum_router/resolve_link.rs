@@ -8,7 +8,7 @@ use axum::{
 };
 use chrono::Utc;
 use ip_extractor::ClientIp;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use rate_limit::{RateLimitConfig, RateLimitKey, inbound::RateLimitExtractable};
 
 use super::GtmInviteRouterState;
@@ -35,7 +35,7 @@ use crate::domain::ports::GtmInviteService;
     )
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: GtmInviteService, R, Auth: MacroAuthorizationService>(
+pub async fn handler<T: GtmInviteService, R, Auth: RoxAuthorizationService>(
     State(state): State<GtmInviteRouterState<T, R, Auth>>,
     Path(token): Path<String>,
 ) -> Result<Json<PublicGtmInviteLink>, GtmInviteError> {

@@ -1,5 +1,5 @@
 use crate::settings::{fetch_settings, patch_settings};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::service::settings::SettingsPatch;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
@@ -7,7 +7,7 @@ use sqlx::{Pool, Postgres};
 async fn insert_link(pool: &Pool<Postgres>) -> Uuid {
     let link_id = Uuid::new_v4();
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, 'macro|owner@corp.test', 'macro|owner@corp.test', 'owner@corp.test', 'GMAIL')"#,
         link_id,
     )
@@ -26,7 +26,7 @@ fn patch(link_id: Uuid) -> SettingsPatch {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn read_receipts_default_on_and_patch_independently(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {

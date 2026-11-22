@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        DELETE FROM \"User\"\n        WHERE id = $1\n          AND EXISTS (SELECT 1 FROM promoted_shared_mailboxes WHERE macro_id = $1)\n        RETURNING macro_user_id\n        ",
+  "query": "\n        DELETE FROM \"User\"\n        WHERE id = $1\n          AND EXISTS (SELECT 1 FROM promoted_shared_mailboxes WHERE rox_id = $1)\n        RETURNING rox_user_id\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "macro_user_id",
+        "name": "rox_user_id",
         "type_info": "Uuid"
       }
     ],

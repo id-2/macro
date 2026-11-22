@@ -42,8 +42,8 @@ pub(crate) struct LoginQueryParams {
 }
 
 pub(crate) fn is_allowed_original_url(url: &Url) -> bool {
-    let local_origin = match macro_env::Environment::new_or_prod() {
-        macro_env::Environment::Local => Some(crate::api::utils::default_redirect_url()),
+    let local_origin = match rox_env::Environment::new_or_prod() {
+        rox_env::Environment::Local => Some(crate::api::utils::default_redirect_url()),
         _ => None,
     };
     is_allowed_original_url_with_local_origin(url, local_origin.as_ref())
@@ -75,8 +75,8 @@ fn is_allowed_original_url_with_local_origin(url: &Url, local_origin: Option<&Ur
 
 /// Strips the userinfo, query, and fragment from an `original_url` so it is
 /// safe to log — all are client-controlled and may carry credentials, tokens,
-/// or PII. The path is kept because it distinguishes e.g. macro://login from
-/// macro:///login.
+/// or PII. The path is kept because it distinguishes e.g. rox://login from
+/// rox:///login.
 pub(crate) fn redact_original_url_for_logging(url: &Url) -> Url {
     let mut redacted_url = url.clone();
     redacted_url.set_query(None);

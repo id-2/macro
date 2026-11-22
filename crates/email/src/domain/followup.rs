@@ -4,7 +4,7 @@
 //! The inbox identity is resolved again for every operation, including dispatch.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -79,7 +79,7 @@ pub trait EmailFollowupMailbox: Send + Sync + 'static {
     /// Missing and inaccessible threads are omitted, including revoked shares.
     fn reminder_threads(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         receipts: Vec<
             entity_access::domain::models::EntityAccessReceipt<
                 entity_access::domain::models::ViewAccessLevel,
@@ -91,7 +91,7 @@ pub trait EmailFollowupMailbox: Send + Sync + 'static {
     /// Resolve owned/delegated access and inspect this conversation.
     fn followup_thread(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> impl Future<Output = Result<Option<FollowupThread>, EmailErr>> + Send;
 
@@ -100,7 +100,7 @@ pub trait EmailFollowupMailbox: Send + Sync + 'static {
     /// Unlike ordinary unarchive, this explicitly permits sent-only threads.
     fn set_followup_inbox(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread_id: Uuid,
         link_id: Uuid,
         visible: bool,
@@ -130,7 +130,7 @@ pub trait EmailFollowupRepo: Send + Sync + 'static {
     /// Load message identity/classification facts for an authorized thread.
     fn followup_messages(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread_id: Uuid,
         link_id: Uuid,
     ) -> impl Future<Output = Result<Vec<FollowupMessage>, EmailErr>> + Send;

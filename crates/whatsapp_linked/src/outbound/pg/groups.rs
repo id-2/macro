@@ -6,7 +6,7 @@ use crate::domain::ports::{GroupRepository, StoredChat, VisibleAdoption};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use external_chat::domain::timeline::view::People;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// The same facts, ignoring when they were read and listing-only fields.
 fn same_facts(stored: &GroupInfo, observed: &GroupInfo) -> bool {
@@ -493,7 +493,7 @@ impl GroupRepository for PgWhatsAppRepository {
 
     async fn visible_adoptions(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         groups: &[String],
     ) -> ExternalChatResult<Vec<VisibleAdoption>> {
         let user = user.as_ref();

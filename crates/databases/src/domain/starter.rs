@@ -1,7 +1,7 @@
 //! A small, retry-safe first database. Blueprint and provisioning policy live here.
 
 use chrono::{DateTime, Utc};
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_databases::OptionId;
 use models_databases::position::{Position, PositionError, key_between};
 use models_databases::views::{Lane, LaneKey, ViewLayout, ViewQuery};
@@ -154,7 +154,7 @@ impl<Repository, Broker> DatabaseStarterServiceImpl<Repository, Broker> {
     }
 }
 
-impl<Repository: DatabaseStarterRepo, Broker: MacroEventBroker> DatabaseStarterService
+impl<Repository: DatabaseStarterRepo, Broker: RoxEventBroker> DatabaseStarterService
     for DatabaseStarterServiceImpl<Repository, Broker>
 {
     async fn ensure_starter(&self, viewer: Viewer) -> Result<StarterDatabase, DatabaseError> {

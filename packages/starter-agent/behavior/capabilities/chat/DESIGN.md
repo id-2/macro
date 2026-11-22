@@ -1,12 +1,12 @@
 # chat
 
 How the agent talks in Rox, as its own account. It is the agent's main way of talking with its
-owner, and it needs nothing but `MACRO_API_KEY`: sending, reading, the relevance screen
+owner, and it needs nothing but `ROX_API_KEY`: sending, reading, the relevance screen
 (`macro.ai.decide`) and presence all go through Rox.
 
 | File                     | What it holds                                                                     |
 | ------------------------ | --------------------------------------------------------------------------------- |
-| `macro.ts`               | The `Chat` port and `sdkChat`, the thin adapter over Macro's SDK.                 |
+| `macro.ts`               | The `Chat` port and `sdkChat`, the thin adapter over Rox's SDK.                 |
 | `listen.ts`, `screen.ts` | Is a message for the agent: the pure decision, and the questions the screen asks. |
 | `history.ts`             | Every message heard, per channel, and the ones still waiting for a reply.         |
 | `prompt.ts`              | What a reply run is asked.                                                        |

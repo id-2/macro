@@ -6,6 +6,6 @@
  */
 
 /**
- * `name` with matched spans wrapped in `<macro_em>…</macro_em>`.
+ * `name` with matched spans wrapped in `<rox_em>…</rox_em>`.
  */
 export type CrmCompanySearchResponseItemNameHighlighted = string | null;

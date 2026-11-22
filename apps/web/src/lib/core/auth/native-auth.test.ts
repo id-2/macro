@@ -69,7 +69,7 @@ describe('native browser authentication', () => {
   it('preserves the iOS plugin contract', async () => {
     mocks.platform.mockReturnValue('ios');
     const session = createNativeAuthSession('inbox-link-callback');
-    expect(session.callbackUrl).toBe('macro://inbox-link-callback');
+    expect(session.callbackUrl).toBe('rox://inbox-link-callback');
     await session.authenticate('https://accounts.google.com/authorize');
     expect(mocks.invoke).toHaveBeenCalledWith('plugin:auth|authenticate', {
       payload: {
@@ -154,7 +154,7 @@ describe('native browser authentication', () => {
   });
 
   // The deep-link bridge maps this to a `/login` router navigation, and only
-  // an empty host parses that way — `macro://login` would arrive as a host.
+  // an empty host parses that way — `rox://login` would arrive as a host.
   it('points the desktop callback at a route that redeems a session code', () => {
     const callback = new URL(DESKTOP_AUTH_CALLBACK_URL);
     expect(callback.protocol).toBe('macro:');

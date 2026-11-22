@@ -18,7 +18,7 @@ async fn fetch_signal(pool: &Pool<Postgres>, thread_id: &str) -> anyhow::Result<
 // Upserting a mute filter for a sender flips their threads to noise via the
 // fan-out resync; deleting the filter flips them back.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_signal_flag"))
 )]
 async fn filter_upsert_and_delete_resync_signal_flags(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -48,7 +48,7 @@ async fn filter_upsert_and_delete_resync_signal_flags(pool: Pool<Postgres>) -> a
 // Marking a whole domain important promotes its category-labeled (noise)
 // threads to signal.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_signal_flag"))
 )]
 async fn domain_filter_upsert_promotes_category_thread(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -74,7 +74,7 @@ async fn domain_filter_upsert_promotes_category_thread(pool: Pool<Postgres>) -> 
 // The email-crate update_thread_metadata port piggybacks the is_signal sync
 // (clears a stale flag), matching the email_db_client behavior.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_signal_flag"))
 )]
 async fn update_thread_metadata_syncs_signal_flag(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -93,27 +93,27 @@ async fn update_thread_metadata_syncs_signal_flag(pool: Pool<Postgres>) -> anyho
     Ok(())
 }
 
-const THREAD_MACRO_DIGEST: &str = "00000000-0000-0000-0000-00000000e207";
+const THREAD_ROX_DIGEST: &str = "00000000-0000-0000-0000-00000000e207";
 
 // Rox's own notification emails are never signal: update_thread_metadata
 // clears a stale flag, and neither an address- nor a domain-important
 // override can promote the thread back.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_signal_flag"))
 )]
-async fn macro_notification_sender_is_never_signal(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    assert!(fetch_signal(&pool, THREAD_MACRO_DIGEST).await?);
+async fn rox_notification_sender_is_never_signal(pool: Pool<Postgres>) -> anyhow::Result<()> {
+    assert!(fetch_signal(&pool, THREAD_ROX_DIGEST).await?);
 
     let mut tx = pool.begin().await?;
     super::super::thread::update_thread_metadata(
         &mut tx,
-        Uuid::parse_str(THREAD_MACRO_DIGEST)?,
+        Uuid::parse_str(THREAD_ROX_DIGEST)?,
         Uuid::parse_str(LINK_ID)?,
     )
     .await?;
     tx.commit().await?;
-    assert!(!fetch_signal(&pool, THREAD_MACRO_DIGEST).await?);
+    assert!(!fetch_signal(&pool, THREAD_ROX_DIGEST).await?);
 
     let repo = EmailPgRepo::new(pool.clone());
     let link_id = Uuid::parse_str(LINK_ID)?;
@@ -126,7 +126,7 @@ async fn macro_notification_sender_is_never_signal(pool: Pool<Postgres>) -> anyh
         },
     )
     .await?;
-    assert!(!fetch_signal(&pool, THREAD_MACRO_DIGEST).await?);
+    assert!(!fetch_signal(&pool, THREAD_ROX_DIGEST).await?);
 
     repo.upsert_email_filter(
         link_id,
@@ -137,7 +137,7 @@ async fn macro_notification_sender_is_never_signal(pool: Pool<Postgres>) -> anyh
         },
     )
     .await?;
-    assert!(!fetch_signal(&pool, THREAD_MACRO_DIGEST).await?);
+    assert!(!fetch_signal(&pool, THREAD_ROX_DIGEST).await?);
 
     Ok(())
 }
@@ -167,7 +167,7 @@ async fn fetch_inbox_state(
 // the draft inflated: is_signal, inbox_visible, and
 // latest_inbound_message_ts all count drafts.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_signal_flag"))
 )]
 async fn delete_draft_message_recomputes_thread_metadata(
@@ -205,7 +205,7 @@ const SENT_THREAD_DRAFT_MSG: &str = "00000000-0000-0000-0000-00000000e508";
 // true via the SENT label, so the inbox_visible / latest_inbound reset is
 // the only thing keeping the thread out of inbox views.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_signal_flag"))
 )]
 async fn delete_draft_message_returns_sent_thread_out_of_inbox(
@@ -238,7 +238,7 @@ const THREAD_SAME_DOMAIN: &str = "00000000-0000-0000-0000-00000000e205";
 // domain flips all its threads, and an address-important exception flips
 // only that sender's threads back.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_signal_flag"))
 )]
 async fn address_exception_beats_domain_mute_via_filter_mutations(
@@ -277,7 +277,7 @@ async fn address_exception_beats_domain_mute_via_filter_mutations(
 // Deleting a domain mute resyncs the whole domain's threads; a coexisting
 // address-important exception keeps its sender signal throughout.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_signal_flag"))
 )]
 async fn deleting_domain_filter_keeps_address_exception(

@@ -1,6 +1,6 @@
 use super::*;
 use ai_toolset::{AsyncTool, ServiceContext, ToolAnnotated, ToolAnnotations, ToolResult};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::Deserialize;
 
@@ -145,7 +145,7 @@ async fn deferred_tools_stay_callable() {
     let tools = read_and_edit();
     let deferred = deferred_tools(&tools, &[]);
     let tools = DeferredToolSet::new(Arc::new(tools), deferred);
-    let user = MacroUserIdStr::try_from_email("t@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("t@example.com").unwrap();
 
     let result = tools
         .try_tool_call(

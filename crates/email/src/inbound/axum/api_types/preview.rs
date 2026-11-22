@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use doppleganger::{Doppleganger, Mirror};
 use frecency::domain::models::AggregateFrecency;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::PaginatedOpaqueCursor;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -41,7 +41,7 @@ pub struct ApiThreadPreviewCursorInner {
     provider_id: Option<String>,
     #[schema(value_type = String)]
     #[cfg_attr(feature = "ai_schema", schemars(with = "String"))]
-    owner_id: MacroUserIdStr<'static>,
+    owner_id: RoxUserIdStr<'static>,
     inbox_visible: bool,
     is_read: bool,
     is_draft: bool,

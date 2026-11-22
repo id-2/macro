@@ -7,7 +7,7 @@ use ai_toolset::{
     ToolCallError, ToolResult,
 };
 use async_trait::async_trait;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use crate::domain::models::{
     WebFetch, WebFetchResponse, WebSearch, WebSearchError, WebSearchResponse,

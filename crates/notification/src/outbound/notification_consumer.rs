@@ -13,8 +13,8 @@ use health::ConsumerHealth;
 use std::{marker::PhantomData, time::Duration};
 
 use kafka_util::{InitialOffset, KafkaEventConsumer, Ungrouped};
-use macro_event_broker::{
-    EventBrokerError, KafkaConsumerAdapter, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    EventBrokerError, KafkaConsumerAdapter, RoxEventCollection, RoxEventConsumerService,
 };
 use rdkafka::message::Message as _;
 use rootcause::prelude::{Report, ResultExt as _};
@@ -30,9 +30,9 @@ const TOPIC_METADATA_TIMEOUT: Duration = Duration::from_secs(10);
 
 type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredMacroEvent>;
 type NotificationEventConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
+    RoxEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: JsonNotificationMacroEvent);
+rox_event_broker::declare_topics!(DeclaredMacroEvent: JsonNotificationMacroEvent);
 
 /// Independent consumer of all notification topic event variants decoded as `T`.
 ///

@@ -8,7 +8,7 @@ use crate::domain::run::RunStateName;
 /// Runs nobody holds come least recently checked first, so runs that keep
 /// waiting never hide the others from a small batch; held and settled runs
 /// aren't checked.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn runs_to_check_take_turns(pool: PgPool) {
     let f = fixture(pool).await;
     let mut runs = Vec::new();
@@ -61,7 +61,7 @@ async fn runs_to_check_take_turns(pool: PgPool) {
 
 /// One holder at a time: a held run can't be claimed until it is let go, by
 /// its holder only, or its hold runs out.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_has_one_holder_at_a_time(pool: PgPool) {
     let f = fixture(pool).await;
     let id = f.prompt(None).await;
@@ -114,7 +114,7 @@ async fn a_run_has_one_holder_at_a_time(pool: PgPool) {
 
 /// A run is stored held by whoever starts it: no one else claims or sweeps
 /// it until it is let go or the hold runs out.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_starts_held_by_its_starter(pool: PgPool) {
     let f = fixture(pool).await;
     let id = f.prompt(None).await;
@@ -146,7 +146,7 @@ async fn a_run_starts_held_by_its_starter(pool: PgPool) {
 
 /// A run row that doesn't decode is skipped and counted as checked, so the
 /// sweep still checks the others and the row never holds the front of it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_sweep_skips_a_run_it_cant_read(pool: PgPool) {
     let f = fixture(pool).await;
     let broken = f.start(f.prompt(None).await).await.unwrap().session;
@@ -180,7 +180,7 @@ async fn the_sweep_skips_a_run_it_cant_read(pool: PgPool) {
 
 /// A move lands only on the run as it was read, lets go of it, and stamps
 /// when it settled.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_moves_only_from_where_it_was_read(pool: PgPool) {
     let f = fixture(pool).await;
     let id = f.prompt(None).await;
@@ -265,7 +265,7 @@ async fn a_run_moves_only_from_where_it_was_read(pool: PgPool) {
 
 /// A finished run adds what it made to the suggestion once each, in the order
 /// given, after what the suggestion has.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_finished_run_records_each_item_it_made_once(pool: PgPool) {
     let f = fixture(pool).await;
     let id = f.prompt(None).await;
@@ -303,7 +303,7 @@ async fn a_finished_run_records_each_item_it_made_once(pool: PgPool) {
 /// A run's session sends nothing when the run was started with nothing to
 /// send, whatever its suggestion says since; a session that is no run isn't
 /// one.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_sends_what_it_was_started_with(pool: PgPool) {
     let f = fixture(pool).await;
     let quiet = f.prompt(None).await;
@@ -331,7 +331,7 @@ async fn a_run_sends_what_it_was_started_with(pool: PgPool) {
 
 /// While a run is unsettled, its suggestion's prompt and `sends` stay; the
 /// rest may change, and both may once it settles.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_running_suggestions_prompt_and_sends_stay(pool: PgPool) {
     let f = fixture(pool).await;
     let id = f.prompt(None).await;

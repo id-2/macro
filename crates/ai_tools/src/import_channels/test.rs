@@ -23,7 +23,7 @@ use import::{
     },
     outbound::pg_import_repo::PgImportRepo,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::{ConnectorRef, ConnectorSelect, UserMcpTools};
 use models_pagination::{Query, SimpleSortMethod};
 use std::{
@@ -39,19 +39,19 @@ use uuid::Uuid;
 struct NoConnectors;
 
 impl ConnectorSelect for NoConnectors {
-    async fn user_toolset(&self, _: &MacroUserIdStr<'static>) -> UserMcpTools {
+    async fn user_toolset(&self, _: &RoxUserIdStr<'static>) -> UserMcpTools {
         unreachable!("deterministic Slack imports never invoke MCP")
     }
     async fn connector_toolset(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: ConnectorRef<'_>,
     ) -> anyhow::Result<Option<UserMcpTools>> {
         unreachable!("deterministic Slack imports never invoke MCP")
     }
     async fn connector_connected(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: ConnectorRef<'_>,
     ) -> anyhow::Result<bool> {
         unreachable!("deterministic Slack imports never invoke MCP")
@@ -66,7 +66,7 @@ struct ReservedCreator {
 impl EntityCreator for ReservedCreator {
     async fn create_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &str,
         _: &ImportedTaskProperties,
@@ -75,7 +75,7 @@ impl EntityCreator for ReservedCreator {
     }
     async fn create_notion_document(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &str,
         _: &NotionLinks,
@@ -85,7 +85,7 @@ impl EntityCreator for ReservedCreator {
     }
     async fn create_channel(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         target: &ImportTargetReservation,
         _: &[String],
@@ -109,8 +109,8 @@ impl EntityCreator for ReservedCreator {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|left-user@test.com".to_string()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|left-user@test.com".to_string()).unwrap()
 }
 
 fn key() -> ImportTargetKey {
@@ -151,7 +151,7 @@ async fn settled(repo: &PgImportRepo, id: Uuid) -> ImportEntity {
 async fn channel_count(repo: &PgChannelsRepo) -> usize {
     repo.get_user_channels_with_participants(
         GetChannelsRequest {
-            macro_id: user(),
+            rox_id: user(),
             limit: Some(100),
             include_frecency: false,
             query: Query::Sort(SimpleSortMethod::UpdatedAt, None),
@@ -164,7 +164,7 @@ async fn channel_count(repo: &PgChannelsRepo) -> usize {
 }
 
 async fn archive(repo: &PgImportRepo, channels: &PgChannelsRepo) -> Uuid {
-    let admin = MacroUserIdStr::try_from("macro|team-owner-a@test.com".to_string()).unwrap();
+    let admin = RoxUserIdStr::try_from("macro|team-owner-a@test.com".to_string()).unwrap();
     let target = repo
         .reserve_target(&admin, &key(), ImportTargetKind::Team, None)
         .await
@@ -187,7 +187,7 @@ async fn archive(repo: &PgImportRepo, channels: &PgChannelsRepo) -> Uuid {
 }
 
 #[sqlx::test(
-    migrations = "../macro_db_client/migrations",
+    migrations = "../rox_db_client/migrations",
     fixtures(path = "../../../channels/fixtures", scripts("channels_repo"))
 )]
 async fn concurrent_onboarding_and_archive_publish_one_canonical_ledger_target(pool: sqlx::PgPool) {
@@ -223,7 +223,7 @@ async fn concurrent_onboarding_and_archive_publish_one_canonical_ledger_target(p
 }
 
 #[sqlx::test(
-    migrations = "../macro_db_client/migrations",
+    migrations = "../rox_db_client/migrations",
     fixtures(path = "../../../channels/fixtures", scripts("channels_repo"))
 )]
 async fn onboarding_crash_retry_completes_the_original_reserved_channel(pool: sqlx::PgPool) {

@@ -987,7 +987,7 @@ describe('GraphQL Soup browser cache session gate', () => {
     expect(payload.query).toContain('@include');
     expect(payload.variables).toEqual({ includeId: true });
     expect(
-      new Headers(transport.headers).get('x-macro-mail-cache-profile')
+      new Headers(transport.headers).get('x-rox-mail-cache-profile')
     ).toBe('soup-mail-v5');
     expect(new Headers(transport.headers).get('traceparent')).toBe(
       mocks.traceparent

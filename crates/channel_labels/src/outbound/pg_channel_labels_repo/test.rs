@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -12,23 +12,23 @@ mod team_channels;
 const USER_A: &str = "macro|labels-a@rox.one";
 const USER_B: &str = "macro|labels-b@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(id)
     .execute(pool)
     .await
     .expect("macro_user should insert");
-    sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#)
+    sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#)
         .bind(id)
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .execute(pool)
         .await
         .expect("user should insert");
@@ -113,7 +113,7 @@ fn written(outcome: LabelWriteOutcome) -> crate::domain::models::ChannelLabel {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_appends_in_order_and_rejects_duplicate_names(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let team_id = insert_team(&pool, USER_A).await;
@@ -167,7 +167,7 @@ async fn create_appends_in_order_and_rejects_duplicate_names(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn labels_are_team_scoped(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -218,7 +218,7 @@ async fn labels_are_team_scoped(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rename_reports_conflicts_and_missing_labels(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let team_id = insert_team(&pool, USER_A).await;
@@ -287,7 +287,7 @@ async fn rename_reports_conflicts_and_missing_labels(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn channels_in_a_label_are_viewer_relative_and_sorted_by_name(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -377,7 +377,7 @@ async fn channels_in_a_label_are_viewer_relative_and_sorted_by_name(pool: PgPool
     assert_eq!(labelled, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_channel_label_rejects_invisible_channels_dms_and_foreign_labels(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -457,14 +457,14 @@ async fn set_channel_label_rejects_invisible_channels_dms_and_foreign_labels(poo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn private_and_team_assignments_do_not_overwrite_each_other(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
     let team_id = insert_team(&pool, USER_A).await;
     let team = ChannelLabelsScope::Team(team_id);
-    let a = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
-    let b = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_B.to_owned()).unwrap());
+    let a = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let b = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_B.to_owned()).unwrap());
     let channel = insert_team_channel(&pool, "Shared", team_id, USER_A, &[USER_A, USER_B]).await;
     let repo = PgChannelLabelsRepo::new(pool);
     let team_label = written(
@@ -516,10 +516,10 @@ async fn private_and_team_assignments_do_not_overwrite_each_other(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_with_invalid_channel_leaves_no_partial_label_or_moves(pool: PgPool) {
     insert_user(&pool, USER_A).await;
-    let scope = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let scope = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let team_id = insert_team(&pool, USER_A).await;
     let channel = insert_team_channel(&pool, "Mine", team_id, USER_A, &[USER_A]).await;
     let dm = insert_channel(&pool, None, "direct_message", USER_A, &[USER_A]).await;
@@ -562,11 +562,11 @@ async fn create_with_invalid_channel_leaves_no_partial_label_or_moves(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn smart_tags_overlap_manual_groups_and_follow_channel_changes(pool: PgPool) {
     use crate::domain::models::ChannelLabelRule;
     insert_user(&pool, USER_A).await;
-    let scope = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let scope = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let repo = PgChannelLabelsRepo::new(pool.clone());
     let team_id = insert_team(&pool, USER_A).await;
     let channel = insert_team_channel(&pool, "Acme SUPPORT", team_id, USER_A, &[USER_A]).await;
@@ -657,7 +657,7 @@ async fn smart_tags_overlap_manual_groups_and_follow_channel_changes(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn smart_preview_is_bounded_literal_and_respects_membership(pool: PgPool) {
     use crate::domain::models::ChannelLabelRule;
     insert_user(&pool, USER_A).await;
@@ -728,13 +728,13 @@ async fn smart_preview_is_bounded_literal_and_respects_membership(pool: PgPool) 
     assert!(empty.channels.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn transfer_preserves_identity_and_moves_conflicting_destination_assignments(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
     let team_id = insert_team(&pool, USER_A).await;
     let team = ChannelLabelsScope::Team(team_id);
-    let personal = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let personal = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let shared = insert_team_channel(&pool, "Shared", team_id, USER_A, &[USER_A, USER_B]).await;
     let hidden = insert_team_channel(&pool, "Hidden", team_id, USER_B, &[USER_B]).await;
     let repo = PgChannelLabelsRepo::new(pool.clone());
@@ -806,13 +806,13 @@ async fn transfer_preserves_identity_and_moves_conflicting_destination_assignmen
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn transfer_rejects_hidden_and_ineligible_members_and_name_collisions(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
     let team_id = insert_team(&pool, USER_A).await;
     let team = ChannelLabelsScope::Team(team_id);
-    let personal = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let personal = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let shared = insert_team_channel(&pool, "Shared", team_id, USER_A, &[USER_A]).await;
     let other_team = insert_team(&pool, USER_B).await;
     let ineligible = insert_team_channel(&pool, "Other", other_team, USER_A, &[USER_A]).await;
@@ -887,14 +887,14 @@ async fn transfer_rejects_hidden_and_ineligible_members_and_name_collisions(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sharing_smart_tag_rejects_personal_matches_outside_team(pool: PgPool) {
     use crate::domain::models::ChannelLabelRule;
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
     let team_id = insert_team(&pool, USER_A).await;
     let team = ChannelLabelsScope::Team(team_id);
-    let personal = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let personal = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let channel = insert_team_channel(&pool, "Support", team_id, USER_A, &[USER_A]).await;
     let other_team = insert_team(&pool, USER_B).await;
     let ineligible =

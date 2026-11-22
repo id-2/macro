@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::model::StoredQueuedAction;
 use crate::domain::ports::AgentSessionRepo;
 use agent_runtime_protocol::domain::action::{AgentAction, AgentActionId};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 fn stored_prompt(text: &str) -> StoredQueuedAction {
     StoredQueuedAction {
@@ -21,7 +21,7 @@ fn stored_prompt(text: &str) -> StoredQueuedAction {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replace_lists_oldest_first_and_empty_deletes_the_row(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -71,7 +71,7 @@ async fn replace_lists_oldest_first_and_empty_deletes_the_row(pool: PgPool) {
     assert_eq!(remaining, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_session_cascades_its_queue(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -98,7 +98,7 @@ async fn deleting_a_session_cascades_its_queue(pool: PgPool) {
     assert_eq!(remaining, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_without_a_row_lists_empty(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -111,7 +111,7 @@ async fn a_session_without_a_row_lists_empty(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_context_entries_never_restore_as_owner_prompts(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;

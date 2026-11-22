@@ -2,17 +2,17 @@ import type {
   Meeting as MeetingRecord,
   UpdateMeetingRequest,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { CallRecord } from '../calls/call-record';
 import { CallConnection, type JoinOptions } from '../calls/connection';
 import { callAdmissionError } from '../calls/errors';
 import { Channel } from '../channels/channel';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import type { User } from '../users/user';
 
 /** A meeting's schedule and invitation link. */
-export class Meeting extends MacroEntity<MeetingRecord> {
+export class Meeting extends RoxEntity<MeetingRecord> {
   /**
    * Join this meeting as the current account; always send a program join body.
    *
@@ -51,18 +51,18 @@ export class Meeting extends MacroEntity<MeetingRecord> {
 
   private lookupToken?: string;
 
-  private constructor(client: MacroClient, id: string, record?: MeetingRecord) {
+  private constructor(client: RoxClient, id: string, record?: MeetingRecord) {
     super(client, id, record);
     this.lookupToken = record?.shareToken;
   }
 
   /** Construct a lazy meeting handle. */
-  static byId(client: MacroClient, id: string): Meeting {
+  static byId(client: RoxClient, id: string): Meeting {
     return new Meeting(client, id);
   }
 
   /** Seed a meeting from a server response. */
-  static from(client: MacroClient, record: MeetingRecord): Meeting {
+  static from(client: RoxClient, record: MeetingRecord): Meeting {
     return new Meeting(client, record.id, record);
   }
 
@@ -78,7 +78,7 @@ export class Meeting extends MacroEntity<MeetingRecord> {
       await this.client.storage.meetingList(),
     ).meetings.find((m) => m.id === this.id);
     if (!record)
-      throw new MacroNotFoundError(`Meeting ${this.id} is unavailable`);
+      throw new RoxNotFoundError(`Meeting ${this.id} is unavailable`);
     this.lookupToken = record.shareToken;
     return record;
   }

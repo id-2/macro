@@ -3,7 +3,7 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::{Extension, Json};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use models_email::service;
 use models_email::service::link::Link;
@@ -42,14 +42,14 @@ pub struct CreateLabelResponse {
 #[tracing::instrument(skip(ctx, authorization, link), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     link: Extension<Link>,
     Json(request_body): Json<CreateLabelRequest>,
 ) -> Result<Response, Response> {
     let label = ctx
         .mailbox_settings
         .create_label(
-            &authorization.authorization.user.macro_user_id,
+            &authorization.authorization.user.rox_user_id,
             link.id,
             &request_body.label_name,
         )

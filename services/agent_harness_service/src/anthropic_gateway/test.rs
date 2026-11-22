@@ -255,7 +255,7 @@ async fn a_flag_off_teammate_on_a_team_computer_is_forwarded() {
 }
 
 #[tokio::test]
-async fn a_session_off_a_macro_computer_is_refused_before_anthropic_is_called() {
+async fn a_session_off_a_rox_computer_is_refused_before_anthropic_is_called() {
     let (upstream_url, seen) = fake_anthropic().await;
     let (app, _session, usage) = gateway_with(&upstream_url, None).await;
 
@@ -496,7 +496,7 @@ mod brain_route {
         BrainAuthenticator, BrainCaller, BrainLookup, BrainRollout,
     };
     use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
-    use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+    use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
     const AGENT: &str = "macro|sam-rivera-abc123@agents.macro.invalid";
     const CREATOR: &str = "macro|admin@rox.one";
@@ -509,7 +509,7 @@ mod brain_route {
         fn authenticate<'a>(&'a self, key: &'a str) -> BrainLookup<'a> {
             Box::pin(async move {
                 Ok((key == "mak_agent").then(|| BrainCaller {
-                    user_id: MacroUserIdStr::parse_from_str(AGENT).unwrap().into_owned(),
+                    user_id: RoxUserIdStr::parse_from_str(AGENT).unwrap().into_owned(),
                     team_id: TEAM,
                 }))
             })
@@ -519,8 +519,8 @@ mod brain_route {
     /// Agent teammates on or off for [`CREATOR`], who invited [`AGENT`], and
     /// the other way round for the agent's own account.
     fn rollout_for_creator(on: bool) -> BrainRollout {
-        let agent = MacroUserIdStr::parse_from_str(AGENT).unwrap().into_owned();
-        let creator = MacroUserIdStr::parse_from_str(CREATOR)
+        let agent = RoxUserIdStr::parse_from_str(AGENT).unwrap().into_owned();
+        let creator = RoxUserIdStr::parse_from_str(CREATOR)
             .unwrap()
             .into_owned();
         let mut creators = agent_credentials::FakeAgentCreators::default();

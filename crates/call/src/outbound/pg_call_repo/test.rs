@@ -13,8 +13,8 @@ use item_filters::{
     CallStatus,
     ast::{LiteralTree, call::CallLiteral},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::channel_share_permission::{
     UpdateChannelSharePermission, UpdateOperation,
@@ -26,7 +26,7 @@ use uuid::Uuid;
 async fn migrate_for_test(pool: &Pool<Postgres>) {
     // Keep both colliding migration bodies in the isolated test database,
     // remapping only the mailbox migration's in-memory version.
-    let migrations = MACRO_DB_MIGRATIONS
+    let migrations = ROX_DB_MIGRATIONS
         .iter()
         .map(|migration| {
             let mut migration = migration.clone();
@@ -86,17 +86,17 @@ const LATEST_FIRST: CallRecordPage = CallRecordPage {
     after: None,
 };
 pub(super) const CALL_ARCHIVED: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_0000000ca2ed);
-const MACRO_USER_A: Uuid = Uuid::from_u128(0xaaaaaaaa_aaaa_aaaa_aaaa_aaaaaaaaaaa1);
-const MACRO_USER_B: Uuid = Uuid::from_u128(0xbbbbbbbb_bbbb_bbbb_bbbb_bbbbbbbbbbb2);
-const MACRO_USER_C: Uuid = Uuid::from_u128(0xcccccccc_cccc_cccc_cccc_ccccccccccc3);
-pub(super) static USER_A: LazyLock<MacroUserIdStr<'static>> =
-    LazyLock::new(|| MacroUserIdStr::parse_from_str("macro|user-a@test.com").unwrap());
-pub(super) static USER_B: LazyLock<MacroUserIdStr<'static>> =
-    LazyLock::new(|| MacroUserIdStr::parse_from_str("macro|user-b@test.com").unwrap());
-static USER_C: LazyLock<MacroUserIdStr<'static>> =
-    LazyLock::new(|| MacroUserIdStr::parse_from_str("macro|user-c@test.com").unwrap());
-static USER_D: LazyLock<MacroUserIdStr<'static>> =
-    LazyLock::new(|| MacroUserIdStr::parse_from_str("macro|user-d@test.com").unwrap());
+const ROX_USER_A: Uuid = Uuid::from_u128(0xaaaaaaaa_aaaa_aaaa_aaaa_aaaaaaaaaaa1);
+const ROX_USER_B: Uuid = Uuid::from_u128(0xbbbbbbbb_bbbb_bbbb_bbbb_bbbbbbbbbbb2);
+const ROX_USER_C: Uuid = Uuid::from_u128(0xcccccccc_cccc_cccc_cccc_ccccccccccc3);
+pub(super) static USER_A: LazyLock<RoxUserIdStr<'static>> =
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-a@test.com").unwrap());
+pub(super) static USER_B: LazyLock<RoxUserIdStr<'static>> =
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-b@test.com").unwrap());
+static USER_C: LazyLock<RoxUserIdStr<'static>> =
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-c@test.com").unwrap());
+static USER_D: LazyLock<RoxUserIdStr<'static>> =
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-d@test.com").unwrap());
 
 pub(super) fn repo(pool: Pool<Postgres>) -> PgCallRepo {
     PgCallRepo::new(pool)
@@ -133,8 +133,8 @@ async fn insert_voice(pool: &Pool<Postgres>, voice_id: Uuid, axis: usize) -> any
 
 pub(super) async fn insert_user_mapping(
     pool: &Pool<Postgres>,
-    user_id: &MacroUserIdStr<'_>,
-    macro_user_id: Uuid,
+    user_id: &RoxUserIdStr<'_>,
+    rox_user_id: Uuid,
 ) -> anyhow::Result<()> {
     sqlx::query(
         r#"
@@ -143,24 +143,24 @@ pub(super) async fn insert_user_mapping(
         ON CONFLICT (id) DO NOTHING
         "#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(user_id.as_ref())
     .bind(user_id.email_str())
-    .bind(format!("cus_{macro_user_id}"))
+    .bind(format!("cus_{rox_user_id}"))
     .execute(pool)
     .await?;
 
     sqlx::query(
         r#"
-        INSERT INTO "User" (id, email, "stripeCustomerId", macro_user_id)
+        INSERT INTO "User" (id, email, "stripeCustomerId", rox_user_id)
         VALUES ($1, $2, $3, $4)
-        ON CONFLICT (id) DO UPDATE SET macro_user_id = EXCLUDED.macro_user_id
+        ON CONFLICT (id) DO UPDATE SET rox_user_id = EXCLUDED.rox_user_id
         "#,
     )
     .bind(user_id.as_ref())
     .bind(user_id.email_str())
-    .bind(format!("cus_{macro_user_id}"))
-    .bind(macro_user_id)
+    .bind(format!("cus_{rox_user_id}"))
+    .bind(rox_user_id)
     .execute(pool)
     .await?;
 
@@ -171,7 +171,7 @@ pub(super) async fn insert_user_mapping(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn a_calls_discussion_is_stored_with_it_and_outlives_archival(
     pool: Pool<Postgres>,
@@ -209,7 +209,7 @@ async fn a_calls_discussion_is_stored_with_it_and_outlives_archival(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn create_call_returns_call(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -254,7 +254,7 @@ async fn create_call_returns_call(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn create_call_returns_none_on_duplicate_channel(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -277,7 +277,7 @@ async fn create_call_returns_none_on_duplicate_channel(pool: Pool<Postgres>) -> 
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_by_channel_id_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -291,7 +291,7 @@ async fn get_call_by_channel_id_found(pool: Pool<Postgres>) -> anyhow::Result<()
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_by_channel_id_not_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -305,7 +305,7 @@ async fn get_call_by_channel_id_not_found(pool: Pool<Postgres>) -> anyhow::Resul
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_by_room_name_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -320,7 +320,7 @@ async fn get_call_by_room_name_found(pool: Pool<Postgres>) -> anyhow::Result<()>
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_by_room_name_not_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -334,7 +334,7 @@ async fn get_call_by_room_name_not_found(pool: Pool<Postgres>) -> anyhow::Result
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_active_calls_for_user_returns_call_for_channel_member(
     pool: Pool<Postgres>,
@@ -354,7 +354,7 @@ async fn get_active_calls_for_user_returns_call_for_channel_member(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_active_calls_for_user_excludes_non_member_with_direct_call_access(
     pool: Pool<Postgres>,
@@ -373,7 +373,7 @@ async fn get_active_calls_for_user_excludes_non_member_with_direct_call_access(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_active_calls_for_user_excludes_zero_participant_calls(
     pool: Pool<Postgres>,
@@ -396,7 +396,7 @@ async fn get_active_calls_for_user_excludes_zero_participant_calls(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_active_calls_for_user_excludes_left_channel_members(
     pool: Pool<Postgres>,
@@ -422,7 +422,7 @@ async fn get_active_calls_for_user_excludes_left_channel_members(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn add_and_check_participant(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -449,7 +449,7 @@ async fn add_and_check_participant(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn remove_participant_removes_from_db(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -465,7 +465,7 @@ async fn remove_participant_removes_from_db(pool: Pool<Postgres>) -> anyhow::Res
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn record_decline_is_idempotent_and_scoped_to_the_user(
     pool: Pool<Postgres>,
@@ -484,7 +484,7 @@ async fn record_decline_is_idempotent_and_scoped_to_the_user(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn declines_are_dropped_with_the_call(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -505,7 +505,7 @@ async fn declines_are_dropped_with_the_call(pool: Pool<Postgres>) -> anyhow::Res
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_active_call_for_user_returns_current_participation(
     pool: Pool<Postgres>,
@@ -522,7 +522,7 @@ async fn find_active_call_for_user_returns_current_participation(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_active_call_for_user_returns_none_when_never_joined(
     pool: Pool<Postgres>,
@@ -539,7 +539,7 @@ async fn find_active_call_for_user_returns_none_when_never_joined(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn find_active_call_for_user_returns_none_after_leave(
     pool: Pool<Postgres>,
@@ -560,7 +560,7 @@ async fn find_active_call_for_user_returns_none_after_leave(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn add_participant_rejects_user_already_active_in_other_call(
     pool: Pool<Postgres>,
@@ -589,7 +589,7 @@ async fn add_participant_rejects_user_already_active_in_other_call(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn add_participant_same_call_rejoin_is_idempotent(
     pool: Pool<Postgres>,
@@ -609,7 +609,7 @@ async fn add_participant_same_call_rejoin_is_idempotent(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn add_participant_allows_join_other_call_after_leave(
     pool: Pool<Postgres>,
@@ -636,7 +636,7 @@ async fn add_participant_allows_join_other_call_after_leave(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_participants_returns_all(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -653,7 +653,7 @@ async fn get_participants_returns_all(pool: Pool<Postgres>) -> anyhow::Result<()
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_participant_count_correct(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -670,7 +670,7 @@ async fn get_participant_count_correct(pool: Pool<Postgres>) -> anyhow::Result<(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn delete_call_cascades_to_participants(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -695,7 +695,7 @@ async fn delete_call_cascades_to_participants(pool: Pool<Postgres>) -> anyhow::R
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_call_creates_record_and_deletes_ephemeral(
     pool: Pool<Postgres>,
@@ -762,7 +762,7 @@ async fn archive_call_creates_record_and_deletes_ephemeral(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_call_preserves_soft_deleted_participants(
     pool: Pool<Postgres>,
@@ -810,7 +810,7 @@ async fn archive_call_preserves_soft_deleted_participants(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_call_returns_no_result_when_call_is_missing(
     pool: Pool<Postgres>,
@@ -830,21 +830,21 @@ pub(super) async fn give_user_a_team(
     user_id: &str,
     team_id: &Uuid,
 ) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
 
     sqlx::query(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, '')"#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(user_id)
     .bind(format!("{user_id}@test.com"))
     .execute(pool)
     .await?;
 
-    sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#)
+    sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#)
         .bind(user_id)
         .bind(format!("{user_id}@test.com"))
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .execute(pool)
         .await?;
 
@@ -883,7 +883,7 @@ pub(super) async fn team_entity_access_count(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_call_preserves_id_and_share_permission(
     pool: Pool<Postgres>,
@@ -920,7 +920,7 @@ async fn archive_call_preserves_id_and_share_permission(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_by_egress_id_returns_call_and_channel_context(
     pool: Pool<Postgres>,
@@ -935,7 +935,7 @@ async fn get_call_record_by_egress_id_returns_call_and_channel_context(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_by_egress_id_returns_none_for_unknown_id(
     pool: Pool<Postgres>,
@@ -954,7 +954,7 @@ async fn get_call_record_by_egress_id_returns_none_for_unknown_id(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn set_active_call_recording_key_updates_matching_call(
     pool: Pool<Postgres>,
@@ -1001,7 +1001,7 @@ async fn set_active_call_recording_key_updates_matching_call(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn set_active_call_recording_key_returns_false_when_no_match(
     pool: Pool<Postgres>,
@@ -1023,7 +1023,7 @@ async fn set_active_call_recording_key_returns_false_when_no_match(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn create_transcript_segment_stores_and_increments_sequence(
     pool: Pool<Postgres>,
@@ -1084,15 +1084,15 @@ async fn create_transcript_segment_stores_and_increments_sequence(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_transcript_voice_id_for_speaker_uses_diarized_speaker_id(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
     let now = Utc::now();
-    let voice_a = macro_uuid::generate_uuid_v7();
-    let voice_b = macro_uuid::generate_uuid_v7();
+    let voice_a = rox_uuid::generate_uuid_v7();
+    let voice_b = rox_uuid::generate_uuid_v7();
     insert_voice(&pool, voice_a, 0).await?;
     insert_voice(&pool, voice_b, 1).await?;
 
@@ -1144,14 +1144,14 @@ async fn get_transcript_voice_id_for_speaker_uses_diarized_speaker_id(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_transcript_voice_id_for_speaker_falls_back_to_participant_id(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
     let now = Utc::now();
-    let voice_id = macro_uuid::generate_uuid_v7();
+    let voice_id = rox_uuid::generate_uuid_v7();
     insert_voice(&pool, voice_id, 0).await?;
 
     let segment = TranscriptSegmentRequest {
@@ -1186,7 +1186,7 @@ async fn get_transcript_voice_id_for_speaker_falls_back_to_participant_id(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_call_copies_transcripts(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -1246,7 +1246,7 @@ async fn archive_call_copies_transcripts(pool: Pool<Postgres>) -> anyhow::Result
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_call_rolls_up_consecutive_same_speaker_transcripts(
     pool: Pool<Postgres>,
@@ -1369,20 +1369,20 @@ async fn archive_call_rolls_up_consecutive_same_speaker_transcripts(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_stable_speaker_voices_for_call_record_returns_all_voices_for_consistent_diarized_speakers(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
     let now = Utc::now();
-    let voice_a = macro_uuid::generate_uuid_v7();
-    let voice_b = macro_uuid::generate_uuid_v7();
+    let voice_a = rox_uuid::generate_uuid_v7();
+    let voice_b = rox_uuid::generate_uuid_v7();
     insert_voice(&pool, voice_a, 0).await?;
     insert_voice(&pool, voice_b, 1).await?;
-    insert_user_mapping(&pool, USER_A.deref(), MACRO_USER_A).await?;
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
-    insert_user_mapping(&pool, USER_C.deref(), MACRO_USER_C).await?;
+    insert_user_mapping(&pool, USER_A.deref(), ROX_USER_A).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
+    insert_user_mapping(&pool, USER_C.deref(), ROX_USER_C).await?;
 
     let segments = [
         // USER_A is stable: every row has the same non-null diarized speaker,
@@ -1449,7 +1449,7 @@ async fn get_stable_speaker_voices_for_call_record_returns_all_voices_for_consis
         .await?;
     stable.sort();
 
-    let mut expected = vec![(MACRO_USER_A, voice_a), (MACRO_USER_A, voice_b)];
+    let mut expected = vec![(ROX_USER_A, voice_a), (ROX_USER_A, voice_b)];
     expected.sort();
     assert_eq!(stable, expected);
     Ok(())
@@ -1459,7 +1459,7 @@ async fn get_stable_speaker_voices_for_call_record_returns_all_voices_for_consis
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_returns_active_call(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -1543,7 +1543,7 @@ async fn get_call_record_returns_active_call(pool: Pool<Postgres>) -> anyhow::Re
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_returns_archived_call(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -1581,7 +1581,7 @@ async fn get_call_record_returns_archived_call(pool: Pool<Postgres>) -> anyhow::
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_overrides_speaker_id_with_custom_speaker(
     pool: Pool<Postgres>,
@@ -1609,7 +1609,7 @@ async fn get_call_record_overrides_speaker_id_with_custom_speaker(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_returns_none_for_unknown(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -1622,7 +1622,7 @@ async fn get_call_record_returns_none_for_unknown(pool: Pool<Postgres>) -> anyho
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn batch_get_call_record_previews_mixes_active_archived_and_missing(
     pool: Pool<Postgres>,
@@ -1668,7 +1668,7 @@ async fn batch_get_call_record_previews_mixes_active_archived_and_missing(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn batch_get_call_record_previews_deduplicates_input(
     pool: Pool<Postgres>,
@@ -1700,7 +1700,7 @@ async fn batch_get_call_record_previews_deduplicates_input(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn batch_get_call_record_previews_empty_input_returns_empty(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -1714,7 +1714,7 @@ async fn batch_get_call_record_previews_empty_input_returns_empty(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_seeks_past_the_soup_cursor(
     pool: Pool<Postgres>,
@@ -1759,7 +1759,7 @@ async fn get_call_records_by_user_seeks_past_the_soup_cursor(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_includes_channel_member_not_in_call(
     pool: Pool<Postgres>,
@@ -1789,7 +1789,7 @@ async fn get_call_records_by_user_includes_channel_member_not_in_call(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_status_attended_for_participant(
     pool: Pool<Postgres>,
@@ -1811,7 +1811,7 @@ async fn get_call_records_by_user_status_attended_for_participant(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_status_missed_for_channel_nonparticipant(
     pool: Pool<Postgres>,
@@ -1833,7 +1833,7 @@ async fn get_call_records_by_user_status_missed_for_channel_nonparticipant(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_status_unattended_for_accessible_non_channel_nonparticipant(
     pool: Pool<Postgres>,
@@ -1855,7 +1855,7 @@ async fn get_call_records_by_user_status_unattended_for_accessible_non_channel_n
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_status_filters_return_exact_matches(
     pool: Pool<Postgres>,
@@ -1892,7 +1892,7 @@ async fn get_call_records_by_user_status_filters_return_exact_matches(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_status_legacy_attended_false_returns_not_participant_statuses(
     pool: Pool<Postgres>,
@@ -1916,7 +1916,7 @@ async fn get_call_records_by_user_status_legacy_attended_false_returns_not_parti
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_status_not_filter_complements_status(
     pool: Pool<Postgres>,
@@ -1939,7 +1939,7 @@ async fn get_call_records_by_user_status_not_filter_complements_status(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_attended_true_returns_only_joined(
     pool: Pool<Postgres>,
@@ -1968,7 +1968,7 @@ async fn get_call_records_by_user_attended_true_returns_only_joined(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_attended_false_returns_only_not_joined(
     pool: Pool<Postgres>,
@@ -1997,7 +1997,7 @@ async fn get_call_records_by_user_attended_false_returns_only_not_joined(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_attended_none_returns_all(
     pool: Pool<Postgres>,
@@ -2015,7 +2015,7 @@ async fn get_call_records_by_user_attended_none_returns_all(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_call_ids_filter_narrows_results(
     pool: Pool<Postgres>,
@@ -2057,7 +2057,7 @@ fn entity_ref_property_literal(definition_id: Uuid, entity_id: Uuid) -> CallLite
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_entity_ref_filter_matches_referencing_calls(
     pool: Pool<Postgres>,
@@ -2161,7 +2161,7 @@ async fn get_call_records_by_user_entity_ref_filter_matches_referencing_calls(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_records_by_user_returns_archived_summary(
     pool: Pool<Postgres>,
@@ -2201,7 +2201,7 @@ async fn get_call_records_by_user_returns_archived_summary(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn delete_call_record_cascades(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -2256,7 +2256,7 @@ async fn delete_call_record_cascades(pool: Pool<Postgres>) -> anyhow::Result<()>
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn delete_call_record_noop_for_unknown_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2442,7 +2442,7 @@ async fn concurrent_first_enable_writes_only_one_audit(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_sets_public_link_and_defaults_level_to_view(
     pool: Pool<Postgres>,
@@ -2474,7 +2474,7 @@ async fn patch_call_record_sets_public_link_and_defaults_level_to_view(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_sets_team_link_and_explicit_level(
     pool: Pool<Postgres>,
@@ -2506,7 +2506,7 @@ async fn patch_call_record_sets_team_link_and_explicit_level(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_explicit_null_disables_link_sharing(
     pool: Pool<Postgres>,
@@ -2544,7 +2544,7 @@ async fn patch_call_record_explicit_null_disables_link_sharing(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_level_only_update_updates_link_share_access_level(
     pool: Pool<Postgres>,
@@ -2580,7 +2580,7 @@ async fn patch_call_record_level_only_update_updates_link_share_access_level(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_adds_channel_share_permission(
     pool: Pool<Postgres>,
@@ -2644,7 +2644,7 @@ async fn patch_call_record_adds_channel_share_permission(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_removes_channel_share_permission(
     pool: Pool<Postgres>,
@@ -2704,7 +2704,7 @@ async fn patch_call_record_removes_channel_share_permission(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_empty_share_permission_update_is_noop(
     pool: Pool<Postgres>,
@@ -2739,7 +2739,7 @@ async fn patch_call_record_empty_share_permission_update_is_noop(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_sets_custom_name_on_archived_record(
     pool: Pool<Postgres>,
@@ -2776,7 +2776,7 @@ async fn patch_call_record_sets_custom_name_on_archived_record(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_custom_name_overwrites_existing(
     pool: Pool<Postgres>,
@@ -2815,7 +2815,7 @@ async fn patch_call_record_custom_name_overwrites_existing(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_custom_name_empty_string_clears_existing(
     pool: Pool<Postgres>,
@@ -2854,7 +2854,7 @@ async fn patch_call_record_custom_name_empty_string_clears_existing(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_record_custom_name_none_is_noop(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -2893,7 +2893,7 @@ async fn patch_call_record_custom_name_none_is_noop(pool: Pool<Postgres>) -> any
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn set_custom_name_if_null_writes_when_column_is_null(
     pool: Pool<Postgres>,
@@ -2917,7 +2917,7 @@ async fn set_custom_name_if_null_writes_when_column_is_null(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn set_custom_name_if_null_does_not_overwrite_existing_name(
     pool: Pool<Postgres>,
@@ -2949,7 +2949,7 @@ async fn set_custom_name_if_null_does_not_overwrite_existing_name(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn set_custom_name_if_null_noop_for_unknown_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -2966,7 +2966,7 @@ async fn set_custom_name_if_null_noop_for_unknown_id(pool: Pool<Postgres>) -> an
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn insert_call_summary_sets_summary_text(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -2988,7 +2988,7 @@ async fn insert_call_summary_sets_summary_text(pool: Pool<Postgres>) -> anyhow::
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn insert_call_summary_noop_for_unknown_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -3013,7 +3013,7 @@ async fn insert_call_summary_noop_for_unknown_id(pool: Pool<Postgres>) -> anyhow
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_participants_with_team_members_returns_distinct_users(
     pool: Pool<Postgres>,
@@ -3021,9 +3021,9 @@ async fn get_call_participants_with_team_members_returns_distinct_users(
     let repo = repo(pool.clone());
     let team_id = Uuid::from_u128(0x00000000_0000_0000_0000_00000000beef);
 
-    insert_user_mapping(&pool, USER_A.deref(), MACRO_USER_A).await?;
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
-    insert_user_mapping(&pool, USER_C.deref(), MACRO_USER_C).await?;
+    insert_user_mapping(&pool, USER_A.deref(), ROX_USER_A).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
+    insert_user_mapping(&pool, USER_C.deref(), ROX_USER_C).await?;
 
     sqlx::query!(
         r#"INSERT INTO team (id, name, owner_id) VALUES ($1, $2, $3)"#,
@@ -3081,7 +3081,7 @@ async fn insert_calendar_event_with_attendees(
     let link_id = Uuid::now_v7();
     sqlx::query(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, $1::text || '@example.com', 'GMAIL')
         "#,
     )
@@ -3121,7 +3121,7 @@ async fn insert_calendar_event_with_attendees(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_people_returns_participants_only_without_a_meeting(
     pool: Pool<Postgres>,
@@ -3140,7 +3140,7 @@ async fn get_call_record_people_returns_participants_only_without_a_meeting(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_people_skips_unparsable_participant_ids(
     pool: Pool<Postgres>,
@@ -3165,12 +3165,12 @@ async fn get_call_record_people_skips_unparsable_participant_ids(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_call_record_people_includes_meeting_owner_and_calendar_invitees(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_C.deref(), MACRO_USER_C).await?;
+    insert_user_mapping(&pool, USER_C.deref(), ROX_USER_C).await?;
     insert_user_mapping(&pool, USER_D.deref(), Uuid::now_v7()).await?;
     let meeting_id = Uuid::now_v7();
     sqlx::query(
@@ -3219,7 +3219,7 @@ async fn get_call_record_people_includes_meeting_owner_and_calendar_invitees(
     ] {
         let link_id = Uuid::now_v7();
         sqlx::query(
-            r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+            r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
                VALUES ($1, $2, $2, $1::text || '@example.com', 'GMAIL')"#,
         )
         .bind(link_id)
@@ -3304,7 +3304,7 @@ async fn get_call_record_people_includes_meeting_owner_and_calendar_invitees(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_enhanced_call_record_transcripts_returns_archived_rows(
     pool: Pool<Postgres>,
@@ -3338,7 +3338,7 @@ async fn get_enhanced_call_record_transcripts_returns_archived_rows(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_enhanced_call_record_transcripts_unknown_call_returns_empty(
     pool: Pool<Postgres>,
@@ -3357,7 +3357,7 @@ async fn get_enhanced_call_record_transcripts_unknown_call_returns_empty(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn overwrite_custom_speakers_sets_rows_by_transcript_id(
     pool: Pool<Postgres>,
@@ -3408,7 +3408,7 @@ async fn overwrite_custom_speakers_sets_rows_by_transcript_id(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn overwrite_custom_speakers_empty_is_noop(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -3429,7 +3429,7 @@ async fn overwrite_custom_speakers_empty_is_noop(pool: Pool<Postgres>) -> anyhow
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_transcript_custom_speakers_sets_and_clears(
     pool: Pool<Postgres>,
@@ -3475,7 +3475,7 @@ async fn patch_call_transcript_custom_speakers_sets_and_clears(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_transcript_custom_speakers_empty_is_noop(
     pool: Pool<Postgres>,
@@ -3496,7 +3496,7 @@ async fn patch_call_transcript_custom_speakers_empty_is_noop(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_call_transcript_custom_speakers_unknown_diarized_id_is_noop(
     pool: Pool<Postgres>,
@@ -3540,13 +3540,13 @@ fn standalone_meeting() -> crate::domain::meetings::Meeting {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn live_call_join_access_requires_membership_or_invitation(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
-    insert_user_mapping(&pool, USER_C.deref(), MACRO_USER_C).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
+    insert_user_mapping(&pool, USER_C.deref(), ROX_USER_C).await?;
     insert_user_mapping(&pool, USER_D.deref(), Uuid::now_v7()).await?;
     let repo = repo(pool);
 
@@ -3571,7 +3571,7 @@ async fn live_call_join_access_requires_membership_or_invitation(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn program_only_call_waits_for_last_person_departure(
     pool: Pool<Postgres>,
@@ -3596,12 +3596,12 @@ async fn program_only_call_waits_for_last_person_departure(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn standalone_meeting_archives_guest_names_and_preserves_invitation(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
     let repo = repo(pool);
     let meeting = repo.create_meeting(standalone_meeting()).await?;
     let (call, created) = repo
@@ -3655,12 +3655,12 @@ async fn standalone_meeting_archives_guest_names_and_preserves_invitation(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn guest_join_racing_archival_fails_instead_of_stranding_a_guest(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
     let repo = repo(pool);
     let meeting = repo.create_meeting(standalone_meeting()).await?;
     let (call, _) = repo
@@ -3683,12 +3683,12 @@ async fn guest_join_racing_archival_fails_instead_of_stranding_a_guest(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn concurrent_meeting_joins_allocate_exactly_one_session(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
     let repo = repo(pool);
     let meeting = repo.create_meeting(standalone_meeting()).await?;
     let first = Uuid::now_v7();
@@ -3706,12 +3706,12 @@ async fn concurrent_meeting_joins_allocate_exactly_one_session(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn meeting_cancellation_is_owner_only_and_revokes_join(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
     let repo = repo(pool);
     let meeting = repo.create_meeting(standalone_meeting()).await?;
     let request = || crate::domain::meetings::UpdateMeetingRequest {
@@ -3772,12 +3772,12 @@ async fn meeting_cancellation_is_owner_only_and_revokes_join(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_invitation_is_pinned_to_original_session(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
     let repo = repo(pool);
     let mut meeting = standalone_meeting();
     meeting.channel_id = Some(CH1);
@@ -3798,13 +3798,13 @@ async fn channel_invitation_is_pinned_to_original_session(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn authenticated_meeting_attendee_gets_only_call_access_and_owner_keeps_owner(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
-    let attendee = MacroUserIdStr::try_from_email("attendee@test.com")?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
+    let attendee = RoxUserIdStr::try_from_email("attendee@test.com")?;
     insert_user_mapping(&pool, &attendee, Uuid::now_v7()).await?;
     let repo = repo(pool.clone());
     let meeting = repo.create_meeting(standalone_meeting()).await?;
@@ -3837,7 +3837,7 @@ async fn authenticated_meeting_attendee_gets_only_call_access_and_owner_keeps_ow
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn standalone_archive_never_translates_pending_intent_into_team_memory(
     pool: Pool<Postgres>,
@@ -3878,14 +3878,14 @@ async fn standalone_archive_never_translates_pending_intent_into_team_memory(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn standalone_call_list_requires_individual_grants_live_and_archived(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     use entity_access_db_utils::{EntityAccessSourceType, EntityType, insert_entity_access_row};
 
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
     insert_user_mapping(&pool, USER_D.deref(), Uuid::now_v7()).await?;
     let team_id = Uuid::now_v7();
     give_user_a_team(&pool, USER_C.deref().as_ref(), &team_id).await?;
@@ -3945,20 +3945,20 @@ const DM_CHANNEL: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000d01)
 
 async fn insert_named_user(
     pool: &Pool<Postgres>,
-    user_id: &MacroUserIdStr<'_>,
-    macro_user_id: Uuid,
+    user_id: &RoxUserIdStr<'_>,
+    rox_user_id: Uuid,
     first_name: &str,
     last_name: &str,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(pool, user_id, macro_user_id).await?;
+    insert_user_mapping(pool, user_id, rox_user_id).await?;
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_info (macro_user_id, first_name, last_name)
+        INSERT INTO rox_user_info (rox_user_id, first_name, last_name)
         VALUES ($1, $2, $3)
-        ON CONFLICT (macro_user_id) DO UPDATE
+        ON CONFLICT (rox_user_id) DO UPDATE
         SET first_name = EXCLUDED.first_name, last_name = EXCLUDED.last_name
         "#,
-        macro_user_id,
+        rox_user_id,
         first_name,
         last_name,
     )
@@ -3970,7 +3970,7 @@ async fn insert_named_user(
 async fn insert_dm_channel(
     pool: &Pool<Postgres>,
     channel_id: Uuid,
-    participants: &[&MacroUserIdStr<'_>],
+    participants: &[&RoxUserIdStr<'_>],
 ) -> anyhow::Result<()> {
     sqlx::query!(
         r#"
@@ -3999,13 +3999,13 @@ async fn insert_dm_channel(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn resolve_channel_name_for_viewers_names_a_dm_after_the_other_participant(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_named_user(&pool, USER_A.deref(), MACRO_USER_A, "Jacob", "Beckerman").await?;
-    insert_named_user(&pool, USER_B.deref(), MACRO_USER_B, "Teo", "Nys").await?;
+    insert_named_user(&pool, USER_A.deref(), ROX_USER_A, "Jacob", "Beckerman").await?;
+    insert_named_user(&pool, USER_B.deref(), ROX_USER_B, "Teo", "Nys").await?;
     insert_dm_channel(&pool, DM_CHANNEL, &[USER_A.deref(), USER_B.deref()]).await?;
     let repo = repo(pool);
 
@@ -4033,7 +4033,7 @@ async fn resolve_channel_name_for_viewers_names_a_dm_after_the_other_participant
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn resolve_channel_name_for_viewers_uses_the_stored_name_for_every_viewer(
     pool: Pool<Postgres>,
@@ -4054,7 +4054,7 @@ async fn resolve_channel_name_for_viewers_uses_the_stored_name_for_every_viewer(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn resolve_channel_name_for_viewers_is_empty_for_unknown_channel_or_no_viewers(
     pool: Pool<Postgres>,
@@ -4073,12 +4073,12 @@ async fn resolve_channel_name_for_viewers_is_empty_for_unknown_channel_or_no_vie
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn meeting_schedule_rejects_partial_or_reversed_ranges(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
+    insert_user_mapping(&pool, USER_B.deref(), ROX_USER_B).await?;
     let repo = repo(pool);
     let start = chrono::Utc::now();
     let end = start + chrono::Duration::hours(1);
@@ -4097,7 +4097,7 @@ async fn meeting_schedule_rejects_partial_or_reversed_ranges(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attach_meeting_recording_survives_archival(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -4131,7 +4131,7 @@ async fn attach_meeting_recording_survives_archival(pool: Pool<Postgres>) -> any
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attach_meeting_recording_racing_archival_keeps_the_recording(
     pool: Pool<Postgres>,

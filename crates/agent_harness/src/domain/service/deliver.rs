@@ -463,7 +463,7 @@ where
         &self,
         session_id: AgentSessionId,
         action: &mut AgentAction,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
         announce: Option<&AnnounceOrigin>,
         context: Option<&TriggerContext>,
         first_turn: bool,
@@ -510,7 +510,7 @@ where
     pub(super) async fn authorize_prompt_origin(
         &self,
         origin: &AnnounceOrigin,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> Result<()> {
         let actor = actor.ok_or_else(|| {
             HarnessError::PromptContext(rootcause::report!(
@@ -529,7 +529,7 @@ where
         &self,
         session_id: AgentSessionId,
         action: &AgentAction,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
         announce: Option<AnnounceOrigin>,
         prompted_message_id: MessageId,
     ) -> Result<Option<SessionAnnouncement>> {
@@ -682,9 +682,9 @@ where
     pub(super) async fn resolve_announced_reply(
         &self,
         session_id: AgentSessionId,
-        message_id: Option<macro_uuid::Uuid>,
+        message_id: Option<rox_uuid::Uuid>,
         origin: Option<&AnnounceOrigin>,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
         outcome: ReplyOutcome,
         turn: agent_fold::domain::model::TurnId,
         segments: Vec<agent_fold::domain::model::ProjectedSegment>,

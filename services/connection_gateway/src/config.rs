@@ -1,7 +1,7 @@
 use anyhow::Context;
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::env_vars;
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::env_vars;
 use secretsmanager_client::LocalOrRemoteSecret;
 
 env_vars! {
@@ -16,24 +16,24 @@ env_vars! {
 /// populate the Docker container
 ///
 /// See `.env.sample` in cognitive-workspace root for details.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// The port the service is running on
-    #[macro_config_default(8080)]
+    #[rox_config_default(8080)]
     pub port: usize,
     /// The environment we are in
-    #[macro_config_default(Environment::new_or_prod())]
+    #[rox_config_default(Environment::new_or_prod())]
     pub environment: Environment,
     pub redis_host: RedisHost,
-    pub macro_db_url: LocalOrRemoteSecret<RoxDbUrl>,
+    pub rox_db_url: LocalOrRemoteSecret<RoxDbUrl>,
     /// The internal api key
     pub internal_api_key: InternalApiKey,
 }
 
 impl Config {
     pub fn from_env() -> anyhow::Result<Self> {
-        macro_config::ConfigLoader::load::<Config>()
+        rox_config::ConfigLoader::load::<Config>()
             .context("failed to load connection gateway config")
     }
 }

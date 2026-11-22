@@ -7,8 +7,8 @@ use channels::domain::{
     ports::ChannelService,
 };
 use entity_access::domain::{models::EntityType, ports::EntityAccessService};
-use macro_service_urls::AppServiceUrl;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_service_urls::AppServiceUrl;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MessageCommands,
     models::{MessageAttribution, PostMessage, PostMessageNotificationPolicy},
@@ -55,8 +55,8 @@ where
 {
     async fn post(
         &self,
-        sender: &MacroUserIdStr<'static>,
-        recipient: &MacroUserIdStr<'static>,
+        sender: &RoxUserIdStr<'static>,
+        recipient: &RoxUserIdStr<'static>,
         content: String,
     ) -> Result<(), rootcause::Report> {
         let channel = self
@@ -109,8 +109,8 @@ where
 {
     async fn deliver_request(
         &self,
-        sender: &MacroUserIdStr<'static>,
-        recipient: &MacroUserIdStr<'static>,
+        sender: &RoxUserIdStr<'static>,
+        recipient: &RoxUserIdStr<'static>,
         grant_id: Uuid,
     ) -> Result<(), rootcause::Report> {
         self.post(sender, recipient, card(grant_id)).await
@@ -118,8 +118,8 @@ where
 
     async fn deliver_approval(
         &self,
-        sender: &MacroUserIdStr<'static>,
-        recipient: &MacroUserIdStr<'static>,
+        sender: &RoxUserIdStr<'static>,
+        recipient: &RoxUserIdStr<'static>,
         grant_id: Uuid,
     ) -> Result<(), rootcause::Report> {
         let link = format!("{}/app/account-manager/{grant_id}", self.app_url.as_ref());

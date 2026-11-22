@@ -1,7 +1,7 @@
 //! Notion values in Rox's terms: document properties and task fields.
-//! Database columns and cells are `import_notion::domain::macro_cells`.
+//! Database columns and cells are `import_notion::domain::rox_cells`.
 
-use import_notion::domain::macro_cells::{PeopleMap, date, is_web_url, text};
+use import_notion::domain::rox_cells::{PeopleMap, date, is_web_url, text};
 use import_notion::domain::model::{NotionPage, NotionValue};
 
 use crate::domain::models::NotionTaskFields;

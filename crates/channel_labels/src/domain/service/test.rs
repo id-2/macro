@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::ChannelLabelsServiceImpl;
@@ -87,7 +87,7 @@ impl ChannelLabelsRepo for FakeRepo {
     async fn list_labels(
         &self,
         scope: &ChannelLabelsScope,
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
     ) -> Result<Vec<ChannelLabel>, Self::Err> {
         Ok(vec![label(
             scope.team_id().unwrap_or_default(),
@@ -99,7 +99,7 @@ impl ChannelLabelsRepo for FakeRepo {
         &self,
         scope: &ChannelLabelsScope,
         label_id: Uuid,
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
     ) -> Result<Option<ChannelLabel>, Self::Err> {
         let mut found = label(scope.team_id().unwrap_or_default(), "Reloaded");
         found.id = label_id;
@@ -113,7 +113,7 @@ impl ChannelLabelsRepo for FakeRepo {
         scope: &ChannelLabelsScope,
         name: &str,
         channel_ids: &[Uuid],
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
         rule: Option<&ChannelLabelRule>,
     ) -> Result<LabelWriteOutcome, Self::Err> {
         self.record(RepoCall::Create {
@@ -139,7 +139,7 @@ impl ChannelLabelsRepo for FakeRepo {
         scope: &ChannelLabelsScope,
         label_id: Uuid,
         name: &str,
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
         rule: Option<&ChannelLabelRule>,
     ) -> Result<LabelWriteOutcome, Self::Err> {
         let _ = rule;
@@ -158,7 +158,7 @@ impl ChannelLabelsRepo for FakeRepo {
         target: &ChannelLabelsScope,
         label_id: Uuid,
         name: &str,
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
         _rule: Option<&ChannelLabelRule>,
     ) -> Result<LabelWriteOutcome, Self::Err> {
         self.record(RepoCall::Transfer {
@@ -188,7 +188,7 @@ impl ChannelLabelsRepo for FakeRepo {
         _scope: &ChannelLabelsScope,
         channel_id: Uuid,
         label_id: Option<Uuid>,
-        _actor: &MacroUserIdStr<'_>,
+        _actor: &RoxUserIdStr<'_>,
     ) -> Result<SetChannelLabelOutcome, Self::Err> {
         self.record(RepoCall::SetChannelLabel {
             channel_id,
@@ -199,7 +199,7 @@ impl ChannelLabelsRepo for FakeRepo {
     async fn preview_smart_tag(
         &self,
         scope: &ChannelLabelsScope,
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
         _rule: &ChannelLabelRule,
         _limit: u16,
     ) -> Result<SmartTagPreview, Self::Err> {
@@ -455,7 +455,7 @@ async fn set_channel_label_maps_repo_outcomes() {
 
 #[tokio::test]
 async fn users_without_teams_create_private_labels() {
-    let actor = MacroUserIdStr::try_from(USER_ID.to_owned()).unwrap();
+    let actor = RoxUserIdStr::try_from(USER_ID.to_owned()).unwrap();
     let receipt = ChannelLabelsReceipt::from_access(actor.clone(), None, None).unwrap();
     let repo = FakeRepo::default();
     let service = ChannelLabelsServiceImpl::new(repo.clone());
@@ -480,8 +480,8 @@ async fn users_without_teams_create_private_labels() {
 
 #[test]
 fn cannot_use_another_users_team_receipt() {
-    let actor = MacroUserIdStr::try_from(USER_ID.to_owned()).unwrap();
-    let other = MacroUserIdStr::try_from("macro|other@rox.one".to_owned()).unwrap();
+    let actor = RoxUserIdStr::try_from(USER_ID.to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("macro|other@rox.one".to_owned()).unwrap();
     let access =
         entity_access::domain::models::EntityAccessReceipt::dangerously_assert_authenticated_user(
             other,
@@ -586,7 +586,7 @@ async fn rules_can_be_edited_only_on_existing_smart_tags() {
 #[test]
 fn explicit_scope_requires_verified_team_membership() {
     use crate::domain::models::ChannelLabelScopeSelection;
-    let actor = MacroUserIdStr::try_from(USER_ID.to_owned()).unwrap();
+    let actor = RoxUserIdStr::try_from(USER_ID.to_owned()).unwrap();
     assert!(matches!(
         ChannelLabelsReceipt::from_access(
             actor.clone(),
@@ -620,7 +620,7 @@ fn explicit_scope_requires_verified_team_membership() {
 #[tokio::test]
 async fn scope_transfer_uses_one_atomic_repo_call_and_checks_actor() {
     let (team_id, source) = receipt();
-    let actor = MacroUserIdStr::try_from(USER_ID.to_owned()).unwrap();
+    let actor = RoxUserIdStr::try_from(USER_ID.to_owned()).unwrap();
     let target = ChannelLabelsReceipt::from_access(actor, None, None).unwrap();
     let label_id = Uuid::now_v7();
     let repo = FakeRepo::default();
@@ -640,7 +640,7 @@ async fn scope_transfer_uses_one_atomic_repo_call_and_checks_actor() {
         }]
     );
     let other = ChannelLabelsReceipt::from_access(
-        MacroUserIdStr::try_from("macro|other@rox.one".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|other@rox.one".to_owned()).unwrap(),
         None,
         None,
     )

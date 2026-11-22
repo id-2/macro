@@ -2,8 +2,8 @@ use std::sync::Mutex;
 
 use axum::{body::Body, http::Request};
 use http_body_util::BodyExt;
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService, ValidatedCredential,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService, ValidatedCredential,
 };
 use model_user::UserContext;
 use rootcause::Report;
@@ -20,10 +20,10 @@ const VALID_JWT: &str = "valid";
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != VALID_JWT {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: REQUESTER.to_string(),
@@ -36,7 +36,7 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt).await.map(ValidatedCredential::session)
     }
 
@@ -44,8 +44,8 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -137,7 +137,7 @@ async fn post_availability(
 ) -> (StatusCode, serde_json::Value) {
     let router: Router = team_calendar_router(CalendarTeamRouterState::new(
         service,
-        MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     ));
     let response = router
         .oneshot(

@@ -4,7 +4,7 @@ use axum::{
     http::{Request, StatusCode, header},
     routing::get,
 };
-use macro_authorization::INTERNAL_API_KEY_HEADER;
+use rox_authorization::INTERNAL_API_KEY_HEADER;
 use tower::ServiceExt;
 
 use super::*;

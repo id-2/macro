@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO macro_user (id, username, email, stripe_customer_id, has_trialed)\n                       VALUES ($1, $2, $3, $4, false)",
+  "query": "INSERT INTO rox_user (id, username, email, stripe_customer_id, has_trialed)\n                       VALUES ($1, $2, $3, $4, false)",
   "describe": {
     "columns": [],
     "parameters": {

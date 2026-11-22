@@ -406,7 +406,7 @@ fn user_tool_from_meta(request: &CreateElicitationRequest) -> Option<(String, Va
     let user_tool = request
         .meta
         .as_ref()?
-        .get(crate::domain::harness::macro_inmem::NAMESPACE)?
+        .get(crate::domain::harness::rox_inmem::NAMESPACE)?
         .get("userTool")?;
     let name = user_tool.get("name")?.as_str()?.to_owned();
     let draft = user_tool.get("draft").cloned().unwrap_or(Value::Null);

@@ -1,11 +1,11 @@
 //! Confirmed tool execution -> PostgreSQL -> public booking HTTP API.
 use ai_toolset::RequestContext;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use std::sync::Arc;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").unwrap()
 }
 use ai_toolset::ToolSet;
 use calendar_scheduling::{
@@ -17,9 +17,9 @@ use calendar_scheduling::{
     outbound::postgres::PostgresRepository,
 };
 use chrono::{DateTime, Duration, Utc};
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
 use model_user::UserContext;
 use rootcause::Report;
@@ -32,25 +32,25 @@ const EMPTY_PUBLIC_SCHEMA: &str = "DROP SCHEMA public CASCADE; CREATE SCHEMA pub
 
 #[derive(Clone)]
 struct NoAuth;
-impl MacroAuthorizationService for NoAuth {
-    async fn authorize(&self, _: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+impl RoxAuthorizationService for NoAuth {
+    async fn authorize(&self, _: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
     async fn authorize_internal(
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 struct Members;
@@ -110,13 +110,13 @@ async fn confirmed_booking_is_saved_and_bookable_without_touching_other_links(po
         .unwrap();
     sqlx::raw_sql("CREATE TABLE \"User\" (id text PRIMARY KEY); CREATE TABLE team (id uuid PRIMARY KEY); INSERT INTO \"User\" VALUES ('macro|owner@rox.one');").execute(&pool).await.unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../macro_db_client/migrations/20260918164303_calendar_scheduling.sql"
+        "../../../rox_db_client/migrations/20260918164303_calendar_scheduling.sql"
     ))
     .execute(&pool)
     .await
     .unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../macro_db_client/migrations/20260918175703_scheduling_recovery.sql"
+        "../../../rox_db_client/migrations/20260918175703_scheduling_recovery.sql"
     ))
     .execute(&pool)
     .await
@@ -197,7 +197,7 @@ async fn confirmed_booking_is_saved_and_bookable_without_touching_other_links(po
     );
     let app: axum::Router = router(RouterState::new(
         service.clone(),
-        MacroAuthorizationState::new(Arc::new(NoAuth)),
+        RoxAuthorizationState::new(Arc::new(NoAuth)),
     ));
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let base = format!("http://{}", listener.local_addr().unwrap());

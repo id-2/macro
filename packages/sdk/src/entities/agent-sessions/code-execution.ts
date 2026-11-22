@@ -1,15 +1,15 @@
 import type { ExecutionRecord } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { AgentSession } from './agent-session';
 import { type CreateReviewOptions, SessionReview } from './review';
 import { presentView, type SessionView } from './view';
 
 /** A saved code execution belonging to one agent session. */
-export class CodeExecution extends MacroEntity<ExecutionRecord> {
+export class CodeExecution extends RoxEntity<ExecutionRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     id: string,
     private readonly parent: AgentSession,
   ) {
@@ -18,7 +18,7 @@ export class CodeExecution extends MacroEntity<ExecutionRecord> {
 
   /** Construct a lazy execution handle within its owning session. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     session: AgentSession,
     id: string,
   ): CodeExecution {

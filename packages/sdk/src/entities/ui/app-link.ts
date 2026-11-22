@@ -1,8 +1,8 @@
-import { MacroError } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 
 /** Hosts a Rox app link may name, besides the client's own web app. */
-const MACRO_HOSTS = ['rox.one', 'dev.rox.one', 'staging.rox.one'];
+const ROX_HOSTS = ['rox.one', 'dev.rox.one', 'staging.rox.one'];
 
 /**
  * A Rox app link, reduced to the app path it opens: a list view such as
@@ -12,7 +12,7 @@ const MACRO_HOSTS = ['rox.one', 'dev.rox.one', 'staging.rox.one'];
  */
 export class AppLink {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The path after `/app`, with its query, such as `/tasks?s0.tasks.tab=mine`. */
     readonly path: string,
   ) {}
@@ -21,18 +21,18 @@ export class AppLink {
    * Parse a Rox app link (`https://rox.one/app/...`). Throws on anything
    * else: another site, a path outside `/app`, or a link with a fragment.
    */
-  static parse(client: MacroClient, url: string): AppLink {
+  static parse(client: RoxClient, url: string): AppLink {
     let parsed: URL;
     try {
       parsed = new URL(url);
     } catch {
-      throw new MacroError(`Not a Rox app link: ${url}`);
+      throw new RoxError(`Not a Rox app link: ${url}`);
     }
 
     const own = new URL(client.webAppUrl);
     const ownHost = own.hostname;
     const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
-    const macroHost = host === ownHost || MACRO_HOSTS.includes(host);
+    const macroHost = host === ownHost || ROX_HOSTS.includes(host);
     const appPath =
       parsed.pathname === '/app' || parsed.pathname.startsWith('/app/');
     const secure =
@@ -42,7 +42,7 @@ export class AppLink {
         own.protocol === 'http:' &&
         host === ownHost);
     if (!macroHost || !appPath || !secure || parsed.hash !== '') {
-      throw new MacroError(`Not a Rox app link: ${url}`);
+      throw new RoxError(`Not a Rox app link: ${url}`);
     }
 
     const path = parsed.pathname.slice('/app'.length) || '/';

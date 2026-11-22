@@ -428,15 +428,15 @@ impl PgGithubPullRequestRepo {
 
     async fn github_user_ids_for_macro_user(
         &self,
-        macro_user_id: &str,
+        rox_user_id: &str,
     ) -> Result<Vec<String>, sqlx::Error> {
         sqlx::query_scalar!(
             r#"
             SELECT github_user_id
             FROM github_links
-            WHERE macro_id = $1
+            WHERE rox_id = $1
             "#,
-            macro_user_id,
+            rox_user_id,
         )
         .fetch_all(&self.pool)
         .await

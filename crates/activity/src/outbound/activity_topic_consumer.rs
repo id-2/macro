@@ -7,8 +7,8 @@
 use std::time::Duration;
 
 use kafka_util::{InitialOffset, KafkaEventConsumer, Ungrouped};
-use macro_event_broker::{
-    EventBrokerError, KafkaConsumerAdapter, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    EventBrokerError, KafkaConsumerAdapter, RoxEventCollection, RoxEventConsumerService,
 };
 use rdkafka::message::Message as _;
 use rootcause::prelude::{Report, ResultExt as _};
@@ -21,9 +21,9 @@ const TOPIC_METADATA_TIMEOUT: Duration = Duration::from_secs(10);
 
 type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredMacroEvent>;
 type ActivityEventConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
+    RoxEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: ActivityMacroEvent);
+rox_event_broker::declare_topics!(DeclaredMacroEvent: ActivityMacroEvent);
 
 /// Independent consumer of activity topic events.
 ///

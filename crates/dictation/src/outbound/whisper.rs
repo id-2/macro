@@ -11,7 +11,7 @@ use async_openai::{
     error::OpenAIError,
     types::audio::{AudioInput, AudioResponseFormat, CreateTranscriptionRequest},
 };
-use macro_env_var::{env_vars, maybe_env_vars};
+use rox_env_var::{env_vars, maybe_env_vars};
 use serde::Deserialize;
 use std::time::Duration;
 use tracing::instrument::WithSubscriber;

@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { type Browser, remote } from 'webdriverio';
 import type {} from './fixtures/links-browser';
 
-assert.equal(process.env.MACRO_E2E_NETNS, '1', 'Run through isolated run.sh');
+assert.equal(process.env.ROX_E2E_NETNS, '1', 'Run through isolated run.sh');
 const web = resolve(import.meta.dirname, '../..');
 const binaries = resolve(web, 'tauri/target/e2e');
 const artifacts = resolve(
@@ -20,7 +20,7 @@ await Bun.write(launchLog, '');
 // sending requests outside the isolated network namespace.
 await writeFile(
   resolve(launcherDirectory, 'xdg-open'),
-  '#!/bin/sh\nprintf "%s\\n" "$1" >> "$MACRO_LINK_TEST_LOG"\n',
+  '#!/bin/sh\nprintf "%s\\n" "$1" >> "$ROX_LINK_TEST_LOG"\n',
   { mode: 0o755 }
 );
 const bundle = await Bun.build({
@@ -63,7 +63,7 @@ const driver = Bun.spawn(
     env: {
       ...process.env,
       PATH: `${launcherDirectory}:${process.env.PATH}`,
-      MACRO_LINK_TEST_LOG: launchLog,
+      ROX_LINK_TEST_LOG: launchLog,
       WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS: '1',
       WEBKIT_DISABLE_DMABUF_RENDERER: '1',
       LIBGL_ALWAYS_SOFTWARE: '1',

@@ -1,16 +1,16 @@
 use crate::domain::ports::{ContactsBackfillOutboxRepo, ContactsRepository};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use sqlx::types::Uuid;
 
 use super::DbContactsRepository;
 
-fn mid(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_owned()).unwrap()
+fn mid(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_owned()).unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_connections_basic(pool: PgPool) -> sqlx::Result<()> {
     let user1 = "macro|a@test.com";
     let user2 = "macro|b@test.com";
@@ -26,7 +26,7 @@ async fn test_create_connections_basic(pool: PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_connections_ordering(pool: PgPool) -> sqlx::Result<()> {
     let user1 = "macro|a@test.com";
     let user2 = "macro|b@test.com";
@@ -42,7 +42,7 @@ async fn test_create_connections_ordering(pool: PgPool) -> sqlx::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_connections_deduplicates_and_ignores_self_edges(
     pool: PgPool,
 ) -> sqlx::Result<()> {
@@ -67,7 +67,7 @@ async fn test_create_connections_deduplicates_and_ignores_self_edges(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("user_list"))
 )]
 async fn test_get_contacts(pool: PgPool) -> sqlx::Result<()> {
@@ -78,7 +78,7 @@ async fn test_get_contacts(pool: PgPool) -> sqlx::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("both_sides"))
 )]
 async fn test_get_contacts_reads_both_columns_once(pool: PgPool) -> sqlx::Result<()> {
@@ -103,9 +103,9 @@ async fn test_get_contacts_reads_both_columns_once(pool: PgPool) -> sqlx::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_connections_batch(pool: PgPool) -> sqlx::Result<()> {
-    let connections: Vec<(MacroUserIdStr<'static>, MacroUserIdStr<'static>)> = (0..8)
+    let connections: Vec<(RoxUserIdStr<'static>, RoxUserIdStr<'static>)> = (0..8)
         .map(|i| {
             (
                 mid("macro|user0@test.com"),
@@ -145,7 +145,7 @@ async fn insert_channel(pool: &PgPool, id: Uuid) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_unapplied_messages_returns_inserted_rows(pool: PgPool) -> sqlx::Result<()> {
     let channel_id = Uuid::new_v4();
     insert_channel(&pool, channel_id).await;
@@ -173,7 +173,7 @@ async fn test_get_unapplied_messages_returns_inserted_rows(pool: PgPool) -> sqlx
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_unapplied_messages_excludes_applied(pool: PgPool) -> sqlx::Result<()> {
     let unapplied_id = Uuid::new_v4();
     let applied_id = Uuid::new_v4();

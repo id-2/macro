@@ -13,10 +13,10 @@ const tags = {
 
 export const coparse_api_vpc = get_coparse_api_vpc();
 
-const MACRO_DB_URL_SECRET_NAME = config.require(`macro_db_secret_key`);
-const MACRO_DB_URL = aws.secretsmanager
+const ROX_DB_URL_SECRET_NAME = config.require(`rox_db_secret_key`);
+const ROX_DB_URL = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: MACRO_DB_URL_SECRET_NAME,
+    secretId: ROX_DB_URL_SECRET_NAME,
   })
   .apply((secret) => secret.secretString);
 
@@ -35,9 +35,9 @@ const emailSfsDeleteHandler = new EmailSfsDeleteHandler(
     queueArns: [sfsDeleteQueueArn],
     vpc: coparse_api_vpc,
     envVars: {
-      DATABASE_URL: pulumi.interpolate`${MACRO_DB_URL}`,
+      DATABASE_URL: pulumi.interpolate`${ROX_DB_URL}`,
       ENVIRONMENT: stack,
-      RUST_LOG: 'email_sfs_delete_handler=info,macro_http_request=info',
+      RUST_LOG: 'email_sfs_delete_handler=info,rox_http_request=info',
     },
     tags,
   }

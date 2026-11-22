@@ -1,11 +1,11 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const USER: &str = "macro|owner@example.com";
 
 fn connection(app_slug: &str) -> PipedreamConnection {
     PipedreamConnection {
-        user_id: MacroUserIdStr::parse_from_str(USER).unwrap().into_owned(),
+        user_id: RoxUserIdStr::parse_from_str(USER).unwrap().into_owned(),
         app_slug: app_slug.to_owned(),
         server_name: app_slug.to_owned(),
         account_id: format!("apn_{app_slug}"),
@@ -18,7 +18,7 @@ fn connection(app_slug: &str) -> PipedreamConnection {
 /// row for an overlaid app is invisible to every read, so no consumer can
 /// reach the app through Pipedream.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("users"))
 )]
 async fn reads_never_return_connections_to_overlaid_apps(pool: PgPool) {
@@ -61,7 +61,7 @@ async fn reads_never_return_connections_to_overlaid_apps(pool: PgPool) {
 /// Overlays hide Pipedream grants, not Connect's: a user on Connect alone
 /// gets `sentry` through their Connect row.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("users"))
 )]
 async fn reads_return_connect_connections_to_overlaid_apps(pool: PgPool) {
@@ -80,7 +80,7 @@ async fn reads_return_connect_connections_to_overlaid_apps(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("users"))
 )]
 async fn connections_are_deleted_with_their_user(pool: PgPool) {
@@ -100,7 +100,7 @@ async fn connections_are_deleted_with_their_user(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("users"))
 )]
 async fn connections_follow_a_renamed_user(pool: PgPool) {
@@ -116,7 +116,7 @@ async fn connections_follow_a_renamed_user(pool: PgPool) {
     assert_eq!(listed[0].user_id.as_ref(), renamed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn connections_require_an_existing_user(pool: PgPool) {
     let repo = PgConnectionRepo::new(pool);
     assert!(repo.save(&connection("granola")).await.is_err());
@@ -125,7 +125,7 @@ async fn connections_require_an_existing_user(pool: PgPool) {
 /// Rows written before the provider column, and by services that predate
 /// it, are Pipedream's; a Connect row round-trips its provider.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("users"))
 )]
 async fn provider_defaults_to_pipedream_and_round_trips_connect(pool: PgPool) {

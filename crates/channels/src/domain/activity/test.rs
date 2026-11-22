@@ -3,10 +3,10 @@ use ::activity::Actor;
 use ::activity::EntityType;
 use bot_id::BotId;
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 
 use super::*;
 use crate::domain::broker_events::{
@@ -15,8 +15,8 @@ use crate::domain::broker_events::{
 use crate::domain::models::ChannelType;
 use messages::domain::events::MessagePostedMetadata;
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn envelope(event: ChannelTopicEvent) -> Event<ChannelTopicEvent> {
@@ -232,7 +232,7 @@ fn created_maps_to_created_by_the_actor() {
 fn created_by_system_stays_on_the_owner_feed() {
     let event = envelope(ChannelTopicEvent::Created(ChannelCreatedMetadata {
         channel_id: CHANNEL_ID,
-        actor: Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID),
+        actor: Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
         on_behalf_of: Some(user("macro|owner@example.com")),
         channel_type: ChannelType::Private,
         channel_name: Some("Macro Support x owner".to_string()),
@@ -245,7 +245,7 @@ fn created_by_system_stays_on_the_owner_feed() {
     assert_eq!(activities[0].action, Action::Created);
     assert_eq!(
         activities[0].actor.as_ref(),
-        Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID).as_ref()
+        Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID).as_ref()
     );
     assert_eq!(activities[0].subject_id, "macro|owner@example.com");
 }

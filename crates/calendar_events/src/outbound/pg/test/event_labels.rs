@@ -58,7 +58,7 @@ fn copy(
     upsert
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn labels_say_whose_calendar_each_stored_event_is_on(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let link_id = insert_link(&pool, OWNER).await;
@@ -160,7 +160,7 @@ async fn labels_say_whose_calendar_each_stored_event_is_on(pool: PgPool) {
     assert_eq!(labels[&ids[3]].role, Some(EventRole::Guest));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_availability_setting_decides_the_schedule_label(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let link_id = insert_link(&pool, OWNER).await;
@@ -219,7 +219,7 @@ async fn set_availability(pool: &PgPool, calendar_id: Uuid, counts: bool) {
 }
 
 /// A hit the requester reads through a channel is someone else's copy.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_users_copy_says_nothing_about_the_requester(pool: PgPool) {
     let sharer = "macro|event-labels-sharer@example.com";
     let sharer_link = insert_link(&pool, sharer).await;

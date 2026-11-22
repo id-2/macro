@@ -4,8 +4,8 @@ use notification::domain::models::apple::{
     APNSPushNotification, Alert, AlertDictionary, PushNotificationData,
 };
 
-fn uid(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(value).unwrap().into_owned()
+fn uid(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(value).unwrap().into_owned()
 }
 
 fn utc_datetime(value: &str) -> DateTime<Utc> {

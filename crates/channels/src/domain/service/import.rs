@@ -7,7 +7,7 @@ use crate::domain::{
     models::{ChannelType, Sender},
     ports::{ChannelEventDispatcher, ChannelMutationErr, ChannelRepo, HistoricalChannelRepo},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashSet;
 use uuid::Uuid;
 
@@ -21,11 +21,11 @@ where
     /// Only initial creation emits the ordinary channel-created event.
     pub async fn create_reserved_team_channel(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         id: Uuid,
         team_id: Uuid,
         name: String,
-        mut participants: HashSet<MacroUserIdStr<'static>>,
+        mut participants: HashSet<RoxUserIdStr<'static>>,
     ) -> Result<EnsuredChannel, ChannelMutationErr> {
         let has_team = self
             .repo

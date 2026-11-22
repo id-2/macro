@@ -3,7 +3,7 @@ use entity_access::domain::{
     models::{AccessError, EntityType},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashSet;
 
 /// Uses the existing access service to mint fresh view capabilities for delivery.
@@ -26,7 +26,7 @@ impl<A: EntityAccessService> MessageAudienceAccess for EntityAccessMessageAudien
         };
         let mut viewers = HashSet::new();
         for candidate in candidates {
-            let Ok(user) = MacroUserIdStr::try_from(candidate.clone()) else {
+            let Ok(user) = RoxUserIdStr::try_from(candidate.clone()) else {
                 continue;
             };
             // No organization is asserted on behalf of a recipient. The access

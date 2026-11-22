@@ -3,17 +3,17 @@ use crate::domain::models::{
 };
 use calendar_events::domain::models::GoogleScopeSet;
 use chrono::{DateTime, Utc};
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use super::db_types::{DbLink, DbUserProvider};
 
-#[tracing::instrument(err, skip(pool, macro_id))]
-pub(super) async fn link_by_fusionauth_and_macro_id(
+#[tracing::instrument(err, skip(pool, rox_id))]
+pub(super) async fn link_by_fusionauth_and_rox_id(
     pool: &PgPool,
     fusionauth_user_id: &str,
-    macro_id: MacroUserIdStr<'_>,
+    rox_id: RoxUserIdStr<'_>,
     provider: UserProvider,
 ) -> Result<Option<Link>, sqlx::Error> {
     let provider: DbUserProvider = match provider {
@@ -25,14 +25,14 @@ pub(super) async fn link_by_fusionauth_and_macro_id(
     let db_link = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id, macro_id, fusionauth_user_id, email_address, provider as "provider: _",
+        SELECT id, rox_id, fusionauth_user_id, email_address, provider as "provider: _",
                is_sync_active, is_primary, created_at, updated_at
         FROM email_links
-        WHERE fusionauth_user_id = $1 AND macro_id = $2 AND provider = $3
+        WHERE fusionauth_user_id = $1 AND rox_id = $2 AND provider = $3
         LIMIT 1
         "#,
         fusionauth_user_id,
-        macro_id.as_ref(),
+        rox_id.as_ref(),
         provider as _
     )
     .fetch_optional(pool)
@@ -60,7 +60,7 @@ pub(super) async fn link_by_fusionauth_email_provider(
     let db_link = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id, macro_id, fusionauth_user_id, email_address, provider as "provider: _",
+        SELECT id, rox_id, fusionauth_user_id, email_address, provider as "provider: _",
                is_sync_active, is_primary, created_at, updated_at
         FROM email_links
         WHERE fusionauth_user_id = $1 AND email_address = $2 AND provider = $3
@@ -79,30 +79,30 @@ pub(super) async fn link_by_fusionauth_email_provider(
         .map_err(|e| sqlx::Error::Decode(Box::new(e)))
 }
 
-#[tracing::instrument(err, skip(pool, macro_id))]
+#[tracing::instrument(err, skip(pool, rox_id))]
 pub(super) async fn owned_link_for_thread(
     pool: &PgPool,
     thread_id: Uuid,
-    macro_id: MacroUserIdStr<'_>,
+    rox_id: RoxUserIdStr<'_>,
 ) -> Result<Option<Link>, sqlx::Error> {
     let db_link: Option<DbLink> = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT l.id, l.macro_id, l.fusionauth_user_id, l.email_address, l.provider as "provider: _",
+        SELECT l.id, l.rox_id, l.fusionauth_user_id, l.email_address, l.provider as "provider: _",
                l.is_sync_active, l.is_primary, l.created_at, l.updated_at
         FROM email_threads t
         JOIN email_links l ON l.id = t.link_id
         WHERE t.id = $1
           AND (
-              l.macro_id = $2
+              l.rox_id = $2
               OR EXISTS (
-                  SELECT 1 FROM macro_user_links mul
-                  WHERE mul.link_id = l.id AND mul.primary_macro_id = $2
+                  SELECT 1 FROM rox_user_links mul
+                  WHERE mul.link_id = l.id AND mul.primary_rox_id = $2
               )
           )
         "#,
         thread_id,
-        macro_id.as_ref()
+        rox_id.as_ref()
     )
     .fetch_optional(pool)
     .await?;
@@ -113,15 +113,15 @@ pub(super) async fn owned_link_for_thread(
         .map_err(|e| sqlx::Error::Decode(Box::new(e)))
 }
 
-#[tracing::instrument(err, skip(pool, macro_id))]
-pub(super) async fn inboxes_for_macro_id(
+#[tracing::instrument(err, skip(pool, rox_id))]
+pub(super) async fn inboxes_for_rox_id(
     pool: &PgPool,
-    macro_id: MacroUserIdStr<'_>,
+    rox_id: RoxUserIdStr<'_>,
 ) -> Result<Vec<Link>, sqlx::Error> {
     let db_links: Vec<DbLink> = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id as "id!", macro_id as "macro_id!",
+        SELECT id as "id!", rox_id as "rox_id!",
                fusionauth_user_id as "fusionauth_user_id!",
                email_address as "email_address!",
                provider as "provider!: _",
@@ -130,20 +130,20 @@ pub(super) async fn inboxes_for_macro_id(
                created_at as "created_at!",
                updated_at as "updated_at!"
         FROM (
-            SELECT el.id, el.macro_id, el.fusionauth_user_id, el.email_address,
+            SELECT el.id, el.rox_id, el.fusionauth_user_id, el.email_address,
                    el.provider, el.is_sync_active, el.is_primary, el.created_at, el.updated_at
             FROM email_links el
-            WHERE el.macro_id = $1
+            WHERE el.rox_id = $1
             UNION
-            SELECT el.id, el.macro_id, el.fusionauth_user_id, el.email_address,
+            SELECT el.id, el.rox_id, el.fusionauth_user_id, el.email_address,
                    el.provider, el.is_sync_active, el.is_primary, el.created_at, el.updated_at
             FROM email_links el
-            JOIN macro_user_links mul ON el.id = mul.link_id
-            WHERE mul.primary_macro_id = $1
+            JOIN rox_user_links mul ON el.id = mul.link_id
+            WHERE mul.primary_rox_id = $1
         ) AS combined
         ORDER BY created_at DESC
         "#,
-        macro_id.as_ref()
+        rox_id.as_ref()
     )
     .fetch_all(pool)
     .await?;
@@ -178,7 +178,7 @@ struct DbInboxDetailsRow {
     /// Stable email link identifier.
     id: Uuid,
     /// Rox user that owns the link.
-    macro_id: String,
+    rox_id: String,
     /// Provider email address.
     email_address: String,
     /// Email provider.
@@ -211,10 +211,10 @@ struct DbInboxDetailsRow {
 
 impl DbInboxDetailsRow {
     /// Convert the database projection into domain-owned persisted facts.
-    fn try_into_model(self) -> Result<EmailInboxDetails, macro_user_id::error::ParseErr> {
+    fn try_into_model(self) -> Result<EmailInboxDetails, rox_user_id::error::ParseErr> {
         Ok(EmailInboxDetails {
             id: self.id,
-            macro_id: MacroUserIdStr::try_from(self.macro_id)?,
+            rox_id: RoxUserIdStr::try_from(self.rox_id)?,
             email_address: EmailStr::try_from(self.email_address)?,
             photo_url: self.photo_url,
             provider: match self.provider {
@@ -248,15 +248,15 @@ impl DbInboxDetailsRow {
 
 /// Fetch and map the enriched, user-scoped inbox details used by inbound
 /// email catalog adapters.
-#[tracing::instrument(err, skip(pool, macro_id))]
-pub(super) async fn inbox_details_for_macro_id(
+#[tracing::instrument(err, skip(pool, rox_id))]
+pub(super) async fn inbox_details_for_rox_id(
     pool: &PgPool,
-    macro_id: &MacroUserIdStr<'_>,
+    rox_id: &RoxUserIdStr<'_>,
 ) -> Result<Vec<EmailInboxDetails>, sqlx::Error> {
     let rows = sqlx::query_as!(
         DbInboxDetailsRow,
         r#"
-        SELECT l.id as "id!", l.macro_id as "macro_id!",
+        SELECT l.id as "id!", l.rox_id as "rox_id!",
                l.email_address as "email_address!",
                l.provider as "provider!: _",
                l.is_sync_active as "is_sync_active!",
@@ -281,18 +281,18 @@ pub(super) async fn inbox_details_for_macro_id(
                    SELECT 1 FROM calendar_accounts ca WHERE ca.email_link_id = l.id
                ) AS "has_calendar_data!"
         FROM (
-            SELECT el.id, el.macro_id, el.email_address, el.provider,
+            SELECT el.id, el.rox_id, el.email_address, el.provider,
                    el.is_sync_active, el.needs_reauth, el.is_primary,
                    el.created_at, el.updated_at, el.sync_generation
             FROM email_links el
-            WHERE el.macro_id = $1
+            WHERE el.rox_id = $1
             UNION
-            SELECT el.id, el.macro_id, el.email_address, el.provider,
+            SELECT el.id, el.rox_id, el.email_address, el.provider,
                    el.is_sync_active, el.needs_reauth, el.is_primary,
                    el.created_at, el.updated_at, el.sync_generation
             FROM email_links el
-            JOIN macro_user_links mul ON el.id = mul.link_id
-            WHERE mul.primary_macro_id = $1
+            JOIN rox_user_links mul ON el.id = mul.link_id
+            WHERE mul.primary_rox_id = $1
         ) l
         LEFT JOIN email_link_google_scopes g ON g.link_id = l.id
         LEFT JOIN email_settings s ON s.link_id = l.id
@@ -306,7 +306,7 @@ pub(super) async fn inbox_details_for_macro_id(
             ON c.link_id = l.id AND LOWER(c.email_address) = LOWER(l.email_address)
         ORDER BY l.created_at DESC
         "#,
-        macro_id.as_ref()
+        rox_id.as_ref()
     )
     .fetch_all(pool)
     .await?;

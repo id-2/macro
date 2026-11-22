@@ -29,11 +29,11 @@ impl CalendarEventJoinRequestMetadata {
     }
 }
 impl NotificationTitle for CalendarEventJoinRequestMetadata {
-    fn format_title(&self, sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_title(&self, sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         let sender = comment_sender_label(sender, None);
         Ok(format!("{sender} asked to join {}", self.display_title()))
     }
-    fn format_body(&self, _sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_body(&self, _sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         Ok(self.display_title().to_string())
     }
 }
@@ -46,7 +46,7 @@ impl NotificationExtIos for CalendarEventJoinRequestMetadata {
     }
     fn as_apns<'a>(
         &self,
-        sender: Option<MacroUserIdStr<'a>>,
+        sender: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {

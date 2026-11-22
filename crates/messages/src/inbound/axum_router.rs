@@ -10,9 +10,9 @@ use entity_access::domain::{
     models::{EntityAccessReceipt, EntityType, RequiredPermission},
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    AnyPrincipal, CredentialOrigin, MacroAuthorization, MacroAuthorizationExtractor,
-    MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, CredentialOrigin, RoxAuthorization, RoxAuthorizationExtractor,
+    RoxAuthorizationService, RoxAuthorizationState,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -25,7 +25,7 @@ pub struct MessagesRouterState<A, Auth> {
     /// Existing parent access boundary.
     pub access: Arc<A>,
     /// Authentication state.
-    pub authorization: MacroAuthorizationState<Auth>,
+    pub authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<A, Auth> Clone for MessagesRouterState<A, Auth> {
@@ -38,7 +38,7 @@ impl<A, Auth> Clone for MessagesRouterState<A, Auth> {
     }
 }
 
-impl<A, Auth> FromRef<MessagesRouterState<A, Auth>> for MacroAuthorizationState<Auth> {
+impl<A, Auth> FromRef<MessagesRouterState<A, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &MessagesRouterState<A, Auth>) -> Self {
         state.authorization.clone()
     }
@@ -48,7 +48,7 @@ impl<A, Auth> FromRef<MessagesRouterState<A, Auth>> for MacroAuthorizationState<
 pub fn router<A, Auth, S>(state: MessagesRouterState<A, Auth>) -> Router<S>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService + Send + Sync + 'static,
+    Auth: RoxAuthorizationService + Send + Sync + 'static,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -104,9 +104,9 @@ impl TimelineQuery {
 
 #[utoipa::path(operation_id = "message_timeline", get, path = "/messages/{parent_type}/{parent_id}", params(("parent_type" = String, Path), ("parent_id" = String, Path), TimelineQuery), responses((status = 200, body = MessagePage)))]
 /// Read a bounded timeline with lazy thread previews.
-pub async fn timeline<A: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn timeline<A: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Query(query): Query<TimelineQuery>,
 ) -> Result<Json<MessagePage>, MessageHttpError> {
@@ -121,9 +121,9 @@ pub async fn timeline<A: EntityAccessService, Auth: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "message_timeline_entries", get, path = "/messages/{parent_type}/{parent_id}/timeline", params(("parent_type" = String, Path), ("parent_id" = String, Path), TimelineQuery), responses((status = 200, body = MessageTimelinePage)))]
 /// Read a bounded window of messages and the parent's activity, ordered by the server.
-pub async fn timeline_entries<A: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn timeline_entries<A: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Query(query): Query<TimelineQuery>,
 ) -> Result<Json<MessageTimelinePage>, MessageHttpError> {
@@ -177,9 +177,9 @@ impl IntoResponse for MessageHttpError {
     }
 }
 
-async fn receipt<P: RequiredPermission, A: EntityAccessService, Auth: MacroAuthorizationService>(
+async fn receipt<P: RequiredPermission, A: EntityAccessService, Auth: RoxAuthorizationService>(
     access: &A,
-    user: &MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: &RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     path: &ParentPath,
 ) -> Result<EntityAccessReceipt<P>, MessageHttpError> {
     receipt_with_sender(access, user, path, false).await
@@ -188,10 +188,10 @@ async fn receipt<P: RequiredPermission, A: EntityAccessService, Auth: MacroAutho
 async fn receipt_with_sender<
     P: RequiredPermission,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: &A,
-    user: &MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: &RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     path: &ParentPath,
     as_sender: bool,
 ) -> Result<EntityAccessReceipt<P>, MessageHttpError> {
@@ -238,13 +238,13 @@ fn path_id(path: &ParentPath) -> Result<Uuid, MessageHttpError> {
 /// Create a root message or reply.
 pub async fn create<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Json(mut input): Json<PostMessage>,
 ) -> Result<Json<Message>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     input.attribution = sender_attribution(&user.authorization);
     Ok(Json(
@@ -261,8 +261,8 @@ where
 /// How a new message's signed agent attribution labels it: with the client a
 /// user drives the agent through, when the credential names one.
 /// Only a user credential carries one; it is set only alongside `agent_id`.
-pub fn sender_attribution(principal: &MacroAuthorization) -> MessageAttribution {
-    if let MacroAuthorization::User(user) = principal
+pub fn sender_attribution(principal: &RoxAuthorization) -> MessageAttribution {
+    if let RoxAuthorization::User(user) = principal
         && let CredentialOrigin::AccountManager(credential) = &user.origin
     {
         return MessageAttribution::AccountManager {
@@ -271,10 +271,10 @@ pub fn sender_attribution(principal: &MacroAuthorization) -> MessageAttribution 
     }
 
     let via = match principal {
-        MacroAuthorization::User(user) => user.agent_via.as_ref(),
-        MacroAuthorization::Bot(_)
-        | MacroAuthorization::Harness(_)
-        | MacroAuthorization::Internal(_) => None,
+        RoxAuthorization::User(user) => user.agent_via.as_ref(),
+        RoxAuthorization::Bot(_)
+        | RoxAuthorization::Harness(_)
+        | RoxAuthorization::Internal(_) => None,
     };
     match via {
         Some(client) => MessageAttribution::ActingUserVia {
@@ -288,12 +288,12 @@ pub fn sender_attribution(principal: &MacroAuthorization) -> MessageAttribution 
 /// Resolve a message within its parent.
 pub async fn get_message<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
 ) -> Result<Json<Message>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -310,13 +310,13 @@ where
 /// Edit an owned message.
 pub async fn edit<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Json(input): Json<MessagePatch>,
 ) -> Result<Json<Message>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -341,13 +341,13 @@ pub struct NonceQuery {
 /// Tombstone one message; deleting a discussion's root deletes the discussion.
 pub async fn delete_message<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Query(query): Query<NonceQuery>,
 ) -> Result<Json<Message>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -376,13 +376,13 @@ pub struct ReactionInput {
 /// Change the caller's reaction.
 pub async fn react<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Json(input): Json<ReactionInput>,
 ) -> Result<Json<Message>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -402,12 +402,12 @@ where
 /// Open a specific discussion from a link or annotation.
 pub async fn get_thread<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
 ) -> Result<Json<MessageThread>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -435,13 +435,13 @@ pub struct TypingInput {
 /// Broadcast typing within an authorized discussion.
 pub async fn typing<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Json(input): Json<TypingInput>,
 ) -> Result<StatusCode, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service
@@ -459,13 +459,13 @@ where
 /// Update a discussion's lifecycle and placement.
 pub async fn patch_thread<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Json(input): Json<ThreadPatch>,
 ) -> Result<Json<ThreadState>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -483,13 +483,13 @@ where
 /// Explicitly remove a discussion.
 pub async fn delete_thread<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Query(query): Query<NonceQuery>,
 ) -> Result<Json<ThreadState>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -515,13 +515,13 @@ pub struct LegacyQuery {
 /// Resolve an old link under current parent permissions.
 pub async fn legacy<A, Auth>(
     State(state): State<MessagesRouterState<A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    user: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<ParentPath>,
     Query(query): Query<LegacyQuery>,
 ) -> Result<Json<Message>, MessageHttpError>
 where
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let id = path
         .legacy_id

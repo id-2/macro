@@ -7,7 +7,7 @@ import type {
   TableVersion,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { DatabaseColumn } from './column';
 import type { Database } from './database';
 import { DatabaseRow } from './row';
@@ -101,7 +101,7 @@ export interface DatabaseQueryResult {
 
 /** @internal Execute through the generated client and hydrate resource references. */
 export async function queryDatabases(
-  client: MacroClient,
+  client: RoxClient,
   databaseById: typeof Database.byId,
   sql: string,
   options: DatabaseQueryOptions = {},

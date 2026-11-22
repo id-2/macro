@@ -23,7 +23,7 @@ defining the sync service's domain ports and an axum router shim, used by
 
 ## Boundaries
 
-- Depends on: `macro_authorization` (feature `inbound`).
+- Depends on: `rox_authorization` (feature `inbound`).
 - Used by: `services/document_storage_service`, `crates/sync_service_client`.
 
 ## Checks

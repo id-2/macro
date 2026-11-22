@@ -23,7 +23,7 @@ A struct that implements `AttachmentService`:
 pub trait AttachmentService: Send + Sync + 'static {
     fn resolve_attachments(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&str]>,
     ) -> impl Future<Output = Attachments> + Send;
 }
@@ -101,7 +101,7 @@ pub struct FooAttachmentService<Svc> {
 impl<Svc: FooService> AttachmentService for FooAttachmentService<Svc> {
     async fn resolve_attachments(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&str]>,
     ) -> Attachments {
         let user_id = &user_id;

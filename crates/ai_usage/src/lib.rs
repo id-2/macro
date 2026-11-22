@@ -39,7 +39,7 @@ pub use domain::{
     UsageService, UsageSummary, normalize_model_id,
 };
 
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use std::sync::Arc;
 
 /// Construct the owning-domain observational journal, without financial adapters.

@@ -10,11 +10,11 @@ use uuid::{Uuid, uuid};
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
     fixtures(path = ".", scripts("project")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn tasks_group_by_their_project_property(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let owner = sqlx::query_scalar!(
@@ -22,7 +22,7 @@ async fn tasks_group_by_their_project_property(pool: Pool<Postgres>) -> anyhow::
     )
     .fetch_one(&pool)
     .await?;
-    let user_id = MacroUserIdStr::parse_from_str(&owner)?;
+    let user_id = RoxUserIdStr::parse_from_str(&owner)?;
     let filter = EntityFilterAst {
         document_filter: Some(Arc::new(Expr::val(DocumentLiteral::SubType(
             DocumentSubType::Task,

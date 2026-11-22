@@ -49,7 +49,7 @@ const MAX_ENTRIES: usize = 8;
 
 /// Where cached bundles live, one directory per key.
 pub fn root_dir() -> Result<PathBuf> {
-    let home = macro_env_var::maybe_read_env("HOME").context("HOME is not set")?;
+    let home = rox_env_var::maybe_read_env("HOME").context("HOME is not set")?;
     Ok(PathBuf::from(home).join(".cache/macro-local/frontend-bundles"))
 }
 

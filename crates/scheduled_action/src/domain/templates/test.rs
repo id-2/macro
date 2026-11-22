@@ -4,7 +4,7 @@ use crate::domain::service::test::{
 };
 use entity_access::domain::models::EntityType;
 use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -66,7 +66,7 @@ fn templates(actions: &Arc<TestService>) -> Templates {
     )
 }
 
-fn owner_receipt(user: MacroUserIdStr<'static>, id: Uuid) -> EntityAccessReceipt<OwnerAccessLevel> {
+fn owner_receipt(user: RoxUserIdStr<'static>, id: Uuid) -> EntityAccessReceipt<OwnerAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
         user,
         &id.to_string(),
@@ -74,8 +74,8 @@ fn owner_receipt(user: MacroUserIdStr<'static>, id: Uuid) -> EntityAccessReceipt
     )
 }
 
-fn other_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|activator@rox.one".to_owned()).unwrap()
+fn other_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|activator@rox.one".to_owned()).unwrap()
 }
 
 async fn create_routine(actions: &TestService) -> Uuid {

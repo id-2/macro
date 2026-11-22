@@ -841,7 +841,7 @@ export function localDraftQueueLifecycle(
             text(input.senderEmail) ?? text(object(message.from).email),
           body_html: text(input.bodyHtml),
           body_text: text(input.bodyText),
-          body_macro: text(input.bodyMacro),
+          body_rox: text(input.bodyMacro),
           replying_to_id: text(input.replyingToId),
           provider_id: text(input.providerId),
           provider_thread_id: text(input.providerThreadId),

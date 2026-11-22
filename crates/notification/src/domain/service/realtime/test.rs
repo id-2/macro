@@ -32,12 +32,12 @@ impl NotificationTopicEventConsumer<TestNotification> for FakeConsumer {
     }
 }
 
-fn user(local: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user ID")
+fn user(local: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user ID")
 }
 
 fn notification(
-    owner_id: MacroUserIdStr<'static>,
+    owner_id: RoxUserIdStr<'static>,
     kind: &str,
 ) -> UserNotificationRow<TestNotification> {
     UserNotificationRow {

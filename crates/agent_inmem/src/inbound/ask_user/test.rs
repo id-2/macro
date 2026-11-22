@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use ai_toolset::{AsyncTool as _, RequestContext, ServiceContext};
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 use crate::domain::user_input::{UserInputError, UserInputRequester};
@@ -25,7 +25,7 @@ impl UserInputRequester for FakeRequester {
 
 fn request_context() -> RequestContext {
     RequestContext::new(
-        MacroUserIdStr::try_from("macro|ask-user-test@example.com".to_owned())
+        RoxUserIdStr::try_from("macro|ask-user-test@example.com".to_owned())
             .expect("test user id should be valid"),
     )
 }

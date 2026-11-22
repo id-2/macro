@@ -92,7 +92,7 @@ the web inbox link flow returns to `/app/inbox-link-callback` on the originating
 On desktop, connecting a Gmail or Outlook account, reconnecting one, or enabling
 calendar opens the selected provider's consent in the system browser. The app
 stays open; the callback is
-`macro:///inbox-link-callback?link_id=...`, which provisions the inbox using the
+`rox:///inbox-link-callback?link_id=...`, which provisions the inbox using the
 existing app session and restores the saved layout, including its query and hash.
 Verify each enabled provider, including reconnects with email-only and calendar
 permissions. Check that opening consent alone does not report an account
@@ -173,7 +173,7 @@ login hint should not start identity checks or account services.
 ## Hosted-dev proxy SSO
 
 On an allowed OAuth origin such as `https://localhost:<port>`, Google/SSO
-sign-in navigates the browser to `/__macro_dev/gateway/auth/login/sso` with
+sign-in navigates the browser to `/__rox_dev/gateway/auth/login/sso` with
 `is_mobile=true` to request the session-code handoff. The `original_url`
 remains the browser destination (including its query and hash). Returning
 from the provider redeems the session code to establish cookies locally.
@@ -190,13 +190,13 @@ account` before the login form. Startup and background/foreground resume work
 with the scene lifecycle enabled; Rox remains single-window on iPhone and
 iPad. The iPad welcome screen can show an `Optimized for iPhone` notice.
 Mobile resume is delivered per window, independently of ordinary focus changes.
-A custom-scheme link to `macro://app/login` now opens the login form both
+A custom-scheme link to `rox://app/login` now opens the login form both
 while Rox is running and when it cold-starts the app. Verify both cases
 separately. When signed out, an ordinary launch with no URL should show the
 welcome screen. When signed in, the session should survive restart and the app
 should open its authenticated landing view without replaying an old deep link.
 For simulator checks, `xcrun devicectl device process launch --device <udid>
---payload-url 'macro://app/login' com.macro.app.prod` delivers the link without
+--payload-url 'rox://app/login' com.macro.app.prod` delivers the link without
 `simctl openurl`'s confirmation dialog. Terminate Rox first for the cold case.
 Signed universal links and share-sheet flows still need end-to-end verification;
 see the [Tauri guide](../../apps/web/tauri/src-tauri/README.md#ios-27-scene-lifecycle)

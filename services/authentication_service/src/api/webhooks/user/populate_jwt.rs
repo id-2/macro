@@ -5,7 +5,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::{
     authentication::webhooks::populate_jwt::{PopulateJwtWebhook, PopulateJwtWebhookResponse},
     user::UserInfoWithMacroUserId,
@@ -15,7 +15,7 @@ use model::{
 #[tracing::instrument(skip(ctx, req, _internal_authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<PopulateJwtWebhook>,
 ) -> Result<Response, Response> {
     let email = req.email.to_lowercase();
@@ -26,8 +26,8 @@ pub async fn handler(
         id: user_id,
         organization_id,
         email: _,
-        macro_user_id,
-    } = macro_db_client::user::get::get_user_info_by_email(&ctx.db, &email)
+        rox_user_id,
+    } = rox_db_client::user::get::get_user_info_by_email(&ctx.db, &email)
         .await
         .map_err(|e| {
             tracing::error!(email, "failed to get user info");
@@ -39,7 +39,7 @@ pub async fn handler(
         Json(PopulateJwtWebhookResponse {
             user_id,
             organization_id,
-            root_macro_id: macro_user_id,
+            root_rox_id: rox_user_id,
         }),
     )
         .into_response())

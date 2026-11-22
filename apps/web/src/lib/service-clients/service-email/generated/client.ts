@@ -772,7 +772,7 @@ export const listBlockedSenders = async (
 };
 
 /**
- * @summary Durably remove Macro-managed sender blocking in the selected inbox.
+ * @summary Durably remove Rox-managed sender blocking in the selected inbox.
  */
 export type unblockSenderResponse204 = {
   data: void;
@@ -2522,7 +2522,7 @@ export const healthCheckLinks = async (
 /**
  * For an inbox the caller owns this enqueues a full cascade teardown
 (`LinkManagerMessage::DeleteLink`). For an inbox reached via delegation it
-only drops the `macro_user_links` edge, leaving the owner's data intact.
+only drops the `rox_user_links` edge, leaving the owner's data intact.
  * @summary Removes a linked inbox.
  */
 export type deleteLinkResponse204 = {
@@ -3196,7 +3196,7 @@ export const mailboxSettingsOperations = async (
 which may be an inbox the caller only reaches through delegation. Removal
 therefore follows the same policy as `DELETE /email/links/{link_id}`: an
 owner's inbox is torn down, while a delegate only loses their
-`macro_user_links` edge and the owner's data stays intact.
+`rox_user_links` edge and the owner's data stays intact.
  * @summary Disables inbox syncing for the selected inbox.
  */
 export type disableSyncResponse204 = {

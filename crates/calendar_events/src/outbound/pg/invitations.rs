@@ -12,9 +12,9 @@ impl CalendarInvitationRepository for PgCalendarRepository {
         let row = sqlx::query!(r#"SELECT count(*) > 0 AS "connected!",
             COALESCE(bool_or(a.sync_status IN ('pending', 'syncing')), false) AS "syncing!"
             FROM calendar_accounts a JOIN email_links l ON l.id = a.email_link_id
-            WHERE ((a.owner_id = $1 AND l.macro_id = $1)
-                OR EXISTS (SELECT 1 FROM macro_user_links delegation
-                    WHERE delegation.primary_macro_id = $1 AND delegation.link_id = a.email_link_id))
+            WHERE ((a.owner_id = $1 AND l.rox_id = $1)
+                OR EXISTS (SELECT 1 FROM rox_user_links delegation
+                    WHERE delegation.primary_rox_id = $1 AND delegation.link_id = a.email_link_id))
               AND a.sync_status NOT IN ('disabled', 'reauth_required')"#, viewer).fetch_one(&self.pool).await.map_err(report)?;
         Ok(InvitationAvailability {
             connected: row.connected,
@@ -50,9 +50,9 @@ impl CalendarInvitationRepository for PgCalendarRepository {
                 SELECT e.id, e.source_link_id, l.email_address, e.sequence, e.status, e.updated_at
                 FROM calendar_events e JOIN email_links l ON l.id = e.source_link_id
                 WHERE calendar_meeting_uid(e.ical_uid) = calendar_meeting_uid(requested.uid)
-                  AND ((e.owner_id = $1 AND l.macro_id = $1)
-                    OR EXISTS (SELECT 1 FROM macro_user_links delegation
-                        WHERE delegation.primary_macro_id = $1 AND delegation.link_id = e.source_link_id))
+                  AND ((e.owner_id = $1 AND l.rox_id = $1)
+                    OR EXISTS (SELECT 1 FROM rox_user_links delegation
+                        WHERE delegation.primary_rox_id = $1 AND delegation.link_id = e.source_link_id))
                   AND EXISTS (SELECT 1 FROM calendar_event_sources s JOIN calendar_accounts a ON a.id = s.account_id JOIN calendars c ON c.id = s.calendar_id WHERE s.event_id = e.id AND s.source_kind IN ('google', 'outlook') AND NOT c.is_deleted AND a.sync_status NOT IN ('disabled', 'reauth_required'))
                   AND EXISTS (SELECT 1 FROM calendar_event_occurrences o WHERE o.event_id = e.id AND (requested.occurrence_key IS NULL OR o.occurrence_key = requested.occurrence_key OR o.recurrence_id = requested.occurrence_key))
                 -- The receiving inbox's copy stays inside the limit however many copies there are.
@@ -124,8 +124,8 @@ impl CalendarInvitationRepository for PgCalendarRepository {
                 ON override.event_id = occurrence.event_id
                AND override.recurrence_id = occurrence.recurrence_id
             WHERE event.owner_id = $1
-               OR EXISTS (SELECT 1 FROM macro_user_links delegation
-                   WHERE delegation.primary_macro_id = $1 AND delegation.link_id = event.source_link_id)
+               OR EXISTS (SELECT 1 FROM rox_user_links delegation
+                   WHERE delegation.primary_rox_id = $1 AND delegation.link_id = event.source_link_id)
 "#,
             viewer,
             &ids,

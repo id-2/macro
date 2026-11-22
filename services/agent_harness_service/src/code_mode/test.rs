@@ -19,7 +19,7 @@ impl NativeToolGate for Gate {
     ) -> Pin<Box<dyn Future<Output = NativeToolVerdict> + Send + 'a>> {
         assert_eq!(name, "ExecuteCode");
         assert_eq!(args["source"], "fixture");
-        assert_eq!(args["turn_id"], macro_uuid::Uuid::from_u128(1).to_string());
+        assert_eq!(args["turn_id"], rox_uuid::Uuid::from_u128(1).to_string());
         self.calls.fetch_add(1, Ordering::SeqCst);
         Box::pin(async { self.verdict.clone() })
     }
@@ -33,7 +33,7 @@ async fn owner_approval_is_required_before_credentials_and_cancel_skips_gate() {
         session: session.id,
         agent_id: session.bot_id,
         owner: session.owner_user().unwrap().clone(),
-        turn: macro_uuid::Uuid::from_u128(1),
+        turn: rox_uuid::Uuid::from_u128(1),
     };
     let gate = Gate {
         verdict: NativeToolVerdict::Refuse("Owner declined".into()),
@@ -65,14 +65,14 @@ async fn owner_approval_is_required_before_credentials_and_cancel_skips_gate() {
 async fn execution_credentials_use_the_gate_resolved_requester() {
     let session = test_agent_session(AgentSessionId::new());
     let requester =
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     let identity = ExecutionIdentity {
         execution: agent_code_mode::domain::ExecutionId::mint(),
         acting_as: ai_toolset::actor::ToolActor::Requester,
         session: session.id,
         owner: session.owner_user().unwrap().clone(),
         agent_id: session.bot_id,
-        turn: macro_uuid::Uuid::from_u128(1),
+        turn: rox_uuid::Uuid::from_u128(1),
     };
     let gate = Gate {
         verdict: NativeToolVerdict::RunAs(requester.clone()),
@@ -566,14 +566,14 @@ const PUBLIC: &str = include_str!(
 
 /// Session and public MCP runs sign the scope they store with the
 /// correlation, so services with no database hold the run to it too.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) {
-    use macro_auth::middleware::decode_jwt::{JwtToken, JwtValidationArgs, handler};
+    use rox_auth::middleware::decode_jwt::{JwtToken, JwtValidationArgs, handler};
     sqlx::raw_sql(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ('00000000-0000-4000-8000-000000000001', 'owner@example.com', 'owner@example.com', 'stripe_owner');
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ('macro|owner@example.com', 'owner@example.com', '00000000-0000-4000-8000-000000000001');
         "#,
     )
@@ -586,31 +586,31 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
     .execute(&pool)
     .await
     .unwrap();
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(
         1,
     )));
     let owner = session.owner_user().unwrap().clone();
     // The agent the fixture's session runs, which a correlation must name.
-    let agent = bot_id::BotId::new_from_uuid(macro_uuid::Uuid::from_u128(0xa9e7));
+    let agent = bot_id::BotId::new_from_uuid(rox_uuid::Uuid::from_u128(0xa9e7));
     let identity = ExecutionIdentity {
         execution: agent_code_mode::domain::ExecutionId::mint(),
         acting_as: ai_toolset::actor::ToolActor::Owner,
         session: session.id,
         agent_id: agent,
         owner: owner.clone(),
-        turn: macro_uuid::Uuid::from_u128(1),
+        turn: rox_uuid::Uuid::from_u128(1),
     };
     let signed = |token: &str| match handler(
-        &JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+        &JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
         token,
     )
     .unwrap()
     {
-        JwtToken::MacroApiToken(token) => {
+        JwtToken::RoxApiToken(token) => {
             assert!(token.agent_correlation_id.is_some());
             token.agent_scope
         }
-        JwtToken::MacroAccessToken(_) => panic!("a code-mode credential is a Rox API token"),
+        JwtToken::RoxAccessToken(_) => panic!("a code-mode credential is a Rox API token"),
     };
     for (scope, name) in [
         (Some(SessionScope::Generation), Some("generation")),
@@ -618,7 +618,7 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
         (None, None),
     ] {
         let run = RunCredentials {
-            signer: MacroApiTokenSigner::new(pool.clone(), "fixture", PRIVATE),
+            signer: RoxApiTokenSigner::new(pool.clone(), "fixture", PRIVATE),
             correlations: agent_correlation::outbound::PgCorrelationRepository(pool.clone()),
             gate: Arc::new(Gate {
                 verdict: NativeToolVerdict::RunAs(owner.clone()),
@@ -632,7 +632,7 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
         .unwrap();
         assert_eq!(signed(&run.token).as_deref(), name, "session run {scope:?}");
         let run = UserRunCredentials {
-            signer: MacroApiTokenSigner::new(pool.clone(), "fixture", PRIVATE),
+            signer: RoxApiTokenSigner::new(pool.clone(), "fixture", PRIVATE),
             correlations: agent_correlation::outbound::PgCorrelationRepository(pool.clone()),
             endpoints: SdkEndpoints::default(),
             scopes: Arc::new(Scopes(scope)),

@@ -8,7 +8,7 @@ use attachment::FormattedParts;
 use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, OwnerAccessLevel, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::chat::Chat;
 use model_owner::Owner;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -49,7 +49,7 @@ pub trait ChatRepo: Send + Sync + 'static {
     /// Get the requesting user's access level on a chat.
     fn get_access_level(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         chat_id: &str,
     ) -> impl std::future::Future<Output = Result<AccessLevel>> + Send;
 
@@ -101,7 +101,7 @@ pub trait ChatRepo: Send + Sync + 'static {
     /// rest of the patch and rejects a team level that arrives without one.
     fn patch(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         chat_id: &str,
         args: PatchChatRepoArgs,
     ) -> impl std::future::Future<Output = Result<()>> + Send;

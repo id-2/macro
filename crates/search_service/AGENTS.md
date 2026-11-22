@@ -31,7 +31,7 @@ per-entity-type search plus a unified search across them — mounted into
 
 ## Boundaries
 
-- Depends on: `opensearch_client`, `models_opensearch`, `macro_db_client`,
+- Depends on: `opensearch_client`, `models_opensearch`, `rox_db_client`,
   `entity_access`, `properties`, `crm`, `item_filters`, `calendar_events`
   (domain only, no features, for its Rox call rule and label port).
 - Used by: `document_storage_service` (mounts `search_router`); called
@@ -93,7 +93,7 @@ per-entity-type search plus a unified search across them — mounted into
   counts there, since the `own` scope lists it, though it never counts as
   holding the meeting for the conference link. Enrichment re-checks every hit
   against the event's access rule. A caller who does not hold the meeting gets
-  no conference link, and `calendar_events`' `content_without_macro_call` takes
+  no conference link, and `calendar_events`' `content_without_rox_call` takes
   the Rox call out of the description; a provider's own join text in the body
   stays, as it does in a mention preview. Enrichment is the only gate: an id
   named in the `own` scope reaches a share as well. The index stores titles,

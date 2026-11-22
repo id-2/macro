@@ -47,7 +47,7 @@ impl ChannelSideEffectContext for FakeContext {
 
     async fn get_existing_user_ids(
         &self,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> Result<HashSet<String>, Self::Err> {
         if self.fail_existing_user_lookup {
             anyhow::bail!("existing-user lookup failed");
@@ -75,7 +75,7 @@ impl ChannelSideEffectContext for FakeContext {
 
     async fn get_sender_profile_picture_url(
         &self,
-        _sender_id: MacroUserIdStr<'static>,
+        _sender_id: RoxUserIdStr<'static>,
     ) -> Option<String> {
         Some("https://example.com/avatar.png".to_string())
     }
@@ -120,7 +120,7 @@ impl ChannelNotificationSender for FakeNotifications {
 
 #[derive(Clone, Default)]
 struct FakeContacts {
-    users: Arc<Mutex<Vec<HashSet<MacroUserIdStr<'static>>>>>,
+    users: Arc<Mutex<Vec<HashSet<RoxUserIdStr<'static>>>>>,
 }
 
 impl ChannelContactsDispatcher for FakeContacts {
@@ -128,18 +128,18 @@ impl ChannelContactsDispatcher for FakeContacts {
 
     async fn enqueue_contacts(
         &self,
-        users: HashSet<MacroUserIdStr<'static>>,
+        users: HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), Self::Err> {
         self.users.lock().unwrap().push(users);
         Ok(())
     }
 }
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
-fn users(emails: &[&str]) -> Vec<MacroUserIdStr<'static>> {
+fn users(emails: &[&str]) -> Vec<RoxUserIdStr<'static>> {
     emails.iter().map(|email| user(email)).collect()
 }
 
@@ -256,7 +256,7 @@ async fn self_reactions_do_not_notify() {
 }
 
 #[tokio::test]
-async fn macro_ai_bot_profile_is_builtin_without_context_lookup() {
+async fn rox_ai_bot_profile_is_builtin_without_context_lookup() {
     let lookup_count = Arc::new(Mutex::new(0));
     let service = ChannelSideEffectService::new(
         FakeContext {
@@ -273,7 +273,7 @@ async fn macro_ai_bot_profile_is_builtin_without_context_lookup() {
         id: Uuid::new_v4(),
         channel_id: Uuid::new_v4(),
         thread_id: None,
-        sender_id: Sender::new_from_bot(bot_id::MACRO_AI_BOT_ID),
+        sender_id: Sender::new_from_bot(bot_id::ROX_AI_BOT_ID),
         triggered_by: None,
         triggered_via: None,
         content: "hello".to_string(),
@@ -288,7 +288,7 @@ async fn macro_ai_bot_profile_is_builtin_without_context_lookup() {
         .await
         .expect("Rox AI should have a built-in profile");
 
-    assert_eq!(profile.name, bot_id::MACRO_AI_NAME);
+    assert_eq!(profile.name, bot_id::ROX_AI_NAME);
     assert_eq!(profile.avatar_url, None);
     assert_eq!(*lookup_count.lock().unwrap(), 0);
 }
@@ -310,7 +310,7 @@ async fn mcp_client_post_is_named_after_the_client() {
         id: Uuid::new_v4(),
         channel_id: Uuid::new_v4(),
         thread_id: None,
-        sender_id: Sender::new_from_bot(bot_id::MACRO_AI_BOT_ID),
+        sender_id: Sender::new_from_bot(bot_id::ROX_AI_BOT_ID),
         triggered_by: Some("macro|alice@example.com".to_string()),
         triggered_via: Some("Claude Code".to_string()),
         content: "hello".to_string(),
@@ -331,7 +331,7 @@ async fn mcp_client_post_is_named_after_the_client() {
 }
 
 #[tokio::test]
-async fn non_macro_bot_profile_uses_context_lookup() {
+async fn non_rox_bot_profile_uses_context_lookup() {
     let lookup_count = Arc::new(Mutex::new(0));
     let service = ChannelSideEffectService::new(
         FakeContext {
@@ -1109,7 +1109,7 @@ fn contact_sync_is_derived_from_private_channel_created() {
 fn contact_sync_system_channel_created_with_subject() {
     let event = ChannelEvent::ChannelCreated {
         channel_id: Uuid::nil(),
-        actor: Sender::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID),
+        actor: Sender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
         on_behalf_of: Some(user("owner@example.com")),
         channel_type: ChannelType::Private,
         channel_name: Some("Macro Support x owner".to_string()),
@@ -1127,7 +1127,7 @@ fn contact_sync_system_channel_created_with_subject() {
 fn contact_sync_ignores_bot_channel_created_without_subject() {
     let event = ChannelEvent::ChannelCreated {
         channel_id: Uuid::nil(),
-        actor: Sender::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID),
+        actor: Sender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
         on_behalf_of: None,
         channel_type: ChannelType::Private,
         channel_name: None,
@@ -1207,22 +1207,22 @@ fn mention(entity_type: &str, entity_id: &str) -> SimpleMention {
 }
 
 #[test]
-fn macro_ai_user_mention_is_not_a_user_recipient() {
+fn rox_ai_user_mention_is_not_a_user_recipient() {
     assert!(is_bot_user_mention(&mention(
         "user",
-        bot_id::MACRO_AI_BOT_ID.into_storage_id().as_ref()
+        bot_id::ROX_AI_BOT_ID.into_storage_id().as_ref()
     )));
     // The legacy bare-UUID encoding is no longer treated as a bot mention.
     assert!(!is_bot_user_mention(&mention(
         "user",
-        &bot_id::MACRO_AI_BOT_ID.as_uuid().to_string()
+        &bot_id::ROX_AI_BOT_ID.as_uuid().to_string()
     )));
     assert!(!is_bot_user_mention(&mention(
         "user",
         "macro|teo@rox.one"
     )));
     assert!(is_bot_principal(
-        bot_id::MACRO_AI_BOT_ID.into_storage_id().as_ref()
+        bot_id::ROX_AI_BOT_ID.into_storage_id().as_ref()
     ));
     assert!(!is_bot_principal("macro|teo@rox.one"));
 }
@@ -1239,13 +1239,13 @@ struct PublishedEvent {
     envelope: serde_json::Value,
 }
 
-impl MacroEventBroker for TestEventBroker {
-    fn send_event<E: macro_event_broker::MacroEvent + ?Sized>(
+impl RoxEventBroker for TestEventBroker {
+    fn send_event<E: rox_event_broker::RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<
-        tokio::task::JoinHandle<Result<(), macro_event_broker::EventBrokerError>>,
-        macro_event_broker::EventBrokerError,
+        tokio::task::JoinHandle<Result<(), rox_event_broker::EventBrokerError>>,
+        rox_event_broker::EventBrokerError,
     > {
         self.published.lock().unwrap().push(PublishedEvent {
             topic: event.topic().to_string(),
@@ -1271,7 +1271,7 @@ fn broker_service(
         FakeNotifications::default(),
         FakeContacts::default(),
     )
-    .with_macro_event_broker(broker)
+    .with_rox_event_broker(broker)
 }
 
 #[tokio::test]
@@ -1293,7 +1293,7 @@ async fn handle_publishes_channel_created_event() {
 
     let published = broker.published.lock().unwrap();
     assert_eq!(published.len(), 1);
-    assert_eq!(published[0].topic, "macro.channels");
+    assert_eq!(published[0].topic, "rox.channels");
     assert_eq!(published[0].key, channel_id.to_string());
     assert_eq!(published[0].envelope["event_type"], "channel.created");
     assert_eq!(published[0].envelope["metadata"]["channel_name"], "general");
@@ -1356,13 +1356,13 @@ async fn handle_publishes_no_channel_topic_facts_for_posted_messages() {
             .lock()
             .unwrap()
             .iter()
-            .all(|event| event.topic != "macro.channels")
+            .all(|event| event.topic != "rox.channels")
     );
 }
 
 #[test]
 fn broker_events_map_participant_joined_to_participant_added() {
-    use macro_event_broker::MacroEvent as _;
+    use rox_event_broker::RoxEvent as _;
     let channel_id = Uuid::new_v4();
     let events = broker_events_for_event(&ChannelEvent::ParticipantJoined {
         channel_id,
@@ -1383,7 +1383,7 @@ fn broker_events_map_participant_joined_to_participant_added() {
 
 #[test]
 fn broker_events_carry_the_requesters_name_on_a_request_to_join() {
-    use macro_event_broker::MacroEvent as _;
+    use rox_event_broker::RoxEvent as _;
     let channel_id = Uuid::new_v4();
     let events = broker_events_for_event(&ChannelEvent::AccessRequested {
         request: ChannelAccessRequest {
@@ -1415,7 +1415,7 @@ fn broker_events_carry_the_requesters_name_on_a_request_to_join() {
 
 #[test]
 fn broker_events_map_channel_updated() {
-    use macro_event_broker::MacroEvent as _;
+    use rox_event_broker::RoxEvent as _;
     let channel_id = Uuid::new_v4();
     let events = broker_events_for_event(&ChannelEvent::ChannelUpdated {
         channel_id,
@@ -1461,7 +1461,7 @@ fn broker_events_skip_entity_mention_events() {
 
 #[test]
 fn mention_broker_events_map_message_posted_mentions() {
-    use macro_event_broker::MacroEvent as _;
+    use rox_event_broker::RoxEvent as _;
     let channel_id = Uuid::new_v4();
     let message_id = Uuid::new_v4();
     let now = Utc::now();
@@ -1513,7 +1513,7 @@ fn mention_broker_events_map_message_posted_mentions() {
 
 #[test]
 fn mention_broker_events_map_entity_mention_created_and_deleted() {
-    use macro_event_broker::MacroEvent as _;
+    use rox_event_broker::RoxEvent as _;
     let mention = entity_mention("bot", "bot-1");
 
     let created = mention_broker_events_for_event(&ChannelEvent::EntityMentionCreated {
@@ -1557,7 +1557,7 @@ async fn handle_publishes_mention_events_alongside_channel_events() {
 
     let published = broker.published.lock().unwrap();
     assert_eq!(published.len(), 1);
-    assert_eq!(published[0].topic, "macro.mentions");
+    assert_eq!(published[0].topic, "rox.mentions");
     assert_eq!(published[0].key, "bot-1");
     assert_eq!(published[0].envelope["event_type"], "mention.created");
 }

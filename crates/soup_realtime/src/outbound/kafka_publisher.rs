@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use rootcause::prelude::{Report, ResultExt as _};
 
 use crate::domain::{
@@ -25,7 +25,7 @@ impl<B> KafkaSoupRealtimePublisher<B> {
 
 impl<B> SoupRealtimePublisher for KafkaSoupRealtimePublisher<B>
 where
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     // No span per message: one event can publish tens of thousands, which would
     // crowd its own batch spans out of the trace. Failures reach the batch span.

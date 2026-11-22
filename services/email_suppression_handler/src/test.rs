@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 
@@ -21,25 +21,25 @@ async fn transient_bounce(db: PgPool, subtype: &str) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 #[should_panic(expected = "internal error: entered unreachable code")]
 async fn transient_undetermined_panics(db: PgPool) {
     transient_bounce(db, "Undetermined").await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 #[should_panic(expected = "internal error: entered unreachable code")]
 async fn transient_no_email_panics(db: PgPool) {
     transient_bounce(db, "NoEmail").await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 #[should_panic(expected = "internal error: entered unreachable code")]
 async fn transient_suppressed_panics(db: PgPool) {
     transient_bounce(db, "Suppressed").await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 #[should_panic(expected = "internal error: entered unreachable code")]
 async fn transient_account_suppressed_panics(db: PgPool) {
     transient_bounce(db, "OnAccountSuppressionList").await;

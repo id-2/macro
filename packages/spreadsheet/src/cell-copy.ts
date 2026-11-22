@@ -15,7 +15,7 @@ import {
   type SpreadsheetCells,
 } from './spreadsheet-document';
 
-export const SPREADSHEET_CLIPBOARD_TYPE = 'application/x-macro-spreadsheet';
+export const SPREADSHEET_CLIPBOARD_TYPE = 'application/x-rox-spreadsheet';
 export type CopiedRange = {
   version: 1;
   cut?: boolean;

@@ -167,7 +167,7 @@ async fn start(selection: &ConfigSelection, options: &ServiceOptions) -> rootcau
             .credentials
             .as_ref()
             .is_some_and(HarnessCredentials::is_valid),
-        web_url: config.macro_api.web_url.clone(),
+        web_url: config.rox_api.web_url.clone(),
     });
 
     if let Some(install) = agent.as_ref().and_then(DetectedAgent::pending_install) {
@@ -213,7 +213,7 @@ async fn pair(
         .await?;
     emit(&Event::Pairing {
         code: created.code.clone(),
-        url: config.macro_api.pairing_approval_url(&created.code),
+        url: config.rox_api.pairing_approval_url(&created.code),
         expires_at: created.expires_at,
     });
     let interval = Duration::from_secs(created.poll_interval_seconds.max(1));
@@ -415,7 +415,7 @@ pub fn inspect_json(
                 inspection.agent_id = agent.as_ref().map(|agent| agent.kind.id());
                 inspection.agent_name = agent.as_ref().map(|agent| agent.name);
                 inspection.workspace = Some(config.workspace.path.display().to_string());
-                inspection.web_url = Some(config.macro_api.web_url.clone());
+                inspection.web_url = Some(config.rox_api.web_url.clone());
             }
             Err(error) => inspection.error = Some(format!("{error}")),
         }

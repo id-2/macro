@@ -1,13 +1,13 @@
 use super::*;
 use crate::domain::{BillingPeriod, OVERAGE_CHARGE_THRESHOLD_CENTS};
 use chrono::DurationRound;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-fn payer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
+fn payer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_anchor_accepts_end_corrections_but_not_stale_or_overlapping_starts(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     let start = DateTime::from_timestamp(1_800_000_000, 0).unwrap();
@@ -69,7 +69,7 @@ async fn charge_rows(pool: &PgPool) -> i64 {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settings_default_and_roundtrip(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     assert_eq!(
@@ -118,7 +118,7 @@ async fn settings_default_and_roundtrip(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn credit_purchases_are_idempotent_on_stripe_reference(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     assert!(
@@ -140,7 +140,7 @@ async fn credit_purchases_are_idempotent_on_stripe_reference(pool: PgPool) {
     assert_eq!(repo.credit_balance_cents(&payer()).await.unwrap(), 3_500);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settlement_consumes_credits_then_reserves_overage(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     let period_start = Utc::now() - chrono::Duration::days(10);
@@ -203,7 +203,7 @@ async fn settlement_consumes_credits_then_reserves_overage(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invoice_webhooks_apply_out_of_order_without_unpaying(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     let period_start = Utc::now() - chrono::Duration::days(10);
@@ -268,7 +268,7 @@ async fn invoice_webhooks_apply_out_of_order_without_unpaying(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settlement_retries_a_failed_charge_instead_of_reserving_a_new_one(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let period_start = Utc::now() - chrono::Duration::days(10);
@@ -313,7 +313,7 @@ async fn settlement_retries_a_failed_charge_instead_of_reserving_a_new_one(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn credits_can_replace_a_failed_charge_that_was_never_invoiced(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let period_start = Utc::now() - chrono::Duration::days(10);
@@ -350,7 +350,7 @@ async fn credits_can_replace_a_failed_charge_that_was_never_invoiced(pool: PgPoo
     assert_eq!(charge_rows(&pool).await, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn credits_do_not_replace_a_failed_charge_with_a_collectible_invoice(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let period_start = Utc::now() - chrono::Duration::days(10);
@@ -399,7 +399,7 @@ async fn credits_do_not_replace_a_failed_charge_with_a_collectible_invoice(pool:
     assert_eq!(charge_rows(&pool).await, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settlement_collects_a_reservation_whose_collector_died(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let period_start = Utc::now() - chrono::Duration::days(10);
@@ -438,7 +438,7 @@ async fn settlement_collects_a_reservation_whose_collector_died(pool: PgPool) {
     assert_eq!(charge_rows(&pool).await, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settlement_uses_stored_overage_policy_and_flushes_at_period_end(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     let period_start = Utc::now() - chrono::Duration::days(40);
@@ -468,16 +468,16 @@ async fn settlement_uses_stored_overage_policy_and_flushes_at_period_end(pool: P
     assert!(outcome.pending_charge.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn frozen_period_starts_lists_the_payers_periods_in_the_window(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let payer = payer();
-    let other = MacroUserIdStr::try_from("macro|other@example.com".to_string()).unwrap();
+    let other = RoxUserIdStr::try_from("macro|other@example.com".to_string()).unwrap();
     let now = Utc::now()
         .duration_trunc(chrono::Duration::microseconds(1))
         .unwrap();
     let month = chrono::Duration::days(30);
-    let seats = |user: &MacroUserIdStr<'static>| {
+    let seats = |user: &RoxUserIdStr<'static>| {
         vec![SeatAllowance {
             user: user.clone(),
             included_cents: 2_000,
@@ -534,7 +534,7 @@ async fn frozen_period_starts_lists_the_payers_periods_in_the_window(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn period_allowance_roundtrips_and_upserts_per_period(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let payer = payer();
@@ -547,7 +547,7 @@ async fn period_allowance_roundtrips_and_upserts_per_period(pool: PgPool) {
     };
     let open = period.open_start(now).unwrap();
     let earlier = open.start() - chrono::Duration::days(30);
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
     let seats = vec![
         SeatAllowance {
             user: payer.clone(),
@@ -665,7 +665,7 @@ async fn reload_rows(pool: &PgPool) -> i64 {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn auto_reload_defaults_when_no_account_row_exists(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     let settings = repo.settings(&payer()).await.unwrap();
@@ -693,7 +693,7 @@ async fn auto_reload_defaults_when_no_account_row_exists(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_auto_reload_persists_thresholds_and_clears_both_suspensions(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     repo.suspend_overage(&payer()).await.unwrap();
@@ -738,7 +738,7 @@ async fn update_auto_reload_persists_thresholds_and_clears_both_suspensions(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reserve_credit_reload_requires_opt_in_and_unsuspended_reloads(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -784,7 +784,7 @@ async fn reserve_credit_reload_requires_opt_in_and_unsuspended_reloads(pool: PgP
     assert_eq!(reload_rows(&pool).await, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reserve_credit_reload_subtracts_usage_the_settlement_will_consume(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     let now = Utc::now();
@@ -822,7 +822,7 @@ async fn reserve_credit_reload_subtracts_usage_the_settlement_will_consume(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reserve_credit_reload_honors_the_monthly_limit_including_pending_rows(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -911,7 +911,7 @@ async fn reserve_credit_reload_honors_the_monthly_limit_including_pending_rows(p
     assert_eq!(fourth.amount_cents, 2_000);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reserve_credit_reload_waits_for_a_pending_reload_but_recovers_an_orphan(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -967,7 +967,7 @@ async fn reserve_credit_reload_waits_for_a_pending_reload_but_recovers_an_orphan
     assert_eq!(reload_rows(&pool).await, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reserve_credit_reload_retries_a_failed_reload_on_its_open_invoice(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -1038,7 +1038,7 @@ async fn reserve_credit_reload_retries_a_failed_reload_on_its_open_invoice(pool:
     assert_eq!(next.amount_cents, 2_000);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn credit_reloads_are_idempotent_on_the_invoice(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     assert!(
@@ -1065,7 +1065,7 @@ async fn credit_reloads_are_idempotent_on_the_invoice(pool: PgPool) {
     assert_eq!(repo.credit_balance_cents(&payer()).await.unwrap(), 9_500);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reload_invoice_webhooks_resolve_once_and_never_unpay(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     let now = Utc::now();
@@ -1125,7 +1125,7 @@ async fn reload_invoice_webhooks_resolve_once_and_never_unpay(pool: PgPool) {
     assert_eq!(repo.credit_balance_cents(&payer()).await.unwrap(), 10_000);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reload_invoice_credit_write_failure_leaves_paid_webhook_retryable(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -1183,7 +1183,7 @@ async fn reload_invoice_credit_write_failure_leaves_paid_webhook_retryable(pool:
     assert_eq!(repo.credit_balance_cents(&payer()).await.unwrap(), 10_000);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reload_invoice_webhook_deduplicates_credits_booked_by_collector(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     let now = Utc::now();
@@ -1221,7 +1221,7 @@ async fn reload_invoice_webhook_deduplicates_credits_booked_by_collector(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn suspend_auto_reload_keeps_the_first_timestamp(pool: PgPool) {
     let repo = PgBillingRepo::new(pool, AiPricing::testing());
     repo.suspend_auto_reload(&payer()).await.unwrap();
@@ -1283,7 +1283,7 @@ async fn seat_generation(pool: &PgPool, payer: &str) -> Option<i64> {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn release_open_seat_removes_the_middle_pair_and_leaves_the_closed_row(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let payer = payer();
@@ -1298,8 +1298,8 @@ async fn release_open_seat_removes_the_middle_pair_and_leaves_the_closed_row(poo
     .open_start(now)
     .unwrap();
     let closed_start = open_start - chrono::Duration::days(60);
-    let alice = MacroUserIdStr::try_from("macro|alice@example.com".to_string()).unwrap();
-    let bob = MacroUserIdStr::try_from("macro|bob@example.com".to_string()).unwrap();
+    let alice = RoxUserIdStr::try_from("macro|alice@example.com".to_string()).unwrap();
+    let bob = RoxUserIdStr::try_from("macro|bob@example.com".to_string()).unwrap();
     let users = vec![
         payer.as_ref().to_string(),
         alice.as_ref().to_string(),
@@ -1385,7 +1385,7 @@ async fn release_open_seat_removes_the_middle_pair_and_leaves_the_closed_row(poo
     );
     assert_eq!(seat_generation(&pool, payer.as_ref()).await, Some(2));
 
-    let outsider = MacroUserIdStr::try_from("macro|outsider@example.com".to_string()).unwrap();
+    let outsider = RoxUserIdStr::try_from("macro|outsider@example.com".to_string()).unwrap();
     repo.release_open_seat(&payer, open, &outsider)
         .await
         .unwrap();
@@ -1400,7 +1400,7 @@ async fn release_open_seat_removes_the_middle_pair_and_leaves_the_closed_row(poo
     assert_eq!(untouched.updated_at, open_row.updated_at);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn store_open_allowance_does_not_write_a_stale_generation(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -1412,8 +1412,8 @@ async fn store_open_allowance_does_not_write_a_stale_generation(pool: PgPool) {
     }
     .open_start(now)
     .unwrap();
-    let alice = MacroUserIdStr::try_from("macro|alice@example.com".to_string()).unwrap();
-    let bob = MacroUserIdStr::try_from("macro|bob@example.com".to_string()).unwrap();
+    let alice = RoxUserIdStr::try_from("macro|alice@example.com".to_string()).unwrap();
+    let bob = RoxUserIdStr::try_from("macro|bob@example.com".to_string()).unwrap();
     let before = vec![
         SeatAllowance {
             user: payer(),
@@ -1479,7 +1479,7 @@ async fn store_open_allowance_does_not_write_a_stale_generation(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn release_open_seat_without_an_allowance_row_bumps_generation(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -1491,7 +1491,7 @@ async fn release_open_seat_without_an_allowance_row_bumps_generation(pool: PgPoo
     }
     .open_start(now)
     .unwrap();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
 
     repo.release_open_seat(&payer(), open, &member)
         .await
@@ -1526,11 +1526,11 @@ async fn release_open_seat_without_an_allowance_row_bumps_generation(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rows_frozen_before_the_cost_column_read_as_the_current_allowance(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let payer = payer();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
     let users = vec![payer.as_ref().to_string(), member.as_ref().to_string()];
     let legacy_start = Utc::now() - chrono::Duration::days(40);
     let stale_start = legacy_start - chrono::Duration::days(30);
@@ -1608,7 +1608,7 @@ async fn rows_frozen_before_the_cost_column_read_as_the_current_allowance(pool: 
     assert_eq!(raw.included_cost_cents_by_user, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn credit_only_settlement_never_reserves_or_retries_direct_charges(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let period_start = Utc::now() - chrono::Duration::days(10);
@@ -1654,11 +1654,11 @@ async fn credit_only_settlement_never_reserves_or_retries_direct_charges(pool: P
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn credit_purchases_respect_the_monthly_limit_and_retry_declined_invoices(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
 
     let PurchaseReservation::New(first) = repo
         .reserve_credit_purchase(&payer(), &member, 2_500, Some(5_000), now)
@@ -1721,7 +1721,7 @@ async fn credit_purchases_respect_the_monthly_limit_and_retry_declined_invoices(
     assert_eq!(buyer.as_deref(), Some(member.as_ref()));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn automatic_reloads_ignore_open_purchases(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -1755,11 +1755,11 @@ async fn automatic_reloads_ignore_open_purchases(pool: PgPool) {
     assert_eq!(resolved.kind, CreditReloadKind::Purchase);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn voided_purchases_are_neither_retried_nor_counted(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
 
     let PurchaseReservation::New(declined) = repo
         .reserve_credit_purchase(&payer(), &member, 2_500, Some(5_000), now)
@@ -1829,7 +1829,7 @@ async fn voided_purchases_are_neither_retried_nor_counted(pool: PgPool) {
     assert_eq!(auto_invoice.as_deref(), Some("in_auto"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_paid_purchase_cannot_be_voided(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -1857,7 +1857,7 @@ async fn a_paid_purchase_cannot_be_voided(pool: PgPool) {
     assert_eq!(row.stripe_invoice_id.as_deref(), Some("in_paid"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_paid_invoice_is_matched_to_its_orphaned_row_by_reload_id(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
@@ -1909,7 +1909,7 @@ async fn a_paid_invoice_is_matched_to_its_orphaned_row_by_reload_id(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stale_orphaned_purchase_stops_counting_against_the_limit(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();

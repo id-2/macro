@@ -23,7 +23,7 @@ use harnessd_protocol::{AgentProvider, ClaudeAccount, Request, Response};
 use harnesses::domain::account_logins::{AccountLoginChange, ProviderAccountIdentity};
 use harnesses::domain::ports::{HarnessError, HarnessService};
 use hosted_runtimes::domain::ids::ComputerId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// The program the control plane runs in a guest.
 pub(crate) const HARNESSD: &str = "harnessd";
@@ -208,7 +208,7 @@ impl<Harnesses: HarnessService> Harnessd<Harnesses> {
         harness_id: HarnessId,
         computer_id: ComputerId,
         request: Request,
-        signed_in_by: Option<MacroUserIdStr<'static>>,
+        signed_in_by: Option<RoxUserIdStr<'static>>,
     ) -> Result<Response, HarnessdError> {
         let agent = request.agent();
         let _lock = self.locks.lock(computer_id).await?;
@@ -251,7 +251,7 @@ impl<Harnesses: HarnessService> Harnessd<Harnesses> {
         &self,
         harness_id: HarnessId,
         status: &Response,
-        signed_in_by: Option<MacroUserIdStr<'static>>,
+        signed_in_by: Option<RoxUserIdStr<'static>>,
     ) -> Result<(), HarnessdError> {
         let change = match status {
             Response::SignedIn {

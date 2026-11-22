@@ -213,7 +213,7 @@ impl DiscussionContextReader for PgDiscussionContext {
         &self,
         actor: &str,
     ) -> Result<Option<String>, rootcause::Report> {
-        Ok(sqlx::query_scalar!(r#"SELECT i.profile_picture FROM macro_user_info i JOIN "User" u ON u.macro_user_id = i.macro_user_id WHERE u.id = $1"#, actor)
+        Ok(sqlx::query_scalar!(r#"SELECT i.profile_picture FROM rox_user_info i JOIN "User" u ON u.rox_user_id = i.rox_user_id WHERE u.id = $1"#, actor)
             .fetch_optional(&self.0).await?.flatten())
     }
     async fn context(

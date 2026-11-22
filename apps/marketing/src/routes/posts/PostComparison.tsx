@@ -3,7 +3,7 @@ import { Dynamic } from 'solid-js/web';
 
 // Brand marks for the comparison-table headers.
 
-export function MacroLogo() {
+export function RoxLogo() {
   return <img class="mvn-logo-macro" src="/macro-favicon.svg" alt="" />;
 }
 
@@ -75,7 +75,7 @@ export function ComparisonTable(props: {
                 <th />
                 <th class="mvn-macro-col">
                   <span class="mvn-th-brand">
-                    <MacroLogo /> Rox
+                    <RoxLogo /> Rox
                   </span>
                 </th>
                 <th>

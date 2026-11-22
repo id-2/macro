@@ -9,8 +9,8 @@ use std::sync::{Arc, Mutex};
 
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::AccessLevel;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel as ShareAccessLevel;
 use models_permissions::share_permission::channel_share_permission::{
     ChannelSharePermission, UpdateChannelSharePermission, UpdateOperation,
@@ -181,7 +181,7 @@ impl FormAccessDirectory for FakeAccess {
 
     async fn accessible_forms(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Vec<(FormId, AccessLevel)>, FakeError> {
         let world = self.0.lock().unwrap();
         if world.fail_form_grants {
@@ -238,8 +238,8 @@ impl Clock for FixedClock {
 #[derive(Clone)]
 pub(crate) struct RecordingBroker(pub(crate) Shared);
 
-impl MacroEventBroker for RecordingBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -610,7 +610,7 @@ impl FormsRepo for FakeRepo {
     async fn response_of(
         &self,
         form: FormId,
-        respondent: &MacroUserIdStr<'_>,
+        respondent: &RoxUserIdStr<'_>,
     ) -> Result<Option<FormResponse>, FakeError> {
         let world = self.0.lock().unwrap();
         Ok(world
@@ -626,7 +626,7 @@ impl FormsRepo for FakeRepo {
     async fn record_stop(
         &self,
         form: FormId,
-        respondent: &MacroUserIdStr<'_>,
+        respondent: &RoxUserIdStr<'_>,
         section: FormSectionId,
         at: DateTime<Utc>,
     ) -> Result<(), FakeError> {
@@ -663,7 +663,7 @@ impl FormsRepo for FakeRepo {
     async fn record_submission(
         &self,
         form: FormId,
-        respondent: Option<&MacroUserIdStr<'_>>,
+        respondent: Option<&RoxUserIdStr<'_>>,
         row: RowId,
         at: DateTime<Utc>,
     ) -> Result<RecordedResponse, FakeError> {
@@ -708,7 +708,7 @@ impl FormsRepo for FakeRepo {
     async fn record_anonymous_submission(
         &self,
         form: FormId,
-        voter: Option<&MacroUserIdStr<'_>>,
+        voter: Option<&RoxUserIdStr<'_>>,
         row: RowId,
         day: DateTime<Utc>,
     ) -> Result<RecordedResponse, FakeError> {
@@ -740,7 +740,7 @@ impl FormsRepo for FakeRepo {
     async fn holds_receipt(
         &self,
         form: FormId,
-        voter: &MacroUserIdStr<'_>,
+        voter: &RoxUserIdStr<'_>,
     ) -> Result<bool, FakeError> {
         let world = self.0.lock().unwrap();
         Ok(world.receipts.contains(&(form, voter.to_string())))
@@ -804,7 +804,7 @@ impl FormsRepo for FakeRepo {
     async fn respondents_by_row(
         &self,
         form: FormId,
-    ) -> Result<Vec<(RowId, MacroUserIdStr<'static>)>, FakeError> {
+    ) -> Result<Vec<(RowId, RoxUserIdStr<'static>)>, FakeError> {
         let world = self.0.lock().unwrap();
         let mut entries: Vec<&LedgerEntry> = world
             .ledger
@@ -818,7 +818,7 @@ impl FormsRepo for FakeRepo {
             .into_iter()
             .filter_map(|entry| {
                 let row = entry.response.row?;
-                let respondent = MacroUserIdStr::try_from(entry.respondent.clone()?).ok()?;
+                let respondent = RoxUserIdStr::try_from(entry.respondent.clone()?).ok()?;
                 Some((row, respondent))
             })
             .collect())

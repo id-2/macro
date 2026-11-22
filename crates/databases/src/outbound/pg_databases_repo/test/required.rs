@@ -16,7 +16,7 @@ fn batch(database_id: DatabaseId, writes: Vec<Write>) -> Writes {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn required_cells_are_checked_for_app_and_core_writes(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     let definition = insert_definition(&pool, "Required").await;
@@ -152,7 +152,7 @@ async fn required_cells_are_checked_for_app_and_core_writes(pool: PgPool) {
     assert!(matches!(outcome, WritesOutcome::Applied { .. }));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn adding_a_required_column_requires_values_for_existing_rows_in_the_same_batch(
     pool: PgPool,
 ) {

@@ -6,9 +6,9 @@ use super::Guid;
 use std::sync::Arc;
 
 /// The plugin id Rox's own `pluginData` entries are stored under.
-pub const MACRO_PLUGIN: &str = "macro";
+pub const ROX_PLUGIN: &str = "macro";
 
-/// Macro's values on a node (`pluginData` under [`MACRO_PLUGIN`]): key and
+/// Rox's values on a node (`pluginData` under [`ROX_PLUGIN`]): key and
 /// value, in order.
 pub type RoxData = Arc<[(Arc<str>, Arc<str>)]>;
 

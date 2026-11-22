@@ -3,8 +3,8 @@ use axum::extract::FromRef;
 use calendar_events::domain::ports::CalendarEventLabelReader;
 use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
-use macro_authorization::{
-    MacroAuthJwtValidator, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_authorization::{
+    RoxAuthJwtValidator, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
 use opensearch_client::OpensearchClient;
 use readonly_pool::ReadOnlyPool;
@@ -15,7 +15,7 @@ use std::sync::Arc;
 pub type SearchEntityAccessService = EntityAccessServiceImpl<PgAccessRepository>;
 
 /// Concrete authorization service backing search request authentication.
-pub type SearchAuthorizationService = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+pub type SearchAuthorizationService = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 
 /// Minimal state required by search handlers.
 /// This can be extracted from any state that implements `FromRef<SearchHandlerState>`.
@@ -28,7 +28,7 @@ pub struct SearchHandlerState {
     /// Resolves the caller's team membership to mint CRM capability receipts.
     pub entity_access_service: Arc<SearchEntityAccessService>,
     /// Authorization state used to authenticate search requests.
-    pub authorization_state: MacroAuthorizationState<SearchAuthorizationService>,
+    pub authorization_state: RoxAuthorizationState<SearchAuthorizationService>,
     /// Agent-session domain service used after the search layer resolves its
     /// authorized session allowlist.
     pub agent_session_search_metadata: Arc<dyn AgentSessionSearchMetadataService>,

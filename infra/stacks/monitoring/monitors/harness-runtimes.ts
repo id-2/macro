@@ -12,7 +12,7 @@
 //   `.reattach_eager`, `.reattach_lazy`, `.reattach_skipped` and
 //   `.reattach_failures` (how each was handled).
 // - The `tokio runtime starvation detected` warning from
-//   `spawn_starvation_detector` in `crates/macro_tower_layers/src/lib.rs`,
+//   `spawn_starvation_detector` in `crates/rox_tower_layers/src/lib.rs`,
 //   logged when a 250 ms tick runs late.
 // - The ECS Fargate integration's `ecs.fargate.mem.rss` and
 //   `ecs.fargate.mem.limit` for the `service` container of the
@@ -29,7 +29,7 @@ const HARNESS = { path: '@harness', tagName: 'harness' };
 const REATTACH = `service:${SERVICE} resource_name:agent.runtime.reattach`;
 
 new datadog.SpansMetric('agent-runtime-reattach', {
-  name: 'macro.agent_harness.runtime_reattach',
+  name: 'rox.agent_harness.runtime_reattach',
   filter: { query: REATTACH },
   compute: { aggregationType: 'count' },
   groupBies: [ENV, HARNESS],
@@ -50,7 +50,7 @@ for (const field of ['sessions', 'eager', 'lazy', 'skipped', 'failures']) {
 }
 
 new datadog.LogsMetric('agent-harness-runtime-starvation', {
-  name: 'macro.agent_harness.runtime_starvation',
+  name: 'rox.agent_harness.runtime_starvation',
   compute: { aggregationType: 'count' },
   filter: {
     query: `service:${SERVICE} status:warn "tokio runtime starvation detected"`,

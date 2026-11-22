@@ -8,8 +8,8 @@ use agent_client_protocol::schema::v1::{
 use super::*;
 use chrono::TimeZone as _;
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("models@example.com").unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("models@example.com").unwrap()
 }
 
 fn options() -> Vec<SessionConfigOption> {
@@ -26,7 +26,7 @@ struct Access(HarnessModelReach);
 impl HarnessModelAccess for Access {
     async fn reach(
         &self,
-        _caller: &MacroUserIdStr<'static>,
+        _caller: &RoxUserIdStr<'static>,
         _harness: HarnessId,
     ) -> Result<HarnessModelReach, String> {
         Ok(self.0)
@@ -61,7 +61,7 @@ impl KnownRoxdModels for Known {
 }
 
 struct Probe {
-    callers: std::sync::Mutex<Vec<MacroUserIdStr<'static>>>,
+    callers: std::sync::Mutex<Vec<RoxUserIdStr<'static>>>,
     calls: AtomicUsize,
     result: fn() -> Result<RawModelProbe, ModelProbeError>,
 }
@@ -83,7 +83,7 @@ impl Probe {
 impl InMemoryModelProbe for Probe {
     async fn probe(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
     ) -> Result<RawModelProbe, ModelProbeError> {
         self.callers.lock().unwrap().push(caller.clone());
         self.calls.fetch_add(1, Ordering::Relaxed);
@@ -94,7 +94,7 @@ impl InMemoryModelProbe for Probe {
 impl CursorModelProbe for Probe {
     async fn probe(
         &self,
-        _caller: &MacroUserIdStr<'static>,
+        _caller: &RoxUserIdStr<'static>,
     ) -> Result<RawModelProbe, ModelProbeError> {
         self.calls.fetch_add(1, Ordering::Relaxed);
         (self.result)()
@@ -121,7 +121,7 @@ struct HangingCursor;
 impl CursorModelProbe for HangingCursor {
     async fn probe(
         &self,
-        _caller: &MacroUserIdStr<'static>,
+        _caller: &RoxUserIdStr<'static>,
     ) -> Result<RawModelProbe, ModelProbeError> {
         std::future::pending().await
     }

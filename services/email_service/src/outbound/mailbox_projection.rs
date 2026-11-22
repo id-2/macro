@@ -7,8 +7,8 @@ use email::domain::{
     mailbox::{DatabaseFailure, EffectFailure, MailboxError, MailboxKey, projection::*},
     models::calendar_invitation::CalendarInvitation,
 };
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::NewEmailMetadata;
 use models_email::{
@@ -59,7 +59,7 @@ impl<A, I, B, N, C> MailboxProjectionEffects for MailboxEffects<A, I, B, N, C>
 where
     A: MailboxAttachmentAccess,
     I: InvitationExtractionRepository + 'static,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: NotificationIngress + 'static,
     C: ContactsIngress + 'static,
 {
@@ -70,7 +70,7 @@ where
     ) -> Result<(), MailboxError> {
         let request = SendNotificationRequestBuilder {
             notification_entity: EntityType::User
-                .with_entity_string(context.link.macro_id.to_string()),
+                .with_entity_string(context.link.rox_id.to_string()),
             secondary_notification_entity: None,
             notification: model_notifications::InboxReauthRequiredMetadata {
                 email_address: context.link.email_address.0.as_ref().into(),
@@ -89,7 +89,7 @@ where
     async fn photo_refresh(
         &self,
         link_id: Uuid,
-        viewers: &HashSet<MacroUserIdStr<'static>>,
+        viewers: &HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), MailboxError> {
         for viewer in viewers {
             crate::pubsub::util::cg_refresh_email(
@@ -113,7 +113,7 @@ where
     async fn refresh(
         &self,
         link_id: Uuid,
-        viewers: &HashSet<MacroUserIdStr<'static>>,
+        viewers: &HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), MailboxError> {
         for viewer in viewers {
             crate::pubsub::util::cg_refresh_email(

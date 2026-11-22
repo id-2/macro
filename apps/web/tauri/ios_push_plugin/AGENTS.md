@@ -36,7 +36,7 @@ and owns durable notification-tap delivery across cold launches/WebView reloads.
   the flag and treat quiet delivery as fully enabled. `.authorized` reports
   `granted` even with banners off; **Keep → Deliver Immediately** authorizes
   without turning them on.
-- Gate new frontend commands on `__MACRO_IOS_NOTIFICATION_LAUNCH__`; older native
+- Gate new frontend commands on `__ROX_IOS_NOTIFICATION_LAUNCH__`; older native
   binaries retain the existing push behavior when receiving an OTA web bundle.
   Pass `launchAware: true` when watching. Older web bundles omit that flag and
   retain legacy delivery without a native cover or required acknowledgment.

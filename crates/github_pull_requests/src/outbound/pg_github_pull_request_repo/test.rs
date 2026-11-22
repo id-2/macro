@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::PgGithubPullRequestRepo;
@@ -52,7 +52,7 @@ fn row(github_key: &str, repository_id: Option<i64>) -> GithubPullRequestRow {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn upsert_stores_a_row_found_by_repository_and_number(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
 
@@ -67,7 +67,7 @@ async fn upsert_stores_a_row_found_by_repository_and_number(pool: PgPool) {
     assert_eq!(repo.github_key_for(99, 8).await.unwrap(), None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn upsert_without_a_repository_id_keeps_the_one_the_row_has(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
 
@@ -98,7 +98,7 @@ async fn upsert_without_a_repository_id_keeps_the_one_the_row_has(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rename_moves_the_row_or_drops_it_when_the_new_key_has_one(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     repo.upsert_row(&(&row("macro/app/pull/7", Some(99)).into()))
@@ -140,7 +140,7 @@ async fn rename_moves_the_row_or_drops_it_when_the_new_key_has_one(pool: PgPool)
     assert!(stored_row(&pool, "macro/renamed/pull/8").await.is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn upsert_stores_assignees_labels_and_reviews(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
 
@@ -196,7 +196,7 @@ async fn upsert_stores_assignees_labels_and_reviews(pool: PgPool) {
     assert_eq!(stored.3.as_deref(), Some("approved"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_sparse_writes_merge_on_missing_row(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     let base = row("macro/app/pull/7", Some(99));
@@ -232,7 +232,7 @@ async fn concurrent_sparse_writes_merge_on_missing_row(pool: PgPool) {
     assert_eq!(stored.requested_reviewer_github_user_ids, vec!["8"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sparse_update_preserves_rich_row_and_supplied_empty_collections_replace_it(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     let mut original = row("macro/app/pull/7", Some(99));
@@ -295,7 +295,7 @@ async fn sparse_update_preserves_rich_row_and_supplied_empty_collections_replace
     assert_eq!(stored.review_decision.as_deref(), Some("approved"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lookup_reads_back_the_stored_row(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool);
     let stored = GithubPullRequestRow {
@@ -339,7 +339,7 @@ async fn lookup_reads_back_the_stored_row(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn partial_git_refs_replace_name_and_sha_together(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool);
     let original = GithubPullRequestRow {

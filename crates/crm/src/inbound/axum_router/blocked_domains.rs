@@ -6,9 +6,9 @@ use axum::{
 use chrono::{DateTime, Utc};
 use entity_access::{
     domain::{models::MemberTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 use serde::Serialize;
 use utoipa::ToSchema;
@@ -56,9 +56,9 @@ pub async fn list_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
 ) -> Result<Json<Vec<CrmBlockedDomainResponse>>, CrmError> {
     let receipt = CrmTeamReceipt::from_team_receipt(access.entity_access_receipt)?;
@@ -87,9 +87,9 @@ pub async fn block_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
     Path(domain): Path<String>,
 ) -> Result<StatusCode, CrmError> {
@@ -121,9 +121,9 @@ pub async fn unblock_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
     Path(domain): Path<String>,
 ) -> Result<StatusCode, CrmError> {

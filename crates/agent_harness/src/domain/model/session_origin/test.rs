@@ -1,8 +1,8 @@
 use super::*;
 use messages::domain::models::MessageParent;
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 
 #[test]

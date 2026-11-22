@@ -3,7 +3,7 @@ use crate::api::email::backfill::get::job_error_response;
 use axum::extract::{Path, State};
 use axum::response::{IntoResponse, Json, Response};
 use email::domain::backfill_jobs::BackfillJobAccess;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use models_email::email::service::backfill::BackfillJob;
 use sqlx::types::Uuid;
 use utoipa::ToSchema;
@@ -17,7 +17,7 @@ pub struct GetBackfillJobResponse {
 /// Get a backfill job.
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path(job_id): Path<Uuid>,
 ) -> Result<Response, Response> {
     let job = ctx

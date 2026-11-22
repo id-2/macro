@@ -1,6 +1,6 @@
 use super::email_api_error::map_email_api_error;
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{
     backfill::*,
     link,
@@ -60,7 +60,7 @@ where
             continue;
         }
 
-        let recipient = match MacroUserIdStr::try_from_email(&email) {
+        let recipient = match RoxUserIdStr::try_from_email(&email) {
             Ok(id) => id,
             // A single malformed address shouldn't fail the whole message.
             Err(e) => {
@@ -69,8 +69,8 @@ where
             }
         };
 
-        let users: HashSet<MacroUserIdStr<'static>> =
-            HashSet::from([link.macro_id.clone(), recipient]);
+        let users: HashSet<RoxUserIdStr<'static>> =
+            HashSet::from([link.rox_id.clone(), recipient]);
 
         // Idempotent on the consumer side, so a retried seed message that
         // re-enqueues already-sent connections is harmless.

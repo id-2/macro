@@ -19,7 +19,7 @@ use crate::test_support::{
     code_challenge_for, query_param,
 };
 use axum::{Router, routing::get};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
 
 const BODY_LIMIT: usize = 64 * 1024;
 
@@ -221,7 +221,7 @@ async fn authorize_for_an_unlisted_host_shows_the_consent_screen() {
         page.csp
     );
     let set_cookie = page.set_cookie.expect("authorize sets the binding cookie");
-    assert!(set_cookie.starts_with("__Host-macro_mcp_oauth="));
+    assert!(set_cookie.starts_with("__Host-rox_mcp_oauth="));
     for attribute in ["Secure", "HttpOnly", "SameSite=Lax", "Path=/"] {
         assert!(
             set_cookie.contains(attribute),
@@ -373,7 +373,7 @@ async fn a_forged_consent_submission_is_refused() {
     let cookie = cookie_pair(&page.set_cookie.expect("authorize sets the binding cookie"));
     let token = consent_token(&page.body);
     let other_browser = format!(
-        "__Host-macro_mcp_oauth={}",
+        "__Host-rox_mcp_oauth={}",
         BrowserBinding::generate().as_str()
     );
 
@@ -477,7 +477,7 @@ async fn a_sign_in_started_in_another_browser_issues_no_code() {
     assert_eq!(approved.status, StatusCode::SEE_OTHER);
     let session_id = harness.inflight.only_pending_session_id();
     let victim_cookie = format!(
-        "__Host-macro_mcp_oauth={}",
+        "__Host-rox_mcp_oauth={}",
         BrowserBinding::generate().as_str()
     );
 
@@ -781,7 +781,7 @@ async fn email_sign_in_sends_a_single_sign_on_address_to_its_provider() {
 async fn email_sign_in_refuses_a_browser_that_did_not_start_it() {
     let flow = EmailSignIn::start(LOOPBACK_REDIRECT_URI).await;
     let other = BrowserBinding::generate();
-    let other_cookie = format!("__Host-macro_mcp_oauth={}", other.as_str());
+    let other_cookie = format!("__Host-rox_mcp_oauth={}", other.as_str());
 
     let page = send(
         &flow.harness,
@@ -1310,7 +1310,7 @@ async fn token_endpoint_names_missing_parameters_as_invalid_request() {
 /// ChatGPT's flow: it names the ChatGPT MCP server as the resource at both
 /// endpoints and receives a Rox API token labelled with its name.
 #[tokio::test]
-async fn a_chatgpt_resource_flow_receives_a_macro_api_token() {
+async fn a_chatgpt_resource_flow_receives_a_rox_api_token() {
     let harness = Harness::new();
     let client_id = register_client(&harness, TRUSTED_REDIRECT_URI).await;
     let resource = urlencoding::encode(CHATGPT_RESOURCE).into_owned();
@@ -1628,28 +1628,28 @@ async fn mounted_mcp_preserves_process_readiness_and_bearer_protection() {
 
 #[derive(Clone)]
 struct KeyOwners(std::sync::Arc<std::sync::atomic::AtomicBool>);
-impl macro_authorization::UserApiKeyAuthorizationRepo for KeyOwners {
+impl rox_authorization::UserApiKeyAuthorizationRepo for KeyOwners {
     type Err = &'static str;
     async fn find_key_owner(
         &self,
         key: &str,
-    ) -> Result<Option<macro_authorization::ResolvedApiKeyUser>, Self::Err> {
+    ) -> Result<Option<rox_authorization::ResolvedApiKeyUser>, Self::Err> {
         if !["fixture-user-key", "fixture-manager-key"].contains(&key)
             || !self.0.load(std::sync::atomic::Ordering::SeqCst)
         {
             return Ok(None);
         }
-        Ok(Some(macro_authorization::ResolvedApiKeyUser {
-            macro_user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(
+        Ok(Some(rox_authorization::ResolvedApiKeyUser {
+            rox_user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(
                 "macro|agent@example.com",
             )
             .unwrap(),
             fusion_user_id: "agent-fusion".into(),
             organization_id: None,
             account_manager: (key == "fixture-manager-key").then(|| {
-                macro_authorization::AccountManagerCredential {
+                rox_authorization::AccountManagerCredential {
                     grant_id: uuid::Uuid::nil(),
-                    manager_user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(
+                    manager_user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(
                         "macro|manager@example.com",
                     )
                     .unwrap(),
@@ -1671,7 +1671,7 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
     let active = Arc::new(AtomicBool::new(true));
     let app = super::mounted_mcp_router(
         Some(Arc::new(
-            macro_authorization::UserApiKeyAuthorizerService::new(KeyOwners(active.clone())),
+            rox_authorization::UserApiKeyAuthorizerService::new(KeyOwners(active.clone())),
         )),
         Harness::new().service,
         JwtValidationArgs::new_testing(),
@@ -1680,7 +1680,7 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
             get(|request: axum::extract::Request| async move {
                 request
                     .extensions()
-                    .get::<macro_user_id::user_id::MacroUserIdStr<'static>>()
+                    .get::<rox_user_id::user_id::RoxUserIdStr<'static>>()
                     .unwrap()
                     .to_string()
             }),
@@ -1691,8 +1691,8 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
         .oneshot(
             Request::builder()
                 .uri("/mcp/mcp")
-                .header("x-macro-user-api-key", "fixture-user-key")
-                .header("x-macro-user-id", "macro|another@example.com")
+                .header("x-rox-user-api-key", "fixture-user-key")
+                .header("x-rox-user-id", "macro|another@example.com")
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -1710,7 +1710,7 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
         .oneshot(
             Request::builder()
                 .uri("/mcp/mcp")
-                .header("x-macro-user-api-key", "fixture-manager-key")
+                .header("x-rox-user-api-key", "fixture-manager-key")
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -1722,7 +1722,7 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
         .oneshot(
             Request::builder()
                 .uri("/mcp/mcp")
-                .header("x-macro-user-api-key", "fixture-user-key")
+                .header("x-rox-user-api-key", "fixture-user-key")
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -1741,15 +1741,15 @@ async fn jwt_bearer_still_authenticates_its_user_with_api_key_support_enabled() 
         &serde_json::json!({
             "aud": "", "iss": "", "exp": 4102444800_u64, "tid": "tenant",
             "email": "user@example.com", "fusion_user_id": "fusion-user",
-            "macro_user_id": "macro|user@example.com", "macro_organization_id": null,
-            "root_macro_id": null,
+            "rox_user_id": "macro|user@example.com", "rox_organization_id": null,
+            "root_rox_id": null,
         }),
         &jsonwebtoken::EncodingKey::from_secret(b""),
     )
     .unwrap();
     let app = super::mounted_mcp_router(
         Some(Arc::new(
-            macro_authorization::UserApiKeyAuthorizerService::new(KeyOwners(Arc::new(
+            rox_authorization::UserApiKeyAuthorizerService::new(KeyOwners(Arc::new(
                 AtomicBool::new(false),
             ))),
         )),
@@ -1760,7 +1760,7 @@ async fn jwt_bearer_still_authenticates_its_user_with_api_key_support_enabled() 
             get(|request: axum::extract::Request| async move {
                 request
                     .extensions()
-                    .get::<macro_user_id::user_id::MacroUserIdStr<'static>>()
+                    .get::<rox_user_id::user_id::RoxUserIdStr<'static>>()
                     .unwrap()
                     .to_string()
             }),
@@ -1771,7 +1771,7 @@ async fn jwt_bearer_still_authenticates_its_user_with_api_key_support_enabled() 
             .uri("/mcp/mcp")
             .header(header::AUTHORIZATION, format!("Bearer {token}"));
         if let Some(key) = key {
-            request = request.header("x-macro-user-api-key", key);
+            request = request.header("x-rox-user-api-key", key);
         }
         let response = app
             .clone()

@@ -97,7 +97,7 @@ Payloads intentionally contain property metadata and complete property values.
 Property display names, string option values, string property values, and link
 values can contain user-authored text. `actor_user_id`, user-scoped
 `owner.user_id`, and user entity references such as task assignees can contain
-Macro user IDs serialized as `macro|<email address>` and must be handled as
+Rox user IDs serialized as `macro|<email address>` and must be handled as
 personal data.
 
 The producer does not redact those contract fields. Its sanitization boundary

@@ -8,11 +8,11 @@ import { Channel } from '../../entities/channels/channel';
 import { Message } from '../../entities/channels/message';
 import { Thread } from '../../entities/channels/thread';
 import { User } from '../../entities/users/user';
-import type { MacroClient } from '../../utils/client';
-import type { MacroEvent } from '../types';
+import type { RoxClient } from '../../utils/client';
+import type { RoxEvent } from '../types';
 
 export type AgentSessionEvent = Extract<
-  MacroEvent,
+  RoxEvent,
   { event_type: `agent_session.${string}` }
 >;
 
@@ -22,7 +22,7 @@ export type AgentSessionEvent = Extract<
  * the SDK's message entities are channel-scoped for now.
  */
 function originHandles(
-  client: MacroClient,
+  client: RoxClient,
   origin: ThreadOrigin | null | undefined,
 ) {
   const channelId = origin?.channel_id;
@@ -35,7 +35,7 @@ function originHandles(
 }
 
 /** Handles every lifecycle event carries: the session, its owner, its origin. */
-function sessionHandles(client: MacroClient, identity: SessionIdentity) {
+function sessionHandles(client: RoxClient, identity: SessionIdentity) {
   return {
     session: AgentSession.byId(client, identity.session_id),
     owner: User.byId(client, identity.owner_id),
@@ -48,7 +48,7 @@ function sessionHandles(client: MacroClient, identity: SessionIdentity) {
  * the origin channel, so a session with no origin never has one.
  */
 function announcementHandle(
-  client: MacroClient,
+  client: RoxClient,
   identity: SessionIdentity,
   announcementMessageId: string | null | undefined,
 ) {
@@ -58,13 +58,13 @@ function announcementHandle(
     : undefined;
 }
 
-function actorHandle(client: MacroClient, actor: string | null | undefined) {
+function actorHandle(client: RoxClient, actor: string | null | undefined) {
   return actor ? User.byId(client, actor) : undefined;
 }
 
 /** Attach SDK entity handles to an agent-session lifecycle webhook event. */
 export function hydrateAgentSessionEvent(
-  client: MacroClient,
+  client: RoxClient,
   event: AgentSessionEvent,
 ) {
   return match(event)

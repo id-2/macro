@@ -25,7 +25,7 @@ use ai_toolset::{
 use ai_toolset::{ToolAnnotated, ToolAnnotations};
 use async_trait::async_trait;
 use cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use models_pagination::CreatedAt;
 use rootcause::compat::boxed_error::IntoBoxedError;
@@ -291,7 +291,7 @@ where
         let paginated = service_context
             .service
             .get_user_notifications::<serde_json::Value>(
-                MacroUserIdStr((*request_context.user_id).copied()),
+                RoxUserIdStr((*request_context.user_id).copied()),
                 Some(limit),
                 models_pagination::Query::Sort(CreatedAt, ()),
                 NotificationListFilters {
@@ -395,7 +395,7 @@ where
         service_context
             .service
             .update_notifications(UpdateNotificationsRequest {
-                user_id: MacroUserIdStr((*request_context.user_id).clone()),
+                user_id: RoxUserIdStr((*request_context.user_id).clone()),
                 notification_ids: &self.notification_ids,
                 status: NotificationStatus::Seen,
             })
@@ -454,7 +454,7 @@ where
         service_context
             .service
             .update_notifications(UpdateNotificationsRequest {
-                user_id: MacroUserIdStr((*request_context.user_id).clone()),
+                user_id: RoxUserIdStr((*request_context.user_id).clone()),
                 notification_ids: &self.notification_ids,
                 status: NotificationStatus::Done(self.done),
             })

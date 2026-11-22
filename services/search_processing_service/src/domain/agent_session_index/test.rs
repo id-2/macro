@@ -37,7 +37,7 @@ impl SearchSnapshotService for Source {
                 metadata: AgentSessionSearchMetadata {
                     id: id.as_uuid(),
                     name: "searchable title".into(),
-                    owner_id: macro_user_id::user_id::MacroUserIdStr::try_from(
+                    owner_id: rox_user_id::user_id::RoxUserIdStr::try_from(
                         "macro|test@example.com".to_string(),
                     )
                     .unwrap(),

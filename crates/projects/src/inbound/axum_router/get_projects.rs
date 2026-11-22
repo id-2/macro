@@ -2,7 +2,7 @@
 
 use axum::{Json, extract::State};
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model::{project::response::GetProjectsResponse, response::TypedSuccessResponse};
 
 use super::ProjectRouterState;
@@ -24,21 +24,21 @@ pub type PendingProjectsResponse = TypedSuccessResponse<Vec<model::project::Pend
 )]
 #[tracing::instrument(
     skip(state, user),
-    fields(user_id = ?user.authorization.user.macro_user_id),
+    fields(user_id = ?user.authorization.user.rox_user_id),
     err
 )]
 pub async fn get_projects_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<GetProjectsResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let projects = state
         .service
-        .list_projects(user.authorization.user.macro_user_id.clone())
+        .list_projects(user.authorization.user.rox_user_id.clone())
         .await?;
     Ok(Json(GetProjectsResponse {
         error: false,
@@ -59,21 +59,21 @@ where
 )]
 #[tracing::instrument(
     skip(state, user),
-    fields(user_id = ?user.authorization.user.macro_user_id),
+    fields(user_id = ?user.authorization.user.rox_user_id),
     err
 )]
 pub async fn get_pending_projects_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<PendingProjectsResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let projects = state
         .service
-        .list_pending_projects(user.authorization.user.macro_user_id.clone())
+        .list_pending_projects(user.authorization.user.rox_user_id.clone())
         .await?;
     Ok(Json(PendingProjectsResponse {
         error: false,

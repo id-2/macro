@@ -1,6 +1,6 @@
 import {
   attachmentLimitBytes,
-  MACRO_EMAIL_SIGNATURE,
+  ROX_EMAIL_SIGNATURE,
 } from '@app/features/email-compose/core/constants';
 import { startUiOperation } from '@app/observability/ui-operation';
 import { setEditorStateFromHtml } from '@core/component/LexicalMarkdown/utils/setEditorStateFromHtml';
@@ -601,7 +601,7 @@ export function createEmailComposer(props: EmailComposerOptions) {
     const currentEditor = editor();
     const cleanupWatermark = $appendWatermarkNodeToLast(
       currentEditor,
-      !hasPaidAccess() ? MACRO_EMAIL_SIGNATURE : undefined
+      !hasPaidAccess() ? ROX_EMAIL_SIGNATURE : undefined
     );
     try {
       return persistence.confirmed(
@@ -1027,7 +1027,7 @@ export function createEmailComposer(props: EmailComposerOptions) {
       const restoreMacro = content();
       const cleanupWatermark = $appendWatermarkNodeToLast(
         currentEditor,
-        !hasPaidAccess() ? MACRO_EMAIL_SIGNATURE : undefined
+        !hasPaidAccess() ? ROX_EMAIL_SIGNATURE : undefined
       );
 
       const prepared = prepareEmailBody(currentEditor);
@@ -1071,7 +1071,7 @@ export function createEmailComposer(props: EmailComposerOptions) {
             subject: form.subject(),
             body_text: prepared.bodyText,
             body_html: prepared.bodyHtml,
-            body_macro: bodyMacro,
+            body_rox: bodyMacro,
             db_id: draftId,
             // Backend includes the signature by default for new emails; only signal
             // an explicit dismiss. Omitting it falls through to the backend default.

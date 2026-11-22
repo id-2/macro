@@ -1,4 +1,4 @@
-use crate::domain::harness::{self, macro_tools};
+use crate::domain::harness::{self, rox_tools};
 use crate::domain::model::{Harness, ToolName};
 use crate::domain::test::util::Frame;
 use serde_json::json;
@@ -16,11 +16,11 @@ fn mcp(server: &str, tool: &str) -> ToolName {
 
 #[test]
 fn splits_claude_code_mcp_names_at_the_server_boundary() {
-    assert_eq!(parse("mcp__macro__SendEmail"), mcp("macro", "SendEmail"));
+    assert_eq!(parse("mcp__rox__SendEmail"), mcp("macro", "SendEmail"));
     assert_eq!(parse("mcp__deepwiki__ask"), mcp("deepwiki", "ask"));
     // Single underscores inside either half are part of the name.
     assert_eq!(
-        parse("mcp__macro__Bulk_Set_Options"),
+        parse("mcp__rox__Bulk_Set_Options"),
         mcp("macro", "Bulk_Set_Options")
     );
     assert_eq!(parse("mcp__my_server__Tool"), mcp("my_server", "Tool"));
@@ -37,21 +37,21 @@ fn everything_else_is_a_native_name() {
 
 #[test]
 fn display_drops_the_server_namespace() {
-    assert_eq!(parse("mcp__macro__ReadContent").display(), "ReadContent");
+    assert_eq!(parse("mcp__rox__ReadContent").display(), "ReadContent");
     assert_eq!(parse("Bash").display(), "Bash");
 }
 
 #[test]
-fn only_macro_mcp_names_are_macro_tools() {
+fn only_rox_mcp_names_are_rox_tools() {
     assert_eq!(
-        macro_tools::mcp_tool(&parse("mcp__macro__ReadContent")),
+        rox_tools::mcp_tool(&parse("mcp__rox__ReadContent")),
         Some("ReadContent")
     );
     assert_eq!(
-        macro_tools::mcp_tool(&parse("mcp__deepwiki__ReadContent")),
+        rox_tools::mcp_tool(&parse("mcp__deepwiki__ReadContent")),
         None
     );
-    assert_eq!(macro_tools::mcp_tool(&parse("ReadContent")), None);
+    assert_eq!(rox_tools::mcp_tool(&parse("ReadContent")), None);
 }
 
 #[test]
@@ -77,7 +77,7 @@ fn a_harness_name_in_meta_outranks_the_title() {
     assert_eq!(
         harness::tool_name(
             claude,
-            &Frame::new().title("mcp__macro__ReadContent").view()
+            &Frame::new().title("mcp__rox__ReadContent").view()
         ),
         mcp("macro", "ReadContent")
     );
@@ -98,7 +98,7 @@ fn wire_form_is_a_tagged_union() {
         json!({"kind": "native", "name": "Bash"})
     );
     assert_eq!(
-        serde_json::to_value(parse("mcp__macro__SendEmail")).unwrap(),
+        serde_json::to_value(parse("mcp__rox__SendEmail")).unwrap(),
         json!({"kind": "mcp", "server": "macro", "tool": "SendEmail"})
     );
 }

@@ -1,4 +1,4 @@
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Initiative } from '../initiatives/initiative';
 import type { Project } from '../projects/project';
 import type { SearchOpts } from '../search/options';
@@ -18,7 +18,7 @@ import { type SimilarTask, Task, type TaskSummary } from './task';
  * Never edit, merge or delete the tasks `findSimilar` matches unless the user asks.
  */
 export class TaskNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to a task by document id. Details load on first access. */
   byId(id: string): Task {

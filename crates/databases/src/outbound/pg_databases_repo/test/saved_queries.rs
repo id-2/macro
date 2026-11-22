@@ -1,6 +1,6 @@
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_saved_query_round_trips_and_outlives_its_database(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     let definition = QueryDefinition::V1 {
@@ -50,11 +50,11 @@ async fn a_saved_query_round_trips_and_outlives_its_database(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_definition_without_its_version_and_query_is_rejected(pool: PgPool) {
     let rejected = sqlx::query!(
         "INSERT INTO database_queries (id, definition, created_by) VALUES ($1, $2, $3)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         serde_json::json!({"query": "SELECT 1"}),
         USER,
     )

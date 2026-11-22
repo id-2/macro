@@ -13,8 +13,8 @@ required-features = ["backfill_binary"]
 purge = [
   "ports",
   "outbound",
-  "dep:macro_db_client",
-  "dep:macro_sha_count_client",
+  "dep:rox_db_client",
+  "dep:rox_sha_count_client",
   "dep:sqs_client",
   "dep:comms_db_client",
 ]
@@ -28,9 +28,9 @@ ai_tools = [
   "dep:fig_engine",
   "dep:async-trait",
   "dep:loro",
-  "dep:macro_tower_layers",
+  "dep:rox_tower_layers",
   "dep:messages",
-  "dep:macro_db_client",
+  "dep:rox_db_client",
   "dep:model_file_type",
   "dep:pptx_engine",
   "dep:psd_engine",
@@ -55,7 +55,7 @@ axum = [
   "dep:entity_registry",
   "dep:jsonwebtoken",
   "dep:lexical_client",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:model_user",
   "dep:task_dedup",
@@ -67,8 +67,8 @@ axum = [
 ]
 backfill_binary = [
   "dep:clap",
-  "dep:macro_entrypoint",
-  "dep:macro_service_urls",
+  "dep:rox_entrypoint",
+  "dep:rox_service_urls",
   "markdown_init",
   "outbound",
   "ports",
@@ -100,7 +100,7 @@ outbound = [
   "ports",
 ]
 ports = ["dep:shared_entity_registry", "dep:tokio", "dep:tokio-retry"]
-schema = ["dep:utoipa", "macro_user_id/schema", "pptx_engine?/openapi"]
+schema = ["dep:utoipa", "rox_user_id/schema", "pptx_engine?/openapi"]
 service = [
   "dep:entity_access_management",
   "dep:foreign_entity",
@@ -110,8 +110,8 @@ service = [
 
 [dependencies]
 agent_correlation = { path = "../agent_correlation" }
-macro_db_client = { path = "../macro_db_client", optional = true }
-macro_sha_count_client = { path = "../macro_sha_count_client", optional = true }
+rox_db_client = { path = "../rox_db_client", optional = true }
+rox_sha_count_client = { path = "../rox_sha_count_client", optional = true }
 sqs_client = { path = "../sqs_client", optional = true }
 activity = { path = "../activity", default-features = false }
 bot_id = { path = "../bot_id" }
@@ -141,18 +141,18 @@ foreign_entity = { path = "../foreign_entity", default-features = false, feature
   "ports",
 ], optional = true }
 github_pull_requests = { path = "../github_pull_requests", default-features = false, optional = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = [
   "axum",
 ] }
-macro_aws_config = { path = "../macro_aws_config", features = ["s3"] }
-macro_entrypoint = { path = "../macro_entrypoint", optional = true }
-macro_env_var = { path = "../macro_env_var" }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
-macro_service_urls = { path = "../macro_service_urls", optional = true }
-macro_sync_service_jwt = { path = "../macro_sync_service_jwt" }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid" }
+rox_aws_config = { path = "../rox_aws_config", features = ["s3"] }
+rox_entrypoint = { path = "../rox_entrypoint", optional = true }
+rox_env_var = { path = "../rox_env_var" }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
+rox_service_urls = { path = "../rox_service_urls", optional = true }
+rox_sync_service_jwt = { path = "../rox_sync_service_jwt" }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid" }
 system_skills = { path = "../system_skills" }
 model = { path = "../model" }
 model-entity = { path = "../model-entity" }
@@ -199,7 +199,7 @@ ai_usage = { path = "../ai_usage", optional = true }
 async-trait = { workspace = true, optional = true }
 lexical_client = { path = "../lexical_client", optional = true }
 loro = { workspace = true, optional = true }
-macro_tower_layers = { path = "../macro_tower_layers", optional = true }
+rox_tower_layers = { path = "../rox_tower_layers", optional = true }
 messages = { path = "../messages", optional = true, features = ["ports"] }
 model_file_type = { path = "../model_file_type", optional = true }
 ai_engine = { path = "../ai_engine", optional = true }
@@ -224,9 +224,9 @@ bot_id = { path = "../bot_id", features = ["test-utils"] }
 embedding = { path = "../embedding" }
 http-body-util = { workspace = true }
 kafka_util = { path = "../kafka_util" }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 # Examples need the Kafka adapter (outbound); the library itself only uses ports.
-macro_event_broker = { path = "../macro_event_broker" }
+rox_event_broker = { path = "../rox_event_broker" }
 mockall = { workspace = true }
 rdkafka = { workspace = true }
 serde_json = { workspace = true }

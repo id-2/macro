@@ -21,7 +21,7 @@ use calendar_events::domain::{
 };
 use calendar_events::outbound::{google::GoogleCalendarClient, pg::PgCalendarRepository};
 use chrono::Utc;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use models_email::email::service::link::Link;
 use redis::aio::MultiplexedConnection;
 use sqlx::PgPool;
@@ -37,7 +37,7 @@ use crate::calendar_reauth::LinkManagerReauthNotifier;
 use crate::pubsub_util::cg_refresh_calendar;
 
 /// The event broker used by the backfill coordinator.
-pub type CalendarEventBroker = MacroEventBrokerService<KafkaEventPublisher, TaskTracker>;
+pub type CalendarEventBroker = RoxEventBrokerService<KafkaEventPublisher, TaskTracker>;
 
 /// Concrete Google Calendar backfill coordinator for this service.
 type GoogleCalendarBackfillService = GoogleCalendarBackfillCoordinator<
@@ -79,7 +79,7 @@ impl CalendarBackfillContext {
         redis_conn: MultiplexedConnection,
         auth_service_client: AuthServiceClient,
         connection_gateway_client: connection_gateway_client::client::ConnectionGatewayClient,
-        macro_event_broker: CalendarEventBroker,
+        rox_event_broker: CalendarEventBroker,
         reauth_notifier: LinkManagerReauthNotifier,
         watch: Option<GoogleWatchConfig>,
         calendar_sync_enabled: bool,
@@ -96,7 +96,7 @@ impl CalendarBackfillContext {
                 RedisCalendarRequestGate::new(rate_limiter),
             ),
             repository.clone(),
-            macro_event_broker,
+            rox_event_broker,
             watch,
         ));
         let failure = Arc::new(GoogleCalendarBackfillFailureService::new(repository));
@@ -306,7 +306,7 @@ async fn run_coordinator(
                 job_id: calendar_job_id,
                 email_link_id: link.id,
             },
-            link.macro_id.as_ref(),
+            link.rox_id.as_ref(),
             access_token,
             OccurrenceRange::maintenance_horizon(Utc::now()),
             &mut report,
@@ -320,7 +320,7 @@ async fn run_coordinator(
         cg_refresh_calendar(
             &ctx.connection_gateway_client,
             &ctx.db,
-            link.macro_id.as_ref(),
+            link.rox_id.as_ref(),
             link.id,
             ctx.team_sharing_enabled,
             report.team_ooo_changed || run_result.is_err(),

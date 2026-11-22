@@ -99,7 +99,7 @@ fn without_a_team_the_agent_hears_the_import_is_personal_and_offers_no_team_shar
 }
 
 #[test]
-fn the_agent_hears_how_much_is_already_in_macro_and_by_whom() {
+fn the_agent_hears_how_much_is_already_in_rox_and_by_whom() {
     let report = NotionImportReport {
         status: Some(RunStatus::Ready),
         on_team: true,

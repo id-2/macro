@@ -2,8 +2,8 @@
 //! other people's clients the picture changed.
 
 use axum::{Json, http::StatusCode};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::response::ErrorResponse;
 use rate_limit::domain::{
     models::{RateLimitConfig, RateLimitExceeded, RateLimitKey, RateLimitResult},
@@ -71,7 +71,7 @@ pub(super) async fn throttle_set(ctx: &ApiContext, user_id: &str) -> Result<(), 
 
 /// Event metadata for a new picture. An empty url means it was removed.
 pub(super) fn picture_changed_metadata(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     file_id: Option<String>,
     url: &str,
 ) -> UserPictureChangedMetadata {

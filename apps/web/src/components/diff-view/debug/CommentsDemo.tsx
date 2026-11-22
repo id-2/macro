@@ -15,7 +15,7 @@ type ThreadComment = { id: number; author: string; text: string; at: string };
 type Thread = { id: number; range: LineRange; comments: ThreadComment[] };
 
 const UNREAD = 'apps/web/src/features/block-agent/state/unread.ts';
-const SERVICE = 'crates/macro_agent_sessions/src/service.rs';
+const SERVICE = 'crates/rox_agent_sessions/src/service.rs';
 
 const SEED: Thread[] = [
   {

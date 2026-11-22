@@ -10,7 +10,7 @@ This component observes requests evaluated by the existing Web ACL; it does not 
 
 ## Correlation
 
-The existing browser `safeFetch` instrumentation already sends W3C `traceparent` headers to Macro services. This component extracts those trace and span IDs from WAF events so a block or challenge can be linked to its browser request without a backend span. No fetch, retry, request-ID, or CORS behavior changes are needed.
+The existing browser `safeFetch` instrumentation already sends W3C `traceparent` headers to Rox services. This component extracts those trace and span IDs from WAF events so a block or challenge can be linked to its browser request without a backend span. No fetch, retry, request-ID, or CORS behavior changes are needed.
 
 Browser telemetry must be enabled for the affected user (`enable-browser-otel` or its build override), and the browser trace must reach Datadog. Deploy this production-only component and verify a new WAF event links to the corresponding trace; merging to main deploys dev and does not enable the production WAF pipeline by itself.
 
@@ -38,7 +38,7 @@ The one-time `import` options have been removed now that the resources are in pr
 
 Before the first deployment, confirm no other Pulumi stack manages the singleton Datadog pipeline-order resource. Then:
 
-1. Verify that Datadog placed `Macro Cloud Storage AWS WAF` first in the pipeline order and that matching sample logs are processed.
+1. Verify that Datadog placed `Rox Cloud Storage AWS WAF` first in the pipeline order and that matching sample logs are processed.
 2. Verify all pre-existing pipeline IDs remain in their original relative order.
 3. Coordinate pipeline-order deployments because the Datadog API exposes one organization-global order; concurrent external edits can race an update.
 

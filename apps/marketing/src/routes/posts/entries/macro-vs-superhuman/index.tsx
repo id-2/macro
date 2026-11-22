@@ -1,5 +1,5 @@
 import { PostProductGraphic } from '../../PostProductGraphic';
-import '../macro-vs-notion/MacroVsNotion.css';
+import '../macro-vs-notion/RoxVsNotion.css';
 import { featureNavGlyphs } from '../../../../app/components/graphics/FeatureNavGlyphs';
 import avatarJacob from '../../../../assets/people/jacob.webp';
 import {
@@ -114,10 +114,10 @@ export const postMeta: PostMeta = {
   showTOC: true,
   tocDepth: 2,
   author: { name: 'Jacob Beckerman', role: 'Rox', avatar: avatarJacob },
-  ctaButtonName: 'macro_vs_superhuman_cta',
+  ctaButtonName: 'rox_vs_superhuman_cta',
 };
 
-export default function MacroVsSuperhumanPost() {
+export default function RoxVsSuperhumanPost() {
   return (
     <div class="mvn-post">
       <article>

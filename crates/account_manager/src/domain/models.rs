@@ -3,7 +3,7 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -59,10 +59,10 @@ pub struct AccountManagerGrant {
     pub id: Uuid,
     /// The account being managed.
     #[cfg_attr(feature = "inbound", schema(value_type = String))]
-    pub managed_user_id: MacroUserIdStr<'static>,
+    pub managed_user_id: RoxUserIdStr<'static>,
     /// The agent account doing the managing.
     #[cfg_attr(feature = "inbound", schema(value_type = String))]
-    pub manager_user_id: MacroUserIdStr<'static>,
+    pub manager_user_id: RoxUserIdStr<'static>,
     /// The side that asked.
     pub requested_by: AccountManagerRole,
     /// Lifecycle status.
@@ -79,7 +79,7 @@ pub struct AccountManagerGrant {
 
 impl AccountManagerGrant {
     /// The side `user` is on, or `None` when they aren't part of this grant.
-    pub fn role_of(&self, user: &MacroUserIdStr<'_>) -> Option<AccountManagerRole> {
+    pub fn role_of(&self, user: &RoxUserIdStr<'_>) -> Option<AccountManagerRole> {
         if user.as_ref() == self.managed_user_id.as_ref() {
             return Some(AccountManagerRole::Managed);
         }
@@ -92,7 +92,7 @@ impl AccountManagerGrant {
     }
 
     /// The account that may respond: whichever side didn't ask.
-    pub fn responder(&self) -> &MacroUserIdStr<'static> {
+    pub fn responder(&self) -> &RoxUserIdStr<'static> {
         match self.requested_by {
             AccountManagerRole::Managed => &self.manager_user_id,
             AccountManagerRole::Manager => &self.managed_user_id,

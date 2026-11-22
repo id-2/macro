@@ -4,8 +4,8 @@ use axum::{
     http::{Request, StatusCode, header},
     routing::put,
 };
-use macro_authorization::{BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotScope, INTERNAL_API_KEY_HEADER};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotScope, INTERNAL_API_KEY_HEADER};
+use rox_user_id::user_id::RoxUserIdStr;
 use tower::ServiceExt;
 
 use super::*;
@@ -180,7 +180,7 @@ async fn user_scoped_bot_uses_scheduled_action_bot_receipt() {
         [BotAccessCall {
             bot_id: BOT_ID,
             scope: BotAccessScope::User {
-                user_id: MacroUserIdStr::parse_from_str(BOT_ACTING_USER_ID).expect("acting user"),
+                user_id: RoxUserIdStr::parse_from_str(BOT_ACTING_USER_ID).expect("acting user"),
                 user_org_id: Some(i64::from(BOT_ACTING_USER_ORGANIZATION_ID)),
             },
             entity_id: ACTION_ID.to_string(),

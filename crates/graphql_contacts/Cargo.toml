@@ -7,7 +7,7 @@ publish = false
 [dependencies]
 async-graphql = { workspace = true }
 contacts = { path = "../contacts", default-features = false, features = ["ports"] }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 models_pagination = { path = "../models_pagination" }
 rootcause = { workspace = true }
 tracing = { workspace = true }

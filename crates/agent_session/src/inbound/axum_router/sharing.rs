@@ -10,7 +10,7 @@ use entity_access::{
     },
     inbound::axum_extractors::AgentSessionAccessLevelExtractor,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use models_permissions::share_permission::{SharePermissionV2, UpdateSharePermissionRequestV2};
 
 /// Sharing routes, mounted below `/agent-sessions`.
@@ -20,7 +20,7 @@ pub fn agent_session_sharing_router<T, Access, Auth, S>(
 where
     T: SessionSharing,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -37,7 +37,7 @@ where
     path = "/agent-sessions/{session_id}/permissions",
     tag = "agent-sessions",
     operation_id = "get_agent_session_permissions",
-    params(("session_id" = macro_uuid::Uuid, Path, description = "ID of the agent session")),
+    params(("session_id" = rox_uuid::Uuid, Path, description = "ID of the agent session")),
     responses((status = 200, body = SharePermissionV2), (status = 403, body = String), (status = 500, body = String))
 )]
 /// Read sharing settings for a session the caller can view.
@@ -45,7 +45,7 @@ where
 pub async fn get_agent_session_permissions<
     T: SessionSharing,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -63,7 +63,7 @@ pub async fn get_agent_session_permissions<
     path = "/agent-sessions/{session_id}/permissions",
     tag = "agent-sessions",
     operation_id = "update_agent_session_permissions",
-    params(("session_id" = macro_uuid::Uuid, Path, description = "ID of the agent session")),
+    params(("session_id" = rox_uuid::Uuid, Path, description = "ID of the agent session")),
     request_body = UpdateSharePermissionRequestV2,
     responses((status = 200, body = SharePermissionV2), (status = 400, body = String), (status = 403, body = String), (status = 409, body = String), (status = 500, body = String))
 )]
@@ -72,7 +72,7 @@ pub async fn get_agent_session_permissions<
 pub async fn update_agent_session_permissions<
     T: SessionSharing,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<OwnerAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,

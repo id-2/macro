@@ -53,7 +53,7 @@ export type WorkbookSheetMetadata = {
 };
 
 /**
- * An Excel pivot table, kept so export writes it back. Macro shows the
+ * An Excel pivot table, kept so export writes it back. Rox shows the
  * table's last values as cells. Excel rebuilds a table over this workbook's
  * cells when the exported file opens; one over another workbook or a data
  * connection keeps the data Excel saved with it until Excel refreshes it.

@@ -13,7 +13,7 @@ use anyhow::Context;
 use async_trait::async_trait;
 use entity_access::domain::models::{EditAccessLevel, EntityType};
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -116,7 +116,7 @@ where
                 "Create canvases with empty fileContent and isTask false, then use ReadCanvas and EditCanvas to populate the scene".to_string(),
             )));
         }
-        let user_id: MacroUserIdStr<'static> = request_context.user_id.clone();
+        let user_id: RoxUserIdStr<'static> = request_context.user_id.clone();
 
         // Mirrors the axum create route's project body extractor: creating
         // inside a project requires edit access to that project.

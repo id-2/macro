@@ -6,7 +6,7 @@ struct ViewerFavorites;
 impl FavoriteReader for ViewerFavorites {
     fn read<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
     ) -> std::pin::Pin<
         Box<dyn Future<Output = Result<Vec<model_entity::Entity<'static>>, SoupErr>> + Send + 'a>,
     > {
@@ -65,7 +65,7 @@ async fn favorites_are_scoped_before_pagination_and_cursor_keeps_the_filter() {
                 limit: 1,
                 cursor: SoupQuery::new_sort_simple(SimpleSortMethod::UpdatedAt, filters.clone()),
                 sort_direction: SoupSortDirection::Desc,
-                user: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+                user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
                 email_preview_view: PreviewView::default(),
                 link_ids: vec![],
             },
@@ -122,7 +122,7 @@ async fn grouped_without_properties_scopes_favorites() {
                     ..Default::default()
                 },
             ),
-            user_id: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
             grouping: GroupingConfig {
                 field: GroupByField::EntityType,
                 group_key: None,

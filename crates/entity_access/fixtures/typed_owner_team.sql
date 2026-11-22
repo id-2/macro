@@ -1,8 +1,8 @@
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
 ('90000000-0000-0000-0000-000000000001', 'typed-owner', 'typed-owner@example.com', 'typed-owner'),
 ('90000000-0000-0000-0000-000000000002', 'typed-other', 'typed-other@example.com', 'typed-other'),
 ('90000000-0000-0000-0000-000000000003', 'typed-teamless', 'typed-teamless@example.com', 'typed-teamless');
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
 ('macro|typed-owner@example.com', 'typed-owner@example.com', '90000000-0000-0000-0000-000000000001'),
 ('macro|typed-other@example.com', 'typed-other@example.com', '90000000-0000-0000-0000-000000000002'),
 ('macro|typed-teamless@example.com', 'typed-teamless@example.com', '90000000-0000-0000-0000-000000000003');
@@ -18,7 +18,7 @@ INSERT INTO bots (id, kind, owner_user_id, team_id, name, handle, created_by) VA
 ('90000000-0000-0000-0000-000000000023', 'owned', 'macro|typed-teamless@example.com', NULL, 'Teamless bot', 'teamless-bot', 'macro|typed-owner@example.com');
 -- Legacy entity owner columns still reference User. Test-only principal rows let
 -- us exercise typed reads without dropping FKs or changing production ownership.
-INSERT INTO "User" (id, email, macro_user_id)
+INSERT INTO "User" (id, email, rox_user_id)
 SELECT id, email, '90000000-0000-0000-0000-000000000001'::uuid FROM (VALUES
 ('90000000-0000-0000-0000-000000000011', 'team-principal@example.com'),
 ('bot|90000000-0000-0000-0000-000000000021', 'team-bot-principal@example.com'),

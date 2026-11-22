@@ -6,8 +6,8 @@ mod test;
 use std::sync::Arc;
 
 use entity_access::domain::models::{AnyEntityPermission, EntityAccessReceipt};
-use macro_sync_service_jwt::DocumentPermissionToken;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_sync_service_jwt::DocumentPermissionToken;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use models_permissions::share_permission::access_level::AccessLevel;
 use uuid::Uuid;
@@ -105,7 +105,7 @@ impl<Repository, Initializer, Documents, Forms>
 /// the id. The receipt must also have been minted for this caller, or one
 /// user could act using another's receipt.
 fn resolve_parent(
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     receipt: &EntityAccessReceipt<AnyEntityPermission>,
 ) -> Result<Entity<'static>, CollabSurfaceError> {
     let receipt_user = receipt
@@ -157,7 +157,7 @@ where
     #[tracing::instrument(err, skip(self, user_id, parent_receipt, initial_markdown))]
     async fn ensure_surface(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         parent_receipt: EntityAccessReceipt<AnyEntityPermission>,
         id: Uuid,
         initial_markdown: String,
@@ -179,7 +179,7 @@ where
     #[tracing::instrument(err, skip(self, user_id, parent_receipt))]
     async fn get_surface(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         parent_receipt: EntityAccessReceipt<AnyEntityPermission>,
         id: Uuid,
     ) -> Result<CollabSurface, CollabSurfaceError> {
@@ -203,7 +203,7 @@ where
     #[tracing::instrument(err, skip(self, user_id, parent_receipt))]
     async fn mint_token(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         parent_receipt: EntityAccessReceipt<AnyEntityPermission>,
         id: Uuid,
     ) -> Result<DocumentPermissionToken, CollabSurfaceError> {
@@ -235,7 +235,7 @@ where
     #[tracing::instrument(err, skip(self, user_id, parent_receipt))]
     async fn delete_surface(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         parent_receipt: EntityAccessReceipt<AnyEntityPermission>,
         id: Uuid,
     ) -> Result<(), CollabSurfaceError> {

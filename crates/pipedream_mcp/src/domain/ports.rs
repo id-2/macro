@@ -1,5 +1,5 @@
 use super::models::{
-    CatalogEntry, CatalogPage, ConnectApp, ConnectToken, ConnectorOverlay, MacroUserIdStr,
+    CatalogEntry, CatalogPage, ConnectApp, ConnectToken, ConnectorOverlay, RoxUserIdStr,
     McpServer, PipedreamAccount, PipedreamConnection,
 };
 
@@ -23,7 +23,7 @@ pub trait OverlayConnections: Send + Sync + 'static {
     /// `overlay`'s MCP server, if they hold one.
     fn connected_name(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         overlay: &ConnectorOverlay,
     ) -> impl Future<Output = anyhow::Result<Option<String>>> + Send;
 }
@@ -55,21 +55,21 @@ pub trait ConnectionStore: Send + Sync + 'static {
     /// Load a record for a user and app slug. Returns `None` if not stored.
     fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> impl Future<Output = Result<Option<PipedreamConnection>, Self::Err>> + Send;
 
     /// Delete a record for a user and app slug.
     fn delete(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// List all stored records for a user.
     fn list(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<PipedreamConnection>, Self::Err>> + Send;
 }
 
@@ -142,11 +142,11 @@ pub trait PipedreamConnect: Send + Sync + 'static {
 /// Port for Rox Connect's connect flow: Connect owns the consent flow,
 /// the grant, and refresh, like Pipedream Connect, but Rox owns the OAuth
 /// apps. Apps are addressed by the Pipedream slug they replace.
-pub trait MacroConnect: Send + Sync + 'static {
+pub trait RoxConnect: Send + Sync + 'static {
     /// Whether every connector call for `user_id` goes through Connect, with
     /// no Pipedream at all: Connect is configured and the `macro-connect`
     /// rollout is on for them. Otherwise everything stays on Pipedream.
-    fn connect_only(&self, user_id: &MacroUserIdStr<'static>) -> impl Future<Output = bool> + Send;
+    fn connect_only(&self, user_id: &RoxUserIdStr<'static>) -> impl Future<Output = bool> + Send;
 
     /// The Connect app standing in for `app_slug`, or `None` when Connect
     /// does not serve it (or is not configured).
@@ -159,28 +159,28 @@ pub trait MacroConnect: Send + Sync + 'static {
     /// open. Connect redirects back to Rox when consent finishes.
     fn create_connect_session(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app: &ConnectApp,
     ) -> impl Future<Output = anyhow::Result<String>> + Send;
 
     /// Whether `user_id` holds a usable connection to `app_id`.
     fn is_connected(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_id: &str,
     ) -> impl Future<Output = anyhow::Result<bool>> + Send;
 
     /// Delete `user_id`'s connection to `app_id` from Connect.
     fn delete_connection(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_id: &str,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
 }
 
 /// Port for browsing the directory of connectable apps. Lookups are for a
 /// user because the directory is theirs: Connect's catalog for a user on
-/// Connect (see [`MacroConnect::connect_only`]), Pipedream's otherwise.
+/// Connect (see [`RoxConnect::connect_only`]), Pipedream's otherwise.
 pub trait ConnectorDirectory: Send + Sync + 'static {
     /// Search the directory.
     ///
@@ -191,7 +191,7 @@ pub trait ConnectorDirectory: Send + Sync + 'static {
     /// action to expose as a tool) and that the catalog doesn't hide.
     fn search(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         search: Option<&str>,
         cursor: Option<&str>,
         limit: u32,
@@ -205,7 +205,7 @@ pub trait ConnectorDirectory: Send + Sync + 'static {
     /// miss.
     fn retrieve(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> impl Future<Output = anyhow::Result<Option<CatalogEntry>>> + Send;
 }
@@ -215,7 +215,7 @@ pub trait ConnectorCapabilities: Send + Sync + 'static {
     /// List tools, including for apps this user has not connected yet.
     fn tools(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> impl Future<Output = anyhow::Result<Vec<super::service::discovery::ConnectorTool>>> + Send;
 }
@@ -271,7 +271,7 @@ pub trait ConnectedAppProxy: Send + Sync + 'static {
 /// call for them goes through Rox Connect instead of Pipedream. Hosts read
 /// the feature flag here; a failed read must answer `false`.
 pub type ConnectRollout = std::sync::Arc<
-    dyn Fn(MacroUserIdStr<'static>) -> std::pin::Pin<Box<dyn Future<Output = bool> + Send>>
+    dyn Fn(RoxUserIdStr<'static>) -> std::pin::Pin<Box<dyn Future<Output = bool> + Send>>
         + Send
         + Sync,
 >;

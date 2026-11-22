@@ -2,9 +2,9 @@ import type {
   BookingLinkDraft,
   BookingLink as BookingLinkRecord,
 } from '../../../generated/calendar/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { Team } from '../teams/team';
 
 /**
@@ -13,9 +13,9 @@ import type { Team } from '../teams/team';
  * guests book through. Paused links (`enabled: false`) stay listed but accept
  * no bookings.
  */
-export class BookingLink extends MacroEntity<BookingLinkRecord> {
+export class BookingLink extends RoxEntity<BookingLinkRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     id: string,
     /** The team owning the link; undefined for a personal link. */
     readonly team: Team | undefined,
@@ -32,18 +32,18 @@ export class BookingLink extends MacroEntity<BookingLinkRecord> {
     );
     const found = links.find((link) => link.eventTypeId === this.id);
     if (!found)
-      throw new MacroNotFoundError(`booking link ${this.id} not found`);
+      throw new RoxNotFoundError(`booking link ${this.id} not found`);
     return found;
   }
 
   /** A handle to a personal link, or a team's when `team` is given. Detail loads on first access. */
-  static byId(client: MacroClient, id: string, team?: Team): BookingLink {
+  static byId(client: RoxClient, id: string, team?: Team): BookingLink {
     return new BookingLink(client, id, team);
   }
 
   /** A handle seeded with a link record the service returned. */
   static fromRecord(
-    client: MacroClient,
+    client: RoxClient,
     record: BookingLinkRecord,
     team?: Team,
   ): BookingLink {
@@ -106,7 +106,7 @@ export class BookingLink extends MacroEntity<BookingLinkRecord> {
 
 /** The public booking page of a profile, or of one link on it. */
 export function bookingPageUrl(
-  client: MacroClient,
+  client: RoxClient,
   profileId: string,
   slug?: string,
 ): string {
@@ -114,6 +114,6 @@ export function bookingPageUrl(
   return slug === undefined ? page : `${page}/${slug}`;
 }
 
-function linkUrl(client: MacroClient, record: BookingLinkRecord): string {
+function linkUrl(client: RoxClient, record: BookingLinkRecord): string {
   return bookingPageUrl(client, record.profileId, record.draft.event.slug);
 }

@@ -1,5 +1,5 @@
 //! Configuration for the agent harness service, loaded via the standard
-//! `macro_config` pattern so it gets a `doppler_config` validation binary.
+//! `rox_config` pattern so it gets a `doppler_config` validation binary.
 //!
 //! Required env vars are declared here as typed fields. The `doppler_config`
 //! binary loads this `Config` from Doppler for both the dev and prod
@@ -8,15 +8,15 @@
 use anyhow::Context;
 use database_env_vars::{DatabaseUrl, RedisUri};
 use entity_registry::NonUserOwners;
-pub use macro_env::Environment;
-use macro_uuid::Uuid;
+pub use rox_env::Environment;
+use rox_uuid::Uuid;
 
 use secretsmanager_client::LocalOrRemoteSecret;
 
 #[cfg(test)]
 mod test;
 
-macro_env_var::env_vars!(
+rox_env_var::env_vars!(
     /// Local static file bucket, read only when using local AWS.
     pub struct StaticStorageBucket;
     /// Comma-separated Kafka bootstrap servers.
@@ -27,10 +27,10 @@ macro_env_var::env_vars!(
     /// RSA key Rox API tokens are signed with - the same one
     /// `authentication_service` signs with. The egress proxy mints
     /// short-lived tokens for session owners inline.
-    pub struct MacroApiTokenPrivateSecretKey;
+    pub struct RoxApiTokenPrivateSecretKey;
     /// Issuer stamped into minted Rox API tokens; must match what the
     /// validators expect.
-    pub struct MacroApiTokenIssuer;
+    pub struct RoxApiTokenIssuer;
     /// OAuth client ID for the Pipedream API. The same credentials
     /// `agent_harness_service::cognition` uses: the connections a sandbox spends
     /// are the ones the person connected in Rox, in the same rows.
@@ -57,7 +57,7 @@ macro_env_var::env_vars!(
     pub struct LivekitApiSecret;
 );
 
-macro_env_var::maybe_env_vars!(
+rox_env_var::maybe_env_vars!(
     /// PostHog project token for feature flags and public MCP analytics. When
     /// unset, both are off.
     pub struct PosthogApiKey;
@@ -86,7 +86,7 @@ fn default_pipedream_environment() -> String {
 }
 
 /// The configuration parameters for the agent harness service.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Optional TypeSafe key for Command K classification and for routing
@@ -97,7 +97,7 @@ pub struct Config {
     /// Workers AI token paired with the account ID.
     pub cloudflare_api_token: universal_input::outbound::clairic::CloudflareApiToken,
     /// Shared pool for sessions, chat, integrations, and routine workers.
-    #[macro_config_default(30)]
+    #[rox_config_default(30)]
     pub database_max_connections: u32,
     /// FusionAuth API origin used by the public MCP OAuth broker.
     pub fusionauth_base_url: FusionauthBaseUrl,
@@ -121,12 +121,12 @@ pub struct Config {
 
     /// Hide agent DM contexts from standalone lists. Enable only after all
     /// replicas use the independent for_warming lifecycle marker.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub hide_agent_dm_sessions: bool,
     /// Seconds a session's command worker waits for its next command before
     /// it releases the quiet session from memory and exits. Lowered only to
     /// exercise the release end to end.
-    #[macro_config_default(900)]
+    #[rox_config_default(900)]
     pub agent_session_idle_timeout_secs: u64,
     /// Backend feature flags, evaluated using the authenticated session owner.
     pub posthog_api_key: PosthogApiKey,
@@ -138,12 +138,12 @@ pub struct Config {
     /// Pinned Deno executable. Unset hosts do not advertise code execution.
     pub deno_binary: Option<String>,
     /// Default-off quota admission and prospective usage counting.
-    #[macro_config_default(ai_usage::AiUsageEnforcement::Disabled)]
+    #[rox_config_default(ai_usage::AiUsageEnforcement::Disabled)]
     pub enable_ai_usage_enforcement: ai_usage::AiUsageEnforcement,
     /// Default-off settlement of usage past allowances. When enabled, counted
     /// usage recorded here asks the authentication service to settle; that
     /// service's own policy decides whether it does.
-    #[macro_config_default(ai_billing::AiUsageBilling::Disabled)]
+    #[rox_config_default(ai_billing::AiUsageBilling::Disabled)]
     pub enable_ai_usage_billing: ai_billing::AiUsageBilling,
     /// Required authentication service key or deployed Secrets Manager name.
     pub authentication_service_secret_key: LocalOrRemoteSecret<AuthenticationServiceSecretKey>,
@@ -160,18 +160,18 @@ pub struct Config {
     /// provider cost. Mandatory; set in Doppler.
     pub ai_usage_overage_markup_percent: ai_billing::OverageMarkupPercent,
     /// The environment we are in.
-    #[macro_config_default(Environment::new_or_prod())]
+    #[rox_config_default(Environment::new_or_prod())]
     pub environment: Environment,
     /// Optional physical fleet selection; absence attaches no computer fleet.
     pub computers_fleet: Option<ComputerFleetKind>,
     /// Days a Rox computer whose billing ended keeps its disk before it is
     /// destroyed; the timers the fleet operator fires use it. The same value
     /// authentication_service reads.
-    #[macro_config_default(14)]
+    #[rox_config_default(14)]
     pub computer_retention_days: u32,
     /// Days a Rox computer keeps running on a past-due subscription before
     /// it is turned off.
-    #[macro_config_default(7)]
+    #[rox_config_default(7)]
     pub computer_past_due_grace_days: u32,
     /// Dedicated OAuth encryption key; absent deployments keep Codex unavailable.
     pub codex_oauth_kms_key_id: CodexOauthKmsKeyId,
@@ -184,24 +184,24 @@ pub struct Config {
     /// KMS key for the public MCP OAuth broker's authorization codes.
     pub mcp_oauth_kms_key_id: McpOauthKmsKeyId,
     /// Base URL of the Daytona REST API.
-    #[macro_config_default(String::from("https://app.daytona.io/api"))]
+    #[rox_config_default(String::from("https://app.daytona.io/api"))]
     pub daytona_api_url: String,
     /// API key the Daytona client authenticates with. Empty means the
     /// managed (sandbox-provisioning) path is unarmed: external sessions
     /// still work, and a managed spawn fails loudly at spawn time.
-    #[macro_config_default(String::new())]
+    #[rox_config_default(String::new())]
     pub daytona_api_key: String,
     /// Name of the prebuilt Daytona snapshot to create sandboxes from. The
     /// image is expected to be built and pushed as a snapshot out of band,
     /// keeping image builds off the first-prompt critical path.
-    #[macro_config_default(String::from("macro-agent-harness"))]
+    #[rox_config_default(String::from("macro-agent-harness"))]
     pub daytona_snapshot: String,
     /// API key sandboxes run Anthropic models with. Injected into the
     /// sandbox environment at creation, where it activates opencode's
     /// `anthropic` provider — the only provider
     /// `crates/agent_harness/container/opencode.json` enables. Empty means
     /// sandboxes advertise no models and managed sessions cannot prompt.
-    #[macro_config_default(String::new())]
+    #[rox_config_default(String::new())]
     pub anthropic_api_key: String,
     /// LiveKit project key for agent call speech.
     pub livekit_api_key: LivekitApiKey,
@@ -213,20 +213,20 @@ pub struct Config {
     /// binary is started with a copied local env file. `just run_local` sets
     /// it. Refused at boot unless `ENVIRONMENT=local`, because this path
     /// drives the host Docker daemon over a mounted socket.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub dev_dangerous_local_containers: bool,
     /// `docker`-compatible binary the local provider drives.
-    #[macro_config_default(String::from("docker"))]
+    #[rox_config_default(String::from("docker"))]
     pub local_container_docker_binary: String,
     /// Image the local provider creates sandboxes from.
-    #[macro_config_default(String::from("macro-agent-harness:latest"))]
+    #[rox_config_default(String::from("macro-agent-harness:latest"))]
     pub local_container_image: String,
     /// Compose network local sandboxes join so this service can dial them.
     ///
     /// Required when `dev_dangerous_local_containers` is on: the harness is
     /// itself a container, so the address that works is one on a network both
     /// share. `just run_local` sets `{project}_services`.
-    #[macro_config_default(String::new())]
+    #[rox_config_default(String::new())]
     pub local_container_network: String,
     /// The bot this deployment answers for.
     ///
@@ -242,26 +242,26 @@ pub struct Config {
     /// mentions.
     pub harness_bot_id: Uuid,
     /// Model slug stamped onto sessions this deployment opens.
-    #[macro_config_default(String::from("claude"))]
+    #[rox_config_default(String::from("claude"))]
     pub harness_model: String,
     /// Harness slug stamped onto sessions this deployment opens.
-    #[macro_config_default(String::from("opencode"))]
+    #[rox_config_default(String::from("opencode"))]
     pub harness_slug: String,
     /// Repository sessions run against, until it becomes per-request data.
-    #[macro_config_default(String::from("https://github.com/macro-inc/macro"))]
+    #[rox_config_default(String::from("https://github.com/macro-inc/macro"))]
     pub harness_repo_url: String,
     /// Provider-qualified model id stamped onto sessions the in-memory bot opens.
-    #[macro_config_default(String::from("anthropic/claude-sonnet-5-5"))]
+    #[rox_config_default(String::from("anthropic/claude-sonnet-5-5"))]
     pub inmem_model: String,
     /// Harness slug stamped onto sessions the in-memory bot opens.
-    #[macro_config_default(String::from("macro-inmem"))]
+    #[rox_config_default(String::from("macro-inmem"))]
     pub inmem_harness_slug: String,
     /// Key for internal service-to-service calls (the connection gateway).
     pub internal_api_key: String,
     /// Key required by document storage's internal endpoints.
     pub document_storage_service_auth_key: String,
     /// Port the control routes are served on.
-    #[macro_config_default(8101)]
+    #[rox_config_default(8101)]
     pub port: u16,
     /// Directory holding agent teammates' bare repos: the EFS volume every
     /// replica mounts in AWS, a compose volume locally. Must exist.
@@ -274,7 +274,7 @@ pub struct Config {
     ///
     /// The shared gateway forwards `/agent-harness-egress/*` to this listener.
     /// The egress router reads sandbox session tokens from `Authorization`.
-    #[macro_config_default(8102)]
+    #[rox_config_default(8102)]
     pub egress_port: u16,
     /// Optional host-reachable egress origin for external runtimes in local stacks.
     pub external_egress_base_url: Option<String>,
@@ -285,20 +285,20 @@ pub struct Config {
     /// The Pipedream Connect project ID.
     pub pipedream_project_id: PipedreamProjectId,
     /// The Pipedream project environment (`development` or `production`).
-    #[macro_config_default(default_pipedream_environment())]
+    #[rox_config_default(default_pipedream_environment())]
     pub pipedream_environment: String,
     /// Base URL of the Pipedream API.
-    #[macro_config_default(String::from(pipedream_mcp::outbound::api::DEFAULT_API_URL))]
+    #[rox_config_default(String::from(pipedream_mcp::outbound::api::DEFAULT_API_URL))]
     pub pipedream_api_url: String,
     /// URL of Pipedream's remote MCP server.
-    #[macro_config_default(String::from(pipedream_mcp::outbound::api::DEFAULT_MCP_URL))]
+    #[rox_config_default(String::from(pipedream_mcp::outbound::api::DEFAULT_MCP_URL))]
     pub pipedream_mcp_url: String,
     /// RSA key Rox API tokens are signed with.
-    pub macro_api_token_private_secret_key: LocalOrRemoteSecret<MacroApiTokenPrivateSecretKey>,
+    pub rox_api_token_private_secret_key: LocalOrRemoteSecret<RoxApiTokenPrivateSecretKey>,
     /// AES key the custom MCP servers' stored OAuth credentials are encrypted with.
     pub mcp_credentials_key_secret_name: LocalOrRemoteSecret<McpCredentialsKeySecretName>,
     /// Issuer stamped into minted Rox API tokens.
-    pub macro_api_token_issuer: MacroApiTokenIssuer,
+    pub rox_api_token_issuer: RoxApiTokenIssuer,
     /// S3 bucket the Changes pane's patches are stored in, one object per
     /// capture under `agent-sessions/{session}/changes/`. Required: a
     /// harness that cannot store a patch cannot show a session's changes,
@@ -380,7 +380,7 @@ impl Config {
     ) -> anyhow::Result<authentication_service_client::AuthServiceClient> {
         Ok(authentication_service_client::AuthServiceClient::new(
             self.authentication_service_secret_key.as_ref().to_owned(),
-            macro_service_urls::AuthServiceUrl::new()?.to_string(),
+            rox_service_urls::AuthServiceUrl::new()?.to_string(),
         ))
     }
 
@@ -402,7 +402,7 @@ impl Config {
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let billing = ai_billing::config::load_ai_usage_billing()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
-        let mut config = macro_config::ConfigLoader::load::<Config>()
+        let mut config = rox_config::ConfigLoader::load::<Config>()
             .context("failed to load agent harness service config")?;
         config.enable_ai_usage_enforcement = enforcement;
         config.enable_ai_usage_billing = billing;
@@ -410,7 +410,7 @@ impl Config {
     }
 }
 
-macro_env_var::env_vars! {
+rox_env_var::env_vars! {
     /// Public MCP OAuth configuration.
     pub struct FusionauthBaseUrl;
     /// Public MCP OAuth configuration.
@@ -427,7 +427,7 @@ macro_env_var::env_vars! {
     /// served at `/.well-known/openai-apps-challenge`.
     pub struct OpenaiDomainVerificationToken;
 }
-macro_env_var::maybe_env_vars! {
+rox_env_var::maybe_env_vars! {
     /// Optional public MCP OAuth configuration.
     pub struct FusionauthPublicUrl;
     /// Optional public MCP OAuth configuration.
@@ -450,11 +450,11 @@ pub enum ComputerFleetConfig {
 
 impl Config {
     /// Docker fleets are local infrastructure, never a deployed fallback.
-    pub fn validate_fleet_selection(&self) -> macro_config::MacroConfigResult<()> {
+    pub fn validate_fleet_selection(&self) -> rox_config::RoxConfigResult<()> {
         if matches!(self.computers_fleet, Some(ComputerFleetKind::Docker))
             && !matches!(self.environment, Environment::Local)
         {
-            return Err(macro_config::MacroConfigError::Deserialize(
+            return Err(rox_config::RoxConfigError::Deserialize(
                 "COMPUTERS_FLEET=docker is only available in local environments".to_owned(),
             ));
         }
@@ -464,25 +464,25 @@ impl Config {
     /// Rox computers' retention and past-due grace.
     pub fn computer_billing_policy(
         &self,
-    ) -> macro_config::MacroConfigResult<hosted_runtimes::domain::lifecycle::BillingPolicy> {
+    ) -> rox_config::RoxConfigResult<hosted_runtimes::domain::lifecycle::BillingPolicy> {
         hosted_runtimes::domain::lifecycle::BillingPolicy::from_days(
             self.computer_retention_days,
             self.computer_past_due_grace_days,
         )
-        .map_err(|error| macro_config::MacroConfigError::Deserialize(error.to_string()))
+        .map_err(|error| rox_config::RoxConfigError::Deserialize(error.to_string()))
     }
 
     /// Load only the required settings for the explicitly selected fleet.
-    pub fn computer_fleet(&self) -> macro_config::MacroConfigResult<Option<ComputerFleetConfig>> {
+    pub fn computer_fleet(&self) -> rox_config::RoxConfigResult<Option<ComputerFleetConfig>> {
         self.validate_fleet_selection()?;
         match self.computers_fleet {
             Some(ComputerFleetKind::Incus) => {
-                let settings: IncusFleetSettings = macro_config::load()?;
+                let settings: IncusFleetSettings = rox_config::load()?;
                 settings.validate()?;
                 Ok(Some(ComputerFleetConfig::Incus(settings)))
             }
             Some(ComputerFleetKind::Docker) => {
-                let settings: DockerFleetSettings = macro_config::load()?;
+                let settings: DockerFleetSettings = rox_config::load()?;
                 settings.validate()?;
                 Ok(Some(ComputerFleetConfig::Docker(settings)))
             }
@@ -492,7 +492,7 @@ impl Config {
 }
 
 /// Required Incus fleet configuration.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct IncusFleetSettings {
     pub computers_control_plane_id: String,
@@ -516,7 +516,7 @@ pub struct IncusFleetSettings {
 }
 
 /// Required Docker fleet configuration.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct DockerFleetSettings {
     pub computers_control_plane_id: String,
@@ -531,7 +531,7 @@ pub struct DockerFleetSettings {
 }
 
 impl IncusFleetSettings {
-    pub fn validate(&self) -> macro_config::MacroConfigResult<()> {
+    pub fn validate(&self) -> rox_config::RoxConfigResult<()> {
         for (name, value) in [
             (
                 "COMPUTERS_CONTROL_PLANE_ID",
@@ -563,11 +563,11 @@ impl IncusFleetSettings {
             ),
         ] {
             if value.trim().is_empty() {
-                return Err(macro_config::MacroConfigError::MissingRequiredValue(name));
+                return Err(rox_config::RoxConfigError::MissingRequiredValue(name));
             }
         }
         if self.computers_oversell_factor == 0 {
-            return Err(macro_config::MacroConfigError::Deserialize(
+            return Err(rox_config::RoxConfigError::Deserialize(
                 "COMPUTERS_OVERSELL_FACTOR must be positive".into(),
             ));
         }
@@ -576,7 +576,7 @@ impl IncusFleetSettings {
 }
 
 impl DockerFleetSettings {
-    pub fn validate(&self) -> macro_config::MacroConfigResult<()> {
+    pub fn validate(&self) -> rox_config::RoxConfigResult<()> {
         for (name, value) in [
             (
                 "COMPUTERS_CONTROL_PLANE_ID",
@@ -595,11 +595,11 @@ impl DockerFleetSettings {
             ),
         ] {
             if value.trim().is_empty() {
-                return Err(macro_config::MacroConfigError::MissingRequiredValue(name));
+                return Err(rox_config::RoxConfigError::MissingRequiredValue(name));
             }
         }
         if self.computers_oversell_factor == 0 {
-            return Err(macro_config::MacroConfigError::Deserialize(
+            return Err(rox_config::RoxConfigError::Deserialize(
                 "COMPUTERS_OVERSELL_FACTOR must be positive".into(),
             ));
         }

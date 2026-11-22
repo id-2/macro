@@ -10,7 +10,7 @@ use item_filters::ast::{
     project::ProjectLiteral,
     properties::{EntityRefId, PropertiesLiteral, PropertyEntityType, PropertyMatchValue},
 };
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use models_pagination::{Identify, Query, SimpleSortMethod};
 use serde_json::{Value, json};
 use std::collections::BTreeSet;
@@ -116,14 +116,14 @@ fn filter(properties: Expr<DocumentLiteral>) -> EntityFilterAst {
     }
 }
 
-async fn user_id(pool: &PgPool) -> anyhow::Result<MacroUserIdStr<'static>> {
+async fn user_id(pool: &PgPool) -> anyhow::Result<RoxUserIdStr<'static>> {
     let owner = sqlx::query_scalar!(
         r#"SELECT owner FROM "Document" WHERE id = $1"#,
         A.to_string()
     )
     .fetch_one(pool)
     .await?;
-    Ok(MacroUserIdStr::parse_from_str(&owner)?.into_owned())
+    Ok(RoxUserIdStr::parse_from_str(&owner)?.into_owned())
 }
 
 fn first_page(properties: Expr<DocumentLiteral>) -> Query<Uuid, DynamicSort, EntityFilterAst> {
@@ -156,10 +156,10 @@ fn set(ids: &[Uuid]) -> BTreeSet<Uuid> {
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn ored_options_match_like_one_exists_per_option(pool: PgPool) -> anyhow::Result<()> {
     let multi = seed(&pool).await?;
@@ -201,10 +201,10 @@ async fn ored_options_match_like_one_exists_per_option(pool: PgPool) -> anyhow::
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_totals_count_each_match_of_ored_options_once(pool: PgPool) -> anyhow::Result<()> {
     let multi = seed(&pool).await?;

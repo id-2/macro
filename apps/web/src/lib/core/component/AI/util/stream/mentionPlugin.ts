@@ -6,14 +6,14 @@ import type { StreamPlugin } from './types';
 
 export const MENTION_OPEN = '<m-document-mention>';
 export const MENTION_CLOSE = '</m-document-mention>';
-export const MACRO_XML_PREFIX = '<m-';
-const MACRO_XML_OPEN_TAG = /^<(m-[a-zA-Z0-9_-]+)>/;
+export const ROX_XML_PREFIX = '<m-';
+const ROX_XML_OPEN_TAG = /^<(m-[a-zA-Z0-9_-]+)>/;
 /*
   Most inline Rox XML tags are compact. If a held tag grows past this,
   stop holding so malformed tags and large block payloads do not stay hidden.
 */
-export const MAX_MACRO_XML_LENGTH = 4096;
-export const MAX_MENTION_LENGTH = MAX_MACRO_XML_LENGTH;
+export const MAX_ROX_XML_LENGTH = 4096;
+export const MAX_MENTION_LENGTH = MAX_ROX_XML_LENGTH;
 
 type ChatResponse = Extract<ChatStream, { type: 'chat_message_response' }>;
 type TextContent = Extract<AssistantMessagePart, { type: 'text' }>;
@@ -41,7 +41,7 @@ export type IsCodeContext = () => boolean;
  * a completed tag is released as one atomic text part so it renders as its
  * parsed node immediately. Text held for a tag that turns out not to be Rox
  * XML is released unchanged, and an open tag that grows past
- * MAX_MACRO_XML_LENGTH is given up on — combined with the buffered stream's
+ * MAX_ROX_XML_LENGTH is given up on — combined with the buffered stream's
  * flush-on-quiet and flush-on-done, an unclosed tag is never held forever.
  *
  * A tag streaming into a code context (fenced block or inline code) renders
@@ -88,7 +88,7 @@ export function createMentionBufferPlugin(
   }
 
   function canBecomeMacroXml(text: string): boolean {
-    if (MACRO_XML_PREFIX.startsWith(text)) return true;
+    if (ROX_XML_PREFIX.startsWith(text)) return true;
     return /^<m-[a-zA-Z0-9_-]*$/.test(text);
   }
 
@@ -112,10 +112,10 @@ export function createMentionBufferPlugin(
         out.push(...release(tagStart));
         continue;
       }
-      const openTag = text.match(MACRO_XML_OPEN_TAG);
+      const openTag = text.match(ROX_XML_OPEN_TAG);
       const viableMacroXml = !!openTag || canBecomeMacroXml(text);
       if (viableMacroXml && !isCodeContext()) {
-        if (text.length > MAX_MACRO_XML_LENGTH) {
+        if (text.length > MAX_ROX_XML_LENGTH) {
           out.push(...release(text.length));
           break;
         }

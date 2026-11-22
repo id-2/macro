@@ -1,7 +1,7 @@
 use super::*;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
 }
 
 async fn describe(

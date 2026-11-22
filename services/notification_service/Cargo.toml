@@ -37,22 +37,22 @@ hmac = { workspace = true }
 http-body-util = { workspace = true }
 itertools = { workspace = true }
 last_online_tracker = { path = "../../crates/last_online_tracker" }
-macro_auth = { path = "../../crates/macro_auth" }
-macro_authorization = { path = "../../crates/macro_authorization", features = [
+rox_auth = { path = "../../crates/rox_auth" }
+rox_authorization = { path = "../../crates/rox_authorization", features = [
   "postgres",
 ] }
-macro_aws_config = { path = "../../crates/macro_aws_config" }
-macro_config = { path = "../../crates/macro_config" }
+rox_aws_config = { path = "../../crates/rox_aws_config" }
+rox_config = { path = "../../crates/rox_config" }
 doppler-config = { workspace = true }
-macro_cors = { path = "../../crates/macro_cors" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env = { path = "../../crates/macro_env" }
-macro_env_var = { path = "../../crates/macro_env_var" }
-macro_event_broker = { path = "../../crates/macro_event_broker" }
-macro_middleware = { path = "../../crates/macro_middleware", default-features = false }
-macro_queues = { path = "../../crates/macro_queues" }
-macro_tower_layers = { path = "../../crates/macro_tower_layers" }
-macro_user_id = { path = "../../crates/macro_user_id" }
+rox_cors = { path = "../../crates/rox_cors" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env = { path = "../../crates/rox_env" }
+rox_env_var = { path = "../../crates/rox_env_var" }
+rox_event_broker = { path = "../../crates/rox_event_broker" }
+rox_middleware = { path = "../../crates/rox_middleware", default-features = false }
+rox_queues = { path = "../../crates/rox_queues" }
+rox_tower_layers = { path = "../../crates/rox_tower_layers" }
+rox_user_id = { path = "../../crates/rox_user_id" }
 model = { path = "../../crates/model" }
 model-entity = { path = "../../crates/model-entity" }
 model-error-response = { path = "../../crates/model-error-response" }
@@ -78,8 +78,8 @@ utoipa = { workspace = true, features = ["chrono"] }
 utoipa-swagger-ui = { workspace = true }
 uuid = { workspace = true }
 
-macro_service_urls = { path = "../../crates/macro_service_urls" }
+rox_service_urls = { path = "../../crates/rox_service_urls" }
 workspace-hack = { version = "0.1", path = "../../crates/workspace-hack" }
 
 [dev-dependencies]
-macro_auth = { path = "../../crates/macro_auth", features = ["testing"] }
+rox_auth = { path = "../../crates/rox_auth", features = ["testing"] }

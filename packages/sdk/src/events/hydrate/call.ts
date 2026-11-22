@@ -3,13 +3,13 @@ import { CallRecord } from '../../entities/calls/call-record';
 import { Channel } from '../../entities/channels/channel';
 import { Meeting } from '../../entities/meetings/meeting';
 import { User } from '../../entities/users/user';
-import type { MacroClient } from '../../utils/client';
-import type { MacroEvent } from '../types';
+import type { RoxClient } from '../../utils/client';
+import type { RoxEvent } from '../types';
 
-export type CallEvent = Extract<MacroEvent, { event_type: `call.${string}` }>;
+export type CallEvent = Extract<RoxEvent, { event_type: `call.${string}` }>;
 
 /** Attach call, channel, meeting, and actor handles to call notifications. */
-export function hydrateCallEvent(client: MacroClient, event: CallEvent) {
+export function hydrateCallEvent(client: RoxClient, event: CallEvent) {
   const handles = (metadata: CallEvent['metadata']) => ({
     call: CallRecord.byId(client, metadata.call_id),
     channel: metadata.channel_id

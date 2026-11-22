@@ -4,7 +4,7 @@ use super::*;
 use crate::domain::ports::AccountRepository;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Pairing transactions last this long.
 const PAIRING_SECONDS: f64 = 5.0 * 60.0;
@@ -103,7 +103,7 @@ fn pairing(row: PairingRow) -> ExternalChatResult<Pairing> {
 impl AccountRepository for PgWhatsAppRepository {
     async fn owned_account(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ExternalChatResult<Option<Account>> {
         let user = user.as_ref();
         account_by_user_in(&self.pool, user).await
@@ -111,7 +111,7 @@ impl AccountRepository for PgWhatsAppRepository {
 
     async fn begin_pairing(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         replace: bool,
     ) -> ExternalChatResult<Pairing> {
         let user = user.as_ref();
@@ -207,7 +207,7 @@ impl AccountRepository for PgWhatsAppRepository {
 
     async fn pair_state(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> ExternalChatResult<PairState> {
         let user = user.as_ref();
@@ -241,7 +241,7 @@ impl AccountRepository for PgWhatsAppRepository {
 
     async fn submit_passkey(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         response: &serde_json::Value,
     ) -> ExternalChatResult<()> {
@@ -266,7 +266,7 @@ impl AccountRepository for PgWhatsAppRepository {
         tx.commit().await.map_err(failure)
     }
 
-    async fn cancel_pairing(&self, user: &MacroUserIdStr<'_>, id: Uuid) -> ExternalChatResult<()> {
+    async fn cancel_pairing(&self, user: &RoxUserIdStr<'_>, id: Uuid) -> ExternalChatResult<()> {
         let user = user.as_ref();
         let mut tx = self.pool.begin().await.map_err(failure)?;
         sqlx::query!(
@@ -315,7 +315,7 @@ impl AccountRepository for PgWhatsAppRepository {
 
     async fn disconnect(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         generation: i64,
     ) -> ExternalChatResult<bool> {
         let user = user.as_ref();

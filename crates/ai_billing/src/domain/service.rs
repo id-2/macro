@@ -22,8 +22,8 @@ use super::ports::{
 use super::pricing::AiPricing;
 use ai_usage::AiUsageEnforcement;
 use chrono::{DateTime, Utc};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
-use macro_uuid::Uuid;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
+use rox_uuid::Uuid;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, PoisonError};
 use teams::domain::open_seat_release::OpenSeatRelease;
@@ -132,7 +132,7 @@ struct Position {
     period: BillingPeriod,
 }
 
-fn usage_for(user: &MacroUserIdStr<'_>, usage: &[SeatUsage]) -> i64 {
+fn usage_for(user: &RoxUserIdStr<'_>, usage: &[SeatUsage]) -> i64 {
     usage
         .iter()
         .find(|entry| entry.user.as_ref() == user.as_ref())
@@ -178,7 +178,7 @@ where
     R: BillingRepo,
     P: PaymentGateway,
 {
-    async fn position(&self, user: &MacroUserIdStr<'_>, now: DateTime<Utc>) -> Result<Position> {
+    async fn position(&self, user: &RoxUserIdStr<'_>, now: DateTime<Utc>) -> Result<Position> {
         let first = self.entitlements.entitlement(user).await?;
         let settings = self.repo.settings(&first.payer).await?;
         let period = self.usage_period(&first, settings.period_anchor, now).await;
@@ -324,7 +324,7 @@ where
         }
     }
 
-    fn period_read_missed_recently(&self, payer: &MacroUserIdStr<'_>, now: DateTime<Utc>) -> bool {
+    fn period_read_missed_recently(&self, payer: &RoxUserIdStr<'_>, now: DateTime<Utc>) -> bool {
         self.period_misses
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
@@ -332,7 +332,7 @@ where
             .is_some_and(|until| now < *until)
     }
 
-    fn note_period_miss(&self, payer: &MacroUserIdStr<'_>, now: DateTime<Utc>) {
+    fn note_period_miss(&self, payer: &RoxUserIdStr<'_>, now: DateTime<Utc>) {
         let mut misses = self
             .period_misses
             .lock()
@@ -344,7 +344,7 @@ where
     async fn release_at(
         &self,
         team_id: Uuid,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
         now: DateTime<Utc>,
     ) -> Result<()> {
         let Some(payer) = self.entitlements.team_payer(team_id).await? else {
@@ -376,7 +376,7 @@ where
 
     async fn snapshot_at(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         position: &Position,
     ) -> Result<UsageSnapshot> {
         let Position {
@@ -449,7 +449,7 @@ where
     /// where the derived one begins, so no usage is settled under two keys.
     async fn closed_periods(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         current: BillingPeriod,
     ) -> Result<Vec<BillingPeriod>> {
         let mut since = current;
@@ -784,7 +784,7 @@ where
     /// book the credits and return `true`.
     async fn abandon_credit_purchase(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         reload_id: Uuid,
         amount_cents: i64,
         invoice_id: &str,
@@ -812,7 +812,7 @@ where
     }
 
     /// Apply freshly booked purchase credits to usage waiting on them.
-    async fn settle_after_purchase(&self, user: &MacroUserIdStr<'_>) {
+    async fn settle_after_purchase(&self, user: &RoxUserIdStr<'_>) {
         if let Err(e) = self.settle(user).await {
             // The credits are booked; the next settlement applies them.
             tracing::warn!(error = ?e, "settlement after credit purchase failed");
@@ -824,7 +824,7 @@ where
     /// purchase does not.
     async fn fail_credit_charge(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         reload_id: Uuid,
         kind: CreditReloadKind,
     ) -> Result<()> {
@@ -843,7 +843,7 @@ where
     fn purchase_limit_cents(
         entitlement: &Entitlement,
         settings: &BillingSettings,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Option<i64> {
         settings.auto_reload.monthly_limit_cents.or_else(|| {
             if entitlement.is_payer(user) {
@@ -854,7 +854,7 @@ where
         })
     }
 
-    fn require_payer(entitlement: &Entitlement, user: &MacroUserIdStr<'_>) -> Result<()> {
+    fn require_payer(entitlement: &Entitlement, user: &RoxUserIdStr<'_>) -> Result<()> {
         if !entitlement.is_payer(user) {
             return Err(BillingError::NotPayer);
         }
@@ -876,7 +876,7 @@ where
 
     async fn change_plan(
         &self,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
         change: teams::domain::open_seat_release::SeatPlanChange,
     ) -> Result<()> {
         let from = change
@@ -909,7 +909,7 @@ where
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn release(&self, team_id: Uuid, member: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn release(&self, team_id: Uuid, member: &RoxUserIdStr<'_>) -> Result<()> {
         self.release_at(team_id, member, Utc::now()).await
     }
 }
@@ -924,7 +924,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn change_plan(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         change: super::plan_change::PlanChange,
     ) -> Result<()> {
         if change.is_valid() {
@@ -949,7 +949,7 @@ where
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn check_allowance(&self, user: &MacroUserIdStr<'_>) -> Result<AllowanceDecision> {
+    async fn check_allowance(&self, user: &RoxUserIdStr<'_>) -> Result<AllowanceDecision> {
         if !self.enforcement.is_enabled() {
             return Ok(AllowanceDecision::Allow);
         }
@@ -962,7 +962,7 @@ where
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn snapshot(&self, user: &MacroUserIdStr<'_>) -> Result<UsageSnapshot> {
+    async fn snapshot(&self, user: &RoxUserIdStr<'_>) -> Result<UsageSnapshot> {
         let now = Utc::now();
         let position = self.position(user, now).await?;
         let mut snapshot = self.snapshot_at(user, &position).await?;
@@ -999,7 +999,7 @@ where
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn settle(&self, user: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn settle(&self, user: &RoxUserIdStr<'_>) -> Result<()> {
         // Guard every caller: summary reads, settings, purchases, and internal settlement.
         if !self.billing.is_enabled() {
             return Ok(());
@@ -1032,7 +1032,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn update_overage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         enabled: bool,
         _limit_cents: i64,
     ) -> Result<UsageSnapshot> {
@@ -1050,7 +1050,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn update_auto_reload(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         enabled: bool,
         thresholds: AutoReloadThresholds,
     ) -> Result<UsageSnapshot> {
@@ -1078,7 +1078,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn purchase_credits(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         amount_cents: i64,
     ) -> Result<CreditPurchase> {
         if !CREDIT_PACKS_CENTS.contains(&amount_cents) {
@@ -1217,7 +1217,7 @@ where
     #[tracing::instrument(skip(self, success_url, cancel_url), err)]
     async fn create_credit_checkout(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         amount_cents: i64,
         success_url: String,
         cancel_url: String,
@@ -1246,7 +1246,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn apply_credit_purchase(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         amount_cents: i64,
         stripe_reference: &str,
     ) -> Result<()> {
@@ -1271,7 +1271,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn sync_period(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
         verified: Option<SubscriptionPeriod>,

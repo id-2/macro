@@ -11,15 +11,15 @@ impl ConnectionStore for Connections {
     }
     async fn load(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> Result<Option<PipedreamConnection>, String> {
         Ok(self.0.iter().find(|c| c.app_slug == app_slug).cloned())
     }
-    async fn delete(&self, _: &MacroUserIdStr<'static>, _: &str) -> Result<(), String> {
+    async fn delete(&self, _: &RoxUserIdStr<'static>, _: &str) -> Result<(), String> {
         unreachable!()
     }
-    async fn list(&self, _: &MacroUserIdStr<'static>) -> Result<Vec<PipedreamConnection>, String> {
+    async fn list(&self, _: &RoxUserIdStr<'static>) -> Result<Vec<PipedreamConnection>, String> {
         unreachable!()
     }
 }
@@ -42,7 +42,7 @@ struct Native(Option<&'static str>);
 impl OverlayConnections for Native {
     async fn connected_name(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         overlay: &ConnectorOverlay,
     ) -> anyhow::Result<Option<String>> {
         assert_eq!(overlay.server_url, "https://mcp.sentry.dev/mcp");
@@ -50,8 +50,8 @@ impl OverlayConnections for Native {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 
 fn pipedream(app_slug: &str, enabled: bool) -> PipedreamConnection {

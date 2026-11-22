@@ -3,7 +3,7 @@ use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessAuth, EntityAccessReceipt, EntityPermission, EntityType,
     ViewAccessLevel,
 };
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 const GMAIL: Uuid = uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 const OUTLOOK: Uuid = uuid::uuid!("0a000000-0000-0000-0000-000000000001");
@@ -23,7 +23,7 @@ fn lookups(link: Uuid) -> [(Uuid, &'static str); 3] {
     ]
 }
 
-fn receipt(viewer: &MacroUserIdStr<'static>, id: Uuid) -> EntityAccessReceipt<ViewAccessLevel> {
+fn receipt(viewer: &RoxUserIdStr<'static>, id: Uuid) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::try_new(
         EntityAccessAuth::Authenticated(viewer.clone()),
         Entity {
@@ -54,7 +54,7 @@ async fn set_unread(pool: &Pool<Postgres>, thread: Uuid) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_outlook_threads", "email_all_mail")
@@ -62,7 +62,7 @@ async fn set_unread(pool: &Pool<Postgres>, thread: Uuid) -> anyhow::Result<()> {
 )]
 async fn threads_opened_by_id_render_outside_all_mail(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let service = super::thread_unread::service(pool.clone());
-    let viewer = MacroUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
+    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
     for link in [GMAIL, OUTLOOK] {
         for (thread, subject) in lookups(link) {
             for unread in [false, true] {
@@ -111,7 +111,7 @@ async fn threads_opened_by_id_render_outside_all_mail(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_outlook_threads", "email_all_mail")
@@ -129,7 +129,7 @@ async fn read_state_writes_reload_threads_outside_all_mail(
     .execute(&pool)
     .await?;
     let service = super::thread_unread::service(pool.clone());
-    let owner = MacroUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
+    let owner = RoxUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
     for link in [GMAIL, OUTLOOK] {
         for (thread, subject) in lookups(link) {
             set_unread(&pool, thread).await?;
@@ -176,7 +176,7 @@ async fn read_state_writes_reload_threads_outside_all_mail(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_outlook_threads", "email_all_mail")
@@ -188,7 +188,7 @@ async fn moving_a_thread_to_spam_or_trash_reloads_it_from_there(
     use crate::domain::models::mailbox_action::MailboxAction;
 
     let service = super::thread_unread::service(pool.clone());
-    let owner = MacroUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
+    let owner = RoxUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
     for (link, archived) in [
         (GMAIL, uuid::uuid!("0b000000-0000-0000-0000-000000000101")),
         (OUTLOOK, uuid::uuid!("0b000000-0000-0000-0000-000000000201")),
@@ -215,7 +215,7 @@ async fn moving_a_thread_to_spam_or_trash_reloads_it_from_there(
     }
 
     // Ownership stays the service's check: another user's lookup finds nothing.
-    let stranger = MacroUserIdStr::parse_from_str("macro|user1@example.com")?.into_owned();
+    let stranger = RoxUserIdStr::parse_from_str("macro|user1@example.com")?.into_owned();
     for (thread, _) in lookups(GMAIL) {
         assert!(
             service

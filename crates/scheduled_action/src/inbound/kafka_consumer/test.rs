@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::event_trigger::EventRejection;
-use macro_event_broker::Event;
-use macro_uuid::Uuid;
+use rox_event_broker::Event;
+use rox_uuid::Uuid;
 use rdkafka::message::{OwnedMessage, Timestamp};
 use serde_json::{Value, json};
 use std::collections::{HashSet, VecDeque};
@@ -143,7 +143,7 @@ fn message(
 
 fn document(offset: i64) -> OwnedMessage {
     message(
-        "macro.documents",
+        "rox.documents",
         Some(serde_json::to_vec(&envelope("document.created")).unwrap()),
         Some(ENTITY_ID.as_bytes().to_vec()),
         offset,
@@ -180,13 +180,13 @@ fn subscriptions_are_exact_and_group_is_dedicated() {
     assert_eq!(
         DeclaredMacroEvent::topics(),
         &[
-            "macro.documents",
-            "macro.channels",
-            "macro.messages",
-            "macro.properties",
-            "macro.email",
-            "macro.calls",
-            "macro.github_webhooks"
+            "rox.documents",
+            "rox.channels",
+            "rox.messages",
+            "rox.properties",
+            "rox.email",
+            "rox.calls",
+            "rox.github_webhooks"
         ]
     );
     assert_eq!(
@@ -198,7 +198,7 @@ fn subscriptions_are_exact_and_group_is_dedicated() {
 #[tokio::test]
 async fn admits_both_topics_before_committing() {
     let channel = message(
-        "macro.channels",
+        "rox.channels",
         Some(serde_json::to_vec(&envelope("channel.created")).unwrap()),
         Some(ENTITY_ID.as_bytes().to_vec()),
         11,
@@ -259,7 +259,7 @@ async fn poison_missing_and_future_payloads_are_rejected_without_ingestion() {
     ];
     for payload in payloads {
         let consumer = fixture(
-            vec![message("macro.documents", payload, Some(vec![]), 10)],
+            vec![message("rox.documents", payload, Some(vec![]), 10)],
             vec![],
         );
         run(&consumer).await.unwrap();
@@ -269,7 +269,7 @@ async fn poison_missing_and_future_payloads_are_rejected_without_ingestion() {
     }
     let consumer = fixture(
         vec![message(
-            "macro.documents",
+            "rox.documents",
             document(10).payload().map(<[u8]>::to_vec),
             None,
             10,
@@ -285,7 +285,7 @@ async fn schema_mismatch_is_an_observable_permanent_reject() {
     let mut payload = envelope("document.created");
     payload["schema_version"] = json!(2);
     let record = message(
-        "macro.documents",
+        "rox.documents",
         Some(serde_json::to_vec(&payload).unwrap()),
         Some(vec![]),
         10,
@@ -334,7 +334,7 @@ async fn exhausted_transient_errors_never_advance_to_the_next_record() {
 async fn commit_failure_is_fatal_even_for_a_poison_record() {
     for record in [
         document(10),
-        message("macro.documents", None, Some(vec![]), 10),
+        message("rox.documents", None, Some(vec![]), 10),
     ] {
         let consumer = fixture(vec![record, document(11)], vec![]);
         consumer.state.lock().unwrap().fail_commit = true;
@@ -408,7 +408,7 @@ fn call_conversion_preserves_the_envelope() {
         }
     });
     let message = message(
-        "macro.calls",
+        "rox.calls",
         Some(serde_json::to_vec(&archived).unwrap()),
         Some(ENTITY_ID.as_bytes().to_vec()),
         10,
@@ -430,7 +430,7 @@ fn the_routine_behind_an_event_reaches_ingestion() {
     let mut posted = envelope("document.created");
     posted["routine_id"] = json!(routine_id);
     let message = message(
-        "macro.documents",
+        "rox.documents",
         Some(serde_json::to_vec(&posted).unwrap()),
         Some(ENTITY_ID.as_bytes().to_vec()),
         10,

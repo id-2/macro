@@ -165,7 +165,7 @@ window.addEventListener('fixture-reaction', () => {
       payload,
       participants[0] ?? { identity: 'macro|member@example.com' },
       undefined,
-      'macro.call.reaction.v1'
+      'rox.call.reaction.v1'
     );
 });
 async function captureMedia(

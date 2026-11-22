@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::ics::CalendarEventExportAccess;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn event_export_resolves_own_copies_before_channel_shares(pool: PgPool) {
     let author_id = "macro|export-author@example.com";
     let attendee_id = "macro|export-attendee@example.com";
@@ -137,7 +137,7 @@ fn with_raw_payload(
     upsert
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn forwarded_copy_reads_googles_private_copy_flag_and_the_conference(pool: PgPool) {
     let owner_id = "macro|forward-guest@example.com";
     let link = insert_link(&pool, owner_id).await;
@@ -221,7 +221,7 @@ async fn forwarded_copy_reads_googles_private_copy_flag_and_the_conference(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_copy_is_private_only_when_every_calendar_holding_it_says_so(pool: PgPool) {
     let owner_id = "macro|forward-two-calendars@example.com";
     let link = insert_link(&pool, owner_id).await;

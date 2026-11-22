@@ -10,7 +10,7 @@ use crate::api::context::ApiContext;
 use super::middleware;
 
 // needs to be public in api crate for swagger
-pub(in crate::api) mod macro_api_token;
+pub(in crate::api) mod rox_api_token;
 pub(in crate::api) mod refresh;
 
 pub fn router() -> Router<ApiContext> {
@@ -25,5 +25,5 @@ pub fn router() -> Router<ApiContext> {
                     .layer(CookieManagerLayer::new()),
             ),
         )
-        .route("/macro_api_token", get(macro_api_token::handler))
+        .route("/rox_api_token", get(rox_api_token::handler))
 }

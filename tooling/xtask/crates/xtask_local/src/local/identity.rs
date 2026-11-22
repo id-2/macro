@@ -16,15 +16,15 @@ pub const FUSIONAUTH_API_KEY: &str = "bf69486b-4733-4954-a44e-2e1b5f2c8a91";
 /// / application JWT config.
 pub const JWT_SIGNING_KEY_ID: &str = "d7d09513-a3f5-401c-9685-34ab6c552453";
 
-/// The HS256 secret. `macro_auth` reads this as `JWT_SECRET_KEY`.
+/// The HS256 secret. `rox_auth` reads this as `JWT_SECRET_KEY`.
 pub const JWT_SECRET: &str = "super-secret-jwt-signing-key-for-local-development-only";
 
 /// Public fixture key for local Rox API tokens, including CRM settings calls.
-pub const MACRO_API_TOKEN_PUBLIC_KEY: &str =
+pub const ROX_API_TOKEN_PUBLIC_KEY: &str =
     include_str!("identity/macro-api-token.local.public.pem");
 
 /// Local-only fixture signing key. Never use this identity in a deployed environment.
-pub const MACRO_API_TOKEN_PRIVATE_KEY: &str =
+pub const ROX_API_TOKEN_PRIVATE_KEY: &str =
     include_str!("identity/macro-api-token.local.private.pem");
 
 /// The populate-JWT lambda id (the unlicensed local variant).
@@ -45,7 +45,7 @@ pub const TENANT_ID: &str = "11111111-1111-4111-8111-111111111111";
 /// A fixed OAuth client secret (deterministic, local-only).
 pub const CLIENT_SECRET: &str = "c3VwZXItc2VjcmV0LWxvY2FsLWNsaWVudC1zZWNyZXQtMDE";
 
-/// The JWT issuer the tenant emits; `macro_auth` checks `iss` against this.
+/// The JWT issuer the tenant emits; `rox_auth` checks `iss` against this.
 pub const ISSUER: &str = "local.rox.one";
 
 /// Fixed id for the passwordless-login email template the kickstart creates.

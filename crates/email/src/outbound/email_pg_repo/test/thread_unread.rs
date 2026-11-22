@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::{models::EmailErr, ports::NoOpEnqueuer, service::EmailServiceImpl};
 use crm::domain::service::NoOpCrmService;
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
-use macro_event_broker::NoopMacroEventBroker;
+use rox_event_broker::NoopMacroEventBroker;
 
 pub(super) fn service(
     pool: Pool<Postgres>,
@@ -19,7 +19,7 @@ pub(super) fn service(
         enqueuer: NoOpEnqueuer,
         crm_service: NoOpCrmService,
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        rox_event_broker: NoopMacroEventBroker,
         sent_undo_delay_secs: 0,
         sender_provider: std::sync::Arc::new(
             crate::domain::senders::UnavailableEmailSenderProvider,
@@ -31,7 +31,7 @@ pub(super) fn service(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_thread_labels", "email_thread_unread")
@@ -44,7 +44,7 @@ async fn mark_unread_uses_the_threads_inbox_and_updates_authoritative_read_state
     let thread_id = Uuid::parse_str("33333333-3333-3333-3333-333333333333")?;
     let link_id = Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb")?;
     let unread_label_id = Uuid::parse_str("cccccccc-cccc-cccc-cccc-dddddddddddd")?;
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
 
     // Repeated requests stay unread and do not duplicate label assignments.
     for _ in 0..2 {
@@ -106,7 +106,7 @@ async fn mark_unread_uses_the_threads_inbox_and_updates_authoritative_read_state
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_thread_labels", "email_thread_unread")
@@ -117,7 +117,7 @@ async fn mark_unread_rejects_inaccessible_threads_without_changing_them(
 ) -> anyhow::Result<()> {
     let service = service(pool);
     let thread_id = Uuid::parse_str("33333333-3333-3333-3333-333333333333")?;
-    let stranger = MacroUserIdStr::try_from_email("stranger@test.com")?;
+    let stranger = RoxUserIdStr::try_from_email("stranger@test.com")?;
 
     assert!(matches!(
         service.mark_thread_unread_impl(stranger, thread_id).await,
@@ -135,12 +135,12 @@ async fn mark_unread_rejects_inaccessible_threads_without_changing_them(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn mark_unread_rejects_missing_and_empty_threads(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let service = service(pool);
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     assert!(matches!(
         service
             .mark_thread_unread_impl(owner.clone(), Uuid::from_u128(99))
@@ -160,7 +160,7 @@ async fn assert_failed_read_state_preserves_labels_and_flags(
     failure: &str,
 ) -> anyhow::Result<()> {
     let service = service(pool);
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let first_link = Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")?;
     let first_thread = Uuid::parse_str("11111111-1111-1111-1111-111111111111")?;
     let second_link = Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb")?;
@@ -220,7 +220,7 @@ async fn assert_failed_read_state_preserves_labels_and_flags(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts(
@@ -238,7 +238,7 @@ async fn read_state_message_failure_rolls_back_label_changes(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts(

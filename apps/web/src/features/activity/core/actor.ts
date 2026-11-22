@@ -1,4 +1,4 @@
-import { type MacroId, tryMacroId } from '@core/user/macroId';
+import { type RoxId, tryMacroId } from '@core/user/macroId';
 
 /**
  * Who performed an activity event, parsed once from the wire `actorId`.
@@ -7,7 +7,7 @@ import { type MacroId, tryMacroId } from '@core/user/macroId';
  * is preserved raw so the row can still say something honest.
  */
 export type Actor =
-  | { kind: 'user'; id: MacroId }
+  | { kind: 'user'; id: RoxId }
   | { kind: 'bot'; botId: string }
   | { kind: 'unknown'; raw: string };
 

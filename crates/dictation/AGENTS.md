@@ -24,7 +24,7 @@ and returns text — nothing is stored.
 
 ## Boundaries
 
-- Depends on: `ai_usage`, `macro_authorization` + `rate_limit` (inbound
+- Depends on: `ai_usage`, `rox_authorization` + `rate_limit` (inbound
   feature), `async-openai` + `opus-pure`/`symphonia` (outbound feature).
 - Used by: `document_storage_service`.
 

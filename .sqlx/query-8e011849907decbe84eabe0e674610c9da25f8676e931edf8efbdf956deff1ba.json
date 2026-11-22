@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT written.import_id, written.kind, written.object, written.macro_id\n            FROM import_entity_written AS written\n            JOIN import_entity AS entity ON entity.id = written.import_id\n            WHERE entity.user_id = $1 AND written.import_id = ANY($2::uuid[])\n            ",
+  "query": "\n            SELECT written.import_id, written.kind, written.object, written.rox_id\n            FROM import_entity_written AS written\n            JOIN import_entity AS entity ON entity.id = written.import_id\n            WHERE entity.user_id = $1 AND written.import_id = ANY($2::uuid[])\n            ",
   "describe": {
     "columns": [
       {
@@ -20,7 +20,7 @@
       },
       {
         "ordinal": 3,
-        "name": "macro_id",
+        "name": "rox_id",
         "type_info": "Uuid"
       }
     ],

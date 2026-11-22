@@ -55,7 +55,7 @@ export function toEmailThread(thread: ApiThread): EmailThread {
         photo_url: contact.photo_url,
       })),
       body_html_sanitized: message.body_html_sanitized,
-      body_macro: message.body_macro,
+      body_rox: message.body_rox,
       body_replyless: message.body_replyless,
       body_text: message.body_text,
       cc: message.cc.map((contact) => ({

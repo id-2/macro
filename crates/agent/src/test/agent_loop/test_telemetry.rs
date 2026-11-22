@@ -682,16 +682,16 @@ async fn each_model_call_records_its_first_chunk() {
         describe(&spans)
     );
     assert_eq!(
-        string_attribute(chats[0], attr::MACRO_CHAT_FIRST_CHUNK_KIND).as_deref(),
+        string_attribute(chats[0], attr::ROX_CHAT_FIRST_CHUNK_KIND).as_deref(),
         Some("tool_call")
     );
     assert_eq!(
-        string_attribute(chats[1], attr::MACRO_CHAT_FIRST_CHUNK_KIND).as_deref(),
+        string_attribute(chats[1], attr::ROX_CHAT_FIRST_CHUNK_KIND).as_deref(),
         Some("text")
     );
     for chat in &chats {
         assert!(
-            int_attribute(chat, attr::MACRO_CHAT_TIME_TO_FIRST_CHUNK_MS).is_some_and(|ms| ms >= 0),
+            int_attribute(chat, attr::ROX_CHAT_TIME_TO_FIRST_CHUNK_MS).is_some_and(|ms| ms >= 0),
             "{}",
             describe(&spans)
         );
@@ -739,16 +739,16 @@ async fn a_loop_with_telemetry_off_still_records_each_first_chunk() {
         describe(&spans)
     );
     assert_eq!(
-        string_attribute(chats[0], attr::MACRO_CHAT_FIRST_CHUNK_KIND).as_deref(),
+        string_attribute(chats[0], attr::ROX_CHAT_FIRST_CHUNK_KIND).as_deref(),
         Some("tool_call")
     );
     assert_eq!(
-        string_attribute(chats[1], attr::MACRO_CHAT_FIRST_CHUNK_KIND).as_deref(),
+        string_attribute(chats[1], attr::ROX_CHAT_FIRST_CHUNK_KIND).as_deref(),
         Some("text")
     );
     for chat in &chats {
         assert!(
-            int_attribute(chat, attr::MACRO_CHAT_TIME_TO_FIRST_CHUNK_MS).is_some_and(|ms| ms >= 0),
+            int_attribute(chat, attr::ROX_CHAT_TIME_TO_FIRST_CHUNK_MS).is_some_and(|ms| ms >= 0),
             "{}",
             describe(&spans)
         );
@@ -765,7 +765,7 @@ async fn a_loop_with_telemetry_off_still_records_each_first_chunk() {
         .unwrap_or_else(|| panic!("the run span, got {}", describe(&spans)));
     assert_eq!(
         int_attribute(run, "agent.stream.first_chunk_ms"),
-        int_attribute(chats[0], attr::MACRO_CHAT_TIME_TO_FIRST_CHUNK_MS),
+        int_attribute(chats[0], attr::ROX_CHAT_TIME_TO_FIRST_CHUNK_MS),
         "the run span carries its first model call's time to first chunk"
     );
     assert_eq!(

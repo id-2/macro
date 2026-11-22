@@ -11,8 +11,8 @@ use databases::domain::ports::{DatabaseMetadataReads, DatabaseRowReads, Database
 use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, EntityAccessReceipt, OwnerAccessLevel,
 };
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_forms::MAX_TEXT_LENGTH;
 use uuid::Uuid;
 
@@ -40,7 +40,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {
@@ -140,7 +140,7 @@ where
     async fn check_branding_image(
         &self,
         file: Uuid,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> Result<(), FormError> {
         let stored = self
             .images

@@ -5,8 +5,8 @@ use item_filters::ast::EntityFilterAst;
 use item_filters::ast::agent_session::AgentSessionLiteral;
 use item_filters::ast::chat::ChatLiteral;
 use item_filters::ast::document::DocumentLiteral;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -53,7 +53,7 @@ fn req<'a>(
     hydratable: NotifiedHydratableTypes,
 ) -> NotifiedSoupRequest<'a> {
     NotifiedSoupRequest {
-        user_id: MacroUserIdStr::parse_from_str(USER_1).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER_1).unwrap(),
         limit: 50,
         after: None,
         filter,
@@ -76,7 +76,7 @@ fn minutes(page: &[NotifiedEntity]) -> Vec<u32> {
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn feed_orders_by_latest_notification(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -114,7 +114,7 @@ async fn feed_orders_by_latest_notification(pool: Pool<Postgres>) -> anyhow::Res
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn keyset_paginates_without_overlap_or_gaps(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -149,7 +149,7 @@ async fn keyset_paginates_without_overlap_or_gaps(pool: Pool<Postgres>) -> anyho
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn inactive_legs_drop_their_types(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -182,7 +182,7 @@ async fn inactive_legs_drop_their_types(pool: Pool<Postgres>) -> anyhow::Result<
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn done_filters_exclude_without_moving_the_sort_key(
     pool: Pool<Postgres>,
@@ -224,7 +224,7 @@ async fn done_filters_exclude_without_moving_the_sort_key(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn calendar_filter_folds_notification_state(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_ids = [Uuid::parse_str(LINK_1)?];
@@ -265,7 +265,7 @@ async fn calendar_filter_folds_notification_state(pool: Pool<Postgres>) -> anyho
 /// nothing and leave the candidates alone.
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn email_and_channel_conjuncts_prefilter_candidates(
     pool: Pool<Postgres>,
@@ -379,7 +379,7 @@ async fn email_and_channel_conjuncts_prefilter_candidates(
 /// feed — the mention shows once, on the thread row.
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_conjuncts_ignore_thread_scoped_notifications(
     pool: Pool<Postgres>,
@@ -421,7 +421,7 @@ async fn channel_conjuncts_ignore_thread_scoped_notifications(
 /// its channel's) and the foreign entity's notifications.
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_and_foreign_entity_conjuncts_prefilter_candidates(
     pool: Pool<Postgres>,
@@ -611,7 +611,7 @@ fn agent_sessions_are_opt_in_by_filter() {
 /// and drops the project whose only notification is done.
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn initiatives_surface_when_notified_and_opted_in(
     pool: Pool<Postgres>,
@@ -785,7 +785,7 @@ async fn seed_agent_sessions(pool: &Pool<Postgres>) -> anyhow::Result<(Uuid, Uui
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("notified_at")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn agent_sessions_surface_when_opted_in_and_accessible(
     pool: Pool<Postgres>,

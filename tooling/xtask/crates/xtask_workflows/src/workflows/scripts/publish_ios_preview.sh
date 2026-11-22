@@ -41,7 +41,7 @@ fi
 
 # Session caps, not access restrictions, are what keep a leaked link cheap: a
 # 3-minute idle timeout, a 30-minute ceiling and two concurrent sessions, on an
-# app that still needs a Macro login to show anything. `run=authenticated`
+# app that still needs a Rox login to show anything. `run=authenticated`
 # would demand an Appetize account and `referrerHostnamesRestricted` would
 # reject the click outright (GitHub sends no referrer on external links), so
 # both would lock out the reviewer this exists for.

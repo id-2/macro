@@ -16,7 +16,7 @@ import type {
 import { AgentIcon } from '../components/AgentGlyph';
 import { AgentPickerIdentity } from '../components/AgentPickerIdentity';
 import { agentPickerGroups } from '../core/agent-picker-groups';
-import { MACRO_PERSONA_ID, type RosterAgent } from '../core/roster';
+import { ROX_PERSONA_ID, type RosterAgent } from '../core/roster';
 import { createComposerModels } from '../queries/composer-models';
 import { AGENTS_TOUR } from '../tour';
 import { MobileAgentPicker } from './MobileAgentPicker';
@@ -56,10 +56,10 @@ function DesktopAgentPicker(props: AgentPickerProps) {
   const [open, setOpen] = createSignal(false);
   const catalog = createComposerModels(() => props.selected);
   const macro = () =>
-    props.agents.find((agent) => agent.id === MACRO_PERSONA_ID);
+    props.agents.find((agent) => agent.id === ROX_PERSONA_ID);
   const macroCatalog = createComposerModels(macro);
   const groups = () => agentPickerGroups(props.agents);
-  const rawModel = () => props.selected?.id === MACRO_PERSONA_ID;
+  const rawModel = () => props.selected?.id === ROX_PERSONA_ID;
   const model = () =>
     props.modelOverride ??
     props.selected?.defaultModel ??

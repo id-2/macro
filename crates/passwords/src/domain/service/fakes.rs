@@ -56,14 +56,14 @@ impl ItemLock for FakeLock {}
 impl Repository for FakeRepository {
     async fn is_human(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<bool, Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
         Ok(!self.agents.lock().unwrap().contains(user.as_ref()))
     }
     async fn is_team_admin(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
         team: TeamId,
     ) -> Result<bool, Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
@@ -261,7 +261,7 @@ impl Repository for FakeRepository {
         &self,
         operation: Uuid,
         record: &Record,
-        publisher: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        publisher: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<(), Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
         if self

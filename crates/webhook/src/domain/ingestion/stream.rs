@@ -16,7 +16,7 @@ use call::domain::notification_events::CallNotificationEvent;
 use channels::domain::broker_events::ChannelTopicEvent;
 use documents::domain::events::DocumentTopicEvent;
 use entity_access::domain::models::EntityType;
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 use messages::outbound::broker::MessageTopicEvent;
 use user_events::UserTopicEvent;
 

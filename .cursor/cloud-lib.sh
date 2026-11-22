@@ -1,7 +1,7 @@
 WORKSPACE_ROOT='/workspace'
 CACHE_ROOT="${HOME}/.cache/macro-cloud"
 TARGET_CACHE="${CACHE_ROOT}/target"
-export MACRO_STACK_SNAPSHOT_DIR="${CACHE_ROOT}/stack-snapshots"
+export ROX_STACK_SNAPSHOT_DIR="${CACHE_ROOT}/stack-snapshots"
 
 LOG_DIR="${HOME}/.cursor-cloud"
 ROXDB_URL='postgres://user:password@localhost:5432/macrodb'
@@ -15,7 +15,7 @@ NIX_CACHE_PUBLIC_KEY='nix-cache.rox.one-1:UtlRPa6ac+o4IfY+wV8KUS+X0XPU0YMv18lPWE
 LOCAL_STACK_BINS="${CACHE_ROOT}/local-stack-bins"
 export DATABASE_URL="${ROXDB_URL}"
 
-mkdir -p "${LOG_DIR}" "${TARGET_CACHE}" "${MACRO_STACK_SNAPSHOT_DIR}"
+mkdir -p "${LOG_DIR}" "${TARGET_CACHE}" "${ROX_STACK_SNAPSHOT_DIR}"
 
 nix_base_conf() {
   echo 'experimental-features = nix-command flakes'
@@ -264,14 +264,14 @@ run_with_bridge_forwarding() {
 }
 
 in_pinned_nix_shell() {
-  [ "${MACRO_CLOUD_PINNED_NIX:-}" = "1" ]
+  [ "${ROX_CLOUD_PINNED_NIX:-}" = "1" ]
 }
 
 reenter_pinned_nix_shell() {
   local script_path="$1"
   shift
   exec "${NIX_BIN}" develop "${WORKSPACE_ROOT}" --command /usr/bin/env \
-    MACRO_CLOUD_PINNED_NIX=1 /usr/bin/bash "${script_path}" "$@"
+    ROX_CLOUD_PINNED_NIX=1 /usr/bin/bash "${script_path}" "$@"
 }
 
 workspace_owner() {
@@ -300,7 +300,7 @@ remove_workspace_target_mounts() {
 }
 
 ensure_persistent_caches() {
-  mkdir -p "${TARGET_CACHE}" "${MACRO_STACK_SNAPSHOT_DIR}"
+  mkdir -p "${TARGET_CACHE}" "${ROX_STACK_SNAPSHOT_DIR}"
   remove_workspace_target_mounts
 
   if [ -e "${WORKSPACE_ROOT}/target" ] && [ ! -L "${WORKSPACE_ROOT}/target" ]; then

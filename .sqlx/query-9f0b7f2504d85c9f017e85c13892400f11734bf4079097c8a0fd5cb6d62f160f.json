@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        INSERT INTO \"User\" (\"id\", \"email\", \"organizationId\", \"macro_user_id\", \"isAgent\")\n        VALUES (\n            $1, $2, $3, $4,\n            COALESCE((SELECT BOOL_OR(u.\"isAgent\") FROM \"User\" u WHERE u.macro_user_id = $4), FALSE)\n        )\n        RETURNING id\n        ",
+  "query": "\n        INSERT INTO \"User\" (\"id\", \"email\", \"organizationId\", \"rox_user_id\", \"isAgent\")\n        VALUES (\n            $1, $2, $3, $4,\n            COALESCE((SELECT BOOL_OR(u.\"isAgent\") FROM \"User\" u WHERE u.rox_user_id = $4), FALSE)\n        )\n        RETURNING id\n        ",
   "describe": {
     "columns": [
       {

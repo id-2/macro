@@ -127,13 +127,13 @@ impl DocumentStorageServiceClient {
             .extend(["internal", "passwords"])
             .extend(resource);
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .lifecycle_client
             .request(method, url)
             .headers(headers)
             .header(
-                crate::constants::MACRO_DOCUMENT_STORAGE_SERVICE_AUTH_HEADER_KEY,
+                crate::constants::ROX_DOCUMENT_STORAGE_SERVICE_AUTH_HEADER_KEY,
                 &self.internal_auth_key,
             )
             .send()

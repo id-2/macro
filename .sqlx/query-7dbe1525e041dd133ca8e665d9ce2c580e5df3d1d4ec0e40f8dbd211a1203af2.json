@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE ai_funding_reservation SET allocated = TRUE, included_public = $2, extra_public = $3,\n             prepaid = $4, reclaimed_prepaid = $5, postpaid = $6, macro_absorbed = $7 WHERE invocation_id = $1",
+  "query": "UPDATE ai_funding_reservation SET allocated = TRUE, included_public = $2, extra_public = $3,\n             prepaid = $4, reclaimed_prepaid = $5, postpaid = $6, rox_absorbed = $7 WHERE invocation_id = $1",
   "describe": {
     "columns": [],
     "parameters": {

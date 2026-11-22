@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use external_chat::domain::models::{AttachmentRef, MediaKind, MediaShape};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 use tokio::sync::mpsc;
@@ -66,7 +66,7 @@ async fn insert_pairing_account(pool: &PgPool) -> Uuid {
             VALUES (gen_random_uuid(), $2, $2, 'stripe_owner')
             RETURNING id
         )
-        INSERT INTO "User" ("id", "email", "macro_user_id")
+        INSERT INTO "User" ("id", "email", "rox_user_id")
         SELECT $1, $2, new_macro_user.id FROM new_macro_user
         "#,
         user_id,
@@ -113,7 +113,7 @@ async fn next_matching(
     .expect("the fake server answers within the timeout")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_phone_scanning_the_qr_links_the_account_through_the_encrypted_store(pool: PgPool) {
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
     let whatsapp = FakeWhatsApp::start().await.unwrap();
@@ -251,7 +251,7 @@ impl InboundSink for RecordingSink {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn attachments_travel_both_ways_with_a_sealed_locator(pool: PgPool) {
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
     let whatsapp = FakeWhatsApp::start().await.unwrap();
@@ -474,7 +474,7 @@ fn group_metadata_keeps_the_timer_and_tells_a_community_from_its_groups() {
     assert_eq!(turned_off.disappearing_seconds, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_fresh_device_replaces_one_whose_data_key_kms_lost(pool: PgPool) {
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
     let whatsapp = FakeWhatsApp::start().await.unwrap();

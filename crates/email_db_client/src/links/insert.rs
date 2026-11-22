@@ -30,7 +30,7 @@ pub async fn upsert_link(
 
     let service::link::Link {
         id,
-        macro_id,
+        rox_id,
         fusionauth_user_id,
         email_address,
         provider,
@@ -48,7 +48,7 @@ pub async fn upsert_link(
         LinkId,
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, is_primary
+            id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, is_primary
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         ON CONFLICT (fusionauth_user_id, email_address, provider)
@@ -61,7 +61,7 @@ pub async fn upsert_link(
         RETURNING id, is_primary
         "#,
         id,
-        macro_id.as_ref(),
+        rox_id.as_ref(),
         fusionauth_user_id,
         email_address.0.as_ref(),
         db_provider as _,
@@ -79,7 +79,7 @@ pub async fn upsert_link(
 
     let service_link = service::link::Link {
         id: result.id,
-        macro_id,
+        rox_id,
         fusionauth_user_id,
         email_address,
         provider,

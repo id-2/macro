@@ -29,7 +29,7 @@ Redis set once no `"BomPart"` row references them.
 
 ## Gotchas
 
-- Counters written back here take `macro_sha_count_client::SHA_REFERENCE_TTL`
+- Counters written back here take `rox_sha_count_client::SHA_REFERENCE_TTL`
   in the same MULTI/EXEC; never write a `sha:` key without an expiry.
 
 - `cargo run --features local` bypasses all AWS calls and returns dummy data

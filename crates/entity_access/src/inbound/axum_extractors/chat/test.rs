@@ -6,10 +6,10 @@ use axum::{
     http::{Request, StatusCode, header},
     response::IntoResponse,
 };
-use macro_authorization::{
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims, BotAuthentication, BotScope,
-    INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
+    INTERNAL_API_KEY_HEADER, INTERNAL_ROX_USER_ID_HEADER, InternalIdentityClaims,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
 };
 use model::chat::ChatBasic;
 use model_owner::Owner;
@@ -46,23 +46,23 @@ impl FakeAuthorizationService {
     }
 }
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             "owner" => Ok(user_context(OWNER_ID)),
             "valid" => Ok(user_context(USER_ID)),
-            "expired" => Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            "expired" => Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_bot(
@@ -70,11 +70,11 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         token: &str,
         bot_scope: BotScope,
         _claims: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         match token {
             VALID_BOT_TOKEN => Ok(valid_bot_authentication(bot_scope)),
             MALFORMED_SYSTEM_BOT_TOKEN => Ok(malformed_system_bot_authentication(bot_scope)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
@@ -82,9 +82,9 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(claims
@@ -96,7 +96,7 @@ impl MacroAuthorizationService for FakeAuthorizationService {
 
 struct TestState {
     entity_access: Arc<FakeEntityAccessService>,
-    authorization: MacroAuthorizationState<FakeAuthorizationService>,
+    authorization: RoxAuthorizationState<FakeAuthorizationService>,
 }
 
 impl TestState {
@@ -110,7 +110,7 @@ impl TestState {
     ) -> Self {
         Self {
             entity_access: Arc::new(FakeEntityAccessService::new(access_level)),
-            authorization: MacroAuthorizationState::new(Arc::new(authorization)),
+            authorization: RoxAuthorizationState::new(Arc::new(authorization)),
         }
     }
 
@@ -119,7 +119,7 @@ impl TestState {
             entity_access: Arc::new(
                 FakeEntityAccessService::new(None).with_bot_permission(permission),
             ),
-            authorization: MacroAuthorizationState::new(Arc::new(
+            authorization: RoxAuthorizationState::new(Arc::new(
                 FakeAuthorizationService::default(),
             )),
         }
@@ -132,7 +132,7 @@ impl FromRef<TestState> for Arc<FakeEntityAccessService> {
     }
 }
 
-impl FromRef<TestState> for MacroAuthorizationState<FakeAuthorizationService> {
+impl FromRef<TestState> for RoxAuthorizationState<FakeAuthorizationService> {
     fn from_ref(state: &TestState) -> Self {
         state.authorization.clone()
     }
@@ -200,7 +200,7 @@ fn internal_request(user_id: Option<&str>, chat: ChatBasic) -> Request<Body> {
     );
     if let Some(user_id) = user_id {
         request.headers_mut().insert(
-            INTERNAL_MACRO_USER_ID_HEADER,
+            INTERNAL_ROX_USER_ID_HEADER,
             user_id.parse().expect("user id should be valid"),
         );
     }

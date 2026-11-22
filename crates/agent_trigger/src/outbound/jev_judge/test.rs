@@ -2,7 +2,7 @@ use std::sync::Mutex;
 
 use chrono::Utc;
 use jev::domain::{JevError, Probability};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use messages::domain::{events::MessageEventAttachment, models::MessageParent};
 
 use super::*;
@@ -65,7 +65,7 @@ fn posted(sender: channel_sender::ChannelSender<'static>) -> MessagePostedMetada
 
 fn user_sender() -> channel_sender::ChannelSender<'static> {
     channel_sender::ChannelSender::new_from_user(
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("jev-judge-test@rox.one")
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("jev-judge-test@rox.one")
             .expect("valid user id"),
     )
 }
@@ -75,7 +75,7 @@ async fn a_non_user_sender_is_not_replaced_with_system_billing_identity() {
     let classifier = FakeClassifier::answering(Ok(vec![1.0]));
     let judge = JevTriggerJudge::new(classifier.clone(), UnexpectedCaptioner);
     let mut posted = posted(channel_sender::ChannelSender::new_from_bot(
-        bot_id::MACRO_AI_BOT_ID,
+        bot_id::ROX_AI_BOT_ID,
     ));
     posted.attachments = vec![MessageEventAttachment {
         attachment_id: Uuid::from_u128(4),

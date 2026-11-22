@@ -8,15 +8,15 @@ use properties::PropertyOptionInfo;
 
 use super::*;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
 }
 
 fn event(name: &str, message_id: Option<Uuid>) -> EventReference {
     serde_json::from_value(json!({
-        "event_id": macro_uuid::generate_uuid_v7(),
+        "event_id": rox_uuid::generate_uuid_v7(),
         "event_name": name,
-        "entity_id": macro_uuid::generate_uuid_v7(),
+        "entity_id": rox_uuid::generate_uuid_v7(),
         "message_id": message_id,
     }))
     .unwrap()
@@ -54,7 +54,7 @@ fn email() -> ParsedMessage {
         body_parsed: Some("Your invoice for October is $420.".into()),
         body_text: Some("full text with quoted replies".into()),
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         body_replyless: None,
         internal_date_ts: Some(at),
         sent_at: None,
@@ -182,7 +182,7 @@ fn select(name: &str, options: &[&str], selected: usize) -> EntityPropertyInfo {
         .iter()
         .enumerate()
         .map(|(index, label)| PropertyOptionInfo {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             display_order: index as i32,
             value: PropertyOptionValue::String((*label).into()),
         })
@@ -191,7 +191,7 @@ fn select(name: &str, options: &[&str], selected: usize) -> EntityPropertyInfo {
         .get(selected)
         .map(|option| PropertyValue::SelectOption(vec![option.id]));
     EntityPropertyInfo {
-        property_definition_id: macro_uuid::generate_uuid_v7(),
+        property_definition_id: rox_uuid::generate_uuid_v7(),
         owner: PropertyOwner::System,
         display_name: name.into(),
         data_type: DataType::SelectString,

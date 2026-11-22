@@ -1,7 +1,7 @@
 //! Which Rox account a Stripe customer belongs to, and the account's
 //! `has_trialed` flag.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 /// Account lookups by Stripe customer.
@@ -21,7 +21,7 @@ impl PgStripeIdentity {
     pub async fn user_for_customer(
         &self,
         customer: &stripe::CustomerId,
-    ) -> anyhow::Result<Option<MacroUserIdStr<'static>>> {
+    ) -> anyhow::Result<Option<RoxUserIdStr<'static>>> {
         let id = sqlx::query_scalar!(
             r#"SELECT id FROM "User" WHERE "stripeCustomerId" = $1"#,
             customer.as_str(),
@@ -29,7 +29,7 @@ impl PgStripeIdentity {
         .fetch_optional(&self.pool)
         .await?;
         id.map(|id| {
-            MacroUserIdStr::try_from(id)
+            RoxUserIdStr::try_from(id)
                 .map_err(|error| anyhow::anyhow!("stored user id is invalid: {error:?}"))
         })
         .transpose()
@@ -37,7 +37,7 @@ impl PgStripeIdentity {
 
     /// Whether the account exists.
     #[tracing::instrument(skip(self, user), err)]
-    pub async fn user_exists(&self, user: &MacroUserIdStr<'_>) -> anyhow::Result<bool> {
+    pub async fn user_exists(&self, user: &RoxUserIdStr<'_>) -> anyhow::Result<bool> {
         Ok(sqlx::query_scalar!(
             r#"SELECT EXISTS (SELECT 1 FROM "User" WHERE id = $1) AS "exists!""#,
             user.as_ref(),
@@ -48,12 +48,12 @@ impl PgStripeIdentity {
 
     /// Records that the account has used its trial.
     #[tracing::instrument(skip(self, user), err)]
-    pub async fn mark_has_trialed(&self, user: &MacroUserIdStr<'_>) -> anyhow::Result<()> {
+    pub async fn mark_has_trialed(&self, user: &RoxUserIdStr<'_>) -> anyhow::Result<()> {
         sqlx::query!(
             r#"
             UPDATE macro_user SET has_trialed = true
             FROM "User" u
-            WHERE u.macro_user_id = macro_user.id AND u.id = $1
+            WHERE u.rox_user_id = macro_user.id AND u.id = $1
             "#,
             user.as_ref(),
         )

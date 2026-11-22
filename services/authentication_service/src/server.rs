@@ -40,13 +40,13 @@ use github_pull_requests::{
     outbound::pg_github_pull_request_repo::PgGithubPullRequestRepo,
 };
 use loops_client::LoopsClient;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
-use macro_service_urls::{
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
+use rox_service_urls::{
     AppServiceUrl, ConnectionGatewayUrl, DocumentStorageServiceUrl, EmailServiceUrl,
     GoogleOauthAuthorizationUrl, StaticFilePublicUrl, StaticFileServiceUrl,
 };
@@ -92,8 +92,8 @@ use crate::{
     api::{
         self,
         context::{
-            ApiContext, AuthorizationService, MacroApiTokenContext, MacroApiTokenExpirySeconds,
-            MacroApiTokenIssuer, MacroApiTokenPrivateSecretKey, StripeWebhookSecretKey,
+            ApiContext, AuthorizationService, RoxApiTokenContext, RoxApiTokenExpirySeconds,
+            RoxApiTokenIssuer, RoxApiTokenPrivateSecretKey, StripeWebhookSecretKey,
         },
     },
     config::{Config, Environment},
@@ -117,7 +117,7 @@ async fn run_server() -> anyhow::Result<()> {
     let env = Environment::new_or_prod();
 
     // One SDK config is sufficient for every AWS client in this process.
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
     );
@@ -184,8 +184,8 @@ async fn run_server() -> anyhow::Result<()> {
     );
 
     // Rox API token
-    let macro_api_token_private_key = secretsmanager_client
-        .get_maybe_secret_value(config.environment, MacroApiTokenPrivateSecretKey::new()?)
+    let rox_api_token_private_key = secretsmanager_client
+        .get_maybe_secret_value(config.environment, RoxApiTokenPrivateSecretKey::new()?)
         .await?;
 
     let fusionauth_api_key = match config.environment {
@@ -300,8 +300,8 @@ async fn run_server() -> anyhow::Result<()> {
         email::outbound::EmailServiceHttpClient::new(EmailServiceUrl::new()?.to_string());
     tracing::trace!("initialized email service client");
 
-    let macro_cache_client =
-        macro_cache_client::MacroCache::new(config.redis_uri.to_string().as_str());
+    let rox_cache_client =
+        rox_cache_client::RoxCache::new(config.redis_uri.to_string().as_str());
 
     tracing::trace!("initialized redis client");
 
@@ -317,13 +317,13 @@ async fn run_server() -> anyhow::Result<()> {
     let jwt_args =
         JwtValidationArgs::new_with_secret_manager(config.environment, &secretsmanager_client)
             .await?;
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
 
@@ -334,12 +334,12 @@ async fn run_server() -> anyhow::Result<()> {
         .await
         .context("failed to get multiplexed redis connection")?;
 
-    let notification_queue = macro_queues::NotificationIngressQueue::new();
-    let search_event_queue = macro_queues::SearchEventQueue::new();
-    let link_manager_queue = macro_queues::LinkManagerQueue::new();
-    let email_backfill_queue = macro_queues::EmailBackfillQueue::new();
+    let notification_queue = rox_queues::NotificationIngressQueue::new();
+    let search_event_queue = rox_queues::SearchEventQueue::new();
+    let link_manager_queue = rox_queues::LinkManagerQueue::new();
+    let email_backfill_queue = rox_queues::EmailBackfillQueue::new();
     let ingress_queue = SqsQueue::new(
-        aws_sdk_sqs::Client::new(&macro_aws_config::get_macro_aws_config().await),
+        aws_sdk_sqs::Client::new(&rox_aws_config::get_rox_aws_config().await),
         notification_queue.to_string(),
     );
     let notification_ingress_service = SqsNotificationIngress {
@@ -417,10 +417,10 @@ async fn run_server() -> anyhow::Result<()> {
     };
     tracing::trace!("initialized loops client");
 
-    let user_roles_and_permissions_macro_db = RoxDB::new(db.clone());
+    let user_roles_and_permissions_rox_db = RoxDB::new(db.clone());
 
     let user_roles_and_permissions_service =
-        UserRolesAndPermissionsServiceImpl::new(user_roles_and_permissions_macro_db);
+        UserRolesAndPermissionsServiceImpl::new(user_roles_and_permissions_rox_db);
 
     let stripe_prices = api::StripePrices {
         premium: config.stripe_price_id.to_string(),
@@ -453,13 +453,13 @@ async fn run_server() -> anyhow::Result<()> {
     let contacts_ingress = Arc::new(SqsContactsIngress {
         queue: SqsContactsQueue::new(
             aws_sdk_sqs::Client::new(&aws_config),
-            macro_queues::ContactsQueue::new().to_string(),
+            rox_queues::ContactsQueue::new().to_string(),
         ),
     });
     let contacts_enqueuer = ContactsIngressEnqueuer::new(contacts_ingress.clone());
     let team_analytics = AnalyticsClientTeamAnalytics::new(analytics_client.clone());
     let event_broker_tracker = TaskTracker::new();
-    let macro_event_broker = MacroEventBrokerService::new(
+    let rox_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
@@ -481,7 +481,7 @@ async fn run_server() -> anyhow::Result<()> {
         NotificationChannelSender::new(notification_ingress_service.clone()),
         ContactsChannelDispatcher::new(contacts_ingress),
     )
-    .with_macro_event_broker(macro_event_broker.clone());
+    .with_rox_event_broker(rox_event_broker.clone());
     let channel_event_dispatcher = SpawnedChannelEventDispatcher::new(channel_side_effects);
     let channel_service = ChannelServiceImpl::with_dependencies(
         PgChannelsRepo::new(db.clone()),
@@ -498,7 +498,7 @@ async fn run_server() -> anyhow::Result<()> {
                 ))
                 .with_crm(crm::outbound::lookup::PgCrmParentReader::new(db.clone())),
             messages::domain::effects::MessageEffects::new(
-                messages::outbound::broker::BrokerMessagePublisher::new(macro_event_broker.clone()),
+                messages::outbound::broker::BrokerMessagePublisher::new(rox_event_broker.clone()),
                 messages::domain::ports::NoMessageEventPublisher,
                 channels::domain::message_delivery::ChannelMessageDelivery::new(
                     PgChannelsRepo::new(db.clone()),
@@ -537,7 +537,7 @@ async fn run_server() -> anyhow::Result<()> {
         )
         .with_event_publisher(
             github_pull_requests::broker::BrokerGithubPullRequestPublisher(
-                macro_event_broker.clone(),
+                rox_event_broker.clone(),
             ),
         ),
         GithubLinkConfig {
@@ -688,8 +688,8 @@ async fn run_server() -> anyhow::Result<()> {
     // The harness and scheduled-action services validate the fleet-wide
     // internal key, not this service's own inbound key.
     let internal_key = config.service_internal_auth_key.to_string();
-    let harness_url = macro_service_urls::AgentHarnessServiceUrl::new()?.to_string();
-    let scheduled_action_url = macro_service_urls::ScheduledActionServiceUrl::new()?.to_string();
+    let harness_url = rox_service_urls::AgentHarnessServiceUrl::new()?.to_string();
+    let scheduled_action_url = rox_service_urls::ScheduledActionServiceUrl::new()?.to_string();
     let team_owned_entity_cleanup = TeamOwnedEntityCleanupAdapter::new(
         Arc::new(
             passwords::outbound::postgres::PgRepository::new(db.clone())
@@ -722,7 +722,7 @@ async fn run_server() -> anyhow::Result<()> {
         team_analytics,
     )
     .with_contacts_enqueuer(contacts_enqueuer)
-    .with_event_broker(macro_event_broker.clone())
+    .with_event_broker(rox_event_broker.clone())
     .with_open_seat_release((*ai_billing_service).clone())
     .with_owned_entity_cleanup(team_owned_entity_cleanup)
     .with_invite_rewarder(Arc::new(invite_rewards));
@@ -758,7 +758,7 @@ async fn run_server() -> anyhow::Result<()> {
         )),
         team_agents::outbound::agent_git_repos::AgentGitRepos::new(
             agent_git::client::AgentGitClient::new(
-                macro_service_urls::AgentGitServiceUrl::new()?.to_string(),
+                rox_service_urls::AgentGitServiceUrl::new()?.to_string(),
                 internal_key.clone(),
             )
             .map_err(|error| anyhow::anyhow!("{error:?}"))?,
@@ -914,7 +914,7 @@ async fn run_server() -> anyhow::Result<()> {
     // rule; agents themselves are created and edited in document storage.
     let bots = Arc::new(bots::domain::service::BotServiceImpl::new(
         PgBotsRepo::new(db.clone()),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
         harnesses::domain::service::HarnessServiceImpl::new(
             harnesses::outbound::pg_harness_repo::PgHarnessRepo::new(db.clone()),
             hosted_runtimes::outbound::pg::PgComputerAgents::new(db.clone()),
@@ -946,7 +946,7 @@ async fn run_server() -> anyhow::Result<()> {
             agent_api_keys,
             bots,
             codex_connection,
-            macro_cache_client: Arc::new(macro_cache_client),
+            rox_cache_client: Arc::new(rox_cache_client),
             stripe_client,
             subscription_checkout,
             subscription_plan,
@@ -962,19 +962,19 @@ async fn run_server() -> anyhow::Result<()> {
             environment: config.environment,
             signup_policy,
             rate_limit_service: rate_limit,
-            event_broker: macro_event_broker.clone(),
+            event_broker: rox_event_broker.clone(),
             calendar_scope_enabled: config.calendar_scope_enabled,
             google_authorization_url,
             account_link_state_key,
             jwt_args,
             authorization_state,
-            token_context: MacroApiTokenContext {
-                issuer: MacroApiTokenIssuer::new()?,
-                macro_api_token_private_key,
-                expiry_seconds: MacroApiTokenExpirySeconds::new()?
+            token_context: RoxApiTokenContext {
+                issuer: RoxApiTokenIssuer::new()?,
+                rox_api_token_private_key,
+                expiry_seconds: RoxApiTokenExpirySeconds::new()?
                     .as_ref()
                     .parse()
-                    .context("failed to parse MACRO_API_TOKEN_EXPIRY_SECONDS as usize")?,
+                    .context("failed to parse ROX_API_TOKEN_EXPIRY_SECONDS as usize")?,
             },
             internal_api_key,
             stripe_webhook_secret,

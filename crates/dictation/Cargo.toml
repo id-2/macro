@@ -9,7 +9,7 @@ default = []
 inbound = [
   "dep:axum",
   "dep:axum-extra",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:rate_limit",
   "dep:rootcause",
@@ -21,7 +21,7 @@ outbound = [
   "dep:async-openai",
   "dep:backoff",
   "dep:genai_telemetry",
-  "dep:macro_env_var",
+  "dep:rox_env_var",
   "dep:opus-pure",
   "dep:reqwest",
   "dep:serde",
@@ -37,11 +37,11 @@ backoff = { workspace = true, optional = true }
 bytes = { workspace = true }
 genai_telemetry = { path = "../genai_telemetry", optional = true }
 infer = { workspace = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = [
   "axum",
 ] }
-macro_env_var = { path = "../macro_env_var", optional = true }
-macro_user_id = { path = "../macro_user_id" }
+rox_env_var = { path = "../rox_env_var", optional = true }
+rox_user_id = { path = "../rox_user_id" }
 model-error-response = { path = "../model-error-response", optional = true }
 opus-pure = { workspace = true, optional = true }
 rate_limit = { path = "../rate_limit", optional = true, default-features = false }

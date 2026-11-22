@@ -3,7 +3,7 @@
 //! The settings dialog and the `ConnectMcpServer` AI tool both add servers
 //! through here, so a server added either way is the same row.
 
-use crate::domain::models::{MacroUserIdStr, McpServerRecord, is_public};
+use crate::domain::models::{RoxUserIdStr, McpServerRecord, is_public};
 use crate::domain::ports::McpServerStore;
 use std::net::IpAddr;
 use std::sync::Arc;
@@ -91,7 +91,7 @@ where
     #[tracing::instrument(skip(self), err)]
     pub async fn add(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         url: &str,
         server_name: &str,
         added_by: AddedBy,

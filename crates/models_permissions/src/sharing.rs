@@ -1,5 +1,5 @@
 //! Facts used by sharing workflows across entity kinds.
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 
 /// A member's role in the recorded owner's team.
@@ -21,7 +21,7 @@ pub struct SharingFacts {
     /// User/team sponsor when the recorded owner is an owned bot.
     pub sponsor: Option<Owner>,
     /// Membership of the owner/sponsor team.
-    pub team_members: Vec<(MacroUserIdStr<'static>, SharingTeamRole)>,
+    pub team_members: Vec<(RoxUserIdStr<'static>, SharingTeamRole)>,
     /// Human-readable entity name.
     pub name: String,
     /// File extension for a document.

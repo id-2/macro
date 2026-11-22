@@ -4,7 +4,7 @@
 use ai_billing::DisabledAiAdmissionService;
 use ai_usage::NoOpUsageRecorder;
 use chrono::NaiveDate;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 use serde_json::json;
 use std::sync::Arc;
@@ -32,7 +32,7 @@ struct Case {
 #[tokio::main]
 async fn main() {
     let suite: Suite = serde_json::from_str(SUITE).expect("the suite is valid JSON");
-    let owner = MacroUserIdStr::try_from_email("eval@example.test").expect("a valid address");
+    let owner = RoxUserIdStr::try_from_email("eval@example.test").expect("a valid address");
     let service = ThreadDueDateService::new(
         AgentThreadFactExtractor::new(Arc::new(NoOpUsageRecorder)),
         Arc::new(DisabledAiAdmissionService),

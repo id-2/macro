@@ -92,7 +92,7 @@ async fn store(repo: &PgCalendarRepository, lease: &OutlookCalendarLease, uid: &
     .event_id
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outlook_discovery_keeps_one_work_row_per_account_and_calendar(pool: PgPool) {
     let (repo, _, _) = mailbox(&pool).await;
     let discovery = claim(&repo).await.unwrap();
@@ -155,7 +155,7 @@ async fn outlook_discovery_keeps_one_work_row_per_account_and_calendar(pool: PgP
     assert!(claim(&repo).await.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outlook_work_rejects_duplicate_account_and_calendar_rows(pool: PgPool) {
     let (repo, _, owner) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -196,7 +196,7 @@ async fn outlook_work_rejects_duplicate_account_and_calendar_rows(pool: PgPool) 
     assert!(claim(&repo).await.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outlook_projection_uses_existing_reads_and_mutation_authorization(pool: PgPool) {
     let (repo, link, owner) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -251,7 +251,7 @@ async fn outlook_projection_uses_existing_reads_and_mutation_authorization(pool:
     assert_eq!(change.event_id, id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outlook_discovery_preserves_coverage_without_google_snapshot_certification(pool: PgPool) {
     let (repo, link, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -289,7 +289,7 @@ async fn outlook_discovery_preserves_coverage_without_google_snapshot_certificat
     log.commit(tx).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconnect_invalidates_old_echoes_pruning_and_health(pool: PgPool) {
     let (repo, link, _) = mailbox(&pool).await;
     let old = calendar(&repo).await;
@@ -347,7 +347,7 @@ async fn reconnect_invalidates_old_echoes_pruning_and_health(pool: PgPool) {
     assert_ne!(status, "reauth_required");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn incremental_commit_never_prunes_unseen_events(pool: PgPool) {
     let (repo, _, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -386,7 +386,7 @@ async fn incremental_commit_never_prunes_unseen_events(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_opt_out_purges_and_fences_without_disconnecting_mail(pool: PgPool) {
     let (repo, link, owner) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -436,7 +436,7 @@ async fn calendar_opt_out_purges_and_fences_without_disconnecting_mail(pool: PgP
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn publication_ack_preserves_a_concurrent_projection_revision(pool: PgPool) {
     let (repo, _, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -470,7 +470,7 @@ async fn publication_ack_preserves_a_concurrent_projection_revision(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn projection_claims_take_due_changes_in_order_and_skip_backed_off_ones(pool: PgPool) {
     let (repo, link, owner) = mailbox(&pool).await;
     let [later, second, first] = [Uuid::now_v7(), Uuid::now_v7(), Uuid::now_v7()];
@@ -495,7 +495,7 @@ async fn projection_claims_take_due_changes_in_order_and_skip_backed_off_ones(po
     assert_eq!(claimed, [first, second]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn simultaneous_workers_do_not_share_a_calendar_lease(pool: PgPool) {
     let (repo, _, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -514,7 +514,7 @@ async fn simultaneous_workers_do_not_share_a_calendar_lease(pool: PgPool) {
     assert!(repo.renew_outlook_calendar(&lease).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn crash_after_echo_replays_one_event_without_advancing_the_page_cursor(pool: PgPool) {
     let (repo, _, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -612,7 +612,7 @@ async fn crash_after_echo_replays_one_event_without_advancing_the_page_cursor(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn tombstones_refresh_known_series_and_reset_unknown_history(pool: PgPool) {
     let (repo, _, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -725,7 +725,7 @@ async fn finish_round(repo: &PgCalendarRepository, pool: &PgPool, revision: i16)
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_delta_round_reads_again_only_events_an_older_reader_skipped(pool: PgPool) {
     let (repo, _, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -834,7 +834,7 @@ async fn a_delta_round_reads_again_only_events_an_older_reader_skipped(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconnect_clears_only_the_replaced_credentials_reauth_state(pool: PgPool) {
     let (repo, link, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -871,7 +871,7 @@ async fn reconnect_clears_only_the_replaced_credentials_reauth_state(pool: PgPoo
     assert_eq!(status, "ready");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replaced_generations_reset_each_work_row_exactly_once(pool: PgPool) {
     let (repo, link, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -905,7 +905,7 @@ async fn replaced_generations_reset_each_work_row_exactly_once(pool: PgPool) {
     assert_eq!(scans(&pool, lease.account_id).await, reset);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn month_rollover_resets_only_expired_windows_once(pool: PgPool) {
     let (repo, _, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -942,7 +942,7 @@ async fn month_rollover_resets_only_expired_windows_once(pool: PgPool) {
     assert_eq!(scans(&pool, lease.account_id).await, reset);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unclaimable_accounts_never_starve_claimable_work(pool: PgPool) {
     let (repo, _, owner) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -1021,7 +1021,7 @@ async fn unclaimable_accounts_never_starve_claimable_work(pool: PgPool) {
     assert_eq!(status(inactive).await, "disabled");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn claims_take_due_work_in_order_across_accounts(pool: PgPool) {
     let (repo, _, owner) = mailbox(&pool).await;
     for _ in 0..2 {
@@ -1049,7 +1049,7 @@ async fn claims_take_due_work_in_order_across_accounts(pool: PgPool) {
     assert_eq!(claimed, [discovered[0], discovered[2], discovered[1]]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_and_popup_reminders_have_independent_delivery_and_stale_firings_drop(pool: PgPool) {
     use crate::domain::models::ReminderDeliveryMethod;
     use crate::domain::ports::CalendarReminderDispatchRepo;
@@ -1164,7 +1164,7 @@ async fn email_and_popup_reminders_have_independent_delivery_and_stale_firings_d
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn automatic_decline_journals_before_submission_and_never_repeats_uncertain_replies(
     pool: PgPool,
 ) {
@@ -1303,7 +1303,7 @@ async fn automatic_decline_journals_before_submission_and_never_repeats_uncertai
     assert_eq!(*provider.submitted.lock().unwrap(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn occurrence_reminders_override_series_and_survive_calendar_default_changes(pool: PgPool) {
     let (repo, link, owner) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -1432,7 +1432,7 @@ async fn occurrence_reminders_override_series_and_survive_calendar_default_chang
     assert_eq!(rows[2].event.reminders.overrides[0].method, "email");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn automatic_reply_journal_survives_calendar_and_mailbox_reconnection(pool: PgPool) {
     use crate::domain::outlook::automatic_decline::*;
     let (repo, link, owner) = mailbox(&pool).await;
@@ -1495,7 +1495,7 @@ async fn automatic_reply_journal_survives_calendar_and_mailbox_reconnection(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn automatic_decline_candidates_are_fair_bounded_and_respect_disabled_occurrences(
     pool: PgPool,
 ) {
@@ -1575,7 +1575,7 @@ async fn automatic_decline_candidates_are_fair_bounded_and_respect_disabled_occu
 /// The migration that stores Outlook organizers, whom Graph lists as not
 /// having answered, as holding their meetings.
 const OUTLOOK_ORGANIZERS_HOLD_THEIR_MEETINGS: &str = include_str!(
-    "../../../../../macro_db_client/migrations/20261026191007_outlook_organizers_hold_their_meetings.sql"
+    "../../../../../rox_db_client/migrations/20261026191007_outlook_organizers_hold_their_meetings.sql"
 );
 
 fn unanswered(email: &str, is_organizer: bool) -> CalendarAttendee {
@@ -1590,7 +1590,7 @@ fn unanswered(email: &str, is_organizer: bool) -> CalendarAttendee {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_organizer_repair_stores_outlook_organizers_as_holding_their_meetings(pool: PgPool) {
     let (repo, link, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -1729,7 +1729,7 @@ async fn the_organizer_repair_stores_outlook_organizers_as_holding_their_meeting
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_outlook_cancellation_or_removal_retires_join_request_notifications(pool: PgPool) {
     let (repo, _, owner) = mailbox(&pool).await;
     let member = "macro|outlook-member@example.com";
@@ -1844,7 +1844,7 @@ async fn clean_round(repo: &PgCalendarRepository, lease: &OutlookCalendarLease) 
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_outlook_sync_error_badge_logs_when_it_appears_and_when_it_changes(pool: PgPool) {
     let (repo, link, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -1876,7 +1876,7 @@ async fn an_outlook_sync_error_badge_logs_when_it_appears_and_when_it_changes(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_clean_outlook_round_logs_a_cleared_badge_once(pool: PgPool) {
     let (repo, link, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -1929,7 +1929,7 @@ async fn a_clean_outlook_round_logs_a_cleared_badge_once(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconnecting_clears_a_reauth_badge_through_the_change_log(pool: PgPool) {
     let (repo, link, _) = mailbox(&pool).await;
     let lease = calendar(&repo).await;
@@ -1988,10 +1988,10 @@ async fn reconnecting_clears_a_reauth_badge_through_the_change_log(pool: PgPool)
 /// The migration that logs every visible Outlook calendar, so caches that
 /// missed a change to its sync error badge refetch it.
 const LOG_OUTLOOK_CALENDARS: &str = include_str!(
-    "../../../../../macro_db_client/migrations/20261105002046_log_outlook_calendars_for_their_sync_error.sql"
+    "../../../../../rox_db_client/migrations/20261105002046_log_outlook_calendars_for_their_sync_error.sql"
 );
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_badge_backfill_logs_every_visible_outlook_calendar(pool: PgPool) {
     let (repo, link, owner) = mailbox(&pool).await;
     let discovery = claim(&repo).await.unwrap();

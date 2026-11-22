@@ -69,8 +69,8 @@ impl Daemon {
         inherited: Option<InheritedAgent>,
     ) -> rootcause::Result<Self> {
         let cancel = CancellationToken::new();
-        let client = EventStreamClient::new(&config.macro_api, &credentials);
-        let api = HarnessApi::new(&config.macro_api, &credentials);
+        let client = EventStreamClient::new(&config.rox_api, &credentials);
+        let api = HarnessApi::new(&config.rox_api, &credentials);
 
         #[cfg(unix)]
         let herdr = start_herdr(&mut config, &credentials);
@@ -99,14 +99,14 @@ impl Daemon {
         let turns = ActiveTurns::default();
         let adopted = adopt(inherited, &turns);
         let (handoffs, handoff) = Handoffs::channel();
-        let computer = crate::computer::is_macro_computer().then(|| {
+        let computer = crate::computer::is_rox_computer().then(|| {
             std::sync::Arc::new(crate::computer::Computer::new(
-                &config.macro_api,
+                &config.rox_api,
                 &config.workspace.path,
             ))
         });
         let runtime = Runtime::start(
-            &config.macro_api,
+            &config.rox_api,
             &credentials,
             config.harness.clone(),
             &config.workspace.path,
@@ -118,7 +118,7 @@ impl Daemon {
         );
         let runtime_connected = runtime.connection_state();
         let presence_watch = AbortOnDropHandle::new(tokio::spawn(watch_presence(
-            EventStreamClient::new(&config.macro_api, &credentials),
+            EventStreamClient::new(&config.rox_api, &credentials),
             runtime_connected.clone(),
         )));
         let executor = Dispatcher::new(api, runtime, config.workspace.clone());
@@ -131,8 +131,8 @@ impl Daemon {
         };
 
         tracing::info!(
-            api = %config.macro_api.api_url,
-            storage = %config.macro_api.storage_url,
+            api = %config.rox_api.api_url,
+            storage = %config.rox_api.storage_url,
             harness_id = %credentials.harness_id,
             harness = %config.harness.command,
             workspace = %config.workspace.path.display(),
@@ -295,12 +295,12 @@ fn start_herdr(config: &mut Config, credentials: &HarnessCredentials) -> Option<
         tracing::info!("herdr detected; the harness opens a herdr window per session");
         return None;
     }
-    let api = HarnessApi::new(&config.macro_api, credentials);
+    let api = HarnessApi::new(&config.rox_api, credentials);
     match crate::herdr::Hub::start(
         &herdr,
         api,
         &config.workspace.path,
-        &config.macro_api.web_url,
+        &config.rox_api.web_url,
     ) {
         Ok(hub) => Some(hub),
         Err(error) => {

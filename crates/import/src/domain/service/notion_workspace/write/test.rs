@@ -1,7 +1,7 @@
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 use super::*;
-use import_notion::domain::macro_cells::Person;
+use import_notion::domain::rox_cells::Person;
 
 fn id(hex: char) -> NotionId {
     NotionId::parse(&hex.to_string().repeat(32)).unwrap()
@@ -80,7 +80,7 @@ fn every_planned_page_gets_a_document_id_before_anything_is_written() {
             Person {
                 email: Some("teo@acme.test".to_string()),
                 macro_user: Some(
-                    MacroUserIdStr::parse_from_str("macro|teo@acme.test")
+                    RoxUserIdStr::parse_from_str("macro|teo@acme.test")
                         .unwrap()
                         .into_owned(),
                 ),

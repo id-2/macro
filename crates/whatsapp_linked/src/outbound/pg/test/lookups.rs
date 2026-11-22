@@ -29,7 +29,7 @@ fn contact(jid: &str, name: &str) -> ChatUpdate {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lookups_need_a_valid_number_a_person_and_stay_within_the_budget(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -124,7 +124,7 @@ async fn lookups_need_a_valid_number_a_person_and_stay_within_the_budget(pool: P
     assert_eq!(lookup(STRANGER).await.unwrap().state, LookupState::Pending);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_found_number_joins_the_chat_list_without_clobbering_it(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -268,7 +268,7 @@ async fn a_found_number_joins_the_chat_list_without_clobbering_it(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_contact_added_before_anyone_wrote_has_nothing_to_import(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);

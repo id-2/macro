@@ -36,7 +36,7 @@ async fn sync_notifications_require_internal_auth_and_forward_only_identity_and_
                 )
                 .unwrap(),
                 on_behalf_of: Some(
-                    macro_user_id::user_id::MacroUserIdStr::try_from(
+                    rox_user_id::user_id::RoxUserIdStr::try_from(
                         "macro|owner@example.com".to_owned()
                     )
                     .unwrap()

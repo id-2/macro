@@ -11,7 +11,7 @@ pub use address_policy::{AddressPolicy, RefusedAddress};
 pub use aes_key::{AesKey, AesKeyError};
 pub use call_tool_result::CallToolResultExt;
 pub use consts::*;
-pub use macro_user_id::user_id::MacroUserIdStr;
+pub use rox_user_id::user_id::RoxUserIdStr;
 pub use oauth_client_metadata::OAuthClientMetadata;
 pub use result::{Error, Result};
 pub use rmcp::transport::auth::StoredCredentials;

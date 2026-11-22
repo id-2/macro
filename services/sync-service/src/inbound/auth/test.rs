@@ -34,15 +34,15 @@ fn extractors_enforce_scope_permission_and_credential_source() {
             get(|_: InternalAccess| async {}),
         )
         .with_state(secrets);
-    let view = macro_sync_service_jwt::encode(
+    let view = rox_sync_service_jwt::encode(
         &serde_json::json!({"document_id": "document-a", "access_level": "view", "exp": usize::MAX / 2}),
         "secret",
     ).unwrap();
-    let edit = macro_sync_service_jwt::encode(
+    let edit = rox_sync_service_jwt::encode(
         &serde_json::json!({"document_id": "document-a", "access_level": "edit", "exp": usize::MAX / 2}),
         "secret",
     ).unwrap();
-    let expired = macro_sync_service_jwt::encode(
+    let expired = rox_sync_service_jwt::encode(
         &serde_json::json!({"document_id": "document-a", "access_level": "edit", "exp": 1}),
         "secret",
     )
@@ -169,9 +169,9 @@ fn extractors_enforce_scope_permission_and_credential_source() {
 
 #[test]
 fn surface_extractors_reject_document_and_cross_surface_grants() {
-    use macro_sync_service_jwt::session::{SurfaceAccessLevel, SurfaceClaims, SurfaceSessionKind};
+    use rox_sync_service_jwt::session::{SurfaceAccessLevel, SurfaceClaims, SurfaceSessionKind};
     let id = "01952cbd-76ad-7a65-9c21-020304050607";
-    let token = macro_sync_service_jwt::session::encode_surface(
+    let token = rox_sync_service_jwt::session::encode_surface(
         &SurfaceClaims {
             session_kind: SurfaceSessionKind::Surface,
             surface_id: id.parse().unwrap(),
@@ -179,12 +179,12 @@ fn surface_extractors_reject_document_and_cross_surface_grants() {
             access_level: SurfaceAccessLevel::View,
             actor: None,
             exp: usize::MAX / 2,
-            iss: macro_sync_service_jwt::ISSUER.into(),
+            iss: rox_sync_service_jwt::ISSUER.into(),
         },
         "secret",
     )
     .unwrap();
-    let document = macro_sync_service_jwt::encode(
+    let document = rox_sync_service_jwt::encode(
         &serde_json::json!({"document_id": id, "access_level": "admin", "exp": usize::MAX / 2}),
         "secret",
     )

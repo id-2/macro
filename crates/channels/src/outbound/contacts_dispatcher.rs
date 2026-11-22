@@ -2,7 +2,7 @@
 
 use crate::domain::ports::ChannelContactsDispatcher;
 use contacts::domain::ports::ContactsIngress;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{collections::HashSet, sync::Arc};
 
 /// Contacts ingress adapter.
@@ -33,7 +33,7 @@ where
 
     async fn enqueue_contacts(
         &self,
-        users: HashSet<MacroUserIdStr<'static>>,
+        users: HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), Self::Err> {
         self.ingress
             .enqueue_contacts(users)

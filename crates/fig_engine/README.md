@@ -229,7 +229,7 @@ precision files store them, so versions survive saving). They are written
 in Figma's fields: `isSymbolPublishable`/`isPublishable`,
 `sharedSymbolVersion`/`version`, and `publishedVersion`; names starting
 with `_` or `.` stay private (keyed, unlisted). The document node records
-what was published and the publisher's note as Macro `pluginData`
+what was published and the publisher's note as Rox `pluginData`
 (`pluginID` `macro`, other plugins' entries kept), so `library::status`
 lists new, changed, and removed assets for "Changes to publish", and
 `library::published` the assets a file using the library sees.
@@ -285,7 +285,7 @@ flow (`edit::flags::PROTOTYPE`). Saving writes `prototypeInteractions`
 starting from the file's own records (conditions, variables, and easing
 curves survive), drops the legacy fields once a node has interactions, and
 writes `prototypeStartingPoint`; a file whose schema has no prototype types
-(designs made in Macro) gets Figma's, by name, when an edit adds any.
+(designs made in Rox) gets Figma's, by name, when an edit adds any.
 `fig_render prototype` reads each file's prototype, edits it as the
 Prototype tab does, saves, reopens, and checks the result reads the same.
 `testing::prototype_file` builds `tests/fixtures/prototype.fig`, the browser

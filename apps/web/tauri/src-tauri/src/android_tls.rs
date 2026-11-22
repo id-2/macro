@@ -3,7 +3,7 @@
 use jni::{JNIEnv, objects::JObject, sys::jboolean};
 
 #[unsafe(no_mangle)]
-extern "system" fn Java_com_macro_workspace_mobile_MainActivity_initializeCertificateVerifier(
+extern "system" fn Java_com_rox_workspace_mobile_MainActivity_initializeCertificateVerifier(
     mut env: JNIEnv,
     _activity: JObject,
     context: JObject,

@@ -6,7 +6,7 @@ use sqlx::Row;
 // ── senders_by_message_ids ──────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_senders_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -37,7 +37,7 @@ async fn test_senders_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_senders_by_message_ids_no_from_contact(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -56,7 +56,7 @@ async fn test_senders_by_message_ids_no_from_contact(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_senders_by_message_ids_empty_input(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -71,7 +71,7 @@ async fn test_senders_by_message_ids_empty_input(pool: Pool<Postgres>) -> anyhow
 // ── recipients_by_message_ids ───────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_recipients_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -100,7 +100,7 @@ async fn test_recipients_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_recipients_by_message_ids_multiple_messages(
@@ -125,7 +125,7 @@ async fn test_recipients_by_message_ids_multiple_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_recipients_by_message_ids_empty_input(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -140,7 +140,7 @@ async fn test_recipients_by_message_ids_empty_input(pool: Pool<Postgres>) -> any
 // ── labels_by_message_ids ───────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_labels_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -160,7 +160,7 @@ async fn test_labels_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_labels_by_message_ids_multiple_messages(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -185,7 +185,7 @@ async fn test_labels_by_message_ids_multiple_messages(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_labels_by_message_ids_no_labels(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -204,7 +204,7 @@ async fn test_labels_by_message_ids_no_labels(pool: Pool<Postgres>) -> anyhow::R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_labels_by_message_ids_empty_input(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -219,7 +219,7 @@ async fn test_labels_by_message_ids_empty_input(pool: Pool<Postgres>) -> anyhow:
 // ── attachments_by_message_ids ──────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_attachments_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -252,7 +252,7 @@ async fn test_attachments_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_attachments_by_message_ids_no_attachments(
@@ -272,7 +272,7 @@ async fn test_attachments_by_message_ids_no_attachments(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_attachments_by_message_ids_empty_input(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -287,7 +287,7 @@ async fn test_attachments_by_message_ids_empty_input(pool: Pool<Postgres>) -> an
 // ── draft_attachments_by_message_ids ────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_draft_attachments_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -315,7 +315,7 @@ async fn test_draft_attachments_by_message_ids(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_draft_attachments_by_message_ids_no_drafts(
@@ -333,7 +333,7 @@ async fn test_draft_attachments_by_message_ids_no_drafts(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_draft_attachments_by_message_ids_empty_input(
@@ -350,7 +350,7 @@ async fn test_draft_attachments_by_message_ids_empty_input(
 // ── forwarded_attachments_by_message_ids ────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_forwarded_attachments_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -381,7 +381,7 @@ async fn test_forwarded_attachments_by_message_ids(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_forwarded_attachments_by_message_ids_empty_input(
@@ -398,7 +398,7 @@ async fn test_forwarded_attachments_by_message_ids_empty_input(
 // ── scheduled_sends_by_message_ids ─────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_scheduled_sends_by_message_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -420,7 +420,7 @@ async fn test_scheduled_sends_by_message_ids(pool: Pool<Postgres>) -> anyhow::Re
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_scheduled_send_times_excludes_already_sent(
@@ -441,7 +441,7 @@ async fn test_scheduled_send_times_excludes_already_sent(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_scheduled_sends_by_message_ids_empty_input(
@@ -458,7 +458,7 @@ async fn test_scheduled_sends_by_message_ids_empty_input(
 // ── process_scheduled_message ──────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn scheduled_send_status_distinguishes_preparation_from_submission(
@@ -522,7 +522,7 @@ async fn scheduled_send_status_distinguishes_preparation_from_submission(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -565,7 +565,7 @@ async fn test_process_scheduled_message_insert(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -627,7 +627,7 @@ async fn test_process_scheduled_message_upsert(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -666,7 +666,7 @@ async fn test_process_scheduled_message_delete(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_process_scheduled_message_delete_nonexistent(
@@ -686,7 +686,7 @@ async fn test_process_scheduled_message_delete_nonexistent(
 // ── upsert_recipients ──────────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -727,7 +727,7 @@ async fn test_upsert_recipients_insert(pool: Pool<Postgres>) -> anyhow::Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -772,7 +772,7 @@ async fn test_upsert_recipients_removes_stale(pool: Pool<Postgres>) -> anyhow::R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_upsert_recipients_unchanged_set_writes_nothing(
@@ -816,7 +816,7 @@ async fn test_upsert_recipients_unchanged_set_writes_nothing(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -849,7 +849,7 @@ async fn test_upsert_recipients_empty_deletes_all(pool: Pool<Postgres>) -> anyho
 // ── delete_scheduled_messages_batch ─────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn test_delete_scheduled_messages_batch_returns_only_pending(
@@ -886,7 +886,7 @@ async fn test_delete_scheduled_messages_batch_returns_only_pending(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_delete_scheduled_messages_batch_empty_input(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -916,7 +916,7 @@ fn staged_attachment(draft_id: Uuid, id: Uuid) -> AttachmentDraft {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn insert_draft_attachment_records_the_attachment_on_the_inboxs_draft(
@@ -946,7 +946,7 @@ async fn insert_draft_attachment_records_the_attachment_on_the_inboxs_draft(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn insert_draft_attachment_keeps_an_inline_part_inline(
@@ -983,7 +983,7 @@ async fn insert_draft_attachment_keeps_an_inline_part_inline(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn insert_draft_attachment_refuses_another_inboxs_draft(
@@ -1012,7 +1012,7 @@ async fn insert_draft_attachment_refuses_another_inboxs_draft(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn insert_draft_attachment_refuses_non_drafts_sent_and_scheduled_messages(

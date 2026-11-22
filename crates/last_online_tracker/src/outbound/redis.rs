@@ -2,7 +2,7 @@
 
 use crate::domain::ports::LastOnlineRepo;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use redis::AsyncCommands;
 use redis::aio::MultiplexedConnection;
 use rootcause::Report;
@@ -21,7 +21,7 @@ impl RedisLastOnlineRepo {
         Self { conn }
     }
 
-    fn key(user: &MacroUserIdStr<'_>) -> String {
+    fn key(user: &RoxUserIdStr<'_>) -> String {
         format!("last_online:{}", user.as_ref())
     }
 }
@@ -29,7 +29,7 @@ impl RedisLastOnlineRepo {
 impl LastOnlineRepo for RedisLastOnlineRepo {
     async fn set_last_online(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         now: DateTime<Utc>,
     ) -> Result<(), Report> {
         let mut conn = self.conn.clone();
@@ -41,7 +41,7 @@ impl LastOnlineRepo for RedisLastOnlineRepo {
 
     async fn get_last_online(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> Result<Option<DateTime<Utc>>, Report> {
         let mut conn = self.conn.clone();
         let key = Self::key(&user);

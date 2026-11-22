@@ -32,7 +32,7 @@ fn meeting_copy(
     copy
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn meeting_copies_list_each_of_the_requesters_inboxes(pool: PgPool) {
     let owner_id = "macro|copies-owner@example.com";
     let other_id = "macro|copies-other@example.com";

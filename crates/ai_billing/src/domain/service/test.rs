@@ -10,21 +10,21 @@ use crate::domain::ports::{
     ResolvedReload, SettlementOutcome,
 };
 use chrono::TimeZone;
-use macro_user_id::cowlike::CowLike;
-use macro_uuid::Uuid;
+use rox_user_id::cowlike::CowLike;
+use rox_uuid::Uuid;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use teams::domain::open_seat_release::OpenSeatRelease;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{email}")).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
 }
 
 #[derive(Clone, Default)]
 struct FakeEntitlements {
     by_user: Arc<Mutex<HashMap<String, Entitlement>>>,
     customers: Arc<Mutex<HashMap<String, String>>>,
-    payers: Arc<Mutex<HashMap<Uuid, MacroUserIdStr<'static>>>>,
+    payers: Arc<Mutex<HashMap<Uuid, RoxUserIdStr<'static>>>>,
     fail_entitlement: Arc<Mutex<bool>>,
 }
 
@@ -51,21 +51,21 @@ impl FakeEntitlements {
             by_user.insert(user.to_string(), resolved);
         }
     }
-    fn with_customer(self, u: &MacroUserIdStr<'_>, customer: &str) -> Self {
+    fn with_customer(self, u: &RoxUserIdStr<'_>, customer: &str) -> Self {
         self.customers
             .lock()
             .unwrap()
             .insert(u.to_string(), customer.to_string());
         self
     }
-    fn payer_for_team(self, team_id: Uuid, payer: MacroUserIdStr<'static>) -> Self {
+    fn payer_for_team(self, team_id: Uuid, payer: RoxUserIdStr<'static>) -> Self {
         self.payers.lock().unwrap().insert(team_id, payer);
         self
     }
 }
 
 impl EntitlementSource for FakeEntitlements {
-    async fn entitlement(&self, user: &MacroUserIdStr<'_>) -> Result<Entitlement> {
+    async fn entitlement(&self, user: &RoxUserIdStr<'_>) -> Result<Entitlement> {
         if *self.fail_entitlement.lock().unwrap() {
             return Err(BillingError::Entitlement(anyhow::anyhow!(
                 "roles unavailable"
@@ -79,10 +79,10 @@ impl EntitlementSource for FakeEntitlements {
             .cloned()
             .unwrap_or_else(|| Entitlement::personal(user.clone().into_owned(), PlanTier::Free)))
     }
-    async fn stripe_customer_id(&self, user: &MacroUserIdStr<'_>) -> Result<Option<String>> {
+    async fn stripe_customer_id(&self, user: &RoxUserIdStr<'_>) -> Result<Option<String>> {
         Ok(self.customers.lock().unwrap().get(user.as_ref()).cloned())
     }
-    async fn team_payer(&self, team_id: Uuid) -> Result<Option<MacroUserIdStr<'static>>> {
+    async fn team_payer(&self, team_id: Uuid) -> Result<Option<RoxUserIdStr<'static>>> {
         Ok(self.payers.lock().unwrap().get(&team_id).cloned())
     }
 }
@@ -101,7 +101,7 @@ struct UsageEntry {
 }
 
 impl FakeUsage {
-    fn add(&self, user: &MacroUserIdStr<'_>, at: DateTime<Utc>, cents: i64) {
+    fn add(&self, user: &RoxUserIdStr<'_>, at: DateTime<Utc>, cents: i64) {
         self.entries.lock().unwrap().push(UsageEntry {
             user: user.to_string(),
             at,
@@ -115,7 +115,7 @@ impl UsageReader for FakeUsage {
     /// `entries` are summed when their timestamp falls in the requested period.
     async fn usage_cost_cents_by_user(
         &self,
-        users: &[MacroUserIdStr<'static>],
+        users: &[RoxUserIdStr<'static>],
         period: BillingPeriod,
     ) -> Result<Vec<SeatUsage>> {
         let now = Utc::now();
@@ -137,7 +137,7 @@ impl UsageReader for FakeUsage {
             .into_iter()
             .map(|(user, used_cents)| {
                 Ok(SeatUsage {
-                    user: MacroUserIdStr::try_from(user)
+                    user: RoxUserIdStr::try_from(user)
                         .map_err(|error| BillingError::Storage(error.into()))?,
                     used_cents,
                     chargeable_cost_cents: None,
@@ -266,7 +266,7 @@ impl FakeRepo {
 impl BillingRepo for FakeRepo {
     async fn credit_reload_committed_cents(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         month: BillingPeriod,
     ) -> Result<i64> {
         let mut state = self.state.lock().unwrap();
@@ -276,7 +276,7 @@ impl BillingRepo for FakeRepo {
 
     async fn legacy_seats(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         _period: BillingPeriod,
         mut seats: Vec<SeatAllowance>,
     ) -> Result<Vec<SeatAllowance>> {
@@ -292,7 +292,7 @@ impl BillingRepo for FakeRepo {
 
     async fn record_plan_change(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         record: crate::domain::plan_change::RecordedPlanChange,
     ) -> Result<()> {
         self.state.lock().unwrap().usage_resets.push((
@@ -303,7 +303,7 @@ impl BillingRepo for FakeRepo {
         Ok(())
     }
 
-    async fn settings(&self, _payer: &MacroUserIdStr<'_>) -> Result<BillingSettings> {
+    async fn settings(&self, _payer: &RoxUserIdStr<'_>) -> Result<BillingSettings> {
         let s = self.state.lock().unwrap();
         let mut settings = s.settings.clone();
         settings.overage_suspended_at = s.suspended.then(Utc::now);
@@ -312,7 +312,7 @@ impl BillingRepo for FakeRepo {
     }
     async fn update_overage(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         enabled: bool,
         limit_cents: i64,
     ) -> Result<()> {
@@ -324,7 +324,7 @@ impl BillingRepo for FakeRepo {
     }
     async fn set_period(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
     ) -> Result<()> {
@@ -345,30 +345,30 @@ impl BillingRepo for FakeRepo {
             .push((payer.as_ref().to_string(), start, end));
         Ok(())
     }
-    async fn suspend_overage(&self, _payer: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn suspend_overage(&self, _payer: &RoxUserIdStr<'_>) -> Result<()> {
         self.state.lock().unwrap().suspended = true;
         Ok(())
     }
-    async fn clear_overage_suspension(&self, _payer: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn clear_overage_suspension(&self, _payer: &RoxUserIdStr<'_>) -> Result<()> {
         self.state.lock().unwrap().suspended = false;
         Ok(())
     }
-    async fn free_allowance_bonus_cents(&self, _user: &MacroUserIdStr<'_>) -> Result<i64> {
+    async fn free_allowance_bonus_cents(&self, _user: &RoxUserIdStr<'_>) -> Result<i64> {
         Ok(self.state.lock().unwrap().free_bonus_cents)
     }
-    async fn credit_balance_cents(&self, _payer: &MacroUserIdStr<'_>) -> Result<i64> {
+    async fn credit_balance_cents(&self, _payer: &RoxUserIdStr<'_>) -> Result<i64> {
         Ok(self.state.lock().unwrap().balance)
     }
     async fn period_ledger(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
     ) -> Result<PeriodLedger> {
         Ok(self.state.lock().unwrap().ledger(period_start))
     }
     async fn period_allowance(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
     ) -> Result<Option<PeriodAllowance>> {
         Ok(self
@@ -381,7 +381,7 @@ impl BillingRepo for FakeRepo {
     }
     async fn frozen_period_starts(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         since: DateTime<Utc>,
         before: DateTime<Utc>,
     ) -> Result<Vec<DateTime<Utc>>> {
@@ -399,7 +399,7 @@ impl BillingRepo for FakeRepo {
     }
     async fn store_open_allowance(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         period: OpenPeriodStart,
         seats: &[SeatAllowance],
         observed: SeatGeneration,
@@ -418,9 +418,9 @@ impl BillingRepo for FakeRepo {
     }
     async fn release_open_seat(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period: OpenPeriodStart,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
     ) -> Result<()> {
         let mut state = self.state.lock().unwrap();
         let next = state.settings.seat_generation.raw().saturating_add(1);
@@ -439,7 +439,7 @@ impl BillingRepo for FakeRepo {
     }
     async fn record_credit_purchase(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         amount_cents: i64,
         stripe_reference: &str,
     ) -> Result<bool> {
@@ -457,7 +457,7 @@ impl BillingRepo for FakeRepo {
     /// new charge plan.
     async fn apply_settlement(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
         chargeable_customer_cents: i64,
         policy: SettlementPolicy,
@@ -501,7 +501,7 @@ impl BillingRepo for FakeRepo {
                 stripe_invoice_id: c.invoice.clone(),
             })
         } else if plan.charge_overage_cents > 0 {
-            let id = macro_uuid::generate_uuid_v7();
+            let id = rox_uuid::generate_uuid_v7();
             s.charges.push(FakeCharge {
                 id,
                 period_start,
@@ -541,7 +541,7 @@ impl BillingRepo for FakeRepo {
         &self,
         stripe_invoice_id: &str,
         status: OverageChargeStatus,
-    ) -> Result<Option<MacroUserIdStr<'static>>> {
+    ) -> Result<Option<RoxUserIdStr<'static>>> {
         let mut s = self.state.lock().unwrap();
         let found = s.charges.iter_mut().find(|c| {
             c.invoice.as_deref() == Some(stripe_invoice_id)
@@ -555,13 +555,13 @@ impl BillingRepo for FakeRepo {
     }
     async fn latest_charge_status(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
     ) -> Result<Option<OverageChargeStatus>> {
         Ok(self.state.lock().unwrap().charges.last().map(|c| c.status))
     }
     async fn update_auto_reload(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         enabled: bool,
         overage_limit_cents: i64,
         thresholds: Option<&AutoReloadThresholds>,
@@ -580,7 +580,7 @@ impl BillingRepo for FakeRepo {
     /// back, any other pending reload blocks, otherwise plan a new one.
     async fn reserve_credit_reload(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
         chargeable_customer_cents: i64,
         now: DateTime<Utc>,
@@ -627,7 +627,7 @@ impl BillingRepo for FakeRepo {
         let Some(amount_cents) = amount_cents else {
             return Ok(None);
         };
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         s.reloads.push(FakeReload {
             id,
             amount_cents,
@@ -645,8 +645,8 @@ impl BillingRepo for FakeRepo {
     }
     async fn reserve_credit_purchase(
         &self,
-        _payer: &MacroUserIdStr<'_>,
-        purchased_by: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
+        purchased_by: &RoxUserIdStr<'_>,
         amount_cents: i64,
         monthly_limit_cents: Option<i64>,
         now: DateTime<Utc>,
@@ -685,7 +685,7 @@ impl BillingRepo for FakeRepo {
                 return Ok(PurchaseReservation::OverLimit { remaining_cents });
             }
         }
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         s.reloads.push(FakeReload {
             id,
             amount_cents,
@@ -703,7 +703,7 @@ impl BillingRepo for FakeRepo {
     }
     async fn declined_credit_purchases(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
     ) -> Result<Vec<PendingReload>> {
         Ok(self
             .state
@@ -748,7 +748,7 @@ impl BillingRepo for FakeRepo {
     }
     async fn record_credit_reload(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         amount_cents: i64,
         stripe_invoice_id: &str,
         _kind: CreditReloadKind,
@@ -788,7 +788,7 @@ impl BillingRepo for FakeRepo {
         }
         Ok(resolved)
     }
-    async fn suspend_auto_reload(&self, _payer: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn suspend_auto_reload(&self, _payer: &RoxUserIdStr<'_>) -> Result<()> {
         self.state.lock().unwrap().auto_reload_suspended = true;
         Ok(())
     }
@@ -963,7 +963,7 @@ struct FakePeriodSync(Mutex<Vec<SubscriptionPeriod>>);
 impl PeriodSync for FakePeriodSync {
     fn sync<'a>(
         &'a self,
-        _payer: MacroUserIdStr<'static>,
+        _payer: RoxUserIdStr<'static>,
         observation: SubscriptionPeriod,
     ) -> std::pin::Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
         Box::pin(async move {
@@ -1129,7 +1129,7 @@ async fn policy_activation_during_analytics_read_cannot_double_bill() {
     impl UsageReader for ActivatingUsage {
         async fn usage_cost_cents_by_user(
             &self,
-            users: &[MacroUserIdStr<'static>],
+            users: &[RoxUserIdStr<'static>],
             _period: BillingPeriod,
         ) -> Result<Vec<SeatUsage>> {
             self.0.state.lock().unwrap().activated_seats =
@@ -1243,13 +1243,13 @@ async fn enabled_enforces_allowances_under_either_settlement_policy_without_sett
 async fn default_disabled_gate_and_disabled_settlement_do_not_read_entitlements() {
     struct PanicEntitlements;
     impl EntitlementSource for PanicEntitlements {
-        async fn entitlement(&self, _: &MacroUserIdStr<'_>) -> Result<Entitlement> {
+        async fn entitlement(&self, _: &RoxUserIdStr<'_>) -> Result<Entitlement> {
             panic!("must not read entitlements")
         }
-        async fn stripe_customer_id(&self, _: &MacroUserIdStr<'_>) -> Result<Option<String>> {
+        async fn stripe_customer_id(&self, _: &RoxUserIdStr<'_>) -> Result<Option<String>> {
             panic!("must not resolve a payment customer")
         }
-        async fn team_payer(&self, _: Uuid) -> Result<Option<MacroUserIdStr<'static>>> {
+        async fn team_payer(&self, _: Uuid) -> Result<Option<RoxUserIdStr<'static>>> {
             panic!("must not resolve a team payer")
         }
     }
@@ -1313,7 +1313,7 @@ async fn enabled_settlement_does_not_retry_pending_or_failed_direct_charges() {
             let payer = user("payer@x.com");
             let period = BillingPeriod::current(None, Utc::now());
             repo.state.lock().unwrap().charges.push(FakeCharge {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 period_start: period.start,
                 amount_cents: 1_000,
                 status,
@@ -1519,7 +1519,7 @@ async fn only_the_payer_manages_billing_and_needs_a_paid_plan() {
         payer: owner.clone(),
         billed_users: vec![owner.clone(), member.clone()],
         scope: PayerScope::TeamOwner {
-            team_id: macro_uuid::generate_uuid_v7(),
+            team_id: rox_uuid::generate_uuid_v7(),
         },
     };
     let ents = FakeEntitlements::default()
@@ -1600,7 +1600,7 @@ async fn summary_reports_calendar_month_commitments_and_minimum_reload_cap_statu
             (10_000, CreditReloadStatus::Paid, Some("in_next"), month.end),
         ] {
             state.reloads.push(FakeReload {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 amount_cents,
                 status,
                 invoice: invoice.map(str::to_string),
@@ -1621,7 +1621,7 @@ async fn summary_reports_calendar_month_commitments_and_minimum_reload_cap_statu
         "exactly the minimum reload still fits"
     );
     repo.state.lock().unwrap().reloads.push(FakeReload {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         amount_cents: 1,
         status: CreditReloadStatus::Paid,
         invoice: Some("in_last_cent".to_string()),
@@ -1669,7 +1669,7 @@ async fn team_seats_keep_allowances_separate_and_share_credits() {
         payer: owner.clone(),
         billed_users: vec![owner.clone(), member.clone()],
         scope: PayerScope::TeamOwner {
-            team_id: macro_uuid::generate_uuid_v7(),
+            team_id: rox_uuid::generate_uuid_v7(),
         },
     };
     let entitlements = FakeEntitlements::default()
@@ -1743,7 +1743,7 @@ async fn overage_invoice_webhooks_update_suspension() {
     let payer = user("payer@x.com");
     let invoice = "in_legacy".to_string();
     repo.state.lock().unwrap().charges.push(FakeCharge {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         period_start: BillingPeriod::current(None, Utc::now()).start,
         amount_cents: 1_575,
         status: OverageChargeStatus::Pending,
@@ -1778,7 +1778,7 @@ async fn out_of_order_invoice_webhooks_follow_the_newest_charge() {
     let (a, b) = ("in_legacy_a".to_string(), "in_legacy_b".to_string());
     for (invoice, amount) in [(&a, 2_100), (&b, 1_575)] {
         repo.state.lock().unwrap().charges.push(FakeCharge {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             period_start: BillingPeriod::current(None, Utc::now()).start,
             amount_cents: amount,
             status: OverageChargeStatus::Pending,
@@ -2263,7 +2263,7 @@ fn anchored_premium(
     FakePayments,
     FakeUsage,
     FakeEntitlements,
-    MacroUserIdStr<'static>,
+    RoxUserIdStr<'static>,
     BillingPeriod,
     BillingPeriod,
 ) {
@@ -2320,7 +2320,7 @@ async fn snapshot_freezes_the_open_period_allowance_and_refreshes_it() {
         payer: payer.clone(),
         billed_users: vec![payer.clone(), member.clone()],
         scope: PayerScope::TeamOwner {
-            team_id: macro_uuid::generate_uuid_v7(),
+            team_id: rox_uuid::generate_uuid_v7(),
         },
     });
     svc.snapshot(&payer).await.unwrap();
@@ -2430,7 +2430,7 @@ async fn previous_period_usage_never_triggers_a_reload() {
     assert_eq!(repo.state.lock().unwrap().balance, 10_000);
 }
 
-fn one_seat(payer: &MacroUserIdStr<'static>, included_cents: i64) -> PeriodAllowance {
+fn one_seat(payer: &RoxUserIdStr<'static>, included_cents: i64) -> PeriodAllowance {
     PeriodAllowance {
         seats: vec![SeatAllowance {
             user: payer.clone(),
@@ -2545,7 +2545,7 @@ async fn previous_period_usage_uses_the_frozen_billed_users() {
     let owner = user("owner@x.com");
     let member_a = user("a@x.com");
     let member_b = user("b@x.com");
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     let old_team = Entitlement {
         tier: PlanTier::Premium,
         seat_tiers: vec![PlanTier::Premium, PlanTier::Premium],
@@ -2897,11 +2897,11 @@ struct ReleaseOnSecondRead {
     after: Entitlement,
     repo: FakeRepo,
     open: OpenPeriodStart,
-    member: MacroUserIdStr<'static>,
+    member: RoxUserIdStr<'static>,
 }
 
 impl EntitlementSource for ReleaseOnSecondRead {
-    async fn entitlement(&self, _user: &MacroUserIdStr<'_>) -> Result<Entitlement> {
+    async fn entitlement(&self, _user: &RoxUserIdStr<'_>) -> Result<Entitlement> {
         let first_read = {
             let mut calls = self.calls.lock().unwrap();
             *calls += 1;
@@ -2917,11 +2917,11 @@ impl EntitlementSource for ReleaseOnSecondRead {
         }
     }
 
-    async fn stripe_customer_id(&self, _user: &MacroUserIdStr<'_>) -> Result<Option<String>> {
+    async fn stripe_customer_id(&self, _user: &RoxUserIdStr<'_>) -> Result<Option<String>> {
         Ok(None)
     }
 
-    async fn team_payer(&self, _team_id: Uuid) -> Result<Option<MacroUserIdStr<'static>>> {
+    async fn team_payer(&self, _team_id: Uuid) -> Result<Option<RoxUserIdStr<'static>>> {
         Ok(None)
     }
 }
@@ -2935,8 +2935,8 @@ fn apr_18_noon() -> DateTime<Utc> {
 }
 
 fn premium_team(
-    owner: &MacroUserIdStr<'static>,
-    member: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
+    member: &RoxUserIdStr<'static>,
     team_id: Uuid,
 ) -> Entitlement {
     Entitlement {
@@ -3582,7 +3582,7 @@ fn prior_overage_remains_covered_separately_from_the_reset_max_allowance() {
     assert_eq!(chargeable_cost_cents(&seats, &usage), 700);
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 async fn all_plan_upgrades_reset_the_real_snapshot_and_gate(pool: sqlx::PgPool) {
     for (from, to) in [
         (PlanTier::Free, PlanTier::Premium),
@@ -4044,7 +4044,7 @@ async fn automatic_reloads_and_purchases_share_the_owners_monthly_limit() {
     let (svc, repo, _) = purchase_team(Some(5_000));
     let member = user("member@x.com");
     repo.state.lock().unwrap().reloads.push(FakeReload {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         amount_cents: 2_500,
         status: CreditReloadStatus::Paid,
         invoice: Some("in_auto".into()),

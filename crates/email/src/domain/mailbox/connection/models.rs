@@ -3,11 +3,11 @@
 use super::super::initialization::InitializationError;
 use calendar_events::domain::models::{CalendarGrantIntent, GoogleScopeSet};
 use email_api_client::domain::models::EmailApiError;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 pub struct ConnectionRequest {
-    pub actor_macro_id: MacroUserIdStr<'static>,
+    pub actor_rox_id: RoxUserIdStr<'static>,
     pub actor_id: String,
     pub actor_fusion_id: String,
     pub attempt: Option<Uuid>,
@@ -45,7 +45,7 @@ pub enum ConnectionError {
     #[error("Bad request")]
     LoginEmailUnavailable,
     #[error("Invalid input")]
-    Parse(#[from] macro_user_id::error::ParseErr),
+    Parse(#[from] rox_user_id::error::ParseErr),
     #[error("Inbox is already connected by another user")]
     SharedInboxConflict {
         email_address: String,

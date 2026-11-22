@@ -7,7 +7,7 @@ use crate::domain::{
     },
 };
 use channel_sender::ChannelSender;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::models::{PostMessageNotificationPolicy, SimpleMention};
 use uuid::Uuid;
 
@@ -32,11 +32,11 @@ pub enum ChannelEvent {
     /// A channel picture was set, replaced, or removed.
     PictureChanged {
         /// User who changed the picture.
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         /// Channel whose picture changed.
         channel_id: Uuid,
         /// Active participants whose sessions should refresh the picture.
-        recipients: Vec<MacroUserIdStr<'static>>,
+        recipients: Vec<RoxUserIdStr<'static>>,
     },
     /// A channel was created.
     ChannelCreated {
@@ -45,13 +45,13 @@ pub enum ChannelEvent {
         /// Actor that created the channel.
         actor: ChannelSender<'static>,
         /// User the actor created the channel for, when the actor is a bot.
-        on_behalf_of: Option<MacroUserIdStr<'static>>,
+        on_behalf_of: Option<RoxUserIdStr<'static>>,
         /// Type of channel that was created.
         channel_type: ChannelType,
         /// Stored channel name; `None` for direct message / unnamed channels.
         channel_name: Option<String>,
         /// Active participants after creation.
-        participant_user_ids: Vec<MacroUserIdStr<'static>>,
+        participant_user_ids: Vec<RoxUserIdStr<'static>>,
     },
     /// A channel was deleted.
     ChannelDeleted {
@@ -95,11 +95,11 @@ pub enum ChannelEvent {
         /// Type of channel that received participants.
         channel_type: ChannelType,
         /// Active participants after the addition.
-        active_participant_user_ids: Vec<MacroUserIdStr<'static>>,
+        active_participant_user_ids: Vec<RoxUserIdStr<'static>>,
         /// Actor who initiated the add.
         invited_by: Sender,
         /// Newly added recipients.
-        recipient_user_ids: Vec<MacroUserIdStr<'static>>,
+        recipient_user_ids: Vec<RoxUserIdStr<'static>>,
         /// Resolved channel metadata for notification copy.
         metadata: ChannelMetadata,
         /// Optional message content associated with the invite.
@@ -114,14 +114,14 @@ pub enum ChannelEvent {
         /// Actor that joined the channel.
         user_id: Sender,
         /// Active participants after the join.
-        active_participant_user_ids: Vec<MacroUserIdStr<'static>>,
+        active_participant_user_ids: Vec<RoxUserIdStr<'static>>,
     },
     /// Channel metadata was updated (rename).
     ChannelUpdated {
         /// Updated channel id.
         channel_id: Uuid,
         /// The user who updated the channel.
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         /// Stored channel name before the update.
         previous_name: Option<String>,
         /// New channel name.
@@ -135,9 +135,9 @@ pub enum ChannelEvent {
         channel_type: ChannelType,
         /// The user who removed the participants; equals the sole removed
         /// user for a self-service leave.
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         /// Users removed by this mutation.
-        removed_user_ids: Vec<MacroUserIdStr<'static>>,
+        removed_user_ids: Vec<RoxUserIdStr<'static>>,
     },
     /// Someone outside a channel asked to join it.
     AccessRequested {
@@ -146,7 +146,7 @@ pub enum ChannelEvent {
         /// The requester's profile name, if they have one, for the timeline.
         requester_name: Option<String>,
         /// Active participants, any of whom may answer it.
-        participant_user_ids: Vec<MacroUserIdStr<'static>>,
+        participant_user_ids: Vec<RoxUserIdStr<'static>>,
         /// Resolved channel metadata for notification copy.
         metadata: ChannelMetadata,
     },
@@ -155,7 +155,7 @@ pub enum ChannelEvent {
         /// The attempt after resolution.
         request: ChannelAccessRequest,
         /// Active participants, whose notifications about it are now done.
-        participant_user_ids: Vec<MacroUserIdStr<'static>>,
+        participant_user_ids: Vec<RoxUserIdStr<'static>>,
     },
     /// A generic entity mention (e.g. a doc mentioning another entity) was recorded.
     EntityMentionCreated {

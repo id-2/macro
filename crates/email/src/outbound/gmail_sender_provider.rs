@@ -6,7 +6,7 @@ use std::{
 };
 
 use gmail_client::GmailClient;
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 use tokio::sync::Mutex;
 use uuid::Uuid;
 

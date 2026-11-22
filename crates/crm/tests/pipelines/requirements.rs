@@ -2,7 +2,7 @@ use super::*;
 use crm::domain::pipelines::requirements::StageRequirement;
 use models_properties::service::property_value::PropertyValue;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_required_options_is_refused_until_the_rule_is_removed(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -113,7 +113,7 @@ async fn deleting_required_options_is_refused_until_the_rule_is_removed(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stage_requirements_reject_atomically_and_allow_combined_edits(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -247,7 +247,7 @@ async fn stage_requirements_reject_atomically_and_allow_combined_edits(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rejected_required_input_edits_preserve_materialized_formulas(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -367,7 +367,7 @@ async fn rejected_required_input_edits_preserve_materialized_formulas(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn board_moves_share_stage_validation_and_keep_failed_moves_unchanged(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -478,7 +478,7 @@ async fn board_moves_share_stage_validation_and_keep_failed_moves_unchanged(pool
     write(&s, &a, &p, vec![fill, moving]).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rule_ids_survive_renames_and_cascade_on_explicit_deletion(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -609,7 +609,7 @@ async fn rule_ids_survive_renames_and_cascade_on_explicit_deletion(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn requirements_refuse_foreign_columns_and_non_stage_fields(pool: PgPool) {
     let (s, _db, a, team, _) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -651,7 +651,7 @@ async fn requirements_refuse_foreign_columns_and_non_stage_fields(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stage_label_case_and_duplicate_option_requests_cannot_bypass_rules(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -722,7 +722,7 @@ async fn stage_label_case_and_duplicate_option_requests_cannot_bypass_rules(pool
     assert!(error.contains("Revenue"), "{error}");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_stage_entry_and_required_field_clear_cannot_both_commit(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -793,7 +793,7 @@ async fn concurrent_stage_entry_and_required_field_clear_cannot_both_commit(pool
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn contended_pipeline_guards_release_pool_connections(pool: PgPool) {
     use crm::outbound::pipelines::PipelineRepoError;
     use sqlx::postgres::PgPoolOptions;

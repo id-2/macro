@@ -8,10 +8,10 @@ a failed load returns `Err`, leaving fallback policy to the caller.
 ```rust
 use feature_flags::{FeatureFlags, FlagSnapshot, FlagValue};
 use feature_flags::outbound::fake::FakeFeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 # async fn example() -> Result<(), rootcause::Report> {
-let user_id = MacroUserIdStr::parse_from_str("macro|person@example.com")?;
+let user_id = RoxUserIdStr::parse_from_str("macro|person@example.com")?;
 let mut feature_flags = FakeFeatureFlags::default();
 feature_flags.set(user_id.clone(), Ok(FlagSnapshot::new([
     ("agent-code-mode".into(), FlagValue::Boolean(true)),
@@ -47,7 +47,7 @@ Construct once at the service composition root and clone to share its HTTP pool:
 
 ```rust
 use feature_flags::outbound::posthog::PostHogFeatureFlags;
-use macro_env::Environment;
+use rox_env::Environment;
 use std::time::Duration;
 
 # fn example() -> Result<(), rootcause::Report> {

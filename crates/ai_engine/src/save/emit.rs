@@ -400,7 +400,7 @@ impl<'a, 'b> PageWriter<'a, 'b> {
 
     /// A path with gradient stops that aren't opaque: its fill and its
     /// stroke each painted under a soft mask of their stops' opacities,
-    /// in `/MacroPath` marked content that reads back as the path.
+    /// in `/RoxPath` marked content that reads back as the path.
     fn masked_path(&mut self, n: &Node, p: &PathNode, to_page: &Affine) {
         let Target { res, .. } = self.targets.last_mut().expect("target");
         let objects = &mut *self.shared.objects;

@@ -27,7 +27,7 @@ tools.
 
 ## Boundaries
 
-- Depends on: `macro_env_var`, optionally `async-openai` (`openai` feature),
+- Depends on: `rox_env_var`, optionally `async-openai` (`openai` feature),
   `ai_billing`/`ai_toolset`/`ai_usage` (`toolset` feature).
 - Used by: `crates/ai_tools`.
 

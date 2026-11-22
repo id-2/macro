@@ -22,8 +22,8 @@ use entity_access::{
     },
     inbound::axum_extractors::DocumentAccessExtractor,
 };
-use macro_authorization::MacroAuthorizationService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::RoxAuthorizationService;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Which blocks to read.
 #[derive(Debug, serde::Deserialize, utoipa::IntoParams)]
@@ -54,7 +54,7 @@ pub struct WordDocumentEditRequest {
 /// The user the edit is made for and the bot making it, if a bot calls.
 fn caller<Level: entity_access::domain::models::RequiredPermission>(
     receipt: &EntityAccessReceipt<Level>,
-) -> Result<(MacroUserIdStr<'static>, Option<String>), DocumentError> {
+) -> Result<(RoxUserIdStr<'static>, Option<String>), DocumentError> {
     let user = receipt
         .acting_user_id()
         .cloned()
@@ -102,7 +102,7 @@ fn word_document_error(error: anyhow::Error) -> DocumentError {
 pub async fn read_word_document_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -150,7 +150,7 @@ pub async fn read_word_document_handler<
 pub async fn edit_word_document_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

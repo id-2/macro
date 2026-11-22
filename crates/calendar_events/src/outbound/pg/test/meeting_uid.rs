@@ -30,7 +30,7 @@ async fn meeting_uid(pool: &PgPool, uid: &str) -> String {
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_meeting_uid_unwraps_only_an_imported_exchange_uid(pool: PgPool) {
     // As Graph reported it on dev for a Google meeting.
     assert_eq!(
@@ -60,7 +60,7 @@ async fn the_meeting_uid_unwraps_only_an_imported_exchange_uid(pool: PgPool) {
     assert_eq!(meeting_uid(&pool, &delete).await, delete);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_outlook_copy_pairs_with_the_meetings_google_copies(pool: PgPool) {
     let author_id = "macro|uid-author@example.com";
     let viewer_id = "macro|uid-viewer@example.com";

@@ -9,9 +9,9 @@ config:
   cloud-storage-service:waf_ip_safety_rule_group_arn: arn:aws:wafv2:us-east-1:569036502058:regional/rulegroup/ip_safety/0a1bfeec-4d6c-4afe-bf35-b93e06c65f9b
   cloud-storage-service:waf_log_group_name: aws-waf-logs-macro-cloud-storage-prod
   cloud-storage-service:waf_datadog_forwarder_arn: arn:aws:lambda:us-east-1:569036502058:function:DatadogIntegration-ForwarderStack-BS3QDP-Forwarder-O0hyWQ9Yq4uQ
-  cloud-storage-service:macro_db_secret_key: macro-db-prod
-  cloud-storage-service:macro_db_proxy_secret_key: macrodb-rds-proxy-prod
-  cloud-storage-service:macro_db_readonly_secret_key: macro-db-readonly-prod
+  cloud-storage-service:rox_db_secret_key: macro-db-prod
+  cloud-storage-service:rox_db_proxy_secret_key: macrodb-rds-proxy-prod
+  cloud-storage-service:rox_db_readonly_secret_key: macro-db-readonly-prod
   cloud-storage-service:document_storage_service_auth_key: document-storage-service-auth-key-prod
   cloud-storage-service:jwt_secret_key: fusionauth-jwt-secret-prod
   cloud-storage-service:fusionauth_client_id: fusionauth-client-id-key-prod
@@ -21,7 +21,7 @@ config:
   cloud-storage-service:sync_service_auth_key: sync-service-key-prod
   cloud-storage-service:authentication_service_secret_key: authentication-service-internal-api-key-prod
   cloud-storage-service:opensearch_password_key: macro-opensearch-password-prod
-  cloud-storage-service:macro_cache_secret_key: macro-cache-prod
+  cloud-storage-service:rox_cache_secret_key: macro-cache-prod
   cloud-storage-service:github_webhook_secret_key: github-webhook-secret-prod
   cloud-storage-service:github_sync_app_url: https://github.com/apps/macro-application
   cloud-storage-service:github_sync_app_pem: github-sync-app-pem-prod

@@ -14,7 +14,7 @@ use calendar_events::domain::{
     ports::CalendarOccurrenceService,
     service::CalendarValidationError,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::Value;
 
@@ -160,7 +160,7 @@ const VIEWER: &str = "macro|viewer@example.com";
 
 async fn execute(reads: Arc<FakeReads>, query: &str) -> async_graphql::Response {
     let schema = Schema::build(
-        GraphqlCalendarQuery::new(MacroUserIdStr::parse_from_str(VIEWER).unwrap()),
+        GraphqlCalendarQuery::new(RoxUserIdStr::parse_from_str(VIEWER).unwrap()),
         EmptyMutation,
         EmptySubscription,
     )

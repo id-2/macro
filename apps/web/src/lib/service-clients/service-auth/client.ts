@@ -67,7 +67,7 @@ import type { GtmInviteOffer } from './generated/schemas/gtmInviteOffer';
 import type { GtmInviteOfferStatus } from './generated/schemas/gtmInviteOfferStatus';
 import type { InviteToTeamRequest } from './generated/schemas/inviteToTeamRequest';
 import type { JoinTeamByInviteLinkResponse } from './generated/schemas/joinTeamByInviteLinkResponse';
-import type { MacroApiTokenResponse } from './generated/schemas/macroApiTokenResponse';
+import type { RoxApiTokenResponse } from './generated/schemas/macroApiTokenResponse';
 import type { PasswordRequest } from './generated/schemas/passwordRequest';
 import type { PatchTeamRequest } from './generated/schemas/patchTeamRequest';
 import type { PatchUserGroupRequest } from './generated/schemas/patchUserGroupRequest';
@@ -450,7 +450,7 @@ export const authServiceClient = {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${args.accessToken}`,
-        'x-macro-refresh-token': args.refreshToken,
+        'x-rox-refresh-token': args.refreshToken,
       },
     });
   },
@@ -569,10 +569,10 @@ export const authServiceClient = {
     const accessToken = await getAccessToken();
     if (!accessToken) {
       Telemetry.warn('No access token found, fetching with cookies');
-      return authApiFetch<MacroApiTokenResponse>('/jwt/macro_api_token');
+      return authApiFetch<RoxApiTokenResponse>('/jwt/rox_api_token');
     }
 
-    return await authApiFetch<MacroApiTokenResponse>('/jwt/macro_api_token', {
+    return await authApiFetch<RoxApiTokenResponse>('/jwt/rox_api_token', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

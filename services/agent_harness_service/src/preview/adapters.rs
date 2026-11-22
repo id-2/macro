@@ -13,14 +13,14 @@ use entity_access::domain::{
     models::{EntityType, ViewAccessLevel},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
-pub struct MacroAuthority<Repo, Access> {
+pub struct RoxAuthority<Repo, Access> {
     pub sessions: Repo,
     pub access: Arc<Access>,
 }
-impl<Repo: AgentSessionRepo, Access> MacroAuthority<Repo, Access> {
+impl<Repo: AgentSessionRepo, Access> RoxAuthority<Repo, Access> {
     async fn session(&self, session: AgentSessionId) -> Result<AgentSession, PreviewError> {
         self.sessions
             .get(session)
@@ -30,7 +30,7 @@ impl<Repo: AgentSessionRepo, Access> MacroAuthority<Repo, Access> {
 }
 #[async_trait]
 impl<Repo: AgentSessionRepo, Access: EntityAccessService> Authority
-    for MacroAuthority<Repo, Access>
+    for RoxAuthority<Repo, Access>
 {
     async fn agent(&self, token: &str) -> Result<AgentIdentity, PreviewError> {
         let token = SessionToken::new(token);
@@ -57,7 +57,7 @@ impl<Repo: AgentSessionRepo, Access: EntityAccessService> Authority
     async fn viewer(
         &self,
         session: AgentSessionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<(), PreviewError> {
         self.access
             .generate_entity_access_receipt::<ViewAccessLevel>(
@@ -83,7 +83,7 @@ impl Events for Realtime {
     async fn changed(
         &self,
         preview: &Preview,
-        viewers: &[MacroUserIdStr<'static>],
+        viewers: &[RoxUserIdStr<'static>],
     ) -> Result<(), PreviewError> {
         if viewers.is_empty() {
             return Ok(());

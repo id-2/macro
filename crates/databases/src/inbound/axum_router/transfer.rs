@@ -13,13 +13,13 @@ use crate::domain::transfer::{DatabaseTransferService, ImportTable};
 pub async fn import_table_handler<Service, EntityAccess, Authorization>(
     access: DatabaseAccessLevelExtractor<EditAccessLevel, EntityAccess, Authorization>,
     State(state): State<DatabasesRouterState<Service, EntityAccess, Authorization>>,
-    user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     Json(request): Json<ImportTable>,
 ) -> Result<Json<Table>, DatabaseError>
 where
     Service: DatabasesService + DatabaseTransferService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service

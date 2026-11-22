@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use whatsmeow::store::{LidMapping, LidStore, StoreError};
 use whatsmeow::types::{
@@ -9,7 +9,7 @@ use whatsmeow::types::{
 
 use crate::store::test::open_new_store;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mappings_resolve_both_ways_keeping_the_device(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let pn = new_jid("111", DEFAULT_USER_SERVER);
@@ -46,7 +46,7 @@ async fn mappings_resolve_both_ways_keeping_the_device(pool: Pool<Postgres>) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_mapping_replaces_older_ones_of_either_side(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let pn = new_jid("111", DEFAULT_USER_SERVER);
@@ -75,7 +75,7 @@ async fn a_new_mapping_replaces_older_ones_of_either_side(pool: Pool<Postgres>) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn batches_skip_invalid_mappings_and_apply_in_order(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let pns: Vec<_> = (0..300)

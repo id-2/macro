@@ -80,17 +80,17 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{messages::create_message_mentions, model::SimpleMention};
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
     use sqlx::PgPool;
     use std::str::FromStr;
     use uuid::Uuid;
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "./../../fixtures", scripts("mentions"))
     )]
     async fn test_insert_message_mentions(pool: PgPool) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
         let message_id = Uuid::from_str("11111111-1111-1111-1111-111111111111").unwrap();
         let mentions = vec![
             SimpleMention {

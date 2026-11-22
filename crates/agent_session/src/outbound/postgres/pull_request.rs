@@ -8,7 +8,7 @@ impl<B: BotFacts + 'static> crate::domain::pull_request::SessionPullRequestRepo
     async fn record_pull_request(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         url: &str,
         claim: Option<SessionClaim>,
     ) -> Result<bool> {
@@ -71,7 +71,7 @@ impl<B: BotFacts + 'static> crate::domain::pull_request_links::SessionPullReques
         &self,
         session: AgentSessionId,
         github_key: &str,
-        linked_by: &MacroUserIdStr<'static>,
+        linked_by: &RoxUserIdStr<'static>,
     ) -> Result<()> {
         sqlx::query!(
             r#"

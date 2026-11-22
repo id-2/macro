@@ -46,8 +46,8 @@ use calendar_events::domain::events::CalendarMacroEvent;
 use channels::domain::broker_events::ChannelMacroEvent;
 use documents::domain::events::DocumentMacroEvent;
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection, RoxEventConsumerService,
 };
 use messages::outbound::broker::MessageMacroEvent;
 use projects::domain::events::ProjectMacroEvent;
@@ -87,9 +87,9 @@ impl GroupName for SearchProcessingConsumerGroup {
 type SearchProcessingKafkaAdapter =
     KafkaConsumerAdapter<SearchProcessingConsumerGroup, DeclaredMacroEvent>;
 type SearchProcessingKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, SearchProcessingKafkaAdapter>;
+    RoxEventConsumerService<DeclaredMacroEvent, SearchProcessingKafkaAdapter>;
 
-macro_event_broker::declare_topics!(
+rox_event_broker::declare_topics!(
     DeclaredMacroEvent:
         AgentSessionLifecycleMacroEvent,
         CalendarMacroEvent,

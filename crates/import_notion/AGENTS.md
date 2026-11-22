@@ -6,7 +6,7 @@ Part of the Notion import feature. Reads a user's Notion workspace (pages,
 data sources and their rows, members, page bodies as markdown) into a typed
 model for the `import` crate to turn into Rox documents and databases, and
 maps a data source onto Rox database columns and cells
-(`domain::macro_cells`).
+(`domain::rox_cells`).
 
 ## Start here
 
@@ -14,7 +14,7 @@ maps a data source onto Rox database columns and cells
   `NotionConnections`, `NotionError`).
 - `src/domain/inventory.rs`: walking the workspace; scope, row draining,
   markdown splicing.
-- `src/domain/macro_cells.rs`: a data source's `ColumnPlan` (column kinds,
+- `src/domain/rox_cells.rs`: a data source's `ColumnPlan` (column kinds,
   options, UUIDv5 ids derived from the database), its column-create ops, and
   each row's `CellWrite`s.
 - `src/outbound/rest.rs`: requests, retries, pacing; `rest/wire.rs` maps

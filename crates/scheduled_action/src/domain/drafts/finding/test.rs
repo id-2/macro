@@ -14,7 +14,7 @@ use super::super::{Draft, DraftedRoutine, RoutineDrafts};
 use super::*;
 use crate::domain::code_check::test::Checker;
 use crate::domain::ports::{CodeOutcome, CodeRun, CodeUnavailable, StepProblems};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 /// Answers the find call with `find`, failing without it, or never, when it
 /// `hangs`; records every call.
@@ -42,7 +42,7 @@ impl Model {
 
 #[async_trait::async_trait]
 impl DraftModel for Model {
-    async fn admit(&self, _: &MacroUserIdStr<'static>) -> Result<(), AiAdmissionError> {
+    async fn admit(&self, _: &RoxUserIdStr<'static>) -> Result<(), AiAdmissionError> {
         if self.refuses {
             Err(AiAdmissionError::Unavailable)
         } else {
@@ -52,7 +52,7 @@ impl DraftModel for Model {
 
     async fn complete(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         call: DraftCall<'_>,
     ) -> Result<String, DraftCallError> {
         self.calls
@@ -105,7 +105,7 @@ impl NameLookups for Names {
 
     async fn look_up(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         names: &[NameAsked],
     ) -> Result<NameAnswers, NameLookupError> {
         self.asked.lock().unwrap().extend(names.iter().cloned());
@@ -181,17 +181,17 @@ impl RoutineCode for Areas {
         self.checker.check_program(program).await
     }
 
-    async fn owner_time_zone(&self, _: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn owner_time_zone(&self, _: &RoxUserIdStr<'static>) -> Option<String> {
         None
     }
 
-    async fn run(&self, _: &MacroUserIdStr<'static>, _: CodeRun<'_>) -> CodeOutcome {
+    async fn run(&self, _: &RoxUserIdStr<'static>, _: CodeRun<'_>) -> CodeOutcome {
         unreachable!("finding runs no code")
     }
 
     async fn reference(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         task: &str,
     ) -> Result<String, CodeUnavailable> {
         self.checker.reference(user, task).await
@@ -221,7 +221,7 @@ impl RoutineCode for Areas {
 
     async fn rewrite(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &routine_program::CodeStep,
         _: &str,
         _: &[String],

@@ -6,7 +6,7 @@ import { Chat } from '../src/entities/chats/chat';
 import { Document } from '../src/entities/documents/document';
 import { Project } from '../src/entities/projects/project';
 import type { SharePermissionOptions } from '../src/entities/sharing/permissions';
-import type { MacroClient } from '../src/utils/client';
+import type { RoxClient } from '../src/utils/client';
 
 const channelId = '0198a4cc-e138-7670-a308-a6b766602710';
 
@@ -29,7 +29,7 @@ function recordingClient() {
     cognition: {
       patchChat: record('patchChat'),
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, requests };
 }
 

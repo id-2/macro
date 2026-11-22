@@ -28,7 +28,7 @@ export const MOBILE_EMAIL_SIGNUP_FLOW = 'mobile_email';
  * can still hold an older visit, and mixing those with this link would
  * attribute the signup to the wrong campaign.
  */
-const MOBILE_EMAIL_ATTRIBUTION_COOKIE = 'macro_mobile_email_attribution';
+const MOBILE_EMAIL_ATTRIBUTION_COOKIE = 'rox_mobile_email_attribution';
 
 /** How long the desktop link's parameters survive a closed tab, in days. */
 const ATTRIBUTION_COOKIE_DAYS = 7;

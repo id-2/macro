@@ -31,7 +31,7 @@ use attention_feed::domain::models::{
     FeedKey, FeedNotification, MailFacts, counts_as_unseen, sort_newest_first,
 };
 use chrono::{DateTime, Days, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::{
     AgentSessionNotificationRef, CalendarEventReminderMetadata, CrmDiscussionReason,
@@ -134,7 +134,7 @@ enum ChannelKind<'a> {
 
 fn channel_view<'a>(
     notification: &'a FeedNotification,
-    viewer: &MacroUserIdStr<'static>,
+    viewer: &RoxUserIdStr<'static>,
 ) -> ChannelView<'a> {
     let message = |role, message_id: &'a str, thread_id: Option<&'a str>| ChannelKind::Message {
         role,
@@ -190,7 +190,7 @@ struct Speaker<'a> {
 /// Place a channel's notifications on its top level and its threads.
 fn place_channel(
     notifications: &[FeedNotification],
-    viewer: &MacroUserIdStr<'static>,
+    viewer: &RoxUserIdStr<'static>,
 ) -> Vec<Placed> {
     let views: Vec<ChannelView<'_>> = notifications
         .iter()
@@ -364,7 +364,7 @@ fn discussion_view(notification: &FeedNotification) -> Option<DiscussionView<'_>
 
 /// The message or comment a notification is about, when it is about one:
 /// the notifications sharing it present as one, by one-message-one-row.
-fn subject(notification: &FeedNotification, viewer: &MacroUserIdStr<'static>) -> Option<String> {
+fn subject(notification: &FeedNotification, viewer: &RoxUserIdStr<'static>) -> Option<String> {
     if let ChannelKind::Message { message_id, .. } = channel_view(notification, viewer).kind {
         return Some(message_id.to_string());
     }
@@ -377,7 +377,7 @@ fn subject(notification: &FeedNotification, viewer: &MacroUserIdStr<'static>) ->
 pub fn speaks_for(
     row: &InboxRow,
     notification: Uuid,
-    viewer: &MacroUserIdStr<'static>,
+    viewer: &RoxUserIdStr<'static>,
 ) -> Vec<Uuid> {
     let Some(shown) = row
         .notifications
@@ -593,7 +593,7 @@ pub fn rows(
     group: &FeedKey,
     notifications: &[FeedNotification],
     mail: Option<MailFacts>,
-    viewer: &MacroUserIdStr<'static>,
+    viewer: &RoxUserIdStr<'static>,
     now: DateTime<Utc>,
 ) -> Vec<InboxRow> {
     let channel = group.entity().entity_type == EntityType::Channel;

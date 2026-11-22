@@ -14,7 +14,7 @@ fn someone_elses_response(id: u128, form_id: &str) -> activity::ActivityRecord {
         agent_verb: None,
         id: Uuid::from_u128(id),
         actor: activity::Actor::new_from_user(
-            MacroUserIdStr::parse_from_str(OTHER_RESPONDENT_ID).unwrap(),
+            RoxUserIdStr::parse_from_str(OTHER_RESPONDENT_ID).unwrap(),
         ),
         subject_id: OTHER_RESPONDENT_ID.to_owned(),
         entity_type: ModelEntityType::Form,

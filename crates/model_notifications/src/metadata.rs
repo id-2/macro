@@ -15,8 +15,8 @@ pub use harnessd_protocol::AgentProvider;
 pub use invite_email::{
     ChannelInviteMetadata, ColleagueJoinedMacro, InviteToTeamMetadata, InviteePlan,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::{email::ReadEmailParts, user_id::MacroUserIdStr};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::{email::ReadEmailParts, user_id::RoxUserIdStr};
 use mention_utils::parse::{ParsedXmlText, PlainTextFormatter, XmlFormatter};
 use model_entity::Entity;
 use model_entity::EntityType;
@@ -193,7 +193,7 @@ impl Notification for GithubPrStatusChanged {
 impl NotificationTitle for GithubPrStatusChanged {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let verb = self.action_verb();
         let title = match self.common.actor_name() {
@@ -206,7 +206,7 @@ impl NotificationTitle for GithubPrStatusChanged {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.common.format_body())
     }
@@ -270,7 +270,7 @@ impl Notification for GithubPrCheckRun {
 impl NotificationTitle for GithubPrCheckRun {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(format!(
             "{} {} on a pull request",
@@ -281,7 +281,7 @@ impl NotificationTitle for GithubPrCheckRun {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.common.format_body())
     }
@@ -307,7 +307,7 @@ impl Notification for GithubReviewRequested {
 impl NotificationTitle for GithubReviewRequested {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let title = match self.common.actor_name() {
             Some(actor) => format!("{actor} requested your review"),
@@ -319,7 +319,7 @@ impl NotificationTitle for GithubReviewRequested {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.common.format_body())
     }
@@ -359,7 +359,7 @@ impl Notification for GithubPrComment {
 impl NotificationTitle for GithubPrComment {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let title = match self.common.actor_name() {
             Some(actor) => format!("{actor} commented on a pull request"),
@@ -371,7 +371,7 @@ impl NotificationTitle for GithubPrComment {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.common.format_body_with_text(&self.comment_snippet))
     }
@@ -415,7 +415,7 @@ impl Notification for GithubPrMention {
 impl NotificationTitle for GithubPrMention {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let title = match self.common.actor_name() {
             Some(actor) => format!("{actor} mentioned you on a pull request"),
@@ -427,7 +427,7 @@ impl NotificationTitle for GithubPrMention {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.common.format_body_with_text(&self.text_snippet))
     }
@@ -469,7 +469,7 @@ impl Notification for GithubPrReview {
 impl NotificationTitle for GithubPrReview {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let actor = self.common.actor_name();
         let title = match (self.state, actor) {
@@ -494,7 +494,7 @@ impl NotificationTitle for GithubPrReview {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self
             .common
@@ -536,7 +536,7 @@ pub struct ChannelMessageSendMetadata {
     #[serde(alias = "invited_by")]
     #[serde(alias = "invitedBy")]
     #[schema(value_type = Option<String>)]
-    pub sender: Option<MacroUserIdStr<'static>>,
+    pub sender: Option<RoxUserIdStr<'static>>,
     /// Display name for non-user senders such as bots
     #[serde(default)]
     pub sender_display_name: Option<String>,
@@ -597,7 +597,7 @@ pub struct ItemSharedMetadata {
     pub item_name: Option<String>,
     #[serde(alias = "shared_by")]
     #[schema(value_type = String)]
-    pub shared_by: MacroUserIdStr<'static>,
+    pub shared_by: RoxUserIdStr<'static>,
     /// Permission level granted (read, write, admin, etc.)
     #[serde(alias = "permission_level")]
     pub permission_level: Option<String>,
@@ -641,7 +641,7 @@ pub struct ChannelReplyMetadata {
     #[serde(default)]
     #[serde(alias = "user_id")]
     #[schema(value_type = Option<String>)]
-    pub user_id: Option<MacroUserIdStr<'static>>,
+    pub user_id: Option<RoxUserIdStr<'static>>,
     /// Display name for non-user senders such as bots
     #[serde(default)]
     pub sender_display_name: Option<String>,
@@ -655,7 +655,7 @@ pub struct ChannelReplyMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(alias = "thread_parent_sender_id")]
     #[schema(value_type = Option<String>)]
-    pub thread_parent_sender_id: Option<MacroUserIdStr<'static>>,
+    pub thread_parent_sender_id: Option<RoxUserIdStr<'static>>,
     #[serde(flatten)]
     pub common: CommonChannelMetadata,
     #[serde(default)]
@@ -730,14 +730,14 @@ impl notification::domain::models::Notification for InboxReauthRequiredMetadata 
 impl NotificationTitle for InboxReauthRequiredMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(format!("Reconnect {}", self.email_address))
     }
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(
             "Sync stopped because the Google connection expired. Reconnect to restore it."
@@ -763,7 +763,7 @@ impl NewEmailMetadata {
 impl NotificationTitle for NewEmailMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self
             .sender_line()
@@ -773,7 +773,7 @@ impl NotificationTitle for NewEmailMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.snippet.clone())
     }
@@ -790,7 +790,7 @@ impl NotificationExtIos for NewEmailMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -833,7 +833,7 @@ impl notification::domain::models::Notification for DocumentMentionMetadata {
 impl NotificationTitle for ChannelMentionMetadata {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = sender_id
             .map(|sender| sender.email_part().local_part().to_string())
@@ -849,7 +849,7 @@ impl NotificationTitle for ChannelMentionMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         parse_message_plain_text_or_attachment(&self.message_content, self.has_attachments)
     }
@@ -858,7 +858,7 @@ impl NotificationTitle for ChannelMentionMetadata {
 impl NotificationTitle for DocumentMentionMetadata {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = sender_id
             .map(|sender| sender.0.email_part().email_str().to_string())
@@ -873,7 +873,7 @@ impl NotificationTitle for DocumentMentionMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let file_type_str = self.file_type.as_deref().unwrap_or("");
         Ok(format!("{}.{}", self.document_name, file_type_str))
@@ -883,7 +883,7 @@ impl NotificationTitle for DocumentMentionMetadata {
 impl NotificationTitle for ChannelMessageSendMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = self
             .sender
@@ -900,7 +900,7 @@ impl NotificationTitle for ChannelMessageSendMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         parse_message_plain_text_or_attachment(&self.message_content, self.has_attachments)
     }
@@ -911,7 +911,7 @@ const CHANNEL_REACTION_EXCERPT_MAX_CHARS: usize = 80;
 impl NotificationTitle for ChannelMessageReactionMetadata {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = sender_id
             .map(|sender| sender.email_part().local_part().to_string())
@@ -937,7 +937,7 @@ impl NotificationTitle for ChannelMessageReactionMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(match self.common.channel_type {
             ChannelType::DirectMessage => "Direct message".to_string(),
@@ -949,7 +949,7 @@ impl NotificationTitle for ChannelMessageReactionMetadata {
 impl NotificationTitle for MentionedInDocumentCommentMetadata {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = comment_sender_label(sender_id, self.sender_display_name.as_deref());
         let title = match &self.file_type {
@@ -961,7 +961,7 @@ impl NotificationTitle for MentionedInDocumentCommentMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         parse_message_plain_text(&self.text)
     }
@@ -970,7 +970,7 @@ impl NotificationTitle for MentionedInDocumentCommentMetadata {
 impl NotificationTitle for ChannelReplyMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = self
             .user_id
@@ -983,7 +983,7 @@ impl NotificationTitle for ChannelReplyMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         parse_message_plain_text_or_attachment(&self.message_content, self.has_attachments)
     }
@@ -1006,7 +1006,7 @@ pub struct TaskAssignedMetadata {
     /// The user who assigned the task
     #[serde(alias = "assigned_by")]
     #[schema(value_type = String)]
-    pub assigned_by: MacroUserIdStr<'static>,
+    pub assigned_by: RoxUserIdStr<'static>,
     #[serde(default)]
     pub sender_profile_picture_url: Option<String>,
 }
@@ -1036,7 +1036,7 @@ fn parse_message_plain_text_or_attachment(
 /// Helper to create an alert-style APNS notification with title and body.
 fn alert_apns<T: NotificationTitle>(
     notif: &T,
-    sender_id: Option<MacroUserIdStr<'_>>,
+    sender_id: Option<RoxUserIdStr<'_>>,
     notification_id: Uuid,
     sender_profile_picture_url: Option<String>,
 ) -> Result<APNSPushNotification<PushNotificationData>, Report> {
@@ -1072,14 +1072,14 @@ fn alert_apns<T: NotificationTitle>(
 impl NotificationTitle for AiResponseMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok("AI Response".to_string())
     }
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.summary.clone())
     }
@@ -1093,7 +1093,7 @@ impl NotificationExtIos for AiResponseMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1110,7 +1110,7 @@ impl NotificationExtIos for ChannelMessageSendMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1136,7 +1136,7 @@ impl NotificationExtIos for ChannelMessageReactionMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1161,7 +1161,7 @@ impl NotificationExtIos for ChannelMentionMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1187,7 +1187,7 @@ impl NotificationExtIos for ChannelReplyMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1213,7 +1213,7 @@ impl NotificationExtIos for DocumentMentionMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1237,7 +1237,7 @@ impl notification::domain::models::Notification for TaskAssignedMetadata {
 impl NotificationTitle for TaskAssignedMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let email = self.assigned_by.email_part();
         let sender = email.email_str();
@@ -1246,7 +1246,7 @@ impl NotificationTitle for TaskAssignedMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let body = if let Some(ref task_name) = self.task_name {
             format!("assigned you to {}", task_name)
@@ -1267,7 +1267,7 @@ impl NotificationExtIos for TaskAssignedMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1312,7 +1312,7 @@ impl std::fmt::Display for CommentRef {
 /// Sender wording shared by the document comment notifications: the acting
 /// user's email, then a bot's public name, then a generic agent label.
 fn comment_sender_label(
-    sender_id: Option<MacroUserIdStr<'_>>,
+    sender_id: Option<RoxUserIdStr<'_>>,
     sender_display_name: Option<&str>,
 ) -> String {
     sender_id
@@ -1365,7 +1365,7 @@ impl NotificationExtIos for MentionedInDocumentCommentMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1409,7 +1409,7 @@ impl Notification for RepliedToDocumentCommentThreadMetadata {
 impl NotificationTitle for RepliedToDocumentCommentThreadMetadata {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = comment_sender_label(sender_id, self.sender_display_name.as_deref());
         let title = match &self.file_type {
@@ -1421,7 +1421,7 @@ impl NotificationTitle for RepliedToDocumentCommentThreadMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         parse_message_plain_text(&self.text)
     }
@@ -1437,7 +1437,7 @@ impl NotificationExtIos for RepliedToDocumentCommentThreadMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1481,7 +1481,7 @@ impl Notification for CommentedOnDocumentMetadata {
 impl NotificationTitle for CommentedOnDocumentMetadata {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = comment_sender_label(sender_id, self.sender_display_name.as_deref());
         let title = match &self.file_type {
@@ -1493,7 +1493,7 @@ impl NotificationTitle for CommentedOnDocumentMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         parse_message_plain_text(&self.text)
     }
@@ -1509,7 +1509,7 @@ impl NotificationExtIos for CommentedOnDocumentMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1546,7 +1546,7 @@ impl Notification for CallStartedMetadata {
 impl NotificationTitle for CallStartedMetadata {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let title = match sender_id {
             Some(sender) => format!("{} started a call", sender.email_part().local_part()),
@@ -1557,7 +1557,7 @@ impl NotificationTitle for CallStartedMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.channel_name.clone().unwrap_or_default())
     }
@@ -1602,7 +1602,7 @@ impl Notification for ReminderMetadata {
 impl NotificationTitle for ReminderMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let subject: String = self.description.chars().take(128).collect();
         Ok(format!("Reminder: {subject}"))
@@ -1610,7 +1610,7 @@ impl NotificationTitle for ReminderMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         // A description can be 2000 characters, which is 8 KB of UTF-8 at four
         // bytes each — twice Apple's 4 KB push payload limit, and the alert
@@ -1650,7 +1650,7 @@ impl NotificationExtIos for ReminderMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1698,7 +1698,7 @@ impl Notification for CalendarEventReminderMetadata {
 impl NotificationTitle for CalendarEventReminderMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(if self.title.is_empty() {
             "(No title)".to_string()
@@ -1709,7 +1709,7 @@ impl NotificationTitle for CalendarEventReminderMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         if let (Some(starts_at), Some(zone)) = (self.starts_at, self.display_zone()) {
             let start = starts_at.with_timezone(&zone).format("%-I:%M %p");
@@ -1788,7 +1788,7 @@ impl NotificationExtIos for CalendarEventReminderMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -1856,7 +1856,7 @@ pub struct AgentSessionSettledMetadata {
     /// Who prompted the turn, absent when a bot acted on nobody's behalf.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<String>)]
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// The ACP stop reason, or `error`.
     pub stop_reason: String,
     /// The agent's last prose in the turn, whole; `None` when it wrote none.
@@ -1885,7 +1885,7 @@ pub struct AgentSessionMentionedMetadata {
     /// Who wrote the prompt, absent when a bot acted on nobody's behalf.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<String>)]
-    pub mentioned_by: Option<MacroUserIdStr<'static>>,
+    pub mentioned_by: Option<RoxUserIdStr<'static>>,
     /// The action carrying the prompt.
     pub action_id: Uuid,
 }
@@ -1919,14 +1919,14 @@ fn agent_excerpt(text: &str) -> String {
 impl NotificationTitle for AgentSessionSettledMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(format!("{} finished", self.session.bot_name))
     }
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self
             .excerpt
@@ -1940,14 +1940,14 @@ impl NotificationTitle for AgentSessionSettledMetadata {
 impl NotificationTitle for AgentSessionWaitingForInputMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(format!("{} needs an answer", self.session.bot_name))
     }
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(agent_excerpt(&self.question))
     }
@@ -1956,7 +1956,7 @@ impl NotificationTitle for AgentSessionWaitingForInputMetadata {
 impl NotificationTitle for AgentSessionMentionedMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(match &self.mentioned_by {
             Some(author) => format!(
@@ -1970,7 +1970,7 @@ impl NotificationTitle for AgentSessionMentionedMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(format!("An agent session with {}", self.session.bot_name))
     }
@@ -1981,7 +1981,7 @@ impl NotificationTitle for AgentSessionMentionedMetadata {
 fn agent_session_apns<T: NotificationTitle>(
     notif: &T,
     session: &AgentSessionNotificationRef,
-    sender_id: Option<MacroUserIdStr<'_>>,
+    sender_id: Option<RoxUserIdStr<'_>>,
     notification_id: Uuid,
 ) -> Option<APNSPushNotification<PushNotificationData>> {
     let mut apns = alert_apns(notif, sender_id, notification_id, None).ok()?;
@@ -1999,7 +1999,7 @@ impl NotificationExtIos for AgentSessionSettledMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -2016,7 +2016,7 @@ impl NotificationExtIos for AgentSessionWaitingForInputMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -2037,7 +2037,7 @@ impl NotificationExtIos for AgentSessionMentionedMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -2066,13 +2066,13 @@ impl Notification for ExternalChatMessageMetadata {
 impl NotificationTitle for ExternalChatMessageMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(self.chat_name.clone())
     }
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(format!("New {} message", self.provider.label()))
     }
@@ -2087,7 +2087,7 @@ impl NotificationExtIos for ExternalChatMessageMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -2125,7 +2125,7 @@ impl Notification for RoutineRunFinishedMetadata {
 impl NotificationTitle for RoutineRunFinishedMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(match self.outcome {
             RoutineRunOutcome::Succeeded => format!("{} finished", self.routine_name),
@@ -2135,7 +2135,7 @@ impl NotificationTitle for RoutineRunFinishedMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok(match self.outcome {
             RoutineRunOutcome::Succeeded => "A routine run finished.".to_string(),

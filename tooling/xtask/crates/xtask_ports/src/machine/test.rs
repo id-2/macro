@@ -26,7 +26,7 @@ fn the_census_sorts_instances_by_what_they_hold() {
             network("databases-up", Some("up"), &[]),
             network("databases-old", Some("old"), &[]),
             network("auth-old", Some("old"), &[]),
-            network("macro_services", None, &[]),
+            network("rox_services", None, &[]),
         ],
         containers: vec![
             container(Some("up"), true, &[]),

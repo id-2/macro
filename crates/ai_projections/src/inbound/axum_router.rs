@@ -15,7 +15,7 @@ use axum::{
     response::{IntoResponse, Response},
     routing::post,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 
 use crate::domain::{
@@ -29,7 +29,7 @@ pub struct AiProjectionRouterState<T, Auth> {
     /// The ai projection service implementation.
     pub service: Arc<T>,
     /// The authorization state used by the request extractors.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 // Manual Clone impl so T doesn't need to be Clone (it's behind Arc).
@@ -42,7 +42,7 @@ impl<T, Auth> Clone for AiProjectionRouterState<T, Auth> {
     }
 }
 
-impl<T, Auth> FromRef<AiProjectionRouterState<T, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Auth> FromRef<AiProjectionRouterState<T, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AiProjectionRouterState<T, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -52,7 +52,7 @@ impl<T, Auth> FromRef<AiProjectionRouterState<T, Auth>> for MacroAuthorizationSt
 pub fn ai_projections_router<T, Auth, S>(state: AiProjectionRouterState<T, Auth>) -> Router<S>
 where
     T: AiProjectionService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()

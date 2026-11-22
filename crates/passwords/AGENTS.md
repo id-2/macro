@@ -47,7 +47,7 @@ Do not add plaintext values to any metadata record, errors or tracing fields.
   persist actor-specific capabilities in metadata or write intents.
   `canEdit` uses current edit grants or administrator access; management remains
   creator/administrator-only, and view grants still permit reveal and copy.
-- Mutations require `X-Macro-Passwords: 1`; responses use `private, no-store`.
+- Mutations require `X-Rox-Passwords: 1`; responses use `private, no-store`.
 - Username GET and audited username-copy POST resolve only the current committed
   identifier with normal human view authorization. Recheck access and revision after
   the provider read; never reconcile or return passwords, notes or custom fields.

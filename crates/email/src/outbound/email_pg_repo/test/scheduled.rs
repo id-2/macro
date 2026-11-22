@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::scheduled::{EmailSchedulingRepo, EmailSchedulingService, ScheduleChange};
 use crate::domain::service::EmailServiceImpl;
 use email_db_client::messages::scheduled::get::get_and_start_processing_scheduled_message;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_event_broker::NoopMacroEventBroker;
 
 fn identity() -> (Uuid, Uuid) {
     (
@@ -11,8 +11,8 @@ fn identity() -> (Uuid, Uuid) {
     )
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 
 fn future() -> ScheduleChange {
@@ -36,7 +36,7 @@ async fn wait_for_transaction_waiter(pool: &Pool<Postgres>, blocker: i32) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn schedule_update_cancel_is_atomic_and_idempotent(
@@ -90,7 +90,7 @@ async fn schedule_update_cancel_is_atomic_and_idempotent(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn sent_or_claimed_delivery_rejects_update_cancel_and_migration(
@@ -145,7 +145,7 @@ async fn sent_or_claimed_delivery_rejects_update_cancel_and_migration(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn service_authorizes_actor_and_validates_future_time(
@@ -163,11 +163,11 @@ async fn service_authorizes_actor_and_validates_future_time(
         enqueuer: (),
         crm_service: (),
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        rox_event_broker: NoopMacroEventBroker,
         sent_undo_delay_secs: 5,
     };
     let (link, message) = identity();
-    let stranger = MacroUserIdStr::parse_from_str("macro|stranger@test.com")?;
+    let stranger = RoxUserIdStr::parse_from_str("macro|stranger@test.com")?;
     assert!(matches!(
         service
             .change_schedule(stranger, link, message, future(), None, 0)
@@ -197,7 +197,7 @@ async fn service_authorizes_actor_and_validates_future_time(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn scheduled_source_rejects_delete_and_migration_into_existing_reply(
@@ -222,7 +222,7 @@ async fn scheduled_source_rejects_delete_and_migration_into_existing_reply(
         enqueuer: NoOpEnqueuer,
         crm_service: NoOpCrmService,
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        rox_event_broker: NoopMacroEventBroker,
         sent_undo_delay_secs: 5,
     };
     let (link, message) = identity();
@@ -250,7 +250,7 @@ async fn scheduled_source_rejects_delete_and_migration_into_existing_reply(
         bcc: vec![],
         body_text: Some("stale autosave".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: None,
@@ -282,7 +282,7 @@ async fn scheduled_source_rejects_delete_and_migration_into_existing_reply(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn waiting_transition_observes_committed_claim(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -334,7 +334,7 @@ fn stale_input(message: Uuid) -> ResolvedDraftInput {
         bcc: vec![],
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -344,7 +344,7 @@ fn stale_input(message: Uuid) -> ResolvedDraftInput {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn stale_autosave_cannot_mutate_confirmed_claimed_or_sent_message(
@@ -411,7 +411,7 @@ async fn stale_autosave_cannot_mutate_confirmed_claimed_or_sent_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn first_save_waiting_on_insert_cannot_overwrite_newly_confirmed_message(
@@ -463,7 +463,7 @@ async fn first_save_waiting_on_insert_cannot_overwrite_newly_confirmed_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn update_or_cancel_before_claim_prevents_stale_queue_delivery(
@@ -507,7 +507,7 @@ async fn update_or_cancel_before_claim_prevents_stale_queue_delivery(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn initial_schedule_prepares_signature_but_time_updates_preserve_content(
@@ -530,7 +530,7 @@ async fn initial_schedule_prepares_signature_but_time_updates_preserve_content(
         enqueuer: (),
         crm_service: (),
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        rox_event_broker: NoopMacroEventBroker,
         sent_undo_delay_secs: 5,
     };
     service
@@ -660,7 +660,7 @@ impl crate::domain::scheduled_delivery::ScheduledMessageSender<(Uuid, Uuid), ()>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn pending_provider_holds_no_locks_and_duplicate_cannot_release_claim(
@@ -706,7 +706,7 @@ async fn pending_provider_holds_no_locks_and_duplicate_cannot_release_claim(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn legacy_cancel_cannot_change_durable_or_historical_delivery_facts(
@@ -734,7 +734,7 @@ async fn legacy_cancel_cannot_change_durable_or_historical_delivery_facts(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn late_provider_upload_cannot_change_a_committed_schedule(
@@ -797,7 +797,7 @@ async fn late_provider_upload_cannot_change_a_committed_schedule(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn scheduled_delivery_keeps_the_latest_invocation_after_request_completion(

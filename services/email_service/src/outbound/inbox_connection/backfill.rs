@@ -6,7 +6,7 @@ use email::domain::{
     },
     events::{EmailMacroEvent, LinkConnectedMetadata},
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use std::sync::Arc;
 
 pub struct InitialConnectionBackfill<R, Q, H, E> {
@@ -72,13 +72,13 @@ impl ConnectedInboxHistory for ConnectionHistory {
 
 pub struct ConnectionEvents<B>(pub B);
 
-impl<B: MacroEventBroker> ConnectedInboxEvents for ConnectionEvents<B> {
+impl<B: RoxEventBroker> ConnectedInboxEvents for ConnectionEvents<B> {
     fn connected(&self, link: &Link) {
         crate::pubsub::publish_email_event(
             &self.0,
             &EmailMacroEvent::link_connected(LinkConnectedMetadata {
                 link_id: link.id,
-                owner: link.macro_id.clone(),
+                owner: link.rox_id.clone(),
                 email_address: link.email_address.0.as_ref().to_string(),
                 provider: link.provider.as_str().to_string(),
                 is_primary: link.is_primary,

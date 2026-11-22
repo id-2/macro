@@ -3,8 +3,8 @@
 
 use channels::domain::ports::ChannelService;
 use entity_access::domain::models::{AdminTeamRole, EntityAccessReceipt, MemberTeamRole};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::service::NotificationIngress;
 use roles_and_permissions::domain::port::UserRolesAndPermissionsService;
 
@@ -28,8 +28,8 @@ use crate::domain::{
 /// The team and caller a member-level receipt was minted for.
 fn receipt_team_and_user(
     receipt: &EntityAccessReceipt<MemberTeamRole>,
-) -> Result<(uuid::Uuid, &MacroUserIdStr<'static>), TeamError> {
-    let team_id = macro_uuid::string_to_uuid(&receipt.entity().entity_id)?;
+) -> Result<(uuid::Uuid, &RoxUserIdStr<'static>), TeamError> {
+    let team_id = rox_uuid::string_to_uuid(&receipt.entity().entity_id)?;
     let user_id = receipt.get_authenticated_user()?;
     Ok((team_id, user_id))
 }
@@ -46,7 +46,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker,
+    EB: RoxEventBroker,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -55,7 +55,7 @@ where
         &self,
         token: &TeamInviteLinkToken,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) {
         let creator = match self
             .team_repository
@@ -83,7 +83,7 @@ where
     async fn caller_may_invite(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, ManageTeamInviteLinkError> {
         let is_admin = matches!(
             self.team_repository.get_team_role(team_id, user_id).await?,
@@ -113,7 +113,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker + Clone,
+    EB: RoxEventBroker + Clone,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -157,7 +157,7 @@ where
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
     ) -> Result<(), TeamError> {
-        let team_id = macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id)?;
+        let team_id = rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id)?;
         self.team_repository.delete_team_invite_link(&team_id).await
     }
 
@@ -176,7 +176,7 @@ where
     async fn join_team_by_invite_link(
         &self,
         token: &TeamInviteLinkToken,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<JoinTeamByInviteLinkOutcome, JoinTeamByInviteLinkError> {
         let team = self.get_team_by_invite_link(token).await?;
 

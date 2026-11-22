@@ -19,7 +19,7 @@ use crate::domain::model::{AgentKind, SessionBlocker, SpawnContainer};
 use crate::domain::ports::ContainerManager;
 use crate::domain::sandbox::{SandboxResizeEffect, create_only_resize_effect, resize_effect};
 use crate::testing::helpers::agent::FakeAgent;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// A container connection driven by hand.
 ///
@@ -431,7 +431,7 @@ impl ContainerManager for MockContainerManager {
     async fn preflight(
         &self,
         _kind: AgentKind,
-        _owner: &MacroUserIdStr<'_>,
+        _owner: &RoxUserIdStr<'_>,
     ) -> Result<Option<SessionBlocker>> {
         Ok(*self
             .blocker

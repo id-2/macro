@@ -28,11 +28,11 @@ use axum::response::IntoResponse;
 use chat::domain::events::{ChatCreatedMetadata, ChatMacroEvent};
 use chat::domain::ports::MessageService;
 use futures::StreamExt;
-use macro_auth::headers::AccessTokenExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::dcs::create_chat;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_auth::headers::AccessTokenExtractor;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::dcs::create_chat;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use memory::domain::MemoryService;
 use model_entity::{Entity, EntityType};
 use models_permissions::share_permission::SharePermissionV2;
@@ -146,18 +146,18 @@ impl IntoResponse for ChatMessageError {
         (status = 503, description = "AI usage validation unavailable — retry later", body = ChatMessageError),
     )
 )]
-#[tracing::instrument(skip(state, model_access, user, bearer, request), fields(chat_id=?request.chat_id, user_id = %user.authorization.user.macro_user_id, attachment_ids=?request.attachments.as_ref().map(|a| a.iter().map(|att| att.entity_id.as_ref()).collect::<Vec<_>>()).unwrap_or_default()), ret, err)]
+#[tracing::instrument(skip(state, model_access, user, bearer, request), fields(chat_id=?request.chat_id, user_id = %user.authorization.user.rox_user_id, attachment_ids=?request.attachments.as_ref().map(|a| a.iter().map(|att| att.entity_id.as_ref()).collect::<Vec<_>>()).unwrap_or_default()), ret, err)]
 pub async fn send_chat_message(
     State(state): State<ApiContext>,
     model_access: DcsChatModelAccess,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     Extension(bearer): Extension<BearerToken>,
     Json(request): Json<HttpSendChatMessageRequest>,
 ) -> Result<Json<SendChatMessageResponse>, ChatMessageError> {
     Box::pin(send_chat_message_inner(
         state,
         model_access,
-        user.authorization.user.macro_user_id.clone(),
+        user.authorization.user.rox_user_id.clone(),
         bearer,
         request,
     ))
@@ -167,7 +167,7 @@ pub async fn send_chat_message(
 async fn send_chat_message_inner(
     state: ApiContext,
     model_access: DcsChatModelAccess,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     bearer: BearerToken,
     request: HttpSendChatMessageRequest,
 ) -> Result<Json<SendChatMessageResponse>, ChatMessageError> {
@@ -407,7 +407,7 @@ async fn send_chat_message_inner(
 /// Helper function to create a new chat
 async fn create_new_chat(
     ctx: &Arc<ApiContext>,
-    user_id: &Arc<MacroUserIdStr<'static>>,
+    user_id: &Arc<RoxUserIdStr<'static>>,
     model: &str,
     stream_id: &str,
 ) -> Result<(crate::cognition::model::chats::ChatResponse, String), ChatMessageError> {
@@ -457,7 +457,7 @@ async fn create_new_chat(
         project_id: None,
     });
     drop(
-        ctx.macro_event_broker
+        ctx.rox_event_broker
             .send_event(&event)
             .inspect_err(|error| {
                 tracing::error!(error = ?error, "failed to schedule chat event");
@@ -539,7 +539,7 @@ fn stream_and_save_message(
     request: Vec<ChatMessage>,
     system_prompt: String,
     tool_selection: ToolSet,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     jwt_token: String,
     chat_id: String,
     message_id: String,
@@ -602,7 +602,7 @@ fn stream_and_save_message(
 
         let rig_messages = agent::to_rig_messages(&request);
         let usage_ctx = ai_usage::UsageContext::new(ai_usage::AiFeature::Chat, user_id.clone())
-            .with_entity(macro_uuid::string_to_uuid(&chat_id).ok());
+            .with_entity(rox_uuid::string_to_uuid(&chat_id).ok());
         // Carry the feature on the context so AI calls made by tools are attributed to it.
         let mut tool_context = tool_context;
         tool_context.usage_context = usage_ctx.clone();

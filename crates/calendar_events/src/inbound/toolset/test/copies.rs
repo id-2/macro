@@ -235,7 +235,7 @@ fn only_reminders_and_availability_stay_on_one_copy() {
 }
 
 #[tokio::test]
-async fn switching_one_of_several_inboxes_copies_to_a_macro_call_asks_which() {
+async fn switching_one_of_several_inboxes_copies_to_a_rox_call_asks_which() {
     let (mutations, context) = context(MockMutations::default(), occurrences_with(two_inboxes()));
 
     let error = update(serde_json::json!({ "eventId": ORGANIZED, "addMacroCall": true }))
@@ -243,7 +243,7 @@ async fn switching_one_of_several_inboxes_copies_to_a_macro_call_asks_which() {
         .await
         .unwrap_err();
 
-    assert!(mutations.switched_to_macro_call.lock().unwrap().is_empty());
+    assert!(mutations.switched_to_rox_call.lock().unwrap().is_empty());
     assert!(
         error.description.contains("2 of the user's inboxes"),
         "{}",

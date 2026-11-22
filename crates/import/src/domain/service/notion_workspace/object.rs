@@ -4,10 +4,10 @@
 use std::collections::HashMap;
 
 use import_notion::domain::inventory::full_markdown;
-use import_notion::domain::macro_cells::PeopleMap;
+use import_notion::domain::rox_cells::PeopleMap;
 use import_notion::domain::model::NotionId;
 use import_notion::domain::ports::{NotionApi, NotionConnections};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::ConnectorSelect;
 use uuid::Uuid;
 
@@ -45,7 +45,7 @@ where
     /// links it once written.
     pub(super) async fn settle_waiting(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         item: &write::WriteItem,
         target: &Target<'_, N::Api>,
         control: &JobControl,
@@ -75,7 +75,7 @@ where
     /// Write one object, recording a failure on its row.
     pub(super) async fn write_or_fail(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         item: &write::WriteItem,
         target: &Target<'_, N::Api>,
         control: &JobControl,
@@ -102,7 +102,7 @@ where
     /// written only by the row holding the team's claim.
     async fn write_item(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         item: &write::WriteItem,
         target: &Target<'_, N::Api>,
         progress: &write::Progress<'_, R>,
@@ -226,7 +226,7 @@ where
     /// teammate), otherwise the document the page becomes.
     pub(super) async fn links(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         items: &[write::WriteItem],
         people: &PeopleMap,
     ) -> Result<NotionLinks> {
@@ -272,7 +272,7 @@ where
     /// Notion id. Only finished copies count.
     pub(super) async fn already_in_macro(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         tree: &plan::PlanTree,
     ) -> Result<HashMap<String, NotionAlreadyImported>> {
         let foreign_ids: Vec<String> = tree
@@ -285,7 +285,7 @@ where
             .into_iter()
             .filter(|copy| copy.status == ImportStatus::Imported)
             .filter_map(|copy| {
-                let by = MacroUserIdStr::parse_from_str(&copy.user_id)
+                let by = RoxUserIdStr::parse_from_str(&copy.user_id)
                     .ok()?
                     .email_str()
                     .to_string();

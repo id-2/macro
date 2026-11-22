@@ -1,6 +1,6 @@
 use crate::domain::ports::UserPictureNotifier;
 use connection_gateway_client::ConnectionGatewayClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use rootcause::Report;
 use std::sync::Arc;
@@ -24,8 +24,8 @@ impl ConnectionGatewayPictureNotifier {
 impl UserPictureNotifier for ConnectionGatewayPictureNotifier {
     async fn notify_picture_changed(
         &self,
-        user_id: &MacroUserIdStr<'_>,
-        recipients: &[MacroUserIdStr<'static>],
+        user_id: &RoxUserIdStr<'_>,
+        recipients: &[RoxUserIdStr<'static>],
     ) -> Result<(), Report> {
         if recipients.is_empty() {
             return Ok(());

@@ -6,7 +6,7 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::{
     Entity, EntityAccessAuth, EntityAccessReceipt, EntityType, ViewAccessLevel,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize};
 
 use super::{InitiativeServiceImpl, receipt_access_level};
@@ -186,7 +186,7 @@ impl<R: InitiativeRepo, S: InitiativeDescriptionSurfaces> InitiativeServiceImpl<
 
     pub(super) async fn read_page(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: InitiativePageRequest,
     ) -> Result<InitiativePage, InitiativeError> {
         let size = limit(request.limit)?;

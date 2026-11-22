@@ -31,8 +31,8 @@ fn test_session() -> AgentSessionId {
     AgentSessionId::new_from_uuid(Uuid::from_u128(0xA))
 }
 
-fn sender() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("asker@example.com").unwrap()
+fn sender() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("asker@example.com").unwrap()
 }
 
 /// A channel post in the channel-only shape channel triggers travel in.
@@ -300,7 +300,7 @@ async fn failed_work_is_returned() {
 fn attributed_bot_mentions_open_and_prompt_with_the_invoking_user() {
     let mut open = mention("fix the test");
     if let AgentTriggerTopicEvent::New(NewAgentSessionEvent::TopLevelMentioned(event)) = &mut open {
-        event.message.sender = ChannelSender::new_from_bot(bot_id::MACRO_NEW_BOT_ID);
+        event.message.sender = ChannelSender::new_from_bot(bot_id::ROX_NEW_BOT_ID);
         event.message.triggered_by = Some(sender().to_string());
     }
     assert!(
@@ -310,7 +310,7 @@ fn attributed_bot_mentions_open_and_prompt_with_the_invoking_user() {
     if let AgentTriggerTopicEvent::Existing(ExistingAgentSessionEvent::Channel(event)) =
         &mut follow_up
     {
-        event.message.sender = ChannelSender::new_from_bot(bot_id::MACRO_NEW_BOT_ID);
+        event.message.sender = ChannelSender::new_from_bot(bot_id::ROX_NEW_BOT_ID);
         event.message.triggered_by = Some(sender().to_string());
     }
     assert!(

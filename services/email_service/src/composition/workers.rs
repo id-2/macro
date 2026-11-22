@@ -3,13 +3,13 @@
 use crm::domain::service::CrmServiceImpl;
 use crm::outbound::companies_repo::CompaniesRepositoryImpl;
 use crm::outbound::unfurl_resolver::UnfurlCompanyMetadataResolver;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use notification::domain::service::SqsNotificationIngress;
 use notification::outbound::queue::SqsQueue;
 use tokio_util::task::TaskTracker;
 
 /// The event broker used by pubsub workers, with publish tasks tracked for graceful shutdown.
-pub type PubSubEventBroker = MacroEventBrokerService<KafkaEventPublisher, TaskTracker>;
+pub type PubSubEventBroker = RoxEventBrokerService<KafkaEventPublisher, TaskTracker>;
 
 /// The concrete notification ingress service type.
 pub type NotificationIngressType = SqsNotificationIngress<SqsQueue>;

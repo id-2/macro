@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -18,8 +18,8 @@ struct RecordingEventBroker {
     published: Mutex<Vec<PublishedEvent>>,
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -35,8 +35,8 @@ impl MacroEventBroker for RecordingEventBroker {
 
 struct FailingEventBroker;
 
-impl MacroEventBroker for FailingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for FailingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         _event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -56,7 +56,7 @@ async fn publishes_document_purged_event_to_documents_topic() {
     assert_eq!(published.len(), 1);
 
     let event = &published[0];
-    assert_eq!(event.topic, "macro.documents");
+    assert_eq!(event.topic, "rox.documents");
     assert_eq!(event.key, "document-one");
     assert!(Uuid::parse_str(event.envelope["event_id"].as_str().unwrap()).is_ok());
     assert_eq!(event.envelope["schema_version"], json!(1));

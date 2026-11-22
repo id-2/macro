@@ -9,7 +9,7 @@ use entity_access::domain::models::{
     RequiredPermission,
 };
 use initiative::domain::models::{InitiativeBasic, InitiativeError, InitiativeId};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use properties::{EditReceipt, ViewReceipt};
 use std::{collections::HashMap, pin::Pin};
 use trigger_context::ProjectRef;
@@ -24,8 +24,8 @@ mockall::mock! {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("assigner@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("assigner@example.com").unwrap()
 }
 
 fn receipt<T: RequiredPermission>(id: &str, entity_type: EntityType) -> EntityAccessReceipt<T> {
@@ -255,7 +255,7 @@ async fn receipts_without_an_acting_user_do_not_expose_project_context() {
     let internal =
         EntityAccessReceipt::dangerously_assert_internal_user("task", EntityType::Document);
     let team_bot = bot_access(BotReceiptScope::Team {
-        team_id: macro_uuid::Uuid::now_v7(),
+        team_id: rox_uuid::Uuid::now_v7(),
     });
     for receipt in [internal, team_bot] {
         let result = ProjectTaskAssignmentContext::new(

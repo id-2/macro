@@ -1,7 +1,7 @@
 //! Maps document lifecycle events to search-index actions and processes them.
 
 use documents::domain::events::{DocumentMacroEvent, DocumentTopicEvent};
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 use model::document::FileType;
 use sqs_client::search::document::SearchExtractorMessage;
 

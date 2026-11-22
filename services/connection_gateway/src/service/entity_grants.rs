@@ -13,7 +13,7 @@ use entity_access::domain::{
     ports::{AccessRepository, EntityAccessService},
     service::EntityAccessServiceImpl,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use tokio::task::AbortHandle;
 
@@ -29,7 +29,7 @@ pub trait EntityViewAccess: Send + Sync {
     /// could not be determined.
     fn can_view(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         organization_id: Option<i64>,
         entity: &Entity<'_>,
     ) -> impl Future<Output = Result<bool, AccessError>> + Send;
@@ -40,7 +40,7 @@ impl<R: AccessRepository> EntityViewAccess for EntityAccessServiceImpl<R> {
     // teams answer with a role rather than an access level.
     async fn can_view(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         organization_id: Option<i64>,
         entity: &Entity<'_>,
     ) -> Result<bool, AccessError> {
@@ -91,7 +91,7 @@ fn key(entity: &Entity<'_>) -> GrantKey {
 
 /// The entities one connection is subscribed to, for the connection's user.
 pub struct EntityGrants {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     organization_id: Option<i64>,
     /// Entities tracked with `track_entity`.
     granted: HashSet<GrantKey>,
@@ -100,7 +100,7 @@ pub struct EntityGrants {
 }
 
 impl EntityGrants {
-    pub fn new(user_id: MacroUserIdStr<'static>, organization_id: Option<i64>) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>, organization_id: Option<i64>) -> Self {
         Self {
             user_id,
             organization_id,
@@ -215,7 +215,7 @@ impl EntityGrants {
         let allowed = match entity.entity_type {
             // A user entity carries everything sent to that user, so only the
             // user themselves may subscribe to it.
-            EntityType::User => MacroUserIdStr::parse_from_str(&entity.entity_id)
+            EntityType::User => RoxUserIdStr::parse_from_str(&entity.entity_id)
                 .is_ok_and(|requested| requested.0.as_ref() == self.user_id.0.as_ref()),
             _ => {
                 access

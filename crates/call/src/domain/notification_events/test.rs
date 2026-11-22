@@ -1,6 +1,6 @@
 use super::*;
-use macro_event_broker::MacroEvent as _;
-use macro_event_topics::Topic as _;
+use rox_event_broker::RoxEvent as _;
+use rox_event_topics::Topic as _;
 use serde_json::json;
 
 #[test]
@@ -13,8 +13,8 @@ fn public_call_notification_uses_the_call_key_and_snake_case_metadata() {
 
     assert_eq!(event.key(), call_id.to_string());
     assert_eq!(
-        MacroCallNotificationsTopic::TOPIC_STR,
-        "macro.call_notifications"
+        RoxCallNotificationsTopic::TOPIC_STR,
+        "rox.call_notifications"
     );
     assert_eq!(
         serde_json::to_value(&event.event().event).unwrap(),

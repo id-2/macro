@@ -13,7 +13,7 @@ import { PersonaAvatar } from '@app/features/agent-dms/components/persona-avatar
 import { Message as AgentMessage } from '@app/features/block-agent/component/AgentMessage';
 import { WorkingLine } from '@app/features/block-agent/ui/WorkingLine';
 import { ChannelMessage } from '@channel/Message/ChannelMessage';
-import { MACRO_AGENT_BOT_ID } from '@core/constant/macroAgent';
+import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
 import type { MessageData } from '@core/messages/types';
 import {
   type AgentChatReply,
@@ -141,17 +141,17 @@ const SEARCH_DOCS = macro(
       documentResult(
         DOC_CHECKLIST,
         'Launch checklist',
-        'Confirm the <macro_em>launch</macro_em> date with design'
+        'Confirm the <rox_em>launch</rox_em> date with design'
       ),
       documentResult(
         DOC_TIMELINE,
         'Launch timeline',
-        'Rollout starts Monday after the <macro_em>checklist</macro_em> clears'
+        'Rollout starts Monday after the <rox_em>checklist</rox_em> clears'
       ),
       documentResult(
         DOC_NOTES,
         'Release notes',
-        'Agent progress in channels, <macro_em>launch</macro_em> week'
+        'Agent progress in channels, <rox_em>launch</rox_em> week'
       ),
     ],
   }
@@ -749,9 +749,9 @@ function channelMessage(reply: AgentChatReply, id: string): MessageData {
   return {
     id,
     content: composeAgentChatReply(reply),
-    sender_id: `bot|${MACRO_AGENT_BOT_ID}`,
+    sender_id: `bot|${ROX_AGENT_BOT_ID}`,
     sender: {
-      id: MACRO_AGENT_BOT_ID,
+      id: ROX_AGENT_BOT_ID,
       type: 'bot',
       name: 'Rox',
       avatar_url: null,
@@ -842,7 +842,7 @@ function ConversationView(props: {
         {/* What the live session tells a reader; the typing, everyone else. */}
         <TypingRow
           avatar={
-            <PersonaAvatar botId={MACRO_AGENT_BOT_ID} name="Rox" size="md" />
+            <PersonaAvatar botId={ROX_AGENT_BOT_ID} name="Rox" size="md" />
           }
           rows={
             (props.reader && openRun(reply())?.rows) || [

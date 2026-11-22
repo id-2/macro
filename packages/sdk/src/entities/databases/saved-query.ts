@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern';
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import type { Database } from './database';
 import type { DatabaseTable } from './table';
 
@@ -89,7 +89,7 @@ const DISPLAY_MODES: readonly string[] = [
 
 function checkDisplayMode(mode: SavedQueryDisplayMode): void {
   if (!DISPLAY_MODES.includes(mode))
-    throw new MacroError(
+    throw new RoxError(
       `display mode must be one of ${DISPLAY_MODES.join(', ')}; got ${String(mode)}`,
     );
 }
@@ -98,7 +98,7 @@ function checkDisplayMode(mode: SavedQueryDisplayMode): void {
 function checkChart(chart: SavedQueryChart): SavedQueryChart {
   const named = (name: unknown) => typeof name === 'string' && !!name.trim();
   if (!named(chart.x))
-    throw new MacroError(
+    throw new RoxError(
       'chart.x must name the result column holding the labels.',
     );
   if (
@@ -106,33 +106,33 @@ function checkChart(chart: SavedQueryChart): SavedQueryChart {
     !chart.y.length ||
     chart.y.length > SAVED_QUERY_MAX_SERIES
   )
-    throw new MacroError(
+    throw new RoxError(
       `chart.y must name one to ${SAVED_QUERY_MAX_SERIES} numeric result columns.`,
     );
   if (!chart.y.every(named))
-    throw new MacroError('chart.y must not contain an empty column name.');
+    throw new RoxError('chart.y must not contain an empty column name.');
   if (new Set(chart.y).size !== chart.y.length)
-    throw new MacroError('chart.y must not name a column twice.');
+    throw new RoxError('chart.y must not name a column twice.');
   if (chart.y.includes(chart.x))
-    throw new MacroError('chart.y must not include the label column chart.x.');
+    throw new RoxError('chart.y must not include the label column chart.x.');
   if (chart.title !== undefined && typeof chart.title !== 'string')
-    throw new MacroError('chart.title must be a string.');
+    throw new RoxError('chart.title must be a string.');
   if (chart.color !== undefined) {
     if (!named(chart.color))
-      throw new MacroError('chart.color must name a result column.');
+      throw new RoxError('chart.color must name a result column.');
     if (chart.color === chart.x)
-      throw new MacroError('chart.color must not be the label column chart.x.');
+      throw new RoxError('chart.color must not be the label column chart.x.');
     if (chart.y.includes(chart.color))
-      throw new MacroError(
+      throw new RoxError(
         'chart.color must not be one of the chart.y columns.',
       );
     if (chart.y.length !== 1)
-      throw new MacroError(
+      throw new RoxError(
         'chart.color splits a single series; with chart.color, chart.y names one column.',
       );
   }
   if (chart.stack !== undefined && typeof chart.stack !== 'boolean')
-    throw new MacroError('chart.stack must be a boolean.');
+    throw new RoxError('chart.stack must be a boolean.');
   return {
     x: chart.x,
     y: [...chart.y],
@@ -149,14 +149,14 @@ function checkHeight(height: number | undefined): void {
       height < SAVED_QUERY_HEIGHT_RANGE.min ||
       height > SAVED_QUERY_HEIGHT_RANGE.max)
   )
-    throw new MacroError(
+    throw new RoxError(
       `height must be from ${SAVED_QUERY_HEIGHT_RANGE.min} to ${SAVED_QUERY_HEIGHT_RANGE.max} pixels.`,
     );
 }
 
 function checkTitle(title: string): string {
   const trimmed = typeof title === 'string' ? title.trim() : '';
-  if (!trimmed) throw new MacroError('title must not be empty.');
+  if (!trimmed) throw new RoxError('title must not be empty.');
   return trimmed;
 }
 
@@ -178,7 +178,7 @@ function checkPresentation(presentation: Presentation): Presentation {
       ? undefined
       : checkChart(presentation.chart);
   if (isChartMode(presentation.displayMode) && !chart)
-    throw new MacroError(
+    throw new RoxError(
       `a ${presentation.displayMode} chart needs chart columns (chart.x and chart.y).`,
     );
   return {
@@ -206,7 +206,7 @@ const BLOCK_TAG = 'm-db-query';
  */
 export class SavedQuery {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Identifier of the saved question. */
     readonly id: string,
     /** The database whose tables win name resolution, if one was given. */
@@ -222,7 +222,7 @@ export class SavedQuery {
    * chart column is one it returns.
    */
   static async save(
-    client: MacroClient,
+    client: RoxClient,
     scope:
       | { database: Database; table?: DatabaseTable }
       | { database?: undefined; table?: undefined },
@@ -320,7 +320,7 @@ export class SavedQuery {
   withView(view: SavedQueryView): SavedQuery {
     const displayMode = view.displayMode ?? this.displayMode;
     if ((displayMode === 'scalar') !== (this.displayMode === 'scalar'))
-      throw new MacroError(
+      throw new RoxError(
         `a ${this.displayMode} answer cannot become ${displayMode}: a scalar answer sits inline in text and every other mode is a block. Save the question again with the mode it should have.`,
       );
     return new SavedQuery(

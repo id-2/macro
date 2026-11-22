@@ -48,7 +48,7 @@ async fn an_owned_surface_snapshot_is_read_with_a_short_lived_view_service_token
         }
     );
     let token = presented_token.lock().unwrap().clone().unwrap();
-    let claims: serde_json::Value = macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+    let claims: serde_json::Value = rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
     let expires_at = claims["exp"].as_u64().unwrap() as usize;
     assert!(
         expires_at > before && expires_at <= unix_now() + 60,
@@ -116,7 +116,7 @@ async fn an_owned_surface_update_is_applied_with_a_short_lived_edit_service_toke
         }
     );
     let token = presented_token.lock().unwrap().clone().unwrap();
-    let claims: serde_json::Value = macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+    let claims: serde_json::Value = rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
     let expires_at = claims["exp"].as_u64().unwrap() as usize;
     assert!(
         expires_at > before && expires_at <= unix_now() + 60,

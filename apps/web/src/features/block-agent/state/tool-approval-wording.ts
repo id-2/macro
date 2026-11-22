@@ -4,7 +4,7 @@
  * possessive of the owner whose access the call spends ("your", "Alice's").
  */
 
-import type { ToolName as MacroToolName } from '@service-cognition/generated/tools/tool';
+import type { ToolName as RoxToolName } from '@service-cognition/generated/tools/tool';
 
 type Wording = (whose: string) => string;
 
@@ -12,7 +12,7 @@ type Wording = (whose: string) => string;
  * Every Rox tool, so a new one does not type-check until it is worded.
  * `null` for the tools that use nobody's access and so are never held.
  */
-const MACRO_TOOLS: Record<MacroToolName, Wording | null> = {
+const ROX_TOOLS: Record<RoxToolName, Wording | null> = {
   AddSharedCalendarEvent: (whose) => `add a shared event to ${whose} calendar`,
   AddToPipeline: (whose) => `add deals to ${whose} pipelines`,
   BashCodeExecution: (whose) => `run code with ${whose} access`,
@@ -199,8 +199,8 @@ const MACRO_TOOLS: Record<MacroToolName, Wording | null> = {
   WebSearch: null,
 };
 
-function isMacroTool(tool: string): tool is MacroToolName {
-  return Object.hasOwn(MACRO_TOOLS, tool);
+function isMacroTool(tool: string): tool is RoxToolName {
+  return Object.hasOwn(ROX_TOOLS, tool);
 }
 
 /** `ListEntities` → `list entities`, `linear-create-issue` → `linear create issue`. */
@@ -222,7 +222,7 @@ export function describeToolCall(
     return `use ${whose} ${server.name} account (${toolWords(tool)})`;
   }
   // A tool newer than this build, or one never held, reads by its name.
-  const wording = isMacroTool(tool) ? MACRO_TOOLS[tool] : null;
+  const wording = isMacroTool(tool) ? ROX_TOOLS[tool] : null;
   return wording
     ? wording(whose)
     : `use ${whose} Rox workspace (${toolWords(tool)})`;

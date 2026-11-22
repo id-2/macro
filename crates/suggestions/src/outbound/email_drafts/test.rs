@@ -1,5 +1,5 @@
 use email::outbound::EmailPgRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -8,15 +8,15 @@ use crate::outbound::pg_suggestion_repo::test::insert_user;
 const OWNER: &str = "macro|drafts-owner@example.com";
 const TEAMMATE: &str = "macro|drafts-teammate@example.com";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 /// An inbox of `owner`'s.
 async fn inbox(pool: &PgPool, owner: &str) -> Uuid {
     let id = Uuid::now_v7();
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $3, $4, 'GMAIL')"#,
         id,
         owner,
@@ -54,7 +54,7 @@ async fn message(pool: &PgPool, inbox: Uuid, draft: bool) -> (Uuid, Uuid) {
     (message, thread)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_an_unsent_draft_in_the_persons_own_inbox_counts(pool: PgPool) {
     for id in [OWNER, TEAMMATE] {
         insert_user(&pool, id).await;
@@ -63,7 +63,7 @@ async fn only_an_unsent_draft_in_the_persons_own_inbox_counts(pool: PgPool) {
     let delegated = inbox(&pool, TEAMMATE).await;
     // The teammate's inbox is delegated to the owner.
     sqlx::query!(
-        r#"INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        r#"INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
            VALUES ($1, $2, $3)"#,
         OWNER,
         TEAMMATE,
@@ -94,7 +94,7 @@ async fn only_an_unsent_draft_in_the_persons_own_inbox_counts(pool: PgPool) {
     assert_eq!(thread_of(TEAMMATE, draft).await, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_draft_previews_the_start_of_its_text(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let own = inbox(&pool, OWNER).await;

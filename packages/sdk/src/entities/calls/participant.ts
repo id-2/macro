@@ -1,5 +1,5 @@
 import type { LiveCallParticipant } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { User } from '../users/user';
 
 /** A connected participant and their published track state. */
@@ -26,7 +26,7 @@ export class CallParticipant {
   readonly user?: User;
 
   /** Build a roster handle from a live participant record. */
-  constructor(client: MacroClient, record: LiveCallParticipant) {
+  constructor(client: RoxClient, record: LiveCallParticipant) {
     this.identity = record.identity;
     this.displayName = record.displayName;
     this.kind = record.kind;

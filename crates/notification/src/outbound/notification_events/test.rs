@@ -1,11 +1,11 @@
 use super::*;
 
 use crate::inbound::notification_events_listener::NotificationDatabaseEvent;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::Postgres;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn notification_delete_trigger_notifies_affected_users(pool: sqlx::Pool<Postgres>) {
     let mut receiver = PgNotificationEventsReceiver::new(pool.clone());
     receiver.listener().await.unwrap();

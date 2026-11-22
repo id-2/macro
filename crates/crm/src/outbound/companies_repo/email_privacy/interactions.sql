@@ -25,12 +25,12 @@ WITH matching_messages AS (
     GROUP BY thread_id
 ), contributing_mailboxes AS MATERIALIZED (
     -- The mailbox conditions depend only on the thread's link.
-    SELECT l.id AS link_id, l.macro_id AS owner
+    SELECT l.id AS link_id, l.rox_id AS owner
     FROM crm_email_consent consent
     JOIN email_links l
-      ON l.id = consent.link_id AND l.macro_id = consent.user_id
+      ON l.id = consent.link_id AND l.rox_id = consent.user_id
      AND l.is_primary AND l.deleting_at IS NULL
-    JOIN team_user member ON member.team_id = $1 AND member.user_id = l.macro_id
+    JOIN team_user member ON member.team_id = $1 AND member.user_id = l.rox_id
     WHERE consent.team_id = $1 AND consent.enabled
 ), thread_links AS MATERIALIZED (
     SELECT ti.*, t.link_id

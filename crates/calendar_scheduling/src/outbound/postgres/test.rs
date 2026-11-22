@@ -18,13 +18,13 @@ async fn setup(pool: &PgPool) {
     .await
     .unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20260918164303_calendar_scheduling.sql"
+        "../../../../rox_db_client/migrations/20260918164303_calendar_scheduling.sql"
     ))
     .execute(pool)
     .await
     .unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20260918175703_scheduling_recovery.sql"
+        "../../../../rox_db_client/migrations/20260918175703_scheduling_recovery.sql"
     ))
     .execute(pool)
     .await

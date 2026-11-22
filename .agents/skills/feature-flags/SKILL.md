@@ -113,8 +113,8 @@ and group conditions ignore this override.
   `FlagSnapshot` per authenticated user id, and read it synchronously. A failed
   load returns `Err`; the caller decides the fallback, explicitly. Wire the adapter and its config at the consuming service composition root.
 - **Every backend rollout or feature gate**, per user or for everyone, is a
-  `crates/feature_flags` flag, never a `MacroConfig`/Doppler boolean.
-  `MacroConfig` holds real environment configuration (endpoints, credentials,
+  `crates/feature_flags` flag, never a `RoxConfig`/Doppler boolean.
+  `RoxConfig` holds real environment configuration (endpoints, credentials,
   capacities), not switches that turn features on. Remove the gate once its
   rollout is done.
 - Keep the backend and web flag keys identical when both gate one feature.

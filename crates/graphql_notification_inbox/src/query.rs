@@ -1,6 +1,6 @@
 use async_graphql::{Context, ID};
 use graphql_soup::SoupEntityEdges;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::{
     context::{NotificationInboxGraphqlContext, to_graphql_error},
@@ -11,7 +11,7 @@ use crate::{
 /// Resolve one page of `user`'s notification inbox.
 pub async fn resolve_notification_inbox<E: SoupEntityEdges>(
     ctx: &Context<'_>,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     input: NotificationInboxInput,
 ) -> async_graphql::Result<GraphqlNotificationInboxPage<E>> {
     let context = ctx.data::<NotificationInboxGraphqlContext>()?;
@@ -30,7 +30,7 @@ pub async fn resolve_notification_inbox<E: SoupEntityEdges>(
 /// and undo still running.
 pub async fn resolve_notification_inbox_clears(
     ctx: &Context<'_>,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     clear_id: Option<ID>,
 ) -> async_graphql::Result<Vec<GraphqlNotificationInboxClear>> {
     let context = ctx.data::<NotificationInboxGraphqlContext>()?;

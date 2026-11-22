@@ -14,14 +14,14 @@ use std::path::{Path, PathBuf};
 /// The repository Cargo workspace root.
 ///
 /// Commands can run from any directory inside the repository. Packaged xtask
-/// binaries can set `MACRO_REPO_ROOT` when they run against a staged copy or
+/// binaries can set `ROX_REPO_ROOT` when they run against a staged copy or
 /// from outside the repository.
 pub fn workspace_root() -> PathBuf {
     repo_root_override()
         .or_else(discover_repo_root)
         .unwrap_or_else(|| {
             panic!(
-                "could not discover the repository root from the current directory or executable path; set MACRO_REPO_ROOT"
+                "could not discover the repository root from the current directory or executable path; set ROX_REPO_ROOT"
             )
         })
 }
@@ -59,7 +59,7 @@ pub fn repo_root() -> PathBuf {
 /// both inside and outside the service runtime, including packaged binaries.
 #[allow(clippy::disallowed_methods)]
 fn repo_root_override() -> Option<PathBuf> {
-    std::env::var_os("MACRO_REPO_ROOT").map(PathBuf::from)
+    std::env::var_os("ROX_REPO_ROOT").map(PathBuf::from)
 }
 
 /// A UTF-8, repository-relative path that must resolve to a regular file.

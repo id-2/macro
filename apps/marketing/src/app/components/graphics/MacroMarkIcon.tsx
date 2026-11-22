@@ -1,7 +1,7 @@
 import type { JSX } from 'solid-js';
 import RoxMarkIcon from '../../../assets/app-icons/macro-logo.svg';
 
-export function MacroMarkIcon(props: {
+export function RoxMarkIcon(props: {
   style?: JSX.CSSProperties;
   class?: string;
 }) {

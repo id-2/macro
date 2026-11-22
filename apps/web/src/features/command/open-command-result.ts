@@ -10,7 +10,7 @@ import { toast } from '@core/component/Toast/Toast';
 import { itemToBlockName } from '@core/constant/allBlocks';
 import {
   enableProjects,
-  USE_MACRO_PR_SUMMARY_BLOCK,
+  USE_ROX_PR_SUMMARY_BLOCK,
 } from '@core/constant/featureFlags';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { useOpenDirectMessage } from '@core/util/open-direct-message';
@@ -49,7 +49,7 @@ export function createCommandResultOpener(
     openInNewSplit: boolean
   ) => {
     if (isGithubPrEntity(item.data)) {
-      if (USE_MACRO_PR_SUMMARY_BLOCK) {
+      if (USE_ROX_PR_SUMMARY_BLOCK) {
         const result = openWithSplit(
           { type: 'pr', id: item.data.id },
           {

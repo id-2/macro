@@ -590,7 +590,7 @@ test("placeCall: a failure says so in a line for people; Rox's error is only in 
       ...ports,
       target: () =>
         Promise.reject(
-          new Error('MacroApiError: Macro API error 400: Invalid URL')
+          new Error('RoxApiError: Macro API error 400: Invalid URL')
         ),
     }
   );

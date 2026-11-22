@@ -14,7 +14,7 @@ and never seed the database the app or the tests use.
 Create it on the local server, migrate it, and drop it when done:
 
 ```sh
-createdb -h localhost query_plans && sqlx migrate run --source crates/macro_db_client/migrations \
+createdb -h localhost query_plans && sqlx migrate run --source crates/rox_db_client/migrations \
   --database-url postgres://<local-user>@localhost/query_plans
 ```
 

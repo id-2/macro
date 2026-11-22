@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_uuid::Uuid;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_uuid::Uuid;
 use rdkafka::message::{OwnedMessage, Timestamp};
 use serde_json::{Value, json};
 use sqlx::PgPool;
@@ -15,7 +15,7 @@ use crate::domain::service::test::runs::run_harness;
 use crate::domain::service::test::{Harness, OWNER, user};
 use crate::outbound::pg_suggestion_repo::PgSuggestionRepo;
 
-const TOPIC: &str = "macro.agent_session_lifecycle";
+const TOPIC: &str = "rox.agent_session_lifecycle";
 const SESSION: &str = "01900000-0000-7000-8000-0000000000a1";
 const ACTION: &str = "01900000-0000-7000-8000-0000000000b1";
 
@@ -36,7 +36,7 @@ fn lifecycle(session: &str, event_type: &str, mut metadata: Value) -> Value {
     metadata["identity"] = json!({
         "session_id": session,
         "session_name": "Compare the supplier quotes",
-        "bot_id": bot_id::MACRO_NEW_BOT_ID,
+        "bot_id": bot_id::ROX_NEW_BOT_ID,
         "bot_name": "Macro",
         "owner_id": OWNER,
         "origin": null,
@@ -277,7 +277,7 @@ async fn bad_records_never_stall_the_partition() {
 
 /// A run's session settling after its prompt's turn, as published, finishes
 /// the run and makes its suggestion done.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_lifecycle_event_settles_a_run(pool: PgPool) {
     let (h, runs) = run_harness(pool.clone()).await;
     let suggestion = h.background("quotes:compare").await;

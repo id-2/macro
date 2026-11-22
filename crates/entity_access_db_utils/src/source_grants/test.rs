@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 const TEAM: &str = "10000000-0000-0000-0000-000000000001";
@@ -21,7 +21,7 @@ async fn remaining_sources(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share", "source_grants"))
 )]
 async fn deletes_every_grant_of_the_source_and_nothing_else(

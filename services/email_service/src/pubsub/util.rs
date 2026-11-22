@@ -1,6 +1,6 @@
 use connection_gateway_client::client::ConnectionGatewayClient;
 use email::domain::events::EmailMacroEvent;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 /// shared utils across different pubsub workers
 use models_email::api::refresh::RefreshEmailEvent;
 
@@ -44,23 +44,23 @@ pub async fn complete_transaction_with_processing_error<T>(
 
 /// Publish an email event to the `macro.email` Kafka topic, logging and
 /// dropping failures — event emission must never fail the email operation.
-pub fn publish_email_event<B: MacroEventBroker>(broker: &B, event: &EmailMacroEvent) {
+pub fn publish_email_event<B: RoxEventBroker>(broker: &B, event: &EmailMacroEvent) {
     let _ = broker
         .send_event(event)
         .inspect_err(|e| tracing::error!(error=?e, "failed to publish email macro event"));
 }
 
 /// Send message to connection gateway to trigger email refresh if user is active on FE
-#[tracing::instrument(skip(client, macro_id), level = "debug")]
+#[tracing::instrument(skip(client, rox_id), level = "debug")]
 pub async fn cg_refresh_email(
     client: &ConnectionGatewayClient,
-    macro_id: &str,
+    rox_id: &str,
     event: RefreshEmailEvent,
 ) {
     if cfg!(feature = "connection_gateway") {
         let payload = serde_json::to_value(&event).unwrap_or_default();
         let _ = client
-            .refresh_email(macro_id, payload)
+            .refresh_email(rox_id, payload)
             .await
             .inspect_err(|e| tracing::error!(error = %e, "Failed to refresh email"));
     }
@@ -69,11 +69,11 @@ pub async fn cg_refresh_email(
 /// Signal every viewer of a connected inbox's calendars — the link owner
 /// plus its delegated users — that the calendar projection changed. Best
 /// effort: an inactive or unreachable viewer only misses a refresh nudge.
-#[tracing::instrument(skip(client, db, owner_macro_id), level = "debug")]
+#[tracing::instrument(skip(client, db, owner_rox_id), level = "debug")]
 pub async fn cg_refresh_calendar(
     client: &ConnectionGatewayClient,
     db: &sqlx::PgPool,
-    owner_macro_id: &str,
+    owner_rox_id: &str,
     link_id: uuid::Uuid,
     team_ooo_changed: bool,
 ) {
@@ -87,9 +87,9 @@ pub async fn cg_refresh_calendar(
         },
     )
     .unwrap_or_default();
-    let mut recipients = vec![owner_macro_id.to_string()];
+    let mut recipients = vec![owner_rox_id.to_string()];
     match sqlx::query_scalar!(
-        "SELECT primary_macro_id FROM macro_user_links WHERE link_id = $1",
+        "SELECT primary_rox_id FROM rox_user_links WHERE link_id = $1",
         link_id,
     )
     .fetch_all(db)
@@ -102,9 +102,9 @@ pub async fn cg_refresh_calendar(
     }
     recipients.sort();
     recipients.dedup();
-    for macro_id in recipients {
+    for rox_id in recipients {
         let _ = client
-            .refresh_calendar(&macro_id, payload.clone())
+            .refresh_calendar(&rox_id, payload.clone())
             .await
             .inspect_err(|e| tracing::error!(error = %e, %link_id, "Failed to refresh calendar"));
     }

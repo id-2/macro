@@ -376,7 +376,7 @@ targets additionally need participant-management authority before adding members
 
 Map ordinary authors/members using lowercase **raw email** to `macro|email`,
 without account/roster lookup or alias canonicalization. No-email/unknown/bot
-authors use `MACRO_SYSTEM_BOT_ID` plus Slack-name `imported_author`. No-email DM
+authors use `ROX_SYSTEM_BOT_ID` plus Slack-name `imported_author`. No-email DM
 participants cause a skip; the admin is never injected as a third participant.
 
 `HistoricalSink::commit` is a worker composition-root coordinator invoking

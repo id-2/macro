@@ -1,19 +1,19 @@
 use axum::extract::FromRef;
-use macro_authorization::{
-    MacroAuthorizationServiceImpl, MacroAuthorizationState, NoopMacroAuthJwtValidator,
+use rox_authorization::{
+    RoxAuthorizationServiceImpl, RoxAuthorizationState, NoopMacroAuthJwtValidator,
 };
 use s3_client::S3;
 use std::sync::Arc;
 
 use crate::config::Config;
 
-pub(crate) type AuthorizationService = MacroAuthorizationServiceImpl<NoopMacroAuthJwtValidator>;
+pub(crate) type AuthorizationService = RoxAuthorizationServiceImpl<NoopMacroAuthJwtValidator>;
 
 #[derive(Clone, FromRef)]
 pub struct ApiContext {
     pub db: sqlx::PgPool,
     pub s3_client: S3,
     pub sqs_client: Arc<sqs_client::SQS>,
-    pub authorization_state: MacroAuthorizationState<AuthorizationService>,
+    pub authorization_state: RoxAuthorizationState<AuthorizationService>,
     pub config: Arc<Config>,
 }

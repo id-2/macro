@@ -198,8 +198,8 @@ pub(super) fn inner_hits_content_highlight(
     serde_json::json!({
         "require_field_match": true,
         "max_analyzer_offset": super::HIGHLIGHT_MAX_ANALYZER_OFFSET,
-        "pre_tags": ["<macro_em>"],
-        "post_tags": ["</macro_em>"],
+        "pre_tags": ["<rox_em>"],
+        "post_tags": ["</rox_em>"],
         "fields": {
             "content": {
                 "type": "plain",

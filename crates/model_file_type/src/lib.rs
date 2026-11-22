@@ -95,7 +95,7 @@ macro_rules! generate_file_types {
             }
 
             /// return the app path for the file type
-            pub fn macro_app_path(&self) -> FileAssociation {
+            pub fn rox_app_path(&self) -> FileAssociation {
                 match self {
                     $(
                         FileType::$variant => FileAssociation::from($app_path),
@@ -259,10 +259,10 @@ generate_file_types!(
     (
         Spreadsheet,
         "spreadsheet",
-        "application/x-macro-spreadsheet",
+        "application/x-rox-spreadsheet",
         Document
     ),
-    (Canvas, "canvas", "application/x-macro-canvas", Canvas),
+    (Canvas, "canvas", "application/x-rox-canvas", Canvas),
     // Code block: generated from VS Code extensions {
     (Coffee, "coffee", "text/plain", Code),
     (Cson, "cson", "text/plain", Code),

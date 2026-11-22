@@ -5,7 +5,7 @@ use email_api_client::domain::models::{
     EmailApiError, GateLimit, MailboxMessage, RateLimitOrigin, StreamPosition,
 };
 use email_api_client::domain::request_count;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::collections::VecDeque;
 use std::sync::Mutex;
 use std::time::Duration;
@@ -90,7 +90,7 @@ async fn enumerated_mailbox(db: &PgPool) -> (PgMailboxSync, Uuid) {
     .unwrap();
     sqlx::query!(
         "INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id,initial_complete) VALUES ($1,$2,1,'folder_catalog','mail',true)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link
     )
     .execute(db)
@@ -99,7 +99,7 @@ async fn enumerated_mailbox(db: &PgPool) -> (PgMailboxSync, Uuid) {
     (repo, link)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn import_completes_once_when_its_last_import_row_settles(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -141,7 +141,7 @@ async fn import_completes_once_when_its_last_import_row_settles(db: PgPool) {
     assert_eq!(reconciled[0]["outlook.graph_calls"], "2");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn workers_finishing_the_last_rows_together_report_one_completion(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -157,7 +157,7 @@ async fn workers_finishing_the_last_rows_together_report_one_completion(db: PgPo
     assert_eq!(telemetry.events("outlook import completed").len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deferrals_name_their_reason_and_gate_refusals_stay_quiet(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -245,7 +245,7 @@ async fn deferrals_name_their_reason_and_gate_refusals_stay_quiet(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enumeration_reports_the_page_it_committed(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -285,7 +285,7 @@ async fn enumeration_reports_the_page_it_committed(db: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn persistence_errors_name_their_sqlstate(db: PgPool) {
     let failure = sqlx::query_scalar!(r#"SELECT 1 / $1::int AS "quotient""#, 0)
         .fetch_one(&db)
@@ -321,7 +321,7 @@ impl crate::domain::mailbox::projection::MailboxProjectionEffects for PendingUpl
     async fn refresh(
         &self,
         _: Uuid,
-        _: &std::collections::HashSet<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _: &std::collections::HashSet<rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) -> Result<(), MailboxError> {
         Err(MailboxError::Effect(
             crate::domain::mailbox::EffectFailure::AttachmentUploadPending {
@@ -359,14 +359,14 @@ impl crate::domain::mailbox::projection::MailboxProjectionEffects for PendingUpl
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn effect_deferrals_name_the_effect_and_its_attachment(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
     let (repo, link) = super::super::test::fixture(&db).await;
     sqlx::query!(
         "INSERT INTO email_projection_outbox (id,link_id,generation,payload,attempts) VALUES ($1,$2,1,$3,4)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link,
         serde_json::json!({"kind": "link_changed"})
     )
@@ -428,9 +428,9 @@ async fn effect_deferrals_name_the_effect_and_its_attachment(db: PgPool) {
 }
 
 async fn outlook_link(db: &PgPool, email: &str, active: bool, needs_reauth: bool) -> Uuid {
-    let link = macro_uuid::generate_uuid_v7();
+    let link = rox_uuid::generate_uuid_v7();
     sqlx::query!(
-        r#"INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider,grant_generation,is_sync_active,needs_reauth)
+        r#"INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider,grant_generation,is_sync_active,needs_reauth)
         VALUES ($1,$2,$3,$4,'OUTLOOK',1,$5,$6)"#,
         link,
         format!("macro|{email}"),
@@ -445,7 +445,7 @@ async fn outlook_link(db: &PgPool, email: &str, active: bool, needs_reauth: bool
     link
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn health_snapshot_counts_the_current_queue_streams_and_recent_imports(db: PgPool) {
     let (repo, active) = super::super::test::fixture(&db).await;
     sqlx::query!(
@@ -455,7 +455,7 @@ async fn health_snapshot_counts_the_current_queue_streams_and_recent_imports(db:
             ($1,1,'leased',true,now() - interval '10 seconds',$2,now() + interval '60 seconds'),
             ($1,0,'old generation',true,now() - interval '1 hour',NULL,NULL)"#,
         active,
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&db)
     .await
@@ -474,8 +474,8 @@ async fn health_snapshot_counts_the_current_queue_streams_and_recent_imports(db:
     queue(&db, paused, "waiting", true, 0).await;
     outlook_link(&db, "idle@example.com", false, false).await;
     sqlx::query!(
-        "INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider) VALUES ($1,'macro|gmail@example.com','gmail-owner','gmail@example.com','GMAIL')",
-        macro_uuid::generate_uuid_v7()
+        "INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,'macro|gmail@example.com','gmail-owner','gmail@example.com','GMAIL')",
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&db)
     .await
@@ -527,7 +527,7 @@ async fn health_snapshot_counts_the_current_queue_streams_and_recent_imports(db:
     assert_eq!(retained, 2, "counts older than a day are dropped");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn import_counts_from_several_workers_add_up_in_the_snapshot(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -638,7 +638,7 @@ async fn notify(repo: &PgMailboxSync, attempt: Uuid) {
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_notified_change_reports_its_wait_and_lag_but_a_polled_change_does_not(db: PgPool) {
     let telemetry = Telemetry::default();
     let _guard = telemetry.install();
@@ -697,7 +697,7 @@ async fn a_notified_change_reports_its_wait_and_lag_but_a_polled_change_does_not
     assert!(!polled.contains_key("outlook.notification_lag_ms"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sync_work_a_notification_made_due_joins_the_webhook_trace_but_retries_do_not(db: PgPool) {
     use opentelemetry::trace::TracerProvider as _;
     use opentelemetry_sdk::trace::{InMemorySpanExporter, SdkTracerProvider};

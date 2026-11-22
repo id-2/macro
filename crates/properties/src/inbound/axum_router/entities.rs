@@ -15,7 +15,7 @@ use axum::{
 };
 use entity_access::domain::models::EditAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use models_properties::api::{PropertyTargetEntityType, PropertyTargetReference, SetPropertyValue};
 use models_properties::service::entity_property_with_definition::EntityPropertyWithDefinition;
 use serde::{Deserialize, Serialize};
@@ -118,7 +118,7 @@ impl IntoResponse for GetEntityPropertiesErr {
 pub async fn get_entity_properties<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Query(query): Query<EntityQueryParams>,
     State(state): State<PropertiesRouterState<S, A, Auth>>,
@@ -247,13 +247,13 @@ fn validate_bulk_request_size(
 pub async fn get_bulk_entity_properties<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<BulkEntityPropertiesRequest>,
 ) -> Result<Json<HashMap<String, EntityPropertiesResponse>>, GetBulkEntityPropertiesErr> {
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     // The public endpoint requires explicit property IDs. An empty property_ids
     // means "no properties requested", so return early with empty result.
     if request.entities.is_empty() || request.property_ids.is_empty() {
@@ -365,7 +365,7 @@ impl IntoResponse for SetEntityPropertyErr {
 pub async fn set_entity_property<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Path((_entity_type, _entity_id, property_uuid)): Path<(PropertyTargetEntityType, String, Uuid)>,
     State(state): State<PropertiesRouterState<S, A, Auth>>,
@@ -435,7 +435,7 @@ impl IntoResponse for EntityPropertyOptionErr {
 pub async fn add_entity_property_option<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Path((_entity_type, _entity_id, property_uuid, option_uuid)): Path<(
         PropertyTargetEntityType,
@@ -481,7 +481,7 @@ pub async fn add_entity_property_option<
 pub async fn remove_entity_property_option<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Path((_entity_type, _entity_id, property_uuid, option_uuid)): Path<(
         PropertyTargetEntityType,
@@ -629,7 +629,7 @@ fn validate_bulk_option_request(
 pub async fn bulk_update_entity_property_options<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<PropertiesRouterState<S, A, Auth>>,
     access: EditReceiptExtractor,
@@ -790,15 +790,15 @@ fn validate_bulk_entities_option_request(
 pub async fn bulk_update_entities_property_options<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<BulkUpdateEntitiesPropertyOptionsRequest>,
 ) -> Result<Json<BulkUpdateEntitiesPropertyOptionsResponse>, BulkUpdateEntitiesPropertyOptionsErr> {
     tracing::info!("bulk updating property options across entities");
 
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     validate_bulk_entities_option_request(&request)?;
 
     let BulkUpdateEntitiesPropertyOptionsRequest {
@@ -929,13 +929,13 @@ impl IntoResponse for DeleteEntityPropertyErr {
 pub async fn delete_entity_property<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Path(entity_property_uuid): Path<Uuid>,
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<StatusCode, DeleteEntityPropertyErr> {
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     tracing::info!("removing entity property");
 
     // The entity this property is attached to is only known after a lookup, so

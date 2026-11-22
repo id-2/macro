@@ -22,7 +22,7 @@ import {
   AddInboxDialog,
   isAddInboxDialogOpen,
 } from '@app/features/inbox/AddInboxDialog';
-import { MacroMcpSetupModal } from '@app/features/integrations/mcp-setup/MacroMcpSetupModal';
+import { RoxMcpSetupModal } from '@app/features/integrations/mcp-setup/RoxMcpSetupModal';
 import { onboardingRedirectPath } from '@app/features/onboarding/core/next-target';
 import { AiUsageLimitDialog } from '@app/features/paywall/AiUsageLimitDialog';
 import { observeAiUsageLimitMutations } from '@app/features/paywall/ai-usage-limit-handling';
@@ -317,7 +317,7 @@ export function AppChrome(props: ParentProps) {
             <LocalRuntimeHost />
           </Show>
           <NativeShareSheet />
-          <MacroMcpSetupModal />
+          <RoxMcpSetupModal />
           <CreateChannelModal />
           <Show when={companyDialogUsed()}>
             <Suspense>

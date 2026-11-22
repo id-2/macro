@@ -1,7 +1,7 @@
 //! Read-only discovery of apps and their actual MCP capabilities.
 
 use crate::domain::{
-    models::{ConnectionProvider, MacroUserIdStr},
+    models::{ConnectionProvider, RoxUserIdStr},
     ports::{
         ConnectionStore, ConnectorCapabilities, ConnectorDirectory, ConnectorOverlays,
         OverlayConnections,
@@ -109,7 +109,7 @@ where
     #[tracing::instrument(skip_all, err)]
     pub async fn discover(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         request: &DiscoveryRequest,
     ) -> anyhow::Result<DiscoveryResult> {
         let Some(directory) = &self.directory else {
@@ -153,7 +153,7 @@ where
 
     async fn connected(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<bool> {
         let connection = self

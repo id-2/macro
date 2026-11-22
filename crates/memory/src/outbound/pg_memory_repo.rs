@@ -2,8 +2,8 @@
 mod test;
 
 use crate::domain::{Memory, MemoryRepo, Result, ports::MemoryRecord};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use sqlx::PgPool;
 
 #[derive(Clone)]
@@ -18,8 +18,8 @@ impl PgMemoryRepo {
 }
 
 impl MemoryRepo for PgMemoryRepo {
-    async fn save_memory(&self, memory: &Memory, user: MacroUserIdStr<'_>) -> Result<Uuid> {
-        let id = macro_uuid::generate_uuid_v7();
+    async fn save_memory(&self, memory: &Memory, user: RoxUserIdStr<'_>) -> Result<Uuid> {
+        let id = rox_uuid::generate_uuid_v7();
         let row = sqlx::query!(
             r#"
             INSERT INTO memory (id, user_id, memory)
@@ -39,7 +39,7 @@ impl MemoryRepo for PgMemoryRepo {
         Ok(row.id)
     }
 
-    async fn get_latest_memory(&self, user: MacroUserIdStr<'_>) -> Result<Option<MemoryRecord>> {
+    async fn get_latest_memory(&self, user: RoxUserIdStr<'_>) -> Result<Option<MemoryRecord>> {
         let row = sqlx::query!(
             r#"
             SELECT memory, updated_at as "updated_at!"
@@ -59,7 +59,7 @@ impl MemoryRepo for PgMemoryRepo {
         }))
     }
 
-    async fn get_memory_by_id(&self, user: MacroUserIdStr<'_>, id: Uuid) -> Result<Memory> {
+    async fn get_memory_by_id(&self, user: RoxUserIdStr<'_>, id: Uuid) -> Result<Memory> {
         let row = sqlx::query!(
             r#"
             SELECT memory

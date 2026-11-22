@@ -93,7 +93,7 @@ fn a_one_off_time_reads_in_the_readers_zone() {
 }
 
 #[test]
-fn macro_events_read_by_their_names() {
+fn rox_events_read_by_their_names() {
     assert_eq!(
         events(json!({ "events": ["email.message_received"] })),
         "New email received"

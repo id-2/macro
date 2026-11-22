@@ -15,7 +15,7 @@ use crate::domain::model::{
     AgentSessionId, McpDestination, McpResolution, ProxyRequest, ProxyResponse, RepoSlug,
     SessionGrant, SessionToken, UpstreamCall,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Turn a sandbox's session token into what it is allowed to spend.
 ///
@@ -59,7 +59,7 @@ pub trait McpCredentials: Send + Sync {
     /// only when the destination cannot be addressed at all.
     fn resolve(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: bot_id::BotId,
         session: uuid::Uuid,
         destination: &McpDestination,
@@ -84,7 +84,7 @@ pub trait GithubTokens: Send + Sync {
     /// access to it.
     fn resolve(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         repo: &RepoSlug,
     ) -> impl Future<Output = Result<UpstreamCall, EgressError>> + Send;
 }
@@ -123,7 +123,7 @@ pub trait ToolApprovalStore: Send + Sync + 'static {
         &self,
         id: ToolApprovalId,
         status: ToolApprovalStatus,
-        resolved_by: Option<&MacroUserIdStr<'static>>,
+        resolved_by: Option<&RoxUserIdStr<'static>>,
         remembered: bool,
     ) -> impl Future<Output = Result<Option<ToolApproval>, EgressError>> + Send;
 
@@ -158,7 +158,7 @@ pub trait ToolApprovalStore: Send + Sync + 'static {
     fn is_standing(
         &self,
         session: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         server_slug: &str,
         tool: &str,
     ) -> impl Future<Output = Result<bool, EgressError>> + Send;
@@ -196,7 +196,7 @@ pub trait ToolApprovalAnnouncer: Send + Sync + 'static {
     fn requested(
         &self,
         approval: &ToolApproval,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = ()> + Send;
 
     /// A held call was resolved.
@@ -212,7 +212,7 @@ pub trait ActorMcpTransport: Send + Sync {
     async fn exchange(
         &self,
         session: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         upstream: UpstreamCall,
         request: serde_json::Value,
     ) -> Result<serde_json::Value, EgressError>;

@@ -17,15 +17,15 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationRejection, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    INTERNAL_API_KEY_HEADER, INTERNAL_ROX_USER_ID_HEADER, InternalIdentityClaims,
+    RoxAuthorizationError, RoxAuthorizationRejection, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_user_id::{
+use rox_user_id::{
     email::Email,
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_user::UserContext;
 use roles_and_permissions::domain::model::PermissionId;
@@ -310,7 +310,7 @@ impl FakeTeamService {
 impl TeamService for FakeTeamService {
     async fn create_team(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _team_name: &str,
         _subscription_id: Option<&stripe::SubscriptionId>,
         _allow_domain_join: bool,
@@ -320,7 +320,7 @@ impl TeamService for FakeTeamService {
 
     async fn is_user_premium(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<stripe::SubscriptionId>, TeamError> {
         panic!("unexpected is_user_premium call")
     }
@@ -348,14 +348,14 @@ impl TeamService for FakeTeamService {
     async fn remove_user_from_team(
         &self,
         _entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), RemoveUserFromTeamError> {
         panic!("unexpected remove_user_from_team call")
     }
 
     async fn reject_invitation(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _team_invite_id: &uuid::Uuid,
     ) -> Result<(), RemoveTeamInviteError> {
         panic!("unexpected reject_invitation call")
@@ -379,7 +379,7 @@ impl TeamService for FakeTeamService {
     async fn join_team(
         &self,
         _team_invite_id: &uuid::Uuid,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<TeamMember<'_>, JoinTeamError> {
         panic!("unexpected join_team call")
     }
@@ -429,7 +429,7 @@ impl TeamService for FakeTeamService {
         panic!("unexpected get_team call")
     }
 
-    async fn get_user_teams(&self, user_id: &MacroUserIdStr<'_>) -> Result<Vec<Team>, TeamError> {
+    async fn get_user_teams(&self, user_id: &RoxUserIdStr<'_>) -> Result<Vec<Team>, TeamError> {
         self.user_calls
             .lock()
             .expect("user calls lock poisoned")
@@ -439,7 +439,7 @@ impl TeamService for FakeTeamService {
 
     async fn get_user_invites(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<TeamInviteDetails>, TeamError> {
         panic!("unexpected get_user_invites call")
     }
@@ -477,7 +477,7 @@ impl TeamService for FakeTeamService {
     async fn set_team_member_plan(
         &self,
         _entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _plan: SeatPlan,
     ) -> Result<TeamMember<'static>, SetTeamMemberPlanError> {
         panic!("unexpected set_team_member_plan call")
@@ -489,7 +489,7 @@ impl TeamService for FakeTeamService {
 
     async fn get_team_user_permissions(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<HashSet<PermissionId>, TeamError> {
         panic!("unexpected get_team_user_permissions call")
     }
@@ -519,14 +519,14 @@ impl TeamService for FakeTeamService {
 
     async fn remove_user_from_all_teams(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), crate::domain::model::RemoveUserFromAllTeamsError> {
         panic!("unexpected remove_user_from_all_teams call")
     }
 
     async fn try_join_team_by_domain(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<TeamMember<'static>>, JoinTeamDirectlyError> {
         panic!("unexpected try_join_team_by_domain call")
     }
@@ -534,7 +534,7 @@ impl TeamService for FakeTeamService {
     async fn add_team_agent(
         &self,
         _entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        _agent_user_id: &MacroUserIdStr<'_>,
+        _agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<TeamMember<'static>, JoinTeamDirectlyError> {
         panic!("unexpected add_team_agent call")
     }
@@ -542,7 +542,7 @@ impl TeamService for FakeTeamService {
     async fn undo_team_agent_join(
         &self,
         _entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        _agent_user_id: &MacroUserIdStr<'_>,
+        _agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), RemoveUserFromTeamError> {
         panic!("unexpected undo_team_agent_join call")
     }
@@ -550,7 +550,7 @@ impl TeamService for FakeTeamService {
     async fn remove_team_agent(
         &self,
         _entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        _agent_user_id: &MacroUserIdStr<'_>,
+        _agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), RemoveUserFromTeamError> {
         panic!("unexpected remove_team_agent call")
     }
@@ -588,7 +588,7 @@ impl TeamInviteLinkService for FakeTeamService {
     async fn join_team_by_invite_link(
         &self,
         _token: &TeamInviteLinkToken,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<JoinTeamByInviteLinkOutcome, JoinTeamByInviteLinkError> {
         panic!("unexpected join_team_by_invite_link call")
     }
@@ -610,7 +610,7 @@ impl FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -630,7 +630,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -639,7 +639,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -658,7 +658,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -668,7 +668,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, uuid::Uuid, TeamRole), AccessError> {
@@ -679,7 +679,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         panic!("unexpected get_users_by_entity call")
     }
 
@@ -699,7 +699,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         let Some((member_id, role)) = &self.membership else {
             return Ok(None);
@@ -717,30 +717,30 @@ impl EntityAccessService for FakeEntityAccessService {
 #[derive(Clone, Default)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt == "valid" {
             return Ok(user_context(USER_ID));
         }
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(claims.user_id.as_deref().map(user_context))
     }
@@ -759,7 +759,7 @@ fn router(service: FakeTeamService, entity_access: FakeEntityAccessService) -> R
     teams_router(TeamRouterState {
         service: Arc::new(service),
         entity_access_service: Arc::new(entity_access),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     })
 }
 
@@ -809,7 +809,7 @@ async fn teams_router_accepts_internal_acting_user_credentials() {
         .oneshot(
             get_user_teams_request()
                 .header(INTERNAL_API_KEY_HEADER, INTERNAL_KEY)
-                .header(INTERNAL_MACRO_USER_ID_HEADER, ACTING_USER_ID)
+                .header(INTERNAL_ROX_USER_ID_HEADER, ACTING_USER_ID)
                 .body(Body::empty())
                 .expect("request should be valid"),
         )
@@ -866,7 +866,7 @@ async fn teams_router_uses_entity_access_team_receipts() {
 
 #[tokio::test]
 async fn premium_user_authorization_rejection_preserves_response() {
-    let rejection = PremiumUserRejection::Authorization(MacroAuthorizationRejection {
+    let rejection = PremiumUserRejection::Authorization(RoxAuthorizationRejection {
         status: StatusCode::FORBIDDEN,
         message: "authorization denied".into(),
     });

@@ -3,14 +3,14 @@
 -- email threads, some of which are shared with user1 via entity_access or project membership.
 
 -- == Second user ==
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES ('b2222222-2222-2222-2222-222222222222', 'user2@test.com', 'user2@test.com', 'stripe_user2');
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES ('macro|user2@test.com', 'user2@test.com', 'Test User 2', 'b2222222-2222-2222-2222-222222222222');
 
 -- Second user's email link
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'macro|user2@test.com', 'user2', 'user2@test.com', 'GMAIL', true, NOW(), NOW());
 

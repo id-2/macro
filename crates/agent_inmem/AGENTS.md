@@ -92,7 +92,7 @@ and views.
 
 Every conversation turn of a user's session runs code mode
 (`tools_for_agent_code_mode`); there is no direct-tools fallback. A turn whose
-MCP catalog lacks any `mcp__macro_internal__` code tool fails
+MCP catalog lacks any `mcp__rox_internal__` code tool fails
 (`code_tools_listed` in `src/rig_engine.rs`). Summaries advertise no tools.
 
 - Owner memory is composed by the memory domain on each read; daily generation is hosted by cognition, not agent turns.

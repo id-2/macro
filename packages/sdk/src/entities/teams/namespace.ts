@@ -1,11 +1,11 @@
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Team } from './team';
 
 /**
- * @routing Use when managing teams and membership or inviting people to a team; not inviting people to Macro, which is referrals.
+ * @routing Use when managing teams and membership or inviting people to a team; not inviting people to Rox, which is referrals.
  */
 export class TeamNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to a team by id. */
   byId(id: string): Team {

@@ -99,7 +99,7 @@ export function claudeStepMark(
   choice: ClaudeMode | undefined,
   signInVisited: boolean
 ): ClaudeStepMark {
-  if (choice !== 'macro_credits') return 'step';
+  if (choice !== 'rox_credits') return 'step';
   return signInVisited ? 'credits' : 'skipped';
 }
 
@@ -279,7 +279,7 @@ export function ComputerSetupSteps(props: {
     const id = harnessId();
     if (!current || !id || done()) return;
     await rename(current);
-    if (props.choice === 'macro_credits') await signOut.mutateAsync(id);
+    if (props.choice === 'rox_credits') await signOut.mutateAsync(id);
     await completeSetup.mutateAsync(props.computer.id);
     await invalidateHarnesses();
   };
@@ -287,7 +287,7 @@ export function ComputerSetupSteps(props: {
   createEffect(() => {
     if (
       props.step !== 'ready' ||
-      props.choice !== 'macro_credits' ||
+      props.choice !== 'rox_credits' ||
       !up() ||
       !agent() ||
       done() ||
@@ -317,7 +317,7 @@ export function ComputerSetupSteps(props: {
   };
 
   const useCreditsInstead = () => {
-    props.onChoice('macro_credits');
+    props.onChoice('rox_credits');
     props.onStep('ready');
   };
 
@@ -363,7 +363,7 @@ export function ComputerSetupSteps(props: {
     match(props.choice)
       .returnType<SignInPlan>()
       .with('own_account', () => 'needed')
-      .with('macro_credits', () => 'skipped')
+      .with('rox_credits', () => 'skipped')
       .with(undefined, () => 'undecided')
       .exhaustive();
   const [progressExpanded, setProgressExpanded] = createSignal(false);
@@ -440,7 +440,7 @@ export function ComputerSetupSteps(props: {
                   tooltip: t('computers.claudeOwnChoiceHint'),
                 },
                 {
-                  value: 'macro_credits',
+                  value: 'rox_credits',
                   label: t('computers.claudeCreditsChoice'),
                   tooltip: t('computers.claudeCreditsChoiceHint'),
                 },

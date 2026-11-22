@@ -7,12 +7,12 @@
 //! reached the registry.
 
 use super::*;
-use macro_authorization::{
+use rox_authorization::{
     HARNESS_TOKEN_HEADER, HarnessAuthentication, HarnessAuthorizationOwner, HarnessAuthorizer,
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroUserAuthentication, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxUserAuthentication, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use tokio_tungstenite::tungstenite;
 
@@ -25,9 +25,9 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -49,24 +49,24 @@ impl HarnessAuthorizer for SelfHarnessAuthorizer {
         &self,
         harness_token: &str,
         _acting_user_claim: Option<String>,
-    ) -> Result<HarnessAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<HarnessAuthentication, Report<RoxAuthorizationError>> {
         if harness_token != HARNESS_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
-        let macro_user_id =
-            MacroUserIdStr::try_from_email("owner@example.com").expect("a valid email");
-        let user_id = macro_user_id.as_ref().to_owned();
+        let rox_user_id =
+            RoxUserIdStr::try_from_email("owner@example.com").expect("a valid email");
+        let user_id = rox_user_id.as_ref().to_owned();
         Ok(HarnessAuthentication {
             harness_id: HarnessId::TEST_A,
-            token_id: macro_uuid::generate_uuid_v7(),
+            token_id: rox_uuid::generate_uuid_v7(),
             owner: HarnessAuthorizationOwner::User {
                 user_id: user_id.clone(),
             },
-            acting_user: MacroUserAuthentication {
-                origin: macro_authorization::CredentialOrigin::Harness,
+            acting_user: RoxUserAuthentication {
+                origin: rox_authorization::CredentialOrigin::Harness,
                 agent_id: None,
                 agent_via: None,
-                macro_user_id,
+                rox_user_id,
                 user_context: model_user::UserContext {
                     user_id,
                     fusion_user_id: "fusion-owner".to_owned(),
@@ -86,7 +86,7 @@ async fn serve() -> (Arc<RuntimeRegistry<GatewaySender>>, String) {
 
 async fn serve_with(dials: DialBudget) -> (Arc<RuntimeRegistry<GatewaySender>>, String) {
     let runtimes = RuntimeRegistry::new();
-    let authorization = MacroAuthorizationServiceImpl::new(
+    let authorization = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".to_string(),
@@ -101,7 +101,7 @@ async fn serve_with(dials: DialBudget) -> (Arc<RuntimeRegistry<GatewaySender>>, 
         runtime_gateway_router(
             RuntimeGatewayState::new(
                 Arc::clone(&runtimes),
-                MacroAuthorizationState::new(Arc::new(authorization)),
+                RoxAuthorizationState::new(Arc::new(authorization)),
             )
             .with_dial_budget(dials),
         ),

@@ -102,7 +102,7 @@ copies a field or a TOTP code to the X clipboard (one paste or 20 s),
 creates and updates items, and requests access, learning the owner's answer
 by polling. Items the agent created are usable at once; shared ones need the
 owner's approval once. No value reaches the model, logs, traces or disk. Each
-call carries the wake id as `X-Macro-Agent-Session-Id`.
+call carries the wake id as `X-Rox-Agent-Session-Id`.
 
 ## Telemetry
 

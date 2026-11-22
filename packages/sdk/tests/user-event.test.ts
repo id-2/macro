@@ -1,10 +1,10 @@
 import { describe, expect, spyOn, test } from 'bun:test';
 import { hydrateUserEvent, type UserEvent } from '../src/events/hydrate/user';
-import type { MacroClient } from '../src/utils/client';
+import type { RoxClient } from '../src/utils/client';
 
 const client = {
   hosts: { 'static-files': 'https://static.example.com' },
-} as unknown as MacroClient;
+} as unknown as RoxClient;
 
 describe('hydrateUserEvent', () => {
   test('picture_changed carries the user and the static image', () => {

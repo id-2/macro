@@ -47,7 +47,7 @@ fn loaded(agent: &FakeAgent) -> Vec<String> {
 #[tokio::test]
 async fn a_redial_loads_a_live_session_without_a_prompt() {
     let (service, repo, containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let session = native_session(&service, &repo, bot_id).await;
     let runtime = ContainerMock::default();
     runtimes.attach(harness_for_bot(bot_id), runtime.clone());
@@ -94,7 +94,7 @@ async fn a_redial_loads_a_live_session_without_a_prompt() {
 #[tokio::test]
 async fn a_redial_loads_every_live_session_but_not_archived_or_unknown_ones() {
     let (service, repo, _containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let first = native_session(&service, &repo, bot_id).await;
     let second = native_session(&service, &repo, bot_id).await;
     let archived = native_session(&service, &repo, bot_id).await;
@@ -152,7 +152,7 @@ async fn a_redial_loads_every_live_session_but_not_archived_or_unknown_ones() {
 #[tokio::test]
 async fn a_live_session_on_a_runtime_that_is_gone_is_left_for_the_next_dial() {
     let (service, repo, _containers, _announcer, _runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let session = native_session(&service, &repo, bot_id).await;
 
     // The report raced the connection's end: nothing is attached and the
@@ -235,8 +235,8 @@ fn listing_harness() -> (
 #[tokio::test]
 async fn a_dial_restores_only_this_harness_tracked_sessions_from_an_agent_that_lists_everything() {
     let (service, repo, runtimes, mut reports) = listing_harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
-    let other_bot = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
+    let other_bot = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let tracked = native_session(&service, &repo, bot_id).await;
     let archived = native_session(&service, &repo, bot_id).await;
     agent_session::domain::ports::AgentSessionRepo::set_archived(&repo, archived, true)
@@ -305,7 +305,7 @@ async fn a_dial_restores_only_this_harness_tracked_sessions_from_an_agent_that_l
 async fn a_redial_delivers_the_prompt_queued_behind_the_turn_the_drop_interrupted() {
     let ((service, repo, _containers, _announcer, runtimes), turns) =
         harness_with_signals(PromptContextMock::default(), PromptComposerMock::default());
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let session = native_session(&service, &repo, bot_id).await;
     let first = ContainerMock::default();
     runtimes.attach(harness_for_bot(bot_id), first.clone());
@@ -364,7 +364,7 @@ async fn a_redial_delivers_the_prompt_queued_behind_the_turn_the_drop_interrupte
 #[tokio::test]
 async fn a_redial_restores_recent_sessions_and_leaves_idle_ones_to_their_next_prompt() {
     let (service, repo, _containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let recent = native_session(&service, &repo, bot_id).await;
     let idle = native_session(&service, &repo, bot_id).await;
     repo.set_modified_at(idle, chrono::Utc::now() - chrono::Duration::days(9));
@@ -425,7 +425,7 @@ async fn a_redial_restores_recent_sessions_and_leaves_idle_ones_to_their_next_pr
 #[tokio::test]
 async fn a_redial_restores_only_a_few_sessions_at_a_time() {
     let (service, repo, _containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let limit = super::super::reattach::REATTACH_CONCURRENCY;
     let total = limit + 4;
     let mut sessions = Vec::new();
@@ -485,7 +485,7 @@ async fn a_redial_restores_only_a_few_sessions_at_a_time() {
 #[tokio::test]
 async fn a_redial_cancels_the_harness_previous_dial() {
     let (service, repo, _containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let limit = super::super::reattach::REATTACH_CONCURRENCY;
     let total = limit + 1;
     let mut sessions = Vec::new();
@@ -559,7 +559,7 @@ async fn a_redial_cancels_the_harness_previous_dial() {
 #[tokio::test(start_paused = true)]
 async fn a_redial_retries_a_session_whose_restore_failed() {
     let (service, repo, _containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let session = native_session(&service, &repo, bot_id).await;
     let runtime = ContainerMock::default();
     runtimes.attach(harness_for_bot(bot_id), runtime.clone());
@@ -599,8 +599,8 @@ async fn a_redial_retries_a_session_whose_restore_failed() {
 #[tokio::test]
 async fn a_redial_does_not_retry_a_session_its_runtime_no_longer_serves() {
     let (service, repo, _containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
-    let other_bot = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
+    let other_bot = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     // The session's bot is bound to a harness that is not connected; the
     // dialing runtime serves another bot.
     let session = native_session(&service, &repo, bot_id).await;
@@ -625,7 +625,7 @@ async fn a_redial_does_not_retry_a_session_its_runtime_no_longer_serves() {
 #[tokio::test]
 async fn a_redial_dispatches_the_queue_an_earlier_attach_failed_to_load() {
     let (service, repo, _containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let session = native_session(&service, &repo, bot_id).await;
     let runtime = ContainerMock::default();
     runtimes.attach(harness_for_bot(bot_id), runtime.clone());
@@ -687,7 +687,7 @@ async fn a_redial_dispatches_the_queue_an_earlier_attach_failed_to_load() {
 async fn a_redial_restores_a_session_whose_turn_the_drop_interrupted_however_old() {
     let ((service, repo, _containers, _announcer, runtimes), turns) =
         harness_with_signals(PromptContextMock::default(), PromptComposerMock::default());
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let session = native_session(&service, &repo, bot_id).await;
     let first = ContainerMock::default();
     runtimes.attach(harness_for_bot(bot_id), first.clone());
@@ -737,7 +737,7 @@ async fn a_redial_restores_a_session_whose_turn_the_drop_interrupted_however_old
 #[tokio::test]
 async fn a_redial_restores_a_session_its_runtime_saw_active_recently() {
     let (service, repo, _containers, _announcer, runtimes) = harness();
-    let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let worked_locally = native_session(&service, &repo, bot_id).await;
     let untouched = native_session(&service, &repo, bot_id).await;
     // Neither was prompted from Rox for days; the runtime says someone

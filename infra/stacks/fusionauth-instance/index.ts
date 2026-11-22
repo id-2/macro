@@ -211,7 +211,7 @@ const populateJwtLambda = new FusionAuthLambda(
   'populate-jwt-lambda',
   {
     lambdaId: 'a7f3e8d2-4b91-4c5a-9e6f-1a2b3c4d5e6f', // had to give a manual uuid so the application lambdaConfiguration works
-    name: 'populate_macro_jwt',
+    name: 'populate_rox_jwt',
     type: 'JWTPopulate',
     debug: stack === 'local',
     body: pulumi.interpolate`${populateLambdaBody}`,

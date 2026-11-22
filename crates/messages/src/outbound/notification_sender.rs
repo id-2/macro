@@ -3,7 +3,7 @@ use crate::domain::{
     models::MessageParent,
     notification::CommentNotificationReason,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::{
     CommentedOnDocumentMetadata, MentionedInDocumentCommentMetadata, NotificationDocumentSubType,
@@ -34,7 +34,7 @@ impl<N: NotificationIngress> DiscussionNotifier for MessageNotificationSender<N>
             })
             .or_else(|| n.message.sender_id.as_bot().map(|_| "Agent".to_owned()));
         let recipient_ids =
-            std::collections::HashSet::from([MacroUserIdStr::try_from(n.recipient)?]);
+            std::collections::HashSet::from([RoxUserIdStr::try_from(n.recipient)?]);
         let kind = match n.event.parent {
             MessageParent::Document(_) => EntityType::Document,
             MessageParent::Initiative(_) => EntityType::Initiative,

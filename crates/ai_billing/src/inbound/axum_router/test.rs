@@ -7,7 +7,7 @@ use crate::domain::{
     AUTO_RELOAD_TARGET_MAX_CENTS, AiPricing, AutoReloadThresholds, PlanTier, SubscriptionScope,
 };
 use axum::extract::{Query, State};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 #[test]
 fn return_urls_must_be_https_on_the_calling_origin() {

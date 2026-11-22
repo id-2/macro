@@ -11,7 +11,7 @@
 //! visited settings yet, and it has to reach the channel as that sentence.
 
 use cursor_api_key::cipher::{CursorApiKey, CursorApiKeyCipher};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use crate::domain::error::{HarnessError, Result};
@@ -39,7 +39,7 @@ pub trait CursorApiKeys: Send + Sync + 'static {
     /// read or decrypted.
     fn resolve(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<ResolvedCursorConfig>> + Send;
 }
 
@@ -61,7 +61,7 @@ impl<Cipher> CursorApiKeys for PgCursorApiKeys<Cipher>
 where
     Cipher: CursorApiKeyCipher + Clone + 'static,
 {
-    async fn resolve(&self, owner: &MacroUserIdStr<'_>) -> Result<ResolvedCursorConfig> {
+    async fn resolve(&self, owner: &RoxUserIdStr<'_>) -> Result<ResolvedCursorConfig> {
         let owner = owner.as_ref();
         let stored = cursor_api_key::store::get_cursor_api_key(&self.pool, owner)
             .await

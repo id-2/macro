@@ -1,7 +1,7 @@
 use super::*;
 use item_filters::ast::EntityFilterAst;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 const OWNER: &str = "macro|agent-owner@test.com";
@@ -74,18 +74,18 @@ struct Fixture {
 
 async fn seed(pool: &PgPool) -> anyhow::Result<Fixture> {
     for user in [OWNER, MEMBER, STRANGER] {
-        let macro_user_id = Uuid::now_v7();
+        let rox_user_id = Uuid::now_v7();
         sqlx::query!(
             "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
-            macro_user_id,
+            rox_user_id,
             user,
         )
         .execute(pool)
         .await?;
         sqlx::query!(
-            r#"INSERT INTO "User" ("id", "email", "macro_user_id") VALUES ($1, $1, $2)"#,
+            r#"INSERT INTO "User" ("id", "email", "rox_user_id") VALUES ($1, $1, $2)"#,
             user,
-            macro_user_id,
+            rox_user_id,
         )
         .execute(pool)
         .await?;
@@ -177,7 +177,7 @@ fn request(
     SimpleSortRequest {
         limit: 10,
         cursor,
-        user_id: MacroUserIdStr::parse_from_str(user).expect("valid user id"),
+        user_id: RoxUserIdStr::parse_from_str(user).expect("valid user id"),
     }
 }
 
@@ -191,7 +191,7 @@ fn ids(items: &[SoupItem<()>]) -> Vec<Uuid> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn runtime_branch_without_a_pr_is_listed_only_for_authorized_viewers(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -222,7 +222,7 @@ async fn runtime_branch_without_a_pr_is_listed_only_for_authorized_viewers(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sessions_are_opt_in(pool: PgPool) -> anyhow::Result<()> {
     seed(&pool).await?;
 
@@ -235,7 +235,7 @@ async fn sessions_are_opt_in(pool: PgPool) -> anyhow::Result<()> {
             SimpleSortMethod::UpdatedAt,
             EntityFilterAst::default(),
         )),
-        user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+        user_id: RoxUserIdStr::parse_from_str(OWNER)?,
     };
     assert!(
         cursor_soup(&pool, ast_without_sessions).await?.is_empty(),
@@ -244,7 +244,7 @@ async fn sessions_are_opt_in(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn include_lists_accessible_sessions_newest_first(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
 
@@ -282,7 +282,7 @@ async fn include_lists_accessible_sessions_newest_first(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn id_and_owner_literals_constrain_the_page(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
 
@@ -322,7 +322,7 @@ async fn id_and_owner_literals_constrain_the_page(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cursor_pages_past_the_first_row(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
 
@@ -337,7 +337,7 @@ async fn cursor_pages_past_the_first_row(pool: PgPool) -> anyhow::Result<()> {
                     ..EntityFilterAst::default()
                 },
             )),
-            user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+            user_id: RoxUserIdStr::parse_from_str(OWNER)?,
         },
     )
     .await?;
@@ -366,7 +366,7 @@ async fn cursor_pages_past_the_first_row(pool: PgPool) -> anyhow::Result<()> {
                     },
                 },
             )),
-            user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+            user_id: RoxUserIdStr::parse_from_str(OWNER)?,
         },
     )
     .await?;
@@ -374,7 +374,7 @@ async fn cursor_pages_past_the_first_row(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn by_ids_respects_access(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
     let entities = [
@@ -387,7 +387,7 @@ async fn by_ids_respects_access(pool: PgPool) -> anyhow::Result<()> {
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+            user_id: RoxUserIdStr::parse_from_str(OWNER)?,
         },
     )
     .await?;
@@ -397,7 +397,7 @@ async fn by_ids_respects_access(pool: PgPool) -> anyhow::Result<()> {
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(MEMBER)?,
+            user_id: RoxUserIdStr::parse_from_str(MEMBER)?,
         },
     )
     .await?;
@@ -407,7 +407,7 @@ async fn by_ids_respects_access(pool: PgPool) -> anyhow::Result<()> {
 
 /// A hidden session (one started from a thread) is missing from broad lists for
 /// everyone, but a named id still finds it and hydrating by id still works.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn hidden_sessions_stay_out_of_broad_lists(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
     sqlx::query!(
@@ -452,7 +452,7 @@ async fn hidden_sessions_stay_out_of_broad_lists(pool: PgPool) -> anyhow::Result
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(MEMBER)?,
+            user_id: RoxUserIdStr::parse_from_str(MEMBER)?,
         },
     )
     .await?;
@@ -463,7 +463,7 @@ async fn hidden_sessions_stay_out_of_broad_lists(pool: PgPool) -> anyhow::Result
 
 /// Hidden unthreaded DM contexts use the same broad-list visibility boundary
 /// as inline mentions, without losing owner access by ID.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn hidden_dm_contexts_are_omitted_from_home_and_agents_but_open_by_id(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -510,7 +510,7 @@ async fn hidden_dm_contexts_are_omitted_from_home_and_agents_but_open_by_id(
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+            user_id: RoxUserIdStr::parse_from_str(OWNER)?,
         },
     )
     .await?;
@@ -525,7 +525,7 @@ async fn hidden_dm_contexts_are_omitted_from_home_and_agents_but_open_by_id(
 /// A routine's unlisted runs stay reachable for whoever asks for them, say a
 /// routine started them, and are what a list asks for by source or
 /// visibility: alone, or left out.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unlisted_runs_leave_lists_that_exclude_them(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
     sqlx::query!(
@@ -596,7 +596,7 @@ async fn unlisted_runs_leave_lists_that_exclude_them(pool: PgPool) -> anyhow::Re
 /// viewers, as the session's REST read and its inline chip already do, so
 /// opening it by id works for someone who prompted it or saw it in the thread.
 /// Broad lists stay limited to grants on the session itself.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn by_ids_inherits_the_parent_thread_access(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
     let entities = [EntityType::AgentSession.with_entity_string(fixture.private.to_string())];
@@ -626,7 +626,7 @@ async fn by_ids_inherits_the_parent_thread_access(pool: PgPool) -> anyhow::Resul
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(STRANGER)?,
+                user_id: RoxUserIdStr::parse_from_str(STRANGER)?,
             },
         )
         .await?;
@@ -650,7 +650,7 @@ async fn by_ids_inherits_the_parent_thread_access(pool: PgPool) -> anyhow::Resul
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(STRANGER)?,
+                user_id: RoxUserIdStr::parse_from_str(STRANGER)?,
             },
         )
         .await?;
@@ -684,7 +684,7 @@ async fn by_ids_inherits_the_parent_thread_access(pool: PgPool) -> anyhow::Resul
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(STRANGER)?,
+                user_id: RoxUserIdStr::parse_from_str(STRANGER)?,
             },
         )
         .await?;
@@ -700,7 +700,7 @@ async fn by_ids_inherits_the_parent_thread_access(pool: PgPool) -> anyhow::Resul
 /// agent there lists it for nobody, owner included. Prompting it from the
 /// session itself follows it: it then lists for that one person while they
 /// can still read it, through a session grant or the thread's parent.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_hidden_thread_session_lists_only_for_its_followers(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
     let document = Uuid::now_v7();
@@ -795,7 +795,7 @@ async fn a_hidden_thread_session_lists_only_for_its_followers(pool: PgPool) -> a
 /// A link share admits whoever it names, as the session's REST read does: a
 /// public link anyone signed in, a team link the owner's teammates. Opening
 /// the session by id works; broad lists stay limited to session grants.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_link_share_opens_the_session_by_id(pool: PgPool) -> anyhow::Result<()> {
     let fixture = seed(&pool).await?;
     let entities = [EntityType::AgentSession.with_entity_string(fixture.private.to_string())];
@@ -804,7 +804,7 @@ async fn a_link_share_opens_the_session_by_id(pool: PgPool) -> anyhow::Result<()
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(STRANGER)?,
+                user_id: RoxUserIdStr::parse_from_str(STRANGER)?,
             },
         )
         .await?;

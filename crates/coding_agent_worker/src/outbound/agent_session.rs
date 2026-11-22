@@ -8,14 +8,14 @@ use agent_session::inbound::axum_router::{
     ControlRequest, CreateAgentSessionRequest, CreateAgentSessionResponse,
     ThreadSessionExistsResponse,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::StatusCode;
 use trigger_context::TriggerContext;
 
-use crate::config::{HarnessCredentials, MacroApi};
+use crate::config::{HarnessCredentials, RoxApi};
 
-const HARNESS_TOKEN_HEADER: &str = "x-macro-harness-token";
-const HARNESS_ACTING_USER_HEADER: &str = "x-macro-harness-for-macro-user-id";
+const HARNESS_TOKEN_HEADER: &str = "x-rox-harness-token";
+const HARNESS_ACTING_USER_HEADER: &str = "x-rox-harness-for-macro-user-id";
 
 /// A failure calling the agent-harness service.
 #[derive(Debug, thiserror::Error)]
@@ -48,7 +48,7 @@ pub struct HarnessApi {
 
 impl HarnessApi {
     /// Build a client from the daemon's config and paired credentials.
-    pub fn new(config: &MacroApi, credentials: &HarnessCredentials) -> Self {
+    pub fn new(config: &RoxApi, credentials: &HarnessCredentials) -> Self {
         Self {
             http: reqwest::Client::new(),
             base: config.api_url.trim_end_matches('/').to_owned(),
@@ -70,7 +70,7 @@ impl HarnessApi {
     pub async fn create_session(
         &self,
         request: &CreateAgentSessionRequest,
-        acting_user: &MacroUserIdStr<'static>,
+        acting_user: &RoxUserIdStr<'static>,
     ) -> Result<CreateAgentSessionResponse, ApiError> {
         // A trigger stream is not replayed. Creation can commit before reply
         // reservation fails, so retry the same identity before any prompt.
@@ -98,7 +98,7 @@ impl HarnessApi {
     async fn create_session_once(
         &self,
         request: &CreateAgentSessionRequest,
-        acting_user: &MacroUserIdStr<'static>,
+        acting_user: &RoxUserIdStr<'static>,
     ) -> Result<CreateAgentSessionResponse, ApiError> {
         let response = self
             .http
@@ -127,7 +127,7 @@ impl HarnessApi {
     pub async fn control(
         &self,
         session: AgentSessionId,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         action: AgentAction,
         context: Option<TriggerContext>,
     ) -> Result<(), ApiError> {
@@ -138,7 +138,7 @@ impl HarnessApi {
     async fn control_with_id(
         &self,
         session: AgentSessionId,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         action: AgentAction,
         context: Option<TriggerContext>,
         action_id: Option<AgentActionId>,
@@ -165,9 +165,9 @@ impl HarnessApi {
     pub async fn prompt(
         &self,
         session: AgentSessionId,
-        sender: &MacroUserIdStr<'static>,
+        sender: &RoxUserIdStr<'static>,
         text: &str,
-        message_id: macro_uuid::Uuid,
+        message_id: rox_uuid::Uuid,
         context: Option<TriggerContext>,
     ) -> Result<(), ApiError> {
         self.control_with_id(

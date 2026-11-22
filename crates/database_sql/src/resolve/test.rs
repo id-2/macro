@@ -825,7 +825,7 @@ fn rejections_quote_what_the_agent_wrote() {
         ),
         (
             "DELETE FROM macro.people WHERE name = 'Sam'",
-            "macro.people is read-only",
+            "rox.people is read-only",
         ),
     ];
 

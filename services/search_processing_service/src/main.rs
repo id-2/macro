@@ -16,12 +16,12 @@ use crate::{
 use anyhow::Context;
 use config::{Config, Environment};
 use lexical_client::LexicalClient;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthorizationState, NoopMacroAuthJwtValidator,
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthorizationState, NoopMacroAuthJwtValidator,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_entrypoint::RoxEntrypoint;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use opensearch_client::OpensearchClient;
 #[cfg(all(feature = "pdf", not(feature = "no_pdf")))]
 use rust_embed::RustEmbed;
@@ -156,7 +156,7 @@ async fn supervise_event_consumer(
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     // Parse our configuration from the environment.
     let config = Config::from_env().context("expected to be able to generate config")?;
@@ -181,22 +181,22 @@ async fn main() -> anyhow::Result<()> {
         "initialized db connection"
     );
 
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
         NoopMacroAuthJwtValidator, // we only have internal calls in this service.
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
-    let search_event_queue = macro_queues::SearchEventQueue::new();
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
+    let search_event_queue = rox_queues::SearchEventQueue::new();
     let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(&aws_config))
         .search_event_queue(&search_event_queue);
 
-    let s3_client = Arc::new(s3_client::S3::new(macro_aws_config::s3_client().await));
+    let s3_client = Arc::new(s3_client::S3::new(rox_aws_config::s3_client().await));
 
     let opensearch_client = Arc::new(
         OpensearchClient::new(
@@ -258,7 +258,7 @@ async fn main() -> anyhow::Result<()> {
 
     let shutdown_token = CancellationToken::new();
     let event_broker_tracker = TaskTracker::new();
-    let macro_event_broker = MacroEventBrokerService::new(
+    let rox_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
@@ -334,7 +334,7 @@ async fn main() -> anyhow::Result<()> {
             config: Arc::new(config),
             backfill_service,
             backfill_jobs,
-            macro_event_broker,
+            rox_event_broker,
         },
         shutdown_token.clone(),
     )

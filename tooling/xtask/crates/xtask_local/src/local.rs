@@ -141,14 +141,14 @@ impl Mode {
         self.spec().label
     }
 
-    /// The value of the `ENVIRONMENT` variable services read (`macro_env`).
-    /// Always `local`, including dev. In the `dev`/`prod` macro_env environments
+    /// The value of the `ENVIRONMENT` variable services read (`rox_env`).
+    /// Always `local`, including dev. In the `dev`/`prod` rox_env environments
     /// the `remote_env_var` layer treats each config var's env value as the NAME
     /// of a Secrets Manager secret to fetch; only `local` reads the env value as
     /// the value itself. The Doppler `dev_personal` config ships real values (a
     /// postgres URL, keys), not secret names, so `run_dev` must run as `local`
     /// and gets its "dev-ness" from those values (dev DB + real AWS), not from
-    /// switching macro_env to `dev`.
+    /// switching rox_env to `dev`.
     pub fn environment_var(self) -> &'static str {
         "local"
     }
@@ -436,7 +436,7 @@ pub(crate) fn bring_up(
     // Both modes run at least Redis + LocalStack locally, and those reference the
     // instance's `external` volumes/networks — which must exist before compose
     // `up`. Unconditional + idempotent, mirroring the unconditional teardown (dev
-    // was tearing `macro_redis_data` down each run but never recreating it).
+    // was tearing `rox_redis_data` down each run but never recreating it).
     ensure_external_resources(stage, instance)?;
 
     // Bring the backend infra up and fully ready — DB created + migrated,
@@ -1217,7 +1217,7 @@ fn bring_up_infra(
     }
     if spec.runs_local_infra {
         // Kafka is healthy (`--wait` gates on its broker healthcheck); create
-        // the event topics declared in `macro_event_topics` — the local
+        // the event topics declared in `rox_event_topics` — the local
         // equivalent of the MSK topic provisioning driven by the generated
         // `.github/kafka-cluster-topics.json`. Restored volumes already carry
         // the topics (they live in the broker's data dir), so only a full init
@@ -1286,14 +1286,14 @@ fn ensure_tracing_backend(stage: &Stage, backend: cli::TracesBackend) -> Result<
     // every payload at the vendor intake (403), which looks like "traces are
     // broken" rather than "key is missing" — so fail loud up front.
     if let Some(var) = backend.required_env()
-        && macro_env_var::maybe_read_env(var).is_none_or(|v| v.is_empty())
+        && rox_env_var::maybe_read_env(var).is_none_or(|v| v.is_empty())
     {
         anyhow::bail!(
             "--traces {profile} requires the {var} env var to be set (export it in \
              the shell you run this from)"
         );
     }
-    // Launch-timing export stays off unless `MACRO_LOCAL_TELEMETRY` is explicitly
+    // Launch-timing export stays off unless `ROX_LOCAL_TELEMETRY` is explicitly
     // on. Unset means off (`xtask_local_telemetry::config::Switch::from_env`).
     // The foreign Grafana copy is a separate switch and stays off: this runner
     // does not start the forwarder and does not set a copy endpoint. Nothing

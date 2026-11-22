@@ -7,7 +7,7 @@ use std::{
 
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use chrono_tz::Tz;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use tracing::{Instrument as _, field::Empty};
 use uuid::Uuid;
@@ -471,7 +471,7 @@ impl<S: FocusStore> FocusQueries<S> {
     /// either direction, so the limit keeps the newest threads.
     pub async fn focus_thread_ids(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         window_days: u16,
     ) -> Result<Vec<Uuid>, Report> {
         let days = window_days.clamp(1, MAX_WINDOW_DAYS);
@@ -491,7 +491,7 @@ impl<S: FocusStore> FocusQueries<S> {
     /// now.
     pub async fn focus_for_threads(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_ids: &[Uuid],
     ) -> Result<HashMap<Uuid, ThreadFocus>, Report> {
         if thread_ids.is_empty() {

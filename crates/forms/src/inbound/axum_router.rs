@@ -22,7 +22,7 @@ use axum::extract::FromRef;
 use axum::routing::{get, post, put};
 use databases::domain::models::Viewer;
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use utoipa::OpenApi;
 
 use crate::domain::ports::FormsService;
@@ -34,7 +34,7 @@ pub use error::FormsApiError;
 pub struct FormsRouterState<Service, EntityAccess, Authorization> {
     service: Arc<Service>,
     entity_access_service: Arc<EntityAccess>,
-    authorization_state: MacroAuthorizationState<Authorization>,
+    authorization_state: RoxAuthorizationState<Authorization>,
 }
 
 impl<Service, EntityAccess, Authorization> Clone
@@ -59,7 +59,7 @@ where
     pub fn new(
         service: Arc<Service>,
         entity_access_service: Arc<EntityAccess>,
-        authorization_state: MacroAuthorizationState<Authorization>,
+        authorization_state: RoxAuthorizationState<Authorization>,
     ) -> Self {
         Self {
             service,
@@ -79,7 +79,7 @@ impl<Service, EntityAccess, Authorization>
 
 impl<Service, EntityAccess, Authorization>
     FromRef<FormsRouterState<Service, EntityAccess, Authorization>>
-    for MacroAuthorizationState<Authorization>
+    for RoxAuthorizationState<Authorization>
 {
     fn from_ref(state: &FormsRouterState<Service, EntityAccess, Authorization>) -> Self {
         state.authorization_state.clone()
@@ -93,7 +93,7 @@ pub fn forms_router<Service, EntityAccess, Authorization, RouterState>(
 where
     Service: FormsService + FormSharingService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
     RouterState: Send + Sync + 'static,
 {
     Router::new()
@@ -152,7 +152,7 @@ where
 /// The viewer a signed-in request acts as.
 pub(crate) fn viewer_of<Authorization>(signed_in: &SignedIn<Authorization>) -> Viewer {
     Viewer {
-        user_id: signed_in.user.authorization.user.macro_user_id.clone(),
+        user_id: signed_in.user.authorization.user.rox_user_id.clone(),
         acting_bot: None,
     }
 }

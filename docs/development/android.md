@@ -1,6 +1,6 @@
 # Android development
 
-Macro's Android package is `com.macro.workspace.mobile`. Its Gradle project lives in
+Rox's Android package is `com.macro.workspace.mobile`. Its Gradle project lives in
 `apps/web/tauri/src-tauri/gen/android`. Keep the project and wrapper in source
 control; do not regenerate them to repair a build error.
 
@@ -674,14 +674,14 @@ service-account private key.
 ## Browser authentication
 
 Android uses `android_auth_plugin` and AndroidX Auth Tab, with a Custom Tabs
-fallback. Each attempt creates `macro://android-auth/<random UUID>` before the
+fallback. Each attempt creates `rox://android-auth/<random UUID>` before the
 backend creates OAuth state. The receiver checks the exact authority/path;
 mismatched callbacks leave the active attempt pending. Duplicate parameters are
 rejected. The Custom Tabs fallback returns to the task that owns the invocation.
 Canceling settles the request so another attempt can start. Never log callback
 URLs or session codes.
-Android navigation uses `macro://app/<route>`; its MainActivity filter is scoped
-to host `app` so older browsers send `macro://android-auth/...` exclusively to
+Android navigation uses `rox://app/<route>`; its MainActivity filter is scoped
+to host `app` so older browsers send `rox://android-auth/...` exclusively to
 the authentication receiver, without an activity chooser.
 
 Login redeems a one-time code using the existing native HTTP cookie jar.
@@ -1003,7 +1003,7 @@ ordinary alert.
 Call pushes are data-only, high priority, have a 60-second TTL, and include a recipient-specific
 LiveKit token and HTTPS ring-status URL. The receiver checks the registered
 account and message age. Tokens are kept in memory and never logged or persisted.
-A dropped call push logs its reason under the `MacroCall` logcat tag (another
+A dropped call push logs its reason under the `RoxCall` logcat tag (another
 account, invalid payload, stale, recently ended, or another call active).
 While ringing, the native coordinator polls the existing ring-status endpoint;
 answering rechecks it before connecting. Answered-elsewhere, cancelled, expired,

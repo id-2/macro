@@ -49,7 +49,7 @@ tools/HTTP/GraphQL surfaces over them.
   sqlx-only slices for other domains to depend on without pulling in
   `unfurl`/`axum`; pick the narrowest feature for a new caller.
 - Depends on: `entity_access` (ports-and-adapters base), `databases` (ports),
-  `filter_ast`, `item_filters`, `macro_authorization`, `properties`.
+  `filter_ast`, `item_filters`, `rox_authorization`, `properties`.
 - Used by: `email`, `memory`, `ai_tools`, `soup`/`models_soup`, `graphql_crm`,
   `search_service`, `complete_graph`; composition roots include
   `document_storage_service`, `agent_harness_service`, `mcp_service`,

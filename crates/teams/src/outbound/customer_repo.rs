@@ -18,7 +18,7 @@ use computer_items::ComputerItem;
 use subscription_error::SubscriptionDataError;
 
 use anyhow::Context;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use stripe::{UpdateSubscription, UpdateSubscriptionItems};
 
 use crate::domain::{
@@ -77,7 +77,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
         &self,
         subscription: &stripe::SubscriptionId,
         schedule: &stripe::SubscriptionScheduleId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<ScheduledSeatPlan>, CustomerError> {
         Ok(self
             .read_scheduled_seat_plans(subscription, schedule)
@@ -88,7 +88,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
     async fn pending_seat_plan(
         &self,
         id: &stripe::SubscriptionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<ScheduledSeatPlan>, CustomerError> {
         Ok(self.pending_seat_plans(id).await?.remove(user.as_ref()))
     }
@@ -187,7 +187,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
     async fn schedule_seat_plan(
         &self,
         id: &stripe::SubscriptionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         plan: Option<SeatPlan>,
     ) -> Result<(), CustomerError> {
         let _billing = self.subscription_guard(id, None).await?;
@@ -284,7 +284,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
         let end_trial = end_trial && subscription.status == stripe::SubscriptionStatus::Trialing;
         let mut params = UpdateSubscription {
             items: Some(vec![UpdateSubscriptionItems { id: Some(item.id.to_string()), price: Some(self.seat_prices.price_id(plan)?.to_string()), ..Default::default() }]),
-            metadata: Some(HashMap::from([("macro_plan_change_at".to_string(), chrono::Utc::now().to_rfc3339()), (APPLIED_KEY.to_string(), String::new())])),
+            metadata: Some(HashMap::from([("rox_plan_change_at".to_string(), chrono::Utc::now().to_rfc3339()), (APPLIED_KEY.to_string(), String::new())])),
             proration_behavior: Some(stripe::generated::billing::subscription::SubscriptionProrationBehavior::AlwaysInvoice), ..Default::default()
         };
         if end_trial {
@@ -513,7 +513,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
         &self,
         subscription_id: &stripe::SubscriptionId,
         team_id: &uuid::Uuid,
-        team_owner_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        team_owner_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<(), CustomerError> {
         let _billing = self.subscription_guard(subscription_id, None).await?;
         let mut metadata = HashMap::new();
@@ -569,11 +569,11 @@ fn paying_subscription(subscriptions: Vec<stripe::Subscription>) -> Option<strip
     trialing
 }
 
-const OWNED_KEY: &str = "macro_plan_schedule";
+const OWNED_KEY: &str = "rox_plan_schedule";
 /// Provider metadata holding the key of the last atomically applied item change.
-const ITEM_CHANGE_KEY: &str = "macro_item_change";
-const PENDING_KEY: &str = "macro_pending_seats";
-const APPLIED_KEY: &str = "macro_renewed_seats";
+const ITEM_CHANGE_KEY: &str = "rox_item_change";
+const PENDING_KEY: &str = "rox_pending_seats";
+const APPLIED_KEY: &str = "rox_renewed_seats";
 
 #[derive(serde::Serialize, serde::Deserialize)]
 struct PendingChanges {

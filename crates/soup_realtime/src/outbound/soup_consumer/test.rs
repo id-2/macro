@@ -1,5 +1,5 @@
-use macro_event_broker::{
-    EventBrokerError, MacroEventCollection as _, MessageParts, MessageWrapper,
+use rox_event_broker::{
+    EventBrokerError, RoxEventCollection as _, MessageParts, MessageWrapper,
 };
 
 use super::DeclaredMacroEvent;
@@ -18,13 +18,13 @@ impl MessageParts for TestMessage {
     }
 
     fn topic(&self) -> &str {
-        "macro.soup"
+        "rox.soup"
     }
 }
 
 #[test]
 fn assigns_only_the_typed_soup_topic() {
-    assert_eq!(DeclaredMacroEvent::topics(), ["macro.soup"]);
+    assert_eq!(DeclaredMacroEvent::topics(), ["rox.soup"]);
 }
 
 #[test]

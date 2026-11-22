@@ -1,6 +1,6 @@
 use super::*;
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 const LINK_ID: &str = "00000000-0000-0000-0000-000000000801";
@@ -8,7 +8,7 @@ const ALICE_CONTACT_ID: &str = "00000000-0000-0000-0000-0000000c8001";
 const BOB_CONTACT_ID: &str = "00000000-0000-0000-0000-0000000c8002";
 fn make_contact(link_id: Uuid, email: &str, name: Option<&str>) -> Contact {
     Contact {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         link_id,
         email_address: Some(email.to_string()),
         name: name.map(|n| n.to_string()),
@@ -18,11 +18,11 @@ fn make_contact(link_id: Uuid, email: &str, name: Option<&str>) -> Contact {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_sync_contacts"))
 )]
 async fn detects_name_change(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str(LINK_ID)?;
     let alice_id = Uuid::parse_str(ALICE_CONTACT_ID)?;
@@ -43,11 +43,11 @@ async fn detects_name_change(pool: Pool<Postgres>) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_sync_contacts"))
 )]
 async fn detects_null_to_name(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str(LINK_ID)?;
     let bob_id = Uuid::parse_str(BOB_CONTACT_ID)?;
@@ -63,11 +63,11 @@ async fn detects_null_to_name(pool: Pool<Postgres>) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_sync_contacts"))
 )]
 async fn no_change_when_name_is_same(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str(LINK_ID)?;
 
@@ -85,11 +85,11 @@ async fn no_change_when_name_is_same(pool: Pool<Postgres>) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_sync_contacts"))
 )]
 async fn no_change_when_new_name_is_null_and_old_exists(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str(LINK_ID)?;
 
@@ -103,11 +103,11 @@ async fn no_change_when_new_name_is_null_and_old_exists(pool: Pool<Postgres>) ->
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_sync_contacts"))
 )]
 async fn new_contact_not_in_changed_ids(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str(LINK_ID)?;
 
@@ -126,11 +126,11 @@ async fn new_contact_not_in_changed_ids(pool: Pool<Postgres>) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("upsert_sync_contacts"))
 )]
 async fn mixed_batch_only_returns_changed(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str(LINK_ID)?;
     let alice_id = Uuid::parse_str(ALICE_CONTACT_ID)?;
@@ -151,9 +151,9 @@ async fn mixed_batch_only_returns_changed(pool: Pool<Postgres>) -> Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn empty_input_returns_empty(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let (rows, changed) = upsert_contacts(&pool, &[]).await?;
     assert_eq!(rows, 0);

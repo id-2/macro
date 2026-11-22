@@ -571,7 +571,7 @@ async fn a_session_whose_row_is_gone_is_released() {
 #[tokio::test]
 async fn a_kill_switch_aimed_at_dev_leaves_prod_retrying_for_the_same_owner() {
     use feature_flags::outbound::posthog::PostHogFeatureFlags;
-    use macro_env::Environment;
+    use rox_env::Environment;
     use wiremock::matchers::body_partial_json;
     use wiremock::{Mock, MockServer, ResponseTemplate};
 

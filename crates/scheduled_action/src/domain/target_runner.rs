@@ -13,7 +13,7 @@ use agent_session::domain::{
 use anyhow::{Context, Result};
 use bot_id::BotId;
 use bots::domain::models::AgentMcpServer;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use routine_program::AgentStep;
 use trigger_context::{TriggerContext, TriggerOrigin};
 
@@ -110,7 +110,7 @@ impl<Sessions: RoutineSessions> RoutineAgents for TargetRunner<Sessions> {
 
     async fn run(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         handle: &ExecutionHandle,
         prompt: String,
         context: Option<TriggerContext>,
@@ -142,7 +142,7 @@ impl<Sessions: RoutineSessions> RoutineAgents for TargetRunner<Sessions> {
 
     async fn cancel(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         handle: &ExecutionHandle,
     ) -> Result<()> {
         // Also stop partially prepared sessions; resource may still be None.
@@ -193,7 +193,7 @@ impl<Sessions: RoutineSessions> TargetRunner<Sessions> {
 }
 
 fn session_action(
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     handle: &ExecutionHandle,
     bot_id: BotId,
 ) -> RoutineSessionAction {

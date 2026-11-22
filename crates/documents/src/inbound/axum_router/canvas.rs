@@ -27,7 +27,7 @@ use entity_access::{
     },
     inbound::axum_extractors::DocumentAccessExtractor,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use std::collections::BTreeMap;
 
 /// Which part of the scene to read.
@@ -292,7 +292,7 @@ fn scene_with_revision(canvas: Option<String>) -> Result<(String, serde_json::Va
 pub async fn canvas_scene_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -344,7 +344,7 @@ pub async fn canvas_scene_handler<
 pub async fn render_canvas_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -410,7 +410,7 @@ pub async fn render_canvas_handler<
 pub async fn apply_canvas_edits_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -475,7 +475,7 @@ pub async fn apply_canvas_edits_handler<
 pub async fn edit_canvas_with_ai_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

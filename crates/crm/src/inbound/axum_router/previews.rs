@@ -1,6 +1,6 @@
 use axum::{Json, extract::State};
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
 use utoipa::ToSchema;
@@ -45,16 +45,16 @@ pub async fn handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
     Json(request): Json<CrmPreviewsRequest>,
 ) -> Result<Json<CrmPreviews>, CrmError> {
     let previews = state
         .service
         .preview_records(
-            user.authorization.user.macro_user_id.as_ref(),
+            user.authorization.user.rox_user_id.as_ref(),
             &request.company_ids,
             &request.contact_ids,
         )

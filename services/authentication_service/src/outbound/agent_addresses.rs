@@ -2,7 +2,7 @@
 //! sees them: each service's canonical URL type, resolved afresh for every
 //! enrollment. Local stacks override them per fleet (`OVERRIDE_*`).
 
-use macro_service_urls::{
+use rox_service_urls::{
     AgentHarnessEgressUrl, AgentHarnessServiceUrl, ApiGatewayUrl, AuthServiceUrl,
     ConnectionGatewayWebsocketUrl, DocumentCognitionServiceUrl, DocumentStorageServiceUrl,
     McpServiceUrl, ScheduledActionServiceUrl,
@@ -13,12 +13,12 @@ use team_agents::domain::{models::TeamAgentError, ports::EnrollmentEnvironment};
 mod test;
 
 /// The public gateway origin the brain's SDK calls.
-pub const GATEWAY_KEY: &str = "MACRO_GATEWAY";
+pub const GATEWAY_KEY: &str = "ROX_GATEWAY";
 /// Rox's Anthropic gateway for brains, on the harness's egress listener.
 pub const ANTHROPIC_BASE_URL_KEY: &str = "ANTHROPIC_BASE_URL";
 /// Rox's call speech gateway for brains, on the same listener: the
 /// runtime opens `ws(s)://…/stt` and `…/tts` under it.
-pub const SPEECH_URL_KEY: &str = "MACRO_SPEECH_URL";
+pub const SPEECH_URL_KEY: &str = "ROX_SPEECH_URL";
 
 /// Resolves [`EnrollmentEnvironment`] from the service URL types.
 pub struct AgentAddresses;
@@ -31,7 +31,7 @@ struct UnreachableAddress {
 
 fn checked(name: &'static str, raw: &str, websocket: bool) -> Result<String, TeamAgentError> {
     let invalid = || TeamAgentError::internal(UnreachableAddress { name });
-    let url = macro_service_urls::Url::parse(raw).map_err(|_| invalid())?;
+    let url = rox_service_urls::Url::parse(raw).map_err(|_| invalid())?;
     let scheme_ok = if websocket {
         matches!(url.scheme(), "ws" | "wss")
     } else {

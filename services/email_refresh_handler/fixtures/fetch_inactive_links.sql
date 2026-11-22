@@ -6,7 +6,7 @@
 -- Created 40 days ago, no user_history entries
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000001', 'macro|unused_user@example.com', '00000000-0000-0000-0000-0000000a0001',
         'unused_user@example.com', 'GMAIL', true, NOW() - INTERVAL '40 days', NOW() - INTERVAL '40 days');
 
@@ -20,7 +20,7 @@ VALUES ('00000000-0000-0000-0000-0000000b0001', '00000000-0000-0000-0000-0000000
 -- Has history, but last activity was 90 days ago
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000002', 'macro|stale_user@example.com', '00000000-0000-0000-0000-0000000a0002',
         'stale_user@example.com', 'GMAIL', true, NOW() - INTERVAL '100 days', NOW() - INTERVAL '90 days');
 
@@ -39,7 +39,7 @@ VALUES ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-0000000
 -- Has history updated recently (5 days ago)
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000003', 'macro|active_user@example.com', '00000000-0000-0000-0000-0000000a0003',
         'active_user@example.com', 'GMAIL', true, NOW() - INTERVAL '60 days', NOW() - INTERVAL '5 days');
 
@@ -58,7 +58,7 @@ VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-0000000
 -- Created recently (10 days ago), no history yet
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000004', 'macro|new_user@example.com', '00000000-0000-0000-0000-0000000a0004',
         'new_user@example.com', 'GMAIL', true, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days');
 
@@ -69,10 +69,10 @@ VALUES ('00000000-0000-0000-0000-0000000b0004', '00000000-0000-0000-0000-0000000
 
 ------------------------------------------------------------
 -- Link 5: INTERNAL @rox.one link (should NEVER be deleted)
--- Old link with no history, but has @rox.one in macro_id
+-- Old link with no history, but has @rox.one in rox_id
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000005', 'internal@rox.one', '00000000-0000-0000-0000-0000000a0005',
         'internal@rox.one', 'GMAIL', true, NOW() - INTERVAL '200 days', NOW() - INTERVAL '200 days');
 

@@ -4,8 +4,8 @@ use std::time::Duration;
 
 use anyhow::Result;
 use chrono::{DateTime, Duration as ChronoDuration, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model_owner::Owner;
 use serde_json::json;
 use tokio::sync::Semaphore;
@@ -72,7 +72,7 @@ impl ScheduledActionRepo for FakeRepository {
 
     async fn get_owned_actions(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ScheduledAction>> {
         Ok(Vec::new())
     }

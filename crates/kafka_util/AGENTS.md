@@ -16,7 +16,7 @@ environments, with trace propagation and typed grouped/ungrouped consumers.
 
 - Owns transport mechanics, not domain event decoding or retry policy.
 - `Ungrouped` always uses manual assignment with automatic commits/stores off.
-- Used by `macro_event_broker` and other domain Kafka adapters.
+- Used by `rox_event_broker` and other domain Kafka adapters.
 
 ## Checks
 

@@ -76,7 +76,7 @@ async fn every_endpoint_pins_the_same_host_key_under_its_own_name() {
         .lines()
         .skip_while(|line| !line.starts_with("cat > \"$preview_known_hosts\""))
         .skip(1)
-        .take_while(|line| *line != "MACRO_PREVIEW_HOST_KEY")
+        .take_while(|line| *line != "ROX_PREVIEW_HOST_KEY")
         .collect();
     assert_eq!(
         known_hosts,

@@ -6,9 +6,9 @@ use databases::domain::ports::{DatabaseRowReads, DatabasesService};
 use entity_access::domain::models::{EntityAccessReceipt, EntityType, ViewAccessLevel};
 use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::domain::service::NoopMacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_event_broker::domain::service::NoopMacroEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{CellValue, CellWrite, DatabaseId, RowId};
 use serde_json::json;
 
@@ -38,7 +38,7 @@ impl databases::domain::ports::TableEventPublisher for Unheard {
     async fn awareness(
         &self,
         _: DatabaseId,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: bool,
         _: &databases::domain::models::Awareness,
     ) -> Result<(), Self::Error> {
@@ -48,31 +48,31 @@ impl databases::domain::ports::TableEventPublisher for Unheard {
 
 /// A user id no other test in this process shares: entity access caches
 /// answers process-wide.
-fn unique_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|webhooks-{}@rox.one", uuid::Uuid::new_v4())).unwrap()
+fn unique_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|webhooks-{}@rox.one", uuid::Uuid::new_v4())).unwrap()
 }
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let rox_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         user_id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_webhook_call_inserts_a_row_the_owner_reads(pool: PgPool) {
     let owner = unique_user();
     insert_user(&pool, owner.as_ref()).await;

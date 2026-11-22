@@ -16,7 +16,7 @@ pub async fn get_paginated_thread_ids_with_macro_user_id(
 ) -> anyhow::Result<Vec<(Uuid, String)>> {
     let result = sqlx::query!(
         r#"
-        SELECT t.id, l.macro_id
+        SELECT t.id, l.rox_id
         FROM email_threads t
         JOIN email_links l ON t.link_id = l.id
         ORDER BY t.latest_inbound_message_ts DESC NULLS LAST
@@ -25,7 +25,7 @@ pub async fn get_paginated_thread_ids_with_macro_user_id(
         thread_limit,
         thread_offset
     )
-    .map(|row| (row.id, row.macro_id))
+    .map(|row| (row.id, row.rox_id))
     .fetch_all(pool)
     .await?;
 
@@ -42,7 +42,7 @@ pub async fn get_paginated_thread_ids_with_macro_user_id_since(
 ) -> anyhow::Result<Vec<(Uuid, String)>> {
     let result = sqlx::query!(
         r#"
-        SELECT t.id, l.macro_id
+        SELECT t.id, l.rox_id
         FROM email_threads t
         JOIN email_links l ON t.link_id = l.id
         WHERE t.updated_at >= $3
@@ -53,7 +53,7 @@ pub async fn get_paginated_thread_ids_with_macro_user_id_since(
         thread_offset,
         since
     )
-    .map(|row| (row.id, row.macro_id))
+    .map(|row| (row.id, row.rox_id))
     .fetch_all(pool)
     .await?;
 
@@ -73,14 +73,14 @@ pub async fn get_thread_ids_with_macro_user_id_by_ids(
 ) -> anyhow::Result<Vec<(Uuid, String)>> {
     let result = sqlx::query!(
         r#"
-        SELECT t.id, l.macro_id
+        SELECT t.id, l.rox_id
         FROM email_threads t
         JOIN email_links l ON t.link_id = l.id
         WHERE t.id = ANY($1)
         "#,
         thread_ids
     )
-    .map(|row| (row.id, row.macro_id))
+    .map(|row| (row.id, row.rox_id))
     .fetch_all(pool)
     .await?;
 
@@ -157,7 +157,7 @@ pub async fn get_threads_by_link_id_and_provider_ids(
 #[tracing::instrument(skip(pool), err)]
 pub async fn get_threads_by_user_with_outbound(
     pool: &PgPool,
-    macro_user_id: &str,
+    rox_user_id: &str,
     limit: i64,
     offset: i64,
 ) -> anyhow::Result<UserThreadsPage> {
@@ -166,12 +166,12 @@ pub async fn get_threads_by_user_with_outbound(
         SELECT t.id as thread_id
         FROM email_threads t
         JOIN email_links l ON t.link_id = l.id
-        WHERE l.macro_id = $1
+        WHERE l.rox_id = $1
           AND t.latest_outbound_message_ts IS NOT NULL
         ORDER BY t.latest_outbound_message_ts DESC
         LIMIT $2 OFFSET $3
         "#,
-        macro_user_id,
+        rox_user_id,
         limit + 1,
         offset
     )
@@ -198,45 +198,45 @@ pub async fn get_outbound_threads_by_thread_ids(
     user_thread_ids: Vec<UserThreadIds>,
 ) -> anyhow::Result<Vec<UserThreadIds>> {
     // Flatten for one query
-    let mut macro_id_and_thread_id_pairs = Vec::new();
+    let mut rox_id_and_thread_id_pairs = Vec::new();
     for user in &user_thread_ids {
         for thread_id in &user.thread_ids {
-            macro_id_and_thread_id_pairs.push((user.macro_user_id.clone(), *thread_id));
+            rox_id_and_thread_id_pairs.push((user.rox_user_id.clone(), *thread_id));
         }
     }
 
     // Early exit if empty
-    if macro_id_and_thread_id_pairs.is_empty() {
+    if rox_id_and_thread_id_pairs.is_empty() {
         return Ok(vec![]);
     }
 
     // Extract for query
-    let macro_ids: Vec<String> = macro_id_and_thread_id_pairs
+    let rox_ids: Vec<String> = rox_id_and_thread_id_pairs
         .iter()
         .map(|x| x.0.clone())
         .collect();
-    let thread_ids: Vec<Uuid> = macro_id_and_thread_id_pairs.iter().map(|x| x.1).collect();
+    let thread_ids: Vec<Uuid> = rox_id_and_thread_id_pairs.iter().map(|x| x.1).collect();
 
     // The trick: Use UNNEST to join pairs in SQL
     let rows = sqlx::query!(
         r#"
-        SELECT l.macro_id, t.id as thread_id
-        FROM UNNEST($1::text[], $2::uuid[]) AS inp(macro_id, thread_id)
-        JOIN email_links l ON l.macro_id = inp.macro_id
+        SELECT l.rox_id, t.id as thread_id
+        FROM UNNEST($1::text[], $2::uuid[]) AS inp(rox_id, thread_id)
+        JOIN email_links l ON l.rox_id = inp.rox_id
         JOIN email_threads t ON t.link_id = l.id AND t.id = inp.thread_id
         WHERE t.latest_outbound_message_ts IS NOT NULL
         "#,
-        &macro_ids,
+        &rox_ids,
         &thread_ids,
     )
     .fetch_all(pool)
     .await?;
 
-    // Group by macro_user_id
+    // Group by rox_user_id
     let mut threads_by_user: HashMap<String, Vec<Uuid>> = HashMap::new();
     for row in rows {
         threads_by_user
-            .entry(row.macro_id)
+            .entry(row.rox_id)
             .or_default()
             .push(row.thread_id);
     }
@@ -246,9 +246,9 @@ pub async fn get_outbound_threads_by_thread_ids(
         .into_iter()
         .filter_map(|user| {
             threads_by_user
-                .get(&user.macro_user_id)
+                .get(&user.rox_user_id)
                 .map(|filtered_ids| UserThreadIds {
-                    macro_user_id: user.macro_user_id,
+                    rox_user_id: user.rox_user_id,
                     thread_ids: filtered_ids.clone(),
                 })
         })
@@ -281,13 +281,13 @@ pub async fn get_provider_id_by_link_and_thread_id(
 }
 
 #[tracing::instrument(skip(pool), err)]
-pub async fn get_macro_id_from_thread_id(
+pub async fn get_rox_id_from_thread_id(
     pool: &PgPool,
     thread_id: Uuid,
 ) -> anyhow::Result<Option<String>> {
-    let macro_id = sqlx::query_scalar!(
+    let rox_id = sqlx::query_scalar!(
         r#"
-        SELECT l.macro_id
+        SELECT l.rox_id
         FROM email_threads t
         JOIN email_links l ON t.link_id = l.id
         WHERE t.id = $1
@@ -297,7 +297,7 @@ pub async fn get_macro_id_from_thread_id(
     .fetch_optional(pool)
     .await?;
 
-    Ok(macro_id)
+    Ok(rox_id)
 }
 
 /// Gets a single thread by ID and link_ID
@@ -393,16 +393,16 @@ pub async fn get_thread_ids_by_contact_ids(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
     use models_email::email::service::thread::UserThreadIds;
     use sqlx::types::uuid::uuid;
     use sqlx::{Pool, Postgres};
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("links", "threads"))
     )]
     async fn test_get_threads_by_users_with_outbound(pool: Pool<Postgres>) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
         let user1 = "macro|user1@rox.one";
         let user2 = "macro|user2@rox.one";
 
@@ -428,7 +428,7 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("links", "threads"))
     )]
     async fn test_get_outbound_threads_by_thread_ids_basic(
@@ -440,14 +440,14 @@ mod tests {
 
         let user_thread_ids = vec![
             UserThreadIds {
-                macro_user_id: user1.clone(),
+                rox_user_id: user1.clone(),
                 thread_ids: vec![
                     uuid!("10000000-0000-0000-0000-000000000001"),
                     uuid!("10000000-0000-0000-0000-000000000002"),
                 ],
             },
             UserThreadIds {
-                macro_user_id: user2.clone(),
+                rox_user_id: user2.clone(),
                 thread_ids: vec![uuid!("10000000-0000-0000-0000-000000000003")],
             },
         ];
@@ -457,7 +457,7 @@ mod tests {
         assert_eq!(result.len(), 2);
 
         // user1 should get both threads if both have outbound, or only those that do
-        let user1_result = result.iter().find(|u| u.macro_user_id == user1).unwrap();
+        let user1_result = result.iter().find(|u| u.rox_user_id == user1).unwrap();
         assert!(!user1_result.thread_ids.is_empty());
         assert!(
             user1_result
@@ -468,7 +468,7 @@ mod tests {
         );
 
         // user2 should get thread 3 if it has outbound
-        let user2_result = result.iter().find(|u| u.macro_user_id == user2).unwrap();
+        let user2_result = result.iter().find(|u| u.rox_user_id == user2).unwrap();
         assert_eq!(
             user2_result.thread_ids,
             vec![uuid!("10000000-0000-0000-0000-000000000003")]
@@ -478,7 +478,7 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("links", "threads"))
     )]
     async fn test_get_outbound_threads_by_thread_ids_empty_input(
@@ -490,7 +490,7 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("links", "threads"))
     )]
     async fn test_get_outbound_threads_by_thread_ids_user_no_outbound(
@@ -500,7 +500,7 @@ mod tests {
         let user3 = "macro|user3@rox.one".to_string();
 
         let user_thread_ids = vec![UserThreadIds {
-            macro_user_id: user3.clone(),
+            rox_user_id: user3.clone(),
             thread_ids: vec![
                 uuid!("10000000-0000-0000-0000-000000000004"),
                 uuid!("10000000-0000-0000-0000-000000000005"),
@@ -513,7 +513,7 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("links", "threads"))
     )]
     async fn test_get_outbound_threads_by_thread_ids_partial_match(
@@ -523,7 +523,7 @@ mod tests {
 
         // Only one thread has outbound
         let user_thread_ids = vec![UserThreadIds {
-            macro_user_id: user1.clone(),
+            rox_user_id: user1.clone(),
             thread_ids: vec![
                 uuid!("10000000-0000-0000-0000-000000000001"), // assume has outbound
                 uuid!("10000000-0000-0000-0000-00000000dead"), // does not exist
@@ -534,7 +534,7 @@ mod tests {
         assert_eq!(result.len(), 1);
 
         let found = &result[0];
-        assert_eq!(found.macro_user_id, user1);
+        assert_eq!(found.rox_user_id, user1);
         assert!(
             found
                 .thread_ids
@@ -546,11 +546,11 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("get_thread_ids_by_contact_ids"))
     )]
     async fn test_get_thread_ids_by_sender_contact(pool: Pool<Postgres>) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
         // Contact A is sender in Thread 1 and Thread 3
         let sender_id = uuid!("00000000-0000-0000-0000-0000000c9001");
@@ -564,11 +564,11 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("get_thread_ids_by_contact_ids"))
     )]
     async fn test_get_thread_ids_by_recipient_contact(pool: Pool<Postgres>) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
         // Contact B is a recipient in Thread 1 only
         let recipient_id = uuid!("00000000-0000-0000-0000-0000000c9002");
@@ -581,13 +581,13 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("get_thread_ids_by_contact_ids"))
     )]
     async fn test_get_thread_ids_by_contact_in_both_roles(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
         // Contact C is sender in Thread 2 and recipient in Thread 3
         let both_id = uuid!("00000000-0000-0000-0000-0000000c9003");
@@ -601,11 +601,11 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("get_thread_ids_by_contact_ids"))
     )]
     async fn test_get_thread_ids_by_orphan_contact(pool: Pool<Postgres>) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
         // Contact D has no messages
         let orphan_id = uuid!("00000000-0000-0000-0000-0000000c9004");
@@ -617,13 +617,13 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("get_thread_ids_by_contact_ids"))
     )]
     async fn test_get_thread_ids_by_multiple_contacts_dedupes(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
         // Contact A (sender in Thread 1,3) + Contact C (sender in Thread 2, recipient in Thread 3)
         // Thread 3 should only appear once
@@ -639,11 +639,11 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn test_get_thread_ids_by_contact_ids_empty_input(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {
-        const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+        const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
         let result = get_thread_ids_by_contact_ids(&pool, &[]).await?;
         assert!(result.is_empty());

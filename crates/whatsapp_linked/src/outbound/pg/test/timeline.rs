@@ -1,5 +1,5 @@
 use super::*;
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn shared_viewer_without_whatsapp_reads_history_and_unread_but_cannot_send(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     session
@@ -24,7 +24,7 @@ async fn shared_viewer_without_whatsapp_reads_history_and_unread_but_cannot_send
     use entity_access::domain::ports::EntityAccessService;
     let receipt = access_service
         .generate_entity_access_receipt::<MessageView>(
-            &macro_user_id::user_id::MacroUserIdStr::try_from(CAROL.to_owned())
+            &rox_user_id::user_id::RoxUserIdStr::try_from(CAROL.to_owned())
                 .unwrap()
                 .0,
             None,
@@ -140,7 +140,7 @@ async fn shared_viewer_without_whatsapp_reads_history_and_unread_but_cannot_send
     assert!(
         access_service
             .generate_entity_access_receipt::<MessageView>(
-                &macro_user_id::user_id::MacroUserIdStr::try_from(CAROL.to_owned())
+                &rox_user_id::user_id::RoxUserIdStr::try_from(CAROL.to_owned())
                     .unwrap()
                     .0,
                 None,
@@ -152,7 +152,7 @@ async fn shared_viewer_without_whatsapp_reads_history_and_unread_but_cannot_send
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn timeline_cursor_and_read_cursor_are_group_scoped_and_monotone(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let mut early = text(30, CUSTOMER_JID, "EARLY", "older");
@@ -227,7 +227,7 @@ impl ChatPublisher for Notifications {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn notifications_are_once_for_live_messages_and_never_history_or_edits(pool: PgPool) {
     let (linked, session, _, _, alice, _) = adopted(&pool).await;
     let notifications = Arc::new(Notifications::default());
@@ -260,7 +260,7 @@ async fn notifications_are_once_for_live_messages_and_never_history_or_edits(poo
     assert_eq!(notifications.0.lock().unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn canonical_team_sharing_is_owner_only_and_reversible(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let owner = receipt::<MessageView>(ALICE, binding.id);
@@ -349,7 +349,7 @@ async fn canonical_team_sharing_is_owner_only_and_reversible(pool: PgPool) {
     let access = entity_access::domain::service::EntityAccessServiceImpl::new(
         entity_access::outbound::PgAccessRepository::new(pool.clone()),
     );
-    let carol = macro_user_id::user_id::MacroUserIdStr::try_from(CAROL.to_owned()).unwrap();
+    let carol = rox_user_id::user_id::RoxUserIdStr::try_from(CAROL.to_owned()).unwrap();
     assert_eq!(
         access
             .get_access_level(
@@ -435,7 +435,7 @@ async fn canonical_team_sharing_is_owner_only_and_reversible(pool: PgPool) {
     assert!(linked.chats.list(&person(CAROL)).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn shared_sender_uses_own_roster_without_adopting_again(pool: PgPool) {
     let (linked, session, _, binding, alice, bob) = adopted(&pool).await;
     sqlx::query!(
@@ -472,7 +472,7 @@ async fn shared_sender_uses_own_roster_without_adopting_again(pool: PgPool) {
     assert_eq!(claimed[0].id, progress.id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_group_mentioned_in_a_channel_is_readable_by_its_current_members(pool: PgPool) {
     let (linked, _, _, binding, _, _) = adopted(&pool).await;
     let channel = Uuid::now_v7();
@@ -523,7 +523,7 @@ async fn a_group_mentioned_in_a_channel_is_readable_by_its_current_members(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_owners_own_session_changes_sharing(pool: PgPool) {
     let (linked, _, _, binding, _, _) = adopted(&pool).await;
     let owner = receipt::<MessageView>(ALICE, binding.id);
@@ -549,7 +549,7 @@ async fn only_the_owners_own_session_changes_sharing(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_owner_sees_and_revokes_channel_grants(pool: PgPool) {
     use models_permissions::share_permission::{
         UpdateSharePermissionRequestV2,
@@ -627,7 +627,7 @@ async fn the_owner_sees_and_revokes_channel_grants(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_message_reads_like_its_timeline_entry(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     for (event, source) in [(1, "ONE"), (2, "TWO")] {
@@ -656,7 +656,7 @@ async fn one_message_reads_like_its_timeline_entry(pool: PgPool) {
 /// History messages carry no WhatsApp name. People still read by the
 /// owner's own contact name, then their WhatsApp name, then their number,
 /// as senders and as reactors, for everyone who can view the chat.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn people_read_by_contact_name_then_whatsapp_name_then_number(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let stranger = format!("{}@s.whatsapp.net", 5550002);

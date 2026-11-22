@@ -1,6 +1,6 @@
 use super::*;
 use ai_toolset::{ToolSet, schema::generate_validated_input_schema};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use std::{collections::BTreeMap, sync::Mutex};
 
@@ -14,7 +14,7 @@ struct FakeCognition {
 impl Cognition for FakeCognition {
     async fn generate_object(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         request: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         self.requests
@@ -31,7 +31,7 @@ impl Cognition for FakeCognition {
 
     async fn decide(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         self.requests
@@ -49,7 +49,7 @@ impl Cognition for FakeCognition {
 }
 
 fn request() -> RequestContext {
-    RequestContext::new(MacroUserIdStr::try_from("macro|requester@macro.local".to_owned()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from("macro|requester@macro.local".to_owned()).unwrap())
 }
 
 fn context(service: Arc<FakeCognition>) -> ServiceContext<CognitionToolContext> {

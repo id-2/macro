@@ -3,7 +3,7 @@ use crate::domain::{
     ports::{Accounts, Result},
 };
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::{
     models::{ConnectionProvider, PipedreamConnection},
     ports::{AppConnections, ConnectionStore},
@@ -21,7 +21,7 @@ fn syncable(connection: &PipedreamConnection) -> bool {
 
 #[async_trait]
 impl<S: ConnectionStore + AppConnections> Accounts for ConnectedAccounts<S> {
-    async fn account(&self, user: &MacroUserIdStr<'static>) -> Result<Option<String>> {
+    async fn account(&self, user: &RoxUserIdStr<'static>) -> Result<Option<String>> {
         Ok(self
             .0
             .load(user, GRANOLA_APP)
@@ -30,7 +30,7 @@ impl<S: ConnectionStore + AppConnections> Accounts for ConnectedAccounts<S> {
             .filter(syncable)
             .map(|connection| connection.account_id))
     }
-    async fn connected(&self) -> Result<Vec<(MacroUserIdStr<'static>, String)>> {
+    async fn connected(&self) -> Result<Vec<(RoxUserIdStr<'static>, String)>> {
         Ok(self
             .0
             .list_enabled_for_app(GRANOLA_APP)
@@ -49,7 +49,7 @@ mod test {
 
     fn connection(provider: ConnectionProvider, enabled: bool) -> PipedreamConnection {
         PipedreamConnection {
-            user_id: MacroUserIdStr::try_from_email("caller@example.com").unwrap(),
+            user_id: RoxUserIdStr::try_from_email("caller@example.com").unwrap(),
             app_slug: GRANOLA_APP.into(),
             server_name: "Granola".into(),
             account_id: "apn_1".into(),

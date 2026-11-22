@@ -7,7 +7,7 @@ import {
   Suspense,
 } from 'solid-js';
 import {
-  MACRO_PERSONA_ID,
+  ROX_PERSONA_ID,
   type RosterAgent,
 } from '../../agents-view/core/roster';
 import { AgentPicker } from '../../agents-view/views/AgentPicker';
@@ -73,7 +73,7 @@ export function RoutineExecutionPickerView(props: Props): JSX.Element {
   const selected = (): RosterAgent | undefined => {
     const target = props.target;
     if (target.kind === 'model') {
-      return props.roster.find((agent) => agent.id === MACRO_PERSONA_ID);
+      return props.roster.find((agent) => agent.id === ROX_PERSONA_ID);
     }
     return props.roster.find((agent) => agent.botId === target.agentId);
   };
@@ -103,7 +103,7 @@ export function RoutineExecutionPickerView(props: Props): JSX.Element {
   };
 
   function select(agent: RosterAgent, override?: string): void {
-    if (agent.id === MACRO_PERSONA_ID) {
+    if (agent.id === ROX_PERSONA_ID) {
       if (override) props.onChange({ kind: 'model', model: override });
       return;
     }

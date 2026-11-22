@@ -1,6 +1,6 @@
 use crate::model::Message;
 use anyhow::{Context, Result};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::{Executor, Postgres};
 use uuid::Uuid;
 
@@ -54,7 +54,7 @@ where
             id: row.id,
             channel_id: row.channel_id,
             thread_id: row.thread_id,
-            sender_id: MacroUserIdStr::parse_from_str(&row.sender_id)
+            sender_id: RoxUserIdStr::parse_from_str(&row.sender_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
             content: row.content,

@@ -28,7 +28,7 @@ Write it as `macro.routines.create` takes it:
 
 ## Reply
 
-In one or two sentences, say when it runs and what each run does, and link the routine the way your instructions say to mention one: in Macro, a routine mention with its id and name; elsewhere, its link (`routine.webUrl()`). Add only what they must act on.
+In one or two sentences, say when it runs and what each run does, and link the routine the way your instructions say to mention one: in Rox, a routine mention with its id and name; elsewhere, its link (`routine.webUrl()`). Add only what they must act on.
 
 ## Example
 

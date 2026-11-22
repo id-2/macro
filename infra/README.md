@@ -1,6 +1,6 @@
-# Macro Cloud Infra
+# Rox Cloud Infra
 
-Pulumi (TypeScript, Bun) for all of Macro's AWS infrastructure. Production is in
+Pulumi (TypeScript, Bun) for all of Rox's AWS infrastructure. Production is in
 `us-east-1`; the [observability pilot](stacks/observability/README.md) runs
 independently in `us-east-2`.
 

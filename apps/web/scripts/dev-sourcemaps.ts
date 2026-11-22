@@ -51,7 +51,7 @@ export function devExternalSourcemaps(
     apply: (_config, { command, isPreview }) =>
       command === 'serve' &&
       !isPreview &&
-      env.MACRO_DEV_INLINE_SOURCEMAPS !== 'true',
+      env.ROX_DEV_INLINE_SOURCEMAPS !== 'true',
     configureServer(server) {
       server.middlewares.use(middleware);
     },

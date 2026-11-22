@@ -20,7 +20,7 @@ use crate::domain::models::{DatabaseError, OpRefusal};
 use crate::domain::ports::{DatabasesRepo, DatabasesService};
 use crate::outbound::pg_definition_store::PgDefinitionStore;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn protected_schema_ops_are_refused_and_stale_writes_are_rechecked(pool: PgPool) {
     let guests = guests(&pool).await;
     // A write planned before the protection was registered must also be refused.
@@ -87,7 +87,7 @@ async fn protected_schema_ops_are_refused_and_stale_writes_are_rechecked(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_batch_creates_a_table_a_select_column_on_it_and_rows_filling_it(pool: PgPool) {
     let guests = guests(&pool).await;
     let before = version(&pool, guests.table_id).await;
@@ -235,7 +235,7 @@ async fn one_batch_creates_a_table_a_select_column_on_it_and_rows_filling_it(poo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_batch_refused_at_its_last_op_leaves_none_of_its_schema_behind(pool: PgPool) {
     let guests = guests(&pool).await;
     let before = version(&pool, guests.table_id).await;
@@ -337,7 +337,7 @@ async fn a_batch_refused_at_its_last_op_leaves_none_of_its_schema_behind(pool: P
     assert_eq!(version(&pool, guests.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_table_id_another_database_already_has_is_refused_as_taken(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -402,7 +402,7 @@ async fn a_table_id_another_database_already_has_is_refused_as_taken(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_option_id_another_definition_already_has_is_refused_as_taken(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -502,7 +502,7 @@ async fn an_option_id_another_definition_already_has_is_refused_as_taken(pool: P
 /// A view id is the client's to mint, like a table's: one another database's
 /// view already has refuses the batch by the views' primary key, which the
 /// planner cannot see from this database's schema.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_view_id_another_database_already_has_is_refused_as_taken(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -594,7 +594,7 @@ async fn a_view_id_another_database_already_has_is_refused_as_taken(pool: PgPool
 /// The service refuses a stale base version before it plans; the store
 /// checks again under the table locks, which a concurrent batch may have
 /// moved past in between.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stale_expected_version_conflicts_and_writes_nothing(pool: PgPool) {
     let guests = guests(&pool).await;
     let before = version(&pool, guests.table_id).await;
@@ -638,7 +638,7 @@ async fn a_stale_expected_version_conflicts_and_writes_nothing(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_type_change_converts_stored_cells_and_rewrites_views_testing_the_column(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -792,7 +792,7 @@ async fn a_type_change_converts_stored_cells_and_rewrites_views_testing_the_colu
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn protected_columns_refuse_direct_sql_but_allow_parent_deletion(pool: PgPool) {
     let guests = guests(&pool).await;
     sqlx::query!("INSERT INTO database_column_protections (column_id, capability) VALUES ($1, 'delete'), ($1, 'change_type')", guests.name.into_uuid()).execute(&pool).await.unwrap();
@@ -834,7 +834,7 @@ async fn protected_columns_refuse_direct_sql_but_allow_parent_deletion(pool: PgP
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_derived_column_stores_its_formula_and_keeps_its_definition_across_edits(pool: PgPool) {
     use crate::domain::models::ColumnConfig;
     use models_databases::{Formula, Operator};

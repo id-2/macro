@@ -322,7 +322,7 @@ describe('smoke boot', () => {
     ]) {
       expect(secret[key].length).toBeGreaterThanOrEqual(32);
     }
-    expect(secret.macro_alerts_webhook_url).toStartWith('https://');
+    expect(secret.rox_alerts_webhook_url).toStartWith('https://');
     expect(
       Object.keys(secret).some((key) => key.includes('integration_key'))
     ).toBe(false);

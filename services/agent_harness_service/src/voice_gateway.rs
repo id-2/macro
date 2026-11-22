@@ -11,10 +11,10 @@ use axum::{
 };
 use entity_access::{
     domain::{models::AdminTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
 use feature_flags::FeatureFlags;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use team_agents::domain::models::{TeamAgentError, VoiceModel};
 use team_agents::domain::voice::{Voice, VoiceProvider, Voices};
@@ -26,7 +26,7 @@ const SAMPLE_CACHE_CONTROL: &str = "private, max-age=86400";
 pub(crate) struct VoiceState<Provider, Flags, Access, Auth> {
     pub(crate) voices: Arc<Voices<Provider, Flags>>,
     pub(crate) access: Arc<Access>,
-    pub(crate) authorization: MacroAuthorizationState<Auth>,
+    pub(crate) authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Provider, Flags, Access, Auth> Clone for VoiceState<Provider, Flags, Access, Auth> {
@@ -48,7 +48,7 @@ impl<Provider, Flags, Access, Auth> FromRef<VoiceState<Provider, Flags, Access, 
 }
 
 impl<Provider, Flags, Access, Auth> FromRef<VoiceState<Provider, Flags, Access, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &VoiceState<Provider, Flags, Access, Auth>) -> Self {
         state.authorization.clone()
@@ -64,7 +64,7 @@ where
     Provider: VoiceProvider,
     Flags: FeatureFlags + 'static,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         .route("/voices", get(catalog::<Provider, Flags, Access, Auth>))
@@ -90,14 +90,14 @@ where
 )]
 #[tracing::instrument(skip_all, err)]
 pub(crate) async fn catalog<Provider, Flags, Access, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Access, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Access, Auth>,
     State(state): State<VoiceState<Provider, Flags, Access, Auth>>,
 ) -> Result<Json<Vec<Voice>>, TeamAgentError>
 where
     Provider: VoiceProvider,
     Flags: FeatureFlags + 'static,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state.voices.catalog(access.entity_access_receipt).await?,
@@ -122,7 +122,7 @@ where
 )]
 #[tracing::instrument(skip_all, err)]
 pub(crate) async fn sample<Provider, Flags, Access, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Access, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Access, Auth>,
     State(state): State<VoiceState<Provider, Flags, Access, Auth>>,
     Path(model): Path<String>,
 ) -> Result<Response, TeamAgentError>
@@ -130,7 +130,7 @@ where
     Provider: VoiceProvider,
     Flags: FeatureFlags + 'static,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let model = VoiceModel::parse(model).map_err(|_| TeamAgentError::UnknownVoice)?;
     let audio = state

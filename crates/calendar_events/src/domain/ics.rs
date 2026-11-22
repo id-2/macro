@@ -8,7 +8,7 @@ use chrono::{DateTime, NaiveDate, Utc};
 use chrono_tz::Tz;
 
 use super::{
-    meeting_links::{first_macro_call_url, strip_macro_call},
+    meeting_links::{first_rox_call_url, strip_rox_call},
     models::{ConferenceProvider, EventTime, EventType},
 };
 
@@ -87,7 +87,7 @@ impl CalendarEventExport {
 /// meeting's identity, revision and series content, from a channel share or
 /// from an event file someone sent them. Guests are left out, so importing it
 /// invites no one. A channel share also leaves out the join link
-/// ([`Self::without_macro_call`]); a forwarded file keeps whatever link it
+/// ([`Self::without_rox_call`]); a forwarded file keeps whatever link it
 /// carries, since its sender meant to invite the recipient.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EventSnapshot {
@@ -112,9 +112,9 @@ pub struct EventSnapshot {
 }
 
 impl EventSnapshot {
-    /// The snapshot without its Rox call ([`content_without_macro_call`]).
-    pub fn without_macro_call(self) -> Self {
-        let (description, location) = content_without_macro_call(self.description, self.location);
+    /// The snapshot without its Rox call ([`content_without_rox_call`]).
+    pub fn without_rox_call(self) -> Self {
+        let (description, location) = content_without_rox_call(self.description, self.location);
         Self {
             description,
             location,
@@ -125,23 +125,23 @@ impl EventSnapshot {
 
 /// A channel share's view of an event's description and location, without the
 /// Rox call join link
-/// [`attach_macro_call`](super::meeting_links::attach_macro_call) wrote into
+/// [`attach_rox_call`](super::meeting_links::attach_rox_call) wrote into
 /// them: it shares the meeting, not a way into its call. A description holding
 /// the link is reduced to plain text to take its join line out; one without it
 /// is left as written.
-pub fn content_without_macro_call(
+pub fn content_without_rox_call(
     description: Option<String>,
     location: Option<String>,
 ) -> (Option<String>, Option<String>) {
-    let Some(url) = first_macro_call_url(location.as_deref(), description.as_deref()) else {
+    let Some(url) = first_rox_call_url(location.as_deref(), description.as_deref()) else {
         return (description, location);
     };
-    let holds_link = first_macro_call_url(None, description.as_deref()).is_some();
+    let holds_link = first_rox_call_url(None, description.as_deref()).is_some();
     let text = description
         .as_deref()
         .and_then(plain_text)
         .unwrap_or_default();
-    let (text, location) = strip_macro_call(&text, location.as_deref().unwrap_or_default(), &url);
+    let (text, location) = strip_rox_call(&text, location.as_deref().unwrap_or_default(), &url);
     (
         if holds_link {
             (!text.is_empty()).then_some(text)
@@ -352,9 +352,9 @@ pub fn render_event_ics(event: &CalendarEventExport, purpose: IcsPurpose<'_>) ->
         .and_then(plain_text)
         .unwrap_or_default();
     let location = event.location.clone().unwrap_or_default();
-    let macro_call = first_macro_call_url(event.location.as_deref(), event.description.as_deref());
-    let (description, location) = match (purpose, macro_call) {
-        (IcsPurpose::Share, Some(url)) => strip_macro_call(&description, &location, &url),
+    let rox_call = first_rox_call_url(event.location.as_deref(), event.description.as_deref());
+    let (description, location) = match (purpose, rox_call) {
+        (IcsPurpose::Share, Some(url)) => strip_rox_call(&description, &location, &url),
         (IcsPurpose::Share, None) => (description, location),
         // The plain text shows the generated join line's link in brackets,
         // which some clients would make part of the link.

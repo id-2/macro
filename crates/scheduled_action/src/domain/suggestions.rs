@@ -37,8 +37,8 @@ use anyhow::{Result, bail};
 use chrono::Utc;
 use chrono_tz::Tz;
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::CreationPrincipal;
 use routine_program::{CATALOG, Surface};
 use suggestions::domain::model::{GenerationSession, GenerationTrigger, RoutineText, SessionKind};
@@ -101,7 +101,7 @@ pub(crate) const ALL_SURFACES: [Surface; 9] = [
 
 /// The id of catalog routine `key` as Rox's template for `user`: the
 /// same on every read, so it can be dismissed and saved from.
-pub fn template_id(user: &MacroUserIdStr<'_>, key: &str) -> Uuid {
+pub fn template_id(user: &RoxUserIdStr<'_>, key: &str) -> Uuid {
     Uuid::new_v5(
         &TEMPLATE_NAMESPACE,
         format!("{}\n{key}", user.as_ref()).as_bytes(),
@@ -158,7 +158,7 @@ where
     }
 
     /// The flags for the person; none when they can't be read.
-    async fn flags(&self, user: &MacroUserIdStr<'_>) -> Option<feature_flags::FlagSnapshot> {
+    async fn flags(&self, user: &RoxUserIdStr<'_>) -> Option<feature_flags::FlagSnapshot> {
         self.flags
             .as_ref()?
             .load(user)
@@ -173,7 +173,7 @@ where
     }
 
     #[tracing::instrument(name = "routine.suggestions_flag", err, skip_all)]
-    async fn require_flag(&self, user: &MacroUserIdStr<'_>) -> Result<feature_flags::FlagSnapshot> {
+    async fn require_flag(&self, user: &RoxUserIdStr<'_>) -> Result<feature_flags::FlagSnapshot> {
         match self.flags(user).await {
             Some(flags) if flags.is_enabled(ROUTINE_SUGGESTIONS_FLAG) => Ok(flags),
             _ => bail!(ActionPolicyError::NotFound),
@@ -185,7 +185,7 @@ where
         &self,
         principal: &CreationPrincipal,
         correlation: Option<Uuid>,
-    ) -> Result<(MacroUserIdStr<'static>, GenerationSession, Vec<Surface>)> {
+    ) -> Result<(RoxUserIdStr<'static>, GenerationSession, Vec<Surface>)> {
         let user = principal
             .owner()
             .as_user()
@@ -230,7 +230,7 @@ where
     /// The person's suggestions, per surface AI's then Rox's templates.
     async fn answer(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         surface: Option<Surface>,
     ) -> Result<RoutineSuggestions> {
         let (status, stored, dismissed_templates, saved_from) = tokio::try_join!(
@@ -249,7 +249,7 @@ where
     async fn keep(
         &self,
         principal: &CreationPrincipal,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         session: &GenerationSession,
         allowed: &[Surface],
         request: SuggestRequest,
@@ -371,7 +371,7 @@ where
     }
 
     /// Catalog keys and routine names the person was suggested or dismissed.
-    async fn dismissed_names(&self, user: &MacroUserIdStr<'static>) -> Vec<String> {
+    async fn dismissed_names(&self, user: &RoxUserIdStr<'static>) -> Vec<String> {
         let (stored, templates) = tokio::join!(
             self.repo.suggestions(user),
             self.repo.dismissed_templates(user),
@@ -398,7 +398,7 @@ where
 {
     async fn suggestions(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         surface: Option<Surface>,
     ) -> Result<RoutineSuggestions> {
         self.require_flag(user).await?;
@@ -413,7 +413,7 @@ where
     ), err)]
     async fn brief(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         surfaces: &[Surface],
         trigger: GenerationTrigger,
         timezone: Tz,
@@ -454,7 +454,7 @@ where
     ), err)]
     async fn texts(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         ids: &[Uuid],
         timezone: Tz,
     ) -> Result<Vec<(Uuid, RoutineText)>> {
@@ -470,11 +470,11 @@ where
             .collect())
     }
 
-    async fn suggested(&self, user: &MacroUserIdStr<'static>, session: Uuid) -> Result<u32> {
+    async fn suggested(&self, user: &RoxUserIdStr<'static>, session: Uuid) -> Result<u32> {
         self.repo.kept_by(user, session).await
     }
 
-    async fn record(&self, user: &MacroUserIdStr<'static>, report: RoutineGenerationReport) {
+    async fn record(&self, user: &RoxUserIdStr<'static>, report: RoutineGenerationReport) {
         let stored = self.repo.suggestions(user).await.unwrap_or_default();
         // How long after the start the first of this generation's
         // suggestions was kept.
@@ -616,7 +616,7 @@ where
         routine.suggestion.id = %id,
         routine.suggestion.from = tracing::field::Empty,
     ), err)]
-    async fn dismiss(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<()> {
+    async fn dismiss(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<()> {
         self.require_flag(user).await?;
         let span = tracing::Span::current();
         if let Some(transition) = self.repo.dismiss(user, id).await? {
@@ -699,7 +699,7 @@ where
 /// one of Rox's templates.
 fn origin_of(
     stored: &[StoredSuggestion],
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     id: Uuid,
 ) -> Option<SuggestionOrigin> {
     if let Some(suggestion) = stored.iter().find(|suggestion| suggestion.id == id) {
@@ -736,7 +736,7 @@ pub struct StoredSuggestionOrigins<Repo>(pub Arc<Repo>);
 impl<Repo: SuggestionRepo> SuggestionOrigins for StoredSuggestionOrigins<Repo> {
     async fn origin(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         suggestion: Uuid,
     ) -> Result<Option<SuggestionOrigin>> {
         let stored = self.0.suggestions(owner).await?;
@@ -779,7 +779,7 @@ fn rejected(problems: Vec<String>) -> SuggestOutcome {
 /// picked. Each suggestion appears once, in the order its first surface
 /// reached it.
 pub fn fill(
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     stored: &[StoredSuggestion],
     dismissed_templates: &[String],
     saved_from: &[Uuid],

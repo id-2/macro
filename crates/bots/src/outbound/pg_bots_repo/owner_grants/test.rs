@@ -1,12 +1,12 @@
 use super::*;
 use crate::domain::ports::BotRepo;
 use entity_registry::OwnerGrantPolicy;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("owner_grants"))
 )]
 async fn deleted_bots_keep_their_sponsor_not_their_creator(pool: PgPool) {
@@ -31,7 +31,7 @@ async fn deleted_bots_keep_their_sponsor_not_their_creator(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn missing_bot_fails_closed(pool: PgPool) {
     let policy = OwnerGrantPolicy::new(PgBotsRepo::new(pool));
     let error = policy

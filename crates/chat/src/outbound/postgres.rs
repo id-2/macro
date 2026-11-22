@@ -14,8 +14,8 @@ use agent::types::ChatMessageContent;
 use attachment::FormattedParts;
 use entity_registry::BotFacts;
 use entity_registry_db_utils::{NewEntityRecord, OwnedEntityRegistrar, RegisteredEntityType};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::chat::ChatMessageWithAttachments;
 use model::chat::NewChatMessage;
 use model_owner::Owner;
@@ -64,7 +64,7 @@ async fn insert_owned_chat(
         .await
         .map_err(to_chat_err)?;
 
-    let chat_uuid = macro_uuid::string_to_uuid(&chat_id).map_err(to_chat_err)?;
+    let chat_uuid = rox_uuid::string_to_uuid(&chat_id).map_err(to_chat_err)?;
     Ok((chat_id, chat_uuid))
 }
 
@@ -199,7 +199,7 @@ impl<B: BotFacts + 'static> ChatRepo for PgChatRepo<B> {
     #[tracing::instrument(err, skip(self))]
     async fn get_access_level(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         chat_id: &str,
     ) -> Result<AccessLevel> {
         queries::get_access_level::get_access_level(&self.pool, user_id.as_ref(), chat_id)
@@ -307,7 +307,7 @@ impl<B: BotFacts + 'static> ChatRepo for PgChatRepo<B> {
     #[tracing::instrument(err, skip(self, args))]
     async fn patch(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         chat_id: &str,
         args: PatchChatRepoArgs,
     ) -> Result<()> {

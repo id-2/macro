@@ -65,7 +65,7 @@ async fn row_positions(pool: &PgPool, table_id: TableId) -> Vec<(RowId, Position
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn positions_compare_as_bytes_as_the_keys_sort(pool: PgPool) {
     let collations = sqlx::query!(
         r#"SELECT c.relname AS "table!", co.collname AS "collation!"
@@ -121,7 +121,7 @@ async fn positions_compare_as_bytes_as_the_keys_sort(pool: PgPool) {
     assert_eq!(stored, sorted);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_board_and_its_card_places_round_trip_and_go_with_their_rows(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -313,7 +313,7 @@ async fn a_board_and_its_card_places_round_trip_and_go_with_their_rows(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_a_column_rewrites_the_views_that_named_it(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -397,7 +397,7 @@ async fn version_of(pool: &PgPool, table_id: TableId) -> TableVersion {
         .unwrap()[&table_id]
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_board_stored_by_an_earlier_build_reads_with_its_card_places(pool: PgPool) {
     let guests = guests(&pool).await;
     let [going, declined] = insert_statuses(&pool, &guests, &["Going", "Going"]).await[..] else {
@@ -505,7 +505,7 @@ async fn a_board_stored_by_an_earlier_build_reads_with_its_card_places(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_card_moved_to_a_persons_lane_is_stored_under_them(pool: PgPool) {
     let guests = guests(&pool).await;
     let [sam] = insert_statuses(&pool, &guests, &["Going"]).await[..] else {

@@ -22,8 +22,8 @@ use entity_access::domain::models::{
     EntityPermission, OwnerAccessLevel, ViewAccessLevel,
 };
 use entity_access_management::domain::ports::EntityAccessManagementService;
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{RoxEventBroker, NoopMacroEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_owner::Owner;
 use models_permissions::share_permission::SharePermissionV2;
@@ -38,7 +38,7 @@ use unicode_segmentation::UnicodeSegmentation;
 pub struct ChatServiceImpl<R, ToolSetContext, Eam, B = NoopMacroEventBroker>
 where
     ToolSetContext: Clone + Send + Sync + 'static,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     // toolset should be replaced with trait;
     toolset: Arc<AsyncToolCollection<ToolSetContext>>,
@@ -50,7 +50,7 @@ where
 
 /// The user id to attribute a chat lifecycle event to, when the caller is an
 /// authenticated user.
-fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<MacroUserIdStr<'static>> {
+fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<RoxUserIdStr<'static>> {
     match auth {
         EntityAccessAuth::Authenticated(user_id) => Some(user_id.clone()),
         EntityAccessAuth::Bot(_)
@@ -94,13 +94,13 @@ impl<R: ChatRepo, Eam: EntityAccessManagementService> ChatServiceImpl<R, (), Eam
     }
 }
 
-impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: MacroEventBroker>
+impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: RoxEventBroker>
     ChatServiceImpl<R, ToolSetContext, Eam, B>
 where
     ToolSetContext: Clone + Send + Sync + 'static,
 {
     /// Replaces the event broker while preserving every other service dependency.
-    pub fn with_event_broker<B2: MacroEventBroker>(
+    pub fn with_event_broker<B2: RoxEventBroker>(
         self,
         event_broker: B2,
     ) -> ChatServiceImpl<R, ToolSetContext, Eam, B2> {
@@ -156,7 +156,7 @@ where
     }
 }
 
-impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: MacroEventBroker>
+impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: RoxEventBroker>
     ChatService for ChatServiceImpl<R, ToolSetContext, Eam, B>
 where
     ToolSetContext: Clone + Send + Sync + 'static,
@@ -645,7 +645,7 @@ where
     }
 }
 
-impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: MacroEventBroker>
+impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: RoxEventBroker>
     ChatServiceImpl<R, ToolSetContext, Eam, B>
 where
     ToolSetContext: Clone + Send + Sync + 'static,

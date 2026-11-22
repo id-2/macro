@@ -5,7 +5,7 @@ use axum::{
 };
 use axum_extra::extract::Cached;
 use email::{domain::ports::EmailService, inbound::axum::axum_impls::EmailLinkExtractor};
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 
 pub(in crate::api) async fn attach_link_context<U, Auth>(
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<U, Auth>>,
@@ -14,8 +14,8 @@ pub(in crate::api) async fn attach_link_context<U, Auth>(
 ) -> Result<Response, Response>
 where
     U: EmailService,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: axum::extract::FromRef<crate::api::ApiContext>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: axum::extract::FromRef<crate::api::ApiContext>,
 {
     let provider = match link.provider.as_str() {
         "GMAIL" => models_email::email::service::link::UserProvider::Gmail,
@@ -33,7 +33,7 @@ where
     req.extensions_mut()
         .insert(models_email::email::service::link::Link {
             id: link.id,
-            macro_id: link.macro_id.clone(),
+            rox_id: link.rox_id.clone(),
             fusionauth_user_id: link.fusionauth_user_id.clone(),
             email_address: link.email_address.clone(),
             provider,

@@ -382,7 +382,7 @@
     },
     {
       "id": "019f199a-21b9-73c1-99e8-f43331932c60",
-      "title": "begin using MacroEventBroker",
+      "title": "begin using RoxEventBroker",
       "body": "",
       "owner": "macro|avery.diaz@rox.one",
       "source": "prod",

@@ -22,7 +22,7 @@ pub(crate) async fn revert_delete_chat(
     .context("unable to update chat")?;
     let chat_owner = Owner::from_principal_str(&chat_owner).context("invalid chat owner")?;
 
-    let chat_uuid = macro_uuid::string_to_uuid(chat_id)?;
+    let chat_uuid = rox_uuid::string_to_uuid(chat_id)?;
     entity_registry_db_utils::clear_deleted(tx, chat_uuid).await?;
 
     // Only a user has a history feed; bot- and team-owned chats leave it alone.

@@ -16,7 +16,7 @@ use super::ics::{
 use super::join_requests::{CalendarJoinRequest, CalendarJoinRequestStatus};
 use super::labels::{EventCopy, EventLabels};
 use super::meeting_links::{
-    MacroCallEventError, MeetingLink, MeetingLinkError, MeetingLinkRequest,
+    RoxCallEventError, MeetingLink, MeetingLinkError, MeetingLinkRequest,
 };
 use super::models::{
     ActorInboxes, AlignedGuestCopy, AppliedGoogleGrant, AttendeeResponseStatus, CalendarAttendee,
@@ -926,7 +926,7 @@ pub trait CalendarRepository: Send + Sync + 'static {
     ) -> impl Future<Output = Result<Vec<EventCopy>, Report>> + Send;
 
     /// Every connected inbox the requester owns
-    /// (`email_links.macro_id = requester`). Raw and unnormalized;
+    /// (`email_links.rox_id = requester`). Raw and unnormalized;
     /// [`ActorInboxes::from_owned`] is the single normalization point.
     fn owned_inboxes(
         &self,
@@ -1180,28 +1180,28 @@ pub trait CalendarEventForwardSource: Send + Sync + 'static {
 /// update attendees receive already names the call, and its join link travels
 /// in the event's description and location. Hosts that mint meetings compose a
 /// [`CalendarMutationService`] with a [`MeetingLinkProvider`] through
-/// [`super::meeting_links::create_event_with_macro_call`] and
-/// [`super::meeting_links::update_event_with_macro_call`]; hosts that are not
+/// [`super::meeting_links::create_event_with_rox_call`] and
+/// [`super::meeting_links::update_event_with_rox_call`]; hosts that are not
 /// the calendar write authority forward the request to the calendar service.
 pub trait CalendarMacroCallService: Send + Sync + 'static {
     /// Mint a Rox call for `draft` and create the event carrying its link.
-    fn create_event_with_macro_call(
+    fn create_event_with_rox_call(
         &self,
         requester_id: &str,
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> impl Future<Output = Result<CalendarEvent, MacroCallEventError>> + Send;
+    ) -> impl Future<Output = Result<CalendarEvent, RoxCallEventError>> + Send;
 
     /// Switch an event to a Rox call, applying `patch` in the same write.
-    fn update_event_with_macro_call(
+    fn update_event_with_rox_call(
         &self,
         requester_id: &str,
         event_id: Uuid,
         calendar_id: Option<Uuid>,
         patch: CalendarEventPatch,
         scope: CalendarUpdateScope,
-    ) -> impl Future<Output = Result<CalendarEvent, MacroCallEventError>> + Send;
+    ) -> impl Future<Output = Result<CalendarEvent, RoxCallEventError>> + Send;
 }
 
 /// Outbound port minting Rox meetings for calendar events.

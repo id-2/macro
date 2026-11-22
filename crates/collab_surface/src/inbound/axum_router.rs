@@ -13,10 +13,10 @@ use entity_access::domain::{
     models::{AccessError, AnyEntityPermission, EntityAccessReceipt},
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
@@ -31,7 +31,7 @@ use crate::domain::ports::CollabSurfaceService;
 pub struct CollabSurfaceRouterState<S, Eas, Auth> {
     service: Arc<S>,
     entity_access_service: Arc<Eas>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Eas, Auth> Clone for CollabSurfaceRouterState<S, Eas, Auth> {
@@ -53,7 +53,7 @@ where
     pub fn new(
         service: Arc<S>,
         entity_access_service: Arc<Eas>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -70,7 +70,7 @@ impl<S, Eas, Auth> FromRef<CollabSurfaceRouterState<S, Eas, Auth>> for Arc<Eas> 
 }
 
 impl<S, Eas, Auth> FromRef<CollabSurfaceRouterState<S, Eas, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &CollabSurfaceRouterState<S, Eas, Auth>) -> Self {
         state.authorization_state.clone()
@@ -90,7 +90,7 @@ pub fn collab_surface_router<S, Eas, Auth, T>(
 where
     S: CollabSurfaceService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -184,7 +184,7 @@ fn build_parent(
 /// matches. The domain service decides what each permission may do.
 async fn mint_parent_receipt<Eas: EntityAccessService>(
     entity_access_service: &Eas,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     user_org_id: Option<i64>,
     parent: &Entity<'_>,
 ) -> Result<EntityAccessReceipt<AnyEntityPermission>, CollabSurfaceError> {
@@ -207,11 +207,11 @@ async fn mint_parent_receipt<Eas: EntityAccessService>(
 }
 
 /// The caller's identity and org, as the receipt-minting path needs them.
-fn caller_identity<Auth: MacroAuthorizationService>(
-    user: &MacroAuthorizationExtractor<Auth, UserOrInternal>,
-) -> (&MacroUserIdStr<'static>, Option<i64>) {
+fn caller_identity<Auth: RoxAuthorizationService>(
+    user: &RoxAuthorizationExtractor<Auth, UserOrInternal>,
+) -> (&RoxUserIdStr<'static>, Option<i64>) {
     (
-        &user.authorization.user.macro_user_id,
+        &user.authorization.user.rox_user_id,
         // Organization channels grant access by matching org, so the org must
         // be carried through or a member of one reads as a non-participant.
         user.authorization
@@ -227,7 +227,7 @@ fn caller_identity<Auth: MacroAuthorizationService>(
 async fn receipt_for_surface<S, Eas>(
     service: &S,
     entity_access_service: &Eas,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     user_org_id: Option<i64>,
     id: Uuid,
 ) -> Result<EntityAccessReceipt<AnyEntityPermission>, CollabSurfaceError>
@@ -267,14 +267,14 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn ensure_surface_handler<S, Eas, Auth>(
     State(state): State<CollabSurfaceRouterState<S, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(SurfaceIdParams { id }): Path<SurfaceIdParams>,
     Json(req): Json<EnsureCollabSurfaceRequest>,
 ) -> Result<Json<CollabSurfaceResponse>, CollabSurfaceError>
 where
     S: CollabSurfaceService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let (user_id, user_org_id) = caller_identity(&user);
     let parent = build_parent(req.parent_entity_type, &req.parent_entity_id)?;
@@ -311,13 +311,13 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn get_surface_handler<S, Eas, Auth>(
     State(state): State<CollabSurfaceRouterState<S, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(SurfaceIdParams { id }): Path<SurfaceIdParams>,
 ) -> Result<Json<CollabSurfaceResponse>, CollabSurfaceError>
 where
     S: CollabSurfaceService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let (user_id, user_org_id) = caller_identity(&user);
     let receipt = receipt_for_surface(
@@ -351,13 +351,13 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn mint_token_handler<S, Eas, Auth>(
     State(state): State<CollabSurfaceRouterState<S, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(SurfaceIdParams { id }): Path<SurfaceIdParams>,
 ) -> Result<Json<CollabSurfaceTokenResponse>, CollabSurfaceError>
 where
     S: CollabSurfaceService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let (user_id, user_org_id) = caller_identity(&user);
     let receipt = receipt_for_surface(
@@ -392,13 +392,13 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn delete_surface_handler<S, Eas, Auth>(
     State(state): State<CollabSurfaceRouterState<S, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(SurfaceIdParams { id }): Path<SurfaceIdParams>,
 ) -> Result<StatusCode, CollabSurfaceError>
 where
     S: CollabSurfaceService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let (user_id, user_org_id) = caller_identity(&user);
     let receipt = receipt_for_surface(

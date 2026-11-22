@@ -18,8 +18,8 @@ use crate::domain::{
     ports::NotificationRepository,
 };
 use either::Either;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::{Report, report};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, sync::Arc, time::Duration};
@@ -211,7 +211,7 @@ pub struct PushNotificationsEnabled {
 
 impl PushNotificationsEnabled {
     /// Get the owner (user) ID of this notification.
-    pub(crate) fn owner_id(&self) -> &MacroUserIdStr<'static> {
+    pub(crate) fn owner_id(&self) -> &RoxUserIdStr<'static> {
         &self.inner.owner_id
     }
 

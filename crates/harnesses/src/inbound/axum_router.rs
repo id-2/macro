@@ -11,9 +11,9 @@ use axum::{
     routing::{delete, get, patch, post, put},
 };
 use harness_id::HarnessId;
-use macro_authorization::{
-    AccountHolderOrInternal, HarnessOnly, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState, UserOnly, UserOrInternal,
+use rox_authorization::{
+    AccountHolderOrInternal, HarnessOnly, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState, UserOnly, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use serde::Serialize;
@@ -34,7 +34,7 @@ mod test;
 /// State for the harnesses router.
 pub struct HarnessesRouterState<S, Auth> {
     service: Arc<S>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for HarnessesRouterState<S, Auth> {
@@ -48,7 +48,7 @@ impl<S, Auth> Clone for HarnessesRouterState<S, Auth> {
 
 impl<S: HarnessService, Auth> HarnessesRouterState<S, Auth> {
     /// Create a router state.
-    pub fn new(service: S, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: S, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service: Arc::new(service),
             authorization_state,
@@ -56,7 +56,7 @@ impl<S: HarnessService, Auth> HarnessesRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<HarnessesRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<HarnessesRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &HarnessesRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -87,7 +87,7 @@ pub struct HarnessPath {
 pub fn harnesses_router<S, Auth, T>(state: HarnessesRouterState<S, Auth>) -> Router<T>
 where
     S: HarnessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync,
 {
     Router::new()
@@ -163,7 +163,7 @@ pub struct PendingClaimResponse {
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn create_pairing_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn create_pairing_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
     Json(req): Json<CreatePairingRequest>,
 ) -> Result<(StatusCode, Json<CreatedPairing>), HarnessesHandlerErr> {
@@ -187,9 +187,9 @@ pub async fn create_pairing_handler<S: HarnessService, Auth: MacroAuthorizationS
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn get_pairing_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn get_pairing_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    _authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    _authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<PairingCodePath>,
 ) -> Result<Json<PairingDetails>, HarnessesHandlerErr> {
     Ok(Json(state.service.get_pairing(&path.code).await?))
@@ -212,16 +212,16 @@ pub async fn get_pairing_handler<S: HarnessService, Auth: MacroAuthorizationServ
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn approve_pairing_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn approve_pairing_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     Path(path): Path<PairingCodePath>,
     Json(req): Json<ApprovePairingRequest>,
 ) -> Result<Json<Harness>, HarnessesHandlerErr> {
     let harness = state
         .service
         .approve_pairing(
-            authorization.authorization.user.macro_user_id,
+            authorization.authorization.user.rox_user_id,
             &path.code,
             req,
         )
@@ -250,7 +250,7 @@ pub async fn approve_pairing_handler<S: HarnessService, Auth: MacroAuthorization
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn claim_pairing_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn claim_pairing_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
     Path(path): Path<PairingIdPath>,
     Json(req): Json<ClaimPairingRequest>,
@@ -277,14 +277,14 @@ pub async fn claim_pairing_handler<S: HarnessService, Auth: MacroAuthorizationSe
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn list_harnesses_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn list_harnesses_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<Harness>>, HarnessesHandlerErr> {
     Ok(Json(
         state
             .service
-            .list_harnesses(authorization.authorization.user.macro_user_id)
+            .list_harnesses(authorization.authorization.user.rox_user_id)
             .await?,
     ))
 }
@@ -305,9 +305,9 @@ pub async fn list_harnesses_handler<S: HarnessService, Auth: MacroAuthorizationS
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn patch_harness_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn patch_harness_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<HarnessPath>,
     Json(req): Json<PatchHarnessRequest>,
 ) -> Result<Json<Harness>, HarnessesHandlerErr> {
@@ -315,7 +315,7 @@ pub async fn patch_harness_handler<S: HarnessService, Auth: MacroAuthorizationSe
         state
             .service
             .patch_harness(
-                authorization.authorization.user.macro_user_id,
+                authorization.authorization.user.rox_user_id,
                 path.harness_id,
                 req,
             )
@@ -335,14 +335,14 @@ pub async fn patch_harness_handler<S: HarnessService, Auth: MacroAuthorizationSe
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn list_directory_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn list_directory_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<Harness>>, HarnessesHandlerErr> {
     Ok(Json(
         state
             .service
-            .list_directory(authorization.authorization.user.macro_user_id)
+            .list_directory(authorization.authorization.user.rox_user_id)
             .await?,
     ))
 }
@@ -364,9 +364,9 @@ pub async fn list_directory_handler<S: HarnessService, Auth: MacroAuthorizationS
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn set_team_access_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn set_team_access_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<HarnessPath>,
     Json(req): Json<SetHarnessTeamAccessRequest>,
 ) -> Result<StatusCode, HarnessesHandlerErr> {
@@ -376,7 +376,7 @@ pub async fn set_team_access_handler<S: HarnessService, Auth: MacroAuthorization
     state
         .service
         .set_team_access(
-            authorization.authorization.macro_user_id,
+            authorization.authorization.rox_user_id,
             path.harness_id,
             req,
         )
@@ -397,16 +397,16 @@ pub async fn set_team_access_handler<S: HarnessService, Auth: MacroAuthorization
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn list_residents_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn list_residents_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<HarnessPath>,
 ) -> Result<Json<Vec<HarnessResident>>, HarnessesHandlerErr> {
     Ok(Json(
         state
             .service
             .list_residents(
-                authorization.authorization.user.macro_user_id,
+                authorization.authorization.user.rox_user_id,
                 path.harness_id,
             )
             .await?,
@@ -427,15 +427,15 @@ pub async fn list_residents_handler<S: HarnessService, Auth: MacroAuthorizationS
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn delete_harness_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn delete_harness_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<HarnessPath>,
 ) -> Result<StatusCode, HarnessesHandlerErr> {
     state
         .service
         .delete_harness(
-            authorization.authorization.user.macro_user_id,
+            authorization.authorization.user.rox_user_id,
             path.harness_id,
         )
         .await?;
@@ -455,9 +455,9 @@ pub async fn delete_harness_handler<S: HarnessService, Auth: MacroAuthorizationS
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn get_self_harness_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn get_self_harness_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, HarnessOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, HarnessOnly>,
     headers: HeaderMap,
 ) -> Result<Json<Harness>, HarnessesHandlerErr> {
     let harness = state
@@ -498,9 +498,9 @@ fn runtime_presence_disagrees(headers: &HeaderMap, harness: &Harness) -> bool {
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn delete_self_harness_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn delete_self_harness_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, HarnessOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, HarnessOnly>,
 ) -> Result<StatusCode, HarnessesHandlerErr> {
     state
         .service
@@ -521,9 +521,9 @@ pub async fn delete_self_harness_handler<S: HarnessService, Auth: MacroAuthoriza
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn list_harness_sessions_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn list_harness_sessions_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, HarnessOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, HarnessOnly>,
 ) -> Result<Json<Vec<HarnessSession>>, HarnessesHandlerErr> {
     Ok(Json(
         state
@@ -545,9 +545,9 @@ pub async fn list_harness_sessions_handler<S: HarnessService, Auth: MacroAuthori
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn list_bound_agents_handler<S: HarnessService, Auth: MacroAuthorizationService>(
+pub async fn list_bound_agents_handler<S: HarnessService, Auth: RoxAuthorizationService>(
     State(state): State<HarnessesRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, HarnessOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, HarnessOnly>,
 ) -> Result<Json<Vec<HarnessAgent>>, HarnessesHandlerErr> {
     Ok(Json(
         state

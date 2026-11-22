@@ -15,7 +15,7 @@ use github::domain::models::GithubError;
 use github::domain::ports::{GithubSyncClient, GithubSyncRepo};
 use github::domain::service::InstallationTokenService;
 use lru::LruCache;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::num::NonZeroUsize;
 use std::sync::Mutex;
 use url::Url;
@@ -72,7 +72,7 @@ pub struct GithubAppTokens<Installations, Client> {
     /// an ownership check that did not happen for this user. Bounded, so the
     /// map cannot grow with every owner ever seen; freshness still comes from
     /// each token's own expiry, never from cache residency.
-    cached: Mutex<LruCache<(MacroUserIdStr<'static>, RepoSlug), CachedToken>>,
+    cached: Mutex<LruCache<(RoxUserIdStr<'static>, RepoSlug), CachedToken>>,
 }
 
 #[derive(Clone)]
@@ -98,7 +98,7 @@ where
 
     async fn token(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         repo: &RepoSlug,
     ) -> Result<String, EgressError> {
         let key = (owner.clone(), repo.clone());
@@ -154,7 +154,7 @@ where
     #[tracing::instrument(skip_all, err, fields(%owner, %repo))]
     async fn resolve(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         repo: &RepoSlug,
     ) -> Result<UpstreamCall, EgressError> {
         let token = self.token(owner, repo).await?;

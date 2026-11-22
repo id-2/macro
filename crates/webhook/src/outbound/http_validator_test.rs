@@ -125,9 +125,9 @@ fn detects_reserved_headers_case_insensitively() {
         "X-Rox-Timestamp",
         "X-Rox-Event",
         "X-Macro-Signature",
-        "x-macro-event-id",
+        "x-rox-event-id",
         "X-Macro-Timestamp",
-        "x-macro-event",
+        "x-rox-event",
     ] {
         assert!(is_reserved_header(name), "{name} should be reserved");
     }
@@ -140,6 +140,6 @@ fn detects_reserved_headers_case_insensitively() {
 fn emits_both_header_families() {
     assert_eq!(EVENT_HEADER, "x-rox-event");
     assert_eq!(EVENT_ID_HEADER, "x-rox-event-id");
-    assert_eq!(LEGACY_EVENT_HEADER, "x-macro-event");
-    assert_eq!(LEGACY_EVENT_ID_HEADER, "x-macro-event-id");
+    assert_eq!(LEGACY_EVENT_HEADER, "x-rox-event");
+    assert_eq!(LEGACY_EVENT_ID_HEADER, "x-rox-event-id");
 }

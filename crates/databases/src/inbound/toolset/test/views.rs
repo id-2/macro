@@ -35,7 +35,7 @@ async fn a_new_name_creates_the_view_through_an_op() {
 
     assert_eq!(
         calls.lock().unwrap().acting_bots,
-        vec![Some(bot_id::MACRO_AI_BOT_ID)]
+        vec![Some(bot_id::ROX_AI_BOT_ID)]
     );
     // The tool mints the new view's id; the view saved is the one it named.
     assert!(saved.created);

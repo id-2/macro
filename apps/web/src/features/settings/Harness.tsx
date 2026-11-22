@@ -1,7 +1,7 @@
 import { TutorialPill } from '@app/features/video-tutorials';
 import { useCodexAgentsAccess } from '@core/codex/flag';
 import { toast } from '@core/component/Toast/Toast';
-import { MACRO_HARNESS_NAME } from '@core/constant/macroAgent';
+import { ROX_HARNESS_NAME } from '@core/constant/macroAgent';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { ThrownResultError, thrownResultErrorHasCode } from '@core/util/result';
 import HardDrivesIcon from '@icon/system/regular/hard-drives.svg';
@@ -41,7 +41,7 @@ import {
 } from './computers/primitives/setup-request';
 import { useTeamComputers } from './computers/primitives/team-computers';
 import { GetComputerEntry } from './computers/views/get-computer-entry';
-import { MacroComputers } from './computers/views/MacroComputers';
+import { RoxComputers } from './computers/views/RoxComputers';
 import {
   CURSOR_KEY_FORMAT_ERROR,
   CURSOR_KEY_PREFIX,
@@ -239,7 +239,7 @@ export function Harness(
               canRemoveShared={isTeamOwner()}
               onRemove={setRemovingHarness}
             />
-            <MacroComputers
+            <RoxComputers
               harnesses={harnesses()}
               buying={buyingComputer()}
               onBuyingChange={setBuyingComputer}
@@ -257,7 +257,7 @@ export function Harness(
                   <div class="min-w-0 flex-1">
                     <div class="flex min-h-5 items-start justify-between gap-3">
                       <h2 class="min-w-0 text-sm/5 font-medium text-ink">
-                        {MACRO_HARNESS_NAME}
+                        {ROX_HARNESS_NAME}
                       </h2>
                       <span class="inline-flex h-5 shrink-0 items-center whitespace-nowrap rounded-md bg-success-bg px-2 text-[11px]/none font-medium text-success">
                         Built in

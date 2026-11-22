@@ -7,6 +7,6 @@
 import type { UserTopicEventOneOf } from './userTopicEventOneOf';
 
 /**
- * Events that can be published to [`MacroUsersTopic`].
+ * Events that can be published to [`RoxUsersTopic`].
  */
 export type UserTopicEvent = UserTopicEventOneOf;

@@ -29,7 +29,7 @@ use ai_tools::{DeferredToolSet, ToolServiceContext};
 use ai_toolset::{AsyncToolCollection, ToolSet as AiToolSet};
 use axum::extract::FromRef;
 use futures::{FutureExt as _, StreamExt as _};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use memory::domain::MemoryService as _;
 use memory::domain::service::MemoryServiceImpl;
 use memory::outbound::pg_memory_repo::PgMemoryRepo;
@@ -63,12 +63,12 @@ mod measure_prompt_cache;
 const PART_BUFFER: usize = 256;
 
 const EAGER_INTERNAL_MCP_TOOLS: &[&str] = &[
-    "mcp__macro_internal__PresentReview",
-    "mcp__macro_internal__GetReview",
-    "mcp__macro_internal__DecideReview",
-    "mcp__macro_internal__ExecuteCode",
-    "mcp__macro_internal__DescribeCodeTools",
-    "mcp__macro_internal__ReadCodeDocs",
+    "mcp__rox_internal__PresentReview",
+    "mcp__rox_internal__GetReview",
+    "mcp__rox_internal__DecideReview",
+    "mcp__rox_internal__ExecuteCode",
+    "mcp__rox_internal__DescribeCodeTools",
+    "mcp__rox_internal__ReadCodeDocs",
 ];
 
 /// [`TurnEngine`] backed by [`agent::AgentLoop`] and
@@ -497,7 +497,7 @@ struct TurnRouting<'a> {
 /// listing future is deep enough to overflow the turn's own future type.
 fn select_skills<'a>(
     context: &'a ToolServiceContext,
-    owner: &'a MacroUserIdStr<'static>,
+    owner: &'a RoxUserIdStr<'static>,
     request: cognition::domain::RoutingRequest<'a>,
     already_loaded: &'a [uuid::Uuid],
     cancel: &'a CancellationToken,
@@ -1126,7 +1126,7 @@ fn routes_documentation(delivery: ReplyDelivery, instructions: Option<&str>) -> 
 /// The owner's memory block, or `None` when it is missing or failed to load.
 async fn fetch_user_memory(
     memory_service: &MemoryServiceImpl<PgMemoryRepo>,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
 ) -> Option<String> {
     match memory_service.get_memory(owner.clone()).await {
         Ok(memory) => memory.map(|memory| memory.to_string()),

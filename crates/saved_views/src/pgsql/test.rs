@@ -2,7 +2,7 @@ use super::PgViewStorage;
 use crate::domain::{
     ChangeNotifier, Error, MembershipPort, SavedViewService, ShareChange, Update, ViewsChanged,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 use std::{
@@ -80,7 +80,7 @@ async fn names(service: &Service, viewer: &str) -> Vec<String> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("users"))
 )]
 async fn reorder_sets_list_order_and_leaves_others_after(pool: PgPool) {
@@ -118,7 +118,7 @@ async fn reorder_sets_list_order_and_leaves_others_after(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("users"))
 )]
 async fn pagination_keeps_order_across_placed_and_unplaced_views(pool: PgPool) {
@@ -152,7 +152,7 @@ async fn pagination_keeps_order_across_placed_and_unplaced_views(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("users"))
 )]
 async fn viewer_order_of_shared_views_is_personal(pool: PgPool) {
@@ -192,7 +192,7 @@ async fn viewer_order_of_shared_views_is_personal(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("users"))
 )]
 async fn reorder_rejects_views_the_viewer_cannot_place(pool: PgPool) {
@@ -243,7 +243,7 @@ async fn reorder_rejects_views_the_viewer_cannot_place(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("users"))
 )]
 async fn deleting_a_placed_view_removes_its_position(pool: PgPool) {
@@ -274,7 +274,7 @@ async fn deleting_a_placed_view_removes_its_position(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("users"))
 )]
 async fn committed_writes_signal_their_kind_and_audience(pool: PgPool) {
@@ -316,7 +316,7 @@ async fn committed_writes_signal_their_kind_and_audience(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("users"))
 )]
 async fn writes_that_change_nothing_send_no_signal(pool: PgPool) {

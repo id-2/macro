@@ -1,7 +1,7 @@
 use entity_access::domain::models::AccessError;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_owner::Owner;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -22,8 +22,8 @@ use crate::outbound::postgres::test::{TestRepo, test_repo};
 const OWNER: &str = "macro|test@example.com";
 const TEAM_ID: Uuid = Uuid::from_u128(0xb2222222_2222_2222_2222_222222222222);
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap().into_owned()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap().into_owned()
 }
 
 async fn create_chat(repo: &TestRepo, name: &str) -> String {
@@ -137,7 +137,7 @@ fn unshared() -> StoredTeamShare {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users", "team"))
 )]
 async fn get_team_share_facts_reads_owner_team_and_null_state(pool: PgPool) {
@@ -155,7 +155,7 @@ async fn get_team_share_facts_reads_owner_team_and_null_state(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users"))
 )]
 async fn get_team_share_facts_without_team_has_no_owner_team(pool: PgPool) {
@@ -169,7 +169,7 @@ async fn get_team_share_facts_without_team_has_no_owner_team(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users", "team"))
 )]
 async fn patch_applies_team_share_command_and_inserts_direct_team_entity_access(pool: PgPool) {
@@ -211,7 +211,7 @@ async fn patch_applies_team_share_command_and_inserts_direct_team_entity_access(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users", "team"))
 )]
 async fn patch_clear_command_removes_managed_team_entity_access_and_bumps_revision(pool: PgPool) {
@@ -235,7 +235,7 @@ async fn patch_clear_command_removes_managed_team_entity_access_and_bumps_revisi
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users", "team"))
 )]
 async fn patch_with_team_level_but_no_command_returns_unauthorized(pool: PgPool) {
@@ -266,7 +266,7 @@ async fn patch_with_team_level_but_no_command_returns_unauthorized(pool: PgPool)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users", "team"))
 )]
 async fn patch_rejects_command_for_other_chat_or_mismatched_level(pool: PgPool) {
@@ -309,7 +309,7 @@ async fn patch_rejects_command_for_other_chat_or_mismatched_level(pool: PgPool) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users", "team"))
 )]
 async fn patch_stale_command_returns_conflict(pool: PgPool) {
@@ -340,7 +340,7 @@ async fn patch_stale_command_returns_conflict(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users", "team"))
 )]
 async fn patch_team_share_and_link_share_in_one_call_persists_both(pool: PgPool) {
@@ -377,7 +377,7 @@ async fn patch_team_share_and_link_share_in_one_call_persists_both(pool: PgPool)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("users", "team"))
 )]
 async fn get_permissions_reads_team_share_access_level(pool: PgPool) {

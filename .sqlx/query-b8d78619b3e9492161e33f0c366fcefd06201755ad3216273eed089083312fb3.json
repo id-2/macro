@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT l.id,l.sync_generation FROM email_links l JOIN email_messages m ON m.link_id = l.id\n        WHERE m.id = $1 AND (l.macro_id = $2 OR EXISTS (SELECT 1 FROM macro_user_links u WHERE u.link_id = l.id AND u.primary_macro_id = $2))\n        FOR UPDATE OF l\n    ",
+  "query": "\n        SELECT l.id,l.sync_generation FROM email_links l JOIN email_messages m ON m.link_id = l.id\n        WHERE m.id = $1 AND (l.rox_id = $2 OR EXISTS (SELECT 1 FROM rox_user_links u WHERE u.link_id = l.id AND u.primary_rox_id = $2))\n        FOR UPDATE OF l\n    ",
   "describe": {
     "columns": [
       {

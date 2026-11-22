@@ -1,7 +1,7 @@
 //! Persistent meeting links and guest identity validation.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::models::CallError;
@@ -246,15 +246,15 @@ pub struct MeetingInvitePermissions {
 pub struct InviteMeetingUsersRequest {
     /// Human user principals; bot principals and historical bare bot UUIDs are invalid.
     #[cfg_attr(feature = "inbound", schema(value_type = Vec<String>))]
-    pub user_ids: Vec<MacroUserIdStr<'static>>,
+    pub user_ids: Vec<RoxUserIdStr<'static>>,
 }
 
 impl InviteMeetingUsersRequest {
     /// Bound the batch, omit the caller, and preserve only distinct recipients.
     pub fn recipients(
         self,
-        actor: &MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, CallError> {
+        actor: &RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, CallError> {
         const MAX_MEETING_INVITE_RECIPIENTS: usize = 50;
         if self.user_ids.is_empty() || self.user_ids.len() > MAX_MEETING_INVITE_RECIPIENTS {
             return Err(CallError::InvalidRequest(format!(

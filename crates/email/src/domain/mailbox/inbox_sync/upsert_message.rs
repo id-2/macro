@@ -4,7 +4,7 @@ use crate::domain::events::{
 };
 use email_api_client::domain::models::{EmailApiError, MessageWithCalendarParts};
 use email_utils::dedupe_emails;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::db::address::EmailRecipientType;
 use models_email::gmail::inbox_sync::{InboxSyncOperation, UpsertMessagePayload};
 use models_email::service::attachment::{
@@ -71,7 +71,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     match ctx
         .gmail
@@ -102,7 +102,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     // Snapshot the previous draft state before the upsert. Provider drafts are mutable,
     // and this state distinguishes a draft-to-sent transition from an unchanged message.
@@ -291,7 +291,7 @@ where
             MessageSyncEventKind::DraftSynced => {
                 EmailMacroEvent::message_draft_synced(MessageDraftSyncedMetadata {
                     link_id: link.id,
-                    owner: link.macro_id.clone(),
+                    owner: link.rox_id.clone(),
                     message_id: message_db_id,
                     provider_message_id: payload.provider_message_id.clone(),
                     thread_id: thread_db_id,
@@ -302,7 +302,7 @@ where
             MessageSyncEventKind::Received => {
                 EmailMacroEvent::message_received(MessageReceivedMetadata {
                     link_id: link.id,
-                    owner: link.macro_id.clone(),
+                    owner: link.rox_id.clone(),
                     message_id: message_db_id,
                     provider_message_id: payload.provider_message_id.clone(),
                     thread_id: thread_db_id,
@@ -319,7 +319,7 @@ where
             }
             MessageSyncEventKind::Sent => EmailMacroEvent::message_sent(MessageSentMetadata {
                 link_id: link.id,
-                owner: link.macro_id.clone(),
+                owner: link.rox_id.clone(),
                 actor: None,
                 message_id: message_db_id,
                 provider_message_id: payload.provider_message_id.clone(),
@@ -358,7 +358,7 @@ where
     // trigger FE inbox refresh
     ctx.effects
         .refresh(
-            link.macro_id.as_ref(),
+            link.rox_id.as_ref(),
             InboxSyncRefresh::UpsertMessage(link.id),
         )
         .await;

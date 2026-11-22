@@ -5,7 +5,7 @@ import type { IUser } from './types';
 // TODO: consolidate idToEmail, see idToEmail in email.ts
 /**
  * Converts a user id to an email address.
- * @deprecated Use `macroIdToEmail` with a validated `MacroId` instead.
+ * @deprecated Use `macroIdToEmail` with a validated `RoxId` instead.
  */
 export function idToEmail(id: string): string {
   return id.replace('macro|', '');
@@ -13,7 +13,7 @@ export function idToEmail(id: string): string {
 
 /**
  * Converts an email address to a user id.
- * @deprecated Use `emailToMacroId` instead for type-safe MacroId creation.
+ * @deprecated Use `emailToMacroId` instead for type-safe RoxId creation.
  */
 export function emailToId(email: string): string {
   return `macro|${email}`;

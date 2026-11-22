@@ -49,11 +49,11 @@ pub async fn bulk_patch_sent_notification_event_item_ids(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
     use sqlx::{Pool, Postgres};
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../../fixtures", scripts("user_notifications"))
     )]
     async fn test_bulk_patch_sent(pool: Pool<Postgres>) -> anyhow::Result<()> {

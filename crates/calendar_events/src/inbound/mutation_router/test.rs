@@ -147,20 +147,20 @@ fn attendee_body_defaults_to_required_attendance() {
 }
 
 #[test]
-fn macro_call_failures_map_to_transport_semantics() {
-    let failed = CalendarMutationApiError::from(MacroCallEventError::MeetingLink(
+fn rox_call_failures_map_to_transport_semantics() {
+    let failed = CalendarMutationApiError::from(RoxCallEventError::MeetingLink(
         MeetingLinkError::Failed("call service at 10.0.0.9 returned 502".to_string()),
     ));
     assert_eq!(
         (failed.status, failed.code),
         (
             StatusCode::SERVICE_UNAVAILABLE,
-            CalendarMutationErrorCode::MacroCallFailed
+            CalendarMutationErrorCode::RoxCallFailed
         )
     );
     assert!(!failed.message.contains("10.0.0.9"));
 
-    let invalid = CalendarMutationApiError::from(MacroCallEventError::MeetingLink(
+    let invalid = CalendarMutationApiError::from(RoxCallEventError::MeetingLink(
         MeetingLinkError::InvalidInput("title too long".to_string()),
     ));
     assert_eq!(
@@ -172,7 +172,7 @@ fn macro_call_failures_map_to_transport_semantics() {
     );
     assert_eq!(invalid.message, "title too long");
 
-    let calendar = CalendarMutationApiError::from(MacroCallEventError::Calendar(
+    let calendar = CalendarMutationApiError::from(RoxCallEventError::Calendar(
         CalendarMutationError::ReadOnly,
     ));
     assert_eq!(
@@ -182,7 +182,7 @@ fn macro_call_failures_map_to_transport_semantics() {
 }
 
 #[test]
-fn create_requests_carry_no_macro_call_unless_asked() {
+fn create_requests_carry_no_rox_call_unless_asked() {
     let time = serde_json::to_value(EventTime::AllDay {
         start_date: chrono::NaiveDate::from_ymd_opt(2026, 10, 6).unwrap(),
         end_date: chrono::NaiveDate::from_ymd_opt(2026, 10, 7).unwrap(),
@@ -190,13 +190,13 @@ fn create_requests_carry_no_macro_call_unless_asked() {
     .unwrap();
     let request: CreateCalendarEventRequest =
         serde_json::from_value(serde_json::json!({ "title": "Lunch", "time": time })).unwrap();
-    assert!(!request.macro_call);
+    assert!(!request.rox_call);
 
     let request: CreateCalendarEventRequest = serde_json::from_value(
         serde_json::json!({ "title": "Lunch", "time": time, "macroCall": true }),
     )
     .unwrap();
-    assert!(request.macro_call);
+    assert!(request.rox_call);
 }
 
 #[test]
@@ -230,7 +230,7 @@ fn a_copy_refusal_asks_the_caller_to_name_the_inbox() {
 fn a_program_cannot_create_an_event_the_user_has_not_seen() {
     let mut program = axum::http::HeaderMap::new();
     program.insert(
-        macro_authorization::CODE_EXECUTION_HEADER,
+        rox_authorization::CODE_EXECUTION_HEADER,
         "1".parse().unwrap(),
     );
     let browser = axum::http::HeaderMap::new();

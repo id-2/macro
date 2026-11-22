@@ -4,7 +4,7 @@ use std::pin::Pin;
 use chrono::Utc;
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use tokio::sync::mpsc::{Receiver, Sender};
 
 use crate::domain::models::{DispatchEvent, InProgressExecution, ScheduledAction};

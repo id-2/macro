@@ -3,14 +3,14 @@ use std::sync::Mutex;
 
 use agent_session::domain::model::AgentSessionId;
 use entity_access::domain::models::AccessLevel;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::{LexicalPromptMentions, MentionSource, SessionAccess};
 use crate::domain::error::{HarnessError, Result};
 use crate::domain::ports::PromptMentions;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).expect("a valid email")
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).expect("a valid email")
 }
 
 struct FixedMentions(Result<Vec<String>>);
@@ -27,32 +27,32 @@ impl MentionSource for FixedMentions {
 /// Grants as a map, recording every edit grant asked for.
 #[derive(Default)]
 struct FixedAccess {
-    levels: HashMap<MacroUserIdStr<'static>, AccessLevel>,
-    granted: Mutex<Vec<Vec<MacroUserIdStr<'static>>>>,
+    levels: HashMap<RoxUserIdStr<'static>, AccessLevel>,
+    granted: Mutex<Vec<Vec<RoxUserIdStr<'static>>>>,
 }
 
 impl FixedAccess {
-    fn with(levels: impl IntoIterator<Item = (MacroUserIdStr<'static>, AccessLevel)>) -> Self {
+    fn with(levels: impl IntoIterator<Item = (RoxUserIdStr<'static>, AccessLevel)>) -> Self {
         Self {
             levels: levels.into_iter().collect(),
             granted: Mutex::default(),
         }
     }
 
-    fn granted(&self) -> Vec<Vec<MacroUserIdStr<'static>>> {
+    fn granted(&self) -> Vec<Vec<RoxUserIdStr<'static>>> {
         self.granted.lock().expect("grants lock").clone()
     }
 }
 
 impl SessionAccess for &'static FixedAccess {
-    async fn viewers(&self, _session_id: AgentSessionId) -> Result<Vec<MacroUserIdStr<'static>>> {
+    async fn viewers(&self, _session_id: AgentSessionId) -> Result<Vec<RoxUserIdStr<'static>>> {
         Ok(self.levels.keys().cloned().collect())
     }
 
     async fn access_of(
         &self,
         _session_id: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Option<AccessLevel>> {
         Ok(self.levels.get(user).copied())
     }
@@ -60,7 +60,7 @@ impl SessionAccess for &'static FixedAccess {
     async fn grant_edit(
         &self,
         _session_id: AgentSessionId,
-        users: &[MacroUserIdStr<'static>],
+        users: &[RoxUserIdStr<'static>],
     ) -> Result<()> {
         self.granted
             .lock()
@@ -70,11 +70,11 @@ impl SessionAccess for &'static FixedAccess {
     }
 }
 
-fn access(levels: Vec<(MacroUserIdStr<'static>, AccessLevel)>) -> &'static FixedAccess {
+fn access(levels: Vec<(RoxUserIdStr<'static>, AccessLevel)>) -> &'static FixedAccess {
     Box::leak(Box::new(FixedAccess::with(levels)))
 }
 
-fn owner() -> MacroUserIdStr<'static> {
+fn owner() -> RoxUserIdStr<'static> {
     user("owner@rox.one")
 }
 
@@ -162,20 +162,20 @@ async fn a_prompt_naming_nobody_never_touches_access() {
         async fn viewers(
             &self,
             _session_id: AgentSessionId,
-        ) -> Result<Vec<MacroUserIdStr<'static>>> {
+        ) -> Result<Vec<RoxUserIdStr<'static>>> {
             panic!("access should not be consulted for a prompt with no mentions")
         }
         async fn access_of(
             &self,
             _session_id: AgentSessionId,
-            _user: &MacroUserIdStr<'static>,
+            _user: &RoxUserIdStr<'static>,
         ) -> Result<Option<AccessLevel>> {
             panic!("access should not be consulted for a prompt with no mentions")
         }
         async fn grant_edit(
             &self,
             _session_id: AgentSessionId,
-            _users: &[MacroUserIdStr<'static>],
+            _users: &[RoxUserIdStr<'static>],
         ) -> Result<()> {
             panic!("nothing should be granted for a prompt with no mentions")
         }

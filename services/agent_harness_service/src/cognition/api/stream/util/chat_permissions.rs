@@ -1,7 +1,7 @@
 use crate::cognition::api::context::ApiContext;
 use anyhow::Result;
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_permissions::share_permission::access_level::AccessLevel;
 
@@ -16,7 +16,7 @@ use models_permissions::share_permission::access_level::AccessLevel;
 )]
 pub async fn chat_access(
     ctx: &ApiContext,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     chat_id: &str,
     stream_id: String,
 ) -> Result<AccessLevel> {

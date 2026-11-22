@@ -11,7 +11,7 @@ use axum::{
     routing::{get, post},
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 
 use crate::domain::{models::ImportError, ports::ImportService};
 
@@ -33,7 +33,7 @@ pub struct SlackRouterState<T, Eas, Auth> {
     /// Standard team receipt provider.
     pub entity_access_service: Arc<Eas>,
     /// Standard authentication provider.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, Eas, Auth> Clone for SlackRouterState<T, Eas, Auth> {
@@ -52,7 +52,7 @@ impl<T, Eas, Auth> FromRef<SlackRouterState<T, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<T, Eas, Auth> FromRef<SlackRouterState<T, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Eas, Auth> FromRef<SlackRouterState<T, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &SlackRouterState<T, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -63,7 +63,7 @@ pub fn slack_router<T, Eas, Auth, S>(state: SlackRouterState<T, Eas, Auth>) -> R
 where
     T: ImportService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()

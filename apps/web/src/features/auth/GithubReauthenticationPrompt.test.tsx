@@ -23,7 +23,7 @@ vi.mock('@core/mobile/isNativeMobilePlatform', () => ({
 
 vi.mock('@core/auth/native-auth', () => ({
   createNativeAuthSession: () => ({
-    callbackUrl: 'macro://android-auth/test-attempt',
+    callbackUrl: 'rox://android-auth/test-attempt',
     authenticate: mocks.authenticate,
   }),
 }));
@@ -149,7 +149,7 @@ describe('GithubReauthenticationPrompt', () => {
       await vi.advanceTimersByTimeAsync(0);
 
       expect(mocks.reauthenticateGithub).toHaveBeenCalledWith(
-        'macro://android-auth/test-attempt'
+        'rox://android-auth/test-attempt'
       );
       expect(mocks.authenticate).toHaveBeenCalledWith(authorizationUrl);
       expect(window.location.href).toBe(originalUrl);

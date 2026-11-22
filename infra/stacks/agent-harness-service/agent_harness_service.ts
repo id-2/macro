@@ -696,7 +696,7 @@ export class AgentHarnessService extends pulumi.ComponentResource {
       },
       { parent: this }
     );
-    // MacroConfig reads only Doppler in ECS, so the key reaches the service
+    // RoxConfig reads only Doppler in ECS, so the key reaches the service
     // through it rather than the container environment.
     const dopplerKeyId = new doppler.Secret(
       `harness-MCP_OAUTH_KMS_KEY_ID-${stack}`,

@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 
@@ -12,7 +12,7 @@ async fn insert_fixtures(pool: &PgPool) {
             ('01900000-0000-7000-8000-00000000000b', 'gone', 'gone@rox.one', 'cus_b'),
             ('01900000-0000-7000-8000-00000000000c', 'sam', 'sam@agents.macro.invalid', 'cus_c'),
             ('01900000-0000-7000-8000-00000000000d', 'kim', 'kim@agents.macro.invalid', 'cus_d');
-        INSERT INTO "User" (id, email, macro_user_id, "isAgent") VALUES
+        INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES
             ('macro|admin@rox.one', 'admin@rox.one', '01900000-0000-7000-8000-00000000000a', FALSE),
             ('macro|gone@rox.one', 'gone@rox.one', '01900000-0000-7000-8000-00000000000b', FALSE),
             ('macro|sam@agents.macro.invalid', 'sam@agents.macro.invalid', '01900000-0000-7000-8000-00000000000c', TRUE),
@@ -30,14 +30,14 @@ async fn insert_fixtures(pool: &PgPool) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_agent_follows_its_creator_then_its_team_owner(pool: PgPool) {
     insert_fixtures(&pool).await;
     let creators = PgAgentCreators::new(pool);
 
-    let sam = MacroUserIdStr::parse_from_str("macro|sam@agents.macro.invalid").unwrap();
-    let kim = MacroUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
-    let admin = MacroUserIdStr::parse_from_str("macro|admin@rox.one").unwrap();
+    let sam = RoxUserIdStr::parse_from_str("macro|sam@agents.macro.invalid").unwrap();
+    let kim = RoxUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
+    let admin = RoxUserIdStr::parse_from_str("macro|admin@rox.one").unwrap();
 
     assert_eq!(
         creators.creator_of(&sam).await.unwrap(),
@@ -53,15 +53,15 @@ async fn an_agent_follows_its_creator_then_its_team_owner(pool: PgPool) {
     assert_eq!(creators.creator_of(&admin).await.unwrap(), None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn with_its_creator_gone_the_team_owners_rollout_decides(pool: PgPool) {
     use feature_flags::outbound::fake::FakeFeatureFlags;
     use feature_flags::{FlagSnapshot, FlagValue};
 
     insert_fixtures(&pool).await;
     let creators = PgAgentCreators::new(pool);
-    let kim = MacroUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
-    let admin = MacroUserIdStr::parse_from_str("macro|admin@rox.one")
+    let kim = RoxUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
+    let admin = RoxUserIdStr::parse_from_str("macro|admin@rox.one")
         .unwrap()
         .into_owned();
 

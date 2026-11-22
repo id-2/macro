@@ -12,21 +12,21 @@ use entity_access::{
     },
     inbound::axum_extractors::AgentSessionAccessLevelExtractor,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use std::sync::Arc;
 
 /// State shared by Rox control routes and the standard authorization extractors.
 pub struct ControlState<Access, Auth> {
     service: PreviewService,
     access: Arc<Access>,
-    auth: MacroAuthorizationState<Auth>,
+    auth: RoxAuthorizationState<Auth>,
 }
 impl<Access, Auth> ControlState<Access, Auth> {
     /// Compose service and existing Rox authentication/entity-access implementations.
     pub fn new(
         service: PreviewService,
         access: Arc<Access>,
-        auth: MacroAuthorizationState<Auth>,
+        auth: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -49,7 +49,7 @@ impl<Access, Auth> FromRef<ControlState<Access, Auth>> for Arc<Access> {
         state.access.clone()
     }
 }
-impl<Access, Auth> FromRef<ControlState<Access, Auth>> for MacroAuthorizationState<Auth> {
+impl<Access, Auth> FromRef<ControlState<Access, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ControlState<Access, Auth>) -> Self {
         state.auth.clone()
     }
@@ -62,7 +62,7 @@ pub struct PreviewSnapshot {
 }
 
 /// Control endpoints; mount under `/preview` on Rox's authenticated API gateway.
-pub fn router<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub fn router<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     state: ControlState<Access, Auth>,
 ) -> Router {
     Router::new()
@@ -76,7 +76,7 @@ pub fn router<Access: EntityAccessService, Auth: MacroAuthorizationService>(
         )
         .with_state(state)
 }
-async fn read<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+async fn read<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<ControlState<Access, Auth>>,
     receipt: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
 ) -> Result<Json<PreviewSnapshot>, PreviewError> {
@@ -86,7 +86,7 @@ async fn read<Access: EntityAccessService, Auth: MacroAuthorizationService>(
         .await
         .map(|preview| Json(PreviewSnapshot { preview }))
 }
-async fn open<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+async fn open<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<ControlState<Access, Auth>>,
     receipt: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
 ) -> Result<Json<Launch>, PreviewError> {
@@ -96,7 +96,7 @@ async fn open<Access: EntityAccessService, Auth: MacroAuthorizationService>(
         .await
         .map(Json)
 }
-async fn stop<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+async fn stop<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<ControlState<Access, Auth>>,
     receipt: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
 ) -> Result<StatusCode, PreviewError> {

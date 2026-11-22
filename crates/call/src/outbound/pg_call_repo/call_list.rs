@@ -11,7 +11,7 @@ use std::collections::{HashMap, HashSet};
 use channels::outbound::channel_name::batch_resolve_channel_names;
 use entity_access::domain::models::AccessLevel;
 use item_filters::ast::{LiteralTree, call::CallLiteral};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -33,7 +33,7 @@ use crate::domain::models::{
 /// memory. Records the filter's shape on the current span.
 pub(super) async fn list_call_records(
     pool: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     limit: u32,
     filter: &LiteralTree<CallLiteral>,
     page: CallRecordPage,

@@ -2,9 +2,9 @@
  * Generate an image and post it to a channel as an image attachment.
  *
  * Usage:
- *   MACRO_API_KEY=mak_... bun examples/generate-image.ts <channel-id> [prompt]
+ *   ROX_API_KEY=mak_... bun examples/generate-image.ts <channel-id> [prompt]
  *
- * The image is charged to your AI allowance. Set MACRO_ENV for dev/prod/local.
+ * The image is charged to your AI allowance. Set ROX_ENV for dev/prod/local.
  */
 import { Rox } from '../src/macro';
 
@@ -12,7 +12,7 @@ const [channelId, prompt = 'A watercolor lighthouse at dusk, soft light'] =
   process.argv.slice(2);
 if (!channelId) {
   console.error(
-    'usage: MACRO_API_KEY=mak_... bun examples/generate-image.ts <channel-id> [prompt]',
+    'usage: ROX_API_KEY=mak_... bun examples/generate-image.ts <channel-id> [prompt]',
   );
   process.exit(1);
 }

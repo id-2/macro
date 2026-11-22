@@ -11,8 +11,8 @@ use async_trait::async_trait;
 use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, EntityType, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tracing::Instrument as _;
@@ -121,7 +121,7 @@ pub struct ReviewRecord {
     /// Account whose email/calendar the drafts use.
     #[schema(value_type = String)]
     #[specta(type = String)]
-    pub acting_user: MacroUserIdStr<'static>,
+    pub acting_user: RoxUserIdStr<'static>,
     /// Originating code execution, absent for directly presented reviews.
     pub execution_id: Option<ExecutionId>,
     /// Durable presentation acknowledgment, separate from user decisions.
@@ -238,7 +238,7 @@ pub trait ReviewStore: Send + Sync + 'static {
 /// Authoritative session facts used by review authorization and dispatch.
 pub struct ReviewSession {
     /// Session owner, independent of the account saved on each review.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Archived sessions cannot start actions or new notification turns.
     pub archived: bool,
     /// Current invocation authority, used only for agent-initiated decisions.
@@ -254,7 +254,7 @@ pub trait ReviewActions: Send + Sync + 'static {
     /// work still in progress refuses until it is ready.
     async fn approvable(
         &self,
-        _account_holder: &MacroUserIdStr<'static>,
+        _account_holder: &RoxUserIdStr<'static>,
         _record: &ReviewRecord,
     ) -> Result<bool, CodeModeError> {
         Ok(true)
@@ -262,20 +262,20 @@ pub trait ReviewActions: Send + Sync + 'static {
     /// Send a reviewed email as the record's saved, authenticated account holder.
     async fn send_email(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         draft: &EmailDraft,
     ) -> Result<EmailResult, CodeModeError>;
     /// Create a reviewed calendar event as the record's account holder.
     async fn create_calendar_event(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         draft: &CalendarDraft,
     ) -> Result<CalendarResult, CodeModeError>;
     /// Start writing `record`'s approved import plan. Its background write
     /// reports its own end as a `review.settled` event once it stops.
     async fn start_import(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         record: &ReviewRecord,
         draft: &ImportDraft,
     ) -> Result<ImportResult, CodeModeError>;
@@ -283,7 +283,7 @@ pub trait ReviewActions: Send + Sync + 'static {
     /// Repeated calls with the same review ID must not duplicate its ACP frames.
     async fn present(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         record: &ReviewRecord,
     ) -> Result<(), CodeModeError>;
     /// Tell the session's viewers that `record` was saved at its current
@@ -294,7 +294,7 @@ pub trait ReviewActions: Send + Sync + 'static {
     /// saved: the presented call is the view's only record.
     async fn present_view(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: AgentSessionId,
         view: &PresentedView,
     ) -> Result<(), CodeModeError>;
@@ -324,7 +324,7 @@ impl ReviewService {
     async fn owner(
         &self,
         session: AgentSessionId,
-    ) -> Result<MacroUserIdStr<'static>, CodeModeError> {
+    ) -> Result<RoxUserIdStr<'static>, CodeModeError> {
         let state = self.actions.session(session).await?;
         if state.archived {
             return Err(CodeModeError::Forbidden);
@@ -334,14 +334,14 @@ impl ReviewService {
     async fn record_actor(
         &self,
         record: &ReviewRecord,
-    ) -> Result<MacroUserIdStr<'static>, CodeModeError> {
+    ) -> Result<RoxUserIdStr<'static>, CodeModeError> {
         self.owner(record.session_id).await?;
         Ok(record.acting_user.clone())
     }
     async fn authorize(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
     ) -> Result<AgentSessionId, CodeModeError> {
         let session = session_id(access.entity().entity_type, &access.entity().entity_id)?;
         self.owner(session).await?;
@@ -354,7 +354,7 @@ impl ReviewService {
     pub async fn create(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         input: CreateReview,
     ) -> Result<ReviewRecord, CodeModeError> {
         let session = self.authorize(access, actor).await?;
@@ -364,7 +364,7 @@ impl ReviewService {
     pub async fn create_for_session(
         &self,
         session: &agent_session::domain::model::AgentSession,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         input: CreateReview,
     ) -> Result<ReviewRecord, CodeModeError> {
         self.authorize_session(session, actor).await?;
@@ -375,7 +375,7 @@ impl ReviewService {
     async fn authorize_session(
         &self,
         session: &agent_session::domain::model::AgentSession,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
     ) -> Result<(), CodeModeError> {
         let state = self.actions.session(session.id).await?;
         if session.owner_user().map_err(|_| CodeModeError::Forbidden)? != &state.owner {
@@ -392,7 +392,7 @@ impl ReviewService {
     async fn create_owned(
         &self,
         session: AgentSessionId,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         input: CreateReview,
     ) -> Result<ReviewRecord, CodeModeError> {
         if let Some(execution) = input.execution_id {
@@ -404,7 +404,7 @@ impl ReviewService {
             return Err(invalid());
         }
         let record = ReviewRecord {
-            id: ReviewId(macro_uuid::generate_uuid_v7()),
+            id: ReviewId(rox_uuid::generate_uuid_v7()),
             session_id: session,
             acting_user: actor.clone(),
             execution_id: input.execution_id,
@@ -544,7 +544,7 @@ impl ReviewService {
     pub async fn decide(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         id: ReviewId,
         decision: ReviewDecision,
     ) -> Result<ReviewRecord, CodeModeError> {
@@ -557,7 +557,7 @@ impl ReviewService {
     pub async fn read_for_session(
         &self,
         session: AgentSessionId,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         id: ReviewId,
     ) -> Result<ReviewRecord, CodeModeError> {
         let record = self.store.get(session, id).await?;
@@ -572,7 +572,7 @@ impl ReviewService {
     pub async fn decide_for_session(
         &self,
         session: AgentSessionId,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         id: ReviewId,
         decision: ReviewDecision,
     ) -> Result<ReviewRecord, CodeModeError> {
@@ -605,7 +605,7 @@ impl ReviewService {
     async fn decide_owned(
         &self,
         session: AgentSessionId,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         id: ReviewId,
         decision: ReviewDecision,
         via: DecisionVia,
@@ -742,7 +742,7 @@ impl ReviewService {
     /// Run the existing action for the item at `index` with its typed draft.
     async fn perform(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         record: &ReviewRecord,
         index: usize,
     ) -> Result<ReviewResult, CodeModeError> {

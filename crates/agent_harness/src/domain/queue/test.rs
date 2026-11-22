@@ -87,10 +87,10 @@ fn editing_reattributes_the_entry_to_the_editor() {
     let queues = SessionQueues::new();
     let session = AgentSessionId::TEST_A;
     let mut first = prompt_entry("first");
-    first.actor = Some(MacroUserIdStr::try_from_email("asker@example.com").unwrap());
+    first.actor = Some(RoxUserIdStr::try_from_email("asker@example.com").unwrap());
     queues.enqueue(session, first.clone()).unwrap();
 
-    let editor = MacroUserIdStr::try_from_email("editor@example.com").unwrap();
+    let editor = RoxUserIdStr::try_from_email("editor@example.com").unwrap();
     queues
         .edit_prompt(
             session,
@@ -311,7 +311,7 @@ fn the_cap_refuses_the_overflowing_entry() {
 /// and system turns, bot turns and compaction act for nobody in particular.
 #[test]
 fn only_a_human_prompt_from_the_session_itself_has_a_direct_prompter() {
-    let person = MacroUserIdStr::try_from_email("prompter@example.com").unwrap();
+    let person = RoxUserIdStr::try_from_email("prompter@example.com").unwrap();
     let direct = QueuedEntry {
         actor: Some(person.clone()),
         ..prompt_entry("from the session view")

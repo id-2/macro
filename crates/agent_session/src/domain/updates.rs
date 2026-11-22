@@ -6,7 +6,7 @@ use agent_fold::domain::{
     model::{MessagePart, PendingInteraction, ToolDetail},
 };
 use chrono::{DateTime, Duration, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -45,7 +45,7 @@ pub enum UpdateTurnState {
 pub trait CodingAgentUpdatesRepo: Send + Sync + 'static {
     fn candidates(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<UpdateCandidate>, CodingAgentError>> + Send;
     fn log(
         &self,
@@ -56,7 +56,7 @@ pub trait CodingAgentUpdatesRepo: Send + Sync + 'static {
 impl CodingAgentUpdatesRepo for () {
     async fn candidates(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<UpdateCandidate>, CodingAgentError> {
         Ok(Vec::new())
     }
@@ -128,7 +128,7 @@ pub struct AgentUpdates {
 )]
 pub async fn list_updates<R: CodingAgentUpdatesRepo>(
     repo: &R,
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
 ) -> Result<AgentUpdates, CodingAgentError> {
     let mut candidates = repo.candidates(owner).await?;
     let truncated = candidates.len() > MAX_SESSIONS;

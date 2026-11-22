@@ -29,7 +29,7 @@ fn chat(jid: &str, kind: ExternalChatKind, name: Option<&str>, minute: Option<u3
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_chat_list_merges_history_activity_and_the_roster(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     session
@@ -139,7 +139,7 @@ async fn the_chat_list_merges_history_activity_and_the_roster(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_adoption_backfills_from_the_chat_anchor_page_by_page(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let state = || async {
@@ -263,7 +263,7 @@ async fn a_new_adoption_backfills_from_the_chat_anchor_page_by_page(pool: PgPool
     assert!(session.backfill_work(alice).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_chat_without_a_listed_message_starts_from_its_newest_stored_one(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     // Stored live, but the chat list never heard of it.
@@ -297,7 +297,7 @@ async fn a_chat_without_a_listed_message_starts_from_its_newest_stored_one(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ending_consent_forgets_the_old_numbers_chat_list(pool: PgPool) {
     let (linked, session, _, _, alice, _) = adopted(&pool).await;
     session
@@ -341,7 +341,7 @@ async fn ending_consent_forgets_the_old_numbers_chat_list(pool: PgPool) {
     assert_eq!(stored(pool.clone()).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_batch_may_name_a_chat_twice(pool: PgPool) {
     let (linked, session, _, _, alice, _) = adopted(&pool).await;
     let mut renamed = chat(

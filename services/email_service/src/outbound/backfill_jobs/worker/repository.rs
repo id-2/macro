@@ -17,7 +17,7 @@ impl BackfillRepository for PgBackfillWorker {
             .map_err(Into::into)
     }
     async fn link_by_email(&self, owner: &str, email: &str) -> Result<Option<Link>, Self::Err> {
-        email_db_client::links::get::fetch_link_by_macro_id_and_email_address(
+        email_db_client::links::get::fetch_link_by_rox_id_and_email_address(
             &self.jobs.0,
             owner,
             email,

@@ -22,7 +22,7 @@ import type {
   ListTeamOutOfOfficeData,
 } from '../../../generated/storage/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Link } from '../email/link';
 import { User } from '../users/user';
 import { BookingNamespace } from './booking-namespace';
@@ -297,7 +297,7 @@ export class CalendarNamespace {
   /** Booking links, their settings, booked meetings and booking statistics. */
   readonly booking: BookingNamespace;
 
-  constructor(private readonly client: MacroClient) {
+  constructor(private readonly client: RoxClient) {
     this.booking = new BookingNamespace(client);
   }
 
@@ -477,7 +477,7 @@ function toCreateBody(options: CreateEventOptions): CreateCalendarEventRequest {
 
 /** The calendars the caller can see, by calendar id. */
 async function visibleCalendars(
-  client: MacroClient,
+  client: RoxClient,
 ): Promise<Map<string, VisibleCalendar>> {
   const { calendars } = unwrap(await client.calendar.listCalendars());
   return new Map(calendars.map((calendar) => [calendar.id, calendar]));

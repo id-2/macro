@@ -15,8 +15,8 @@ use serde_json::json;
 use super::*;
 use crate::{AiHost, tools_for};
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id")
 }
 
 fn field<'form>(form: &'form ReviewForm, name: &str) -> &'form ReviewField {
@@ -170,7 +170,7 @@ impl ToolAnnotated for Greet {
 #[derive(Clone, Default)]
 struct Ran(
     Arc<Mutex<Vec<Greet>>>,
-    Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
 );
 
 #[async_trait]
@@ -352,7 +352,7 @@ async fn account_authorization_covers_final_edits_and_refusal_never_executes() {
         )]))),
     });
     let ran = Ran::default();
-    let requester = MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+    let requester = RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     for approved in [false, true] {
         let requester = requester.clone();
         let authorize: UserToolAuthorizer = Arc::new(move |name, args| {

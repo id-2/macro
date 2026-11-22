@@ -1,6 +1,6 @@
 import type { DocumentAiEditRefused } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
-import { MacroApiError, unwrap } from '../../utils/unwrap';
+import type { RoxClient } from '../../utils/client';
+import { RoxApiError, unwrap } from '../../utils/unwrap';
 import type { Document } from './document';
 
 /**
@@ -9,7 +9,7 @@ import type { Document } from './document';
  * with no response (status 0). It may have partly applied. Read the document
  * with `content()` before retrying; never replay the edit blindly.
  */
-export class EditOutcomeUnknownError extends MacroApiError {
+export class EditOutcomeUnknownError extends RoxApiError {
   constructor(data: unknown, status = 502) {
     super(status, data);
     this.name = 'EditOutcomeUnknownError';
@@ -53,7 +53,7 @@ export interface DocumentEditResult {
  * ambiguous, name text that isn't there, or pass an invalid block. Nothing
  * changed. `reason` says what it needs; rewrite the instructions.
  */
-export class DocumentEditRefusedError extends MacroApiError {
+export class DocumentEditRefusedError extends RoxApiError {
   /** Why the editor refused, in its words. */
   readonly reason: string;
 
@@ -67,7 +67,7 @@ export class DocumentEditRefusedError extends MacroApiError {
 
 /** Run an instructions edit; `Document.edit` calls this. */
 export async function editWithInstructions(
-  client: MacroClient,
+  client: RoxClient,
   document: Document,
   instructions: string,
   options: DocumentEditOptions,

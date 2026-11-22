@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::ExecutionRecord;
 use agent_session::domain::model::PrompterKind;
 use entity_access::domain::models::EntityType;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -22,14 +22,14 @@ const ROUTES: &str = r#"{"branches": [
 const TURN: u128 = 1;
 const DOC: &str = "/drive/md/0190f5a4-0000-7000-8000-000000000001";
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|owner@example.com")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|owner@example.com")
         .unwrap()
         .into_owned()
 }
 
-fn other_person() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|other@example.com")
+fn other_person() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|other@example.com")
         .unwrap()
         .into_owned()
 }
@@ -91,7 +91,7 @@ struct Flag(bool);
 
 #[async_trait]
 impl UiNavigationFlag for Flag {
-    async fn enabled(&self, _: &MacroUserIdStr<'static>) -> bool {
+    async fn enabled(&self, _: &RoxUserIdStr<'static>) -> bool {
         self.0
     }
 }
@@ -121,7 +121,7 @@ impl UiCommandBudgets for Budgets {
 /// Records every frame and answers with a fixed number of connections.
 struct Gateway {
     connections: u64,
-    sent: Mutex<Vec<(MacroUserIdStr<'static>, UiCommandFrame)>>,
+    sent: Mutex<Vec<(RoxUserIdStr<'static>, UiCommandFrame)>>,
 }
 
 impl Gateway {
@@ -132,7 +132,7 @@ impl Gateway {
         })
     }
 
-    fn frames(&self) -> Vec<(MacroUserIdStr<'static>, UiCommandFrame)> {
+    fn frames(&self) -> Vec<(RoxUserIdStr<'static>, UiCommandFrame)> {
         self.sent.lock().unwrap().clone()
     }
 }
@@ -141,7 +141,7 @@ impl Gateway {
 impl UiCommandDelivery for Gateway {
     async fn send(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         frame: &UiCommandFrame,
     ) -> Result<u64, CodeModeError> {
         self.sent
@@ -223,7 +223,7 @@ fn harness_sharing(
 impl Harness {
     async fn open_as(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         path: &str,
     ) -> Result<UiCommandOutcome, CodeModeError> {
         let access = EntityAccessReceipt::<EditAccessLevel>::dangerously_assert_authenticated_user(

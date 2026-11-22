@@ -81,7 +81,7 @@ const TOKEN = '@outlook.token_cache:*';
 const SUBSCRIPTION = 'resource_name:outlook.subscription.*';
 
 new datadog.SpansMetric('outlook-sync', {
-  name: 'macro.outlook.sync',
+  name: 'rox.outlook.sync',
   filter: { query: SYNC },
   compute: { aggregationType: 'count' },
   groupBies: [
@@ -95,7 +95,7 @@ new datadog.SpansMetric('outlook-sync', {
 // How long a change Graph announced took to import, including retries.
 // Messages queued by polling or an initial import carry no lag.
 new datadog.SpansMetric('outlook-notification-lag', {
-  name: 'macro.outlook.notification_lag',
+  name: 'rox.outlook.notification_lag',
   filter: {
     query:
       'resource_name:outlook.sync.reconcile @outlook.notification_lag_ms:*',
@@ -110,7 +110,7 @@ new datadog.SpansMetric('outlook-notification-lag', {
 
 // Counts come from `count:`; latency includes any wait for the mailbox gate.
 new datadog.SpansMetric('outlook-graph-request', {
-  name: 'macro.outlook.graph_request',
+  name: 'rox.outlook.graph_request',
   filter: { query: GRAPH },
   compute: {
     aggregationType: 'distribution',
@@ -121,7 +121,7 @@ new datadog.SpansMetric('outlook-graph-request', {
 });
 
 new datadog.SpansMetric('outlook-token-acquire', {
-  name: 'macro.outlook.token.acquire',
+  name: 'rox.outlook.token.acquire',
   filter: { query: TOKEN },
   compute: { aggregationType: 'count' },
   groupBies: [

@@ -3,7 +3,7 @@
 use agent_session::domain::error::{AgentSessionError, Result};
 use channels::domain::models::ChannelType;
 use channels::domain::ports::ChannelRepo;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use crate::domain::processing::ChannelTypeLookup;
 

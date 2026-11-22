@@ -1,8 +1,8 @@
-import type { MacroOpts } from '@macro-inc/sdk';
+import type { RoxOpts } from '@macro-inc/sdk';
 import type { Configured } from './startup.ts';
 
 /** A service the SDK talks to. */
-export type ServiceName = keyof NonNullable<MacroOpts['hosts']>;
+export type ServiceName = keyof NonNullable<RoxOpts['hosts']>;
 
 export type Hosts = Partial<Record<ServiceName, string>>;
 
@@ -11,27 +11,27 @@ export type Addresses = {
   readonly hosts: Hosts;
   readonly presence: string;
   /**
-   * A call's speech gateway (`MACRO_SPEECH_URL`): the relay opens `…/stt`
+   * A call's speech gateway (`ROX_SPEECH_URL`): the relay opens `…/stt`
    * and `…/tts` under it.
    */
   readonly speech: string;
 };
 
 /** The public gateway origin enrollment gives, which every route below is under. */
-export const gatewayKey = 'MACRO_GATEWAY';
+export const gatewayKey = 'ROX_GATEWAY';
 const websocketKey = 'OVERRIDE_CONNECTION_GATEWAY_WEBSOCKET_URL';
-/** `macro_service_urls::AgentHarnessEgressUrl`'s override, which enrollment writes. */
+/** `rox_service_urls::AgentHarnessEgressUrl`'s override, which enrollment writes. */
 const egressKey = 'OVERRIDE_AGENT_HARNESS_EGRESS_URL';
 const egressRoute = '/agent-harness-egress';
 /** The speech gateway enrollment gives (`authentication_service` `agent_addresses`). */
-const speechKey = 'MACRO_SPEECH_URL';
+const speechKey = 'ROX_SPEECH_URL';
 /** Where speech is on the egress listener, for an enrollment that names none. */
 const speechRoute = '/brain/inference';
 const connectionService: ServiceName = 'connection';
 
 /**
  * Each service the SDK knows: the `OVERRIDE_*` URL Rox's services are
- * configured with (`crates/macro_service_urls`), which enrollment writes for
+ * configured with (`crates/rox_service_urls`), which enrollment writes for
  * the ones an agent needs, and the gateway's route to it otherwise.
  * `static-files` has neither (it isn't behind the gateway), so it is left to
  * the SDK.
@@ -112,7 +112,7 @@ const swapped = (url: string, from: string, to: string): string =>
 
 /**
  * Where the agent reaches Rox, from its credentials (enrollment's
- * `agent.env`, or a self-hosted agent's secrets). It needs `MACRO_GATEWAY`;
+ * `agent.env`, or a self-hosted agent's secrets). It needs `ROX_GATEWAY`;
  * nothing falls back to Rox's production hosts. A message names a key,
  * never its value.
  */

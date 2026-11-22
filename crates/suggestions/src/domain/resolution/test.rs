@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Mutex;
 
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -18,8 +18,8 @@ const THREAD: &str = "01900000-0000-7000-8000-0000000000a1";
 const CHANNEL: &str = "01900000-0000-7000-8000-0000000000c1";
 const DOCUMENT: &str = "document-1";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 /// People who can't open any item: those in `denied`.
@@ -31,7 +31,7 @@ struct FakeAccess {
 impl SuggestionAccess for FakeAccess {
     type Err = std::convert::Infallible;
 
-    async fn can_view(&self, user: &MacroUserIdStr<'_>, _: &Target) -> Result<bool, Self::Err> {
+    async fn can_view(&self, user: &RoxUserIdStr<'_>, _: &Target) -> Result<bool, Self::Err> {
         Ok(!self.denied.lock().unwrap().contains(user.as_ref()))
     }
 
@@ -176,7 +176,7 @@ fn resolved(reason: &str) -> (String, Option<String>) {
 
 /// The person's own send resolves their reply suggestion about the thread, and no
 /// other: not another kind, not another action, not someone else's.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reply_resolves_only_the_matching_reply_suggestion_of_that_user(pool: PgPool) {
     let h = harness(pool).await;
     let about = vec![target(EntityType::EmailThread, THREAD, None)];
@@ -247,7 +247,7 @@ async fn a_reply_resolves_only_the_matching_reply_suggestion_of_that_user(pool: 
 }
 
 /// A send from before the suggestion was proposed didn't answer it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reply_from_before_the_suggestion_leaves_it_open(pool: PgPool) {
     let h = harness(pool).await;
     let answer = h
@@ -274,7 +274,7 @@ async fn a_reply_from_before_the_suggestion_leaves_it_open(pool: PgPool) {
 
 /// A reply in a channel thread answers suggestions about that thread or the whole
 /// channel, not suggestions about another thread in it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_channel_reply_resolves_suggestions_about_its_thread(pool: PgPool) {
     let h = harness(pool).await;
     let in_thread = h
@@ -338,7 +338,7 @@ async fn a_channel_reply_resolves_suggestions_about_its_thread(pool: PgPool) {
 
 /// Deleting an item resolves the open suggestions about it, accepted ones too, and
 /// leaves dismissed, retired and done ones as they were.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deletion_resolves_open_suggestions_about_the_item(pool: PgPool) {
     let h = harness(pool).await;
     let about = vec![
@@ -390,7 +390,7 @@ async fn deletion_resolves_open_suggestions_about_the_item(pool: PgPool) {
 }
 
 /// Deleting one message resolves only suggestions about that message.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_part_resolves_only_suggestions_about_it(pool: PgPool) {
     let h = harness(pool).await;
     let message = h
@@ -427,7 +427,7 @@ async fn deleting_a_part_resolves_only_suggestions_about_it(pool: PgPool) {
 
 /// The same event again changes nothing: the suggestion stays resolved as first
 /// resolved.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn redelivery_is_a_no_op(pool: PgPool) {
     let h = harness(pool).await;
     let id = h
@@ -472,7 +472,7 @@ async fn redelivery_is_a_no_op(pool: PgPool) {
 
 /// After a change to who can open an item, only the suggestions of people who can
 /// no longer open it are resolved.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lost_access_resolves_only_suggestions_of_people_who_lost_it(pool: PgPool) {
     let h = harness(pool).await;
     let about = vec![target(EntityType::Document, DOCUMENT, None)];

@@ -1,10 +1,10 @@
 INSERT INTO public."Organization" ("id", "name")
     VALUES (1, 'test-org');
 
-INSERT INTO public."macro_user" ("id", "username", "email", "stripe_customer_id")
+INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id")
     VALUES ('a1111111-1111-1111-1111-111111111111', 'testuser', 'testuser@test.com', 'stripe_test');
 
-INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "macro_user_id")
+INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
     VALUES ('macro|testuser@test.com', 'testuser@test.com', 'stripe_test', 1, 'a1111111-1111-1111-1111-111111111111');
 
 -- Root project (no parent)

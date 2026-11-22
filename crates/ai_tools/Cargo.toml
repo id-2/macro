@@ -12,13 +12,13 @@ feature_flags = { path = "../feature_flags" }
 import_linear = { path = "../import_linear" }
 import_jira = { path = "../import_jira" }
 
-macro_entrypoint = { path = "../macro_entrypoint" }
+rox_entrypoint = { path = "../rox_entrypoint" }
 memory = { path = "../memory" }
 clap = { workspace = true, features = ["derive"] }
 favorites = { path = "../favorites", features = ["ai_tools", "postgres"] }
 forms = { path = "../forms", features = ["ai_tools", "gateway", "postgres", "scheduling", "static_files"] }
 routines = { path = "../routines" }
-macro_auth = { path = "../macro_auth" }
+rox_auth = { path = "../rox_auth" }
 agent_code_mode = { path = "../agent_code_mode" }
 dynamic_ui = { path = "../dynamic_ui" }
 ai_billing = { path = "../ai_billing", features = ["pg-admission"] }
@@ -74,12 +74,12 @@ import_notion = { path = "../import_notion" }
 item_filters = { path = "../item_filters" }
 lexical_client = { path = "../lexical_client" }
 lexical_mention_extractor = { path = "../lexical_mention_extractor" }
-macro_aws_config = { path = "../macro_aws_config" }
-macro_env_var = { path = "../macro_env_var" }
-macro_event_broker = { path = "../macro_event_broker" }
+rox_aws_config = { path = "../rox_aws_config" }
+rox_env_var = { path = "../rox_env_var" }
+rox_event_broker = { path = "../rox_event_broker" }
 messages = { path = "../messages", features = ["ai_tools", "broker", "delivery"] }
-macro_queues = { path = "../macro_queues" }
-macro_user_id = { path = "../macro_user_id" }
+rox_queues = { path = "../rox_queues" }
+rox_user_id = { path = "../rox_user_id" }
 mcp_client = { path = "../mcp_client" }
 mcp_select = { path = "../mcp_select" }
 pipedream_mcp = { path = "../pipedream_mcp" }
@@ -120,16 +120,16 @@ tracing.workspace = true
 unicode-segmentation.workspace = true
 uuid.workspace = true
 web_search = { path = "../web_search" }
-macro_env = { path = "../macro_env" }
+rox_env = { path = "../rox_env" }
 secretsmanager_client = { path = "../secretsmanager_client" }
 aws-sdk-secretsmanager = { workspace = true }
 
-macro_service_urls = { path = "../macro_service_urls" }
+rox_service_urls = { path = "../rox_service_urls" }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 harnesses = { path = "../harnesses", default-features = false, features = ["test-utils"] }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 calendar_scheduling = { path = "../calendar_scheduling", features = ["inbound"] }
-macro_authorization = { path = "../macro_authorization", features = ["axum"] }
+rox_authorization = { path = "../rox_authorization", features = ["axum"] }
 model_user = { path = "../model_user" }

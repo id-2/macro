@@ -2,23 +2,23 @@ import { displayName } from '@core/constant/brand';
 
 /**
  * Identity for the first-party Rox coding agent. Mirrors
- * `bot_id::MACRO_CODER_BOT_ID` on the backend. Deliberately a distinct bot
+ * `bot_id::ROX_CODER_BOT_ID` on the backend. Deliberately a distinct bot
  * from Rox (see `macroAgent.ts`): mentioning Rox answers in chat, while
  * mentioning the coding agent opens a sandboxed coding-agent session.
  */
-export const MACRO_CODER_BOT_ID = '00000000-0000-0000-0000-00000000a9e7';
+export const ROX_CODER_BOT_ID = '00000000-0000-0000-0000-00000000a9e7';
 
 /**
  * Canonical principal id for Rox Coding Agent, matching the `bot|<uuid>` form used
  * for bot senders and participants everywhere else.
  */
-export const MACRO_CODER_PRINCIPAL_ID = `bot|${MACRO_CODER_BOT_ID}`;
+export const ROX_CODER_PRINCIPAL_ID = `bot|${ROX_CODER_BOT_ID}`;
 
 /** Display name for the Rox coding agent. */
-export const MACRO_CODER_NAME = `${displayName} Coding Agent`;
+export const ROX_CODER_NAME = `${displayName} Coding Agent`;
 
 /** Handle used to find Rox Coding Agent in the mention typeahead (`@coder`). */
-export const MACRO_CODER_HANDLE = 'coder';
+export const ROX_CODER_HANDLE = 'coder';
 
 /**
  * Whether an id refers to the Rox Coding Agent bot. Accepts both the bare UUID and
@@ -27,5 +27,5 @@ export const MACRO_CODER_HANDLE = 'coder';
 export function isMacroCoderId(id: string | undefined): boolean {
   if (!id) return false;
   const bare = id.startsWith('bot|') ? id.slice('bot|'.length) : id;
-  return bare === MACRO_CODER_BOT_ID;
+  return bare === ROX_CODER_BOT_ID;
 }

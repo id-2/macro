@@ -9,15 +9,15 @@ use agent_fold::domain::model::TurnId;
 use agent_session::domain::agent_conversation::{AgentConversation, AgentConversationRepo};
 use bots::domain::ports::{AgentDmEligibility, BotError, MockBotRepo};
 use channels::{domain::agent_dm::AgentDmRepo, outbound::pg_channels_repo::PgChannelsRepo};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 struct Eligibility(bool);
 impl AgentDmEligibility for Eligibility {
     async fn authorize_agent_dm(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: bot_id::BotId,
     ) -> std::result::Result<(), BotError> {
         if self.0 {
@@ -31,7 +31,7 @@ impl AgentDmEligibility for Eligibility {
 fn conversation(channel: Uuid) -> AgentConversation {
     AgentConversation {
         channel_id: channel,
-        bot_id: bot_id::MACRO_NEW_BOT_ID,
+        bot_id: bot_id::ROX_NEW_BOT_ID,
     }
 }
 
@@ -50,9 +50,9 @@ fn conversations(
 }
 
 async fn setup(pool: PgPool) -> (PgConversationTurnStore, AgentSessionId, Uuid, OpenSession) {
-    let user = macro_user_id::user_id::MacroUserIdStr::try_from_email("dm@example.com").unwrap();
+    let user = rox_user_id::user_id::RoxUserIdStr::try_from_email("dm@example.com").unwrap();
     let channel = PgChannelsRepo::new(pool.clone())
-        .ensure(user.clone(), bot_id::MACRO_NEW_BOT_ID)
+        .ensure(user.clone(), bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap()
         .dm
@@ -61,9 +61,9 @@ async fn setup(pool: PgPool) -> (PgConversationTurnStore, AgentSessionId, Uuid, 
         .current_or_create(conversation(channel))
         .await
         .unwrap();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     let command = OpenSession {
-        bot_id: bot_id::MACRO_NEW_BOT_ID,
+        bot_id: bot_id::ROX_NEW_BOT_ID,
         runtime: AgentRuntimeConfig {
             kind: AgentKind::InMemory,
             model: "test".to_owned(),
@@ -103,7 +103,7 @@ fn flight(record: &ConversationTurn) -> InFlightTurn {
             thread_id: record.source_message_id,
             message_id: record.source_message_id,
         }),
-        announcement_message_id: Some(macro_uuid::generate_uuid_v7()),
+        announcement_message_id: Some(rox_uuid::generate_uuid_v7()),
         dispatched_at: chrono::Utc::now(),
         bot_id: None,
         speaks_as_chip: false,
@@ -112,7 +112,7 @@ fn flight(record: &ConversationTurn) -> InFlightTurn {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replay_after_reset_retains_the_original_session_payload_and_terminal_deduplication(
     pool: PgPool,
 ) {
@@ -150,7 +150,7 @@ async fn replay_after_reset_retains_the_original_session_payload_and_terminal_de
     assert!(store.pending_replies(10).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_replicas_admit_one_record_and_only_one_claim_can_run(pool: PgPool) {
     let (store, session, channel, command) = setup(pool).await;
     let (a, b) = tokio::join!(
@@ -161,7 +161,7 @@ async fn concurrent_replicas_admit_one_record_and_only_one_claim_can_run(pool: P
     assert_eq!(a.action_id, b.action_id);
     assert_eq!(
         store
-            .for_conversation(channel, bot_id::MACRO_NEW_BOT_ID, 100)
+            .for_conversation(channel, bot_id::ROX_NEW_BOT_ID, 100)
             .await
             .unwrap()
             .len(),
@@ -176,7 +176,7 @@ async fn concurrent_replicas_admit_one_record_and_only_one_claim_can_run(pool: P
     assert!(store.pending(10).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn interrupted_work_holds_its_session_queue_until_an_explicit_decision(pool: PgPool) {
     let (store, session, channel, mut command) = setup(pool.clone()).await;
     let interrupted = store
@@ -195,7 +195,7 @@ async fn interrupted_work_holds_its_session_queue_until_an_explicit_decision(poo
         )
         .await
         .unwrap();
-    mention_origin_mut(&mut command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut command).message_id = rox_uuid::generate_uuid_v7();
     store
         .admit(session, channel, command.clone())
         .await
@@ -205,14 +205,14 @@ async fn interrupted_work_holds_its_session_queue_until_an_explicit_decision(poo
         .start_fresh(conversation(channel))
         .await
         .unwrap();
-    mention_origin_mut(&mut command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut command).message_id = rox_uuid::generate_uuid_v7();
     store.admit(fresh, channel, command).await.unwrap();
     let pending = store.pending(10).await.unwrap();
     assert_eq!(pending.len(), 1);
     assert_eq!(pending[0].session_id, fresh);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_explicit_retry_waits_for_reply_reconciliation_and_mints_only_one_new_attempt(
     pool: PgPool,
 ) {
@@ -231,7 +231,7 @@ async fn an_explicit_retry_waits_for_reply_reconciliation_and_mints_only_one_new
         !store
             .retry(
                 first.source_message_id,
-                bot_id::MACRO_NEW_BOT_ID,
+                bot_id::ROX_NEW_BOT_ID,
                 first.action_id
             )
             .await
@@ -240,7 +240,7 @@ async fn an_explicit_retry_waits_for_reply_reconciliation_and_mints_only_one_new
     assert!(store.pending(10).await.unwrap().is_empty());
     let retryable = async || {
         store
-            .for_conversation(channel, bot_id::MACRO_NEW_BOT_ID, 100)
+            .for_conversation(channel, bot_id::ROX_NEW_BOT_ID, 100)
             .await
             .unwrap()[0]
             .retryable
@@ -257,18 +257,18 @@ async fn an_explicit_retry_waits_for_reply_reconciliation_and_mints_only_one_new
     let (a, b) = tokio::join!(
         store.retry(
             first.source_message_id,
-            bot_id::MACRO_NEW_BOT_ID,
+            bot_id::ROX_NEW_BOT_ID,
             first.action_id
         ),
         store.retry(
             first.source_message_id,
-            bot_id::MACRO_NEW_BOT_ID,
+            bot_id::ROX_NEW_BOT_ID,
             first.action_id
         )
     );
     assert_ne!(a.unwrap(), b.unwrap());
     let next = store
-        .get(first.source_message_id, bot_id::MACRO_NEW_BOT_ID)
+        .get(first.source_message_id, bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap()
         .unwrap();
@@ -282,7 +282,7 @@ async fn an_explicit_retry_waits_for_reply_reconciliation_and_mints_only_one_new
     assert!(store.by_action(first.action_id).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reply_claims_release_on_drop_and_stale_finalizers_cannot_hide_a_late_answer(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
     let other_replica = PgConversationTurnStore::new(pool);
@@ -331,7 +331,7 @@ async fn reply_claims_release_on_drop_and_stale_finalizers_cannot_hide_a_late_an
         .await
         .unwrap();
     let updated = store
-        .get(record.source_message_id, bot_id::MACRO_NEW_BOT_ID)
+        .get(record.source_message_id, bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap()
         .unwrap();
@@ -340,10 +340,10 @@ async fn reply_claims_release_on_drop_and_stale_finalizers_cannot_hide_a_late_an
     drop(lease);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn starting_fresh_requires_owner_and_current_persona_access(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
-    let stranger = MacroUserIdStr::try_from_email("stranger@example.com").unwrap();
+    let stranger = RoxUserIdStr::try_from_email("stranger@example.com").unwrap();
     let service = conversations(pool.clone(), store.clone(), true);
     assert!(matches!(
         service
@@ -371,7 +371,7 @@ async fn starting_fresh_requires_owner_and_current_persona_access(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_running_turn_blocks_reset_and_completed_context_is_retained(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
     let owner = mention_origin(&command).sender.clone();
@@ -417,7 +417,7 @@ async fn a_running_turn_blocks_reset_and_completed_context_is_retained(pool: PgP
     assert!(sessions[1].is_current);
     assert_eq!(
         store
-            .get(record.source_message_id, bot_id::MACRO_NEW_BOT_ID)
+            .get(record.source_message_id, bot_id::ROX_NEW_BOT_ID)
             .await
             .unwrap()
             .unwrap()
@@ -426,7 +426,7 @@ async fn a_running_turn_blocks_reset_and_completed_context_is_retained(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_released_context_lease_is_free_at_once(pool: PgPool) {
     let (store, session, _, _) = setup(pool.clone()).await;
     let other = PgConversationTurnStore::new(pool);
@@ -444,7 +444,7 @@ async fn a_released_context_lease_is_free_at_once(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_refused_reset_leaves_the_context_free(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
     let owner = mention_origin(&command).sender.clone();
@@ -473,7 +473,7 @@ async fn a_refused_reset_leaves_the_context_free(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reset_cancels_undispatched_work_and_serializes_with_claims(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
     let owner = mention_origin(&command).sender.clone();
@@ -501,7 +501,7 @@ async fn reset_cancels_undispatched_work_and_serializes_with_claims(pool: PgPool
         .unwrap();
     assert_eq!(
         store
-            .get(record.source_message_id, bot_id::MACRO_NEW_BOT_ID)
+            .get(record.source_message_id, bot_id::ROX_NEW_BOT_ID)
             .await
             .unwrap()
             .unwrap()
@@ -511,7 +511,7 @@ async fn reset_cancels_undispatched_work_and_serializes_with_claims(pool: PgPool
     assert!(store.pending(10).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settings_remain_pinned_after_reconnect_and_new_sessions_adopt_edits(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
     let original = ConversationSettings {
@@ -549,12 +549,12 @@ async fn settings_remain_pinned_after_reconnect_and_new_sessions_adopt_edits(poo
     assert_eq!(reconnected.settings(session).await.unwrap(), Some(original));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_personas_keep_separate_turns_for_one_message(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
     let coder = AgentConversation {
         channel_id: channel,
-        bot_id: bot_id::MACRO_CODER_BOT_ID,
+        bot_id: bot_id::ROX_CODER_BOT_ID,
     };
     let coder_session = crate::testing::postgres_sessions(pool)
         .current_or_create(coder)
@@ -567,7 +567,7 @@ async fn two_personas_keep_separate_turns_for_one_message(pool: PgPool) {
     assert_eq!(first.source_message_id, second.source_message_id);
     assert_ne!(first.action_id, second.action_id);
     assert_eq!(second.session_id, coder_session);
-    for bot in [bot_id::MACRO_NEW_BOT_ID, coder.bot_id] {
+    for bot in [bot_id::ROX_NEW_BOT_ID, coder.bot_id] {
         let turns = store.for_conversation(channel, bot, 100).await.unwrap();
         assert_eq!(turns.len(), 1);
         assert_eq!(turns[0].bot_id, bot);
@@ -607,7 +607,7 @@ async fn production_sized(pool: &PgPool) -> PgConversationTurnStore {
     PgConversationTurnStore::new(small)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_bootstrapping_session_does_not_starve_admission_or_replies(pool: PgPool) {
     let (_, session, channel, command) = setup(pool.clone()).await;
     let store = production_sized(&pool).await;
@@ -632,7 +632,7 @@ async fn a_bootstrapping_session_does_not_starve_admission_or_replies(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_lease_waits_for_a_busy_slot_instead_of_refusing(pool: PgPool) {
     let (_, session, channel, command) = setup(pool.clone()).await;
     let store = production_sized(&pool).await;
@@ -665,7 +665,7 @@ async fn a_lease_waits_for_a_busy_slot_instead_of_refusing(pool: PgPool) {
 
 /// Admitting a message holds up every broker event behind it, so it never
 /// waits for the slot a reply being posted holds.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_never_waits_behind_a_reply(pool: PgPool) {
     let (_, session, channel, command) = setup(pool.clone()).await;
     let store = production_sized(&pool).await;
@@ -687,7 +687,7 @@ async fn admission_never_waits_behind_a_reply(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recovery_offers_only_turns_a_claim_could_take(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
     let running = store
@@ -696,7 +696,7 @@ async fn recovery_offers_only_turns_a_claim_could_take(pool: PgPool) {
         .unwrap();
     let mut waiting = command.clone();
     if let crate::domain::model::SessionOrigin::Mention(origin) = &mut waiting.origin {
-        origin.message_id = macro_uuid::generate_uuid_v7();
+        origin.message_id = rox_uuid::generate_uuid_v7();
     }
     let waiting = store.admit(session, channel, waiting).await.unwrap();
     assert_eq!(
@@ -735,7 +735,7 @@ async fn pending_sources(store: &PgConversationTurnStore) -> Vec<Uuid> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_delivery_attempt_never_fails_a_turn_another_replica_claimed(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
     let record = store.admit(session, channel, command).await.unwrap();
@@ -760,7 +760,7 @@ async fn turn_in(
     command: &mut OpenSession,
     state: ConversationTurnState,
 ) -> ConversationTurn {
-    mention_origin_mut(command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(command).message_id = rox_uuid::generate_uuid_v7();
     let record = store
         .admit(session, channel, command.clone())
         .await
@@ -793,7 +793,7 @@ async fn turn_in(
 
 /// What a conversation reports stays bounded as it grows: what still waits or
 /// runs, where each session's context starts, and its latest turns.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_conversation_reports_what_it_shows_however_long_it_grows(pool: PgPool) {
     use ConversationTurnState::{Failed, Queued, Running, Succeeded};
     let (store, session, channel, mut command) = setup(pool.clone()).await;
@@ -811,7 +811,7 @@ async fn a_conversation_reports_what_it_shows_however_long_it_grows(pool: PgPool
     let latest = turn_in(&store, fresh, channel, &mut command, Queued).await;
 
     let reported: Vec<Uuid> = store
-        .for_conversation(channel, bot_id::MACRO_NEW_BOT_ID, 2)
+        .for_conversation(channel, bot_id::ROX_NEW_BOT_ID, 2)
         .await
         .unwrap()
         .into_iter()
@@ -825,7 +825,7 @@ async fn a_conversation_reports_what_it_shows_however_long_it_grows(pool: PgPool
 
 /// The conversation reports only its latest turns, but a failure older than
 /// them can still be retried.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failure_older_than_the_reported_turns_still_retries(pool: PgPool) {
     use ConversationTurnState::{Failed, Succeeded};
     let (store, session, channel, mut command) = setup(pool.clone()).await;
@@ -837,7 +837,7 @@ async fn a_failure_older_than_the_reported_turns_still_retries(pool: PgPool) {
     }
     assert!(
         !store
-            .for_conversation(channel, bot_id::MACRO_NEW_BOT_ID, 100)
+            .for_conversation(channel, bot_id::ROX_NEW_BOT_ID, 100)
             .await
             .unwrap()
             .iter()
@@ -855,7 +855,7 @@ async fn a_failure_older_than_the_reported_turns_still_retries(pool: PgPool) {
         .unwrap();
     assert_eq!(
         store
-            .get(failed.source_message_id, bot_id::MACRO_NEW_BOT_ID)
+            .get(failed.source_message_id, bot_id::ROX_NEW_BOT_ID)
             .await
             .unwrap()
             .unwrap()
@@ -864,14 +864,14 @@ async fn a_failure_older_than_the_reported_turns_still_retries(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn terminal_reply_ids_require_the_current_unfinalized_attempt_and_saved_flight(pool: PgPool) {
     let (store, session, channel, command) = setup(pool).await;
     let record = store.admit(session, channel, command).await.unwrap();
     let mut original = flight(&record);
     original.announcement_message_id = None;
     let mut reserved = original.clone();
-    reserved.presented.push(macro_uuid::generate_uuid_v7());
+    reserved.presented.push(rox_uuid::generate_uuid_v7());
     reserved.announcement_message_id = reserved.presented.last().copied();
     assert!(store.claim(record.action_id, &original).await.unwrap());
     assert!(
@@ -896,7 +896,7 @@ async fn terminal_reply_ids_require_the_current_unfinalized_attempt_and_saved_fl
             .unwrap()
     );
     let mut stale = reserved.clone();
-    stale.presented.push(macro_uuid::generate_uuid_v7());
+    stale.presented.push(rox_uuid::generate_uuid_v7());
     assert!(
         !store
             .record_reply_flight(record.action_id, &original, &stale)
@@ -942,7 +942,7 @@ async fn terminal_reply_ids_require_the_current_unfinalized_attempt_and_saved_fl
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retry_racing_the_first_terminal_reservation_cannot_discard_a_postable_reply(pool: PgPool) {
     let (store, session, channel, command) = setup(pool).await;
     let record = store.admit(session, channel, command).await.unwrap();
@@ -958,7 +958,7 @@ async fn retry_racing_the_first_terminal_reservation_cannot_discard_a_postable_r
         .await
         .unwrap();
     let mut reserved = original.clone();
-    reserved.presented.push(macro_uuid::generate_uuid_v7());
+    reserved.presented.push(rox_uuid::generate_uuid_v7());
     reserved.announcement_message_id = reserved.presented.last().copied();
     let (retry, saved) = tokio::join!(
         store.retry(record.source_message_id, record.bot_id, record.action_id),

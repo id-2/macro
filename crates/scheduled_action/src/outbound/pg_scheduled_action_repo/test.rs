@@ -4,9 +4,9 @@ mod user_cleanup;
 use chrono::{SubsecRound, Utc};
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::Owner;
 use serde_json::json;
 use sqlx::PgPool;
@@ -23,8 +23,8 @@ pub(crate) const USER_A: &str = "macro|sched-a@rox.one";
 pub(crate) const USER_B: &str = "macro|sched-b@rox.one";
 const DAILY_9AM: &str = "0 0 9 * * *";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 pub(crate) fn user_owner(id: &'static str) -> Owner {
@@ -76,19 +76,19 @@ async fn direct_grants(pool: &PgPool, id: Uuid) -> Vec<(String, String, String)>
 }
 
 pub(crate) async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let rox_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         id,
     )
     .execute(pool)
     .await
     .expect("macro_user should insert");
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -145,7 +145,7 @@ async fn scheduled_action_row_count(pool: &PgPool, id: Uuid) -> i64 {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_action_returns_id_and_is_listable_by_owner(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -167,7 +167,7 @@ async fn create_action_returns_id_and_is_listable_by_owner(pool: PgPool) {
     assert_eq!(listed[0].owner, user_owner(USER_A));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn last_runs_report_each_actions_latest_finished_run(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -222,7 +222,7 @@ async fn last_runs_report_each_actions_latest_finished_run(pool: PgPool) {
     assert!(last_runs[&recovered].is_success);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_owned_actions_excludes_other_principals(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -245,7 +245,7 @@ async fn get_owned_actions_excludes_other_principals(pool: PgPool) {
     assert!(listed.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_action_changes_name_schedule_and_enabled(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -282,7 +282,7 @@ async fn update_action_changes_name_schedule_and_enabled(pool: PgPool) {
     assert!(!updated.enabled);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replacement_is_fenced_against_claims_and_stale_revisions(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -327,7 +327,7 @@ async fn replacement_is_fenced_against_claims_and_stale_revisions(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn second_claim_returns_already_running(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -348,7 +348,7 @@ async fn second_claim_returns_already_running(pool: PgPool) {
     assert!(error.downcast_ref::<AlreadyRunningError>().is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn claims_from_snapshots_older_than_a_pause_or_update_fail(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -395,7 +395,7 @@ async fn claims_from_snapshots_older_than_a_pause_or_update_fail(pool: PgPool) {
         .expect("the current snapshot claims");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn release_is_fenced_to_its_own_execution(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -437,7 +437,7 @@ async fn release_is_fenced_to_its_own_execution(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_action_removes_row_from_owner_list(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -459,7 +459,7 @@ async fn delete_action_removes_row_from_owner_list(pool: PgPool) {
     assert!(listed.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_action_registers_entity_row(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -495,7 +495,7 @@ async fn create_action_registers_entity_row(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_action_removes_entity_row(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -518,7 +518,7 @@ async fn delete_action_removes_entity_row(pool: PgPool) {
         .expect("deleting a missing row succeeds");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_action_succeeds_when_entity_row_is_missing(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -555,7 +555,7 @@ fn event_action() -> ScheduledAction {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn event_round_trip_and_bookkeeping_does_not_advance_configuration(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -587,7 +587,7 @@ async fn event_round_trip_and_bookkeeping_does_not_advance_configuration(pool: P
     let filters = EventFilters::try_from(vec![
         EventFilter::new(
             vec![EventName::ChannelMessagePosted],
-            Some(vec![macro_uuid::generate_uuid_v7()]),
+            Some(vec![rox_uuid::generate_uuid_v7()]),
         )
         .unwrap(),
     ])
@@ -615,7 +615,7 @@ async fn event_round_trip_and_bookkeeping_does_not_advance_configuration(pool: P
     assert_eq!(updated.configuration_revision.get(), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lookup_update_and_delete_are_id_scoped(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -662,14 +662,14 @@ async fn lookup_update_and_delete_are_id_scoped(pool: PgPool) {
         repo.delete_action(&id).await.unwrap();
     }
     assert!(
-        repo.get_action(&macro_uuid::generate_uuid_v7())
+        repo.get_action(&rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .is_none()
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn trigger_transitions_replace_all_trigger_columns(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -714,7 +714,7 @@ async fn trigger_transitions_replace_all_trigger_columns(pool: PgPool) {
     assert_eq!(repo.get_next_unclaimed_actions(10).await.unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn polling_returns_only_enabled_unclaimed_cron_rows(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -744,7 +744,7 @@ async fn polling_returns_only_enabled_unclaimed_cron_rows(pool: PgPool) {
     assert_eq!(candidates[0].id, cron.id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deployed_cron_insert_remains_valid(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let next_run_at = Utc::now();
@@ -768,7 +768,7 @@ async fn deployed_cron_insert_remains_valid(pool: PgPool) {
     assert!(action.next_run_at.is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn database_rejects_invalid_trigger_shapes(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let now = Utc::now();
@@ -898,7 +898,7 @@ async fn database_rejects_invalid_trigger_shapes(pool: PgPool) {
         (None, Some(DAILY_9AM), Some("UTC"), Some(now), None, None, 1),
     ];
     for (trigger_type, schedule, timezone, next_run_at, filters, activated_at, revision) in cases {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let error = sqlx::query!(
             r#"
             INSERT INTO scheduled_action
@@ -927,7 +927,7 @@ async fn database_rejects_invalid_trigger_shapes(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn database_rejects_external_webhooks_and_unknown_mixed_trigger_kinds(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     for config in [
@@ -936,7 +936,7 @@ async fn database_rejects_external_webhooks_and_unknown_mixed_trigger_kinds(pool
         json!({ "type": "multiple", "triggers": [{ "type": "unknown" }] }),
         json!({ "type": "multiple", "triggers": [] }),
     ] {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let kind = config["type"].as_str().unwrap().to_owned();
         let error = sqlx::query!(
             r#"
@@ -958,7 +958,7 @@ async fn database_rejects_external_webhooks_and_unknown_mixed_trigger_kinds(pool
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn exhausted_one_off_clears_firing_and_is_not_dispatched_again(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -998,7 +998,7 @@ async fn exhausted_one_off_clears_firing_and_is_not_dispatched_again(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn once_routine_fires_for_exactly_one_of_concurrent_claims_and_then_is_done(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -1044,7 +1044,7 @@ async fn once_routine_fires_for_exactly_one_of_concurrent_claims_and_then_is_don
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn once_inside_multiple_is_stored_and_other_shapes_are_rejected(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -1078,7 +1078,7 @@ async fn once_inside_multiple_is_stored_and_other_shapes_are_rejected(pool: PgPo
             INSERT INTO scheduled_action (id, owner, name, kind, task, trigger_type, trigger_config, next_run_at, enabled)
             VALUES ($1, $2, 'invalid', 'Agent', '{}', $3, $4, NULL, false)
             "#,
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             USER_A,
             kind,
             config,
@@ -1093,7 +1093,7 @@ async fn once_inside_multiple_is_stored_and_other_shapes_are_rejected(pool: PgPo
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn multiple_triggers_survive_grant_listing_and_configuration_updates(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);
@@ -1118,7 +1118,7 @@ async fn multiple_triggers_survive_grant_listing_and_configuration_updates(pool:
     assert_eq!(updated.name, "renamed mixed triggers");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_actions_by_ids_returns_another_owners_row(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -1144,7 +1144,7 @@ async fn get_actions_by_ids_returns_another_owners_row(pool: PgPool) {
     assert_eq!(rows.len(), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bot_owner_create_writes_bot_and_sponsor_grants(pool: PgPool) {
     let sponsor = user_owner(USER_A);
     let repo = PgScheduledActionRepo::new(
@@ -1169,7 +1169,7 @@ async fn bot_owner_create_writes_bot_and_sponsor_grants(pool: PgPool) {
 }
 
 const BACKFILL_SQL: &str = include_str!(
-    "../../../../../crates/macro_db_client/migrations/20260929195914_backfill_scheduled_action_owner_grants.sql"
+    "../../../../../crates/rox_db_client/migrations/20260929195914_backfill_scheduled_action_owner_grants.sql"
 );
 
 async fn insert_legacy_action(pool: &PgPool, id: Uuid, owner: &str) {
@@ -1195,10 +1195,10 @@ async fn run_backfill(pool: &PgPool) -> Result<(), sqlx::Error> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn backfill_owner_grants_is_idempotent_and_fails_closed(pool: PgPool) {
     insert_user(&pool, USER_A).await;
-    let legacy_id = macro_uuid::generate_uuid_v7();
+    let legacy_id = rox_uuid::generate_uuid_v7();
     insert_legacy_action(&pool, legacy_id, USER_A).await;
     sqlx::query!(
         r#"
@@ -1240,7 +1240,7 @@ async fn backfill_owner_grants_is_idempotent_and_fails_closed(pool: PgPool) {
         vec![("user".to_owned(), USER_A.to_owned(), "owner".to_owned())]
     );
 
-    let conflict_id = macro_uuid::generate_uuid_v7();
+    let conflict_id = rox_uuid::generate_uuid_v7();
     insert_legacy_action(&pool, conflict_id, USER_A).await;
     sqlx::query!(
         r#"
@@ -1256,7 +1256,7 @@ async fn backfill_owner_grants_is_idempotent_and_fails_closed(pool: PgPool) {
     assert!(direct_grants(&pool, conflict_id).await.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_consumed_firing_is_not_due_again_after_its_claim_goes_stale(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -1305,7 +1305,7 @@ async fn a_consumed_firing_is_not_due_again_after_its_claim_goes_stale(pool: PgP
     assert!(next_run(unconsumed.id.unwrap()) <= now);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn run_history_is_the_last_run_and_the_last_success_ignoring_skipped_runs(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool);

@@ -3,7 +3,7 @@ use std::time::Duration;
 use super::*;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn mail_projection_excludes_trashed_messages(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -12,7 +12,7 @@ async fn mail_projection_excludes_trashed_messages(pool: Pool<Postgres>) -> anyh
     let trash = uuid::uuid!("20000009-0000-0000-0000-000000000009");
     let rows = repo
         .thread_mail_projections_by_ids(
-            macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user1@test.com")?,
+            rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user1@test.com")?,
             &[draft, trash],
         )
         .await?;
@@ -36,7 +36,7 @@ async fn mail_projection_excludes_trashed_messages(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_thread_by_id_exists(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -63,7 +63,7 @@ async fn test_thread_by_id_exists(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_thread_by_id_not_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -78,7 +78,7 @@ async fn test_thread_by_id_not_found(pool: Pool<Postgres>) -> anyhow::Result<()>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn thread_metadata_by_ids_returns_canonical_rows(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -104,7 +104,7 @@ async fn thread_metadata_by_ids_returns_canonical_rows(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn mail_archive_filters_do_not_require_notifications(
@@ -146,7 +146,7 @@ async fn mail_archive_filters_do_not_require_notifications(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn moving_thread_to_project_advances_thread_timestamp(
@@ -171,7 +171,7 @@ async fn moving_thread_to_project_advances_thread_timestamp(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_thread_by_id_nullable_timestamps(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -192,7 +192,7 @@ async fn test_thread_by_id_nullable_timestamps(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_messages_by_thread_id_paginated_returns_all(
@@ -211,7 +211,7 @@ async fn test_messages_by_thread_id_paginated_returns_all(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_messages_by_thread_id_paginated_ordered_by_date_desc(
@@ -245,7 +245,7 @@ async fn test_messages_by_thread_id_paginated_ordered_by_date_desc(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_messages_by_thread_id_paginated_with_offset_and_limit(
@@ -274,7 +274,7 @@ async fn test_messages_by_thread_id_paginated_with_offset_and_limit(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_messages_by_thread_id_paginated_empty_thread(
@@ -293,7 +293,7 @@ async fn test_messages_by_thread_id_paginated_empty_thread(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_messages_by_thread_id_paginated_fields_populated(
@@ -325,7 +325,7 @@ async fn test_messages_by_thread_id_paginated_fields_populated(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_messages_by_thread_id_paginated_dateless_message_not_page_head(
@@ -361,7 +361,7 @@ async fn test_messages_by_thread_id_paginated_dateless_message_not_page_head(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_latest_content_messages_are_batched_and_exclude_drafts(
@@ -401,7 +401,7 @@ async fn test_latest_content_messages_are_batched_and_exclude_drafts(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread"))
 )]
 async fn test_latest_content_message_uses_id_as_timestamp_tiebreaker(
@@ -437,7 +437,7 @@ async fn test_latest_content_message_uses_id_as_timestamp_tiebreaker(
 // ── insert_thread ─────────────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_insert_thread_new(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -481,7 +481,7 @@ async fn test_insert_thread_new(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_insert_thread_conflict_with_provider_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -544,7 +544,7 @@ async fn recompute_inbox_state(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn a_local_draft_only_thread_stays_out_of_the_inbox(
@@ -558,7 +558,7 @@ async fn a_local_draft_only_thread_stays_out_of_the_inbox(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn a_reply_draft_does_not_return_a_sent_only_thread_to_the_inbox(
@@ -574,7 +574,7 @@ async fn a_reply_draft_does_not_return_a_sent_only_thread_to_the_inbox(
 // Offline draft edits rebuild a thread's inbox state from the projection's
 // draft aggregate, so that aggregate must agree with the canonical recompute.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn draft_aggregate_inbox_state_matches_canonical_metadata(
@@ -600,14 +600,14 @@ async fn draft_aggregate_inbox_state_matches_canonical_metadata(
         canonical.insert(id, recompute_inbox_state(&pool, id).await?);
     }
     let owner = sqlx::query_scalar!(
-        "SELECT macro_id FROM email_links WHERE id = $1",
+        "SELECT rox_id FROM email_links WHERE id = $1",
         DRAFT_FIXTURE_LINK
     )
     .fetch_one(&pool)
     .await?;
     let projections = EmailPgRepo::new(pool)
         .thread_mail_projections_by_ids(
-            macro_user_id::user_id::MacroUserIdStr::parse_from_str(&owner)?,
+            rox_user_id::user_id::RoxUserIdStr::parse_from_str(&owner)?,
             &ids,
         )
         .await?;
@@ -637,7 +637,7 @@ async fn draft_aggregate_inbox_state_matches_canonical_metadata(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -666,7 +666,7 @@ async fn test_update_thread_metadata_read_status(pool: Pool<Postgres>) -> anyhow
 // ── upsert_user_history ───────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -692,7 +692,7 @@ async fn test_upsert_user_history_insert(pool: Pool<Postgres>) -> anyhow::Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -746,7 +746,7 @@ async fn test_upsert_user_history_updates_timestamp(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn returned_sent_only_metadata_preserves_visibility_without_rewriting(
@@ -819,7 +819,7 @@ async fn returned_sent_only_metadata_preserves_visibility_without_rewriting(
 /// Under a scope that may not share, moving a thread into a folder shared
 /// with a team is refused and leaves the thread where it was.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn a_scoped_session_cant_move_a_thread_into_a_shared_folder(

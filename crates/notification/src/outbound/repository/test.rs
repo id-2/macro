@@ -5,7 +5,7 @@ use crate::domain::models::{Notification, request::NotificationCategory};
 
 use super::*;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use model_entity::EntityType;
 use models_pagination::CreatedAt;
 use serde::{Deserialize, Serialize};
@@ -65,13 +65,13 @@ impl Notification for TestGithubCheckRunNotification {
     const TYPE_NAME: &'static str = "github_pr_check_run";
 }
 
-fn test_user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn test_user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 async fn create_message_notification(
     pool: &Pool<Postgres>,
-    recipient: &MacroUserIdStr<'static>,
+    recipient: &RoxUserIdStr<'static>,
     notification_id: Uuid,
     message_id: &str,
     thread_id: Option<&str>,
@@ -93,7 +93,7 @@ async fn create_message_notification(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("muted_users"))
 )]
 async fn test_get_muted_users(pool: Pool<Postgres>) {
@@ -109,7 +109,7 @@ async fn test_get_muted_users(pool: Pool<Postgres>) {
     assert!(result.contains(&muted));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_muted_users_empty(pool: Pool<Postgres>) {
     let user = test_user("nobody@test.com");
 
@@ -119,7 +119,7 @@ async fn test_get_muted_users_empty(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("unsubscribed_users"))
 )]
 async fn test_get_unsubscribed_users(pool: Pool<Postgres>) {
@@ -136,7 +136,7 @@ async fn test_get_unsubscribed_users(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("unsubscribed_users"))
 )]
 async fn test_get_unsubscribed_users_different_item(pool: Pool<Postgres>) {
@@ -151,7 +151,7 @@ async fn test_get_unsubscribed_users_different_item(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_devices"))
 )]
 async fn test_get_device_endpoints(pool: Pool<Postgres>) {
@@ -176,7 +176,7 @@ async fn test_get_device_endpoints(pool: Pool<Postgres>) {
     assert!(has_android, "should have Android endpoint");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_device_endpoints_no_devices(pool: Pool<Postgres>) {
     let user = test_user("nobody@test.com");
 
@@ -185,7 +185,7 @@ async fn test_get_device_endpoints_no_devices(pool: Pool<Postgres>) {
     assert!(result.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_notification(pool: Pool<Postgres>) {
     let recipient = test_user("recipient@test.com");
     let notification_id = uuid::Uuid::new_v4();
@@ -225,7 +225,7 @@ async fn test_create_notification(pool: Pool<Postgres>) {
     assert_eq!(user_row.user_id, recipient.to_string());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_join_request_for_an_event_that_has_gone_is_nothing_to_deliver(pool: Pool<Postgres>) {
     let request = SendNotificationRequestBuilder {
         notification_entity: EntityType::CalendarEvent
@@ -244,7 +244,7 @@ async fn a_join_request_for_an_event_that_has_gone_is_nothing_to_deliver(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_notification_stores_secondary_entity(pool: Pool<Postgres>) {
     let recipient = test_user("recipient@test.com");
     let notification_id = uuid::Uuid::new_v4();
@@ -285,7 +285,7 @@ async fn test_create_notification_stores_secondary_entity(pool: Pool<Postgres>) 
     assert_eq!(row.secondary_event_item_type.as_deref(), Some("channel"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_notification_returns_timestamps(pool: Pool<Postgres>) {
     let recipient = test_user("recipient@test.com");
     let notification_id = uuid::Uuid::new_v4();
@@ -312,7 +312,7 @@ async fn test_create_notification_returns_timestamps(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_update_sent_status(pool: Pool<Postgres>) {
@@ -335,7 +335,7 @@ async fn test_update_sent_status(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("notifications_with_collapse_keys")
@@ -369,7 +369,7 @@ async fn test_mark_notifications_seen(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("notifications_with_collapse_keys")
@@ -412,7 +412,7 @@ async fn test_mark_notifications_seen_does_not_affect_other_users(pool: Pool<Pos
     assert!(row.seen_at.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_notification_ids_for_entities_matches_multiple_primary_and_secondary_for_user(
     pool: Pool<Postgres>,
 ) {
@@ -500,7 +500,7 @@ async fn test_get_notification_ids_for_entities_matches_multiple_primary_and_sec
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_notification_ids_for_entities_matches_task_entity(pool: Pool<Postgres>) {
     let user = test_user("task-entity-user@test.com");
     let task_id = Uuid::new_v4();
@@ -535,7 +535,7 @@ async fn test_get_notification_ids_for_entities_matches_task_entity(pool: Pool<P
     assert_eq!(notification_ids, vec![task_id]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_notification_ids_for_entities_matches_message_entity(pool: Pool<Postgres>) {
     let user = test_user("message-entity-user@test.com");
     let message_id = Uuid::new_v4().to_string();
@@ -564,7 +564,7 @@ async fn test_get_notification_ids_for_entities_matches_message_entity(pool: Poo
     assert_eq!(notification_ids, vec![direct_id, thread_reply_id]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_notification_ids_for_entities_matches_foreign_entities_including_github(
     pool: Pool<Postgres>,
 ) {
@@ -622,7 +622,7 @@ async fn test_get_notification_ids_for_entities_matches_foreign_entities_includi
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("notifications_with_collapse_keys")
@@ -689,7 +689,7 @@ async fn test_mark_notifications_done_returns_owned_rows_in_requested_order(pool
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("notifications_with_collapse_keys")
@@ -710,7 +710,7 @@ async fn test_get_basic_notifications(pool: Pool<Postgres>) {
     assert_eq!(result[0].apns_collapse_key, "collapse-key-1");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_basic_notifications_empty(pool: Pool<Postgres>) {
     let id = uuid::Uuid::new_v4();
 
@@ -720,7 +720,7 @@ async fn test_get_basic_notifications_empty(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("notifications_with_collapse_keys")
@@ -791,7 +791,7 @@ async fn test_get_digest_eligible_notification_ids_filters_seen_deleted_missing_
     assert!(result.contains(&eligible_id));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_digest_eligible_notification_ids_empty_input(pool: Pool<Postgres>) {
     let user = test_user("user@test.com");
 
@@ -804,13 +804,13 @@ async fn test_get_digest_eligible_notification_ids_empty_input(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_get_user_notifications(pool: Pool<Postgres>) {
     let result: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications(
-            MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
             10,
             Query::Sort(CreatedAt, ()),
             NotificationListFilters::active(),
@@ -822,7 +822,7 @@ async fn test_get_user_notifications(pool: Pool<Postgres>) {
     let row = &result[0];
     assert_eq!(
         row.owner_id,
-        MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap()
+        RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap()
     );
     assert_eq!(
         row.notification_id,
@@ -835,11 +835,11 @@ async fn test_get_user_notifications(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_get_user_notifications_filters_exact_states(pool: Pool<Postgres>) {
-    let user = MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap();
     let notification_id = uuid::Uuid::parse_str("0193b1ea-a542-7589-893b-2b4a509c1e76").unwrap();
 
     pool.mark_notifications_seen(&user, &[notification_id])
@@ -892,11 +892,11 @@ async fn test_get_user_notifications_filters_exact_states(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_get_user_notifications_filters_type_and_entity(pool: Pool<Postgres>) {
-    let user = MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap();
 
     let document_results: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications(
@@ -959,7 +959,7 @@ async fn test_get_user_notifications_filters_type_and_entity(pool: Pool<Postgres
     assert!(wrong_entity_results.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_entity_notifications_batch_matches_channel_thread_secondary_entity(
     pool: Pool<Postgres>,
 ) {
@@ -1018,7 +1018,7 @@ async fn test_get_entity_notifications_batch_matches_channel_thread_secondary_en
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_entity_notifications_batch_preserves_canonical_entity_identity(
     pool: Pool<Postgres>,
 ) {
@@ -1105,7 +1105,7 @@ async fn test_get_entity_notifications_batch_preserves_canonical_entity_identity
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_user_notifications_filters_github_type_and_entity(pool: Pool<Postgres>) {
     let user = test_user("github-recipient@test.com");
     let foreign_entity_id = uuid::Uuid::new_v4().to_string();
@@ -1287,13 +1287,13 @@ async fn test_get_user_notifications_filters_github_type_and_entity(pool: Pool<P
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_notifications_with_invalid"))
 )]
 async fn test_get_user_notifications_skips_invalid_entity_type(pool: Pool<Postgres>) {
     let result: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications(
-            MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
             10,
             Query::Sort(CreatedAt, ()),
             NotificationListFilters::active(),
@@ -1314,7 +1314,7 @@ async fn test_get_user_notifications_skips_invalid_entity_type(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_notifications_with_invalid"))
 )]
 async fn test_get_user_notifications_by_event_item_ids_skips_invalid(pool: Pool<Postgres>) {
@@ -1326,7 +1326,7 @@ async fn test_get_user_notifications_by_event_item_ids_skips_invalid(pool: Pool<
 
     let result: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications_by_event_item_ids(
-            MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
             &[valid_item, invalid_entity_item, invalid_metadata_item],
             10,
             Query::Sort(CreatedAt, ()),
@@ -1345,11 +1345,11 @@ async fn test_get_user_notifications_by_event_item_ids_skips_invalid(pool: Pool<
     assert_eq!(result[0].notification_metadata.message, "hello");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_get_user_notifications_empty(pool: Pool<Postgres>) {
     let result: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications(
-            MacroUserIdStr::parse_from_str("macro|nobody@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|nobody@test.com").unwrap(),
             10,
             Query::Sort(CreatedAt, ()),
             NotificationListFilters::active(),
@@ -1360,7 +1360,7 @@ async fn test_get_user_notifications_empty(pool: Pool<Postgres>) {
     assert!(result.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_notification_returns_none_on_conflict(pool: Pool<Postgres>) {
     let recipient = test_user("recipient@test.com");
     let notification_id = uuid::Uuid::new_v4();
@@ -1426,7 +1426,7 @@ async fn test_create_notification_returns_none_on_conflict(pool: Pool<Postgres>)
     assert_eq!(user_count, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_create_notification_stores_bare_metadata(pool: Pool<Postgres>) {
     let recipient = test_user("recipient@test.com");
     let notification_id = uuid::Uuid::new_v4();
@@ -1481,11 +1481,11 @@ async fn test_create_notification_stores_bare_metadata(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_delete_all_user_notifications(pool: Pool<Postgres>) {
-    let user = MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap();
     let notification_id = uuid::Uuid::parse_str("0193b1ea-a542-7589-893b-2b4a509c1e76").unwrap();
 
     // Verify the notification exists before deletion
@@ -1527,11 +1527,11 @@ async fn test_delete_all_user_notifications(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_delete_all_user_notifications_does_not_affect_other_users(pool: Pool<Postgres>) {
-    let user = MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap();
     let other_user = test_user("other@test.com");
     let notification_id = uuid::Uuid::parse_str("0193b1ea-a542-7589-893b-2b4a509c1e76").unwrap();
 
@@ -1561,7 +1561,7 @@ async fn test_delete_all_user_notifications_does_not_affect_other_users(pool: Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_devices"))
 )]
 async fn android_native_call_capability_round_trips_and_can_be_cleared(pool: Pool<Postgres>) {

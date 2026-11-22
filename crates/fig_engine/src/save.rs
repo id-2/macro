@@ -30,7 +30,7 @@ mod handoff;
 
 /// The schema of designs created in Rox: a subset of Figma's, with the
 /// same type and field names, so the files are ordinary `.fig` files.
-pub const MACRO_SCHEMA: &str = "
+pub const ROX_SCHEMA: &str = "
 enum MessageType JOIN_START NODE_CHANGES USER_CHANGES JOIN_END SIGNAL STYLE STYLE_SET_CHANGES INTERACTIVE_SLIDE_CHANGE
 enum NodePhase CREATED REMOVED
 enum NodeType NONE DOCUMENT CANVAS GROUP FRAME BOOLEAN_OPERATION VECTOR STAR LINE ELLIPSE RECTANGLE REGULAR_POLYGON ROUNDED_RECTANGLE TEXT SLICE SYMBOL INSTANCE STICKY SHAPE_WITH_TEXT CONNECTOR CODE_BLOCK WIDGET STAMP MEDIA HIGHLIGHT SECTION SECTION_OVERLAY WASHI_TAPE VARIABLE TABLE TABLE_CELL
@@ -111,7 +111,7 @@ message Message type:MessageType sessionID:uint ackID:uint nodeChanges:NodeChang
 ";
 
 /// The format version written into new files' headers.
-const MACRO_VERSION: u32 = 48;
+const ROX_VERSION: u32 = 48;
 
 /// Kiwi values built against one schema.
 struct Build<'s> {
@@ -1290,7 +1290,7 @@ pub fn save(doc: &Document, original: &[u8]) -> Result<Vec<u8>> {
         !n.removed
             && n.edits & flags::LIBRARY != 0
             && (n.props.library.is_some()
-                || n.props.macro_data.is_some()
+                || n.props.rox_data.is_some()
                 || n.props.key.is_some()
                 || n.props.override_key.is_some())
     });
@@ -1875,7 +1875,7 @@ pub fn thumbnail(doc: &Document) -> Option<Vec<u8>> {
 
 /// A new design: one empty page named "Page 1", on Figma's canvas gray.
 pub fn blank(name: &str) -> Vec<u8> {
-    let schema_bytes = schema_from_text(MACRO_SCHEMA);
+    let schema_bytes = schema_from_text(ROX_SCHEMA);
     let schema = Schema::decode(&schema_bytes).expect("the built-in schema decodes");
     let b = Build { schema: &schema };
     let node_def = b.def("NodeChange").expect("NodeChange");
@@ -1932,7 +1932,7 @@ pub fn blank(name: &str) -> Vec<u8> {
     message.set(&schema, "blobs", Value::List(Vec::new()));
     let mut w = Writer::default();
     schema.encode(&message, &mut w);
-    let canvas = document_bytes(MACRO_VERSION, &schema_bytes, &w.bytes);
+    let canvas = document_bytes(ROX_VERSION, &schema_bytes, &w.bytes);
     let meta = serde_json::json!({ "file_name": name, "client_meta": { "background_color": { "r": 0.961, "g": 0.961, "b": 0.961, "a": 1.0 } } });
     let meta_bytes = serde_json::to_vec(&meta).unwrap_or_default();
     crate::zip::write_stored(&[("canvas.fig", &canvas), ("meta.json", &meta_bytes)])

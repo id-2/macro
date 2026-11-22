@@ -12,7 +12,7 @@ async function openLinksFixture(page: Page) {
     };
   });
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(
     page,
     '/src/features/block-database/browser-test/records.html?links'

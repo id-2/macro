@@ -13,8 +13,8 @@ fn authorization(enabled: bool) -> AuthorizationSnapshot {
     AuthorizationSnapshot {
         id: FundingAuthorizationId::new(),
         invocation_id: InvocationId::new(),
-        payer: MacroUserIdStr::try_from("macro|payer@example.com").unwrap(),
-        seat: MacroUserIdStr::try_from("macro|seat@example.com").unwrap(),
+        payer: RoxUserIdStr::try_from("macro|payer@example.com").unwrap(),
+        seat: RoxUserIdStr::try_from("macro|seat@example.com").unwrap(),
         period: BillingPeriod {
             start: Utc.with_ymd_and_hms(2026, 9, 1, 0, 0, 0).unwrap(),
             end: Utc.with_ymd_and_hms(2026, 10, 1, 0, 0, 0).unwrap(),
@@ -88,7 +88,7 @@ fn pricing_table_and_enabled_does_not_mean_consumed() {
         assert_eq!(allocation.extra_public, public_cents(1_000));
         assert_eq!(allocation.prepaid, money(prepaid));
         assert_eq!(allocation.postpaid, money(postpaid));
-        assert_eq!(allocation.macro_absorbed, ZERO_MONEY);
+        assert_eq!(allocation.rox_absorbed, ZERO_MONEY);
     }
 }
 
@@ -206,7 +206,7 @@ fn release_is_terminal_and_unresolved_attempts_must_keep_their_holds() {
 }
 
 #[test]
-fn overshoot_is_macro_absorbed_not_unauthorized_debt() {
+fn overshoot_is_rox_absorbed_not_unauthorized_debt() {
     let mut reservation = reserve(
         AiPricing::testing(),
         authorization(false),
@@ -218,7 +218,7 @@ fn overshoot_is_macro_absorbed_not_unauthorized_debt() {
     let allocation = reservation
         .allocate(position(0, ZERO_PUBLIC), public_cents(3_000))
         .unwrap();
-    assert_eq!(allocation.macro_absorbed, money(1_050));
+    assert_eq!(allocation.rox_absorbed, money(1_050));
     assert_eq!(allocation.customer_liability(), ZERO_MONEY);
     assert_eq!(allocation.extra_money().unwrap(), money(1_050));
 }
@@ -248,7 +248,7 @@ fn holds_and_incurred_liability_reduce_only_postpaid_cap_not_prepaid() {
         .unwrap();
     assert_eq!(allocation.prepaid, money(105));
     assert_eq!(allocation.postpaid, ZERO_MONEY);
-    assert_eq!(allocation.macro_absorbed, money(105));
+    assert_eq!(allocation.rox_absorbed, money(105));
 }
 
 #[test]
@@ -307,7 +307,7 @@ fn released_earlier_credits_replace_provisional_postpaid_not_finalized_liability
     assert_eq!(allocation.reclaimed_prepaid, money(105));
     assert_eq!(allocation.postpaid, ZERO_MONEY);
     // Reclaimed credits substitute the captured budget, never expand it for overshoot.
-    assert_eq!(allocation.macro_absorbed, money(105));
+    assert_eq!(allocation.rox_absorbed, money(105));
     assert_eq!(later.released_holds().unwrap().postpaid, money(105));
     assert_eq!(later.released_holds().unwrap().prepaid, ZERO_MONEY);
     assert_eq!(later.state(), ReservationState::Consumed);
@@ -544,7 +544,7 @@ fn rounding_is_cumulative_half_up_with_signed_carry_preserved() {
 
 #[test]
 fn legacy_free_enterprise_and_exempt_features_keep_their_paths() {
-    let user = MacroUserIdStr::try_from("macro|seat@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("macro|seat@example.com").unwrap();
     let mut entitlement = Entitlement::personal(user, PlanTier::Premium);
     assert_eq!(
         accounting_route(UsagePolicy::Legacy, AiFeature::Chat, &entitlement),

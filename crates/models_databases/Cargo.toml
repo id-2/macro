@@ -4,7 +4,7 @@ name = "models_databases"
 publish = false
 version = "0.1.0"
 
-# The write vocabulary of Macro databases, shared by the SQL engine (which
+# The write vocabulary of Rox databases, shared by the SQL engine (which
 # also runs in the browser), the HTTP API and the domain port. It stays
 # wasm-safe, so it takes no workspace-hack dependency (see .config/hakari.toml).
 [features]
@@ -14,8 +14,8 @@ schema = ["dep:schemars"]
 [dependencies]
 chrono = { workspace = true }
 fractional_index = { workspace = true }
-macro_user_id = { path = "../macro_user_id", features = ["schema"] }
-macro_uuid = { path = "../macro_uuid" }
+rox_user_id = { path = "../rox_user_id", features = ["schema"] }
+rox_uuid = { path = "../rox_uuid" }
 nom = { workspace = true }
 schemars = { workspace = true, optional = true }
 serde = { workspace = true }

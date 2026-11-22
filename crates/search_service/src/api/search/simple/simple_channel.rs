@@ -1,7 +1,7 @@
 use crate::api::search::simple::SearchError;
 use channels::domain::models::ChannelType;
 use item_filters::ChannelFilters;
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::user_id::RoxUserId;
 use name_search::ChannelNameSearchScope;
 use opensearch_client::search::model::{Highlight, SearchHit};
 use sqlx::types::Uuid;
@@ -21,7 +21,7 @@ pub(in crate::api::search) struct FilterChannelResponse {
 #[tracing::instrument(skip(db, filters, term), fields(term_len = term.len()), err)]
 pub(in crate::api::search) async fn search_names<'a>(
     db: &sqlx::Pool<sqlx::Postgres>,
-    user_id: &MacroUserId<macro_user_id::lowercased::Lowercase<'a>>,
+    user_id: &RoxUserId<rox_user_id::lowercased::Lowercase<'a>>,
     filters: &ChannelFilters,
     term: String,
     exact_match: bool,
@@ -130,7 +130,7 @@ pub(in crate::api::search) async fn filter_channels(
 
     // filter through org_id if provided
     let channel_ids = if let Some(org_id) = filters.org_id {
-        macro_db_client::items::filter::filter_channels_by_org_id(&ctx.db, &channel_ids, org_id)
+        rox_db_client::items::filter::filter_channels_by_org_id(&ctx.db, &channel_ids, org_id)
             .await?
     } else {
         channel_ids

@@ -1,7 +1,7 @@
 //! [`ColleagueDirectory`] adapter backed by the contacts graph.
 
 use contacts::domain::ports::ContactsRepository;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 use crate::domain::domain_notice::ColleagueDirectory;
@@ -21,8 +21,8 @@ impl<R> ContactsColleagueDirectory<R> {
 impl<R: ContactsRepository> ColleagueDirectory for ContactsColleagueDirectory<R> {
     async fn contacts(
         &self,
-        user_id: &MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+        user_id: &RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         self.repository.get_contacts(user_id.clone()).await
     }
 }

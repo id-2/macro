@@ -9,7 +9,7 @@ use std::sync::Arc;
 use anyhow::{Context, Result, anyhow, bail};
 use chrono::{DateTime, Utc};
 use chrono_tz::Tz;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use routine_program::{
     AgentStep, AgentTask, RoutineProgram, Step, StepPath, StepRecord, StepResult,
 };
@@ -203,7 +203,7 @@ where
     /// needs to act on it.
     async fn trigger(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
     ) -> Result<Value> {
         // Reports can carry content; keep them out of history and logs.
@@ -228,7 +228,7 @@ where
         writes = tracing::field::Empty,
         failed = tracing::field::Empty,
     ))]
-    async fn code(&self, owner: &MacroUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
+    async fn code(&self, owner: &RoxUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
         let outcome = self.code.run(owner, run).await;
         let span = tracing::Span::current();
         span.record("calls", outcome.calls.len());
@@ -354,7 +354,7 @@ where
         &self,
         action: &ScheduledAction,
         instructions: &AgentInstructions,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         firing: RoutineRun<'_>,
     ) -> Result<Option<TriggerContext>> {
         let firing = match firing {

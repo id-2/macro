@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "DELETE FROM macro_user WHERE id=$1",
+  "query": "DELETE FROM rox_user WHERE id=$1",
   "describe": {
     "columns": [],
     "parameters": {

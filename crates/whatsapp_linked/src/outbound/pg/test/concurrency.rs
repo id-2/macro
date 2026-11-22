@@ -4,7 +4,7 @@ use external_chat::domain::ports::{ChatProvider, SendIntent};
 use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::sync::Barrier;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sends_and_roster_refreshes_share_a_consistent_lock_order(pool: PgPool) {
     let (_, session, repository, binding, alice, _) = adopted(&pool).await;
     let account = WhatsAppProvider::new(repository.clone())
@@ -48,7 +48,7 @@ async fn sends_and_roster_refreshes_share_a_consistent_lock_order(pool: PgPool) 
     assert_eq!(claimed.len(), 64);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn observers_can_refresh_groups_in_opposite_orders(pool: PgPool) {
     let (linked, session, _, _, alice, bob) = adopted(&pool).await;
     let first = group(&[ALICE_JID, BOB_JID, CUSTOMER_JID]);
@@ -93,7 +93,7 @@ async fn observers_can_refresh_groups_in_opposite_orders(pool: PgPool) {
     tokio::join!(alice_refresh, bob_refresh);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn adding_a_group_waits_for_its_first_message_in_flight(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -185,7 +185,7 @@ async fn backfill_state_of(pool: &PgPool, chat: Uuid) -> Option<String> {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_group_added_while_its_first_message_is_recorded_can_import(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -246,7 +246,7 @@ async fn a_group_added_while_its_first_message_is_recorded_can_import(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn groups_added_as_their_first_messages_arrive_can_all_import(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);

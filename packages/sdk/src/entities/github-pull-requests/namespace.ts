@@ -1,4 +1,4 @@
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { ForeignEntity } from '../foreign/foreign-entity';
 import { GithubPullRequest } from './pull-request';
 
@@ -8,7 +8,7 @@ import { GithubPullRequest } from './pull-request';
  * @routing Use when reading a GitHub pull request's stored snapshot or diff; not changing code, which a coding agent does.
  */
 export class GithubPullRequestNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct from a Rox foreign entity's identity. */
   byId(id: string): GithubPullRequest {

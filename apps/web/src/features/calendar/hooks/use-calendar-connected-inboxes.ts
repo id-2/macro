@@ -18,7 +18,7 @@ export function useCalendarConnectedInboxes() {
   return createMemo<EmailLink[]>(() =>
     (linksQuery.data?.links ?? []).filter(
       (link) =>
-        link.macro_id === userId() &&
+        link.rox_id === userId() &&
         (!link.needs_calendar_permission || link.has_calendar_data)
     )
   );

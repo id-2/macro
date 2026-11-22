@@ -12,7 +12,7 @@ use ai_toolset::{
 use async_trait::async_trait;
 use code_execution::domain::ExecuteRequest;
 use cognition::domain::Cognition;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -117,7 +117,7 @@ pub struct ExecuteCode {
     pub acting_as: ai_toolset::actor::ToolActor,
     /// Copy the current server-issued turn_id from the prompt's execution context.
     /// Never reuse an ID from another turn or discover a replacement for a stale call.
-    pub turn_id: macro_uuid::Uuid,
+    pub turn_id: rox_uuid::Uuid,
     /// A JavaScript ES module, with imports and an exported async main function.
     #[schemars(
         description = "JavaScript module, at most 64 KiB. Import { Macro } from '@macro-inc/sdk' and Handlebars from 'handlebars'. Export async function main({token, hosts, webAppUrl}) { const macro = new Macro({token, hosts, webAppUrl}); return {data: ...}; }. The optional reviews array defaults to empty. Dependencies are preinstalled; no TypeScript syntax or package downloads. The token, hosts and webAppUrl are supplied by the runner; never return or log the token."
@@ -353,7 +353,7 @@ impl DescribeCodeTools {
     async fn describe(
         &self,
         host: CodeHost,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         cognition: Option<&Arc<dyn Cognition>>,
         cancel: &CancellationToken,
     ) -> Result<CodeToolsDescription, CodeModeError> {

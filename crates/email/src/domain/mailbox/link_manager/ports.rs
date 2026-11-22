@@ -7,7 +7,7 @@ use super::super::lifecycle::{
 };
 use crate::domain::mailbox::connection::ConnectionSourceError;
 use crate::domain::message_labels::gmail_ops::GmailOpsLinks;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::link::Link;
 use models_email::service::pubsub::DeletionReason;
 use std::collections::HashSet;
@@ -75,11 +75,11 @@ impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> LinkManagerLifecycle
 /// Owner and delegates selected by the domain for a reconnect notification.
 pub struct ReauthNotification {
     /// Current link owner and notification entity.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Existing notification's inbox address.
     pub email_address: String,
     /// The owner and valid delegated primaries, deduplicated by identity.
-    pub recipient_ids: HashSet<MacroUserIdStr<'static>>,
+    pub recipient_ids: HashSet<RoxUserIdStr<'static>>,
 }
 
 /// Deliver the existing reconnect notification to the selected identities.

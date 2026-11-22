@@ -113,7 +113,7 @@ struct RealJev {
 impl Cognition for RealJev {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         unreachable!("routing never generates text")
@@ -121,7 +121,7 @@ impl Cognition for RealJev {
 
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         let (keys, questions): (Vec<String>, Vec<YesNoQuestion>) = request
@@ -166,7 +166,7 @@ async fn entity_route_evaluation() {
         input_tokens: std::sync::atomic::AtomicU64::new(0),
     });
     let cognition: Arc<dyn Cognition> = jev.clone();
-    let owner = MacroUserIdStr::parse_from_str("macro|eval@example.com").expect("a user id");
+    let owner = RoxUserIdStr::parse_from_str("macro|eval@example.com").expect("a user id");
     let docs = sdk_documentation();
     let (mut recalled, mut expected_total, mut exact, mut spurious, mut loaded_total) =
         (0, 0, 0, 0, 0);

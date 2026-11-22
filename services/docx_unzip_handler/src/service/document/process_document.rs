@@ -31,7 +31,7 @@ pub async fn process(
 
     // Get docx upload job for job id using document id
     tracing::trace!("getting docx upload job");
-    let job = macro_db_client::docx_unzip::get_job_for_docx_upload(
+    let job = rox_db_client::docx_unzip::get_job_for_docx_upload(
         &ctx.db,
         &document_key_parts.document_id,
     )
@@ -71,7 +71,7 @@ pub async fn process(
 
     tracing::trace!("document retrieved");
 
-    if let Err(e) = macro_db_client::docx_unzip::update_uploaded_status(
+    if let Err(e) = rox_db_client::docx_unzip::update_uploaded_status(
         &ctx.db,
         &document_key_parts.document_id,
     )
@@ -122,7 +122,7 @@ pub async fn process(
         })
         .collect();
 
-    macro_db_client::docx_unzip::save_bom_parts_to_db(
+    rox_db_client::docx_unzip::save_bom_parts_to_db(
         &ctx.db,
         &save_bom_parts,
         document_key_parts.document_bom_id,
@@ -150,7 +150,7 @@ pub(super) fn convert_message(
     document_storage_bucket: &str,
 ) -> ConvertQueueMessage {
     let notify_job = upload_job_id.is_some();
-    let job_id = upload_job_id.unwrap_or_else(|| macro_uuid::generate_uuid_v7().to_string());
+    let job_id = upload_job_id.unwrap_or_else(|| rox_uuid::generate_uuid_v7().to_string());
 
     ConvertQueueMessage {
         job_id,

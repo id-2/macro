@@ -2,7 +2,7 @@
 
 use agent_session::domain::model::AgentSessionId;
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use sqlx::PgPool;
 
 use crate::domain::model::{

@@ -6,14 +6,14 @@ use std::collections::{HashMap, HashSet};
 
 use futures::{FutureExt, StreamExt, stream};
 use import_notion::domain::inventory::{all_rows, full_markdown};
-use import_notion::domain::macro_cells::{
+use import_notion::domain::rox_cells::{
     ColumnNames, ColumnPlan, PeopleMap, capped_name, derived_id,
 };
 use import_notion::domain::model::{
     NotionDataSource, NotionId, NotionPage, NotionPropertyKind, NotionPropertySchema, NotionValue,
 };
 use import_notion::domain::ports::NotionApi;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{
     CellValue, CellWrite, ColumnChange, ColumnId, ColumnKind, DatabaseId, DatabaseOp, EntityKind,
     EntityRef, NewColumn, OpResult, RowChange, RowChanges, RowId, RowsChange, RowsResult,
@@ -97,7 +97,7 @@ pub(in super::super) async fn write_database<
 >(
     api: &Api,
     writer: &Writer,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     item: &WriteItem,
     folder: Uuid,
     share: bool,
@@ -227,7 +227,7 @@ pub(in super::super) async fn write_database<
 /// anything is written into it.
 async fn database_once<Writer: WorkspaceWriter, Store: WrittenObjects>(
     writer: &Writer,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     item: &WriteItem,
     progress: &Progress<'_, Store>,
 ) -> anyhow::Result<NewDatabase> {
@@ -401,7 +401,7 @@ fn inserted_rows(results: &[OpResult]) -> Vec<RowId> {
 async fn write_row_bodies<Api: NotionApi, Writer: WorkspaceWriter, Store: WrittenObjects>(
     api: &Api,
     writer: &Writer,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     item: &WriteItem,
     folder: Uuid,
     share: bool,
@@ -603,7 +603,7 @@ fn owned_batches<Item: Clone>(items: &[Item]) -> Vec<Vec<Item>> {
 pub(in super::super) async fn link_relations<Writer: WorkspaceWriter, Store: WrittenObjects>(
     writer: &Writer,
     store: &Store,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     databases: &HashMap<NotionId, WrittenDatabase>,
     cancel: &Cancel,
 ) -> anyhow::Result<()> {
@@ -636,7 +636,7 @@ pub(in super::super) async fn link_relations<Writer: WorkspaceWriter, Store: Wri
                     import_id: database.import_id,
                     kind,
                     object: relation.name.clone(),
-                    macro_id: column.into_uuid(),
+                    rox_id: column.into_uuid(),
                 };
                 async move { store.record_written(user, &[object]).await }
             };

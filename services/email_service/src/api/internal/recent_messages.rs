@@ -11,8 +11,8 @@ use email::domain::{
     mailbox::MailboxError,
     recent_inbox::{DEFAULT_RECENT_MESSAGES, DEFAULT_SNIPPET_CHARS},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
+use rox_user_id::user_id::RoxUserIdStr;
 use model::response::ErrorResponse;
 use models_email::email::service::message::RecentInboxMessagesResponse;
 use serde::Deserialize;
@@ -59,8 +59,8 @@ impl IntoResponse for RecentMessagesError {
 fn parse_request(
     user_id: String,
     query: RecentMessagesQuery,
-) -> Result<(MacroUserIdStr<'static>, u16, u16), RecentMessagesError> {
-    let user = MacroUserIdStr::try_from(user_id).map_err(|_| RecentMessagesError::InvalidUser)?;
+) -> Result<(RoxUserIdStr<'static>, u16, u16), RecentMessagesError> {
+    let user = RoxUserIdStr::try_from(user_id).map_err(|_| RecentMessagesError::InvalidUser)?;
     Ok((
         user,
         query.limit.unwrap_or(DEFAULT_RECENT_MESSAGES),
@@ -73,7 +73,7 @@ fn parse_request(
 #[tracing::instrument(skip_all, err)]
 pub(crate) async fn handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path(user_id): Path<String>,
     Query(query): Query<RecentMessagesQuery>,
 ) -> Result<Json<RecentInboxMessagesResponse>, RecentMessagesError> {

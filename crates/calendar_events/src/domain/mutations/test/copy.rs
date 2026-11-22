@@ -52,9 +52,9 @@ async fn copy_imports_a_channel_shared_event_onto_the_requesters_calendar() {
 }
 
 #[tokio::test]
-async fn copy_leaves_the_meetings_macro_call_out() {
+async fn copy_leaves_the_meetings_rox_call_out() {
     let call = "https://rox.one/app/meet/join/0123456789abcdef0123456789abcdef";
-    let (description, location) = crate::domain::meeting_links::attach_macro_call(
+    let (description, location) = crate::domain::meeting_links::attach_rox_call(
         Some("<p>Bring the budget draft</p>"),
         None,
         call,

@@ -4,7 +4,7 @@
 
 use std::future::Future;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::models::ClearAction;
 
@@ -16,7 +16,7 @@ pub trait ClearUpdates: Send + Sync + 'static {
     /// an update read the clear again when they reconnect.
     fn updated(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         action: &ClearAction,
     ) -> impl Future<Output = ()> + Send;
 }

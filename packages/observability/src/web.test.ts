@@ -44,12 +44,12 @@ test('recording exports even unsampled-parent spans with launch identity and mem
       enabled: async () => true,
       tracesUrl: 'http://localhost/v1/traces',
       recording: true,
-      spanAttributes: () => ({ 'macro.memory.native.rss_bytes': memory }),
+      spanAttributes: () => ({ 'rox.memory.native.rss_bytes': memory }),
     },
     resourceFromAttributes({
       'app.runtime': 'tauri',
       'service.instance.id': 'launch-1',
-      'macro.recording.id': 'recording-1',
+      'rox.recording.id': 'recording-1',
     }),
     () => 'user-1',
     sampling
@@ -70,12 +70,12 @@ test('recording exports even unsampled-parent spans with launch identity and mem
   expect(exported?.resource.attributes).toMatchObject({
     'app.runtime': 'tauri',
     'service.instance.id': 'launch-1',
-    'macro.recording.id': 'recording-1',
+    'rox.recording.id': 'recording-1',
   });
   expect(exported?.attributes).toMatchObject({
     'usr.id': 'user-1',
-    'macro.memory.native.rss_bytes': 100,
-    'macro.memory.native.rss_bytes.end': 200,
+    'rox.memory.native.rss_bytes': 100,
+    'rox.memory.native.rss_bytes.end': 200,
   });
   await provider.shutdown();
 });
@@ -89,7 +89,7 @@ test('buffered samples retain their native timestamp and values despite live enr
       environment: 'test',
       enabled: async () => true,
       tracesUrl: 'http://localhost/v1/traces',
-      spanAttributes: () => ({ 'macro.memory.native.rss_bytes': 999 }),
+      spanAttributes: () => ({ 'rox.memory.native.rss_bytes': 999 }),
     },
     resourceFromAttributes({}),
     () => undefined,
@@ -97,14 +97,14 @@ test('buffered samples retain their native timestamp and values despite live enr
   );
   new Tracing().recordSample(
     'app.memory.sample',
-    { 'macro.memory.native.rss_bytes': 123 },
+    { 'rox.memory.native.rss_bytes': 123 },
     1_700_000_000_125
   );
   await provider.forceFlush();
   const sample = exporters.at(-1)?.getFinishedSpans()[0];
   expect(sample?.startTime).toEqual([1_700_000_000, 125_000_000]);
   expect(sample?.endTime).toEqual(sample?.startTime);
-  expect(sample?.attributes['macro.memory.native.rss_bytes']).toBe(123);
+  expect(sample?.attributes['rox.memory.native.rss_bytes']).toBe(123);
   await provider.shutdown();
 });
 
@@ -189,8 +189,8 @@ test('every span in a kept classed trace carries its class and rate, including r
     (exporters.at(-1)?.getFinishedSpans() ?? []).map((span) => [
       span.name,
       [
-        span.attributes['macro.sampling.class'],
-        span.attributes['macro.sampling.rate'],
+        span.attributes['rox.sampling.class'],
+        span.attributes['rox.sampling.rate'],
       ],
     ])
   );
@@ -255,8 +255,8 @@ test('a span in a dropped trace starts its own trace when its class is kept, and
   expect(retry.spanContext().traceId).toBe(request.spanContext().traceId);
   expect(write.parentSpanContext).toBeUndefined();
   expect(write.spanContext().traceId).not.toBe(request.spanContext().traceId);
-  expect(write.attributes['macro.sampling.class']).toBe('always');
-  expect(request.attributes['macro.sampling.class']).toBeUndefined();
+  expect(write.attributes['rox.sampling.class']).toBe('always');
+  expect(request.attributes['rox.sampling.class']).toBeUndefined();
   await provider.shutdown();
 });
 
@@ -378,7 +378,7 @@ test('early spans keep explicit async parentage and wait for exporter enablement
   transport.end();
   mutation.end();
   document.end();
-  boot.event('macro.boot.render-start', undefined, 1700000000050);
+  boot.event('rox.boot.render-start', undefined, 1700000000050);
   boot.end(1700000000100);
   expect(exporters).toHaveLength(count);
   decide(true);

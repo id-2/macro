@@ -60,11 +60,11 @@ fn both_put_tasks_before_pull_requests() {
 #[test]
 fn tasks_name_the_tools_they_rely_on() {
     for tool in [
-        "macro.NameSearch",
-        "macro.ContentSearch",
-        "macro.CreateDocument",
-        "macro_internal.task_pull_requests",
-        "macro_internal.link_task",
+        "rox.NameSearch",
+        "rox.ContentSearch",
+        "rox.CreateDocument",
+        "rox_internal.task_pull_requests",
+        "rox_internal.link_task",
     ] {
         assert!(CREATE_TASKS_INSTRUCTIONS.contains(tool), "{tool}");
     }
@@ -87,5 +87,5 @@ fn tasks_are_stated_as_a_mention_chip() {
 
 #[test]
 fn pull_requests_are_registered_with_the_session() {
-    assert!(OPEN_PULL_REQUESTS_INSTRUCTIONS.contains("macro_internal.set_pull_request"));
+    assert!(OPEN_PULL_REQUESTS_INSTRUCTIONS.contains("rox_internal.set_pull_request"));
 }

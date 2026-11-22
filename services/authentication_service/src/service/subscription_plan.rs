@@ -1,5 +1,5 @@
 //! Personal plan-change policy. Downgrades preserve already paid access until renewal.
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use teams::domain::model::SeatPlan;
 
 /// Active personal subscription facts, with provider identity kept opaque.
@@ -43,12 +43,12 @@ pub trait PlanGateway: Send + Sync {
     /// Load all live personal subscriptions belonging to this user.
     fn personal_subscription(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<PersonalSubscription, PlanChangeError>> + Send;
     /// Execute exactly the timing selected by the service.
     fn apply(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         subscription: PersonalSubscription,
         target: SeatPlan,
         action: PlanAction,
@@ -66,7 +66,7 @@ impl<G: PlanGateway> PlanService<G> {
     /// Select immediate upgrade, renewal downgrade or cancellation of a pending change.
     pub async fn change(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         target: SeatPlan,
     ) -> Result<SeatPlan, PlanChangeError> {
         if !SeatPlan::PURCHASABLE.contains(&target) {
@@ -106,7 +106,7 @@ mod test {
     impl PlanGateway for Fake {
         async fn personal_subscription(
             &self,
-            _: &MacroUserIdStr<'_>,
+            _: &RoxUserIdStr<'_>,
         ) -> Result<PersonalSubscription, PlanChangeError> {
             Ok(PersonalSubscription {
                 id: "sub_test".into(),
@@ -116,7 +116,7 @@ mod test {
         }
         async fn apply(
             &self,
-            _: &MacroUserIdStr<'_>,
+            _: &RoxUserIdStr<'_>,
             _: PersonalSubscription,
             _: SeatPlan,
             action: PlanAction,
@@ -130,7 +130,7 @@ mod test {
         let service = PlanService::new(Fake {
             calls: Mutex::new(Vec::new()),
         });
-        let user = MacroUserIdStr::try_from("macro|max@example.com").unwrap();
+        let user = RoxUserIdStr::try_from("macro|max@example.com").unwrap();
         assert_eq!(
             service.change(&user, SeatPlan::Premium).await.unwrap(),
             SeatPlan::Max

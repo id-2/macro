@@ -20,7 +20,7 @@ mod process;
 use std::time::Instant;
 
 use anyhow::Context;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::postgres::PgPoolOptions;
 
 struct Stats {
@@ -34,7 +34,7 @@ struct Stats {
 async fn main() -> anyhow::Result<()> {
     println!("=== Reverse SFS Mappings ===\n");
 
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = config::Config::from_env().context("Failed to load configuration")?;
 
     println!("Configuration:");

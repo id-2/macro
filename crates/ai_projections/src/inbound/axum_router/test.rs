@@ -7,11 +7,11 @@ use axum::{
     http::{Request, StatusCode, header},
 };
 use http_body_util::BodyExt;
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rootcause::Report;
 use tower::ServiceExt;
@@ -30,10 +30,10 @@ use crate::domain::{
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(test_user_context())
@@ -42,18 +42,18 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -76,7 +76,7 @@ struct MockService {
 impl AiProjectionService for MockService {
     async fn upsert_projection(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         params: UpsertProjectionParams,
     ) -> Result<UserAiProjection, UpsertProjectionError> {
         let id = params.id.clone();
@@ -95,7 +95,7 @@ impl AiProjectionService for MockService {
 
     async fn has_professional_features(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, AiProjectionError> {
         Ok(self.has_permission)
     }
@@ -127,7 +127,7 @@ fn build_router(has_permission: bool) -> axum::Router {
 fn build_router_with(service: Arc<MockService>) -> axum::Router {
     let state = AiProjectionRouterState {
         service,
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     };
     ai_projections_router(state).layer(axum::middleware::map_request(attach_bearer))
 }

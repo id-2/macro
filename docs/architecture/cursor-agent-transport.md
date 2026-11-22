@@ -254,7 +254,7 @@ Cursor, anything else to the sandbox provider.
 
 ```rust
 pub fn is_managed_bot(bot: BotId) -> bool {
-    bot == bot_id::MACRO_CODER_BOT_ID
+    bot == bot_id::ROX_CODER_BOT_ID
 }
 ```
 

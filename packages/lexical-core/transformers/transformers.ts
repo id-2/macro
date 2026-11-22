@@ -335,8 +335,8 @@ export const SEARCH_MATCH: TextMatchTransformer = {
   export: (_: LexicalNode) => {
     return null;
   },
-  importRegExp: xmlMatcher('macro_em'),
-  regExp: xmlMatcher('macro_em'),
+  importRegExp: xmlMatcher('rox_em'),
+  regExp: xmlMatcher('rox_em'),
   replace: (textNode, match) => {
     try {
       const searchMatchNode = $createSearchMatchNode([]);

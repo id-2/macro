@@ -6,7 +6,7 @@
  */
 
 import type { ChannelAccessRequestedMetadataRequesterName } from './channelAccessRequestedMetadataRequesterName';
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './macroUserIdStr';
 
 /**
  * Metadata for [`ChannelTopicEvent::AccessRequested`].
@@ -17,7 +17,7 @@ export interface ChannelAccessRequestedMetadata {
   /** The attempt; channel participants read its current outcome by id. */
   request_id: string;
   /** Person asking to join. */
-  requester_id: MacroUserIdStr;
+  requester_id: RoxUserIdStr;
   /** The requester's profile name when they asked, if they had one. Absent
 on events from before it was added. */
   requester_name?: ChannelAccessRequestedMetadataRequesterName;

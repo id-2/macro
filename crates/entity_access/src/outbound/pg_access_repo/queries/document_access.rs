@@ -8,7 +8,7 @@ use crate::{
     domain::models::AccessGrant, outbound::pg_access_repo::queries::list_entity_access_grants,
 };
 use crate::{domain::models::AccessLevel, outbound::pg_access_repo::queries::SourceIds};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 #[cfg(feature = "explain_binary")]
 use model_entity::EntityType;
 use sqlx::PgPool;
@@ -20,7 +20,7 @@ pub async fn get_document_access(
     pool: &PgPool,
     document_id: &uuid::Uuid,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Option<AccessLevel>, sqlx::Error> {
     // Check share permission access only
     if source_ids.0.is_empty() {
@@ -104,18 +104,18 @@ pub async fn get_document_access(
             UNION ALL
             -- Source 3: email-attachment documents inherit access from any
             -- linked thread the caller can reach. Owning or being delegated
-            -- the thread's inbox (macro_user_links) grants Edit, mirroring
+            -- the thread's inbox (rox_user_links) grants Edit, mirroring
             -- calendar-event delegation. A thread-level entity_access grant
             -- inherits as View regardless of its level: a SHA-deduped document
             -- can back attachments in other threads with different audiences,
             -- so a per-thread share must not confer write access to it.
             SELECT CASE
-                WHEN l.macro_id = $4
+                WHEN l.rox_id = $4
                   OR EXISTS (
                       SELECT 1
-                      FROM macro_user_links mul
+                      FROM rox_user_links mul
                       WHERE mul.link_id = l.id
-                        AND mul.primary_macro_id = $4
+                        AND mul.primary_rox_id = $4
                   )
                 THEN 'edit'
                 ELSE 'view'
@@ -127,12 +127,12 @@ pub async fn get_document_access(
             JOIN email_links l ON l.id = t.link_id
             WHERE de.document_id = $3
               AND (
-                  l.macro_id = $4
+                  l.rox_id = $4
                   OR EXISTS (
                       SELECT 1
-                      FROM macro_user_links mul
+                      FROM rox_user_links mul
                       WHERE mul.link_id = l.id
-                        AND mul.primary_macro_id = $4
+                        AND mul.primary_rox_id = $4
                   )
                   OR EXISTS (
                       SELECT 1
@@ -218,7 +218,7 @@ pub async fn get_documents_access(
     pool: &PgPool,
     document_ids: &[uuid::Uuid],
     source_ids: &SourceIds,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<HashMap<uuid::Uuid, AccessLevel>, sqlx::Error> {
     let mut highest: HashMap<uuid::Uuid, AccessLevel> = HashMap::new();
     if document_ids.is_empty() {
@@ -255,7 +255,7 @@ pub async fn explain_document_access(
     pool: &PgPool,
     document_id: &uuid::Uuid,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let mut grants =
         list_entity_access_grants(pool, document_id, EntityType::Document, source_ids).await?;
@@ -340,7 +340,7 @@ async fn explain_document_email_attachments(
     pool: &PgPool,
     document_id: &uuid::Uuid,
     source_ids: &SourceIds,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let user_id_str = user_id.as_ref();
     let rows = sqlx::query!(
@@ -348,12 +348,12 @@ async fn explain_document_email_attachments(
         SELECT
             t.id AS thread_id,
             CASE
-                WHEN l.macro_id = $3 THEN 'inbox_owner'
+                WHEN l.rox_id = $3 THEN 'inbox_owner'
                 WHEN EXISTS (
                     SELECT 1
-                    FROM macro_user_links mul
+                    FROM rox_user_links mul
                     WHERE mul.link_id = l.id
-                      AND mul.primary_macro_id = $3
+                      AND mul.primary_rox_id = $3
                 ) THEN 'inbox_delegate'
                 ELSE 'thread_grant'
             END AS "reason!"
@@ -364,12 +364,12 @@ async fn explain_document_email_attachments(
         JOIN email_links l ON l.id = t.link_id
         WHERE de.document_id = $1
           AND (
-              l.macro_id = $3
+              l.rox_id = $3
               OR EXISTS (
                   SELECT 1
-                  FROM macro_user_links mul
+                  FROM rox_user_links mul
                   WHERE mul.link_id = l.id
-                    AND mul.primary_macro_id = $3
+                    AND mul.primary_rox_id = $3
               )
               OR EXISTS (
                   SELECT 1
@@ -408,7 +408,7 @@ pub async fn get_legacy_document_access(
     pool: &PgPool,
     document_id: &str,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Option<AccessLevel>, sqlx::Error> {
     let levels = sqlx::query_scalar!(
         r#"

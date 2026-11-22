@@ -2,8 +2,8 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use zeroize::Zeroizing;
 
 /// A model provider an agent can bring its own key for.
@@ -158,7 +158,7 @@ pub struct EncryptedProviderApiKey {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AgentOwner {
     /// A person's own agent.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
     /// A team's agent.
     Team(Uuid),
 }

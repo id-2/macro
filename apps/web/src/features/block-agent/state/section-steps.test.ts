@@ -16,7 +16,7 @@ const call = (id: string, overrides?: Partial<ToolUsePart>): ToolUsePart => ({
 });
 const program = (id: string): ToolUsePart =>
   call(id, {
-    name: { kind: 'mcp', server: 'macro_internal', tool: 'ExecuteCode' },
+    name: { kind: 'mcp', server: 'rox_internal', tool: 'ExecuteCode' },
     status: 'running',
   });
 const row = (
@@ -82,7 +82,7 @@ describe('sectionSteps', () => {
           call('lookup', {
             name: {
               kind: 'mcp',
-              server: 'macro_internal',
+              server: 'rox_internal',
               tool: 'SearchTools',
             },
           }),

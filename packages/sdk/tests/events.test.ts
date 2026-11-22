@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { Macro } from '../src/macro';
-import { MacroError } from '../src/utils';
+import { RoxError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
 
@@ -42,7 +42,7 @@ async function sign(
   return `v1=${new Uint8Array(digest).toHex()}`;
 }
 
-describe('MacroEvents', () => {
+describe('RoxEvents', () => {
   test('is always available and defaults listen() filters from .on()', async () => {
     let request: Request | undefined;
     const delivered = Promise.withResolvers<typeof created>();
@@ -117,7 +117,7 @@ describe('MacroEvents', () => {
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
-    await expect(macro.events.listen()).rejects.toThrow(MacroError);
+    await expect(macro.events.listen()).rejects.toThrow(RoxError);
   });
 
   test('webhook() requires a signing secret', () => {
@@ -125,7 +125,7 @@ describe('MacroEvents', () => {
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
-    expect(() => macro.events.webhook()).toThrow(MacroError);
+    expect(() => macro.events.webhook()).toThrow(RoxError);
   });
 
   test('webhook() verifies the signature and dispatches', async () => {
@@ -149,9 +149,9 @@ describe('MacroEvents', () => {
         method: 'POST',
         body: rawBody,
         headers: {
-          'x-macro-event': 'document.created',
-          'x-macro-timestamp': timestamp,
-          'x-macro-signature': signature,
+          'x-rox-event': 'document.created',
+          'x-rox-timestamp': timestamp,
+          'x-rox-signature': signature,
         },
       }),
     );
@@ -173,8 +173,8 @@ describe('MacroEvents', () => {
           method: 'POST',
           body: JSON.stringify(created),
           headers: {
-            'x-macro-timestamp': '1710000000',
-            'x-macro-signature': 'v1=deadbeef',
+            'x-rox-timestamp': '1710000000',
+            'x-rox-signature': 'v1=deadbeef',
           },
         }),
       ),

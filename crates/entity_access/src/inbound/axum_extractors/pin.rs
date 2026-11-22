@@ -11,8 +11,8 @@ use axum::{
     Json, RequestExt,
     extract::{FromRef, FromRequest, Path, Request},
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
     OptionalMacroAuthorizationExtractor,
 };
 use tracing::Level;
@@ -58,8 +58,8 @@ where
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
     V: DeserializeOwned + std::fmt::Debug,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -76,12 +76,12 @@ where
             .map_err(ExtractorError::from)?
             .authorization
             .ok_or(ExtractorError::Unauthorized)?;
-        let macro_user_id = match &authorization {
-            MacroAuthorization::User(user) | MacroAuthorization::Internal(Some(user)) => {
-                Some(user.macro_user_id.clone())
+        let rox_user_id = match &authorization {
+            RoxAuthorization::User(user) | RoxAuthorization::Internal(Some(user)) => {
+                Some(user.rox_user_id.clone())
             }
-            MacroAuthorization::Bot(_) => None,
-            MacroAuthorization::Harness(_) | MacroAuthorization::Internal(None) => {
+            RoxAuthorization::Bot(_) => None,
+            RoxAuthorization::Harness(_) | RoxAuthorization::Internal(None) => {
                 return Err(ExtractorError::Unauthorized);
             }
         };
@@ -107,7 +107,7 @@ where
             .map_err(|_| ExtractorError::BadRequest("Invalid pin_type"))?;
 
         let entity_access_receipt = match authorization {
-            MacroAuthorization::Bot(authentication) => {
+            RoxAuthorization::Bot(authentication) => {
                 generate_bot_entity_access_receipt::<T>(
                     service.as_ref(),
                     &authentication,
@@ -116,10 +116,10 @@ where
                 )
                 .await?
             }
-            MacroAuthorization::User(_) | MacroAuthorization::Internal(Some(_)) => {
-                let macro_user_id = macro_user_id.ok_or(ExtractorError::Unauthorized)?;
+            RoxAuthorization::User(_) | RoxAuthorization::Internal(Some(_)) => {
+                let rox_user_id = rox_user_id.ok_or(ExtractorError::Unauthorized)?;
                 let access_level = service
-                    .get_access_level(Some(&macro_user_id), &pinned_item_id, entity_type)
+                    .get_access_level(Some(&rox_user_id), &pinned_item_id, entity_type)
                     .await
                     .map_err(ExtractorError::from)?
                     .ok_or(ExtractorError::Unauthorized)?;
@@ -133,12 +133,12 @@ where
                         entity_id: pinned_item_id,
                         entity_type,
                     },
-                    auth: EntityAccessAuth::Authenticated(macro_user_id),
+                    auth: EntityAccessAuth::Authenticated(rox_user_id),
                     entity_permission: permission,
                     _marker: PhantomData,
                 }
             }
-            MacroAuthorization::Harness(_) | MacroAuthorization::Internal(None) => {
+            RoxAuthorization::Harness(_) | RoxAuthorization::Internal(None) => {
                 return Err(ExtractorError::Unauthorized);
             }
         };

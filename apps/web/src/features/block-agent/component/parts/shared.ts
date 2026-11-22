@@ -9,7 +9,7 @@ import type {
   MessagePart,
   ToolName,
 } from '@service-agent-fold/generated/types';
-import type { ToolName as MacroToolName } from '@service-cognition/generated/tools/tool';
+import type { ToolName as RoxToolName } from '@service-cognition/generated/tools/tool';
 import type { JSX } from 'solid-js';
 import { match } from 'ts-pattern';
 import type { ToolStatus } from '../../ui';
@@ -32,7 +32,7 @@ export type ToolCallContext = {
   /** The turn is still in flight — the chat block's `isStreaming`. */
   inFlight: boolean;
   /** Whether a later part of the same turn calls this tool. */
-  followedBy: (name: MacroToolName) => boolean;
+  followedBy: (name: RoxToolName) => boolean;
 };
 
 /** Row-level facts common to every tool card, derived once by the dispatcher. */
@@ -60,7 +60,7 @@ export function toolLabel(name: ToolName): string {
 export function toolUsedAfter(
   parts: readonly MessagePart[],
   index: number
-): (name: MacroToolName) => boolean {
+): (name: RoxToolName) => boolean {
   return (name) =>
     parts
       .slice(index + 1)

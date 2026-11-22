@@ -29,7 +29,7 @@ function $buildForwardEditorState() {
   // the header lines and a blockquote holding the rendered original email.
   const wrapper = $createClassedBlockNode({
     tag: 'div',
-    classes: ['macro_quote', 'gmail_quote'],
+    classes: ['rox_quote', 'gmail_quote'],
   });
   const header = $createParagraphNode();
   header.append($createTextNode('---------- Forwarded message ----------'));

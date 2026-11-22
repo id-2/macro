@@ -37,7 +37,7 @@ impl PairingClient {
         Self {
             http: reqwest::Client::new(),
             base: config
-                .macro_api
+                .rox_api
                 .storage_url
                 .trim_end_matches('/')
                 .to_owned(),

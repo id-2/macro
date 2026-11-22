@@ -16,12 +16,12 @@
 -- User Link
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-00000000001a', 'macro|user@rox.one', '00000000-0000-0000-0000-00000000001a',
         'user@rox.one', 'GMAIL', true, NOW(), NOW());
 
 -- Link B intentionally has no email_contacts row for its own address.
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-00000000002a', 'macro|missing-self@example.net', '00000000-0000-0000-0000-00000000002a',
         'missing-self@example.net', 'GMAIL', true, NOW(), NOW());
 
@@ -523,15 +523,15 @@ VALUES ('00000000-0000-0000-0000-000000aa1301',
         '00000000-0000-0000-0000-0000000e1301',
         'provider-att-1301', 'missing_self_contact.pdf', 'application/pdf', NOW());
 
--- Macro user for the User table foreign key
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+-- Rox user for the User table foreign key
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES ('00000000-0000-0000-0000-00000000001a',
         'user_a',
         'user@rox.one',
         'cus_test123');
 
 -- User for the document owner
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES ('00000000-0000-0000-0000-00000000001a',
         'user@rox.one',
         'User A',

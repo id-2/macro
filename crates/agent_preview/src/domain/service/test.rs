@@ -167,7 +167,7 @@ fn isolated_domains_and_shell_fields_are_validated() {
         "preview.rox.one",
         "bad;hostname",
         "UPPERCASE.test",
-        "macro.test",
+        "rox.test",
         // Nested either way: the app under the preview domain, and the preview
         // domain under the app.
         "test",

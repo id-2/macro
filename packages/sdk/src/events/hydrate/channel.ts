@@ -2,11 +2,11 @@ import { match } from 'ts-pattern';
 import { ChannelAccessRequest } from '../../entities/channels/access-request';
 import { Channel } from '../../entities/channels/channel';
 import { User } from '../../entities/users/user';
-import type { MacroClient } from '../../utils/client';
-import type { MacroEvent } from '../types';
+import type { RoxClient } from '../../utils/client';
+import type { RoxEvent } from '../types';
 
 export type ChannelEvent = Extract<
-  MacroEvent,
+  RoxEvent,
   { event_type: `channel.${string}` }
 >;
 
@@ -18,7 +18,7 @@ const USER_PREFIX = 'macro|';
  * bot. Lower-cased to match how the backend stores ids. Note `|` is legal in an
  * email, so `macro|bot|a@b.com` is a user.
  */
-export function userFromPrincipal(client: MacroClient, principalId: string) {
+export function userFromPrincipal(client: RoxClient, principalId: string) {
   return principalId.startsWith(USER_PREFIX) &&
     principalId.length > USER_PREFIX.length
     ? User.byId(client, principalId.toLowerCase())
@@ -26,7 +26,7 @@ export function userFromPrincipal(client: MacroClient, principalId: string) {
 }
 
 /** Attach SDK entity handles to a channel webhook event. */
-export function hydrateChannelEvent(client: MacroClient, event: ChannelEvent) {
+export function hydrateChannelEvent(client: RoxClient, event: ChannelEvent) {
   return match(event)
     .with({ event_type: 'channel.created' }, ({ metadata }) => ({
       event_type: 'channel.created' as const,

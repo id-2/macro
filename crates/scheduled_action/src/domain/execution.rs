@@ -8,7 +8,7 @@ use ai_usage::AiFeature;
 use anyhow::{Context, Result};
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_uuid::{Uuid, generate_uuid_v7};
 use routine_program::{RoutineProgram, StepRecord};
 use tokio_util::{sync::CancellationToken, task::TaskTracker};
 use tracing::Instrument;

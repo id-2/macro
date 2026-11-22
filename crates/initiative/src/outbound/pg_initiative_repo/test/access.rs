@@ -1,6 +1,6 @@
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn assignee_sharing_adds_manageable_collaborators_without_owner_downgrade(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -62,7 +62,7 @@ async fn assignee_sharing_adds_manageable_collaborators_without_owner_downgrade(
 
 /// A session that may not share assigns only people who already have the
 /// access an assignee gets.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_scoped_session_assigns_only_who_already_has_access(pool: PgPool) -> anyhow::Result<()> {
     use agent_correlation::context::{Attribution, scope_attribution};
     use agent_correlation::scope::SessionScope;

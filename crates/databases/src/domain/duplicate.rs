@@ -33,7 +33,7 @@ pub trait DatabaseDuplicateService: Send + Sync + 'static {
     fn duplicate_database(
         &self,
         receipt: EntityAccessReceipt<ViewAccessLevel>,
-        owner: macro_user_id::user_id::MacroUserIdStr<'static>,
+        owner: rox_user_id::user_id::RoxUserIdStr<'static>,
         acting_bot: Option<bot_id::BotId>,
         name: Option<String>,
     ) -> impl Future<Output = Result<Database, DatabaseError>> + Send;

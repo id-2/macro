@@ -16,7 +16,7 @@ import { createMemo, createSignal, For, Show } from 'solid-js';
 import { AgentIcon } from '../components/AgentGlyph';
 import { AgentPickerIdentity } from '../components/AgentPickerIdentity';
 import { agentPickerGroups } from '../core/agent-picker-groups';
-import { MACRO_PERSONA_ID, type RosterAgent } from '../core/roster';
+import { ROX_PERSONA_ID, type RosterAgent } from '../core/roster';
 import { createComposerModels } from '../queries/composer-models';
 import type { AgentPickerProps } from './AgentPicker';
 
@@ -28,11 +28,11 @@ export function MobileAgentPicker(props: AgentPickerProps) {
   let searchInput: HTMLInputElement | undefined;
   const [browsing, setBrowsing] = createSignal<RosterAgent>();
   const macro = () =>
-    props.agents.find((agent) => agent.id === MACRO_PERSONA_ID);
+    props.agents.find((agent) => agent.id === ROX_PERSONA_ID);
   const catalog = createComposerModels(() => browsing() ?? macro());
   const model = () => props.modelOverride ?? props.selected?.defaultModel;
   const label = () =>
-    props.selected?.id === MACRO_PERSONA_ID
+    props.selected?.id === ROX_PERSONA_ID
       ? modelLabel(model())
       : (props.selected?.name ?? 'Choose agent');
   const matches = (text: string) =>
@@ -114,7 +114,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
       >
         {/* Icon only on a phone; the title and the sheet name the choice. */}
         <Show
-          when={props.selected?.id !== MACRO_PERSONA_ID && props.selected}
+          when={props.selected?.id !== ROX_PERSONA_ID && props.selected}
           fallback={<ModelIcon model={model()} class="size-[18px]" />}
         >
           {(agent) => <AgentIcon agent={agent()} class="size-[18px]" />}

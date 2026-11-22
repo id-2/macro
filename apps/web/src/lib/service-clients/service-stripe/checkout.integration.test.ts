@@ -14,7 +14,7 @@ const token = `header.${btoa(JSON.stringify({ exp: 4_000_000_000 }))}.signature`
 
 beforeEach(() => {
   vi.spyOn(authServiceClient, 'macroApiToken').mockResolvedValue(
-    ok({ macro_api_token: token })
+    ok({ rox_api_token: token })
   );
 });
 afterEach(() => vi.restoreAllMocks());

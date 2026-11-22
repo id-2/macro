@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_event_broker::NoopMacroEventBroker;
 use model_owner::Owner;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -24,7 +24,7 @@ struct CapturingQueue {
 
 impl DocumentPurgeQueue for Arc<CapturingQueue> {
     async fn enqueue(&self, document_id: String, owner: Owner) -> Result<(), DocumentError> {
-        let stored = macro_db_client::document::get_deleted_document_info(&self.pool, &document_id)
+        let stored = rox_db_client::document::get_deleted_document_info(&self.pool, &document_id)
             .await
             .unwrap();
         assert_eq!(stored.owner, owner);
@@ -40,7 +40,7 @@ struct RecordingPartReferences {
 
 impl DocxPartReferences for Arc<RecordingPartReferences> {
     async fn release(&self, mut shas: Vec<String>) -> Result<(), DocumentError> {
-        let deleted = macro_db_client::document::get_deleted_document_info(&self.pool, DOCX).await;
+        let deleted = rox_db_client::document::get_deleted_document_info(&self.pool, DOCX).await;
         assert!(matches!(deleted, Err(sqlx::Error::RowNotFound)));
         shas.sort();
         self.released.lock().unwrap().push(shas);
@@ -82,7 +82,7 @@ fn fixture(pool: &PgPool) -> Fixture {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../entity_access/fixtures",
         scripts("typed_owner_team")
@@ -123,7 +123,7 @@ async fn queues_the_stored_owner_before_deleting_the_document(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("docx_purge"))
 )]
 async fn releases_each_docx_part_reference_once_the_rows_are_gone(pool: PgPool) {
@@ -142,14 +142,14 @@ async fn releases_each_docx_part_reference_once_the_rows_are_gone(pool: PgPool) 
         ]]
     );
     assert!(
-        macro_db_client::document::get_bom_parts(&pool, DOCX)
+        rox_db_client::document::get_bom_parts(&pool, DOCX)
             .await
             .unwrap()
             .is_empty()
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn purge_of_a_missing_document_is_ok(pool: PgPool) {
     let fixture = fixture(&pool);
     fixture.purger.purge(Uuid::now_v7()).await.unwrap();

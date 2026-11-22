@@ -37,7 +37,7 @@ impl AgentSessionSearchIndex for OpenSearchAgentSessionIndex {
             )?,
             // The session lease serializes writers; every reconciliation gets
             // its own generation to remove obsolete children after a refold.
-            projection_generation: macro_uuid::Uuid::now_v7().to_string(),
+            projection_generation: rox_uuid::Uuid::now_v7().to_string(),
             messages: snapshot
                 .messages
                 .into_iter()

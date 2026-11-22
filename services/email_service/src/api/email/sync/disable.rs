@@ -5,7 +5,7 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use email::domain::mailbox::lifecycle::InboxActor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use models_email::email::service::link::Link;
 
@@ -15,7 +15,7 @@ use models_email::email::service::link::Link;
 /// which may be an inbox the caller only reaches through delegation. Removal
 /// therefore follows the same policy as `DELETE /email/links/{link_id}`: an
 /// owner's inbox is torn down, while a delegate only loses their
-/// `macro_user_links` edge and the owner's data stays intact.
+/// `rox_user_links` edge and the owner's data stays intact.
 #[utoipa::path(
     delete,
     tag = "Sync",
@@ -37,11 +37,11 @@ use models_email::email::service::link::Link;
 #[tracing::instrument(skip(ctx, authorization, link), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id, link_id=%link.id), err)]
 pub async fn disable_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Extension(link): Extension<Link>,
 ) -> Result<Response, InboxActionError> {
     let actor = InboxActor {
-        macro_id: authorization.authorization.user.macro_user_id.clone(),
+        rox_id: authorization.authorization.user.rox_user_id.clone(),
         credential_owner: authorization
             .authorization
             .user

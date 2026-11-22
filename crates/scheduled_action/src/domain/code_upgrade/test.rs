@@ -58,11 +58,11 @@ impl RoutineCode for Code {
             .collect())
     }
 
-    async fn owner_time_zone(&self, _: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn owner_time_zone(&self, _: &RoxUserIdStr<'static>) -> Option<String> {
         None
     }
 
-    async fn run(&self, _: &MacroUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
+    async fn run(&self, _: &RoxUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
         self.dry_runs
             .lock()
             .unwrap()
@@ -81,7 +81,7 @@ impl RoutineCode for Code {
 
     async fn reference(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
     ) -> std::result::Result<String, CodeUnavailable> {
         Ok(String::new())
@@ -93,7 +93,7 @@ impl RoutineCode for Code {
 
     async fn rewrite(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         step: &routine_program::CodeStep,
         steps: &str,
         problems: &[String],
@@ -221,7 +221,7 @@ async fn upgrade(
     current_code(
         code,
         upgrades,
-        &MacroUserIdStr::parse_from_str(OWNER).unwrap(),
+        &RoxUserIdStr::parse_from_str(OWNER).unwrap(),
         action,
         RoutineProgram::from_task(&action.task).unwrap(),
         &context(),

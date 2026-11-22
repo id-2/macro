@@ -1,14 +1,14 @@
 -- Test users, teams, and properties for properties_db_client tests.
 -- Property definitions are owned by a team, a user, or the system.
 -- The schema enforces UNIQUE (user_id) on team_user, so each user belongs to one team.
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES
     ('a1111111-1111-1111-1111-111111111111', 'user1@test.com', 'user1@test.com', 'cus_test1'),
     ('a2222222-2222-2222-2222-222222222222', 'user2@test.com', 'user2@test.com', 'cus_test2'),
     ('a3333333-3333-3333-3333-333333333333', 'user3@test.com', 'user3@test.com', 'cus_test3')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO "User" (id, email, name, "stripeCustomerId", macro_user_id)
+INSERT INTO "User" (id, email, name, "stripeCustomerId", rox_user_id)
 VALUES ('macro|user1@test.com', 'user1@test.com', 'Test User 1', 'cus_test1', 'a1111111-1111-1111-1111-111111111111'),
        ('macro|user2@test.com', 'user2@test.com', 'Test User 2', 'cus_test2', 'a2222222-2222-2222-2222-222222222222'),
        ('macro|user3@test.com', 'user3@test.com', 'Test User 3', 'cus_test3', 'a3333333-3333-3333-3333-333333333333')

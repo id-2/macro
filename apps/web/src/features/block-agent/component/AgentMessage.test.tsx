@@ -680,11 +680,11 @@ describe('Message tool runs', () => {
     status: 'running' | 'completed' = 'completed'
   ): MessagePart =>
     tool(id, {
-      name: { kind: 'mcp', server: 'macro_internal', tool: 'ExecuteCode' },
+      name: { kind: 'mcp', server: 'rox_internal', tool: 'ExecuteCode' },
       status,
     });
   const lookup = (id: string, name: string): MessagePart =>
-    tool(id, { name: { kind: 'mcp', server: 'macro_internal', tool: name } });
+    tool(id, { name: { kind: 'mcp', server: 'rox_internal', tool: name } });
 
   it('counts one group per segment: shown calls and program steps, never lookups or programs', () => {
     programs.steps.first = 5;

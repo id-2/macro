@@ -1,6 +1,6 @@
--- One Gmail inbox whose three messages were archived in Macro by write
+-- One Gmail inbox whose three messages were archived in Rox by write
 -- ...00f1, which Gmail has not confirmed yet.
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-0000000000a1', 'macro|revert@example.com', 'revert-user', 'revert@example.com', 'GMAIL', true, NOW(), NOW());
 
 INSERT INTO email_threads (id, provider_id, link_id, inbox_visible, is_read, created_at, updated_at)

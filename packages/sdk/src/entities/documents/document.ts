@@ -20,13 +20,13 @@ import {
   wrapXml,
 } from '../../mentions';
 import {
-  MacroApiError,
-  MacroError,
+  RoxApiError,
+  RoxError,
   mapConcurrently,
   paginate,
   unwrap,
 } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { rejectUnknownOptions } from '../../utils/options';
 import { Canvas } from '../canvases/canvas';
 import type { Channel } from '../channels/channel';
@@ -265,13 +265,13 @@ export class Document
   }
 
   /** A handle to a document by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Document {
+  static byId(client: RoxClient, id: string): Document {
     return new Document(client, id);
   }
 
   /** Create a markdown document. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: { name: string; markdown?: string; project?: Project },
   ): Promise<Document> {
     rejectUnknownOptions('documents.create', opts, {
@@ -297,7 +297,7 @@ export class Document
    * any markdown area.
    */
   static async createSnippet(
-    client: MacroClient,
+    client: RoxClient,
     opts: { name: string; markdown?: string; project?: Project },
   ): Promise<Document> {
     rejectUnknownOptions('documents.createSnippet', opts, {
@@ -324,7 +324,7 @@ export class Document
    * matches its `description`.
    */
   static async createSkill(
-    client: MacroClient,
+    client: RoxClient,
     opts: {
       name: string;
       description: string;
@@ -354,7 +354,7 @@ export class Document
 
   /** The user's recent documents, most recent first, auto-paginated. */
   static recent(
-    client: MacroClient,
+    client: RoxClient,
     opts?: { pageSize?: number; fileType?: string },
   ): AsyncGenerator<Document> {
     const limit = opts?.pageSize ?? 50;
@@ -384,7 +384,7 @@ export class Document
    * The user's recently soft-deleted documents. The underlying endpoint also
    * returns deleted chats and projects; those are filtered out here.
    */
-  static async recentlyDeleted(client: MacroClient): Promise<Document[]> {
+  static async recentlyDeleted(client: RoxClient): Promise<Document[]> {
     const { data } = unwrap(await client.storage.recentlyDeleted({}));
     return data.items
       .filter((i) => i.type === 'document')
@@ -550,7 +550,7 @@ export class Document
   async bytes(): Promise<Uint8Array<ArrayBuffer>> {
     const fileType = await this.fileType();
     if (fileType && NATIVE_FILE_TYPES.has(fileType))
-      throw new MacroError(
+      throw new RoxError(
         `a native ${fileType} document has no stored file; read it with content()`,
       );
     return new Uint8Array(await (await this.download()).arrayBuffer());
@@ -565,7 +565,7 @@ export class Document
     );
     const res = await fetch(presigned_url);
     if (!res.ok)
-      throw new MacroApiError(res.status, {
+      throw new RoxApiError(res.status, {
         message: 'failed to download document content',
       });
     return res;
@@ -763,7 +763,7 @@ export class Document
   }
 
   /**
-   * Read an uploaded Word (.docx) document as it stands now in Macro,
+   * Read an uploaded Word (.docx) document as it stands now in Rox,
    * including edits people made in the editor: every paragraph, table cell
    * and content control with its stable id, style, alignment, text and
    * formatted spans, tracked changes and Word comments, plus the paragraph

@@ -1,6 +1,6 @@
 import {
   attachmentLimitBytes,
-  MACRO_EMAIL_SIGNATURE,
+  ROX_EMAIL_SIGNATURE,
 } from '@app/features/email-compose/core/constants';
 import type { EmailMessage } from '@app/features/email-message/core/email-message';
 import type { UserMentionRecord } from '@core/component/LexicalMarkdown/utils/mentionsUtils';
@@ -662,7 +662,7 @@ export function createReplyComposer(
       replying_to_id: replyTarget?.db_id,
       subject: form.subject(),
       to: form.recipients().to.map(convertEmailRecipientToContactInfo),
-      body_macro: forDelivery ? prepareMacroBody(bodyMacro()) : undefined,
+      body_rox: forDelivery ? prepareMacroBody(bodyMacro()) : undefined,
       include_signature: includeSignature() ? undefined : false,
       draft_generation: draftGeneration(),
     };
@@ -978,7 +978,7 @@ export function createReplyComposer(
     const currentEditor = editor();
     const cleanupWatermark = $appendWatermarkNodeToLast(
       currentEditor,
-      !hasPaidAccess() ? MACRO_EMAIL_SIGNATURE : undefined
+      !hasPaidAccess() ? ROX_EMAIL_SIGNATURE : undefined
     );
     try {
       return persistence.confirmed(
@@ -1277,7 +1277,7 @@ export function createReplyComposer(
       const restoreMacro = bodyMacro();
       const cleanupWatermark = $appendWatermarkNodeToLast(
         currentEditor,
-        !hasPaidAccess() ? MACRO_EMAIL_SIGNATURE : undefined
+        !hasPaidAccess() ? ROX_EMAIL_SIGNATURE : undefined
       );
 
       const replyingTo = replyTarget;
@@ -1323,7 +1323,7 @@ export function createReplyComposer(
           db_id: currentDraftId,
           bcc,
           body_html: prepared.bodyHtml,
-          body_macro: processedMacroBody,
+          body_rox: processedMacroBody,
           body_text: prepared.bodyText,
           cc,
           provider_id: draftSeed?.provider_id,

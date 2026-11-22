@@ -4,14 +4,14 @@
 //!
 //! Follows the canonical pattern in `documents/src/domain/events.rs`:
 //! per-variant metadata structs, a [`TopicEvent`] enum tagged by `event_type`,
-//! and a [`MacroEvent`] wrapper keyed by user id.
+//! and a [`RoxEvent`] wrapper keyed by user id.
 
 #[cfg(test)]
 mod test;
 
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroUsersTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxUsersTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 /// Metadata for [`UserTopicEvent::PictureChanged`].
@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "schema", derive(utoipa::ToSchema))]
 pub struct UserPictureChangedMetadata {
     /// User whose profile picture changed.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Static file id of the new picture; `None` when it is not a static file
     /// (set by URL) or the picture was removed.
     pub file_id: Option<String>,
@@ -27,7 +27,7 @@ pub struct UserPictureChangedMetadata {
     pub url: Option<String>,
 }
 
-/// Events that can be published to [`MacroUsersTopic`].
+/// Events that can be published to [`RoxUsersTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 #[cfg_attr(feature = "schema", derive(utoipa::ToSchema))]
@@ -38,12 +38,12 @@ pub enum UserTopicEvent {
 }
 
 impl TopicEvent for UserTopicEvent {
-    type Topic = MacroUsersTopic;
+    type Topic = RoxUsersTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroUsersTopic`], keyed by user id so one user's
+/// Publishable event for [`RoxUsersTopic`], keyed by user id so one user's
 /// changes stay ordered on one partition.
 pub struct UserMacroEvent {
     key: String,
@@ -68,7 +68,7 @@ impl UserMacroEvent {
     }
 }
 
-impl MacroEvent for UserMacroEvent {
+impl RoxEvent for UserMacroEvent {
     type EventPayload = UserTopicEvent;
 
     fn key(&self) -> &str {

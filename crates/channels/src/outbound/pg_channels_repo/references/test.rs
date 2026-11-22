@@ -1,6 +1,6 @@
 use crate::domain::models::{MessageParent, ReferenceSource, ReferenceTarget, ReferencingMessage};
 use crate::outbound::pg_channels_repo::PgChannelsRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -44,7 +44,7 @@ async fn mention(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("channels_repo"))
 )]
 async fn resolves_live_documents_and_messages_once(pool: Pool<Postgres>) {
@@ -134,7 +134,7 @@ async fn resolves_live_documents_and_messages_once(pool: Pool<Postgres>) {
     assert_eq!(sources, expected);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn no_targets_reads_nothing(pool: Pool<Postgres>) {
     assert!(
         PgChannelsRepo::new(pool)

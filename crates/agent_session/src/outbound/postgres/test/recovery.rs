@@ -26,7 +26,7 @@ impl AgentSessionRealtime for Realtime {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recovery_preserves_history_closes_stale_turn_and_fences_old_writer(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -120,7 +120,7 @@ async fn recovery_preserves_history_closes_stale_turn_and_fences_old_writer(pool
     let batch = repo
         .create_batch_fenced(
             vec![StoredAgentSessionLog {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 created_at: chrono::Utc::now(),
                 entry: fenced_log(session.id),
             }],
@@ -136,7 +136,7 @@ async fn recovery_preserves_history_closes_stale_turn_and_fences_old_writer(pool
     assert_ne!(replay.inner().metadata().turn, TurnState::Disconnected);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recovery_is_bounded_and_leaves_live_and_draining_holders_alone(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -173,7 +173,7 @@ async fn recovery_is_bounded_and_leaves_live_and_draining_holders_alone(pool: Pg
     assert!(repo.list_by_session(live.id).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn refreshed_heartbeat_wins_while_recovery_waits_for_its_lock(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -203,7 +203,7 @@ async fn refreshed_heartbeat_wins_while_recovery_waits_for_its_lock(pool: PgPool
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn successor_claim_wins_while_recovery_waits_for_the_session_lock(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -236,7 +236,7 @@ async fn successor_claim_wins_while_recovery_waits_for_the_session_lock(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn simultaneous_recoveries_append_only_one_disconnect(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;

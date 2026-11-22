@@ -21,7 +21,7 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, post},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use serde::Serialize;
 
 use crate::BackfillServiceImpl;
@@ -57,7 +57,7 @@ struct AcceptedReceipt {
 async fn agent_sessions(
     State(service): State<Arc<crate::AgentSessionIndexer>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<
         crate::domain::agent_session_index::AgentSessionBackfillRequest,
     >,
@@ -75,7 +75,7 @@ async fn agent_sessions(
 async fn calls(
     State(service): State<Arc<BackfillServiceImpl>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<CallBackfillRequest>,
 ) -> Response {
     spawn_backfill(
@@ -91,7 +91,7 @@ async fn calls(
 async fn chats(
     State(service): State<Arc<BackfillServiceImpl>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<ChatBackfillRequest>,
 ) -> Response {
     spawn_backfill(
@@ -107,7 +107,7 @@ async fn chats(
 async fn channels(
     State(service): State<Arc<BackfillServiceImpl>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<ChannelBackfillRequest>,
 ) -> Response {
     spawn_backfill(
@@ -125,7 +125,7 @@ async fn channels(
 async fn documents(
     State(service): State<Arc<BackfillServiceImpl>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<DocumentBackfillRequest>,
 ) -> Response {
     spawn_backfill(
@@ -143,7 +143,7 @@ async fn documents(
 async fn emails(
     State(service): State<Arc<BackfillServiceImpl>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<EmailBackfillRequest>,
 ) -> Response {
     spawn_backfill(
@@ -161,7 +161,7 @@ async fn emails(
 async fn properties(
     State(service): State<Arc<BackfillServiceImpl>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<PropertiesBackfillRequest>,
 ) -> Response {
     spawn_backfill(
@@ -179,7 +179,7 @@ async fn properties(
 async fn projects(
     State(service): State<Arc<BackfillServiceImpl>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<ProjectBackfillRequest>,
 ) -> Response {
     spawn_backfill(
@@ -197,7 +197,7 @@ async fn projects(
 async fn calendar_events(
     State(service): State<Arc<BackfillServiceImpl>>,
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<CalendarEventBackfillRequest>,
 ) -> Response {
     spawn_backfill(
@@ -214,7 +214,7 @@ async fn calendar_events(
 #[tracing::instrument(skip(jobs, _internal_authorization))]
 async fn status(
     State(jobs): State<BackfillJobs>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path(job_id): Path<String>,
 ) -> Response {
     match jobs.snapshot(&JobId::from(job_id)).await {

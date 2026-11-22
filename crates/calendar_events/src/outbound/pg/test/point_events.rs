@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::team::CalendarTeamRepository;
 use crate::outbound::pg_team::PgCalendarTeamRepository;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn point_event_keeps_its_start_based_reminder_identity(pool: PgPool) {
     let owner = "macro|point-reminder@example.com";
     let link = insert_link(&pool, owner).await;
@@ -35,7 +35,7 @@ async fn point_event_keeps_its_start_based_reminder_identity(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn point_storage_and_own_and_team_queries_preserve_half_open_membership(pool: PgPool) {
     let owner = "macro|point-owner@example.com";
     let viewer = "macro|point-viewer@example.com";

@@ -6,7 +6,7 @@
 
 use std::pin::Pin;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::models::MessageParent;
 use tracing::Instrument;
 
@@ -59,7 +59,7 @@ impl TaskDocumentId {
         if let Some((_, short)) =
             lazy_regex::regex_captures!(r"\A(?i:macro)-([1-9A-HJ-NP-Za-km-z]+)\z", input)
         {
-            return macro_uuid::ShortUuidConverter::default()
+            return rox_uuid::ShortUuidConverter::default()
                 .to_uuid(short)
                 .map(|uuid| Self(uuid.to_string()))
                 .map_err(|_| SessionTaskError::InvalidTaskReference);
@@ -156,14 +156,14 @@ pub trait TaskDirectory: Send + Sync {
     /// it does not exist or is hidden, and [`SessionTaskError::NotATask`] for other documents.
     fn task(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> impl Future<Output = Result<TaskFacts>> + Send;
 
     /// The pull requests linked to a task `viewer` can view.
     fn pull_requests(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> impl Future<Output = Result<Vec<TaskPullRequest>>> + Send;
 }
@@ -190,7 +190,7 @@ pub trait SessionTaskRepo: Send + Sync {
     fn set_task(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> impl Future<Output = Result<SessionTaskWrite, AgentSessionError>> + Send;
 
@@ -210,14 +210,14 @@ pub trait SessionTasks: Send + Sync {
     fn link_task<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<LinkedTask>>;
 
     /// The pull requests linked to a task the owner can view.
     fn task_pull_requests<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<TaskPullRequests>>;
 
@@ -225,7 +225,7 @@ pub trait SessionTasks: Send + Sync {
     fn link_session_pull_request<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
     ) -> BoxFuture<'a, Result<()>>;
 }
 
@@ -272,7 +272,7 @@ where
     async fn owned_session(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> Result<super::model::AgentSession> {
         let stored = self.sessions.get(session).await?;
         if !stored.owner_id.is_user(owner) {
@@ -301,7 +301,7 @@ where
     fn link_task<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<LinkedTask>> {
         let span = tracing::info_span!("agent.session.link_task", agent.session.id = %session);
@@ -343,7 +343,7 @@ where
 
     fn task_pull_requests<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<TaskPullRequests>> {
         Box::pin(async move {
@@ -359,7 +359,7 @@ where
     fn link_session_pull_request<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
     ) -> BoxFuture<'a, Result<()>> {
         Box::pin(async move {
             let stored = self.owned_session(session, owner).await?;

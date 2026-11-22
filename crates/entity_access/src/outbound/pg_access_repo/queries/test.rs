@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use super::*;
 use bot_id::BotId;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -10,13 +10,13 @@ const OWNER: &str = "macro|sharedbox@corp.test";
 const DELEGATE: &str = "macro|primary@corp.test";
 const BOT_OWNER: &str = "macro|bot-owner@corp.test";
 
-/// macro_user + "User" rows so macro_user_links FKs resolve.
+/// macro_user + "User" rows so rox_user_links FKs resolve.
 async fn insert_user(pool: &PgPool, user_id: &str, email: &str) {
-    let macro_uuid = Uuid::new_v4();
+    let rox_uuid = Uuid::new_v4();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $3, $4)"#,
-        macro_uuid,
+        rox_uuid,
         user_id,
         email,
         user_id,
@@ -26,10 +26,10 @@ async fn insert_user(pool: &PgPool, user_id: &str, email: &str) {
     .unwrap();
 
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         user_id,
         email,
-        macro_uuid,
+        rox_uuid,
     )
     .execute(pool)
     .await
@@ -122,16 +122,16 @@ fn source_id_set(source_ids: SourceIds) -> HashSet<String> {
     source_ids.0.into_iter().collect()
 }
 
-/// An empty link + thread owned by `owner_macro_id`. Returns `(link_id, thread_id)`.
-async fn insert_thread(pool: &PgPool, owner_macro_id: &str, email: &str) -> (Uuid, Uuid) {
+/// An empty link + thread owned by `owner_rox_id`. Returns `(link_id, thread_id)`.
+async fn insert_thread(pool: &PgPool, owner_rox_id: &str, email: &str) -> (Uuid, Uuid) {
     let link_id = Uuid::new_v4();
     let thread_id = Uuid::new_v4();
 
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
         link_id,
-        owner_macro_id,
+        owner_rox_id,
         email,
     )
     .execute(pool)
@@ -150,7 +150,7 @@ async fn insert_thread(pool: &PgPool, owner_macro_id: &str, email: &str) -> (Uui
     (link_id, thread_id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_scope_source_ids_include_only_owning_team_and_active_bot_sources(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -204,7 +204,7 @@ async fn team_scope_source_ids_include_only_owning_team_and_active_bot_sources(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_scope_source_ids_reject_mismatched_team(pool: PgPool) -> anyhow::Result<()> {
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
     let bot_principal = bot_id.into_storage_id();
@@ -220,7 +220,7 @@ async fn team_scope_source_ids_reject_mismatched_team(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_scope_source_ids_reject_soft_deleted_bot(pool: PgPool) -> anyhow::Result<()> {
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
     let bot_principal = bot_id.into_storage_id();
@@ -244,14 +244,14 @@ async fn team_scope_source_ids_reject_soft_deleted_bot(pool: PgPool) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_entity_users_includes_inbox_delegate(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER, "sharedbox@corp.test").await;
     insert_user(&pool, DELEGATE, "primary@corp.test").await;
     let (link_id, thread_id) = insert_thread(&pool, OWNER, "sharedbox@corp.test").await;
 
     sqlx::query!(
-        r#"INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        r#"INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
            VALUES ($1, $2, $3)"#,
         DELEGATE,
         OWNER,
@@ -269,7 +269,7 @@ async fn get_entity_users_includes_inbox_delegate(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_entity_users_excludes_delegate_scoped_to_other_link(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -279,7 +279,7 @@ async fn get_entity_users_excludes_delegate_scoped_to_other_link(
     let (_, other_thread_id) = insert_thread(&pool, OWNER, "other@corp.test").await;
 
     sqlx::query!(
-        r#"INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        r#"INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
            VALUES ($1, $2, $3)"#,
         DELEGATE,
         OWNER,
@@ -300,7 +300,7 @@ async fn get_entity_users_excludes_delegate_scoped_to_other_link(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn foreign_recipients_follow_exact_source_and_current_team_membership(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -328,11 +328,11 @@ async fn foreign_recipients_follow_exact_source_and_current_team_membership(
     }
     assert_eq!(
         get_entity_users(&pool, &personal, EntityType::ForeignEntity).await?,
-        vec![MacroUserIdStr::parse_from_str(OWNER)?.into_owned()]
+        vec![RoxUserIdStr::parse_from_str(OWNER)?.into_owned()]
     );
     assert_eq!(
         get_entity_users(&pool, &shared, EntityType::ForeignEntity).await?,
-        vec![MacroUserIdStr::parse_from_str(DELEGATE)?.into_owned()]
+        vec![RoxUserIdStr::parse_from_str(DELEGATE)?.into_owned()]
     );
     sqlx::query!(
         "DELETE FROM team_user WHERE team_id = $1 AND user_id = $2",

@@ -1,12 +1,12 @@
 //! All typed TEAM-link query implementations must agree, including explanations.
 use super::{SourceIds, chat_access, document_access, project_access};
 use crate::domain::models::AccessLevel;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("typed_owner_team"))
 )]
 async fn discussion_attachments_use_the_parents_typed_owner_audience(
@@ -74,7 +74,7 @@ fn fixture_entity_id(suffix: u8) -> Uuid {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("typed_owner_team"))
 )]
 async fn typed_owner_team_links_allow_only_the_resolved_audience(

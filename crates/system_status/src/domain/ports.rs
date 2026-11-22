@@ -2,7 +2,7 @@
 
 use std::future::Future;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::{CurrentSystemStatus, StatusUpdate, SystemStatus, SystemStatusError};
 
@@ -47,17 +47,17 @@ pub trait SystemStatusService: Send + Sync + 'static {
         &self,
     ) -> impl Future<Output = Result<CurrentSystemStatus, SystemStatusError>> + Send;
 
-    /// Recent updates, newest first. Macro staff only.
+    /// Recent updates, newest first. Rox staff only.
     fn history(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<StatusUpdate>, SystemStatusError>> + Send;
 
-    /// Sets the current status and pushes it to every open app. Macro staff
+    /// Sets the current status and pushes it to every open app. Rox staff
     /// only.
     fn set_status(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         status: SystemStatus,
     ) -> impl Future<Output = Result<StatusUpdate, SystemStatusError>> + Send;
 }

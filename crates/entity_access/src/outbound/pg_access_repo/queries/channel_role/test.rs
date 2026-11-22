@@ -1,6 +1,6 @@
 use super::*;
 use bot_id::{BotId, BotIdStr};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 const TEAM_ALPHA: Uuid = Uuid::from_u128(0x000000000000000000000000000ea001);
@@ -100,7 +100,7 @@ async fn insert_bot_participant(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn matching_team_member_without_participant_is_view_only(pool: PgPool) -> anyhow::Result<()> {
@@ -125,7 +125,7 @@ async fn matching_team_member_without_participant_is_view_only(pool: PgPool) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn active_team_channel_participant_receives_stored_role(pool: PgPool) -> anyhow::Result<()> {
@@ -152,7 +152,7 @@ async fn active_team_channel_participant_receives_stored_role(pool: PgPool) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn departed_participant_is_view_only_while_team_membership_remains(
@@ -176,7 +176,7 @@ async fn departed_participant_is_view_only_while_team_membership_remains(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn unrelated_team_member_has_no_access(pool: PgPool) -> anyhow::Result<()> {
@@ -190,7 +190,7 @@ async fn unrelated_team_member_has_no_access(pool: PgPool) -> anyhow::Result<()>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn non_team_channels_do_not_grant_team_members_view_only(pool: PgPool) -> anyhow::Result<()> {
@@ -208,7 +208,7 @@ async fn non_team_channels_do_not_grant_team_members_view_only(pool: PgPool) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_channel_role_explicit_participation_wins_in_any_channel(
@@ -227,7 +227,7 @@ async fn team_channel_role_explicit_participation_wins_in_any_channel(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_channel_role_matching_team_channel_is_view_only(pool: PgPool) -> anyhow::Result<()> {
@@ -243,7 +243,7 @@ async fn team_channel_role_matching_team_channel_is_view_only(pool: PgPool) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_channel_role_other_team_channel_has_no_implicit_access(
@@ -261,7 +261,7 @@ async fn team_channel_role_other_team_channel_has_no_implicit_access(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_channel_role_non_team_channels_have_no_implicit_access(
@@ -286,7 +286,7 @@ async fn team_channel_role_non_team_channels_have_no_implicit_access(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_channel_role_departed_participation_does_not_grant_a_role(
@@ -305,7 +305,7 @@ async fn team_channel_role_departed_participation_does_not_grant_a_role(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_channel_role_soft_deleted_bot_has_no_access(pool: PgPool) -> anyhow::Result<()> {
@@ -328,7 +328,7 @@ async fn team_channel_role_soft_deleted_bot_has_no_access(pool: PgPool) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_channel_role_mismatched_bot_team_has_no_access(pool: PgPool) -> anyhow::Result<()> {
@@ -344,7 +344,7 @@ async fn team_channel_role_mismatched_bot_team_has_no_access(pool: PgPool) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_channel_role_unknown_channel_is_not_found(pool: PgPool) -> anyhow::Result<()> {

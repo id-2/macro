@@ -43,16 +43,16 @@ const EMAIL_KEYWORD_FIELDS: &[&str] = &[
 
 /// Domain Rox's own notification/digest emails are sent from. Those are
 /// never signal, mirroring the Postgres `is_signal` heuristic. Kept in sync
-/// with `email_utils::MACRO_NOTIFICATION_SENDER_DOMAIN`, which is not imported
+/// with `email_utils::ROX_NOTIFICATION_SENDER_DOMAIN`, which is not imported
 /// so this crate stays free of the email HTML tooling that crate pulls in.
-const MACRO_NOTIFICATION_SENDER_DOMAIN: &str = "notification.rox.one";
+const ROX_NOTIFICATION_SENDER_DOMAIN: &str = "notification.rox.one";
 
 /// Matches messages whose `sender` is any address at
-/// [`MACRO_NOTIFICATION_SENDER_DOMAIN`].
-fn macro_notification_sender_query<'a>() -> QueryType<'a> {
+/// [`ROX_NOTIFICATION_SENDER_DOMAIN`].
+fn rox_notification_sender_query<'a>() -> QueryType<'a> {
     QueryType::WildCard(WildcardQuery::new(
         "sender",
-        format!("*@{MACRO_NOTIFICATION_SENDER_DOMAIN}"),
+        format!("*@{ROX_NOTIFICATION_SENDER_DOMAIN}"),
         true,
         None,
     ))
@@ -342,7 +342,7 @@ impl EmailQueryBuilder {
                         ["CATEGORY_PERSONAL", "SENT", "DRAFT"],
                     ));
                 content_bool_query.must_not(QueryType::Bool(importance_exclude));
-                content_bool_query.must_not(macro_notification_sender_query());
+                content_bool_query.must_not(rox_notification_sender_query());
             }
             Some(false) => {
                 // Only show deprioritized emails: must have a depriority label
@@ -364,7 +364,7 @@ impl EmailQueryBuilder {
                     ));
                 let noise_filter = BoolQuery::new()
                     .should(QueryType::Bool(depriority_filter))
-                    .should(macro_notification_sender_query())
+                    .should(rox_notification_sender_query())
                     .minimum_should_match(1);
                 content_bool_query.filter(QueryType::Bool(noise_filter));
             }

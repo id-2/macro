@@ -37,8 +37,8 @@ use entity_access::domain::models::{
 use foreign_entity::domain::models::{ForeignEntity, SourceId};
 use foreign_entity::domain::ports::ForeignEntityService;
 use github_pull_requests::domain::models::GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::response::{DocumentResponseMetadata, LocationResponseData};
 use model::document::{
     ContentType, DocumentBasic, DocumentMetadata, FileAssociation, FileType, FileTypeExt,
@@ -92,7 +92,7 @@ pub struct DocumentServiceImpl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > {
     /// Document repository
@@ -112,7 +112,7 @@ pub struct DocumentServiceImpl<
     /// Foreign entity service
     pub foreign_entity_service: F,
     /// Rox event broker for publishing document lifecycle events
-    pub macro_event_broker: B,
+    pub rox_event_broker: B,
 }
 
 /// Blank native spreadsheets have no object upload; importing workbook bytes is
@@ -209,8 +209,8 @@ fn should_revoke_non_owner_user_access(
 #[derive(Default)]
 struct PublishedDocumentActors {
     actor: Option<Actor<'static>>,
-    on_behalf_of: Option<MacroUserIdStr<'static>>,
-    actor_user_id: Option<MacroUserIdStr<'static>>,
+    on_behalf_of: Option<RoxUserIdStr<'static>>,
+    actor_user_id: Option<RoxUserIdStr<'static>>,
 }
 
 fn published_document_actors(auth: &EntityAccessAuth) -> PublishedDocumentActors {
@@ -253,9 +253,9 @@ impl DocumentDates {
 }
 
 fn short_id_for_entity_id(entity_id: &str) -> Result<String, DocumentError> {
-    let uuid = macro_uuid::string_to_uuid(entity_id)
+    let uuid = rox_uuid::string_to_uuid(entity_id)
         .map_err(|e| DocumentError::BadRequest(format!("invalid entity_id: {e}")))?;
-    Ok(macro_uuid::ShortUuidConverter::default().from_uuid(&uuid))
+    Ok(rox_uuid::ShortUuidConverter::default().from_uuid(&uuid))
 }
 
 fn invalid_team_task_slug() -> DocumentError {
@@ -354,7 +354,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 {
@@ -369,7 +369,7 @@ impl<
         connection_service: C,
         entity_access_management_service: Eam,
         foreign_entity_service: F,
-        macro_event_broker: B,
+        rox_event_broker: B,
     ) -> Self {
         Self {
             repo,
@@ -380,7 +380,7 @@ impl<
             connection_service,
             entity_access_management_service,
             foreign_entity_service,
-            macro_event_broker,
+            rox_event_broker,
         }
     }
 
@@ -441,7 +441,7 @@ impl<
         let constructed_url = self.cloudfront_url_for_key(key);
         let options = self.get_signed_options();
 
-        let signed_url = if !macro_aws_config::is_local_aws() {
+        let signed_url = if !rox_aws_config::is_local_aws() {
             get_signed_url(&constructed_url, &options)?
         } else {
             constructed_url
@@ -705,7 +705,7 @@ impl<
 
     /// Publish a document lifecycle event; failures are logged and dropped.
     fn publish_document_event(&self, event: &DocumentMacroEvent) {
-        let _ = self.macro_event_broker.send_event(event).inspect_err(|e| {
+        let _ = self.rox_event_broker.send_event(event).inspect_err(|e| {
             tracing::error!(error=?e, "failed to publish document event");
         });
     }
@@ -733,7 +733,7 @@ impl<
         let project_id = args.document.project_id;
         let dates = DocumentDates::of(&args.document);
         let sha = args.document.sha.clone();
-        let attribution = Attribution::direct(Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID));
+        let attribution = Attribution::direct(Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID));
 
         let owner_team = self
             .repo
@@ -1011,7 +1011,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > DocumentCreationService for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 {
@@ -1095,7 +1095,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > DocumentService for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 {
@@ -1644,7 +1644,7 @@ impl<
             return Ok(response);
         }
 
-        let converter = macro_uuid::ShortUuidConverter::default();
+        let converter = rox_uuid::ShortUuidConverter::default();
         let mut task_ids_by_key = std::collections::HashMap::<String, Vec<String>>::new();
         for (github_key, task_short_id) in links {
             match converter.to_uuid(&task_short_id) {
@@ -1859,7 +1859,7 @@ impl<
                     )
                 })?;
 
-            let current_association = current_file_type.macro_app_path();
+            let current_association = current_file_type.rox_app_path();
 
             if !matches!(current_association, FileAssociation::Code(_)) {
                 return Err(DocumentError::BadRequest(
@@ -1868,7 +1868,7 @@ impl<
             }
 
             if let FileTypeUpdate::Set(new_file_type) = file_type_update {
-                let new_association = new_file_type.macro_app_path();
+                let new_association = new_file_type.rox_app_path();
                 if std::mem::discriminant(&current_association)
                     != std::mem::discriminant(&new_association)
                 {
@@ -2351,7 +2351,7 @@ impl<
     async fn update_task_status(
         &self,
         entity_access_receipt: EntityAccessReceipt<entity_access::domain::models::EditAccessLevel>,
-        credited_user: Option<MacroUserIdStr<'static>>,
+        credited_user: Option<RoxUserIdStr<'static>>,
         source: Option<PropertyChangeSource>,
         status: &str,
     ) -> Result<(), DocumentError> {

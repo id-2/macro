@@ -1,4 +1,4 @@
-import MacroLogo from '@icon/macro.svg';
+import RoxLogo from '@icon/macro.svg';
 import { BaseTool } from './BaseTool';
 import { createToolRenderer } from './ToolRenderer';
 
@@ -11,7 +11,7 @@ import { createToolRenderer } from './ToolRenderer';
 const handler = createToolRenderer({
   name: 'SelfKnowledge',
   render: (ctx) => (
-    <BaseTool icon={MacroLogo} renderContext={ctx.renderContext} type="call">
+    <BaseTool icon={RoxLogo} renderContext={ctx.renderContext} type="call">
       Self knowledge
     </BaseTool>
   ),

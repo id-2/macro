@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 
@@ -21,14 +21,14 @@ async fn insert_agent(pool: &PgPool, model: &str) -> anyhow::Result<Uuid> {
             VALUES (gen_random_uuid(), 'owner@example.com', 'owner@example.com', 'stripe_owner')
             RETURNING id
         )
-        INSERT INTO "User" ("id", "email", "macro_user_id")
+        INSERT INTO "User" ("id", "email", "rox_user_id")
         SELECT $1, 'owner@example.com', new_macro_user.id FROM new_macro_user
         "#,
         OWNER,
     )
     .execute(pool)
     .await?;
-    let bot_id = macro_uuid::generate_uuid_v7();
+    let bot_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO bots (id, kind, name, handle, has_agent, owner_user_id) VALUES ($1, 'owned', 'Agent', 'agent', true, $2)",
         bot_id,
@@ -49,7 +49,7 @@ async fn insert_agent(pool: &PgPool, model: &str) -> anyhow::Result<Uuid> {
     Ok(bot_id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stored_key_carries_the_agent_as_configured_now(pool: PgPool) -> anyhow::Result<()> {
     let bot_id = insert_agent(&pool, "anthropic/claude-sonnet-5-5").await?;
     let repo = PgAgentKeyRepo::new(pool.clone());
@@ -63,7 +63,7 @@ async fn a_stored_key_carries_the_agent_as_configured_now(pool: PgPool) -> anyho
     assert_eq!(stored.encrypted, encrypted());
     assert_eq!(
         stored.agent.owner,
-        AgentOwner::User(MacroUserIdStr::try_from(OWNER.to_owned())?)
+        AgentOwner::User(RoxUserIdStr::try_from(OWNER.to_owned())?)
     );
     assert_eq!(stored.agent.model, "anthropic/claude-sonnet-5-5");
     assert_eq!(stored.agent.harness, "in-memory");
@@ -78,7 +78,7 @@ async fn a_stored_key_carries_the_agent_as_configured_now(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn registering_again_replaces_the_key(pool: PgPool) -> anyhow::Result<()> {
     let bot_id = insert_agent(&pool, "openai/gpt-6-astra").await?;
     let repo = PgAgentKeyRepo::new(pool);
@@ -97,7 +97,7 @@ async fn registering_again_replaces_the_key(pool: PgPool) -> anyhow::Result<()> 
 
 /// Postgres cannot read the ciphertext, so the stored prefix is how it
 /// refuses a key filed under the wrong provider.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_table_refuses_a_prefix_that_is_not_the_providers(pool: PgPool) -> anyhow::Result<()> {
     let bot_id = insert_agent(&pool, "openai/gpt-6-astra").await?;
     let repo = PgAgentKeyRepo::new(pool);

@@ -71,12 +71,12 @@ PID 1 (for the dev-only DockerFleet).
 ## Contract with roxd and the computers control plane
 
 - `roxd-enroll.service` (oneshot, root, `Before=roxd.service`) runs on
-  every boot: `roxd enroll --from $MACRO_ENROLL_FROM --config
+  every boot: `roxd enroll --from $ROX_ENROLL_FROM --config
   /home/macro/.roxd/roxd.toml`. `macro.box.enrollFrom` sets the source
   (`incus`, or `file:<path>`). The marker `/var/lib/roxd/enrolled` holds
   `<computer id>\n<generation>`; a newer generation re-enrolls, and no source
   with a marker means already enrolled. `check-enrollment-source` runs first:
-  it waits up to 60 s (`MACRO_INCUS_SOCKET_WAIT`) for `/dev/incus/sock`,
+  it waits up to 60 s (`ROX_INCUS_SOCKET_WAIT`) for `/dev/incus/sock`,
   which incus-agent creates a few seconds after it starts, then fails with a
   reason when there is no source and no marker, and passes when the marker
   exists, leaving the decision to `roxd enroll`. Enroll
@@ -125,9 +125,9 @@ PID 1 (for the dev-only DockerFleet).
   agent's display), `MUPPET_BROWSER_CDP_URL`, `DISPLAY`, the agent's bus,
   `PULSE_SERVER`, LiveKit's ffmpeg and the libstdc++ path. A call shares `:1`
   (`ffmpeg-x11grab`) and records the default sink's monitor (`parec`).
-- `start-agent run` reads `MACRO_REPO_URL` (HTTP(S), no credentials),
-  `MACRO_REPO_TOKEN`, `MACRO_AGENT_USER_ID` (`macro|email`) and
-  `MACRO_AGENT_NAME` from the credential file (missing or invalid: exit 78),
+- `start-agent run` reads `ROX_REPO_URL` (HTTP(S), no credentials),
+  `ROX_REPO_TOKEN`, `ROX_AGENT_USER_ID` (`macro|email`) and
+  `ROX_AGENT_NAME` from the credential file (missing or invalid: exit 78),
   clones into a staging sibling on first start, points `origin` at the
   current URL, sets git's identity and the exact-repo credential helper
   (`git-credential-agent <credential file>`, never the token), links the

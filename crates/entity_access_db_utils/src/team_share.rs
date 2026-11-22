@@ -6,7 +6,7 @@
 
 use crate::scoped_grants::{Grant, refuse_added_access, refuse_grant};
 use crate::{AccessLevel, EntityAccessSourceType, EntityType, get_nested_project_entities};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use sqlx::{PgConnection, Postgres, QueryBuilder, Transaction};
 
 #[cfg(test)]
@@ -39,7 +39,7 @@ pub async fn ensure_owner_direct(
     connection: &mut PgConnection,
     entity_id: &Uuid,
     entity_type: EntityType,
-    owner: &macro_user_id::user_id::MacroUserIdStr<'_>,
+    owner: &rox_user_id::user_id::RoxUserIdStr<'_>,
 ) -> Result<bool, sqlx::Error> {
     let row = sqlx::query!(
         r#"INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
@@ -169,7 +169,7 @@ pub async fn replace_project_contributions(
         .into_iter()
         .filter(|entity| !(entity.entity_type == "project" && entity.entity_id == project_id_str))
         .filter_map(|entity| {
-            macro_uuid::string_to_uuid(&entity.entity_id)
+            rox_uuid::string_to_uuid(&entity.entity_id)
                 .ok()
                 .map(|id| (id, entity.entity_type))
         })

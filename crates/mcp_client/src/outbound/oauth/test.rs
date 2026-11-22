@@ -29,7 +29,7 @@ impl McpServerStore for FakeServerStore {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         Ok(None)
@@ -37,7 +37,7 @@ impl McpServerStore for FakeServerStore {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<(), Self::Err> {
         Ok(())
@@ -45,7 +45,7 @@ impl McpServerStore for FakeServerStore {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         Ok(Vec::new())
     }
@@ -184,8 +184,8 @@ fn oauth_service() -> OAuthService<FakeServerStore, FakeStateStore> {
     )
 }
 
-fn test_user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|test@example.com")
+fn test_user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|test@example.com")
         .expect("valid test user id")
         .into_owned()
 }

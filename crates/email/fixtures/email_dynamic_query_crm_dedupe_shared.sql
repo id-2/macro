@@ -7,15 +7,15 @@
 -- Dave's own copy (td1). Her thread ts (14:00) is the newest of all X
 -- copies, so a dedupe failure would surface it at the top of the list.
 
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES
     ('f1111111-1111-1111-1111-111111111111', 'faye@out.com', 'faye@out.com', 'stripe_faye');
 
-INSERT INTO "User" (id, email, name, macro_user_id)
+INSERT INTO "User" (id, email, name, rox_user_id)
 VALUES
     ('macro|faye@out.com', 'faye@out.com', 'Faye', 'f1111111-1111-1111-1111-111111111111');
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('d0000003-0000-0000-0000-000000000003', 'macro|faye@out.com', 'fa_faye', 'faye@out.com', 'GMAIL', true, NOW(), NOW());
 

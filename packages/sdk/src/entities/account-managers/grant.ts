@@ -1,19 +1,19 @@
 import type { AccountManagerGrant as AccountManagerGrantRecord } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 
 /** A request for an agent account to manage a person's account, and what became of it. */
-export class AccountManagerGrant extends MacroEntity<AccountManagerGrantRecord> {
+export class AccountManagerGrant extends RoxEntity<AccountManagerGrantRecord> {
   /** Construct a lazy grant handle. */
-  static byId(client: MacroClient, id: string): AccountManagerGrant {
+  static byId(client: RoxClient, id: string): AccountManagerGrant {
     return new AccountManagerGrant(client, id);
   }
 
   /** Seed from a fetched grant. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     record: AccountManagerGrantRecord,
   ): AccountManagerGrant {
     return new AccountManagerGrant(client, record.id, record);

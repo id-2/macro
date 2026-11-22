@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use doppleganger::{Doppleganger, Mirror};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -127,7 +127,7 @@ pub struct SoupEmailThreadPreview {
     pub provider_id: Option<String>,
     /// Owner user id.
     #[cfg_attr(feature = "schema", schema(value_type = String))]
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// Whether the thread should appear in the inbox.
     pub inbox_visible: bool,
     /// Whether the thread has been read.

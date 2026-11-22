@@ -13,7 +13,7 @@ use agent_runtime_protocol::domain::notification::{
 };
 use agent_session::domain::notifications::{PendingNotification, ProduceNotification};
 use import_notion::domain::ports::NotionConnections;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::ConnectorSelect;
 use uuid::Uuid;
 
@@ -43,7 +43,7 @@ where
     /// review how it went. Returns whether the run moved.
     pub(in crate::domain::service) async fn end_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         to: RunStatus,
         error: Option<&str>,
     ) -> Result<bool> {
@@ -82,7 +82,7 @@ where
     /// whether the run moved.
     pub(in crate::domain::service) async fn end_plan(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         to: RunStatus,
         error: Option<&str>,
     ) -> Result<bool> {
@@ -111,7 +111,7 @@ where
     /// without adopting or settling anything.
     pub(in crate::domain::service) async fn current_report(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<NotionImportReport> {
         let run = self
             .repo

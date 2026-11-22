@@ -1,7 +1,7 @@
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { MACRO_AGENT_BOT_ID } from '@core/constant/macroAgent';
-import { MACRO_CODER_BOT_ID } from '@core/constant/macroCoder';
-import { MACRO_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
+import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
 import type { AgentsMode } from './mode';
 
 /**
@@ -31,9 +31,9 @@ export function kindForHarness(harness: string | null | undefined): AgentKind {
 
 /** The first-party bots, whose kind is fixed by what mentioning them does. */
 const SYSTEM_BOT_KINDS: ReadonlyMap<string, AgentKind> = new Map([
-  [MACRO_AGENT_BOT_ID, 'agent'],
-  [MACRO_NEW_BOT_ID, 'agent'],
-  [MACRO_CODER_BOT_ID, 'coder'],
+  [ROX_AGENT_BOT_ID, 'agent'],
+  [ROX_NEW_BOT_ID, 'agent'],
+  [ROX_CODER_BOT_ID, 'coder'],
   [CURSOR_BOT_ID, 'coder'],
 ]);
 

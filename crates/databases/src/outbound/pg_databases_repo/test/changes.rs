@@ -1,6 +1,6 @@
 //! A table's changes since a version, over Postgres, on the guest list.
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::apply_ops::service;
@@ -14,7 +14,7 @@ use crate::domain::journal::{
 use crate::domain::models::TableVersion;
 use crate::domain::ports::DatabasesService;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reader_learns_which_rows_and_columns_changed_since_its_version(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, omar) = insert_guests(&pool, &wedding).await;

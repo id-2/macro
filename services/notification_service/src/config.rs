@@ -1,5 +1,5 @@
 //! Configuration for the notification service, loaded via the standard
-//! `macro_config` pattern so it gets a `doppler_config` validation binary.
+//! `rox_config` pattern so it gets a `doppler_config` validation binary.
 //!
 //! Required env vars are declared here as typed fields. The `doppler_config`
 //! binary loads this `Config` from Doppler for both the dev and prod
@@ -7,9 +7,9 @@
 
 use anyhow::Context;
 use database_env_vars::{DatabaseUrl, RedisUri};
-use macro_auth::InternalApiKey;
-use macro_env::Environment;
-use macro_env_var::{env_var, env_vars, maybe_env_vars};
+use rox_auth::InternalApiKey;
+use rox_env::Environment;
+use rox_env_var::{env_var, env_vars, maybe_env_vars};
 
 env_vars! {
     #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ env_var!(
 /// The configuration parameters for the application.
 ///
 /// These are loaded from `APP_SECRETS_JSON` when present, otherwise from environment variables.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// The connection URL for the Postgres database this application should use.
@@ -56,19 +56,19 @@ pub struct Config {
     pub(crate) url_signing_hmac: UrlSigningHmac,
 
     /// The port to listen for HTTP requests on.
-    #[macro_config_default(8080)]
+    #[rox_config_default(8080)]
     pub(crate) port: usize,
 
     /// The environment we are in.
-    #[macro_config_default(Environment::new_or_prod())]
+    #[rox_config_default(Environment::new_or_prod())]
     pub(crate) environment: Environment,
 
     /// The notification queue max messages per poll.
-    #[macro_config_default(9)]
+    #[rox_config_default(9)]
     pub(crate) notification_queue_max_messages: i32,
 
     /// The notification queue wait time seconds.
-    #[macro_config_default(4)]
+    #[rox_config_default(4)]
     pub(crate) notification_queue_wait_time_seconds: i32,
 
     /// Redis used by notification-service for digest batching, rate limiting, etc.
@@ -100,7 +100,7 @@ pub struct Config {
 
 impl Config {
     pub fn from_env() -> anyhow::Result<Self> {
-        let config = macro_config::ConfigLoader::load::<Config>()
+        let config = rox_config::ConfigLoader::load::<Config>()
             .context("failed to load notification service config")?;
 
         if !matches!(config.environment, Environment::Local)

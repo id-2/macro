@@ -9,7 +9,7 @@ use crate::domain::{
     ports::{EmailMessageEnqueuer, EmailRepo},
 };
 use frecency::domain::ports::FrecencyQueryService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use std::collections::HashSet;
 use std::ops::Range;
 use uuid::Uuid;
@@ -111,14 +111,14 @@ where
     U: FrecencyQueryService,
     E: EmailMessageEnqueuer,
     CS: crm::domain::service::CrmService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
     anyhow::Error: From<E::Err>,
 {
     /// Set `action`'s state on the thread; the number of messages it changed.
     pub(crate) async fn change_thread_mailbox_state_impl(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
         action: MailboxAction,
     ) -> Result<usize, EmailErr> {
@@ -166,7 +166,7 @@ where
         &self,
         link: &Link,
         thread_id: Uuid,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         action: MailboxAction,
     ) -> Result<UpdateThreadLabelsResult, EmailErr> {
         let messages = self
@@ -189,15 +189,15 @@ where
             failed_ids: vec![],
         })
     }
-    #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id))]
+    #[tracing::instrument(err, skip(self), fields(user_id = %rox_id, %thread_id))]
     pub(crate) async fn mark_thread_seen_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<usize, EmailErr> {
         let link = self
             .email_repo
-            .owned_link_for_thread(thread_id, macro_id.clone())
+            .owned_link_for_thread(thread_id, rox_id.clone())
             .await
             .map_err(|e| EmailErr::RepoErr(anyhow::Error::from(e)))?
             .ok_or(EmailErr::ThreadNotFound)?;
@@ -218,7 +218,7 @@ where
 
         if link.provider == UserProvider::Outlook {
             return Ok(self
-                .queue_outlook_action(&link, thread_id, macro_id, MailboxAction::Read(true))
+                .queue_outlook_action(&link, thread_id, rox_id, MailboxAction::Read(true))
                 .await?
                 .successful_ids
                 .len());
@@ -253,15 +253,15 @@ where
             .len())
     }
 
-    #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id))]
+    #[tracing::instrument(err, skip(self), fields(user_id = %rox_id, %thread_id))]
     pub(crate) async fn mark_thread_unread_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<usize, EmailErr> {
         let link = self
             .email_repo
-            .owned_link_for_thread(thread_id, macro_id.clone())
+            .owned_link_for_thread(thread_id, rox_id.clone())
             .await
             .map_err(|e| EmailErr::RepoErr(anyhow::Error::from(e)))?
             .ok_or(EmailErr::ThreadNotFound)?;
@@ -270,7 +270,7 @@ where
         // inbox: multi-inbox users have a distinct UNREAD label for each link.
         if link.provider == UserProvider::Outlook {
             return Ok(self
-                .queue_outlook_action(&link, thread_id, macro_id, MailboxAction::Read(false))
+                .queue_outlook_action(&link, thread_id, rox_id, MailboxAction::Read(false))
                 .await?
                 .successful_ids
                 .len());
@@ -287,16 +287,16 @@ where
     }
 
     /// Resolve the owning inbox server-side, including delegated inboxes.
-    #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id, archived))]
+    #[tracing::instrument(err, skip(self), fields(user_id = %rox_id, %thread_id, archived))]
     pub(crate) async fn set_thread_archived_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> Result<usize, EmailErr> {
         let link = self
             .email_repo
-            .owned_link_for_thread(thread_id, macro_id.clone())
+            .owned_link_for_thread(thread_id, rox_id.clone())
             .await
             .map_err(|e| EmailErr::RepoErr(anyhow::Error::from(e)))?
             .ok_or(EmailErr::ThreadNotFound)?;
@@ -304,7 +304,7 @@ where
             self.ensure_thread_has_received_messages(thread_id, link.id)
                 .await?;
         }
-        self.set_thread_inbox(&link, thread_id, macro_id, !archived)
+        self.set_thread_inbox(&link, thread_id, rox_id, !archived)
             .await
     }
 
@@ -314,7 +314,7 @@ where
         &self,
         link: &Link,
         thread_id: Uuid,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         in_inbox: bool,
     ) -> Result<usize, EmailErr> {
         if link.provider == UserProvider::Outlook {
@@ -405,22 +405,22 @@ where
         Err(EmailErr::ThreadHasNoInboundMessages)
     }
 
-    #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id, %label_id, add))]
+    #[tracing::instrument(err, skip(self), fields(user_id = %rox_id, %thread_id, %label_id, add))]
     pub(crate) async fn update_thread_labels_for_user_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
         label_id: Uuid,
         add: bool,
     ) -> Result<UpdateThreadLabelsResult, EmailErr> {
         let link = self
             .email_repo
-            .owned_link_for_thread(thread_id, macro_id.clone())
+            .owned_link_for_thread(thread_id, rox_id.clone())
             .await
             .map_err(|e| EmailErr::RepoErr(anyhow::Error::from(e)))?
             .ok_or(EmailErr::ThreadNotFound)?;
 
-        self.update_thread_labels_with_actor(&link, thread_id, label_id, add, Some(macro_id))
+        self.update_thread_labels_with_actor(&link, thread_id, label_id, add, Some(rox_id))
             .await
     }
 
@@ -443,7 +443,7 @@ where
         thread_id: Uuid,
         label_id: Uuid,
         add: bool,
-        actor: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        actor: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) -> Result<UpdateThreadLabelsResult, EmailErr> {
         let label = self
             .email_repo
@@ -457,7 +457,7 @@ where
                 .queue_outlook_action(
                     link,
                     thread_id,
-                    actor.unwrap_or_else(|| link.macro_id.clone()),
+                    actor.unwrap_or_else(|| link.rox_id.clone()),
                     MailboxAction::Category {
                         name: label.provider_label_id,
                         present: add,
@@ -466,7 +466,7 @@ where
                 .await;
         }
 
-        let write_id = macro_uuid::generate_uuid_v7();
+        let write_id = rox_uuid::generate_uuid_v7();
         let thread = self
             .stage_thread_labels(link, thread_id, &label.provider_label_id, add, write_id)
             .await?;
@@ -496,11 +496,11 @@ where
     #[tracing::instrument(
         err,
         skip(self, thread_ids),
-        fields(user_id = %macro_id, thread_count = thread_ids.len(), archived)
+        fields(user_id = %rox_id, thread_count = thread_ids.len(), archived)
     )]
     pub(crate) async fn set_threads_archived_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
         archived: bool,
     ) -> Result<SetThreadsArchivedResult, EmailErr> {
@@ -521,7 +521,7 @@ where
             let staged: Result<Option<(usize, StagedThreadLabels)>, EmailErr> = async {
                 let link = self
                     .email_repo
-                    .owned_link_for_thread(thread_id, macro_id.clone())
+                    .owned_link_for_thread(thread_id, rox_id.clone())
                     .await
                     .map_err(|e| EmailErr::RepoErr(anyhow::Error::from(e)))?
                     .ok_or(EmailErr::ThreadNotFound)?;
@@ -533,7 +533,7 @@ where
                     self.queue_outlook_action(
                         &link,
                         thread_id,
-                        macro_id.clone(),
+                        rox_id.clone(),
                         MailboxAction::Archived(archived),
                     )
                     .await?;
@@ -549,7 +549,7 @@ where
                             link,
                             label,
                             add: !archived,
-                            write_id: macro_uuid::generate_uuid_v7(),
+                            write_id: rox_uuid::generate_uuid_v7(),
                             threads: Vec::new(),
                         });
                         writes.len() - 1
@@ -583,7 +583,7 @@ where
         for write in writes {
             let thread_ids: Vec<Uuid> = write.threads.iter().map(|t| t.thread_id).collect();
             match self
-                .commit_thread_label_write(write, Some(macro_id.clone()))
+                .commit_thread_label_write(write, Some(rox_id.clone()))
                 .await
             {
                 Ok(()) => result.updated_thread_ids.extend(thread_ids),
@@ -647,7 +647,7 @@ where
     async fn commit_thread_label_write(
         &self,
         write: ThreadLabelWrite,
-        actor: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        actor: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) -> Result<(), UnsentThreads> {
         let ThreadLabelWrite {
             link,
@@ -792,11 +792,11 @@ where
         label: &LinkLabel,
         add: bool,
         cancelled_send_ids: &[Uuid],
-        actor: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        actor: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) {
         let event = EmailMacroEvent::thread_label_change(
             link.id,
-            link.macro_id.clone(),
+            link.rox_id.clone(),
             actor.clone(),
             thread_id,
             LabelRef {
@@ -816,7 +816,7 @@ where
             self.publish_email_event(&EmailMacroEvent::message_send_cancelled(
                 MessageSendCancelledMetadata {
                     link_id: link.id,
-                    owner: link.macro_id.clone(),
+                    owner: link.rox_id.clone(),
                     actor: actor.clone(),
                     message_id: *message_id,
                     thread_id,

@@ -3,7 +3,7 @@
 use agent_harness::domain::model_load::{HarnessModelAccess, HarnessModelReach};
 use harness_id::HarnessId;
 use harnesses::domain::ports::HarnessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Visibility adapter backed by the harness domain's existing list policy.
 pub struct VisibleHarnessAccess<Harnesses> {
@@ -23,7 +23,7 @@ where
 {
     async fn reach(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         harness: HarnessId,
     ) -> Result<HarnessModelReach, String> {
         let visible = self

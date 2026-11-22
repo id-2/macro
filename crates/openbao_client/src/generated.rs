@@ -214,7 +214,7 @@ impl Client {
     pub async fn login_lifecycle<'a>(
         &'a self,
         x_vault_token: Option<&'a str>,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
         body: &'a types::LoginRequest,
     ) -> Result<ResponseValue<types::LoginResponse>, Error<types::ErrorResponse>> {
         let url = format!("{}/v1/auth/macro-lifecycle/login", self.baseurl,);
@@ -226,8 +226,8 @@ impl Client {
         if let Some(value) = x_vault_token {
             header_map.append("X-Vault-Token", value.to_string().try_into()?);
         }
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -266,7 +266,7 @@ impl Client {
         &'a self,
         x_vault_namespace: &'a str,
         x_vault_token: Option<&'a str>,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
         body: &'a types::LoginRequest,
     ) -> Result<ResponseValue<types::LoginResponse>, Error<types::ErrorResponse>> {
         let url = format!("{}/v1/auth/macro/login", self.baseurl,);
@@ -282,8 +282,8 @@ impl Client {
         if let Some(value) = x_vault_token {
             header_map.append("X-Vault-Token", value.to_string().try_into()?);
         }
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -321,14 +321,14 @@ impl Client {
     ///- `version`
     ///- `x_vault_namespace`
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     pub async fn read_secret<'a>(
         &'a self,
         path: &'a str,
         version: Option<u64>,
         x_vault_namespace: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
     ) -> Result<ResponseValue<types::KvReadResponse>, Error<types::ErrorResponse>> {
         let url = format!(
             "{}/v1/passwords/data/{}",
@@ -345,8 +345,8 @@ impl Client {
             x_vault_namespace.to_string().try_into()?,
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -383,14 +383,14 @@ impl Client {
     ///- `path`: Location of the secret.
     ///- `x_vault_namespace`
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     ///- `body`
     pub async fn write_secret<'a>(
         &'a self,
         path: &'a str,
         x_vault_namespace: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
         body: &'a types::WriteSecretRequest,
     ) -> Result<ResponseValue<types::KvWriteResponse>, Error<types::ErrorResponse>> {
         let url = format!(
@@ -408,8 +408,8 @@ impl Client {
             x_vault_namespace.to_string().try_into()?,
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -446,14 +446,14 @@ impl Client {
     ///- `path`: Location of the secret.
     ///- `x_vault_namespace`
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     ///- `body`
     pub async fn destroy_versions<'a>(
         &'a self,
         path: &'a str,
         x_vault_namespace: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
         body: &'a types::DestroyRequest,
     ) -> Result<ResponseValue<()>, Error<types::ErrorResponse>> {
         let url = format!(
@@ -471,8 +471,8 @@ impl Client {
             x_vault_namespace.to_string().try_into()?,
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -509,13 +509,13 @@ impl Client {
     ///- `path`: Location of the secret.
     ///- `x_vault_namespace`
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     pub async fn read_metadata<'a>(
         &'a self,
         path: &'a str,
         x_vault_namespace: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
     ) -> Result<ResponseValue<types::KvMetadataResponse>, Error<types::ErrorResponse>> {
         let url = format!(
             "{}/v1/passwords/metadata/{}",
@@ -532,8 +532,8 @@ impl Client {
             x_vault_namespace.to_string().try_into()?,
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -570,12 +570,12 @@ impl Client {
     ///Arguments:
     ///- `path`: Path of the namespace.
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     pub async fn read_namespace<'a>(
         &'a self,
         path: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
     ) -> Result<ResponseValue<types::NamespaceResponse>, Error<types::ErrorResponse>> {
         let url = format!(
             "{}/v1/sys/namespaces/{}",
@@ -588,8 +588,8 @@ impl Client {
             ::reqwest::header::HeaderValue::from_static(Self::api_version()),
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -626,12 +626,12 @@ impl Client {
     ///Arguments:
     ///- `path`: Path of the namespace.
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     pub async fn delete_namespace<'a>(
         &'a self,
         path: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
     ) -> Result<ResponseValue<()>, Error<types::ErrorResponse>> {
         let url = format!(
             "{}/v1/sys/namespaces/{}",
@@ -644,8 +644,8 @@ impl Client {
             ::reqwest::header::HeaderValue::from_static(Self::api_version()),
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -682,13 +682,13 @@ impl Client {
     ///- `name`: Name of the key.
     ///- `x_vault_namespace`
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     pub async fn read_totp<'a>(
         &'a self,
         name: &'a str,
         x_vault_namespace: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
     ) -> Result<ResponseValue<types::TotpResponse>, Error<types::ErrorResponse>> {
         let url = format!(
             "{}/v1/totp/code/{}",
@@ -705,8 +705,8 @@ impl Client {
             x_vault_namespace.to_string().try_into()?,
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -742,14 +742,14 @@ impl Client {
     ///- `name`: Name of the key.
     ///- `x_vault_namespace`
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     ///- `body`
     pub async fn write_totp<'a>(
         &'a self,
         name: &'a str,
         x_vault_namespace: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
         body: &'a types::TotpWriteRequest,
     ) -> Result<ResponseValue<()>, Error<types::ErrorResponse>> {
         let url = format!(
@@ -767,8 +767,8 @@ impl Client {
             x_vault_namespace.to_string().try_into()?,
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self
@@ -805,13 +805,13 @@ impl Client {
     ///- `name`: Name of the key.
     ///- `x_vault_namespace`
     ///- `x_vault_token`
-    ///- `x_macro_audit_id`
+    ///- `x_rox_audit_id`
     pub async fn delete_totp<'a>(
         &'a self,
         name: &'a str,
         x_vault_namespace: &'a str,
         x_vault_token: &'a str,
-        x_macro_audit_id: Option<&'a str>,
+        x_rox_audit_id: Option<&'a str>,
     ) -> Result<ResponseValue<()>, Error<types::ErrorResponse>> {
         let url = format!(
             "{}/v1/totp/keys/{}",
@@ -828,8 +828,8 @@ impl Client {
             x_vault_namespace.to_string().try_into()?,
         );
         header_map.append("X-Vault-Token", x_vault_token.to_string().try_into()?);
-        if let Some(value) = x_macro_audit_id {
-            header_map.append("x-macro-audit-id", value.to_string().try_into()?);
+        if let Some(value) = x_rox_audit_id {
+            header_map.append("x-rox-audit-id", value.to_string().try_into()?);
         }
         #[allow(unused_mut)]
         let mut request = self

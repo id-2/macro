@@ -60,7 +60,7 @@ export function SetupStatus() {
     linksQuery.isSuccess
       ? (linksQuery.data?.links ?? [])
           .filter(isExternalEmailLink)
-          .filter((link) => link.macro_id === userId())
+          .filter((link) => link.rox_id === userId())
       : [];
 
   const hasEvents = () =>

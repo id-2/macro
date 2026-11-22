@@ -11,8 +11,8 @@ use item_filters::ast::{
     LiteralTree,
     channel::{ChannelLiteral, ChannelThreadLiteral},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{CreatedAt, Cursor, CursorVal, Query, SimpleSortMethod};
 use sqlx::{Pool, Postgres};
 use std::{
@@ -58,18 +58,18 @@ fn repo(pool: Pool<Postgres>) -> PgChannelsRepo {
     PgChannelsRepo::new(pool)
 }
 
-fn macro_user_id(user_id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(user_id.to_owned()).expect("valid macro user id")
+fn rox_user_id(user_id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(user_id.to_owned()).expect("valid macro user id")
 }
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn team_admin_authority_is_scoped_to_exact_membership(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
     let team_b = Uuid::from_u128(0x22222222_2222_2222_2222_222222222222);
-    let actor = macro_user_id(LEFT_USER);
+    let actor = rox_user_id(LEFT_USER);
     assert!(!repo.user_is_team_admin(&actor, TEAM_A).await.unwrap());
 
     sqlx::query!(
@@ -94,7 +94,7 @@ async fn team_admin_authority_is_scoped_to_exact_membership(pool: Pool<Postgres>
     assert!(repo.user_is_team_admin(&actor, TEAM_A).await.unwrap());
     assert!(
         !repo
-            .user_is_team_admin(&macro_user_id(NON_MEMBER), TEAM_A)
+            .user_is_team_admin(&rox_user_id(NON_MEMBER), TEAM_A)
             .await
             .unwrap()
     );
@@ -107,7 +107,7 @@ fn thread_rows_request(
     limit: u32,
 ) -> GetThreadReplyRowsRequest {
     GetThreadReplyRowsRequest {
-        macro_id: macro_user_id(user_id),
+        rox_id: rox_user_id(user_id),
         limit: Some(limit),
         query: Query::Sort(sort, filter),
     }
@@ -123,7 +123,7 @@ fn report_err(e: rootcause::Report) -> anyhow::Error {
 
 fn channels_params(user_id: &str, filter: LiteralTree<ChannelLiteral>) -> GetChannelsParams {
     GetChannelsRequest {
-        macro_id: macro_user_id(user_id),
+        rox_id: rox_user_id(user_id),
         limit: Some(50),
         include_frecency: false,
         query: Query::Sort(SimpleSortMethod::UpdatedAt, filter),
@@ -176,7 +176,7 @@ fn participant_roles(channel: &ChannelWithParticipants) -> Vec<(String, Particip
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_list_flags_active_participation(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -205,7 +205,7 @@ async fn channel_list_flags_active_participation(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_list_excludes_non_member_team_channels_by_default(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -222,7 +222,7 @@ async fn channel_list_excludes_non_member_team_channels_by_default(pool: Pool<Po
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn is_participant_filter_false_returns_non_member_team_channels(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -262,7 +262,7 @@ async fn is_participant_filter_false_returns_non_member_team_channels(pool: Pool
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn is_participant_filter_true_matches_default_membership(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -287,7 +287,7 @@ async fn is_participant_filter_true_matches_default_membership(pool: Pool<Postgr
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn is_participant_filter_inside_not_widens_candidates(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -390,7 +390,7 @@ fn channel_list_states_seek_the_viewer_entity_index() {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_list_filters_by_notification_state(pool: Pool<Postgres>) -> anyhow::Result<()> {
     use item_filters::NotificationState::{Done, Seen, Unseen};
@@ -421,7 +421,7 @@ async fn channel_list_filters_by_notification_state(pool: Pool<Postgres>) -> any
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_list_notification_state_boolean_semantics(
     pool: Pool<Postgres>,
@@ -473,7 +473,7 @@ async fn channel_list_notification_state_boolean_semantics(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_list_unseen_or_seen_stays_on_joined_channels(
     pool: Pool<Postgres>,
@@ -502,7 +502,7 @@ async fn channel_list_unseen_or_seen_stays_on_joined_channels(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_list_notification_state_with_participation(
     pool: Pool<Postgres>,
@@ -577,7 +577,7 @@ async fn channel_list_notification_state_with_participation(
         path = "../../../fixtures",
         scripts("channels_repo", "channel_list_pagination")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_list_cursor_pagination_matches_unpaginated_results(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -594,7 +594,7 @@ async fn channel_list_cursor_pagination_matches_unpaginated_results(pool: Pool<P
         let unpaginated = repo
             .get_user_channels_with_participants(
                 GetChannelsRequest {
-                    macro_id: macro_user_id(USER_A),
+                    rox_id: rox_user_id(USER_A),
                     limit: Some(50),
                     include_frecency: false,
                     query: Query::Sort(sort, None),
@@ -615,7 +615,7 @@ async fn channel_list_cursor_pagination_matches_unpaginated_results(pool: Pool<P
             let page = repo
                 .get_user_channels_with_participants(
                     GetChannelsRequest {
-                        macro_id: macro_user_id(USER_A),
+                        rox_id: rox_user_id(USER_A),
                         limit: Some(1),
                         include_frecency: false,
                         query,
@@ -681,14 +681,14 @@ async fn channel_list_cursor_pagination_matches_unpaginated_results(pool: Pool<P
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn create_channel_persists_auto_join_team_and_adds_current_members(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
 
     let enabled_channel_id = repo
         .create_channel(
-            macro_user_id(USER_A),
+            rox_user_id(USER_A),
             None,
             CreateChannelRequest {
                 name: Some("enabled".to_string()),
@@ -702,7 +702,7 @@ async fn create_channel_persists_auto_join_team_and_adds_current_members(pool: P
         .unwrap();
     let disabled_channel_id = repo
         .create_channel(
-            macro_user_id(USER_A),
+            rox_user_id(USER_A),
             None,
             CreateChannelRequest {
                 name: Some("disabled".to_string()),
@@ -769,18 +769,18 @@ async fn create_channel_persists_auto_join_team_and_adds_current_members(pool: P
     assert_eq!(disabled_participants, vec![USER_A]);
     assert_eq!(
         enabled_channel_id.participant_user_ids,
-        vec![macro_user_id(LEFT_USER), macro_user_id(USER_A)]
+        vec![rox_user_id(LEFT_USER), rox_user_id(USER_A)]
     );
 }
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn maybe_get_dm_finds_channel_regardless_of_argument_order(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
-    let user_a = macro_user_id(USER_A);
-    let user_b = macro_user_id(USER_B);
+    let user_a = rox_user_id(USER_A);
+    let user_b = rox_user_id(USER_B);
 
     let created = repo
         .create_channel(
@@ -809,7 +809,7 @@ async fn maybe_get_dm_finds_channel_regardless_of_argument_order(pool: Pool<Post
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_channel_rename_advances_updated_at(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
@@ -848,7 +848,7 @@ async fn patch_channel_rename_advances_updated_at(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_channel_rename_allows_a_member(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
@@ -875,7 +875,7 @@ async fn patch_channel_rename_allows_a_member(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_channel_settings_reject_a_member(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -902,11 +902,11 @@ async fn patch_channel_settings_reject_a_member(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_channel_converts_to_team_and_updates_auto_join_members(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
-    let user_id = macro_user_id(TEAM_OWNER_A);
+    let user_id = rox_user_id(TEAM_OWNER_A);
     sqlx::query!(
         r#"
         INSERT INTO team_user (user_id, team_id, team_role)
@@ -1019,7 +1019,7 @@ async fn patch_channel_converts_to_team_and_updates_auto_join_members(pool: Pool
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_team_channel_converts_to_private_and_clears_team_settings(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
@@ -1074,11 +1074,11 @@ async fn patch_team_channel_converts_to_private_and_clears_team_settings(pool: P
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn auto_join_is_enabled_team_scoped_and_idempotent(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
-    let user_id = macro_user_id(NON_MEMBER);
+    let user_id = rox_user_id(NON_MEMBER);
 
     repo.auto_join_by_team_id(&TEAM_A, &user_id).await.unwrap();
     repo.auto_join_by_team_id(&TEAM_A, &user_id).await.unwrap();
@@ -1103,13 +1103,13 @@ async fn auto_join_is_enabled_team_scoped_and_idempotent(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn auto_join_reactivates_left_members_without_changing_active_memberships(
     pool: Pool<Postgres>,
 ) {
     let repo = repo(pool.clone());
-    let user_id = macro_user_id(LEFT_USER);
+    let user_id = rox_user_id(LEFT_USER);
     let active_before = sqlx::query!(
         r#"
         SELECT role AS "role: ParticipantRole", joined_at
@@ -1172,11 +1172,11 @@ async fn auto_join_reactivates_left_members_without_changing_active_memberships(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn leave_soft_leaves_all_team_channels_and_returns_only_changes(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
-    let user_id = macro_user_id(LEFT_USER);
+    let user_id = rox_user_id(LEFT_USER);
     let original_left_at = sqlx::query_scalar!(
         r#"
         SELECT left_at::timestamptz
@@ -1246,11 +1246,11 @@ async fn leave_soft_leaves_all_team_channels_and_returns_only_changes(pool: Pool
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn rollback_restores_exact_channels_without_changing_role_or_joined_at(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
-    let user_id = macro_user_id(LEFT_USER);
+    let user_id = rox_user_id(LEFT_USER);
     let before = sqlx::query!(
         r#"
         SELECT channel_id, role AS "role: ParticipantRole", joined_at
@@ -1309,30 +1309,30 @@ async fn rollback_restores_exact_channels_without_changing_role_or_joined_at(poo
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn add_participant_atomically_adds_or_reactivates(pool: Pool<Postgres>) {
     let repo = repo(pool);
 
     assert!(
         !repo
-            .add_participant(CH1, macro_user_id(USER_A), ParticipantRole::Member)
+            .add_participant(CH1, rox_user_id(USER_A), ParticipantRole::Member)
             .await
             .unwrap()
     );
     assert!(
-        repo.add_participant(CH1, macro_user_id(LEFT_USER), ParticipantRole::Member)
+        repo.add_participant(CH1, rox_user_id(LEFT_USER), ParticipantRole::Member)
             .await
             .unwrap()
     );
     assert!(
         !repo
-            .add_participant(CH1, macro_user_id(LEFT_USER), ParticipantRole::Member)
+            .add_participant(CH1, rox_user_id(LEFT_USER), ParticipantRole::Member)
             .await
             .unwrap()
     );
     assert!(
-        repo.add_participant(CH1, macro_user_id(NON_MEMBER), ParticipantRole::Member)
+        repo.add_participant(CH1, rox_user_id(NON_MEMBER), ParticipantRole::Member)
             .await
             .unwrap()
     );
@@ -1340,7 +1340,7 @@ async fn add_participant_atomically_adds_or_reactivates(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_join_code_is_generated_once_and_reused(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -1353,7 +1353,7 @@ async fn channel_join_code_is_generated_once_and_reused(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_can_be_resolved_by_join_code(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -1370,7 +1370,7 @@ async fn channel_can_be_resolved_by_join_code(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn unknown_channel_join_code_resolves_to_none(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -1385,7 +1385,7 @@ async fn unknown_channel_join_code_resolves_to_none(pool: Pool<Postgres>) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_are_visible_to_channel_members(
     pool: Pool<Postgres>,
@@ -1418,7 +1418,7 @@ async fn channel_thread_rows_are_visible_to_channel_members(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_are_scoped_to_active_channel_members(
     pool: Pool<Postgres>,
@@ -1437,7 +1437,7 @@ async fn channel_thread_rows_are_scoped_to_active_channel_members(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_thread_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -1469,7 +1469,7 @@ async fn channel_thread_rows_filter_by_thread_id(pool: Pool<Postgres>) -> anyhow
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_channel_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -1492,7 +1492,7 @@ async fn channel_thread_rows_filter_by_channel_id(pool: Pool<Postgres>) -> anyho
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_root_sender(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -1500,7 +1500,7 @@ async fn channel_thread_rows_filter_by_root_sender(pool: Pool<Postgres>) -> anyh
         .get_thread_messages(
             thread_rows_request(
                 USER_A,
-                thread_filter(ChannelThreadLiteral::RootSender(macro_user_id(USER_A))),
+                thread_filter(ChannelThreadLiteral::RootSender(rox_user_id(USER_A))),
                 SimpleSortMethod::UpdatedAt,
                 50,
             )
@@ -1536,11 +1536,11 @@ async fn thread_ids_matching(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_has_replies(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // user-a rooted msg1 (four replies), msg31 (one reply) and msg3 (none).
-    let root_sender = || Expr::val(ChannelThreadLiteral::RootSender(macro_user_id(USER_A)));
+    let root_sender = || Expr::val(ChannelThreadLiteral::RootSender(rox_user_id(USER_A)));
     let with_replies = thread_ids_matching(
         pool.clone(),
         USER_A,
@@ -1567,16 +1567,16 @@ async fn channel_thread_rows_filter_by_has_replies(pool: Pool<Postgres>) -> anyh
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_hides_unanswered_own_roots(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     // The web Threads tab: threads user-a takes part in, minus roots they sent
     // that nobody answered. msg3 is user-a's unanswered root.
-    let participant = Expr::val(ChannelThreadLiteral::Participant(macro_user_id(USER_A)));
+    let participant = Expr::val(ChannelThreadLiteral::Participant(rox_user_id(USER_A)));
     let unanswered_own_root = Expr::and(
-        Expr::val(ChannelThreadLiteral::RootSender(macro_user_id(USER_A))),
+        Expr::val(ChannelThreadLiteral::RootSender(rox_user_id(USER_A))),
         Expr::val(ChannelThreadLiteral::HasReplies(false)),
     );
     let parent_ids = thread_ids_matching(
@@ -1607,7 +1607,7 @@ async fn threads_matching_participant(
         .get_thread_messages(
             thread_rows_request(
                 querying_user,
-                thread_filter(ChannelThreadLiteral::Participant(macro_user_id(
+                thread_filter(ChannelThreadLiteral::Participant(rox_user_id(
                     participant,
                 ))),
                 SimpleSortMethod::UpdatedAt,
@@ -1622,7 +1622,7 @@ async fn threads_matching_participant(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_participant_reply_and_mention(
     pool: Pool<Postgres>,
@@ -1636,7 +1636,7 @@ async fn channel_thread_rows_filter_by_participant_reply_and_mention(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_participant_group_mention(
     pool: Pool<Postgres>,
@@ -1650,7 +1650,7 @@ async fn channel_thread_rows_filter_by_participant_group_mention(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_participant_root_sender(
     pool: Pool<Postgres>,
@@ -1664,7 +1664,7 @@ async fn channel_thread_rows_filter_by_participant_root_sender(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_participant_excludes_departed_users(
     pool: Pool<Postgres>,
@@ -1795,7 +1795,7 @@ async fn insert_channel_thread_notification(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_notification_done_secondary_entity(
     pool: Pool<Postgres>,
@@ -1827,7 +1827,7 @@ async fn channel_thread_rows_filter_by_notification_done_secondary_entity(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_filter_by_notification_seen_secondary_entity(
     pool: Pool<Postgres>,
@@ -1859,7 +1859,7 @@ async fn channel_thread_rows_filter_by_notification_seen_secondary_entity(
 #[test]
 fn channel_thread_rows_notification_plan_splits_and_keeps_or_on_the_scan() {
     let state = |state| Expr::val(ChannelThreadLiteral::NotificationState(state));
-    let participant = Expr::val(ChannelThreadLiteral::Participant(macro_user_id(USER_A)));
+    let participant = Expr::val(ChannelThreadLiteral::Participant(rox_user_id(USER_A)));
     let and_filter = Expr::and(
         Expr::or(
             state(item_filters::NotificationState::Unseen),
@@ -1890,7 +1890,7 @@ fn channel_thread_rows_notification_plan_splits_and_keeps_or_on_the_scan() {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_notification_and_participant(
     pool: Pool<Postgres>,
@@ -1914,7 +1914,7 @@ async fn channel_thread_rows_notification_and_participant(
     .await?;
     insert_user_notification(&pool, USER_A, bad_notification_id, true, false).await?;
 
-    let participant = Expr::val(ChannelThreadLiteral::Participant(macro_user_id(USER_A)));
+    let participant = Expr::val(ChannelThreadLiteral::Participant(rox_user_id(USER_A)));
     let parent_ids = thread_ids_matching(
         pool.clone(),
         USER_A,
@@ -1970,7 +1970,7 @@ async fn channel_thread_rows_notification_and_participant(
     let participating = thread_ids_matching(
         pool,
         USER_A,
-        Expr::val(ChannelThreadLiteral::Participant(macro_user_id(USER_A))),
+        Expr::val(ChannelThreadLiteral::Participant(rox_user_id(USER_A))),
     )
     .await?;
     assert_eq!(widened, participating);
@@ -1980,7 +1980,7 @@ async fn channel_thread_rows_notification_and_participant(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_thread_rows_apply_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -1996,7 +1996,7 @@ async fn channel_thread_rows_apply_cursor(pool: Pool<Postgres>) -> anyhow::Resul
     let second_page = repo
         .get_thread_messages(
             GetThreadReplyRowsRequest {
-                macro_id: macro_user_id(USER_A),
+                rox_id: rox_user_id(USER_A),
                 limit: Some(50),
                 query: Query::Cursor(Cursor {
                     id: first_page[0].id,
@@ -2020,7 +2020,7 @@ async fn channel_thread_rows_apply_cursor(pool: Pool<Postgres>) -> anyhow::Resul
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_data_preview_count_limits_replies(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2045,7 +2045,7 @@ async fn thread_data_preview_count_limits_replies(pool: Pool<Postgres>) -> anyho
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_data_latest_reply_at_is_most_recent(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2060,7 +2060,7 @@ async fn thread_data_latest_reply_at_is_most_recent(pool: Pool<Postgres>) -> any
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_data_multiple_parents(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2076,7 +2076,7 @@ async fn thread_data_multiple_parents(pool: Pool<Postgres>) -> anyhow::Result<()
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn reactions_grouped_by_emoji(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2116,7 +2116,7 @@ async fn reactions_grouped_by_emoji(pool: Pool<Postgres>) -> anyhow::Result<()> 
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachments_batch_grouped_by_message(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2133,7 +2133,7 @@ async fn attachments_batch_grouped_by_message(pool: Pool<Postgres>) -> anyhow::R
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_attachments_cursor_pagination(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2166,7 +2166,7 @@ async fn channel_attachments_cursor_pagination(pool: Pool<Postgres>) -> anyhow::
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_attachments_include_dimensions(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2186,7 +2186,7 @@ async fn channel_attachments_include_dimensions(pool: Pool<Postgres>) -> anyhow:
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_attachments_exclude_deleted_messages(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2209,7 +2209,7 @@ async fn channel_attachments_exclude_deleted_messages(pool: Pool<Postgres>) -> a
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn participants_excludes_left_users(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2223,7 +2223,7 @@ async fn participants_excludes_left_users(pool: Pool<Postgres>) -> anyhow::Resul
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn participants_roles_parsed_correctly(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2251,7 +2251,7 @@ async fn participants_roles_parsed_correctly(pool: Pool<Postgres>) -> anyhow::Re
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_participant_readers_handle_bot_principals(
     pool: Pool<Postgres>,
@@ -2292,7 +2292,7 @@ async fn channel_participant_readers_handle_bot_principals(
 
     let repo = repo(pool);
     let metadata = repo
-        .get_channel_metadata(channel_id, MacroUserIdStr::try_from(USER_A.to_string())?)
+        .get_channel_metadata(channel_id, RoxUserIdStr::try_from(USER_A.to_string())?)
         .await?;
     let participants = repo.get_participants(channel_id).await?;
 
@@ -2323,7 +2323,7 @@ async fn channel_participant_readers_handle_bot_principals(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_participants_exclude_departed_senders(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2346,7 +2346,7 @@ async fn thread_participants_exclude_departed_senders(pool: Pool<Postgres>) -> a
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_participants_exclude_deleted_messages(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
@@ -2378,7 +2378,7 @@ async fn thread_participants_exclude_deleted_messages(pool: Pool<Postgres>) -> a
 // -- resolve_top_level_parent -------------------------------------------------
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("channels_repo"))
 )]
 async fn batch_preview_returns_existing_public_channel(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -2407,7 +2407,7 @@ fn mention_opts(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_entity_mention_persists_row(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
     let mention = repo
@@ -2429,7 +2429,7 @@ async fn create_entity_mention_persists_row(pool: Pool<Postgres>) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_entity_mention_allows_duplicates(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool);
     let opts = mention_opts("doc-2", "user", "user-y", None);
@@ -2453,7 +2453,7 @@ async fn create_entity_mention_allows_duplicates(pool: Pool<Postgres>) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_entity_mention_by_id_returns_none_when_missing(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -2466,7 +2466,7 @@ async fn get_entity_mention_by_id_returns_none_when_missing(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_entity_mention_by_id_removes_only_targeted_row(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -2488,7 +2488,7 @@ async fn delete_entity_mention_by_id_removes_only_targeted_row(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_entity_mention_by_id_returns_none_when_missing(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -2520,7 +2520,7 @@ fn channel_refs(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_returns_channel_reference_for_participant(
     pool: Pool<Postgres>,
@@ -2539,7 +2539,7 @@ async fn attachment_references_returns_channel_reference_for_participant(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("channels_repo"))
 )]
 async fn batch_preview_omits_missing_channels(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -2555,7 +2555,7 @@ async fn batch_preview_omits_missing_channels(pool: Pool<Postgres>) -> anyhow::R
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_hidden_from_non_and_former_participants(
     pool: Pool<Postgres>,
@@ -2578,7 +2578,7 @@ async fn attachment_references_hidden_from_non_and_former_participants(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_excludes_deleted_message(
     pool: Pool<Postgres>,
@@ -2593,7 +2593,7 @@ async fn attachment_references_excludes_deleted_message(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_returns_message_mention(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // doc-mention is mentioned inside msg3 (source_entity_type = 'message').
@@ -2611,7 +2611,7 @@ async fn attachment_references_returns_message_mention(pool: Pool<Postgres>) -> 
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_returns_generic_reference(
     pool: Pool<Postgres>,
@@ -2634,7 +2634,7 @@ async fn attachment_references_returns_generic_reference(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_collapse_repeat_mentions_from_one_source(
     pool: Pool<Postgres>,
@@ -2668,7 +2668,7 @@ async fn attachment_references_collapse_repeat_mentions_from_one_source(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_collapse_alias_typed_mentions_from_one_source(
     pool: Pool<Postgres>,
@@ -2704,7 +2704,7 @@ async fn attachment_references_collapse_alias_typed_mentions_from_one_source(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_merges_channel_and_generic_newest_first(
     pool: Pool<Postgres>,
@@ -2729,7 +2729,7 @@ async fn attachment_references_merges_channel_and_generic_newest_first(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_treats_email_alias_as_thread(
     pool: Pool<Postgres>,
@@ -2769,7 +2769,7 @@ async fn attachment_references_treats_email_alias_as_thread(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn attachment_references_returns_comments_on_every_parent(
     pool: Pool<Postgres>,
@@ -2807,7 +2807,7 @@ async fn attachment_references_returns_comments_on_every_parent(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bot_profiles_includes_soft_deleted_bots(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let active = Uuid::new_v4();
     let deleted = Uuid::new_v4();
@@ -2853,12 +2853,12 @@ async fn bot_profiles_includes_soft_deleted_bots(pool: Pool<Postgres>) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_channel_cascades_contacts_backfill_outbox_rows(pool: Pool<Postgres>) {
     let repo = repo(pool.clone());
     let created = repo
         .create_channel(
-            macro_user_id(USER_A),
+            rox_user_id(USER_A),
             None,
             CreateChannelRequest {
                 name: Some("delete-with-outbox".to_string()),
@@ -2907,7 +2907,7 @@ async fn delete_channel_cascades_contacts_backfill_outbox_rows(pool: Pool<Postgr
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_picture_round_trips_through_batched_previews(pool: Pool<Postgres>) {
     let repo = repo(pool);
@@ -3006,7 +3006,7 @@ fn home_unread_thread_feed_reads_notifications_once() {
     let state = |state| Expr::val(ChannelThreadLiteral::NotificationState(state));
     let filter = home_unread(
         state,
-        Expr::val(ChannelThreadLiteral::Participant(macro_user_id(USER_A))),
+        Expr::val(ChannelThreadLiteral::Participant(rox_user_id(USER_A))),
     );
     let params = thread_rows_request(
         USER_A,
@@ -3035,7 +3035,7 @@ fn home_unread_thread_feed_reads_notifications_once() {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn home_unread_channel_list_matches_unseen_participant_channels(
     pool: Pool<Postgres>,
@@ -3065,7 +3065,7 @@ async fn home_unread_channel_list_matches_unseen_participant_channels(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn home_unread_thread_feed_matches_unseen_participant_threads(
     pool: Pool<Postgres>,
@@ -3076,7 +3076,7 @@ async fn home_unread_thread_feed_matches_unseen_participant_threads(
     insert_channel_thread_notification(&pool, USER_B, CH1, MSG1, false, false).await?;
 
     let state = |state| Expr::val(ChannelThreadLiteral::NotificationState(state));
-    let participant = || Expr::val(ChannelThreadLiteral::Participant(macro_user_id(USER_A)));
+    let participant = || Expr::val(ChannelThreadLiteral::Participant(rox_user_id(USER_A)));
     let home = thread_ids_matching(pool.clone(), USER_A, home_unread(state, participant())).await?;
     assert_eq!(home, vec![MSG3]);
     assert_eq!(

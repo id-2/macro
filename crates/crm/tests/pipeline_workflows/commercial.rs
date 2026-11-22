@@ -2,7 +2,7 @@
 
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outcomes_persist_and_mixed_currency_totals_stay_separate(pool: PgPool) {
     let Fixture {
         workflows,

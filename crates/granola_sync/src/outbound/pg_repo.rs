@@ -7,7 +7,7 @@ use aes_gcm::{
     aead::{Aead, AeadCore, OsRng, Payload},
 };
 use async_trait::async_trait;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -58,7 +58,7 @@ impl PgSyncRepository {
 
 #[async_trait]
 impl SyncRepository for PgSyncRepository {
-    async fn by_user(&self, user: &MacroUserIdStr<'static>) -> Result<Option<Connection>> {
+    async fn by_user(&self, user: &RoxUserIdStr<'static>) -> Result<Option<Connection>> {
         let row = sqlx::query!(
             "SELECT id FROM granola_sync_connections WHERE user_id = $1",
             user.as_ref()
@@ -78,7 +78,7 @@ impl SyncRepository for PgSyncRepository {
             Ok(Connection {
                 id: row.id,
                 namespace: row.namespace,
-                user_id: MacroUserIdStr::parse_from_str(&row.user_id)?.into_owned(),
+                user_id: RoxUserIdStr::parse_from_str(&row.user_id)?.into_owned(),
                 account_id: row.account_id,
                 scope: row.scope.parse()?,
                 enabled: row.enabled,
@@ -106,7 +106,7 @@ impl SyncRepository for PgSyncRepository {
             .map(|row| {
                 Ok(SyncState {
                     id: row.id,
-                    user_id: MacroUserIdStr::parse_from_str(&row.user_id)?.into_owned(),
+                    user_id: RoxUserIdStr::parse_from_str(&row.user_id)?.into_owned(),
                     account_id: row.account_id,
                     scope: row.scope.parse()?,
                     enabled: row.enabled,
@@ -182,7 +182,7 @@ impl SyncRepository for PgSyncRepository {
         Ok(())
     }
     async fn claim(&self) -> Result<Option<Job>> {
-        let lease = macro_uuid::generate_uuid_v7();
+        let lease = rox_uuid::generate_uuid_v7();
         let row = sqlx::query!(
             r#"WITH candidate AS (
                 SELECT e.connection_id, e.event_id FROM granola_sync_events e

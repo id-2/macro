@@ -2,7 +2,7 @@ import * as aws from '@pulumi/aws';
 import type * as pulumi from '@pulumi/pulumi';
 import { stack } from '../../shared';
 
-const MACRO_API_TOKEN_PUBLIC_KEY = `macro-api-token-public-key-${stack}`;
+const ROX_API_TOKEN_PUBLIC_KEY = `macro-api-token-public-key-${stack}`;
 
 export function getMacroApiToken(): {
   macroApiTokenIssuer: string;
@@ -14,10 +14,10 @@ export function getMacroApiToken(): {
       stack === 'prod'
         ? 'authentication-service.rox.one'
         : `authentication-service-${stack}.rox.one`,
-    macroApiTokenPublicKey: MACRO_API_TOKEN_PUBLIC_KEY,
+    macroApiTokenPublicKey: ROX_API_TOKEN_PUBLIC_KEY,
     macroApiTokenPublicKeyArn: aws.secretsmanager
       .getSecretVersionOutput({
-        secretId: MACRO_API_TOKEN_PUBLIC_KEY,
+        secretId: ROX_API_TOKEN_PUBLIC_KEY,
       })
       .apply((secret) => secret.arn),
   };

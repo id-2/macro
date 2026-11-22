@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use entity_access::domain::models::{AdminTeamRole, EntityAccessReceipt};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use teams::domain::model::RemoveUserFromTeamError;
 use teams::domain::team_repo::TeamService;
 
@@ -26,7 +26,7 @@ impl<Teams: TeamService> TeamMembership for TeamsMembership<Teams> {
     async fn add_agent(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<(), TeamAgentError> {
         self.teams
             .add_team_agent(receipt, agent)
@@ -38,7 +38,7 @@ impl<Teams: TeamService> TeamMembership for TeamsMembership<Teams> {
     async fn undo_add_agent(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<(), TeamAgentError> {
         match self.teams.undo_team_agent_join(receipt, agent).await {
             Ok(()) | Err(RemoveUserFromTeamError::UserNotInTeam) => Ok(()),
@@ -49,7 +49,7 @@ impl<Teams: TeamService> TeamMembership for TeamsMembership<Teams> {
     async fn remove_agent(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<(), TeamAgentError> {
         match self.teams.remove_team_agent(receipt, agent).await {
             Ok(()) | Err(RemoveUserFromTeamError::UserNotInTeam) => Ok(()),

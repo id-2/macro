@@ -1,24 +1,24 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 
 const TEAM: Uuid = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_00aa);
 
 async fn insert_team(pool: &PgPool) {
-    let macro_user_id = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_0011);
+    let rox_user_id = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_0011);
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'admin@example.com', 'admin@example.com', 'cus_admin')
         "#,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|admin@example.com', 'admin@example.com', $1)"#,
-        macro_user_id,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|admin@example.com', 'admin@example.com', $1)"#,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -34,19 +34,19 @@ async fn insert_team(pool: &PgPool) {
 
 fn sam() -> NewAgentAccount {
     NewAgentAccount {
-        user_id: MacroUserIdStr::parse_from_str("macro|sam-rivera-abc123@agents.macro.invalid")
+        user_id: RoxUserIdStr::parse_from_str("macro|sam-rivera-abc123@agents.macro.invalid")
             .unwrap()
             .into_owned(),
         email: "sam-rivera-abc123@agents.macro.invalid".to_owned(),
         team_id: TEAM,
-        created_by: MacroUserIdStr::parse_from_str("macro|admin@example.com")
+        created_by: RoxUserIdStr::parse_from_str("macro|admin@example.com")
             .unwrap()
             .into_owned(),
         name: "Sam Rivera".to_owned(),
         avatar_url: None,
         persona_seed: PersonaSeed {
             creator_id: Some(
-                MacroUserIdStr::parse_from_str("macro|admin@example.com")
+                RoxUserIdStr::parse_from_str("macro|admin@example.com")
                     .unwrap()
                     .into_owned(),
             ),
@@ -58,7 +58,7 @@ fn sam() -> NewAgentAccount {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_agent_account_round_trips_and_is_marked_as_an_agent(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgTeamAgentsRepo::new(pool.clone());
@@ -84,7 +84,7 @@ async fn an_agent_account_round_trips_and_is_marked_as_an_agent(pool: PgPool) {
     assert!(is_agent);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_the_account_deletes_the_agent(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgTeamAgentsRepo::new(pool);
@@ -97,7 +97,7 @@ async fn deleting_the_account_deletes_the_agent(pool: PgPool) {
     assert!(repo.list_for_team(TEAM).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_facts_read_the_row_the_agent_flag_membership_and_creator(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgTeamAgentsRepo::new(pool.clone());
@@ -146,11 +146,11 @@ async fn admission_facts_read_the_row_the_agent_flag_membership_and_creator(pool
             .created_by_is_agent
     );
 
-    let human = MacroUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let human = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
     assert_eq!(repo.account_facts(&human).await.unwrap(), None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_an_agent_keeps_what_it_owns_and_its_key_stops_working(pool: PgPool) {
     use std::sync::Arc;
 

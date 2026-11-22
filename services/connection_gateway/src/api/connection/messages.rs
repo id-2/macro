@@ -17,7 +17,7 @@ use anyhow::{Context, Result};
 use axum::extract::ws::{Message, WebSocket};
 use cowlike::CowLike;
 use futures::{StreamExt, stream::SplitStream};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use tokio::{
     sync::mpsc::Sender,
@@ -110,7 +110,7 @@ pub async fn handle_message(
     if text_message.trim() == PING_MESSAGE {
         // Refresh last-online timestamp so long-lived connections don't appear offline
         if let Ok(user_id) =
-            MacroUserIdStr::parse_from_str(&connection_context.user_context.user_id)
+            RoxUserIdStr::parse_from_str(&connection_context.user_context.user_id)
         {
             connection_context
                 .api_context

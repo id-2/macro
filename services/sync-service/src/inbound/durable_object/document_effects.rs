@@ -1,6 +1,6 @@
 //! Worker notification adapter for the document update use case.
 
-use macro_sync_service_jwt::session::SessionKind;
+use rox_sync_service_jwt::session::SessionKind;
 use tracing::{error, warn};
 use worker::Env;
 

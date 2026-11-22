@@ -3,7 +3,7 @@
 use std::pin::Pin;
 use std::sync::Arc;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::error::{AgentSessionError, Result};
 use super::model::{AgentSessionId, SessionClaim};
@@ -20,7 +20,7 @@ pub trait SessionPullRequests: Send + Sync {
     fn set_pull_request<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         url: &'a str,
         claim: Option<SessionClaim>,
     ) -> Pin<Box<dyn Future<Output = Result<String>> + Send + 'a>>;
@@ -33,7 +33,7 @@ pub trait SessionPullRequestRepo: Send + Sync {
     fn record_pull_request(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         url: &str,
         claim: Option<SessionClaim>,
     ) -> impl Future<Output = Result<bool>> + Send;
@@ -66,7 +66,7 @@ where
     fn set_pull_request<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         url: &'a str,
         claim: Option<SessionClaim>,
     ) -> Pin<Box<dyn Future<Output = Result<String>> + Send + 'a>> {

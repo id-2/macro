@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use model_entity::Entity;
 use models_pagination::{CreatedAt, Paginated, Query};
 use notification_hex::domain::models::{
@@ -56,10 +56,10 @@ async fn invite_delivery_preserves_dm_context_for_email_and_push() {
         };
         let ingress = Arc::new(CapturingIngress::default());
         let channel_id = Uuid::from_u128(1);
-        let sender = MacroUserIdStr::try_from_email("sender@example.com").unwrap();
-        let registered = MacroUserIdStr::try_from_email("registered@example.com").unwrap();
+        let sender = RoxUserIdStr::try_from_email("sender@example.com").unwrap();
+        let registered = RoxUserIdStr::try_from_email("registered@example.com").unwrap();
         let unregistered =
-            MacroUserIdStr::try_from_email("julia+scribbington@example.com").unwrap();
+            RoxUserIdStr::try_from_email("julia+scribbington@example.com").unwrap();
 
         NotificationChannelSender::new(ingress.clone())
             .send(ChannelNotificationEffect::Invite {
@@ -151,11 +151,11 @@ async fn dm_email_delivery_keys_are_per_recipient_and_stable_on_retry() {
     let effect = ChannelNotificationEffect::Invite {
         channel_id: Uuid::new_v4(),
         message_id: Some(Uuid::new_v4()),
-        invited_by_user_id: MacroUserIdStr::try_from_email("sender@example.com").unwrap(),
+        invited_by_user_id: RoxUserIdStr::try_from_email("sender@example.com").unwrap(),
         registered_recipient_ids: HashSet::new(),
         unregistered_recipient_ids: HashSet::from([
-            MacroUserIdStr::try_from_email("one@example.com").unwrap(),
-            MacroUserIdStr::try_from_email("two@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("one@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("two@example.com").unwrap(),
         ]),
         sender_profile_picture_url: None,
         message_content: Some("hello".to_string()),
@@ -191,7 +191,7 @@ async fn dm_email_delivery_keys_are_per_recipient_and_stable_on_retry() {
 
 #[derive(Default)]
 struct FailingFirstReader {
-    attempts: Mutex<Vec<(MacroUserIdStr<'static>, Uuid)>>,
+    attempts: Mutex<Vec<(RoxUserIdStr<'static>, Uuid)>>,
 }
 
 impl NotificationReader for FailingFirstReader {
@@ -227,7 +227,7 @@ impl NotificationReader for FailingFirstReader {
 
     fn get_user_notifications<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _limit: Option<u32>,
         _cursor: Query<Uuid, CreatedAt, ()>,
         _filters: notification_hex::domain::models::request::NotificationListFilters,
@@ -246,7 +246,7 @@ impl NotificationReader for FailingFirstReader {
 
     fn get_entity_notifications_batch<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _entity_refs: Vec<Entity<'static>>,
         _query: notification_hex::domain::models::entity_query::EntityNotificationQuery,
     ) -> impl Future<Output = Result<HashMap<Entity<'static>, Vec<UserNotificationRow<T>>>, Report>> + Send
@@ -256,7 +256,7 @@ impl NotificationReader for FailingFirstReader {
 
     fn get_user_notification_by_id<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_id: Uuid,
     ) -> impl Future<Output = Result<Option<UserNotificationRow<T>>, Report>> + Send {
         async { unreachable!("only completion updates are expected") }
@@ -264,7 +264,7 @@ impl NotificationReader for FailingFirstReader {
 
     fn delete_user_notification(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_id: Uuid,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!("only completion updates are expected") }
@@ -272,7 +272,7 @@ impl NotificationReader for FailingFirstReader {
 
     fn bulk_delete_user_notifications(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_ids: &[Uuid],
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!("only completion updates are expected") }
@@ -280,7 +280,7 @@ impl NotificationReader for FailingFirstReader {
 
     fn register_device(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _device_token: &str,
         _device_type: &DeviceType,
         _native_call_capable: bool,
@@ -290,7 +290,7 @@ impl NotificationReader for FailingFirstReader {
 
     fn unregister_device(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _device_token: &str,
         _device_type: &DeviceType,
     ) -> impl Future<Output = Result<(), Report>> + Send {
@@ -299,14 +299,14 @@ impl NotificationReader for FailingFirstReader {
 
     fn get_disabled_notification_types(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<DisabledNotificationType>, Report>> + Send {
         async { unreachable!("only completion updates are expected") }
     }
 
     fn disable_notification_type(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _type_name: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!("only completion updates are expected") }
@@ -314,7 +314,7 @@ impl NotificationReader for FailingFirstReader {
 
     fn enable_notification_type(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _type_name: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!("only completion updates are expected") }
@@ -339,9 +339,9 @@ async fn completion_continues_after_a_recipient_failure() {
     let withdrawal = Arc::new(CapturingWithdrawal::default());
     let notification_id = Uuid::now_v7();
     let recipients = HashSet::from([
-        MacroUserIdStr::try_from_email("first@example.com").unwrap(),
-        MacroUserIdStr::try_from_email("second@example.com").unwrap(),
-        MacroUserIdStr::try_from_email("third@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("first@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("second@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("third@example.com").unwrap(),
     ]);
 
     let error = NotificationReaderCompletion::new(reader.clone(), withdrawal.clone())

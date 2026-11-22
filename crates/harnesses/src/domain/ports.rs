@@ -7,7 +7,7 @@ use std::future::Future;
 use chrono::{DateTime, Utc};
 use harness_id::HarnessId;
 use harness_token::HashedHarnessToken;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::account_logins::{
@@ -61,7 +61,7 @@ pub struct NewHarness {
     /// A team to open the harness to as it is created.
     pub team_grant: Option<Uuid>,
     /// The approving user.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// The Rox computer this harness runs on, for hosted harnesses.
     pub computer_id: Option<ComputerId>,
 }
@@ -222,21 +222,21 @@ pub trait HarnessRepo: Send + Sync + 'static {
     /// List active harnesses the caller may run agents on.
     fn list_usable_harnesses(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Harness>, Self::Err>> + Send;
 
     /// List active harnesses of everyone who shares a team with the caller,
     /// the caller included, whether or not the caller may use them.
     fn list_directory_harnesses(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Harness>, Self::Err>> + Send;
 
     /// What the caller may do with an active harness.
     fn harness_access(
         &self,
         harness_id: HarnessId,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<HarnessAccess, Self::Err>> + Send;
 
     /// Add or remove a team's grant on a harness.
@@ -275,14 +275,14 @@ pub trait HarnessRepo: Send + Sync + 'static {
     /// Check team membership.
     fn user_has_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
     /// Check whether a user owns a team.
     fn user_owns_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -319,7 +319,7 @@ pub trait HarnessService: Send + Sync + 'static {
     /// open to a team of theirs.
     fn approve_pairing(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         code: &str,
         req: ApprovePairingRequest,
     ) -> impl Future<Output = Result<Harness, HarnessError>> + Send;
@@ -334,13 +334,13 @@ pub trait HarnessService: Send + Sync + 'static {
     /// List harnesses the caller may run agents on.
     fn list_harnesses(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Harness>, HarnessError>> + Send;
 
     /// Change a harness the caller may manage.
     fn patch_harness(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
         req: PatchHarnessRequest,
     ) -> impl Future<Output = Result<Harness, HarnessError>> + Send;
@@ -348,13 +348,13 @@ pub trait HarnessService: Send + Sync + 'static {
     /// may do with each.
     fn list_directory(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Harness>, HarnessError>> + Send;
 
     /// Open a harness the caller owns to a team of theirs, or close it again.
     fn set_team_access(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
         req: SetHarnessTeamAccessRequest,
     ) -> impl Future<Output = Result<(), HarnessError>> + Send;
@@ -362,14 +362,14 @@ pub trait HarnessService: Send + Sync + 'static {
     /// List the agents living on a harness the caller may at least read.
     fn list_residents(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
     ) -> impl Future<Output = Result<Vec<HarnessResident>, HarnessError>> + Send;
 
     /// Revoke a harness the caller may manage.
     fn delete_harness(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
     ) -> impl Future<Output = Result<(), HarnessError>> + Send;
 
@@ -449,7 +449,7 @@ pub trait HarnessService: Send + Sync + 'static {
     /// rule (the owner, or a team harness's registrant or team owner).
     fn authorize_harness(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
         access: HarnessPermission,
     ) -> impl Future<Output = Result<Harness, HarnessError>> + Send;
@@ -484,7 +484,7 @@ pub trait ComputerTeamAgents: Send + Sync + 'static {
         &self,
         computers: &[ComputerId],
     ) -> impl Future<
-        Output = Result<std::collections::HashMap<ComputerId, MacroUserIdStr<'static>>, Self::Err>,
+        Output = Result<std::collections::HashMap<ComputerId, RoxUserIdStr<'static>>, Self::Err>,
     > + Send;
 }
 
@@ -500,7 +500,7 @@ pub trait HarnessTeamAgents: Send + Sync + 'static {
     fn harness_team_agent(
         &self,
         harness_id: HarnessId,
-    ) -> impl Future<Output = Result<Option<MacroUserIdStr<'static>>, HarnessError>> + Send;
+    ) -> impl Future<Output = Result<Option<RoxUserIdStr<'static>>, HarnessError>> + Send;
 }
 
 /// Harness service error.

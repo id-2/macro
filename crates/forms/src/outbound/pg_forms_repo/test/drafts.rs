@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::drafts::{FormDraftRepository, LayoutDraftState, LayoutProjection};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_projection_commits_its_layout_and_revision_together(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repository = PgFormsRepo::new(pool);
@@ -127,7 +127,7 @@ async fn a_projection_commits_its_layout_and_revision_together(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_projections_commit_exactly_one_revision_and_its_layout(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repository = PgFormsRepo::new(pool);

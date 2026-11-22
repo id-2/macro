@@ -1,6 +1,6 @@
 use axum::{Json, Router, extract::State, http::StatusCode, response::IntoResponse, routing::get};
 use axum_extra::extract::Cached;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use thiserror::Error;
 
@@ -49,9 +49,9 @@ pub fn list_labels_router<S, T, Auth>() -> Router<S>
 where
     S: Send + Sync + Clone + 'static,
     T: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     EmailRouterState<T>: axum::extract::FromRef<S>,
-    MacroAuthorizationState<Auth>: axum::extract::FromRef<S>,
+    RoxAuthorizationState<Auth>: axum::extract::FromRef<S>,
 {
     Router::new().route("/", get(list_labels_handler::<T, Auth>))
 }
@@ -69,7 +69,7 @@ where
     )
 )]
 #[tracing::instrument(err, skip_all)]
-pub async fn list_labels_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn list_labels_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
     Cached(MultiEmailLinkExtractor(links, _)): Cached<MultiEmailLinkExtractor<T, Auth>>,
 ) -> Result<Json<ListLabelsResponse>, ListLabelsError> {

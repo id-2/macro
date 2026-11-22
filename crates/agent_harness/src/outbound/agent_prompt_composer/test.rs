@@ -9,7 +9,7 @@ use uuid::Uuid;
 struct NewYork;
 
 impl UserTimeZones for NewYork {
-    async fn time_zone(&self, _user: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn time_zone(&self, _user: &RoxUserIdStr<'static>) -> Option<String> {
         Some("America/New_York".to_owned())
     }
 }
@@ -18,7 +18,7 @@ impl UserTimeZones for NewYork {
 struct Unknown;
 
 impl UserTimeZones for Unknown {
-    async fn time_zone(&self, _user: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn time_zone(&self, _user: &RoxUserIdStr<'static>) -> Option<String> {
         None
     }
 }
@@ -51,7 +51,7 @@ async fn the_trigger_reaches_the_lexical_service_beside_the_people() {
         NewYork,
     )
     .with_clock(afternoon_in_new_york);
-    let owner = MacroUserIdStr::try_from_email("julia@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("julia@example.com").unwrap();
     let trigger = TriggerContext::TaskAssigned(TaskAssignedContext {
         task: TaskSnapshot {
             id: "task-1".to_owned(),

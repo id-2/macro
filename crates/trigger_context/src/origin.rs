@@ -8,7 +8,7 @@
 //! disagree. It describes a session; it grants nothing.
 
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ pub enum TriggerOrigin {
     /// A person wrote in their private conversation with the agent.
     Conversation {
         /// Who wrote.
-        by: MacroUserIdStr<'static>,
+        by: RoxUserIdStr<'static>,
         /// The message.
         message_id: Uuid,
     },
@@ -53,13 +53,13 @@ pub enum TriggerOrigin {
     /// A person opened the session directly: from the composer, or by asking for a routine draft.
     Requested {
         /// Who opened it.
-        by: MacroUserIdStr<'static>,
+        by: RoxUserIdStr<'static>,
     },
     /// A tool handed the agent work. The tool knows only whose authority it
     /// runs under, not which agent called it.
     Dispatched {
         /// The user whose authority the work runs under.
-        on_behalf_of: MacroUserIdStr<'static>,
+        on_behalf_of: RoxUserIdStr<'static>,
     },
     /// A routine fired. Its owner owns the session, so the owner is not repeated.
     Routine {
@@ -91,7 +91,7 @@ pub enum Caller {
     /// A person.
     Person {
         /// Who.
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     },
     /// An agent, which always acts for a person on a path that opens a session.
     Agent(AgentActor),
@@ -104,7 +104,7 @@ pub struct AgentActor {
     /// The agent.
     pub bot: BotId,
     /// The person it acts for.
-    pub on_behalf_of: MacroUserIdStr<'static>,
+    pub on_behalf_of: RoxUserIdStr<'static>,
     /// Where the agent's own work came from.
     pub lineage: Lineage,
 }
@@ -134,7 +134,7 @@ pub enum Root {
     /// A person.
     Person {
         /// Who.
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     },
     /// A routine.
     Routine {

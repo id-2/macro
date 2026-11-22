@@ -3,8 +3,8 @@
 //! with its sender's name.
 
 use email::domain::ports::EmailRepo;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use sqlx::PgPool;
 
@@ -30,7 +30,7 @@ where
 {
     async fn waiting(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> Result<Option<Waiting>, rootcause::Report> {
         match target.entity_type {
@@ -84,7 +84,7 @@ impl<R: EmailRepo> ItemReplyWaits<R> {
     /// The channel message the target names, unless the person sent it.
     async fn channel_waiting(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> Result<Option<Waiting>, sqlx::Error> {
         let (Some(message), Ok(channel)) = (
@@ -101,7 +101,7 @@ impl<R: EmailRepo> ItemReplyWaits<R> {
                       i.first_name AS "first_name?", i.last_name AS "last_name?"
                FROM comms_messages m
                LEFT JOIN "User" u ON u.id = m.sender_id
-               LEFT JOIN macro_user_info i ON i.macro_user_id = u.macro_user_id
+               LEFT JOIN rox_user_info i ON i.rox_user_id = u.rox_user_id
                WHERE m.id = $1 AND m.parent_entity_type = 'channel'
                  AND m.parent_entity_id = $2 AND m.deleted_at IS NULL"#,
             message,

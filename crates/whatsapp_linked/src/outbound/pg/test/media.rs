@@ -113,7 +113,7 @@ async fn content(pool: &PgPool, chat_id: Uuid) -> Vec<String> {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_inbound_photo_is_downloaded_once_and_becomes_a_static_file(pool: PgPool) {
     let (linked, session, _, binding, alice, bob) = adopted(&pool).await;
     let bytes = b"jpeg bytes".to_vec();
@@ -256,7 +256,7 @@ async fn an_inbound_photo_is_downloaded_once_and_becomes_a_static_file(pool: PgP
     assert_eq!(media.delete_released().await.unwrap(), 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_chats_owner_deletes_its_files(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let bytes = b"jpeg bytes".to_vec();
@@ -284,7 +284,7 @@ async fn deleting_a_chats_owner_deletes_its_files(pool: PgPool) {
     assert_eq!(*files.deleted.lock().unwrap(), vec![file_id]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_file_stored_after_its_message_was_deleted_is_deleted(pool: PgPool) {
     let (linked, session, _, _, alice, _) = adopted(&pool).await;
     let bytes = b"jpeg bytes".to_vec();
@@ -320,7 +320,7 @@ async fn a_file_stored_after_its_message_was_deleted_is_deleted(pool: PgPool) {
     assert_eq!(ready, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_uploaded_attachment_is_sent_once_and_becomes_the_messages_file(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let bytes = b"%PDF-1.7 quote".to_vec();
@@ -423,7 +423,7 @@ async fn an_uploaded_attachment_is_sent_once_and_becomes_the_messages_file(pool:
     assert_eq!(stored[0].owner, ALICE, "the uploader owns what they sent");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_passkey_assertion_is_forwarded_once(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -489,7 +489,7 @@ async fn a_passkey_assertion_is_forwarded_once(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enqueued_events_survive_until_ingested_and_health_reports_them(pool: PgPool) {
     let (_, session, _, binding, alice, _) = adopted(&pool).await;
     let event = text(1, CUSTOMER_JID, "3EB0Q1", "queued");
@@ -509,7 +509,7 @@ async fn enqueued_events_survive_until_ingested_and_health_reports_them(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_attachment_preserves_the_plain_caption(pool: PgPool) {
     let (_, session, _, binding, alice, _) = adopted(&pool).await;
     let mut event = photo(1, CUSTOMER_JID, "3EB0CAP", b"bytes");
@@ -526,7 +526,7 @@ async fn a_failed_attachment_preserves_the_plain_caption(pool: PgPool) {
     assert_eq!(content(&pool, binding.id).await, vec!["Look at this"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sent_image_keeps_the_size_read_from_its_file(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let mut png = Vec::new();

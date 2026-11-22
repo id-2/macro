@@ -8,8 +8,8 @@ use handler::handler;
 use anyhow::Context;
 use aws_lambda_events::sns::SnsEvent;
 use lambda_runtime::{Error, LambdaEvent, run, service_fn, tracing};
-use macro_entrypoint::MacroEntrypoint;
-use macro_env_var::env_vars;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env_var::env_vars;
 use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
 
@@ -19,7 +19,7 @@ env_vars! {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     tracing::trace!("initiating lambda");
 

@@ -518,15 +518,15 @@ describe('shared message API contracts', () => {
       hosts: { storage: host },
     });
     await team.channels.byId(channelId).send('Team bot');
-    expect(requests[1]?.headers.get('x-macro-bot-token')).toBe('mbot_team');
-    expect(requests[1]?.headers.get('x-macro-bot-scope')).toBe('team');
+    expect(requests[1]?.headers.get('x-rox-bot-token')).toBe('mbot_team');
+    expect(requests[1]?.headers.get('x-rox-bot-scope')).toBe('team');
     owner = { type: 'user', user_id: 'macro|owner@example.com' };
     const user = new Macro({
       auth: { type: 'bot', token: 'mbot_user' },
       hosts: { storage: host },
     });
     await user.channels.byId(channelId).send('User bot');
-    expect(requests[3]?.headers.get('x-macro-bot-scope')).toBe('user');
+    expect(requests[3]?.headers.get('x-rox-bot-scope')).toBe('user');
     await expect(
       user.channels.byId(channelId).message(rootId).reply('Reply'),
     ).rejects.toThrow('does not support threads');

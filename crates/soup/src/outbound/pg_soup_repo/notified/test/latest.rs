@@ -6,7 +6,7 @@ use chrono::Timelike;
         path = "../../../../../fixtures",
         scripts("notified_at", "notified_latest")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn timestamp_ties_deduplicate_without_merging_entity_types(
     pool: Pool<Postgres>,
@@ -33,7 +33,7 @@ async fn timestamp_ties_deduplicate_without_merging_entity_types(
         path = "../../../../../fixtures",
         scripts("notified_at", "notified_latest")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn cursor_does_not_resurrect_older_notifications(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let links = [Uuid::parse_str(LINK_1)?];
@@ -57,7 +57,7 @@ async fn cursor_does_not_resurrect_older_notifications(pool: Pool<Postgres>) -> 
         path = "../../../../../fixtures",
         scripts("notified_at", "notified_latest")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn state_filter_does_not_move_latest_timestamp(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let links = [Uuid::parse_str(LINK_1)?];

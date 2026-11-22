@@ -30,7 +30,7 @@ fn mime_contains_recipients_threading_bodies_and_attachments() {
             bcc: Some(vec![contact("bcc@example.com", "Bcc Recipient")]),
             body_text: Some("Plain body".to_string()),
             body_html: Some("<strong>HTML body</strong>".to_string()),
-            body_macro: None,
+            body_rox: None,
             attachments: Some(vec![AttachmentToSend {
                 content_id: None,
                 is_inline: false,
@@ -100,7 +100,7 @@ fn message(attachments: Vec<AttachmentToSend>) -> SendRequest {
             bcc: None,
             body_text: Some("Plain body".to_string()),
             body_html: Some("<div>HTML body</div>".to_string()),
-            body_macro: None,
+            body_rox: None,
             attachments: Some(attachments),
             headers_json: None,
             send_time: None,

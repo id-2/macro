@@ -4467,7 +4467,7 @@
             "description": "Where the agent's own work came from."
           },
           "on_behalf_of": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "The person it acts for."
           }
         }
@@ -5563,7 +5563,7 @@
                 "enum": ["person"]
               },
               "user": {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "Who."
               }
             }
@@ -5858,7 +5858,7 @@
       "ClaudeMode": {
         "type": "string",
         "description": "How Claude Code on a Rox computer is paid for: its own Claude account\nwhen it has an active Claude login, otherwise Rox credits.",
-        "enum": ["macro_credits", "own_account"]
+        "enum": ["rox_credits", "own_account"]
       },
       "ClaudeModeResponse": {
         "type": "object",
@@ -7273,7 +7273,7 @@
           }
         }
       },
-      "MacroUserIdStr": {
+      "RoxUserIdStr": {
         "type": "string"
       },
       "MessageParent": {
@@ -8069,7 +8069,7 @@
                 "enum": ["person"]
               },
               "user": {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "Who."
               }
             }
@@ -8656,7 +8656,7 @@
             "required": ["by", "message_id", "origin"],
             "properties": {
               "by": {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "Who wrote."
               },
               "message_id": {
@@ -8719,7 +8719,7 @@
             "required": ["by", "origin"],
             "properties": {
               "by": {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "Who opened it."
               },
               "origin": {
@@ -8734,7 +8734,7 @@
             "required": ["on_behalf_of", "origin"],
             "properties": {
               "on_behalf_of": {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The user whose authority the work runs under."
               },
               "origin": {

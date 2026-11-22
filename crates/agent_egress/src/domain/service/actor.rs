@@ -8,7 +8,7 @@ use crate::domain::model::{
 };
 use agent_session::domain::model::TurnPrompter;
 use ai_toolset::actor::{ToolActor, add_actor_schema};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 
 /// Preserve the original MCP session/callback capabilities for owner calls.
@@ -49,10 +49,10 @@ where
         let public = matches!(destination, McpDestination::Macro)
             && !listing
             && !spends_owner_access(
-                MACRO_SERVER_SLUG,
+                ROX_SERVER_SLUG,
                 request["params"]["name"].as_str().unwrap_or_default(),
             );
-        let macro_tools = matches!(destination, McpDestination::Macro);
+        let rox_tools = matches!(destination, McpDestination::Macro);
         let (actor, user) = if listing || public {
             // Keep the session owner's configured catalog. Selecting requester
             // changes execution credentials, not which integrations are advertised.
@@ -102,7 +102,7 @@ where
             upstream,
             request,
             listing,
-            macro_tools,
+            rox_tools,
         )
         .await
     }
@@ -112,7 +112,7 @@ where
     async fn resolve_upstream(
         &self,
         grant: &SessionGrant,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         destination: &McpDestination,
         listing: bool,
     ) -> Result<Result<UpstreamCall, String>, EgressError> {
@@ -165,7 +165,7 @@ where
     async fn exchange_as(
         &self,
         grant: &SessionGrant,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         destination: &McpDestination,
         request: Value,
     ) -> Result<Value, EgressError> {
@@ -225,7 +225,7 @@ where
     async fn hold_owner_call(
         &self,
         grant: &SessionGrant,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         destination: &McpDestination,
         request: &Value,
     ) -> Result<Option<String>, EgressError> {
@@ -278,11 +278,11 @@ const UNKNOWN_OUTCOME: &str = "The selected account's tool could not complete. I
 async fn exchange_result(
     transport: &dyn crate::domain::ports::ActorMcpTransport,
     session: crate::domain::model::AgentSessionId,
-    actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+    actor: rox_user_id::user_id::RoxUserIdStr<'static>,
     upstream: UpstreamCall,
     request: Value,
     listing: bool,
-    macro_tools: bool,
+    rox_tools: bool,
 ) -> Result<ProxyResponse, EgressError> {
     let id = request["id"].clone();
     let mut result = match transport.exchange(session, actor, upstream, request).await {
@@ -300,9 +300,9 @@ async fn exchange_result(
                 .is_some_and(|properties| properties.contains_key(ai_toolset::actor::ACTING_AS))
         });
         for tool in tools {
-            if macro_tools
+            if rox_tools
                 && !spends_owner_access(
-                    MACRO_SERVER_SLUG,
+                    ROX_SERVER_SLUG,
                     tool["name"].as_str().unwrap_or_default(),
                 )
             {

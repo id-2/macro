@@ -71,7 +71,7 @@ impl<S: Storage> Engine<S> {
         {
             return Err(PeopleError::InvalidInput.into());
         }
-        let viewer = MacroUserIdStr::parse_from_str(&request.viewer)
+        let viewer = RoxUserIdStr::parse_from_str(&request.viewer)
             .map_err(|_| PeopleError::InvalidInput)?;
         let requested: BTreeSet<_> = request.requested.iter().map(|id| id.as_ref()).collect();
         let present: BTreeSet<_> = request.present.iter().map(|id| id.as_ref()).collect();

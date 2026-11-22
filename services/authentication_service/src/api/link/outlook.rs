@@ -5,9 +5,9 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
-use macro_middleware::tracking::ClientIp;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
+use rox_middleware::tracking::ClientIp;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::response::ErrorResponse;
 use serde_utils::urlencode::UrlEncoded;
 use url::Url;
@@ -116,7 +116,7 @@ pub async fn init_outlook_link_handler(
         reconnect_link_id,
     }): Query<InitOutlookLinkQueryParams>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<InitOutlookLinkResponse>, InitOutlookLinkError> {
     let service = ctx
         .microsoft_auth
@@ -135,7 +135,7 @@ pub async fn init_outlook_link_handler(
     start_outlook_link(
         service.as_ref(),
         owner,
-        &authorization.authorization.user.macro_user_id,
+        &authorization.authorization.user.rox_user_id,
         format_redirect_uri("microsoft"),
         original_url.map(String::from),
         ctx.calendar_scope_enabled && matches!(scopes, OutlookConsentScopes::MailAndCalendar),
@@ -150,7 +150,7 @@ pub async fn init_outlook_link_handler(
 async fn start_outlook_link(
     service: &dyn MicrosoftAuth,
     owner: uuid::Uuid,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     redirect_uri: String,
     original_url: Option<String>,
     calendar_requested: bool,
@@ -220,7 +220,7 @@ pub async fn email_connection_providers(
     Query(EmailConnectionProvidersQueryParams { original_url }): Query<
         EmailConnectionProvidersQueryParams,
     >,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<EmailConnectionProviders>, InitOutlookLinkError> {
     if original_url
         .as_ref()
@@ -231,7 +231,7 @@ pub async fn email_connection_providers(
     Ok(Json(
         connection_providers(
             ctx.microsoft_auth.as_deref(),
-            &authorization.authorization.user.macro_user_id,
+            &authorization.authorization.user.rox_user_id,
             original_url,
             ctx.calendar_scope_enabled,
         )
@@ -241,7 +241,7 @@ pub async fn email_connection_providers(
 
 async fn connection_providers(
     microsoft_auth: Option<&dyn MicrosoftAuth>,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     original_url: Option<Url>,
     calendar_scope_enabled: bool,
 ) -> EmailConnectionProviders {

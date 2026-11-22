@@ -1,20 +1,20 @@
 use std::pin::Pin;
 use std::sync::Mutex;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 
 #[derive(Default)]
 struct Service {
-    list_callers: Mutex<Vec<MacroUserIdStr<'static>>>,
+    list_callers: Mutex<Vec<RoxUserIdStr<'static>>>,
     dispatched: Mutex<Vec<DispatchCodingAgentRequest>>,
 }
 
 impl CodingAgentService for Service {
     fn list_updates(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<
         Box<
             dyn Future<Output = Result<crate::domain::updates::AgentUpdates, CodingAgentError>>
@@ -41,7 +41,7 @@ impl CodingAgentService for Service {
 
     fn list(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<CodingAgent>, CodingAgentError>> + Send + '_>> {
         Box::pin(async move {
             self.list_callers.lock().unwrap().push(user_id);
@@ -56,7 +56,7 @@ impl CodingAgentService for Service {
     {
         Box::pin(async move {
             let response = DispatchedCodingAgent {
-                agent_session_id: macro_uuid::generate_uuid_v7(),
+                agent_session_id: rox_uuid::generate_uuid_v7(),
                 agent_id: command.agent_id,
                 agent_name: "Coder".into(),
             };
@@ -73,7 +73,7 @@ async fn tools_always_use_the_authenticated_request_identity() {
         service: service.clone(),
         sessions: service.clone(),
     });
-    let caller = MacroUserIdStr::try_from("macro|requester@example.com".to_owned()).unwrap();
+    let caller = RoxUserIdStr::try_from("macro|requester@example.com".to_owned()).unwrap();
     let request = RequestContext::new(caller.clone());
     let listed = ListCodingAgents {}
         .call(context.clone(), request.clone())
@@ -93,7 +93,7 @@ async fn tools_always_use_the_authenticated_request_identity() {
     );
 
     let tool = DispatchCodingAgent {
-        agent_id: macro_uuid::generate_uuid_v7(),
+        agent_id: rox_uuid::generate_uuid_v7(),
         prompt: "Implement repository issue 123".into(),
     };
     let response = tool.call(context, request).await.unwrap();
@@ -121,7 +121,7 @@ fn tools_reject_an_ai_supplied_user_identity() {
     );
     assert!(
         serde_json::from_value::<DispatchCodingAgent>(serde_json::json!({
-            "agent_id": macro_uuid::generate_uuid_v7(),
+            "agent_id": rox_uuid::generate_uuid_v7(),
             "prompt": "Fix the bug",
             "user_id": "macro|another@example.com"
         }))
@@ -132,7 +132,7 @@ fn tools_reject_an_ai_supplied_user_identity() {
 impl crate::domain::tool_actions::SessionActions for Service {
     fn execute(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _id: Uuid,
         _action: crate::domain::tool_actions::SessionAction,
     ) -> Pin<

@@ -82,7 +82,7 @@ async fn insert_member(pool: &PgPool, team: Uuid, user: &str) -> anyhow::Result<
     .execute(pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         user,
         macro_user
     )
@@ -102,7 +102,7 @@ fn at(month: u32) -> DateTime<Utc> {
     format!("2025-{month:02}-01T00:00:00Z").parse().unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_based_scan_applies_every_privacy_rule_like_thread_allowed(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -233,7 +233,7 @@ async fn set_based_scan_applies_every_privacy_rule_like_thread_allowed(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_based_domain_matching_agrees_with_domain_blocked_on_edge_cases(
     pool: PgPool,
 ) -> anyhow::Result<()> {

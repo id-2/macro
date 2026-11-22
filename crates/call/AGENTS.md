@@ -83,7 +83,7 @@ in-call chat.
 - Bot RTC identities use `bot|<uuid>`. Webhooks never write bot attendance or
   participant events; an archived call's recreated room evicts the bot.
 - `enable-programmatic-calls` fails closed for explicit start and leave. For
-  `POST /call/record/{call_id}/join`, only `MacroUserAuthentication::is_human_session()`
+  `POST /call/record/{call_id}/join`, only `RoxUserAuthentication::is_human_session()`
   bypasses the flag; API credentials and agent-attributed sessions remain gated.
   The handler still refuses code-execution tokens, and the domain service still
   checks live-call admission and returns Gone for ended calls. Meeting join
@@ -95,7 +95,7 @@ in-call chat.
   `POST /call/record/{call_id}/join`; the latter never creates a call.
 - A view grant alone does not admit a user to a live call. Channel membership,
   standalone ownership, attendance, or an explicit invite is required.
-- Every token-producing HTTP route refuses `x-macro-code-execution` because
+- Every token-producing HTTP route refuses `x-rox-code-execution` because
   tokens can outlive a code execution and cannot be revoked.
 - `edit_call_record_handler` refuses share permission and team sharing
   changes from a scoped agent session

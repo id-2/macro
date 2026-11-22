@@ -3,7 +3,7 @@
 use std::{collections::BTreeMap, future::Future, pin::Pin, sync::Arc, time::Duration};
 
 use cognition::domain::{Cognition, DecisionRequest};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Instrument as _;
 
 use super::models::resolve;
@@ -40,7 +40,7 @@ pub trait AutoModelSelector: Send + Sync {
     /// keeps the turn on Auto's default model.
     fn select<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         prompt: &'a str,
     ) -> Pin<Box<dyn Future<Output = &'static str> + Send + 'a>>;
 }
@@ -51,7 +51,7 @@ pub struct DefaultAutoModel;
 impl AutoModelSelector for DefaultAutoModel {
     fn select<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'static>,
+        _: &'a RoxUserIdStr<'static>,
         _: &'a str,
     ) -> Pin<Box<dyn Future<Output = &'static str> + Send + 'a>> {
         Box::pin(async { resolve(super::models::AUTO_MODEL) })
@@ -75,7 +75,7 @@ impl JevAutoModel {
 impl AutoModelSelector for JevAutoModel {
     fn select<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         prompt: &'a str,
     ) -> Pin<Box<dyn Future<Output = &'static str> + Send + 'a>> {
         Box::pin(async move {

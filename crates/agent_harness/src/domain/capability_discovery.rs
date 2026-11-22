@@ -6,7 +6,7 @@ use std::time::Duration;
 use agent_client_protocol::schema::v1::SessionConfigOption as AcpSessionConfigOption;
 use agent_fold::domain::session_config::{SessionConfigOption, session_config_options};
 use harness_id::HarnessId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -110,7 +110,7 @@ pub trait HarnessCapabilityAccess: Send + Sync + 'static {
     /// Whether `caller` may use and see `harness`.
     fn can_use(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         harness: HarnessId,
     ) -> impl Future<Output = Result<bool, String>> + Send;
 }
@@ -133,7 +133,7 @@ pub trait AgentCapabilitiesService: Send + Sync + 'static {
     /// Discover one target's session settings without creating a persisted session.
     fn load(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         request: DiscoverAgentCapabilities,
     ) -> impl Future<Output = Result<AgentCapabilities, DiscoverAgentCapabilitiesError>> + Send;
 }
@@ -172,13 +172,13 @@ impl<Access, InMemory, Cursor, Roxd> AgentCapabilitiesService
     for AgentCapabilitiesServiceImpl<Access, InMemory, Cursor, Roxd>
 where
     Access: HarnessCapabilityAccess,
-    InMemory: CapabilityProbe<Target = MacroUserIdStr<'static>>,
-    Cursor: CapabilityProbe<Target = MacroUserIdStr<'static>>,
+    InMemory: CapabilityProbe<Target = RoxUserIdStr<'static>>,
+    Cursor: CapabilityProbe<Target = RoxUserIdStr<'static>>,
     Roxd: CapabilityProbe<Target = HarnessId>,
 {
     async fn load(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         request: DiscoverAgentCapabilities,
     ) -> Result<AgentCapabilities, DiscoverAgentCapabilitiesError> {
         match (request.harness, request.harness_id) {
@@ -245,7 +245,7 @@ impl<Access, InMemory, Cursor, Roxd>
 impl<T: super::model_load::HarnessModelAccess> HarnessCapabilityAccess for T {
     async fn can_use(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         harness: HarnessId,
     ) -> Result<bool, String> {
         super::model_load::HarnessModelAccess::reach(self, caller, harness)

@@ -4,8 +4,8 @@ use entity_access::domain::models::EntityType as AccessEntityType;
 use entity_access::domain::models::{
     Entity, EntityAccessReceipt, EntityPermission, EntityType, MemberTeamRole, TeamRole,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use properties::domain::model::TaskAssignedNotification;
 use properties::domain::model::{EditReceipt, ViewReceipt};
 use properties::{NotificationService, PermissionService, PropertiesPgRepo, PropertiesServiceImpl};
@@ -23,7 +23,7 @@ impl PermissionService for NoPermissions {
 
     async fn mint_view_receipt<'a>(
         &self,
-        _user_id: Option<&'a MacroUserIdStr<'a>>,
+        _user_id: Option<&'a RoxUserIdStr<'a>>,
         _entity_id: &str,
         _entity_type: AccessEntityType,
     ) -> Result<ViewReceipt, Self::Err> {
@@ -32,7 +32,7 @@ impl PermissionService for NoPermissions {
 
     async fn mint_edit_receipt<'a>(
         &self,
-        _user_id: &MacroUserIdStr<'a>,
+        _user_id: &RoxUserIdStr<'a>,
         _entity_id: &str,
         _entity_type: AccessEntityType,
     ) -> Result<EditReceipt, Self::Err> {
@@ -41,7 +41,7 @@ impl PermissionService for NoPermissions {
 
     async fn grant_permissions_to_task<'a>(
         &self,
-        _user_ids: &[MacroUserIdStr<'a>],
+        _user_ids: &[RoxUserIdStr<'a>],
         _task_id: &str,
     ) -> Result<(), Self::Err> {
         unimplemented!("stage definitions never grant task permissions")
@@ -76,7 +76,7 @@ fn store(pool: &PgPool) -> Store {
 async fn team_receipt(pool: &PgPool, email: &str) -> CrmTeamReceipt<MemberTeamRole> {
     let team_id = Uuid::now_v7();
     seed_team(pool, team_id, email).await.expect("seed team");
-    let user = MacroUserIdStr::parse_from_str(email).unwrap().into_owned();
+    let user = RoxUserIdStr::parse_from_str(email).unwrap().into_owned();
     CrmTeamReceipt::from_team_receipt(
         EntityAccessReceipt::<MemberTeamRole>::try_new_authenticated_user(
             user,
@@ -104,7 +104,7 @@ fn owned(labels: &[&str]) -> Vec<String> {
     labels.iter().map(|label| (*label).to_string()).collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_without_definition_has_no_stage_set(pool: PgPool) {
     let access = team_receipt(&pool, "macro|owner@test.com").await;
     assert_eq!(
@@ -113,7 +113,7 @@ async fn team_without_definition_has_no_stage_set(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_seeds_options_in_order_and_reads_back(pool: PgPool) {
     let access = team_receipt(&pool, "macro|owner@test.com").await;
     let store = store(&pool);
@@ -136,7 +136,7 @@ async fn create_seeds_options_in_order_and_reads_back(pool: PgPool) {
     assert_eq!(read, Some(created));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replace_applies_delete_rewrite_and_insert_together(pool: PgPool) {
     let access = team_receipt(&pool, "macro|owner@test.com").await;
     let store = store(&pool);
@@ -181,7 +181,7 @@ async fn replace_applies_delete_rewrite_and_insert_together(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_stages_can_trade_labels(pool: PgPool) {
     let access = team_receipt(&pool, "macro|owner@test.com").await;
     let store = store(&pool);
@@ -216,7 +216,7 @@ async fn two_stages_can_trade_labels(pool: PgPool) {
     assert_eq!(replaced.stages[0].id, lead);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn duplicate_label_rolls_back_the_whole_plan(pool: PgPool) {
     let access = team_receipt(&pool, "macro|owner@test.com").await;
     let store = store(&pool);
@@ -246,7 +246,7 @@ async fn duplicate_label_rolls_back_the_whole_plan(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn duplicate_label_is_a_client_error(pool: PgPool) {
     let access = team_receipt(&pool, "macro|owner@test.com").await;
     let store = store(&pool);
@@ -271,7 +271,7 @@ async fn duplicate_label_is_a_client_error(pool: PgPool) {
     assert!(matches!(err, CrmError::InvalidRequest(_)), "{err:?}");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_set_returns_team_to_defaults(pool: PgPool) {
     let access = team_receipt(&pool, "macro|owner@test.com").await;
     let store = store(&pool);
@@ -286,7 +286,7 @@ async fn delete_set_returns_team_to_defaults(pool: PgPool) {
     assert_eq!(store.get_team_stage_set(&access).await.unwrap(), None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_team_cannot_see_or_touch_the_set(pool: PgPool) {
     let owner = team_receipt(&pool, "macro|owner@test.com").await;
     let stranger = team_receipt(&pool, "macro|stranger@test.com").await;
@@ -325,7 +325,7 @@ async fn another_team_cannot_see_or_touch_the_set(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn internal_receipt_cannot_write(pool: PgPool) {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com")

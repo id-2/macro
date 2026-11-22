@@ -3,11 +3,11 @@ use crate::domain::companies_repo::*;
 use crate::domain::model::CrmError;
 use crate::outbound::companies_repo::*;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_lookup_requires_an_unambiguous_visible_contact(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -67,7 +67,7 @@ async fn email_lookup_requires_an_unambiguous_visible_contact(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_contact_by_email_returns_team_contact_case_insensitively(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -91,7 +91,7 @@ async fn get_contact_by_email_returns_team_contact_case_insensitively(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_contact_by_email_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -111,7 +111,7 @@ async fn get_contact_by_email_does_not_leak_across_teams(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_contact_by_email_applies_hidden_contact_visibility(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -143,7 +143,7 @@ async fn get_contact_by_email_applies_hidden_contact_visibility(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_contact_by_email_applies_hidden_company_visibility(
     pool: PgPool,
 ) -> anyhow::Result<()> {

@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 fn link() -> Uuid {
     Uuid::parse_str("00000000-0000-0000-0000-000000000f01").unwrap()
@@ -40,7 +40,7 @@ fn missing_uploaded_bytes_require_review_but_transient_storage_errors_remain_ret
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../../crates/email_db_client/fixtures",
         scripts("forwarded_attachments")
@@ -59,7 +59,7 @@ async fn source_deletion_before_preparation_rejects_incomplete_payload(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../../crates/email_db_client/fixtures",
         scripts("forwarded_attachments")
@@ -83,7 +83,7 @@ async fn source_deletion_after_snapshot_cannot_shrink_the_payload(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../../crates/email_db_client/fixtures",
         scripts("forwarded_attachments")

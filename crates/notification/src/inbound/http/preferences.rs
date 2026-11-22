@@ -6,9 +6,9 @@ use axum::{
     http::{HeaderMap, StatusCode, header, uri::PathAndQuery},
     response::Html,
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
-use macro_service_urls::NotificationServiceUrl;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
+use rox_service_urls::NotificationServiceUrl;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -47,15 +47,15 @@ pub struct GetNotificationTypePreferencesResponse {
 )]
 pub async fn get_notification_type_preferences<
     S: NotificationReader,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<GetNotificationTypePreferencesResponse>, (StatusCode, Json<ErrorResponse<'static>>)>
 {
     let disabled = state
         .inner
-        .get_disabled_notification_types(user.authorization.user.macro_user_id)
+        .get_disabled_notification_types(user.authorization.user.rox_user_id)
         .await
         .map_err(|e| {
             tracing::error!(error=?e, "failed to get notification type preferences");
@@ -90,16 +90,16 @@ pub async fn get_notification_type_preferences<
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn disable_notification_type<S: NotificationReader, Auth: MacroAuthorizationService>(
+pub async fn disable_notification_type<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(state): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(NotificationEventTypePath {
         notification_event_type,
     }): Path<NotificationEventTypePath>,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
     disable_notification_type_inner(
         &state,
-        user.authorization.user.macro_user_id,
+        user.authorization.user.rox_user_id,
         notification_event_type.as_str(),
     )
     .await
@@ -109,14 +109,14 @@ pub async fn disable_notification_type<S: NotificationReader, Auth: MacroAuthori
 /// The query param value to extract the macro user id
 #[derive(Deserialize)]
 pub struct PresignedQueryParams {
-    id: MacroUserIdStr<'static>,
+    id: RoxUserIdStr<'static>,
 }
 
 /// Disable a notification type for the authenticated user via a GET request with a presigned url.
 /// This guarantees the signed url was produced in a trusted environment
 pub async fn presigned_disable_notification_type<
     S: NotificationReader,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<NotificationRouterState<S, Auth>>,
     Path(NotificationEventTypePath {
@@ -173,9 +173,9 @@ pub async fn presigned_disable_notification_type<
 }
 
 /// internal implementation of the GET/PUT methods to DRY up the code
-async fn disable_notification_type_inner<S: NotificationReader, Auth: MacroAuthorizationService>(
+async fn disable_notification_type_inner<S: NotificationReader, Auth: RoxAuthorizationService>(
     state: &NotificationRouterState<S, Auth>,
-    calling_user: MacroUserIdStr<'_>,
+    calling_user: RoxUserIdStr<'_>,
     notification_event_type: &str,
 ) -> Result<(), (StatusCode, Json<ErrorResponse<'static>>)> {
     // make sure the notification to block is one that matches the list
@@ -226,9 +226,9 @@ async fn disable_notification_type_inner<S: NotificationReader, Auth: MacroAutho
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn enable_notification_type<S: NotificationReader, Auth: MacroAuthorizationService>(
+pub async fn enable_notification_type<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(state): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(NotificationEventTypePath {
         notification_event_type,
     }): Path<NotificationEventTypePath>,
@@ -236,7 +236,7 @@ pub async fn enable_notification_type<S: NotificationReader, Auth: MacroAuthoriz
     state
         .inner
         .enable_notification_type(
-            user.authorization.user.macro_user_id,
+            user.authorization.user.rox_user_id,
             &notification_event_type,
         )
         .await

@@ -572,8 +572,8 @@ pub struct Props {
     /// Being published from a library, or coming from one.
     pub library: Option<Arc<LibraryLink>>,
     /// Rox's own data on the node (`pluginData` under
-    /// [`library::MACRO_PLUGIN`]): key and value.
-    pub macro_data: Option<library::RoxData>,
+    /// [`library::ROX_PLUGIN`]): key and value.
+    pub rox_data: Option<library::RoxData>,
     /// On an instance's override or derived layout entry: made by the
     /// editor (and written when saving); the file's own are kept as they
     /// are.
@@ -608,7 +608,7 @@ impl Props {
             text_style_id, key, style_type, sort_position, soft_deleted, variant_specs,
             variant_orders, props_bubbled, variable, variable_modes, mode_by_set,
             layout_grids, guides,
-            interactions, flow_start, overlay, prototype_start, library, macro_data,
+            interactions, flow_start, overlay, prototype_start, library, rox_data,
         );
     }
 
@@ -708,9 +708,9 @@ impl Props {
         self.library.as_ref()?.source.as_deref()
     }
 
-    /// One of Rox's values on the node (see [`Props::macro_data`]).
-    pub fn macro_value(&self, key: &str) -> Option<&str> {
-        self.macro_data
+    /// One of Rox's values on the node (see [`Props::rox_data`]).
+    pub fn rox_value(&self, key: &str) -> Option<&str> {
+        self.rox_data
             .as_deref()?
             .iter()
             .find(|(k, _)| k.as_ref() == key)

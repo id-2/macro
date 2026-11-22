@@ -6,7 +6,7 @@
 use chrono::{DateTime, Utc};
 use computer_id::ComputerId;
 use harness_id::HarnessId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 pub use harnessd_protocol::AgentProvider;
@@ -39,8 +39,8 @@ pub struct HarnessAccountLogin {
     pub harness_id: HarnessId,
     /// The account.
     pub account: ProviderAccount,
-    /// Who signed it in through Macro; `None` once that user is deleted.
-    pub signed_in_by: Option<MacroUserIdStr<'static>>,
+    /// Who signed it in through Rox; `None` once that user is deleted.
+    pub signed_in_by: Option<RoxUserIdStr<'static>>,
     /// When the sign-in was recorded.
     pub signed_in_at: DateTime<Utc>,
     /// When the sign-in stops refreshing, as the machine last reported it.
@@ -64,7 +64,7 @@ pub enum AccountLoginChange {
         expires_at: Option<DateTime<Utc>>,
         /// The person whose request completed the sign-in; `None` when the
         /// machine reported a sign-in nobody made through Rox.
-        signed_in_by: Option<MacroUserIdStr<'static>>,
+        signed_in_by: Option<RoxUserIdStr<'static>>,
     },
     /// The provider's active login on the machine was signed out.
     SignedOut {

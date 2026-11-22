@@ -1,6 +1,6 @@
 use super::*;
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 const LINK: &str = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
@@ -25,7 +25,7 @@ async fn stored_receipt(pool: &PgPool, message: &str) -> (i32, Option<DateTime<U
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_message"))
 )]
 async fn tracking_follows_the_inbox_setting(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -51,7 +51,7 @@ async fn tracking_follows_the_inbox_setting(pool: Pool<Postgres>) -> Result<(), 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_message"))
 )]
 async fn a_message_keeps_its_first_token(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -67,7 +67,7 @@ async fn a_message_keeps_its_first_token(pool: Pool<Postgres>) -> Result<(), Rep
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_message"))
 )]
 async fn opens_count_only_for_sent_messages_outside_the_debounce(
@@ -107,7 +107,7 @@ async fn opens_count_only_for_sent_messages_outside_the_debounce(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_message"))
 )]
 async fn thread_receipts_list_sent_messages_of_the_given_inboxes(
@@ -138,7 +138,7 @@ async fn thread_receipts_list_sent_messages_of_the_given_inboxes(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_message"))
 )]
 async fn accessible_inboxes_include_the_owners_link(pool: Pool<Postgres>) -> Result<(), Report> {
@@ -147,6 +147,6 @@ async fn accessible_inboxes_include_the_owners_link(pool: Pool<Postgres>) -> Res
         .await
         .into_rootcause()?
         .expect("fixture link exists");
-    assert_eq!(repo.accessible_inboxes(&link.macro_id).await?, [id(LINK)]);
+    assert_eq!(repo.accessible_inboxes(&link.rox_id).await?, [id(LINK)]);
     Ok(())
 }

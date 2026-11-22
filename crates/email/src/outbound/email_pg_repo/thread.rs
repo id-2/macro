@@ -63,7 +63,7 @@ pub(super) async fn thread_metadata_by_ids(
 #[tracing::instrument(err, skip(pool, thread_ids))]
 pub(super) async fn thread_mail_projections_by_ids(
     pool: &PgPool,
-    viewer: macro_user_id::user_id::MacroUserIdStr<'_>,
+    viewer: rox_user_id::user_id::RoxUserIdStr<'_>,
     thread_ids: &[Uuid],
 ) -> Result<Vec<EmailThreadMailProjection>, sqlx::Error> {
     if thread_ids.is_empty() {
@@ -90,9 +90,9 @@ pub(super) async fn thread_mail_projections_by_ids(
         r#"
         WITH message_facts AS (
             SELECT m.id, m.thread_id, m.is_draft, m.is_read,
-                draft.macro_draft,
+                draft.rox_draft,
                 ((facts.in_inbox AND NOT facts.in_sent)
-                    OR (draft.macro_draft AND thread.has_received_mail)) AS inbox_visible,
+                    OR (draft.rox_draft AND thread.has_received_mail)) AS inbox_visible,
                 NOT facts.in_trash
                 AND LOWER(SPLIT_PART(c.email_address, '@', 2)) IS DISTINCT FROM $3
                 AND (
@@ -111,11 +111,11 @@ pub(super) async fn thread_mail_projections_by_ids(
                             SELECT 1 FROM email_message_recipients r
                             WHERE r.message_id = m.id AND r.contact_id = m.from_contact_id
                         )) THEN m.internal_date_ts END,
-                    CASE WHEN draft.macro_draft AND thread.has_received_mail THEN m.updated_at END
+                    CASE WHEN draft.rox_draft AND thread.has_received_mail THEN m.updated_at END
                 ) AS inbound_ts,
                 GREATEST(
                     CASE WHEN NOT (facts.in_junk OR facts.in_trash) THEN COALESCE(m.internal_date_ts, CASE WHEN m.is_draft THEN m.created_at END) END,
-                    CASE WHEN draft.macro_draft AND NOT (facts.in_junk OR facts.in_trash) THEN m.updated_at END
+                    CASE WHEN draft.rox_draft AND NOT (facts.in_junk OR facts.in_trash) THEN m.updated_at END
                 ) AS all_ts,
                 CASE WHEN m.is_sent AND NOT facts.in_trash THEN m.internal_date_ts END AS sent_ts,
                 CASE WHEN NOT facts.in_trash AND (m.is_draft OR NOT facts.in_junk) THEN COALESCE(m.internal_date_ts, m.created_at) END AS preview_ts,
@@ -130,7 +130,7 @@ pub(super) async fn thread_mail_projections_by_ids(
             CROSS JOIN LATERAL (
                 SELECT m.is_draft AND (m.provider_id IS NULL OR EXISTS (
                     SELECT 1 FROM email_mailbox_drafts d WHERE d.message_id = m.id AND NOT d.delete_requested
-                )) AS macro_draft
+                )) AS rox_draft
             ) draft
             CROSS JOIN LATERAL (
                 SELECT COALESCE(bool_or(f.is_important) FILTER (WHERE LOWER(f.email_address) = LOWER(c.email_address)), false) AS address_true,
@@ -155,7 +155,7 @@ pub(super) async fn thread_mail_projections_by_ids(
                     'preview_ts', max(preview_ts) FILTER (WHERE NOT is_draft)
                 ),
                 'drafts', COALESCE(jsonb_agg(jsonb_build_object(
-                    'id', id, 'macro_draft', macro_draft, 'facts', jsonb_build_object(
+                    'id', id, 'rox_draft', rox_draft, 'facts', jsonb_build_object(
                         'message_count', 1, 'inbox_visible', inbox_visible, 'is_read', is_read,
                         'is_signal', is_signal, 'has_calendar_attachment', has_calendar_attachment,
                         'latest_inbound_message_ts', inbound_ts, 'latest_non_spam_message_ts', all_ts,
@@ -205,7 +205,7 @@ pub(super) async fn thread_mail_projections_by_ids(
         LEFT JOIN email_contacts sc ON sc.id = sm.from_contact_id
         WHERE t.id = ANY($1)
         "#,
-        thread_ids, viewer.as_ref(), email_utils::MACRO_NOTIFICATION_SENDER_DOMAIN,
+        thread_ids, viewer.as_ref(), email_utils::ROX_NOTIFICATION_SENDER_DOMAIN,
     ).fetch_all(pool).await?;
     Ok(rows
         .into_iter()
@@ -241,7 +241,7 @@ pub(super) async fn messages_by_thread_id_paginated(
             draft_generation, id, provider_id, thread_id, provider_thread_id, replying_to_id,
             global_id, link_id, provider_history_id, internal_date_ts, snippet,
             size_estimate, subject, sent_at, has_attachments, is_read, is_starred,
-            is_sent, is_draft, body_text, body_html_sanitized, body_macro,
+            is_sent, is_draft, body_text, body_html_sanitized, body_rox,
             headers_jsonb, created_at, updated_at
         FROM email_messages
         WHERE thread_id = $1
@@ -279,7 +279,7 @@ pub(super) async fn latest_content_message_rows(
             message.subject, message.sent_at, message.has_attachments,
             message.is_read, message.is_starred, message.is_sent,
             message.is_draft, message.body_text, message.body_html_sanitized,
-            message.body_macro, message.headers_jsonb, message.created_at,
+            message.body_rox, message.headers_jsonb, message.created_at,
             message.updated_at
         FROM UNNEST($1::uuid[]) AS requested(thread_id)
         CROSS JOIN LATERAL (
@@ -288,7 +288,7 @@ pub(super) async fn latest_content_message_rows(
                 global_id, link_id, provider_history_id, internal_date_ts,
                 snippet, size_estimate, subject, sent_at, has_attachments,
                 is_read, is_starred, is_sent, is_draft, body_text,
-                body_html_sanitized, body_macro, headers_jsonb, created_at,
+                body_html_sanitized, body_rox, headers_jsonb, created_at,
                 updated_at
             FROM email_messages
             WHERE thread_id = requested.thread_id
@@ -323,7 +323,7 @@ pub(super) async fn cross_inbox_reply_drafts(
             draft_generation, id, provider_id, thread_id, provider_thread_id, replying_to_id,
             global_id, link_id, provider_history_id, internal_date_ts, snippet,
             size_estimate, subject, sent_at, has_attachments, is_read, is_starred,
-            is_sent, is_draft, body_text, body_html_sanitized, body_macro,
+            is_sent, is_draft, body_text, body_html_sanitized, body_rox,
             headers_jsonb, created_at, updated_at
         FROM email_messages
         WHERE is_draft = true

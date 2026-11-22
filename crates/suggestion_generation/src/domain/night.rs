@@ -4,7 +4,7 @@
 
 use chrono::{DateTime, NaiveDate, NaiveTime, TimeDelta, TimeZone, Timelike, Utc};
 use chrono_tz::Tz;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -21,7 +21,7 @@ pub fn in_night(timezone: Tz, at: DateTime<Utc>) -> bool {
 /// When a person just seen at `now` is next due: their time tonight if it
 /// is still ahead, now if tonight's time passed but the night hasn't, else
 /// their time the next night.
-pub fn upcoming(user: &MacroUserIdStr<'_>, timezone: Tz, now: DateTime<Utc>) -> DateTime<Utc> {
+pub fn upcoming(user: &RoxUserIdStr<'_>, timezone: Tz, now: DateTime<Utc>) -> DateTime<Utc> {
     let local = now.with_timezone(&timezone);
     let today = local.date_naive();
     if local.hour() < u32::from(NIGHT.0) {
@@ -35,7 +35,7 @@ pub fn upcoming(user: &MacroUserIdStr<'_>, timezone: Tz, now: DateTime<Utc>) -> 
 
 /// When a person whose run started (or was passed over) at `now` is next
 /// due: their time the next night that hasn't begun yet.
-pub fn following(user: &MacroUserIdStr<'_>, timezone: Tz, now: DateTime<Utc>) -> DateTime<Utc> {
+pub fn following(user: &RoxUserIdStr<'_>, timezone: Tz, now: DateTime<Utc>) -> DateTime<Utc> {
     let local = now.with_timezone(&timezone);
     let today = local.date_naive();
     if local.hour() < u32::from(NIGHT.0) {
@@ -51,7 +51,7 @@ fn next_day(day: NaiveDate) -> NaiveDate {
 
 /// The person's time on the night starting on `day`: the night's start plus
 /// a fixed offset of theirs, leaving the last hour for runs that wait.
-fn slot(user: &MacroUserIdStr<'_>, timezone: Tz, day: NaiveDate) -> DateTime<Utc> {
+fn slot(user: &RoxUserIdStr<'_>, timezone: Tz, day: NaiveDate) -> DateTime<Utc> {
     let spread = (u32::from(NIGHT.1) - u32::from(NIGHT.0)).saturating_sub(1) * 60;
     let minute = offset(user.as_ref()) % spread.max(1);
     let start = NaiveTime::from_hms_opt(u32::from(NIGHT.0), 0, 0).unwrap_or_default();

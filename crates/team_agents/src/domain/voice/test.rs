@@ -2,7 +2,7 @@ use std::sync::Mutex;
 
 use entity_access::domain::models::EntityType;
 use feature_flags::{FlagSnapshot, FlagValue};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use rootcause::Report;
 
 use super::*;
@@ -30,7 +30,7 @@ impl VoiceProvider for Provider {
 
     async fn sample(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         team: Uuid,
         model: &VoiceModel,
     ) -> Result<Vec<u8>, TeamAgentError> {
@@ -46,7 +46,7 @@ impl VoiceProvider for Provider {
 struct Flags(bool);
 
 impl FeatureFlags for Flags {
-    async fn load(&self, _: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
+    async fn load(&self, _: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
         Ok(FlagSnapshot::new([(
             AGENT_TEAMMATES_FLAG.to_owned(),
             FlagValue::Boolean(self.0),
@@ -56,7 +56,7 @@ impl FeatureFlags for Flags {
 
 fn receipt() -> EntityAccessReceipt<AdminTeamRole> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::parse_from_str(ADMIN).unwrap().into_owned(),
+        RoxUserIdStr::parse_from_str(ADMIN).unwrap().into_owned(),
         TEAM,
         EntityType::Team,
     )

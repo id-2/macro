@@ -9,8 +9,8 @@ use item_filters::{
     CallStatus,
     ast::{LiteralTree, call::CallLiteral},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -49,8 +49,8 @@ const BY_ACTIVITY: [Uuid; 8] = [A2, L1, A1, I1, S2, U1, T2, T1];
 /// The viewer's calls by start, newest first.
 const BY_START: [Uuid; 8] = [L1, A1, I1, A2, S2, U1, T2, T1];
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
 fn page(by_start: bool) -> CallRecordPage {
@@ -113,7 +113,7 @@ fn record(records: &[CallRecord], call_id: Uuid) -> &CallRecord {
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn lists_the_calls_the_viewer_can_see_in_both_orders(
     pool: Pool<Postgres>,
@@ -128,7 +128,7 @@ async fn lists_the_calls_the_viewer_can_see_in_both_orders(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn call_id_filter_keeps_the_visibility_rules(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // Naming a call doesn't grant it: a standalone call still needs the
@@ -152,7 +152,7 @@ async fn call_id_filter_keeps_the_visibility_rules(pool: Pool<Postgres>) -> anyh
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn channel_filter_lists_the_channels_visible_calls(
     pool: Pool<Postgres>,
@@ -189,7 +189,7 @@ async fn channel_filter_lists_the_channels_visible_calls(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn hidden_calls_stay_hidden_under_every_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // S1 and I2 carry their owner's grant and one from the viewer's team (S1
@@ -233,7 +233,7 @@ async fn hidden_calls_stay_hidden_under_every_filter(pool: Pool<Postgres>) -> an
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn calls_that_tie_sort_by_id_and_the_cursor_crosses_them(
     pool: Pool<Postgres>,
@@ -268,7 +268,7 @@ async fn calls_that_tie_sort_by_id_and_the_cursor_crosses_them(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archiving_leaves_one_listable_row_per_call_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // The list reads the first row it finds for a granted call id, so it
@@ -301,7 +301,7 @@ async fn archiving_leaves_one_listable_row_per_call_id(pool: Pool<Postgres>) -> 
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn pages_reach_every_live_archived_and_imported_call(
     pool: Pool<Postgres>,
@@ -335,7 +335,7 @@ async fn pages_reach_every_live_archived_and_imported_call(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn reads_each_kind_of_call(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let records = list(&pool, &None, 50, page(false)).await?;
@@ -387,7 +387,7 @@ async fn reads_each_kind_of_call(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_list")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn loads_everyone_on_each_call_in_join_order(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let records = list(&pool, &None, 50, page(false)).await?;

@@ -33,7 +33,7 @@ use agent_session::domain::routines::{
 use anyhow::Result;
 use bot_id::BotId;
 use chrono::{SecondsFormat, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use routine_program::{CATALOG, CODE_STEPS, RoutineProgram, STEP_CONTEXT, Step};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -384,7 +384,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions> RoutineDraftService
 {
     async fn draft(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: DraftRequest,
         context: DraftContext,
     ) -> Result<Draft> {
@@ -470,7 +470,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions> RoutineDrafts<Code, Sessions>
     /// admission is an error.
     async fn briefed(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         request: &DraftRequest,
         program: &[Step],
         context: &DraftContext,
@@ -529,7 +529,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions> RoutineDrafts<Code, Sessions>
     /// Who a draft's session belongs to, for the session operations.
     fn action(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> RoutineSessionAction {
         RoutineSessionAction {
@@ -546,7 +546,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions> RoutineDrafts<Code, Sessions>
     /// whatever happens, unless `drafting` keeps them.
     async fn drafted(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         request: &DraftRequest,
         program: &[Step],
         context: &DraftContext,
@@ -1033,7 +1033,7 @@ fn brief(
     program: &[Step],
     context: &DraftContext,
     code: bool,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     guide: &str,
 ) -> Result<String, &'static str> {
     let task = task(request, program, code)?;

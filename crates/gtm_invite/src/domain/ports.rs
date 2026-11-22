@@ -5,7 +5,7 @@
 use std::future::Future;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{
@@ -63,21 +63,21 @@ pub trait GtmInviteRepo: Send + Sync + 'static {
     fn redeem_link<'a>(
         &self,
         id: Uuid,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         now: DateTime<Utc>,
     ) -> impl Future<Output = Result<Option<InviteLink>, Self::Err>> + Send;
 
     /// The link `user_id` signed up through, if any.
     fn get_redeemed_link_for_user<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Option<InviteLink>, Self::Err>> + Send;
 
     /// Records that the user's redeemed link turned into a paid subscription.
     /// Returns whether a row changed.
     fn mark_converted<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         stripe_subscription_id: &str,
         now: DateTime<Utc>,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
@@ -93,21 +93,21 @@ pub trait GtmInviteService: Send + Sync + 'static {
     /// Creates a link. Only Rox staff may create links.
     fn create_link(
         &self,
-        creator: &MacroUserIdStr<'_>,
+        creator: &RoxUserIdStr<'_>,
         request: CreateInviteLink,
     ) -> impl Future<Output = Result<InviteLink, GtmInviteError>> + Send;
 
     /// Lists links for the dashboard. Only Rox staff may list links.
     fn list_links(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         only_mine: bool,
     ) -> impl Future<Output = Result<Vec<InviteLink>, GtmInviteError>> + Send;
 
     /// Revokes a link nobody has signed up through. Only Rox staff may revoke.
     fn revoke_link(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> impl Future<Output = Result<InviteLink, GtmInviteError>> + Send;
 
@@ -122,20 +122,20 @@ pub trait GtmInviteService: Send + Sync + 'static {
     fn redeem_link(
         &self,
         token: &InviteToken,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<InviteLink, GtmInviteError>> + Send;
 
     /// The redeemed link whose offer the user has not yet used at checkout.
     fn active_offer_for_user(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<InviteLink>, GtmInviteError>> + Send;
 
     /// Records the user's redeemed link as converted into a paid
     /// subscription. Returns whether the user held a redeemed link.
     fn mark_converted(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         stripe_subscription_id: &str,
     ) -> impl Future<Output = Result<bool, GtmInviteError>> + Send;
 }

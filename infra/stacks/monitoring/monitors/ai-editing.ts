@@ -11,7 +11,7 @@
 // Neither covers "the worker answers 200 but silently produces no edits", and
 // both are blind while nobody is editing. That needs the hourly canary against
 // a fixed document, which is a follow-up: POST /edit requires a short-lived
-// `documentToken` (macro_sync_service_jwt), so a probe needs somewhere to mint
+// `documentToken` (rox_sync_service_jwt), so a probe needs somewhere to mint
 // one.
 import * as datadog from '@pulumi/datadog';
 import { goalertWebhooks } from '../goalert';

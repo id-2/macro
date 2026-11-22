@@ -9,7 +9,7 @@ import {
 } from '../call-presence';
 import { isProgramParticipant } from '../is-program-participant';
 
-const CALL_PRESENCE_TOPIC = 'macro.call-presence.v1';
+const CALL_PRESENCE_TOPIC = 'rox.call-presence.v1';
 const LEAVE_ANNOUNCEMENT_TIMEOUT_MS = 150;
 const MAX_PENDING_ANNOUNCEMENTS = 32;
 const MAX_RECORDED_DEPARTURES = 64;

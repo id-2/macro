@@ -12,14 +12,14 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use super::events::{DocumentSyncEditor, DocumentTopicEvent};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 
 // Display attribution only: teams cannot act. Prefer the initiating user when
 // known, otherwise represent an unattributed team creation as system activity.
 fn actor_from_owner(
     owner: &Owner,
-    on_behalf_of: Option<&MacroUserIdStr<'static>>,
+    on_behalf_of: Option<&RoxUserIdStr<'static>>,
 ) -> Actor<'static> {
     match owner {
         Owner::User(user) => Actor::new_from_user(user.clone()),
@@ -27,14 +27,14 @@ fn actor_from_owner(
         Owner::Team(_) => on_behalf_of
             .cloned()
             .map(Actor::new_from_user)
-            .unwrap_or_else(|| Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID)),
+            .unwrap_or_else(|| Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID)),
     }
 }
 
 fn creation_attribution(
     owner: &Owner,
     actor: &Option<Actor<'static>>,
-    on_behalf_of: &Option<MacroUserIdStr<'static>>,
+    on_behalf_of: &Option<RoxUserIdStr<'static>>,
 ) -> Attribution {
     let actor = actor
         .clone()
@@ -47,8 +47,8 @@ fn creation_attribution(
 /// `None` when neither is set, e.g. internal callers.
 fn mutation_attribution(
     actor: &Option<Actor<'static>>,
-    actor_user_id: &Option<MacroUserIdStr<'static>>,
-    on_behalf_of: &Option<MacroUserIdStr<'static>>,
+    actor_user_id: &Option<RoxUserIdStr<'static>>,
+    on_behalf_of: &Option<RoxUserIdStr<'static>>,
 ) -> Option<Attribution> {
     let actor = actor
         .clone()

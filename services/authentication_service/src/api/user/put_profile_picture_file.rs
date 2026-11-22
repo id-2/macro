@@ -1,6 +1,6 @@
 use axum::{Json, extract::State, http::StatusCode};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::user::update_profile_picture::update_profile_picture;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::user::update_profile_picture::update_profile_picture;
 use model::response::{EmptyResponse, ErrorResponse};
 use models_sfs::FileMetadata;
 
@@ -132,14 +132,14 @@ fn validate_profile_picture_upload(
 #[tracing::instrument(
     skip_all,
     fields(
-        user_id = %authorization.authorization.user.macro_user_id,
+        user_id = %authorization.authorization.user.rox_user_id,
         size_bytes = req.size_bytes,
         rate_limited = tracing::field::Empty,
     ),
 )]
 pub async fn create_upload_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(req): Json<CreateProfilePictureUploadRequest>,
 ) -> Result<Json<ProfilePictureUpload>, (StatusCode, Json<ErrorResponse<'static>>)> {
     validate_profile_picture_upload(&req.content_type, req.size_bytes).map_err(|e| match e {
@@ -153,7 +153,7 @@ pub async fn create_upload_handler(
         ),
     })?;
 
-    let user_id = authorization.authorization.user.macro_user_id.as_ref();
+    let user_id = authorization.authorization.user.rox_user_id.as_ref();
 
     let ticket = if RATE_LIMIT_ENABLED {
         let key = RateLimitKey::builder(&"profile-picture-upload")
@@ -230,14 +230,14 @@ pub async fn create_upload_handler(
 #[tracing::instrument(
     skip_all,
     fields(
-        user_id = %authorization.authorization.user.macro_user_id,
+        user_id = %authorization.authorization.user.rox_user_id,
         file_id = %req.file_id,
         rate_limited = tracing::field::Empty,
     ),
 )]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(req): Json<PutProfilePictureFileRequest>,
 ) -> Result<Json<EmptyResponse>, (StatusCode, Json<ErrorResponse<'static>>)> {
     let file_id = uuid::Uuid::parse_str(&req.file_id)
@@ -245,7 +245,7 @@ pub async fn handler(
 
     throttle_set(
         &ctx,
-        authorization.authorization.user.macro_user_id.as_ref(),
+        authorization.authorization.user.rox_user_id.as_ref(),
     )
     .await?;
 
@@ -259,7 +259,7 @@ pub async fn handler(
         })?
         .ok_or_else(|| error(StatusCode::NOT_FOUND, "file not found"))?;
 
-    let caller_id = authorization.authorization.user.macro_user_id.as_ref();
+    let caller_id = authorization.authorization.user.rox_user_id.as_ref();
     validate_profile_picture_file(&metadata, caller_id).map_err(|e| match e {
         // Someone else's file answers like a missing one.
         ProfilePictureFileError::NotOwner => error(StatusCode::NOT_FOUND, "file not found"),
@@ -291,7 +291,7 @@ pub async fn handler(
     publish_picture_changed(
         &ctx,
         picture_changed_metadata(
-            authorization.authorization.user.macro_user_id.clone(),
+            authorization.authorization.user.rox_user_id.clone(),
             Some(file_id.to_string()),
             &url,
         ),

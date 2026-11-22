@@ -24,7 +24,7 @@ follow-up reminders.
 ## Boundaries
 
 - Depends on: `entity_access` (ports), `email` (ports), `notification` /
-  `model_notifications` (the `notify` feature), `macro_uuid`/`sqlx` (`postgres`).
+  `model_notifications` (the `notify` feature), `rox_uuid`/`sqlx` (`postgres`).
 - Used by: `memory`.
 
 ## Recipes

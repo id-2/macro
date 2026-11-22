@@ -21,8 +21,8 @@ separately before expanding it.
    protected by HTTP Basic (`metrics`, existing OTLP token) over ALB TLS. It
    exposes no query/administration routes. Existing OTLP bearer access is
    unchanged. The password is hashed at boot and passed privately to nginx.
-   Grafana gets **Macro PostgreSQL** at `/d/macro-postgres` and
-   **Macro PostgreSQL queries** at `/d/macro-postgres-queries`.
+   Grafana gets **Rox PostgreSQL** at `/d/macro-postgres` and
+   **Rox PostgreSQL queries** at `/d/macro-postgres-queries`.
 2. As an authorized database administrator, connect **to dev writer / macrodb**
    with TLS and run `psql --file monitoring-role.sql`. Choose a random password
    of at least 32 characters at its secure prompt. The role/grants replicate to
@@ -104,7 +104,7 @@ This pilot must not be the sole database monitor.
 
 ## Query investigation and limits
 
-Open **Macro PostgreSQL queries**, choose an instance, then click a query ID in
+Open **Rox PostgreSQL queries**, choose an instance, then click a query ID in
 the query overview. Normalized SQL appears directly beside execution time,
 workload share, call count, average duration and rows. Sort any metric column,
 filter the SQL column, select a database user, or raise the row limit to 200.

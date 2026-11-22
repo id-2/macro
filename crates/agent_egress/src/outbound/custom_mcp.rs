@@ -12,7 +12,7 @@
 //! connector runs - so a server connected in Rox is a server the sandbox
 //! can reach, with nothing to keep in sync.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::domain::models::McpServerRecord;
 use mcp_client::domain::ports::McpServerStore;
 use mcp_client::domain::service::{ServerAccess, server_access};
@@ -64,7 +64,7 @@ where
     /// access with it.
     async fn record(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         key: &CustomMcpServerKey,
     ) -> Result<Option<McpServerRecord>, EgressError> {
         Ok(self
@@ -92,7 +92,7 @@ where
     #[tracing::instrument(skip_all, err, fields(%owner, ?destination))]
     async fn resolve(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: bot_id::BotId,
         session: uuid::Uuid,
         destination: &McpDestination,

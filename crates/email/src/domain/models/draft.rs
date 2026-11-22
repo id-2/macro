@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value as JsonValue;
 use uuid::Uuid;
 
@@ -21,7 +21,7 @@ pub struct CreateDraftInput {
     /// Requested sender. Absent selects the inbox's primary address. The domain
     /// verifies alternate addresses against the selected inbox's provider grant.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub sender_email: Option<macro_user_id::email::EmailStr<'static>>,
+    pub sender_email: Option<rox_user_id::email::EmailStr<'static>>,
     /// Existing message DB ID (for updating an existing draft).
     pub db_id: Option<Uuid>,
     /// Provider message ID.
@@ -46,8 +46,8 @@ pub struct CreateDraftInput {
     /// before storage).
     pub body_html: Option<String>,
     /// Rox-specific body format.
-    pub body_macro: Option<String>,
-    /// Headers JSON (e.g. Macro-In-Reply-To).
+    pub body_rox: Option<String>,
+    /// Headers JSON (e.g. Rox-In-Reply-To).
     pub headers_json: Option<JsonValue>,
     /// Scheduled send time.
     pub send_time: Option<DateTime<Utc>>,
@@ -59,7 +59,7 @@ pub struct CreateDraftInput {
     /// layer (never from the request body). Distinct from the link owner on
     /// delegated inboxes; attribution (events, activity) follows the actor.
     /// Ignored for drafts.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Client draft handle to bind to the final message row. Set only by
     /// user-scoped (GraphQL) saves during handle resolution — never from a
     /// request body. The binding is upserted inside the insert transaction
@@ -105,8 +105,8 @@ pub struct ResolvedDraftInput {
     /// HTML body (decoded).
     pub body_html: Option<String>,
     /// Rox-specific body format.
-    pub body_macro: Option<String>,
-    /// Headers JSON (e.g. Macro-In-Reply-To).
+    pub body_rox: Option<String>,
+    /// Headers JSON (e.g. Rox-In-Reply-To).
     pub headers_json: Option<JsonValue>,
     /// Scheduled send time.
     pub send_time: Option<DateTime<Utc>>,
@@ -243,7 +243,7 @@ pub struct CreatedDraft {
     /// HTML body (decoded).
     pub body_html: Option<String>,
     /// Rox body.
-    pub body_macro: Option<String>,
+    pub body_rox: Option<String>,
     /// Headers JSON.
     pub headers_json: Option<JsonValue>,
     /// Scheduled send time.

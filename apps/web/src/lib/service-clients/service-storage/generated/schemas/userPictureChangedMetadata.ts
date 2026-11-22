@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './macroUserIdStr';
 import type { UserPictureChangedMetadataFileId } from './userPictureChangedMetadataFileId';
 import type { UserPictureChangedMetadataUrl } from './userPictureChangedMetadataUrl';
 
@@ -19,5 +19,5 @@ export interface UserPictureChangedMetadata {
   /** URL of the new picture; `None` when the picture was removed. */
   url?: UserPictureChangedMetadataUrl;
   /** User whose profile picture changed. */
-  user_id: MacroUserIdStr;
+  user_id: RoxUserIdStr;
 }

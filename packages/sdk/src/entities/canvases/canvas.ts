@@ -5,8 +5,8 @@ import type {
   CanvasTextLayout,
   CanvasUnavailable,
 } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
-import { MacroApiError, unwrap } from '../../utils/unwrap';
+import type { RoxClient } from '../../utils/client';
+import { RoxApiError, unwrap } from '../../utils/unwrap';
 import {
   DocumentEditRefusedError,
   EditOutcomeUnknownError,
@@ -163,7 +163,7 @@ export class CanvasRenderImage extends StaticImage {
  * The canvas changed since `expectedRevision` (HTTP 409). Nothing was
  * committed: read the scene again, replan against it, and retry.
  */
-export class CanvasRevisionConflictError extends MacroApiError {
+export class CanvasRevisionConflictError extends RoxApiError {
   constructor(body: CanvasErrorBody) {
     super(409, body);
     this.name = 'CanvasRevisionConflictError';
@@ -176,7 +176,7 @@ export class CanvasRevisionConflictError extends MacroApiError {
  * item that isn't there, or asked for something the editor can't do. Nothing
  * changed; `message` says why. Fix the code and retry.
  */
-export class CanvasEditRejectedError extends MacroApiError {
+export class CanvasEditRejectedError extends RoxApiError {
   constructor(body: CanvasErrorBody) {
     super(422, body);
     this.name = 'CanvasEditRejectedError';
@@ -194,7 +194,7 @@ export class CanvasEditRejectedError extends MacroApiError {
 export class Canvas {
   /** @internal Use `document.canvas()`. */
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The canvas's document. */
     readonly document: Document,
   ) {}

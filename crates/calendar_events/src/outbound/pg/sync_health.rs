@@ -54,11 +54,11 @@ impl CalendarSyncHealthReader for PgCalendarRepository {
             WITH links AS MATERIALIZED (
                 SELECT link.id
                 FROM email_links link
-                WHERE link.macro_id = $1
+                WHERE link.rox_id = $1
                 UNION
                 SELECT delegation.link_id
-                FROM macro_user_links delegation
-                WHERE delegation.primary_macro_id = $1
+                FROM rox_user_links delegation
+                WHERE delegation.primary_rox_id = $1
             )
             SELECT
                 links.id AS "email_link_id!",

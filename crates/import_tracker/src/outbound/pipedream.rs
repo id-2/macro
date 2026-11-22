@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use http::{HeaderMap, Method, StatusCode};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::models::PipedreamConnection;
 use pipedream_mcp::domain::ports::{ConnectedAppProxy, ConnectionStore};
 use rootcause::compat::IntoRootcause;
@@ -73,7 +73,7 @@ impl<Store: ConnectionStore, Proxy: ConnectedAppProxy> Connections<Store, Proxy>
     /// Open the enabled grant for this user.
     pub async fn open(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Session<Proxy>, TrackerError> {
         let proxy = self.proxy.clone().ok_or(TrackerError::NotConnected)?;
         let connection = self

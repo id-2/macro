@@ -1,9 +1,9 @@
 use super::*;
 use activity::{Actor, Attribution, CommonAction, EntityType};
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
-macro_env_var::maybe_env_var! {
+rox_env_var::maybe_env_var! {
     struct RedisUrl;
 }
 
@@ -24,7 +24,7 @@ fn edit(document_id: &str, actor: &str, subject: Option<&str>) -> Activity {
         0,
         Attribution::new(
             Actor::try_from(actor.to_owned()).unwrap(),
-            subject.map(|user| MacroUserIdStr::try_from(user.to_owned()).unwrap()),
+            subject.map(|user| RoxUserIdStr::try_from(user.to_owned()).unwrap()),
         ),
         EntityType::Document,
         document_id,

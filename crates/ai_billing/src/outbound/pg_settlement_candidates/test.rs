@@ -2,16 +2,16 @@ use super::*;
 use ai_usage::outbound::PgUsageRepo;
 use ai_usage::{AiFeature, CompletionUsage, ModelPricing, Price, Usage, UsageAmount, UsageRepo};
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{email}")).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
 }
 
 /// One counted (or not) completion for `user`, backdated to `at`.
 async fn usage_row(
     pool: &PgPool,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     at: DateTime<Utc>,
     counted: bool,
 ) {
@@ -60,7 +60,7 @@ async fn usage_row(
 
 async fn reservation(
     pool: &PgPool,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     status: &str,
     invoice: Option<&str>,
     updated_at: DateTime<Utc>,
@@ -70,7 +70,7 @@ async fn reservation(
         INSERT INTO ai_credit_reload (id, user_id, amount_cents, stripe_invoice_id, status, updated_at)
         VALUES ($1, $2, 1000, $3, ($4::text)::ai_credit_reload_status, $5)
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         user.as_ref(),
         invoice,
         status,
@@ -84,7 +84,7 @@ async fn reservation(
 /// A retired direct usage charge, which settlement never retries.
 async fn abandoned_overage_charge(
     pool: &PgPool,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     updated_at: DateTime<Utc>,
 ) {
     sqlx::query!(
@@ -93,7 +93,7 @@ async fn abandoned_overage_charge(
             (id, user_id, period_start, amount_cents, stripe_invoice_id, status, updated_at)
         VALUES ($1, $2, $3, 1000, NULL, 'pending', $3)
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         user.as_ref(),
         updated_at,
     )
@@ -104,7 +104,7 @@ async fn abandoned_overage_charge(
 
 async fn anchor(
     pool: &PgPool,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     start: DateTime<Utc>,
     end: DateTime<Utc>,
 ) {
@@ -119,7 +119,7 @@ async fn anchor(
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lists_recent_counted_users_abandoned_reloads_and_period_boundaries(pool: PgPool) {
     let now = Utc::now();
     let since = now - Duration::hours(24);
@@ -190,7 +190,7 @@ async fn lists_recent_counted_users_abandoned_reloads_and_period_boundaries(pool
     assert_eq!(candidates, expected);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_empty_window_lists_nobody(pool: PgPool) {
     let now = Utc::now();
     let candidates = PgSettlementCandidates::new(pool)

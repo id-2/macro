@@ -1,6 +1,6 @@
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { MACRO_AGENT_BOT_ID } from '@core/constant/macroAgent';
-import { MACRO_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
+import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
 import { describe, expect, it } from 'vitest';
 import {
   agentKindNoun,
@@ -30,8 +30,8 @@ describe('isCoderHarness', () => {
 
 describe('systemBotKind', () => {
   it('knows the first-party bots in either id form', () => {
-    expect(systemBotKind(MACRO_AGENT_BOT_ID)).toBe('agent');
-    expect(systemBotKind(MACRO_CODER_BOT_ID)).toBe('coder');
+    expect(systemBotKind(ROX_AGENT_BOT_ID)).toBe('agent');
+    expect(systemBotKind(ROX_CODER_BOT_ID)).toBe('coder');
     expect(systemBotKind(`bot|${CURSOR_BOT_ID}`)).toBe('coder');
   });
 

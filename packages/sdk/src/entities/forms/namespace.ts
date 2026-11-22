@@ -1,4 +1,4 @@
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Database } from '../databases/database';
 import type { DatabaseTable } from '../databases/table';
 import { Form } from './form';
@@ -9,7 +9,7 @@ import { Form } from './form';
  * @routing Use when building a form, poll or survey, or reading its responses; not database tables.
  */
 export class FormNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A form handle. Details load on first access. */
   byId(id: string): Form {

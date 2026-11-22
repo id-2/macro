@@ -9,7 +9,7 @@ use super::models::{
 use agent_session::domain::model::AgentSessionId;
 use agent_session::domain::notifications::PendingNotification;
 use import_notion::domain::model::{NotionId, NotionPage};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashMap;
 use std::time::Duration;
 use thiserror::Error;
@@ -100,7 +100,7 @@ pub trait SlackWorkspaceSource: Send + Sync + 'static {
     /// lacks a needed capability.
     fn open(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = std::result::Result<Self::Session, SlackSourceError>> + Send;
 }
 
@@ -136,7 +136,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// The user's own row for `(source, foreign_id)`, regardless of status.
     fn get_own_by_foreign_id(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         foreign_id: &str,
     ) -> impl Future<Output = Result<Option<ImportEntity>>> + Send;
@@ -145,7 +145,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// user's team, if any.
     fn find_team_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         foreign_id: &str,
     ) -> impl Future<Output = Result<Option<ImportEntity>>> + Send;
@@ -156,7 +156,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// decides what that means.
     fn upsert_staged(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         kind: ImportKind,
         initiator: Initiator,
@@ -171,7 +171,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     #[allow(clippy::too_many_arguments)]
     fn upsert_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         kind: ImportKind,
         initiator: Initiator,
@@ -185,7 +185,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// The user's own row by ledger id.
     fn get(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<Option<ImportEntity>>> + Send;
 
@@ -194,7 +194,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// foreign_id)`, own row winning). Newest first.
     fn list(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: Option<ImportSource>,
         status: Option<ImportStatus>,
     ) -> impl Future<Output = Result<Vec<ImportEntity>>> + Send;
@@ -203,7 +203,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// rows that flipped (missing / non-staged ids are skipped, not errors).
     fn mark_importing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         ids: &[Uuid],
     ) -> impl Future<Output = Result<Vec<ImportEntity>>> + Send;
 
@@ -213,7 +213,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// the same entity.
     fn mark_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         entity_id: &str,
         entity_type: &str,
@@ -224,7 +224,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// dropping its team claim. Rows waiting on it go back to `staged` too.
     fn mark_import_failed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         error: &str,
     ) -> impl Future<Output = Result<bool>> + Send;
@@ -233,7 +233,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// running batch's heartbeat, proving a live process still owns them.
     fn touch_importing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         ids: &[Uuid],
     ) -> impl Future<Output = Result<u64>> + Send;
 
@@ -244,7 +244,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// adopting process ([`NotionRunRepo`]). Returns how many were reaped.
     fn fail_stale_importing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         older_than_secs: i64,
     ) -> impl Future<Output = Result<u64>> + Send;
 
@@ -252,14 +252,14 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// whether it happened.
     fn discard(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<bool>> + Send;
 
     /// The user's team, when they are on one.
     fn user_team_id(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<Uuid>>> + Send;
 
     /// IDs of the team's members. Rox user IDs encode emails, so this is
@@ -267,19 +267,19 @@ pub trait ImportRepo: Send + Sync + 'static {
     fn team_members(
         &self,
         team_id: Uuid,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send;
 
     /// All discovery runs for the user.
     fn list_runs(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<ImportRun>>> + Send;
 
     /// CAS a discovery run to `running`. Wins when no run exists or the
     /// existing status is in `from`. Returns whether this call won.
     fn start_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         from: &[RunStatus],
     ) -> impl Future<Output = Result<bool>> + Send;
@@ -291,7 +291,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// instead ([`NotionRunRepo`]). Returns how many were reaped.
     fn fail_stale_runs(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         older_than_secs: i64,
     ) -> impl Future<Output = Result<u64>> + Send;
 
@@ -299,7 +299,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     /// `error` when there is one. Returns whether it happened.
     fn finish_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         to: RunStatus,
         error: Option<&str>,
@@ -340,7 +340,7 @@ pub trait CanonicalImportRepo: Send + Sync + 'static {
     /// or an earlier ready reservation in this namespace.
     fn reserve_target(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         key: &ImportTargetKey,
         kind: ImportTargetKind,
         existing_channel_id: Option<Uuid>,
@@ -494,7 +494,7 @@ pub struct NotionPageLink {
 #[derive(Debug, Clone, PartialEq)]
 pub struct NotionUserLink {
     /// The Rox user id.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Their email, lowercase.
     pub email: String,
 }
@@ -508,7 +508,7 @@ pub trait EntityCreator: Send + Sync + 'static {
     /// task exists. Returns the new entity id.
     fn create_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         markdown: &str,
         properties: &ImportedTaskProperties,
@@ -518,7 +518,7 @@ pub trait EntityCreator: Send + Sync + 'static {
     /// its references resolved through `links`. Returns the new entity id.
     fn create_notion_document(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         notion_markdown: &str,
         links: &NotionLinks,
@@ -532,7 +532,7 @@ pub trait EntityCreator: Send + Sync + 'static {
     /// Returns the persisted channel ID, never a discarded creation candidate.
     fn create_channel(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         target: &ImportTargetReservation,
         participant_emails: &[String],
@@ -566,7 +566,7 @@ pub enum SharedEntity {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TeamMember {
     /// The member's Rox user id.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Their email, lowercase.
     pub email: String,
 }
@@ -582,7 +582,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// stable id and the approved visibility, using attributed creation.
     fn create_tracker_project(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         markdown: &str,
@@ -593,7 +593,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// task properties and approved visibility. Never uses Notion conversion.
     fn create_tracker_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         markdown: &str,
@@ -605,7 +605,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// exist. Safe to repeat; never points at a failed or excluded row.
     fn link_tracker_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         relations: &TrackerTaskRelations,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
@@ -614,7 +614,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// into it rather than by when it was made. Returns the folder id.
     fn create_folder(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         parent: Option<Uuid>,
     ) -> impl Future<Output = anyhow::Result<Uuid>> + Send;
@@ -622,7 +622,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// Whether `folder` still exists and `user` can create inside it.
     fn folder_exists(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         folder: Uuid,
     ) -> impl Future<Output = anyhow::Result<bool>> + Send;
 
@@ -635,7 +635,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     #[allow(clippy::too_many_arguments)]
     fn create_document(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         notion_markdown: &str,
@@ -655,7 +655,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     )]
     fn create_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         notion_markdown: &str,
@@ -668,7 +668,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// Create an empty database named `name`.
     fn create_database(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
     ) -> impl Future<Output = anyhow::Result<NewDatabase>> + Send;
 
@@ -676,7 +676,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// refer to ids minted earlier in the same batch.
     fn apply_database_ops(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         database_id: Uuid,
         ops: Vec<models_databases::DatabaseOp>,
     ) -> impl Future<Output = anyhow::Result<Vec<models_databases::OpResult>>> + Send;
@@ -686,7 +686,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// Safe to repeat.
     fn share_with_team(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         entity: SharedEntity,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
 
@@ -694,7 +694,7 @@ pub trait WorkspaceWriter: Send + Sync + 'static {
     /// people by email. Empty when the user has no team.
     fn team_members(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = anyhow::Result<Vec<TeamMember>>> + Send;
 }
 
@@ -731,7 +731,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// imported keep their rows. Returns the rows now staged.
     fn replace_plan(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         rows: &[PlanRow],
     ) -> impl Future<Output = Result<Vec<ImportEntity>>> + Send;
@@ -741,7 +741,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// Rows no longer staged are left alone. Returns how many changed.
     fn update_plan_rows(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         rows: &[PlanRow],
     ) -> impl Future<Output = Result<u64>> + Send;
@@ -750,7 +750,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// user's team's claim (`importing` or `imported`, shared with the team).
     fn team_copies(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         foreign_ids: &[String],
     ) -> impl Future<Output = Result<Vec<ImportEntity>>> + Send;
 
@@ -758,7 +758,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// become shared with the team, `personal` not. Returns how many changed.
     fn set_plan_sharing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         shared: &[Uuid],
         personal: &[Uuid],
     ) -> impl Future<Output = Result<u64>> + Send;
@@ -771,7 +771,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// taken.
     fn claim_importing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         ids: &[Uuid],
         shared: &[Uuid],
         team_id: Option<Uuid>,
@@ -783,7 +783,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// run); otherwise it writes a copy of its own.
     fn claim_team_object(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_id: Uuid,
         team_id: Uuid,
         claim: bool,
@@ -794,7 +794,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// (and changes nothing) when `holder` is no longer being written.
     fn wait_on(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_id: Uuid,
         holder: Uuid,
     ) -> impl Future<Output = Result<bool>> + Send;
@@ -806,7 +806,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// write ends. Returns how many rows it tied.
     fn attach_review(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         review_id: Uuid,
         session_id: AgentSessionId,
@@ -816,7 +816,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// dropping any lease on it. Returns whether the run moved.
     fn transition_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         from: &[RunStatus],
         to: RunStatus,
@@ -827,7 +827,7 @@ pub trait NotionPlanRepo: Send + Sync + 'static {
     /// Returns whether the run was still running.
     fn record_scan(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         scanned: ScanCounts,
     ) -> impl Future<Output = Result<bool>> + Send;
@@ -850,7 +850,7 @@ pub trait NotionRunRepo: Send + Sync + 'static {
     /// `importing`, held by nobody) can be taken. Returns whether it was.
     fn take_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         owner: Uuid,
         lease: Duration,
         job: &NotionJob,
@@ -860,7 +860,7 @@ pub trait NotionRunRepo: Send + Sync + 'static {
     /// Returns `false` once the run stopped or another process holds it.
     fn renew_lease(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         owner: Uuid,
         lease: Duration,
     ) -> impl Future<Output = Result<bool>> + Send;
@@ -869,7 +869,7 @@ pub trait NotionRunRepo: Send + Sync + 'static {
     /// Returns whether `owner` held it.
     fn release_lease(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         owner: Uuid,
     ) -> impl Future<Output = Result<bool>> + Send;
 
@@ -880,7 +880,7 @@ pub trait NotionRunRepo: Send + Sync + 'static {
     /// process is adopting at the same moment are skipped.
     fn adopt_stalled_runs(
         &self,
-        user: Option<&MacroUserIdStr<'static>>,
+        user: Option<&RoxUserIdStr<'static>>,
         owner: Uuid,
         lease: Duration,
         stale_after: Duration,
@@ -895,7 +895,7 @@ pub trait NotionRunRepo: Send + Sync + 'static {
     /// moved run, or `None` when it was in none of `from`.
     fn transition_reviewed_run<Event>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         from: &[RunStatus],
         to: RunStatus,
         error: Option<&str>,
@@ -907,13 +907,13 @@ pub trait NotionRunRepo: Send + Sync + 'static {
     /// The user's "Notion" folder, once an import has made one.
     fn root_folder(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<Uuid>>> + Send;
 
     /// Record `folder` as the user's "Notion" folder.
     fn set_root_folder(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         folder: Uuid,
     ) -> impl Future<Output = Result<()>> + Send;
 
@@ -923,7 +923,7 @@ pub trait NotionRunRepo: Send + Sync + 'static {
     /// that stopped go back too. Returns how many moved.
     fn settle_importing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         reason: &str,
     ) -> impl Future<Output = Result<u64>> + Send;
 }
@@ -934,7 +934,7 @@ pub trait WrittenObjects: Send + Sync + 'static {
     /// Everything recorded for the user's ledger rows `import_ids`.
     fn written(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_ids: &[Uuid],
     ) -> impl Future<Output = Result<Vec<WrittenObject>>> + Send;
 
@@ -943,7 +943,7 @@ pub trait WrittenObjects: Send + Sync + 'static {
     /// id. Returns what is recorded for each of `objects` afterwards.
     fn record_written(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         objects: &[WrittenObject],
     ) -> impl Future<Output = Result<Vec<WrittenObject>>> + Send;
 }

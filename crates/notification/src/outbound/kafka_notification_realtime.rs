@@ -5,8 +5,8 @@ mod test;
 
 use std::borrow::Cow;
 
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::cowlike::CowLike as _;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::cowlike::CowLike as _;
 use rootcause::Report;
 use rootcause::prelude::ResultExt as _;
 
@@ -28,8 +28,8 @@ impl<B> KafkaNotificationRealtimePublisher<B> {
     }
 }
 
-impl<B: MacroEventBroker> NotificationRealtimePublisher for KafkaNotificationRealtimePublisher<B> {
-    #[tracing::instrument(err, skip_all, fields(topic = "macro.notifications"))]
+impl<B: RoxEventBroker> NotificationRealtimePublisher for KafkaNotificationRealtimePublisher<B> {
+    #[tracing::instrument(err, skip_all, fields(topic = "rox.notifications"))]
     async fn publish_updates(&self, payload: &NotificationStatusPayload<'_>) -> Result<(), Report> {
         let event = match payload {
             NotificationStatusPayload::NotificationForUsers { users, update } => {

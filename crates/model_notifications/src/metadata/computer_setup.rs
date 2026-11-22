@@ -50,7 +50,7 @@ impl Notification for ComputerSetupMetadata {
 }
 
 impl NotificationTitle for ComputerSetupMetadata {
-    fn format_title(&self, _sender_id: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_title(&self, _sender_id: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         if let Some(agent) = &self.agent {
             return Ok(match &self.outcome {
                 ComputerSetupOutcome::Ready => format!("{} is ready", agent.name),
@@ -69,7 +69,7 @@ impl NotificationTitle for ComputerSetupMetadata {
         })
     }
 
-    fn format_body(&self, _sender_id: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_body(&self, _sender_id: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         if let Some(agent) = &self.agent {
             return Ok(match &self.outcome {
                 ComputerSetupOutcome::Ready => format!("Message {} to get started.", agent.name),
@@ -101,7 +101,7 @@ impl NotificationExtIos for ComputerSetupMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {

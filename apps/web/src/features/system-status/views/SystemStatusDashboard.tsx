@@ -270,7 +270,7 @@ function ApiDocs() {
   const example = () =>
     [
       `curl -X POST ${endpoint} \\`,
-      `  -H 'x-macro-user-api-key: <your API key>' \\`,
+      `  -H 'x-rox-user-api-key: <your API key>' \\`,
       `  -H 'content-type: application/json' \\`,
       `  -d '{"status": "degraded", "message": "Search is slow to update."}'`,
     ].join('\n');

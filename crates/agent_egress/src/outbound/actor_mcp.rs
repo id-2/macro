@@ -4,7 +4,7 @@ use crate::domain::{
     model::{AgentSessionId, UpstreamCall},
     ports::ActorMcpTransport,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::outbound::guarded_http::{self, AddressPolicy};
 use rmcp::transport::streamable_http_client::StreamableHttpClientTransportConfig;
 use rmcp::{ServiceExt, model::ClientConfig, transport::StreamableHttpClientTransport};
@@ -27,7 +27,7 @@ type Connection = Arc<OnceCell<Arc<Client>>>;
 #[derive(Hash, PartialEq, Eq)]
 struct AccountSession {
     session: AgentSessionId,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
     endpoint: String,
     credential: [u8; 32],
 }
@@ -60,7 +60,7 @@ impl HttpActorMcpTransport {
     async fn connection(
         &self,
         session: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         upstream: UpstreamCall,
     ) -> Result<Arc<Client>, EgressError> {
         guarded_http::check_url(self.policy, upstream.url())
@@ -126,7 +126,7 @@ impl ActorMcpTransport for HttpActorMcpTransport {
     async fn exchange(
         &self,
         session: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         upstream: UpstreamCall,
         request: Value,
     ) -> Result<Value, EgressError> {
@@ -142,7 +142,7 @@ impl ActorMcpTransport for HttpActorMcpTransport {
                     serde_json::from_value(request["params"].clone())
                         .map_err(|error| EgressError::Internal(rootcause::report!(error).into()))?;
                 let mut trace_headers = http::HeaderMap::new();
-                macro_tower_layers::inject_trace_headers(&mut trace_headers);
+                rox_tower_layers::inject_trace_headers(&mut trace_headers);
                 let meta = params.meta.get_or_insert_with(Default::default);
                 for (name, value) in &trace_headers {
                     if let Ok(value) = value.to_str() {

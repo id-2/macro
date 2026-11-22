@@ -5,7 +5,7 @@ use agent_runtime_protocol::domain::notification::NotificationEvent;
 use agent_session::domain::error::AgentSessionError;
 use agent_session::domain::model::AgentSessionId;
 use agent_session::domain::notifications::ProduceNotification;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 
@@ -32,7 +32,7 @@ impl ConnectedApps for Connections {
 
     async fn connected_app_name(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> Result<Option<String>, NeverFails> {
         Ok(self
@@ -53,8 +53,8 @@ impl SessionNotifications for RecordedNotifications {
     }
 }
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).expect("a valid user id")
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).expect("a valid user id")
 }
 
 #[tokio::test]

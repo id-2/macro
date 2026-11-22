@@ -26,7 +26,7 @@ export { createImage } from './resources/image';
 export { versionEnvironment } from './resources/image_version';
 export {
   serviceLoadBalancer,
-  MacroApplicationLoadBalancer,
+  RoxApplicationLoadBalancer,
 } from './resources/load_balancer';
 export { Queue } from './resources/queue';
 export { QueueAlarms } from './resources/queue_alarms';

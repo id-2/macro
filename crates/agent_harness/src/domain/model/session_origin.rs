@@ -1,8 +1,8 @@
 //! Distinct session origins for mentions and task assignments.
 
 use agent_runtime_protocol::domain::action::{AgentAction, PromptAttachment};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use trigger_context::{TriggerContext, TriggerOrigin};
 
 use super::{AnnounceOrigin, ReplyPlacement};
@@ -23,7 +23,7 @@ pub struct MentionOrigin {
     /// The mentioning message itself.
     pub message_id: Uuid,
     /// Who asked. Owns the session and is credited for its messages.
-    pub sender: MacroUserIdStr<'static>,
+    pub sender: RoxUserIdStr<'static>,
     /// The message text, verbatim; becomes the session's first prompt.
     pub content: String,
     /// Files attached to the message, as the prompt will refer to them.
@@ -45,7 +45,7 @@ pub struct TaskAssignmentOrigin {
     /// Reserved agent-authored session link, also the discussion's root.
     pub discussion_id: Uuid,
     /// User who assigned the task and owns the session.
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
     /// Task instructions supplied privately to the session.
     pub prompt: String,
     /// The task, who assigned it, and how, as the trigger read it.
@@ -85,7 +85,7 @@ impl SessionOrigin {
         }
     }
 
-    pub(crate) fn actor(&self) -> &MacroUserIdStr<'static> {
+    pub(crate) fn actor(&self) -> &RoxUserIdStr<'static> {
         match self {
             Self::Mention(origin) => &origin.sender,
             Self::TaskAssignment(origin) => &origin.actor,

@@ -18,7 +18,7 @@ impl<
     Sm: CallSummarizer + Clone,
     V: VoipPushSender,
     Vr: VoiceRepository + Clone,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 > CallServiceImpl<R, C, Cn, E, N, S, Sm, V, Vr, B>
 {
     /// Webhooks can beat the startup API response, especially if a call ends
@@ -54,7 +54,7 @@ impl<
     #[tracing::instrument(err, skip_all)]
     pub(super) async fn email_invitation(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         token: MeetingToken,
         email: String,
     ) -> Result<(), CallError> {
@@ -71,7 +71,7 @@ impl<
             ));
         }
         let email = email.trim().to_lowercase();
-        let recipient = MacroUserIdStr::try_from_email(&email)
+        let recipient = RoxUserIdStr::try_from_email(&email)
             .map_err(|_| CallError::InvalidRequest("Enter a valid email address".to_string()))?
             .into_owned();
         self.notification_ingress
@@ -102,7 +102,7 @@ impl<
     #[tracing::instrument(err, skip_all)]
     pub(super) async fn create_invitation(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         request: CreateMeetingRequest,
     ) -> Result<Meeting, CallError> {
         let request = request.validate()?;
@@ -131,7 +131,7 @@ impl<
     #[tracing::instrument(err, skip_all)]
     pub(super) async fn prepare_invitation_room(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
     ) -> Result<MeetingPreparation, CallError> {
         let preparation = MeetingPreparation {
             id: Uuid::now_v7(),
@@ -158,7 +158,7 @@ impl<
     #[tracing::instrument(err, skip_all)]
     pub(super) async fn cancel_invitation_room(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<(), CallError> {
         if self
@@ -237,7 +237,7 @@ impl<
     pub(super) async fn preview_invitation(
         &self,
         token: MeetingToken,
-        actor: Option<MacroUserIdStr<'_>>,
+        actor: Option<RoxUserIdStr<'_>>,
     ) -> Result<crate::domain::meetings::MeetingParticipants, CallError> {
         use crate::domain::meetings::{MeetingParticipant, MeetingParticipants};
 
@@ -266,7 +266,7 @@ impl<
             .map_err(CallError::Internal)?
             .unwrap_or_default();
         for participant in connected {
-            if let Ok(user) = MacroUserIdStr::parse_from_str(&participant.identity) {
+            if let Ok(user) = RoxUserIdStr::parse_from_str(&participant.identity) {
                 let display_name = self
                     .repo
                     .get_user_display_name(user.copied())
@@ -337,7 +337,7 @@ impl<
         }
         let (call, created) = allocated?;
         if created {
-            let created_by = MacroUserIdStr::parse_from_str(&call.created_by)
+            let created_by = RoxUserIdStr::parse_from_str(&call.created_by)
                 .map_err(|error| CallError::Internal(error.into()))?
                 .into_owned();
             self.publish_call_event(&CallMacroEvent::started(CallStartedMetadata {
@@ -373,7 +373,7 @@ impl<
     pub(super) async fn join_invitation(
         &self,
         token: MeetingToken,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         request: JoinCallRequest,
         credential_is_program: bool,
         agent_attributed: bool,
@@ -548,7 +548,7 @@ impl<
     #[tracing::instrument(err, skip(self))]
     pub(super) async fn leave_other_active_call(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         joining: Uuid,
     ) -> Result<(), CallError> {
         let Some((other_call_id, _)) = self
@@ -689,7 +689,7 @@ impl<
                 .map_err(CallError::Internal)?;
         } else {
             let identity =
-                MacroUserIdStr::parse_from_str(&verified.identity).map_err(|_| CallError::Auth)?;
+                RoxUserIdStr::parse_from_str(&verified.identity).map_err(|_| CallError::Auth)?;
             self.repo
                 .remove_participant(&call.id, identity.copied())
                 .await

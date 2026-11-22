@@ -84,7 +84,7 @@ function resume() {
 }
 
 beforeEach(() => {
-  window.__MACRO_ANDROID_CALL_KIT__ = true;
+  window.__ROX_ANDROID_CALL_KIT__ = true;
   vi.useFakeTimers();
   bridge.pending = null;
   bridge.watchers.clear();
@@ -96,7 +96,7 @@ beforeEach(() => {
   );
 });
 afterEach(() => {
-  delete window.__MACRO_ANDROID_CALL_KIT__;
+  delete window.__ROX_ANDROID_CALL_KIT__;
   bridge.cleanups.splice(0).forEach((cleanup) => cleanup());
   vi.unstubAllGlobals();
   vi.useRealTimers();

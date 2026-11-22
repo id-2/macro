@@ -11,7 +11,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use rand::Rng;
 
 use crate::service::user::agent_signup::AGENT_SIGNUP_DATA_KEY;
@@ -32,9 +32,9 @@ use channels::domain::{
 };
 use favorites::domain::ports::FavoritesService;
 use fusionauth::error::FusionAuthClientError;
-use macro_user_id::{
+use rox_user_id::{
     email::{Email, ReadEmailParts},
-    user_id::MacroUserIdStr,
+    user_id::RoxUserIdStr,
 };
 use model::authentication::webhooks::{FusionAuthUserWebhook, User as FusionAuthWebhookUser};
 use model_entity::EntityType;
@@ -42,7 +42,7 @@ use teams::domain::team_repo::TeamService;
 use tracing::Instrument;
 
 /// Rox team members added to every new user's support channel.
-const MACRO_SUPPORT_EMAILS: [&str; 15] = [
+const ROX_SUPPORT_EMAILS: [&str; 15] = [
     "jacob@rox.one",
     "julia@rox.one",
     "teo@rox.one",
@@ -110,7 +110,7 @@ async fn has_pending_agent_invite(
     teams_service: &TeamsServiceType,
     email: &str,
 ) -> anyhow::Result<bool> {
-    let user_id = MacroUserIdStr::try_from_email(email)?;
+    let user_id = RoxUserIdStr::try_from_email(email)?;
     let invites = teams_service.get_user_invites(&user_id).await?;
 
     Ok(invites.iter().any(|invite| invite.is_agent))
@@ -131,7 +131,7 @@ async fn has_pending_agent_invite(
 )]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<FusionAuthUserWebhook>,
 ) -> Result<Response, Response> {
     tracing::info!("received FusionAuth user webhook");
@@ -221,7 +221,7 @@ async fn verify_user_email_webhook(
     let fusionauth_user_id = req.event.user.id;
     let email = req.event.user.email.to_lowercase();
 
-    macro_db_client::macro_user_email_verification::upsert_macro_user_email_verification(
+    rox_db_client::rox_user_email_verification::upsert_macro_user_email_verification(
         &ctx.db,
         &fusionauth_user_id,
         &email,
@@ -297,7 +297,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
 
     // rate limit check for user creation
     let rate_limit = ctx
-        .macro_cache_client
+        .rox_cache_client
         .get_create_user_hourly_rate_limit(&ip_address)
         .await?;
 
@@ -313,7 +313,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
     }
 
     if let Some((user_id, organization_id)) =
-        macro_db_client::user::get::get_user_profile_by_fusionauth_user_id_and_email(
+        rox_db_client::user::get::get_user_profile_by_fusionauth_user_id_and_email(
             &ctx.db,
             &fusionauth_user_id,
             &email,
@@ -326,7 +326,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
 
     // check if user exists
     if let Ok((user_id, _stripe_customer_id)) =
-        macro_db_client::user::get::get_user_id_and_stripe_customer_id_by_email(&ctx.db, &email)
+        rox_db_client::user::get::get_user_id_and_stripe_customer_id_by_email(&ctx.db, &email)
             .await
     {
         // The macro_user already exists for that email
@@ -369,7 +369,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
     // Mark the account as freshly created so the auth callback completing this
     // flow can attribute the login as a signup (analytics). Best-effort.
     let _ = ctx
-        .macro_cache_client
+        .rox_cache_client
         .mark_user_just_signed_up(&email)
         .await
         .inspect_err(|e| tracing::error!(error=?e, "unable to mark user as just signed up"));
@@ -398,7 +398,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
             // SSO). Keyed on the FusionAuth id, which is macro_user.id — `user_id`
             // here is the "macro|{email}" User profile id.
             if first_name.is_some() || last_name.is_some() {
-                let _ = macro_db_client::user::update_user_name::update_user_name(
+                let _ = rox_db_client::user::update_user_name::update_user_name(
                     &db,
                     &fusionauth_user_id,
                     first_name,
@@ -488,7 +488,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
         let teams_service = ctx.teams_service.clone();
         let user_id = user_id.clone();
         async move {
-            let user_id = match MacroUserIdStr::parse_from_str(&user_id) {
+            let user_id = match RoxUserIdStr::parse_from_str(&user_id) {
                 Ok(user_id) => user_id,
                 Err(e) => {
                     tracing::error!(error=?e, "unable to parse user id for team auto-join");
@@ -518,7 +518,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
 
     // Allow to fail silently
     let _ = ctx
-        .macro_cache_client
+        .rox_cache_client
         .increment_create_user_hourly_rate_limit(&ip_address)
         .await
         .inspect_err(|e| tracing::error!(error=?e, "unable to increment create user rate limit"));
@@ -587,7 +587,7 @@ fn spawn_human_signup_content(ctx: &ApiContext, user_id: &str, email: &str) {
             initialize_starter_docs_with_retries(&document_storage_service_client, &user_id)
                 .await;
 
-            let owner_id = match MacroUserIdStr::try_from(user_id) {
+            let owner_id = match RoxUserIdStr::try_from(user_id) {
                 Ok(owner_id) => owner_id,
                 Err(e) => {
                     tracing::error!(error=?e, "unable to parse user id for support channel");
@@ -595,9 +595,9 @@ fn spawn_human_signup_content(ctx: &ApiContext, user_id: &str, email: &str) {
                 }
             };
 
-            let participants = match MACRO_SUPPORT_EMAILS
+            let participants = match ROX_SUPPORT_EMAILS
                 .into_iter()
-                .map(MacroUserIdStr::try_from_email)
+                .map(RoxUserIdStr::try_from_email)
                 .collect::<Result<HashSet<_>, _>>()
             {
                 Ok(participants) => participants,
@@ -656,7 +656,7 @@ fn spawn_human_signup_content(ctx: &ApiContext, user_id: &str, email: &str) {
 /// nobody has proven, and give them the content a person's signup skips. A
 /// failure here must not block signing in.
 pub(in crate::api) async fn revert_unconfirmed_agent(ctx: &ApiContext, user_id: &str, email: &str) {
-    match macro_db_client::user::revert_unconfirmed_agent::revert_unconfirmed_agent(&ctx.db, email)
+    match rox_db_client::user::revert_unconfirmed_agent::revert_unconfirmed_agent(&ctx.db, email)
         .await
     {
         Ok(true) => {
@@ -673,7 +673,7 @@ pub(in crate::api) async fn revert_unconfirmed_agent(ctx: &ApiContext, user_id: 
 /// webhook cannot see the sign-in's state, so the flag is set here. A failure
 /// here must not block signing in.
 pub(in crate::api) async fn mark_sso_signup_as_agent(ctx: &ApiContext, user_id: &str, email: &str) {
-    match macro_db_client::user::mark_agent::mark_agent(&ctx.db, email).await {
+    match rox_db_client::user::mark_agent::mark_agent(&ctx.db, email).await {
         Ok(()) => tracing::info!(user_id, "marked new SSO account as an agent"),
         Err(e) => tracing::error!(error=?e, user_id, "unable to mark new SSO account as an agent"),
     }
@@ -710,7 +710,7 @@ async fn initialize_user_experiments(
     db: &sqlx::Pool<sqlx::Postgres>,
     user_id: &str,
 ) -> anyhow::Result<usize> {
-    let active_experiments = macro_db_client::experiment::get_active_experiments(db)
+    let active_experiments = rox_db_client::experiment::get_active_experiments(db)
         .await
         .context("failed to get active experiments")?;
 
@@ -727,7 +727,7 @@ async fn initialize_user_experiments(
         })
         .collect::<Vec<(String, String)>>();
 
-    macro_db_client::experiment_log::bulk_create_experiment_logs(db, user_id, &active_experiments)
+    rox_db_client::experiment_log::bulk_create_experiment_logs(db, user_id, &active_experiments)
         .await
         .context("failed to bulk create experiment logs")?;
 

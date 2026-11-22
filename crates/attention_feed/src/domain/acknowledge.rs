@@ -5,7 +5,7 @@
 //! tells the viewer's other sessions, and returns a receipt that undo
 //! reverses exactly.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use uuid::Uuid;
 
@@ -52,7 +52,7 @@ where
 
     /// Tell the viewer's open feeds that `keys` may have changed. Best
     /// effort.
-    pub async fn signal(&self, user: &MacroUserIdStr<'static>, keys: &[FeedKey]) {
+    pub async fn signal(&self, user: &RoxUserIdStr<'static>, keys: &[FeedKey]) {
         self.signals
             .changed(
                 user.clone(),

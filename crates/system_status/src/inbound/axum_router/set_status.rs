@@ -1,7 +1,7 @@
 //! Handler for `POST /system-status`.
 
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 
 use super::SystemStatusRouterState;
 use crate::domain::models::{StatusUpdate, SystemStatus, SystemStatusError};
@@ -11,7 +11,7 @@ use crate::domain::ports::SystemStatusService;
 /// staff only.
 ///
 /// Authenticate with a Rox session, or from a script with a personal API
-/// key (Settings → API keys) in the `x-macro-user-api-key` header. The body
+/// key (Settings → API keys) in the `x-rox-user-api-key` header. The body
 /// is the new status:
 ///
 /// - `{"status": "operational"}` clears the banner. It takes no message.
@@ -35,11 +35,11 @@ use crate::domain::ports::SystemStatusService;
     )
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: SystemStatusService, Auth: MacroAuthorizationService>(
+pub async fn handler<T: SystemStatusService, Auth: RoxAuthorizationService>(
     State(state): State<SystemStatusRouterState<T, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(status): Json<SystemStatus>,
 ) -> Result<Json<StatusUpdate>, SystemStatusError> {
-    let caller = &authorization.authorization.user.macro_user_id;
+    let caller = &authorization.authorization.user.rox_user_id;
     Ok(Json(state.service.set_status(caller, status).await?))
 }

@@ -9,7 +9,7 @@ import {
   setCreateMenuOpen,
   useCreateCommands,
 } from '@app/features/command/Launcher';
-import { openMacroMcpSetupModal } from '@app/features/integrations/mcp-setup/MacroMcpSetupModal';
+import { openMacroMcpSetupModal } from '@app/features/integrations/mcp-setup/RoxMcpSetupModal';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { inEnglish, t } from '@app/lib/i18n';

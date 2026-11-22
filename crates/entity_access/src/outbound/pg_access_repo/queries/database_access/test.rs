@@ -1,14 +1,14 @@
 use super::*;
 use crate::outbound::pg_access_repo::queries::get_user_source_ids;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 const OWNER: &str = "macro|owner@team.com";
 const MEMBER: &str = "macro|member@team.com";
 const MEMBER_TEAM: &str = "00000000-0000-0000-0000-0000000ea001";
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn core_storage_does_not_become_an_entity_through_a_stray_grant(pool: PgPool) {
@@ -59,7 +59,7 @@ async fn core_storage_does_not_become_an_entity_through_a_stray_grant(pool: PgPo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn core_storage_does_not_gain_database_access_through_a_form(pool: PgPool) {
@@ -153,12 +153,12 @@ async fn insert_database(pool: &PgPool) -> Uuid {
 }
 
 async fn source_ids(pool: &PgPool, email: &str) -> SourceIds {
-    let user = MacroUserIdStr::try_from_email(email).unwrap();
+    let user = RoxUserIdStr::try_from_email(email).unwrap();
     get_user_source_ids(pool, Some(&user)).await.unwrap()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn every_reachable_database_is_listed_at_its_highest_grant(pool: PgPool) {
@@ -201,7 +201,7 @@ async fn every_reachable_database_is_listed_at_its_highest_grant(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_channel_grant_reaches_its_active_participants(pool: PgPool) {
@@ -295,7 +295,7 @@ async fn insert_form_over(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn editing_a_form_grants_edit_on_its_database(pool: PgPool) {
@@ -316,7 +316,7 @@ async fn editing_a_form_grants_edit_on_its_database(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn owning_a_form_grants_only_edit_on_its_database(pool: PgPool) {
@@ -337,7 +337,7 @@ async fn owning_a_form_grants_only_edit_on_its_database(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn viewing_a_form_that_shares_responses_grants_view_on_its_database(pool: PgPool) {
@@ -353,7 +353,7 @@ async fn viewing_a_form_that_shares_responses_grants_view_on_its_database(pool: 
 
     let member = get_user_source_ids(
         &pool,
-        Some(&MacroUserIdStr::try_from(MEMBER.to_string()).unwrap()),
+        Some(&RoxUserIdStr::try_from(MEMBER.to_string()).unwrap()),
     )
     .await
     .unwrap();
@@ -370,7 +370,7 @@ async fn viewing_a_form_that_shares_responses_grants_view_on_its_database(pool: 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn viewing_a_form_grants_nothing_on_its_database(pool: PgPool) {
@@ -392,7 +392,7 @@ async fn viewing_a_form_grants_nothing_on_its_database(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_trashed_form_grants_nothing_on_its_database(pool: PgPool) {
@@ -420,7 +420,7 @@ async fn a_trashed_form_grants_nothing_on_its_database(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_direct_database_grant_above_edit_wins_over_a_form(pool: PgPool) {
@@ -465,7 +465,7 @@ async fn a_direct_database_grant_above_edit_wins_over_a_form(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_form_over_another_database_grants_nothing_here(pool: PgPool) {

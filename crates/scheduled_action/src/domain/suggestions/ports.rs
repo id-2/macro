@@ -5,8 +5,8 @@ use std::future::Future;
 
 use anyhow::Result;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use routine_program::Surface;
 use serde::Serialize;
 
@@ -24,7 +24,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// How many suggestions session `session` handed back and kept.
     fn kept_by(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         session: Uuid,
     ) -> impl Future<Output = Result<u32>> + Send;
 
@@ -39,7 +39,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// [`MAX_KEPT_PER_SESSION`]: super::MAX_KEPT_PER_SESSION
     fn add(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         session: Uuid,
         generation: Uuid,
         suggestion: &CheckedSuggestion,
@@ -53,7 +53,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// [`RoutineSuggestionState::on`]: super::state::RoutineSuggestionState::on
     fn retire(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         session: Uuid,
         generation: Uuid,
@@ -65,13 +65,13 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// too.
     fn suggestions(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<StoredSuggestion>>> + Send;
 
     /// Catalog routines the person dismissed as Rox's templates, by key.
     fn dismissed_templates(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<String>>> + Send;
 
     /// Dismiss the person's suggestion `id` and its card for good, as
@@ -81,28 +81,28 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// [`RoutineSuggestionState::on`]: super::state::RoutineSuggestionState::on
     fn dismiss(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> impl Future<Output = Result<Option<Transition>>> + Send;
 
     /// Dismiss catalog routine `key` as a template for the person, for good.
     fn dismiss_template(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         key: &str,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// The suggestions the person's routines were saved from.
     fn saved_from(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Uuid>>> + Send;
 
     /// The routines AI drafted in the person's suggestions `ids`, by
     /// suggestion; catalog picks and suggestions not theirs are left out.
     fn drafted(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         ids: &[Uuid],
     ) -> impl Future<Output = Result<Vec<(Uuid, ActionConfiguration)>>> + Send;
 }
@@ -129,14 +129,14 @@ pub trait SuggestionSources: Send + Sync + 'static {
     /// their mail has synchronized.
     fn inbox(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         limit: u16,
     ) -> impl Future<Output = Result<Vec<InboxMessage>>> + Send;
 
     /// The apps the person connected for tool use, by slug.
     fn apps(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<String>>> + Send;
 }
 
@@ -146,7 +146,7 @@ pub trait RoutineSuggestionApi: Send + Sync + 'static {
     /// surface (only `surface`, when given). Reading never generates.
     fn suggestions(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         surface: Option<Surface>,
     ) -> impl Future<Output = Result<RoutineSuggestions>> + Send;
 
@@ -155,7 +155,7 @@ pub trait RoutineSuggestionApi: Send + Sync + 'static {
     /// untrusted data, the catalog, and what they dismissed.
     fn brief(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         surfaces: &[Surface],
         trigger: GenerationTrigger,
         timezone: chrono_tz::Tz,
@@ -167,7 +167,7 @@ pub trait RoutineSuggestionApi: Send + Sync + 'static {
     /// own flag.
     fn texts(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         ids: &[Uuid],
         timezone: chrono_tz::Tz,
     ) -> impl Future<Output = Result<Vec<(Uuid, RoutineText)>>> + Send;
@@ -176,7 +176,7 @@ pub trait RoutineSuggestionApi: Send + Sync + 'static {
     /// suggested and kept; retirements don't count.
     fn suggested(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         session: Uuid,
     ) -> impl Future<Output = Result<u32>> + Send;
 
@@ -185,7 +185,7 @@ pub trait RoutineSuggestionApi: Send + Sync + 'static {
     /// `routine_suggestions.surface` per surface, the dashboard's contract.
     fn record(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         report: RoutineGenerationReport,
     ) -> impl Future<Output = ()> + Send;
 
@@ -211,7 +211,7 @@ pub trait RoutineSuggestionApi: Send + Sync + 'static {
     /// it is never suggested again.
     fn dismiss(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<()>> + Send;
 
@@ -232,7 +232,7 @@ pub trait RoutineSuggestionApi: Send + Sync + 'static {
 pub trait GenerationStatuses: Send + Sync + 'static {
     /// The status of the person's latest generation; none when they never
     /// had one.
-    async fn latest(&self, user: &MacroUserIdStr<'_>) -> Result<Option<GenerationStatus>>;
+    async fn latest(&self, user: &RoxUserIdStr<'_>) -> Result<Option<GenerationStatus>>;
 }
 
 /// What keeping a suggestion did.

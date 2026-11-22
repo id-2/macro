@@ -3,8 +3,8 @@
 
 use std::time::Duration;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use sqlx::PgPool;
 
 use super::*;
@@ -13,7 +13,7 @@ use crate::domain::ports::{ImportRepo, NotionRunRepo};
 
 const ROADMAP: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
-async fn member(pool: &PgPool, label: &str, team: Uuid) -> MacroUserIdStr<'static> {
+async fn member(pool: &PgPool, label: &str, team: Uuid) -> RoxUserIdStr<'static> {
     let id = Uuid::now_v7();
     let email = format!("{label}@example.com");
     let user_id = format!("macro|{email}");
@@ -27,7 +27,7 @@ async fn member(pool: &PgPool, label: &str, team: Uuid) -> MacroUserIdStr<'stati
     .await
     .unwrap();
     sqlx::query!(
-        "INSERT INTO \"User\" (id, email, macro_user_id) VALUES ($1, $2, $3)",
+        "INSERT INTO \"User\" (id, email, rox_user_id) VALUES ($1, $2, $3)",
         user_id,
         email,
         id,
@@ -51,13 +51,13 @@ async fn member(pool: &PgPool, label: &str, team: Uuid) -> MacroUserIdStr<'stati
     .execute(pool)
     .await
     .unwrap();
-    MacroUserIdStr::parse_from_str(&user_id)
+    RoxUserIdStr::parse_from_str(&user_id)
         .unwrap()
         .into_owned()
 }
 
 /// `user`'s one-page plan of the Roadmap, staged.
-async fn roadmap_plan(repo: &PgImportRepo, user: &MacroUserIdStr<'static>) -> Uuid {
+async fn roadmap_plan(repo: &PgImportRepo, user: &RoxUserIdStr<'static>) -> Uuid {
     let staged = repo
         .replace_plan(
             user,
@@ -78,7 +78,7 @@ async fn roadmap_plan(repo: &PgImportRepo, user: &MacroUserIdStr<'static>) -> Uu
 }
 
 /// `user`'s run, writing, held by a live process.
-async fn writing(repo: &PgImportRepo, user: &MacroUserIdStr<'static>, lease: Duration) {
+async fn writing(repo: &PgImportRepo, user: &RoxUserIdStr<'static>, lease: Duration) {
     repo.start_run(user, ImportSource::Notion, &[])
         .await
         .unwrap();
@@ -102,7 +102,7 @@ async fn writing(repo: &PgImportRepo, user: &MacroUserIdStr<'static>, lease: Dur
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_first_teammate_to_start_writing_holds_the_teams_claim(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let team = Uuid::now_v7();
@@ -126,7 +126,7 @@ async fn only_the_first_teammate_to_start_writing_holds_the_teams_claim(pool: Pg
     assert_eq!(second[0].team_id, None, "Bo writes nothing for the team");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_private_object_takes_no_claim(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let team = Uuid::now_v7();
@@ -147,7 +147,7 @@ async fn a_private_object_takes_no_claim(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_teammate_waits_on_the_live_holder_and_is_linked_once_it_is_imported(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let team = Uuid::now_v7();
@@ -187,7 +187,7 @@ async fn a_teammate_waits_on_the_live_holder_and_is_linked_once_it_is_imported(p
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_finished_copy_is_linked_and_a_stopped_holder_is_taken_over(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let team = Uuid::now_v7();
@@ -231,7 +231,7 @@ async fn a_finished_copy_is_linked_and_a_stopped_holder_is_taken_over(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_teammate_linking_a_finished_copy_never_claims_it(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let team = Uuid::now_v7();
@@ -262,7 +262,7 @@ async fn a_teammate_linking_a_finished_copy_never_claims_it(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_holder_that_fails_gives_up_its_claim_and_releases_its_waiters(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let team = Uuid::now_v7();
@@ -293,7 +293,7 @@ async fn a_holder_that_fails_gives_up_its_claim_and_releases_its_waiters(pool: P
     assert_eq!(bos.last_error.as_deref(), Some(TEAMMATE_STOPPED));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_waiting_row_outlives_its_own_write_until_the_holder_settles(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let team = Uuid::now_v7();
@@ -319,7 +319,7 @@ async fn a_waiting_row_outlives_its_own_write_until_the_holder_settles(pool: PgP
     assert_eq!(bos.last_error.as_deref(), Some(TEAMMATE_STOPPED));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_owners_sharing_changes_are_recorded_on_their_staged_rows(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let team = Uuid::now_v7();

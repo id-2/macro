@@ -38,7 +38,7 @@ const ENTITY_ACCESS_SQL = `CREATE TABLE entity_access
 (
   entity_id UUID NOT NULL,        -- document_id, project_id, chat_id, email_thread_id
   entity_type EntityType NOT NULL, -- document, project, chat, email
-  source_id TEXT NOT NULL,         -- channel_id, team_id or macro_user_id if creator
+  source_id TEXT NOT NULL,         -- channel_id, team_id or rox_user_id if creator
   source_type TEXT NOT NULL,       -- channel, team, user if creator
   access_level AccessLevel NOT NULL, -- the access level granted to the source
   granted_from_project_id UUID     -- set when access came from a shared project

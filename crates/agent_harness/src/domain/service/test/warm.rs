@@ -144,7 +144,7 @@ async fn warming_initializes_without_a_prompt_or_visible_created_event() {
             instructions: None,
             model: None,
             profile: Some(agent_session::domain::ports::SelectedManagedPersona {
-                bot_id: bot_id::MACRO_NEW_BOT_ID,
+                bot_id: bot_id::ROX_NEW_BOT_ID,
                 profile: None,
             }),
             source: SessionSource::User,
@@ -208,7 +208,7 @@ async fn a_warm_claim_delivers_its_first_prompt_under_the_callers_id() {
             instructions: None,
             model: None,
             profile: Some(agent_session::domain::ports::SelectedManagedPersona {
-                bot_id: bot_id::MACRO_NEW_BOT_ID,
+                bot_id: bot_id::ROX_NEW_BOT_ID,
                 profile: None,
             }),
             source: SessionSource::User,
@@ -287,7 +287,7 @@ async fn a_missed_warm_claim_records_why_on_the_open_span() {
             instructions: None,
             model: Some("composer-model".to_owned()),
             profile: Some(agent_session::domain::ports::SelectedManagedPersona {
-                bot_id: bot_id::MACRO_NEW_BOT_ID,
+                bot_id: bot_id::ROX_NEW_BOT_ID,
                 profile: None,
             }),
             source: SessionSource::User,
@@ -342,7 +342,7 @@ async fn an_open_without_a_client_id_records_that_no_warm_id_was_sent() {
             instructions: None,
             model: None,
             profile: Some(agent_session::domain::ports::SelectedManagedPersona {
-                bot_id: bot_id::MACRO_NEW_BOT_ID,
+                bot_id: bot_id::ROX_NEW_BOT_ID,
                 profile: None,
             }),
             source: SessionSource::User,
@@ -426,7 +426,7 @@ async fn a_routine_run_opens_its_own_session_instead_of_claiming_a_warm_one() {
             instructions: None,
             model: None,
             profile: Some(agent_session::domain::ports::SelectedManagedPersona {
-                bot_id: bot_id::MACRO_NEW_BOT_ID,
+                bot_id: bot_id::ROX_NEW_BOT_ID,
                 profile: None,
             }),
             source: SessionSource::Routine,
@@ -464,7 +464,7 @@ async fn a_session_asked_for_out_of_sight_is_hidden_and_notifies_nobody() {
         instructions: None,
         model: None,
         profile: Some(agent_session::domain::ports::SelectedManagedPersona {
-            bot_id: bot_id::MACRO_NEW_BOT_ID,
+            bot_id: bot_id::ROX_NEW_BOT_ID,
             profile: None,
         }),
         source: SessionSource::User,

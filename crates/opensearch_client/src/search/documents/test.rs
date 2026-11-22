@@ -581,7 +581,7 @@ fn inner_hit_groups_expand_in_clause_order() {
             "_id": id,
             "_score": 1.0,
             "_source": { "node_id": id },
-            "highlight": { "content": ["<macro_em>match</macro_em>"] },
+            "highlight": { "content": ["<rox_em>match</rox_em>"] },
         })
     };
     let inner_hits = serde_json::json!({

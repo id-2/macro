@@ -24,7 +24,7 @@ preview endpoint.
 
 ## Boundaries
 
-- Depends on: `email` (features `axum`, `inbound`), `macro_tower_layers`,
+- Depends on: `email` (features `axum`, `inbound`), `rox_tower_layers`,
   `model`, `models_email`.
 - Used by: `crates/memory`, `crates/ai_tools`, `services/agent_harness_service`,
   `services/agent_harness_service`.
@@ -46,7 +46,7 @@ preview endpoint.
   internal service-to-service calls, `EmailServiceClientExternal` is for
   calls authenticated with a caller's JWT — pick the one matching the caller.
 - New endpoint calls inject the caller's trace context
-  (`macro_tower_layers::inject_trace_headers`, as
+  (`rox_tower_layers::inject_trace_headers`, as
   `get_recent_inbox_messages` does); most older modules predate that.
 
 ## Related

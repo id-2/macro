@@ -1,5 +1,5 @@
 use super::support::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -53,7 +53,7 @@ async fn state(pool: &PgPool) -> anyhow::Result<State> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -74,7 +74,7 @@ async fn concurrent_claims_have_one_owner(pool: PgPool) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -95,7 +95,7 @@ async fn expiry_before_submission_allows_preparation_with_same_message_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -116,7 +116,7 @@ async fn expiry_after_submission_permits_only_reconciliation(pool: PgPool) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -140,7 +140,7 @@ async fn old_worker_claim_without_message_id_remains_ambiguous(pool: PgPool) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -172,7 +172,7 @@ async fn reclaimed_worker_fences_every_stale_transition(pool: PgPool) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -196,7 +196,7 @@ async fn failed_delivery_never_becomes_claimable_just_because_time_passes(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -220,7 +220,7 @@ async fn unconfirmed_delivery_can_only_be_claimed_for_lookup(pool: PgPool) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -248,7 +248,7 @@ async fn preparation_release_backs_off_and_preserves_stable_identity(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -280,7 +280,7 @@ async fn pre_upgrade_unfenced_clear_cannot_reopen_uncertain_delivery(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")
@@ -305,7 +305,7 @@ async fn pre_upgrade_successful_completion_remains_compatible(pool: PgPool) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("get_process_scheduled_messages")

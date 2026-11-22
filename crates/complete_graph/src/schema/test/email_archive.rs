@@ -113,7 +113,7 @@ async fn archive_undo_and_redo_return_primary_state_without_reading_the_soup_rep
     assert_eq!(
         *harness.email_service.archive_mutation_calls.lock().unwrap(),
         [true, false, true].map(|archived| (
-            MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+            RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
             thread_id,
             archived,
         ))
@@ -146,7 +146,7 @@ async fn bulk_archive_returns_primary_state_for_each_thread_without_reading_the_
     assert_eq!(
         *harness.email_service.archive_mutation_calls.lock().unwrap(),
         [first, second].map(|thread_id| (
-            MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+            RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
             thread_id,
             true,
         ))

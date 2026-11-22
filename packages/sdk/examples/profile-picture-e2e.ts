@@ -9,7 +9,7 @@
 import { StaticImage } from '../src/entities/images/image';
 import { resolveLocalPortmap } from '../src/local-portmap';
 import { Rox } from '../src/macro';
-import { MacroError } from '../src/utils';
+import { RoxError } from '../src/utils';
 
 const portmap = resolveLocalPortmap();
 if (!portmap) throw new Error('no local stack portmap; run `just run_local`');
@@ -33,12 +33,12 @@ async function login(name: string): Promise<string> {
     `${authHost}/oauth/passwordless/${code}?email=${encodeURIComponent(email)}&disable_redirect=true`,
   );
   const { access_token } = (await tokens.json()) as { access_token: string };
-  const api = await fetch(`${authHost}/jwt/macro_api_token`, {
+  const api = await fetch(`${authHost}/jwt/rox_api_token`, {
     headers: { Authorization: `Bearer ${access_token}` },
   });
-  if (!api.ok) throw new Error(`macro_api_token ${api.status} for ${name}`);
-  const { macro_api_token } = (await api.json()) as { macro_api_token: string };
-  return macro_api_token;
+  if (!api.ok) throw new Error(`rox_api_token ${api.status} for ${name}`);
+  const { rox_api_token } = (await api.json()) as { rox_api_token: string };
+  return rox_api_token;
 }
 
 // A 1x1 PNG whose single pixel differs per image, so uploads differ.
@@ -137,7 +137,7 @@ let throttled = false;
 try {
   await alice.me.update({ profilePicture: second });
 } catch (error) {
-  throttled = error instanceof MacroError || error instanceof Error;
+  throttled = error instanceof RoxError || error instanceof Error;
   console.log('  throttle error:', (error as Error).message);
 }
 check('second change within 1s is throttled', throttled);

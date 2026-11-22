@@ -28,9 +28,9 @@ table.
 
 ## Boundaries
 
-- Depends on (by feature): `entity_access` (ports), `macro_authorization`
+- Depends on (by feature): `entity_access` (ports), `rox_authorization`
   (inbound), `lexical_client` + `sync_service_client` (outbound init),
-  `macro_db_client` (postgres).
+  `rox_db_client` (postgres).
 - Used by: `forms`, `ai_tools`, `initiative_description`,
   `document_storage_service` — each wires its own domain port over
   `OwnedSurfaceService` or calls `CollabSurfaceService` directly for

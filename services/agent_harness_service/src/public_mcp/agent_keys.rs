@@ -7,7 +7,7 @@
 
 use std::{future::Future, pin::Pin};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_auth_proxy::domain::user_api_keys::McpUserApiKeys;
 
 use crate::anthropic_gateway::brain::BrainRollout;
@@ -31,7 +31,7 @@ impl<Keys: McpUserApiKeys> McpUserApiKeys for AgentUserApiKeys<Keys> {
     fn user<'a>(
         &'a self,
         key: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Option<MacroUserIdStr<'static>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Option<RoxUserIdStr<'static>>> + Send + 'a>> {
         Box::pin(async move {
             let user = self.keys.user(key).await?;
             if !self.rollout.enabled(&user).await {

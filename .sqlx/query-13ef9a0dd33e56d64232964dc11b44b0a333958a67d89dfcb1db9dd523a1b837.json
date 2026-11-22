@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT macro_user_id FROM \"User\" WHERE id = $1",
+  "query": "SELECT rox_user_id FROM \"User\" WHERE id = $1",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "macro_user_id",
+        "name": "rox_user_id",
         "type_info": "Uuid"
       }
     ],

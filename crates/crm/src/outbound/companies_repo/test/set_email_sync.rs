@@ -1,11 +1,11 @@
 use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_disable_preserves_contacts_and_sources(pool: PgPool) -> anyhow::Result<()> {
     // Disabling email_sync only affects read-side visibility /
     // permission checks — it must not touch existing contacts.
@@ -32,7 +32,7 @@ async fn set_email_sync_disable_preserves_contacts_and_sources(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_enable_preserves_contacts(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@test.com";
@@ -51,7 +51,7 @@ async fn set_email_sync_enable_preserves_contacts(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_returns_not_found_for_unknown_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;
@@ -66,7 +66,7 @@ async fn set_email_sync_returns_not_found_for_unknown_company(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_isolates_companies_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -92,7 +92,7 @@ async fn set_email_sync_isolates_companies_across_teams(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_disable_handles_multi_domain_company(pool: PgPool) -> anyhow::Result<()> {
     // Multi-domain companies lock each (team, domain) on disable; the
     // flag flips but contacts/sources/domains are preserved.
@@ -121,7 +121,7 @@ async fn set_email_sync_disable_handles_multi_domain_company(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_enable_refuses_hidden_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@test.com";
@@ -145,7 +145,7 @@ async fn set_email_sync_enable_refuses_hidden_company(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_email_sync_disable_allowed_on_hidden_company(pool: PgPool) -> anyhow::Result<()> {
     // Disabling sync on an already-hidden, already-disabled company is
     // a no-op-shaped call but must not error — the hidden check only

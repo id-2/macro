@@ -335,7 +335,7 @@ each run.
 
 - Depends on: `agent_session`, `trigger_context`, `jev`, `channels`, `crm`,
   `documents`, `github` (delivery fact and installation claims only),
-  `macro_event_broker`/`macro_event_topics` (Kafka), `macro_db_client`.
+  `rox_event_broker`/`rox_event_topics` (Kafka), `rox_db_client`.
 - Used by: the web app's automations/routines UI and agent tooling, through
   the gateway.
 

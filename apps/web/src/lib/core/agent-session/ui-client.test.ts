@@ -232,7 +232,7 @@ describe('startUiClientId', () => {
     startUiClientId();
 
     expect(opened).toHaveLength(1);
-    const stored = sessionStorage.getItem('macro.ui-client-id');
+    const stored = sessionStorage.getItem('rox.ui-client-id');
     expect(stored).toMatch(/^[0-9a-f-]{36}$/);
     expect(typedInClientId()).toBe(stored);
   });
@@ -248,7 +248,7 @@ describe('startUiClientId', () => {
 
       expect(typedInClientId()).toBeUndefined();
       expect(opened).toEqual([]);
-      expect(sessionStorage.getItem('macro.ui-client-id')).toBeNull();
+      expect(sessionStorage.getItem('rox.ui-client-id')).toBeNull();
     }
   );
 });

@@ -11,7 +11,7 @@ it('follows what the user writes and leaves out the quoted thread', () => {
     () => {
       const quote = $createClassedBlockNode({
         tag: 'div',
-        classes: ['macro_quote', 'gmail_quote'],
+        classes: ['rox_quote', 'gmail_quote'],
       });
       quote.append(
         $createParagraphNode().append($createTextNode('Lunch tomorrow at 1pm?'))

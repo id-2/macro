@@ -217,7 +217,7 @@ and onboarding's team confirmation asks a creator who just invited teammates
 to send them the link too.
 A signed-out invitee who opens an emailed or link invite is sent to
 `/app/login?redirect=/team-invite?…`; once signed in or signed up (including
-desktop Google sign-in, whose `macro:///login` callback carries the redirect)
+desktop Google sign-in, whose `rox:///login` callback carries the redirect)
 they return to the invite before onboarding, so they join first and onboarding
 opens on the team. Channel invites (`/channel-invite`) also open before
 onboarding. Other `?redirect=` deep links, such as meetings, return there after
@@ -277,7 +277,7 @@ to <name>** is the Claude sign-in for the agent's computer, opened from the
 notification or the row, never as a step of the invite: it shows the
 computer's setup progress above **Open claude.ai** and the pasted code, and
 **Close** or **Use Rox credits instead** leaves it. Owners and admins see
-the agent's Claude under its job description: **Claude: Macro credits · Sign
+the agent's Claude under its job description: **Claude: Rox credits · Sign
 in to Claude** (offered only while the computer is connected), **Claude: your
 plan · Use Rox credits** (a confirmation, then sign-out), or **Claude
 sign-in expired · Sign in to Claude**. The sign-in spans carry
@@ -920,7 +920,7 @@ on touch) for the rest. The line is the size and the resources recorded at
 purchase (`Standard · 4 vCPU · 8 GB · 100 GB`), then one state: setup progress
 (`Setting up · Starting up (2 of 3)`, or **Waiting for space on the
 host**), **Starting…** while a power-on runs, **Powered off**, a fault, or how
-Claude is paid for (`Claude: Macro credits`, `Signed in with Claude`,
+Claude is paid for (`Claude: Rox credits`, `Signed in with Claude`,
 `Claude: not signed in`; a shimmer while the mode loads). A purchase whose
 charge is still being confirmed (`purchasing`, or the API's billing setup
 step) reads `Setting up · Updating billing… · 0:12`. Then the billing state: `Payment past due` while the team

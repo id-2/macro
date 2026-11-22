@@ -1,6 +1,6 @@
 //! Authorize source inboxes when registering and delivering forwarded attachments.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{AttachmentForwarded, MessageAttachment};
@@ -22,7 +22,7 @@ pub trait ForwardedAttachmentRepo: Send + Sync {
     /// Return the caller's own and delegated inboxes.
     fn accessible_inboxes(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Uuid>, Self::Err>> + Send;
     /// Check that the destination is still a draft in the selected inbox.
     fn draft_exists(
@@ -80,7 +80,7 @@ impl<R: ForwardedAttachmentRepo> ForwardedAttachmentService<R> {
     #[tracing::instrument(skip(self, actor), fields(source_link_id = tracing::field::Empty, source_accessible = tracing::field::Empty), err)]
     pub async fn add(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link_id: Uuid,
         draft_id: Uuid,
         attachment_id: Uuid,
@@ -123,7 +123,7 @@ impl<R: ForwardedAttachmentRepo> ForwardedAttachmentService<R> {
     #[tracing::instrument(skip(self, actor), fields(source_accessible = tracing::field::Empty), err)]
     pub async fn for_delivery(
         &self,
-        actor: Option<&MacroUserIdStr<'_>>,
+        actor: Option<&RoxUserIdStr<'_>>,
         link_id: Uuid,
         draft_id: Uuid,
     ) -> Result<Vec<ForwardedAttachmentSource>, ForwardedAttachmentError> {

@@ -72,7 +72,7 @@ async fn deliver(
     let state = DatabaseWebhooksRouterState::new(
         service.clone(),
         Arc::new(()),
-        MacroAuthorizationState::new(Arc::new(())),
+        RoxAuthorizationState::new(Arc::new(())),
     );
     let response: Response = deliver_handler::<FakeService, (), ()>(
         State(state),

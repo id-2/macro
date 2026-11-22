@@ -28,7 +28,7 @@ x-local-e2e-env: &local-e2e-env
   CONNECTION_GATEWAY_TABLE: connection-gateway-table
   STATIC_FILE_SERVICE_DYNAMODB_TABLE_NAME: static-file-metadata
 
-  # Queue names now live in the `macro_queues` crate; these OVERRIDE_* vars point
+  # Queue names now live in the `rox_queues` crate; these OVERRIDE_* vars point
   # the local-e2e services at the localstack queues (OVERRIDE_ wins over the
   # per-environment constant regardless of ENVIRONMENT).
   OVERRIDE_CHAT_DELETE_QUEUE: delete-chat-handler-queue

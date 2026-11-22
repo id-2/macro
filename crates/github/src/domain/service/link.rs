@@ -2,9 +2,9 @@
 
 use chrono::Utc;
 use github_pull_requests::domain::ports::GithubPullRequestService;
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 
 use crate::domain::{
@@ -67,20 +67,20 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService>
 
     async fn find_user_link(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
     ) -> Result<Option<GithubLink>, GithubError> {
         self.repo
-            .get_github_link_by_user_id(macro_user_id)
+            .get_github_link_by_user_id(rox_user_id)
             .await
             .map_err(|e| GithubError::Internal(e.into()))
     }
 
     async fn validated_access_token(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
     ) -> Result<GithubAccessToken, GithubError> {
         let link = self
-            .find_user_link(macro_user_id)
+            .find_user_link(rox_user_id)
             .await?
             .ok_or(GithubError::NoLinkFound)?;
 
@@ -214,9 +214,9 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
     #[tracing::instrument(skip(self), err)]
     async fn get_user_link_status(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
     ) -> Result<GithubLinkStatus, GithubError> {
-        let Some(link) = self.find_user_link(macro_user_id).await? else {
+        let Some(link) = self.find_user_link(rox_user_id).await? else {
             return Ok(GithubLinkStatus::NotLinked);
         };
 
@@ -233,22 +233,22 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
     #[tracing::instrument(skip(self))]
     async fn get_user_access_token(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
     ) -> Result<GithubAccessToken, GithubError> {
-        self.validated_access_token(macro_user_id).await
+        self.validated_access_token(rox_user_id).await
     }
 
     #[tracing::instrument(skip(self, pull_requests), err)]
     async fn enrich_pull_requests(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
         pull_requests: Vec<GithubPullRequestRef>,
     ) -> Result<Vec<EnrichedGithubPullRequest>, GithubError> {
         if pull_requests.is_empty() {
             return Ok(Vec::new());
         }
 
-        let access_token = self.validated_access_token(macro_user_id).await?;
+        let access_token = self.validated_access_token(rox_user_id).await?;
 
         let mut enriched_pull_requests = Vec::with_capacity(pull_requests.len());
 
@@ -293,10 +293,10 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
     #[tracing::instrument(skip(self), err)]
     async fn merge_pull_request(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
         request: MergeGithubPullRequestRequest,
     ) -> Result<MergeGithubPullRequestResponse, GithubError> {
-        let access_token = self.validated_access_token(macro_user_id).await?;
+        let access_token = self.validated_access_token(rox_user_id).await?;
         let merge_method = self.resolve_merge_method(&access_token, &request).await?;
 
         let outcome = self
@@ -332,10 +332,10 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
     #[tracing::instrument(skip(self), err)]
     async fn set_pull_request_draft(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
         request: SetGithubPullRequestDraftRequest,
     ) -> Result<SetGithubPullRequestDraftResponse, GithubError> {
-        let access_token = self.validated_access_token(macro_user_id).await?;
+        let access_token = self.validated_access_token(rox_user_id).await?;
 
         let outcome = self
             .oauth
@@ -369,10 +369,10 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
     #[tracing::instrument(skip(self), err)]
     async fn set_pull_request_state(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
         request: SetGithubPullRequestStateRequest,
     ) -> Result<SetGithubPullRequestStateResponse, GithubError> {
-        let access_token = self.validated_access_token(macro_user_id).await?;
+        let access_token = self.validated_access_token(rox_user_id).await?;
 
         let outcome = self
             .oauth
@@ -406,7 +406,7 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
     #[tracing::instrument(skip(self), err)]
     async fn get_pull_request_mergeability(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
         pull_requests: Vec<GithubPullRequestNumber>,
     ) -> Result<Vec<GithubPullRequestMergeabilityEntry>, GithubError> {
         if pull_requests.len() > GithubPullRequestMergeabilityRequest::MAX {
@@ -416,7 +416,7 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
             return Ok(Vec::new());
         }
 
-        let access_token = self.validated_access_token(macro_user_id).await?;
+        let access_token = self.validated_access_token(rox_user_id).await?;
 
         self.oauth
             .get_pull_request_mergeability(access_token.as_str(), &pull_requests)
@@ -427,14 +427,14 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
     #[tracing::instrument(skip(self), err)]
     async fn delete_user_link(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'static>>,
+        rox_user_id: &RoxUserId<Lowercase<'static>>,
     ) -> Result<(), GithubError> {
         let mut user_guard = self
             .repo
-            .lock_user_link(macro_user_id.as_ref())
+            .lock_user_link(rox_user_id.as_ref())
             .await
             .map_err(|e| GithubError::Internal(e.into()))?;
-        let Some(link) = self.find_user_link(macro_user_id).await? else {
+        let Some(link) = self.find_user_link(rox_user_id).await? else {
             tracing::trace!("no github link found for user");
             return Ok(());
         };
@@ -445,7 +445,7 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
             .map_err(|e| GithubError::Internal(e.into()))?;
         // A different sharer may have repaired the owner while we waited.
         let link = self
-            .find_user_link(macro_user_id)
+            .find_user_link(rox_user_id)
             .await?
             .ok_or(GithubError::NoLinkFound)?;
 
@@ -488,7 +488,7 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
     #[tracing::instrument(skip(self, user_id, code, redirect_uri), err)]
     async fn link_user(
         &self,
-        user_id: &MacroUserId<Lowercase<'static>>,
+        user_id: &RoxUserId<Lowercase<'static>>,
         fusionauth_user_id: &uuid::Uuid,
         in_progess_link_id: &uuid::Uuid,
         redirect_uri: &str,
@@ -628,8 +628,8 @@ impl<R: GithubRepo, U: GithubOauth, F: Auth, E: GithubPullRequestService> Github
 
         // create github link
         let link = GithubLink {
-            id: macro_uuid::generate_uuid_v7(),
-            macro_id: MacroUserIdStr(user_id.clone()),
+            id: rox_uuid::generate_uuid_v7(),
+            rox_id: RoxUserIdStr(user_id.clone()),
             fusionauth_user_id: row_fusionauth_user_id,
             github_username: user_info.login.clone(),
             github_user_id: gh_id,

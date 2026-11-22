@@ -16,8 +16,8 @@ use axum_extra::extract::Query;
 use entity_access::{
     domain::ports::EntityAccessService, inbound::axum_extractors::EntityBodyAccessLevelExtractor,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_entity::EntityType;
 use model_error_response::ErrorResponse;
@@ -32,7 +32,7 @@ use crate::domain::{
 pub struct FavoritesRouterState<S, AccessSvc, Auth> {
     service: Arc<S>,
     access_service: Arc<AccessSvc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, AccessSvc, Auth> Clone for FavoritesRouterState<S, AccessSvc, Auth> {
@@ -54,7 +54,7 @@ where
     pub fn new(
         service: Arc<S>,
         access_service: Arc<AccessSvc>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -71,7 +71,7 @@ impl<S, AccessSvc, Auth> FromRef<FavoritesRouterState<S, AccessSvc, Auth>> for A
 }
 
 impl<S, AccessSvc, Auth> FromRef<FavoritesRouterState<S, AccessSvc, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &FavoritesRouterState<S, AccessSvc, Auth>) -> Self {
         state.authorization_state.clone()
@@ -91,7 +91,7 @@ pub fn favorites_router<S, AccessSvc, Auth, T>(
 where
     S: FavoritesService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -169,17 +169,17 @@ pub struct ReorderFavoritesRequest {
 #[tracing::instrument(err, skip_all)]
 pub async fn list_favorites_handler<S, AccessSvc, Auth>(
     State(state): State<FavoritesRouterState<S, AccessSvc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(filter): Query<FavoriteFilter>,
 ) -> Result<Json<FavoritesList>, FavoritesError>
 where
     S: FavoritesService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let favorites = state
         .service
-        .list_favorites(&user.authorization.user.macro_user_id, &filter)
+        .list_favorites(&user.authorization.user.rox_user_id, &filter)
         .await?;
     Ok(Json(FavoritesList { favorites }))
 }
@@ -207,7 +207,7 @@ pub async fn add_favorite_handler<S, AccessSvc, Auth>(
 where
     S: FavoritesService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let favorite = state
         .service
@@ -233,18 +233,18 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn remove_favorite_by_entity_handler<S, AccessSvc, Auth>(
     State(state): State<FavoritesRouterState<S, AccessSvc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(params): Path<RemoveFavoriteByEntityParams>,
 ) -> Result<Json<()>, FavoritesError>
 where
     S: FavoritesService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let entity = params.entity_type.with_entity_str(&params.entity_id);
     state
         .service
-        .remove_favorite_by_entity(&user.authorization.user.macro_user_id, &entity)
+        .remove_favorite_by_entity(&user.authorization.user.rox_user_id, &entity)
         .await?;
     Ok(Json(()))
 }
@@ -266,13 +266,13 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn reorder_favorites_handler<S, AccessSvc, Auth>(
     State(state): State<FavoritesRouterState<S, AccessSvc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<ReorderFavoritesRequest>,
 ) -> Result<Json<()>, FavoritesError>
 where
     S: FavoritesService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let ordered: Vec<_> = req
         .favorites
@@ -281,7 +281,7 @@ where
         .collect();
     state
         .service
-        .reorder_favorites(&user.authorization.user.macro_user_id, &ordered)
+        .reorder_favorites(&user.authorization.user.rox_user_id, &ordered)
         .await?;
     Ok(Json(()))
 }

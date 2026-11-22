@@ -44,7 +44,7 @@ pub struct ParsedMessage {
     /// Sanitized HTML body.
     pub body_html_sanitized: Option<String>,
     /// Rox-format body.
-    pub body_macro: Option<String>,
+    pub body_rox: Option<String>,
     /// Body with reply/forwarded content stripped.
     pub body_replyless: Option<String>,
     /// Internal date timestamp from the provider.
@@ -96,7 +96,7 @@ impl From<&Message> for ParsedMessage {
             body_parsed,
             body_text: message.body_text.clone(),
             body_html_sanitized: message.body_html_sanitized.clone(),
-            body_macro: message.body_macro.clone(),
+            body_rox: message.body_rox.clone(),
             body_replyless: message.body_replyless.clone(),
             internal_date_ts: message.internal_date_ts,
             sent_at: message.sent_at,

@@ -103,7 +103,7 @@ function navIconStyle(props: {
   };
 }
 
-function MacroNavIcon(props: {
+function RoxNavIcon(props: {
   name: string;
   active?: boolean;
   accent?: boolean;
@@ -592,7 +592,7 @@ export function HeroTaskWindow() {
               gap: '8px',
             }}
           >
-            <MacroNavIcon name="tasks" active size={16} /> Tasks
+            <RoxNavIcon name="tasks" active size={16} /> Tasks
           </span>
           <SsgDesktop>
             <TabsInset
@@ -1481,7 +1481,7 @@ export function CaptureTaskGraphic() {
               'min-width': 0,
             }}
           >
-            <MacroNavIcon name="channels" size={15} />
+            <RoxNavIcon name="channels" size={15} />
             bug-reports
           </span>
           <span
@@ -1503,7 +1503,7 @@ export function CaptureTaskGraphic() {
               'white-space': 'nowrap',
             }}
           >
-            <MacroNavIcon name="tasks" size={13} />
+            <RoxNavIcon name="tasks" size={13} />
             Create task
           </span>
         </div>
@@ -3567,7 +3567,7 @@ function CreatorBackdrop() {
                 padding: '13px 6px',
               }}
             >
-              <MacroNavIcon name={row.icon} size={15} />
+              <RoxNavIcon name={row.icon} size={15} />
               <span
                 style={{
                   color: 'var(--c2)',
@@ -4589,7 +4589,7 @@ export function ChatTasksGraphic() {
               padding: '11px 14px',
             }}
           >
-            <MacroNavIcon name="channels" size={15} />
+            <RoxNavIcon name="channels" size={15} />
             <span
               style={{
                 color: 'var(--c1)',
@@ -4726,7 +4726,7 @@ export function ChatTasksGraphic() {
                   'white-space': 'nowrap',
                 }}
               >
-                <MacroNavIcon name="tasks" size={13} accent />
+                <RoxNavIcon name="tasks" size={13} accent />
                 Create task
                 <span
                   aria-hidden="true"
@@ -4937,7 +4937,7 @@ export function AgentHandoffGraphic() {
             padding: '11px 14px',
           }}
         >
-          <MacroNavIcon name="channels" size={15} />
+          <RoxNavIcon name="channels" size={15} />
           <span
             style={{
               color: 'var(--c1)',

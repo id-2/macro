@@ -18,8 +18,8 @@ use entity_access::domain::models::{AccessLevel, EntityType};
 use entity_access::domain::ports::AccessRepository;
 use entity_access::outbound::PgAccessRepository;
 use lexical_client::LexicalClient;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use crate::domain::error::{HarnessError, Result};
@@ -61,13 +61,13 @@ pub(crate) trait SessionAccess: Send + Sync + 'static {
     fn viewers(
         &self,
         session_id: AgentSessionId,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send;
 
     /// The highest access `user` has on `session_id`, if any.
     fn access_of(
         &self,
         session_id: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<AccessLevel>>> + Send;
 
     /// Let each of `users` edit `session_id`. Never lowers anyone: a user who
@@ -75,7 +75,7 @@ pub(crate) trait SessionAccess: Send + Sync + 'static {
     fn grant_edit(
         &self,
         session_id: AgentSessionId,
-        users: &[MacroUserIdStr<'static>],
+        users: &[RoxUserIdStr<'static>],
     ) -> impl Future<Output = Result<()>> + Send;
 }
 
@@ -98,7 +98,7 @@ impl PgSessionAccess {
 }
 
 impl SessionAccess for PgSessionAccess {
-    async fn viewers(&self, session_id: AgentSessionId) -> Result<Vec<MacroUserIdStr<'static>>> {
+    async fn viewers(&self, session_id: AgentSessionId) -> Result<Vec<RoxUserIdStr<'static>>> {
         self.access
             .get_entity_users(&session_id.as_uuid(), EntityType::AgentSession)
             .await
@@ -108,7 +108,7 @@ impl SessionAccess for PgSessionAccess {
     async fn access_of(
         &self,
         session_id: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Option<AccessLevel>> {
         self.access
             .get_agent_session_access(&session_id.as_uuid().to_string(), Some(&user.0))
@@ -119,7 +119,7 @@ impl SessionAccess for PgSessionAccess {
     async fn grant_edit(
         &self,
         session_id: AgentSessionId,
-        users: &[MacroUserIdStr<'static>],
+        users: &[RoxUserIdStr<'static>],
     ) -> Result<()> {
         // The shared writer for direct user grants: it never touches an
         // owner row, and edit is the most anyone else can hold, so nobody is
@@ -162,19 +162,19 @@ where
     fn share_with_mentioned<'a>(
         &'a self,
         session_id: AgentSessionId,
-        actor: Option<&'a MacroUserIdStr<'static>>,
+        actor: Option<&'a RoxUserIdStr<'static>>,
         prompt_markdown: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send + 'a>> {
         Box::pin(async move {
             if !prompt_markdown.contains(USER_MENTION_TAG) {
                 return Ok(Vec::new());
             }
             let mentioned = self.source.mentioned_user_ids(prompt_markdown).await?;
-            let mut users: Vec<MacroUserIdStr<'static>> = Vec::new();
+            let mut users: Vec<RoxUserIdStr<'static>> = Vec::new();
             for id in mentioned {
                 // An id the lexical service produced that is not a Rox user
                 // id is not ours to notify; skip it rather than fail the lot.
-                let Ok(user) = MacroUserIdStr::parse_from_str(&id) else {
+                let Ok(user) = RoxUserIdStr::parse_from_str(&id) else {
                     tracing::warn!(mention = %id, "ignoring a user mention that is not a macro user id");
                     continue;
                 };

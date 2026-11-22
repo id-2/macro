@@ -1,7 +1,7 @@
 config:
   aws-native:region: us-east-1
   aws:region: us-east-1
-  notification-service:macro_db_secret_key: macro-db-prod
+  notification-service:rox_db_secret_key: macro-db-prod
   notification-service:notification_retention_enabled: true
   notification-service:notification_retention_dry_run: false
   notification-service:jwt_secret_key: fusionauth-jwt-secret-prod

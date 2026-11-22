@@ -1,4 +1,4 @@
-import { MACRO_SYSTEM_BOT_ID } from '@core/constant/macroSystem';
+import { ROX_SYSTEM_BOT_ID } from '@core/constant/macroSystem';
 import { createRoot, createSignal } from 'solid-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -113,7 +113,7 @@ describe('appActivityContext.botName', () => {
   it('never fetches the bots list for first-party bots', () => {
     createRoot((dispose) => {
       const context = useActivityContext();
-      const name = context.botName(() => MACRO_SYSTEM_BOT_ID);
+      const name = context.botName(() => ROX_SYSTEM_BOT_ID);
 
       expect(name()).toBe('System');
       expect(useBotsQuery).not.toHaveBeenCalled();

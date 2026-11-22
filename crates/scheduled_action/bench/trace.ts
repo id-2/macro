@@ -261,7 +261,7 @@ export function breakdown(
     modelMs,
     modelCalls: chats.length + pauses.length,
     untracedCalls: pauses.length,
-    firstChunkMs: chats.map((span) => number(span, 'macro.genai.chat.time_to_first_chunk_ms')),
+    firstChunkMs: chats.map((span) => number(span, 'rox.genai.chat.time_to_first_chunk_ms')),
     inputTokens:
       sum('gen_ai.usage.input_tokens') + cachedTokens + sum('gen_ai.usage.cache_creation.input_tokens'),
     cachedTokens,

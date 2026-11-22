@@ -11,7 +11,7 @@ use std::pin::Pin;
 use chrono::{DateTime, Utc};
 
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt, ViewAccessLevel};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use item_filters::ast::{LiteralTree, call::CallLiteral};
@@ -140,7 +140,7 @@ pub trait CallRepository: Send + Sync + 'static {
         &self,
         meeting_id: &Uuid,
         call_id: &Uuid,
-        users: &[MacroUserIdStr<'a>],
+        users: &[RoxUserIdStr<'a>],
     ) -> impl Future<Output = Result<(), CallError>> + Send;
     /// Update metadata when the supplied actor owns the uncancelled invitation.
     fn update_meeting(
@@ -191,7 +191,7 @@ pub trait CallRepository: Send + Sync + 'static {
         call_id: &Uuid,
         channel_id: &Uuid,
         room_name: &str,
-        created_by: MacroUserIdStr<'a>,
+        created_by: RoxUserIdStr<'a>,
         channel_thread: bool,
     ) -> impl Future<Output = Result<Option<Call>, CallError>> + Send;
 
@@ -217,7 +217,7 @@ pub trait CallRepository: Send + Sync + 'static {
     /// newest first. Calls with no active participants are excluded.
     fn get_active_calls_for_user<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Vec<ActiveCallSummary>, Self::Err>> + Send;
 
     /// Get an active call by its RTC room name.
@@ -235,14 +235,14 @@ pub trait CallRepository: Send + Sync + 'static {
     fn add_participant<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<CallParticipant, AddParticipantError>> + Send;
 
     /// Commit authenticated link participation and grant comment access to this call only, enabling chat.
     fn add_meeting_participant<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<CallParticipant, AddParticipantError>> + Send;
 
     /// Find the call the user is currently an active participant of, if any.
@@ -250,14 +250,14 @@ pub trait CallRepository: Send + Sync + 'static {
     /// for the first active participation row (`left_at IS NULL`).
     fn find_active_call_for_user<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Option<(Uuid, Option<Uuid>)>, Self::Err>> + Send;
 
     /// Remove a participant from a call.
     fn remove_participant<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Every call session that has not been archived yet.
@@ -298,7 +298,7 @@ pub trait CallRepository: Send + Sync + 'static {
     fn get_call_participants_with_team_members(
         &self,
         call_record_id: &Uuid,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Self::Err>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Self::Err>> + Send;
 
     /// Check if a user is already a participant in a call.
     fn is_participant(
@@ -312,7 +312,7 @@ pub trait CallRepository: Send + Sync + 'static {
     fn record_decline<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Check if a user has declined an active call on any of their devices.
@@ -432,17 +432,17 @@ pub trait CallRepository: Send + Sync + 'static {
         diarized_speaker_id: Option<&'a str>,
     ) -> impl Future<Output = Result<Option<Uuid>, Self::Err>> + Send;
 
-    /// Get the profile picture URL for a user by their `MacroUserIdStr`.
+    /// Get the profile picture URL for a user by their `RoxUserIdStr`.
     fn get_user_profile_picture<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Option<String>, Self::Err>> + Send;
 
     /// Get the display name (first + last) for a user. Returns `None` if neither
     /// field is set or both are the sentinel "N/A".
     fn get_user_display_name<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Option<String>, Self::Err>> + Send;
 
     /// Fetch a full [`CallRecord`] by call id. Looks in both the active
@@ -467,7 +467,7 @@ pub trait CallRepository: Send + Sync + 'static {
     fn batch_get_call_record_previews<'a>(
         &self,
         call_ids: &[Uuid],
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Vec<CallRecordPreview>, Self::Err>> + Send;
 
     /// Fetch visible active and archived records, without transcripts. Status
@@ -477,7 +477,7 @@ pub trait CallRepository: Send + Sync + 'static {
     /// seek past `page.after`, and return at most `limit`.
     fn get_call_records_by_user<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         limit: u32,
         filter: &LiteralTree<CallLiteral>,
         page: CallRecordPage,
@@ -487,7 +487,7 @@ pub trait CallRepository: Send + Sync + 'static {
     fn resolve_channel_name<'a>(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Option<String>, Self::Err>> + Send;
 
     /// Resolve the display name of one channel as each of `viewer_ids` sees
@@ -500,8 +500,8 @@ pub trait CallRepository: Send + Sync + 'static {
     fn resolve_channel_name_for_viewers<'a>(
         &self,
         channel_id: &Uuid,
-        viewer_ids: &[MacroUserIdStr<'a>],
-    ) -> impl Future<Output = Result<HashMap<MacroUserIdStr<'static>, String>, Self::Err>> + Send;
+        viewer_ids: &[RoxUserIdStr<'a>],
+    ) -> impl Future<Output = Result<HashMap<RoxUserIdStr<'static>, String>, Self::Err>> + Send;
 
     /// Delete a row from `call_records` by id. Participants and transcript
     /// segments are removed via `ON DELETE CASCADE`. No-op if no row matches.
@@ -560,13 +560,13 @@ pub trait CallRepository: Send + Sync + 'static {
         assignments: Vec<(Uuid, String)>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
-    /// Stable `(macro_user_id, voice_id)` pairs inferred from a finished
+    /// Stable `(rox_user_id, voice_id)` pairs inferred from a finished
     /// call's archived transcripts. A speaker is returned only when every
     /// transcript row for that `speaker_id` has the same non-NULL
     /// `diarized_speaker_id`; all distinct non-NULL `voice_id`s observed on
     /// those rows are returned. The `speaker_id` is resolved through the
     /// canonical `User` row to get the `macro_user.id` used by
-    /// `macro_user_voice`.
+    /// `rox_user_voice`.
     fn get_stable_speaker_voices_for_call_record(
         &self,
         call_record_id: &Uuid,
@@ -750,7 +750,7 @@ pub trait CallSummarizer: Send + Sync + 'static {
     fn generate_custom_speakers(
         &self,
         transcript: Vec<EnrichedCallTranscript>,
-        candidate_speakers: Vec<MacroUserIdStr<'static>>,
+        candidate_speakers: Vec<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<Vec<CallTranscriptCustomSpeakerResult>, Self::Err>> + Send;
 }
 
@@ -785,14 +785,14 @@ pub trait CallRtcClient: Send + Sync + 'static {
     fn generate_token<'a>(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'a>,
+        participant_identity: RoxUserIdStr<'a>,
     ) -> impl Future<Output = anyhow::Result<String>> + Send;
 
     /// Mint a room token with a display name for a person.
     fn generate_named_token<'a>(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'a>,
+        participant_identity: RoxUserIdStr<'a>,
         name: &str,
     ) -> impl Future<Output = anyhow::Result<String>> + Send;
 
@@ -800,7 +800,7 @@ pub trait CallRtcClient: Send + Sync + 'static {
     fn generate_program_token<'a>(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'a>,
+        participant_identity: RoxUserIdStr<'a>,
         program: &str,
         name: Option<String>,
     ) -> impl Future<Output = anyhow::Result<String>> + Send;
@@ -837,13 +837,13 @@ pub trait CallRtcClient: Send + Sync + 'static {
     fn build_voip_push_payloads<'a>(
         &self,
         request: VoipPushPayloadRequest<'a>,
-    ) -> impl Future<Output = Vec<(MacroUserIdStr<'static>, VoipPushPayload)>> + Send;
+    ) -> impl Future<Output = Vec<(RoxUserIdStr<'static>, VoipPushPayload)>> + Send;
 
     /// Remove a participant from a room.
     fn remove_participant<'a>(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'a>,
+        participant_identity: RoxUserIdStr<'a>,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
 
     /// RTC identities connected to a room right now, or `None` when the room
@@ -887,29 +887,29 @@ pub trait CallService: Send + Sync + 'static {
     /// Whether explicit programmatic call routes are enabled for this caller.
     fn programmatic_calls_enabled<'a>(
         &self,
-        caller: MacroUserIdStr<'a>,
+        caller: RoxUserIdStr<'a>,
     ) -> impl Future<Output = bool> + Send;
     /// Reserve an empty room without creating a call, recording, or inviting anyone.
     fn prepare_meeting<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<MeetingPreparation, CallError>> + Send;
     /// Cancel only the actor's unused preparation; safe against concurrent activation.
     fn cancel_meeting_preparation<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
         id: Uuid,
     ) -> impl Future<Output = Result<(), CallError>> + Send;
     /// Create an invitation without starting media.
     fn create_meeting<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
         request: CreateMeetingRequest,
     ) -> impl Future<Output = Result<Meeting, CallError>> + Send;
     /// Send a direct call invitation, restricted to the meeting owner.
     fn invite_to_meeting<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
         token: MeetingToken,
         email: String,
     ) -> impl Future<Output = Result<(), CallError>> + Send;
@@ -917,7 +917,7 @@ pub trait CallService: Send + Sync + 'static {
     /// Return whether the actor owns the standalone meeting and can invite teammates.
     fn get_meeting_invite_permissions<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
         token: MeetingToken,
     ) -> impl Future<Output = Result<MeetingInvitePermissions, CallError>> + Send;
 
@@ -925,7 +925,7 @@ pub trait CallService: Send + Sync + 'static {
     /// Inviting does not create an RTC room or join the caller to the meeting.
     fn invite_users_to_meeting<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
         token: MeetingToken,
         request: InviteMeetingUsersRequest,
     ) -> impl Future<Output = Result<(), CallError>> + Send;
@@ -933,24 +933,24 @@ pub trait CallService: Send + Sync + 'static {
     /// List the actor's uncancelled meetings.
     fn list_meetings<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Vec<Meeting>, CallError>> + Send;
     /// List active quick calls owned, attended, or invited to by the authenticated actor.
     fn list_active_meetings<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Vec<ActiveMeeting>, CallError>> + Send;
     /// Update a meeting owned by the actor.
     fn update_meeting<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
         meeting_id: &Uuid,
         request: UpdateMeetingRequest,
     ) -> impl Future<Output = Result<Meeting, CallError>> + Send;
     /// Cancel an invitation owned by the actor.
     fn cancel_meeting<'a>(
         &self,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
         meeting_id: &Uuid,
     ) -> impl Future<Output = Result<(), CallError>> + Send;
     /// Create or retrieve a live call's invitation from an authorized receipt.
@@ -967,20 +967,20 @@ pub trait CallService: Send + Sync + 'static {
     fn get_meeting_participants<'a>(
         &self,
         token: MeetingToken,
-        actor: Option<MacroUserIdStr<'a>>,
+        actor: Option<RoxUserIdStr<'a>>,
     ) -> impl Future<Output = Result<MeetingParticipants, CallError>> + Send;
 
     /// Join using an authenticated Rox identity.
     fn join_meeting<'a>(
         &self,
         token: MeetingToken,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<CallTokenResponse, CallError>> + Send;
     /// Join with an explicit policy for other calls and RTC connections.
     fn join_meeting_with_options<'a>(
         &self,
         token: MeetingToken,
-        actor: MacroUserIdStr<'a>,
+        actor: RoxUserIdStr<'a>,
         request: JoinCallRequest,
         credential_is_program: bool,
         agent_attributed: bool,
@@ -998,7 +998,7 @@ pub trait CallService: Send + Sync + 'static {
         bearer: &str,
     ) -> impl Future<Output = Result<LeaveCallResponse, CallError>> + Send;
 
-    /// Validate an internal call token (e.g. from the `x-macro-internal-call` header).
+    /// Validate an internal call token (e.g. from the `x-rox-internal-call` header).
     fn validate_internal_call(&self, token: &str) -> bool;
 
     /// Check if an active call exists for a channel.
@@ -1018,7 +1018,7 @@ pub trait CallService: Send + Sync + 'static {
     /// newest first. Calls with no active participants are excluded.
     fn get_active_calls<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<ActiveCallsResponse, CallError>> + Send;
 
     /// Get or create a call in a channel. If a call already exists, joins it;
@@ -1026,14 +1026,14 @@ pub trait CallService: Send + Sync + 'static {
     fn get_or_create_call<'a>(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<CallTokenResponse, CallError>> + Send;
 
     /// Explicit start or join of a channel call.
     fn start_call<'a>(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         request: JoinCallRequest,
         credential_is_program: bool,
     ) -> impl Future<Output = Result<CallTokenResponse, CallError>> + Send;
@@ -1042,7 +1042,7 @@ pub trait CallService: Send + Sync + 'static {
     fn join_call<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         request: JoinCallRequest,
         credential_is_program: bool,
     ) -> impl Future<Output = Result<CallTokenResponse, CallError>> + Send;
@@ -1051,34 +1051,34 @@ pub trait CallService: Send + Sync + 'static {
     fn leave_call<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<LeaveCallResponse, CallError>> + Send;
 
     /// Ring state for an authenticated account.
     fn get_call_ring_state<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<RingStatusResponse, CallError>> + Send;
 
     /// All live calls this account may join.
     fn get_live_calls<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<LiveCallsResponse, CallError>> + Send;
 
     /// Connected people in a live call, with the same access as join.
     fn get_call_participants<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<LiveCallParticipantsResponse, CallError>> + Send;
 
     /// Leave or end a call. Removes the user; if last participant, also deletes the room and call.
     fn leave_or_end_call<'a>(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<LeaveCallResponse, CallError>> + Send;
 
     /// Decline a specific active call for this user without joining it.
@@ -1091,7 +1091,7 @@ pub trait CallService: Send + Sync + 'static {
     fn decline_call<'a>(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<(), CallError>> + Send;
 
     /// Decline a ringing call from a native client, authenticated like
@@ -1181,7 +1181,7 @@ pub trait CallService: Send + Sync + 'static {
     /// Apply per-diarized-speaker `custom_speaker` overrides to a call's
     /// transcript. Authorization is carried in the receipt; the entity must
     /// be `EntityType::Call` and its `entity_id` must be the call's UUID.
-    /// Each `custom_speaker` (when `Some`) must parse as a `MacroUserId`;
+    /// Each `custom_speaker` (when `Some`) must parse as a `RoxUserId`;
     /// otherwise the request is rejected with [`CallError::InvalidRequest`].
     fn edit_call_transcript(
         &self,
@@ -1199,7 +1199,7 @@ pub trait CallService: Send + Sync + 'static {
     fn get_batch_call_record_previews<'a>(
         &self,
         request: GetBatchCallRecordPreviewRequest,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<GetBatchCallRecordPreviewResponse, CallError>> + Send;
 
     /// Generate and persist an AI summary for a finished call.
@@ -1212,18 +1212,18 @@ pub trait CallService: Send + Sync + 'static {
     /// cases.
     fn summarize_call(&self, call_id: &Uuid) -> impl Future<Output = Result<(), CallError>> + Send;
 
-    /// List the voice ids currently enrolled for `macro_user_id`.
+    /// List the voice ids currently enrolled for `rox_user_id`.
     fn get_user_voices(
         &self,
-        macro_user_id: &Uuid,
+        rox_user_id: &Uuid,
     ) -> impl Future<Output = Result<Vec<Uuid>, CallError>> + Send;
 
-    /// Enroll a new voice embedding for `macro_user_id`. Inserts a row into
-    /// the `voice` table and links it to the user via `macro_user_voice`.
+    /// Enroll a new voice embedding for `rox_user_id`. Inserts a row into
+    /// the `voice` table and links it to the user via `rox_user_voice`.
     /// Returns the new `voice.id`.
     fn set_user_voice(
         &self,
-        macro_user_id: &Uuid,
+        rox_user_id: &Uuid,
         embedding: &[f32],
     ) -> impl Future<Output = Result<Uuid, CallError>> + Send;
 }
@@ -1289,7 +1289,7 @@ impl CallRecordQueryService for NoOpCallRecordQueryService {
 ///
 /// `voice` stores a row per distinct speaker fingerprint (a `vector(N)`
 /// embedding produced by the LiveKit agent's speaker-embedding model).
-/// `macro_user_voice` is a many-to-many join linking enrolled users to
+/// `rox_user_voice` is a many-to-many join linking enrolled users to
 /// the voice rows that identify them.
 #[cfg_attr(test, mockall::automock(type Err = anyhow::Error;))]
 pub trait VoiceRepository: Send + Sync + 'static {
@@ -1307,21 +1307,21 @@ pub trait VoiceRepository: Send + Sync + 'static {
     ) -> impl Future<Output = Result<Uuid, Self::Err>> + Send;
 
     /// Link a `voice` row to a macro user. Idempotent on the composite
-    /// primary key `(macro_user_id, voice_id)`.
+    /// primary key `(rox_user_id, voice_id)`.
     fn link_user_voice(
         &self,
-        macro_user_id: &Uuid,
+        rox_user_id: &Uuid,
         voice_id: &Uuid,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// All voice ids currently linked to a macro user.
     fn get_user_voices(
         &self,
-        macro_user_id: &Uuid,
+        rox_user_id: &Uuid,
     ) -> impl Future<Output = Result<Vec<Uuid>, Self::Err>> + Send;
 
     /// Resolve a `voice_id` back to its linked macro user, if any. Uses the
-    /// `macro_user_voice` join — does not perform similarity search.
+    /// `rox_user_voice` join — does not perform similarity search.
     fn find_user_by_voice(
         &self,
         voice_id: &Uuid,
@@ -1396,7 +1396,7 @@ impl VoiceRepository for NoOpVoiceRepository {
 #[async_trait::async_trait]
 pub trait ProgrammaticCallGate: Send + Sync + 'static {
     /// Return false when the flag is disabled or unavailable.
-    async fn enabled_for(&self, caller: MacroUserIdStr<'_>) -> bool;
+    async fn enabled_for(&self, caller: RoxUserIdStr<'_>) -> bool;
 }
 
 /// Whether new channel calls discuss in a channel thread, and creating that thread.
@@ -1404,7 +1404,7 @@ pub trait ProgrammaticCallGate: Send + Sync + 'static {
 pub trait ChannelThreads: Send + Sync + 'static {
     /// Whether a call this person starts gets a thread in its channel. A failed
     /// read answers no: the call then behaves as calls always have.
-    async fn enabled_for(&self, caller: MacroUserIdStr<'_>) -> bool;
+    async fn enabled_for(&self, caller: RoxUserIdStr<'_>) -> bool;
     /// Create the call's thread root, once.
     async fn ensure_root(&self, call_id: Uuid) -> Result<(), rootcause::Report>;
 }

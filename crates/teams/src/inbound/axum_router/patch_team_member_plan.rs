@@ -4,10 +4,10 @@ use axum::{
 };
 use entity_access::{
     domain::{models::AdminTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::RoxAuthorizationService;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 
 use crate::domain::{
@@ -21,7 +21,7 @@ use super::TeamRouterState;
 #[derive(serde::Deserialize)]
 pub struct Param {
     /// The member whose seat plan changes.
-    pub member_user_id: MacroUserIdStr<'static>,
+    pub member_user_id: RoxUserIdStr<'static>,
 }
 
 /// Moves one team member's seat between paid plans.
@@ -47,8 +47,8 @@ pub struct Param {
     ),
 )]
 #[tracing::instrument(skip_all, err, fields(member = %member_user_id, plan = %req.plan))]
-pub async fn handler<T: TeamService, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+pub async fn handler<T: TeamService, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<TeamRouterState<T, Eas, Auth>>,
     Path(Param { member_user_id }): Path<Param>,
     Json(req): Json<PatchTeamMemberPlanRequest>,

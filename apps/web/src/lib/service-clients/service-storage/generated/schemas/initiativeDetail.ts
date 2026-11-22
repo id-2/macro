@@ -8,7 +8,7 @@
 import type { AccessLevel } from './accessLevel';
 import type { InitiativeDetailAppearance } from './initiativeDetailAppearance';
 import type { InitiativeId } from './initiativeId';
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './macroUserIdStr';
 import type { SharePermissionV2 } from './sharePermissionV2';
 
 /**
@@ -21,11 +21,11 @@ export interface InitiativeDetail {
   /** Opaque identifier. */
   id: InitiativeId;
   /** Member user ids. The owner is never stored here. */
-  memberIds: MacroUserIdStr[];
+  memberIds: RoxUserIdStr[];
   /** Display name. */
   name: string;
   /** Owner of the initiative. */
-  ownerId: MacroUserIdStr;
+  ownerId: RoxUserIdStr;
   /** Current share permission. */
   sharePermission: SharePermissionV2;
   /** Task ids currently assigned to the initiative. */

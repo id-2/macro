@@ -13,7 +13,7 @@ use entity_access::domain::{
     models::{AccessError, ViewAccessLevel},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{collections::HashMap, num::NonZeroU32, sync::Arc};
 use uuid::Uuid;
 
@@ -33,7 +33,7 @@ impl<R, A> ProjectVisibleActivityReads<R, A> {
 impl<R, A: EntityAccessService> ProjectVisibleActivityReads<R, A> {
     async fn visible(
         &self,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         entity_type: EntityType,
         entity_id: &str,
         cache: &mut HashMap<String, bool>,
@@ -73,7 +73,7 @@ impl<R, A: EntityAccessService> ProjectVisibleActivityReads<R, A> {
         records: Vec<ActivityRecord>,
     ) -> Result<Vec<ActivityRecord>, InitiativeError> {
         let viewer =
-            MacroUserIdStr::parse_from_str(subject).map_err(|_| InitiativeError::Unauthorized)?;
+            RoxUserIdStr::parse_from_str(subject).map_err(|_| InitiativeError::Unauthorized)?;
         let mut cache = HashMap::new();
         let mut visible = Vec::with_capacity(records.len());
         for record in records {
@@ -152,7 +152,7 @@ impl<R: ActivityReads + Send + Sync, A: EntityAccessService> ActivityReads
             .subject_overview(subject_id, window)
             .await
             .map_err(|error| InitiativeError::Internal(rootcause::report!(error).into()))?;
-        let viewer = MacroUserIdStr::parse_from_str(subject_id)
+        let viewer = RoxUserIdStr::parse_from_str(subject_id)
             .map_err(|_| InitiativeError::Unauthorized)?;
         let mut cache = HashMap::new();
         let mut entities = Vec::new();

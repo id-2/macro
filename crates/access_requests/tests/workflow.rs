@@ -8,8 +8,8 @@ use access_requests::{
 };
 use chrono::{DateTime, Utc};
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use sqlx::PgPool;
 use std::sync::{
@@ -41,8 +41,8 @@ fn setup(pool: PgPool) -> (Service, TestClock) {
         clock,
     )
 }
-fn user(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{name}@requests.test")).unwrap()
+fn user(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{name}@requests.test")).unwrap()
 }
 fn entity() -> ShareEntity {
     ShareEntity {
@@ -57,7 +57,7 @@ fn ask(level: AccessLevel, revision: Option<i32>) -> RequestAccess {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn upgrades_and_private_state(pool: PgPool) {
     let (s, _) = setup(pool);
     assert!(matches!(
@@ -108,7 +108,7 @@ async fn upgrades_and_private_state(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn initial_access_requires_owner_approval_and_supports_cancellation(pool: PgPool) {
     let (s, clock) = setup(pool);
     let first = s
@@ -195,7 +195,7 @@ async fn initial_access_requires_owner_approval_and_supports_cancellation(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn edits_cancel_and_stale_reviews(pool: PgPool) {
     let (s, clock) = setup(pool);
     let first = s
@@ -284,7 +284,7 @@ async fn edits_cancel_and_stale_reviews(pool: PgPool) {
     assert!(initial.superseded.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn denial_cooldown_applies_to_both_levels(pool: PgPool) {
     let (s, clock) = setup(pool);
     let request = s
@@ -328,7 +328,7 @@ async fn denial_cooldown_applies_to_both_levels(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn requester_cannot_repeat_notifications_by_changing_levels_or_cancelling(pool: PgPool) {
     let (service, clock) = setup(pool);
     let first = service
@@ -414,7 +414,7 @@ async fn requester_cannot_repeat_notifications_by_changing_levels_or_cancelling(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn approval_allows_an_immediate_further_upgrade(pool: PgPool) {
     let (service, _) = setup(pool);
     let first = service
@@ -453,7 +453,7 @@ async fn approval_allows_an_immediate_further_upgrade(pool: PgPool) {
     assert!(upgraded.retry_after.is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn first_review_wins_and_grants_are_manageable(pool: PgPool) {
     let (s, _) = setup(pool);
     let request = s
@@ -510,7 +510,7 @@ async fn first_review_wins_and_grants_are_manageable(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn concurrent_duplicate_submissions_have_one_request_and_event(pool: PgPool) {
     let (s, _) = setup(pool);
     let (a, b) = tokio::join!(
@@ -521,7 +521,7 @@ async fn concurrent_duplicate_submissions_have_one_request_and_event(pool: PgPoo
     assert_eq!(s.repository.claim_events().await.unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn approval_preserves_stronger_access_and_rejects_owner_grants(pool: PgPool) {
     let (s, _) = setup(pool);
     let request = s
@@ -574,7 +574,7 @@ async fn approval_preserves_stronger_access_and_rejects_owner_grants(pool: PgPoo
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document", "folder"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document", "folder"))]
 async fn folder_grants_propagate_without_overwriting_direct_child_access(pool: PgPool) {
     let (s, _) = setup(pool);
     let folder = ShareEntity {
@@ -615,7 +615,7 @@ async fn folder_grants_propagate_without_overwriting_direct_child_access(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn recorded_owner_reports_owner_access_over_its_grant_row(pool: PgPool) {
     sqlx::query!(
         "UPDATE entity_access SET access_level = 'edit' WHERE source_id = 'macro|owner@requests.test'"
@@ -647,7 +647,7 @@ async fn recorded_owner_reports_owner_access_over_its_grant_row(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn bot_sponsor_can_review_without_a_separate_user_grant(pool: PgPool) {
     sqlx::query!("INSERT INTO bots (id, kind, owner_user_id, name, handle) VALUES ('00000000-0000-0000-0000-000000000020', 'owned', 'macro|owner@requests.test', 'Owner bot', 'request-owner')")
         .execute(&pool).await.unwrap();
@@ -716,7 +716,7 @@ async fn bot_sponsor_can_review_without_a_separate_user_grant(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn request_workflow_does_not_acquire_a_second_pool_connection(pool: PgPool) {
     let single = sqlx::postgres::PgPoolOptions::new()
         .max_connections(1)
@@ -764,7 +764,7 @@ async fn request_workflow_does_not_acquire_a_second_pool_connection(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS", fixtures("document"))]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS", fixtures("document"))]
 async fn notification_supersession_follows_revisions_when_transaction_times_are_reordered(
     pool: PgPool,
 ) {
@@ -819,24 +819,24 @@ async fn notification_supersession_follows_revisions_when_transaction_times_are_
 /// A runtime owned by `owner`, who shares a team with `teammate` but not `outsider`.
 async fn seed_harness(pool: &PgPool) -> ShareEntity {
     for name in ["owner", "teammate", "outsider"] {
-        let macro_user_id = Uuid::now_v7();
+        let rox_user_id = Uuid::now_v7();
         let email = format!("{name}@requests.test");
         let id = user(name);
         sqlx::query!(
             r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
             VALUES ($1, $2, $2, $3)"#,
-            macro_user_id,
+            rox_user_id,
             email,
-            format!("stripe_{macro_user_id}"),
+            format!("stripe_{rox_user_id}"),
         )
         .execute(pool)
         .await
         .unwrap();
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+            r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
             id.as_ref(),
             email,
-            macro_user_id,
+            rox_user_id,
         )
         .execute(pool)
         .await
@@ -878,7 +878,7 @@ async fn seed_harness(pool: &PgPool) -> ShareEntity {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_runtime_is_shared_only_among_the_owners_teammates(pool: PgPool) {
     let runtime = seed_harness(&pool).await;
     let (s, _) = setup(pool);
@@ -996,7 +996,7 @@ async fn bind_agent(
     bot_id
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_runtime_access_names_the_residents_it_stopped(pool: PgPool) {
     let runtime = seed_harness(&pool).await;
     let (s, _) = setup(pool.clone());

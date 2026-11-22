@@ -1,7 +1,7 @@
 //! Which lane of a board a card is in: the one rule from a grouping cell to
 //! its lane, and from a lane to the cell a card moved there gets.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use crate::ids::OptionId;
@@ -23,7 +23,7 @@ pub enum LaneKey {
     User(
         #[specta(type = String)]
         #[cfg_attr(feature = "schema", schemars(with = "String"))]
-        MacroUserIdStr<'static>,
+        RoxUserIdStr<'static>,
     ),
     /// The cards whose grouping cell is empty.
     None,
@@ -33,7 +33,7 @@ impl LaneKey {
     /// The lane of the person an entity id names; a reference that is not
     /// a Rox user id names no one, so its card is in the empty lane.
     pub fn person(entity_id: &str) -> LaneKey {
-        MacroUserIdStr::try_from(entity_id.to_string())
+        RoxUserIdStr::try_from(entity_id.to_string())
             .map(LaneKey::User)
             .unwrap_or(LaneKey::None)
     }

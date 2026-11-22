@@ -10,8 +10,8 @@ mod test;
 
 use std::str::FromStr;
 
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::channel_share_permission::ChannelSharePermission;
@@ -124,7 +124,7 @@ impl InitiativeRepo for PgInitiativeRepo {
     #[tracing::instrument(err, skip(self, user_id))]
     async fn list_accessible(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<InitiativeList, Self::Err> {
         list::list_accessible(&self.pool, user_id).await
     }
@@ -142,7 +142,7 @@ impl InitiativeRepo for PgInitiativeRepo {
     #[tracing::instrument(err, skip(self, user_id))]
     async fn get_team_default_link_share(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<Option<TeamLinkShareDefault>, Self::Err> {
         share::get_team_default_link_share(&self.pool, user_id).await
     }
@@ -151,7 +151,7 @@ impl InitiativeRepo for PgInitiativeRepo {
     async fn grant_assignees(
         &self,
         id: InitiativeId,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> Result<(), Self::Err> {
         members::grant_assignees(&self.pool, id, &user_ids).await
     }
@@ -231,13 +231,13 @@ impl InitiativeRecord {
     }
 }
 
-fn parse_owner(raw: &str) -> Result<MacroUserIdStr<'static>, InitiativeError> {
-    MacroUserIdStr::parse_from_str(raw)
+fn parse_owner(raw: &str) -> Result<RoxUserIdStr<'static>, InitiativeError> {
+    RoxUserIdStr::parse_from_str(raw)
         .map(|id| id.into_owned())
         .map_err(|error| map_sqlx(AdapterError::Sqlx(sqlx::Error::Decode(Box::new(error)))))
 }
 
-fn parse_members(raw: Vec<String>) -> Result<Vec<MacroUserIdStr<'static>>, InitiativeError> {
+fn parse_members(raw: Vec<String>) -> Result<Vec<RoxUserIdStr<'static>>, InitiativeError> {
     raw.into_iter()
         .filter(|id| !id.is_empty())
         .map(|id| parse_owner(&id))

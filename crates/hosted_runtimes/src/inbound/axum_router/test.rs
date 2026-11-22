@@ -43,16 +43,16 @@ use entity_access::domain::models::{
     AccessError, AccessLevel, BotAccessScope, BotId, CallChannelInfo, EntityPermission, EntityType,
     TeamRole, UserTeamInfo,
 };
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError, ValidatedCredential};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError, ValidatedCredential};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use model_user::UserContext;
 use rootcause::Report;
 use tower::ServiceExt;
 
 #[derive(Clone)]
 struct Authorization;
-impl MacroAuthorizationService for Authorization {
-    async fn authorize(&self, _jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for Authorization {
+    async fn authorize(&self, _jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         Ok(UserContext {
             user_id: "macro|admin@example.com".to_owned(),
             fusion_user_id: Uuid::from_u128(1).to_string(),
@@ -63,18 +63,18 @@ impl MacroAuthorizationService for Authorization {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt).await.map(ValidatedCredential::session)
     }
     async fn authorize_internal(
         &self,
         provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key == "test-internal-key" {
             Ok(None)
         } else {
-            Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+            Err(Report::new(RoxAuthorizationError::InvalidCredentials))
         }
     }
 }
@@ -85,7 +85,7 @@ struct TeamAccess(TeamRole);
 impl EntityAccessService for TeamAccess {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -105,7 +105,7 @@ impl EntityAccessService for TeamAccess {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -114,7 +114,7 @@ impl EntityAccessService for TeamAccess {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -133,7 +133,7 @@ impl EntityAccessService for TeamAccess {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -143,7 +143,7 @@ impl EntityAccessService for TeamAccess {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -154,7 +154,7 @@ impl EntityAccessService for TeamAccess {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Ok(Vec::new())
     }
 
@@ -174,7 +174,7 @@ impl EntityAccessService for TeamAccess {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(Some(UserTeamInfo {
             team_id: TEAM,
@@ -190,7 +190,7 @@ async fn registered_routes_reject_detached_fleet_without_side_effects() {
         let state = ComputerRouterState {
             service: service.clone(),
             entity_access_service: Arc::new(TeamAccess(TeamRole::Admin)),
-            authorization_state: MacroAuthorizationState::new(Arc::new(Authorization)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(Authorization)),
         };
         let router: Router = team_router(state);
         for (method, path, body) in [
@@ -266,7 +266,7 @@ async fn registered_routes_preserve_rollout_denials() {
     let state = ComputerRouterState {
         service: service.clone(),
         entity_access_service: Arc::new(TeamAccess(TeamRole::Admin)),
-        authorization_state: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(Authorization)),
     };
     let router: Router = team_router(state);
     for (method, path, body) in [
@@ -314,7 +314,7 @@ async fn listing_answers_with_the_teams_rows_while_the_fleet_is_detached() {
         let state = ComputerRouterState {
             service,
             entity_access_service: Arc::new(TeamAccess(TeamRole::Admin)),
-            authorization_state: MacroAuthorizationState::new(Arc::new(Authorization)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(Authorization)),
         };
         let router: Router = team_router(state);
         let response = router
@@ -371,7 +371,7 @@ async fn finishing_setup_follows_the_team_admin_role_not_the_buyer() {
         repo.computers.lock().unwrap().insert(
             id,
             crate::domain::models::Computer {
-                created_by: macro_user_id::user_id::MacroUserIdStr::try_from(buyer.to_owned())
+                created_by: rox_user_id::user_id::RoxUserIdStr::try_from(buyer.to_owned())
                     .unwrap(),
                 ..crate::domain::service::test::computer(
                     id,
@@ -396,7 +396,7 @@ async fn finishing_setup_follows_the_team_admin_role_not_the_buyer() {
         let router: Router = team_router(ComputerRouterState {
             service: service.clone(),
             entity_access_service: Arc::new(TeamAccess(role)),
-            authorization_state: MacroAuthorizationState::new(Arc::new(Authorization)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(Authorization)),
         });
         let response = router
             .oneshot(

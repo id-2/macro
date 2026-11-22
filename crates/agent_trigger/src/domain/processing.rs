@@ -3,8 +3,8 @@
 use agent_session::domain::error::AgentSessionError;
 use agent_session::domain::ports::AgentSessionRepo;
 use channels::domain::models::ChannelType;
-use macro_event_broker::{EventBrokerError, MacroEvent as _, MacroEventBroker};
-use macro_uuid::Uuid;
+use rox_event_broker::{EventBrokerError, RoxEvent as _, RoxEventBroker};
+use rox_uuid::Uuid;
 use messages::domain::events::MessagePostedMetadata;
 use messages::domain::models::MessageParent;
 
@@ -92,9 +92,9 @@ where
     History: ThreadHistory,
     Kinds: ChannelTypeLookup,
     Discussions: DiscussionReader,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
-    tracing::Span::current().record("macro.event.type", "message.posted");
+    tracing::Span::current().record("rox.event.type", "message.posted");
     let posted = &input.posted;
 
     let decisions = trigger.evaluate(posted).await?;

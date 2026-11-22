@@ -14,7 +14,7 @@
 
 use agent_runtime_protocol::domain::action::AgentActionId;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use non_empty::NonEmpty;
 use serde::Serialize;
 use specta::Type;
@@ -277,7 +277,7 @@ pub enum Author {
         /// The attributed user's id.
         #[serde(rename = "userId")]
         #[specta(type = Option<String>)]
-        user_id: Option<MacroUserIdStr<'static>>,
+        user_id: Option<RoxUserIdStr<'static>>,
     },
     /// The agent.
     Agent,

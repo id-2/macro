@@ -10,8 +10,8 @@ pub use entity_access_db_utils::team_share::acquire_guard;
 use entity_access_db_utils::team_share::{
     delete_direct, direct_level, replace_project_contributions, upsert_direct,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_uuid::Uuid;
+use rox_user_id::cowlike::CowLike;
+use rox_uuid::Uuid;
 use model_entity::{Entity, EntityType};
 use model_owner::{
     Owner,
@@ -141,7 +141,7 @@ async fn load_state(connection: &mut PgConnection, entity: &Entity<'_>) -> TeamS
             FROM "Chat" c LEFT JOIN "ChatPermission" cp ON cp."chatId" = c.id
             WHERE $2 = 'chat' AND c.id = $1
             UNION ALL
-            SELECT l.macro_id, tp."sharePermissionId"
+            SELECT l.rox_id, tp."sharePermissionId"
             FROM email_threads t JOIN email_links l ON l.id = t.link_id
             LEFT JOIN "EmailThreadPermission" tp ON tp."threadId" = t.id::text
             WHERE $2 = 'email_thread' AND t.id = $3

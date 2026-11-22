@@ -100,14 +100,14 @@ beforeEach(() => {
   registration.buffered = undefined;
   registration.acknowledge.mockClear();
   setPendingNotificationNavigationId(undefined);
-  delete window.__MACRO_ANDROID_CALL_KIT__;
+  delete window.__ROX_ANDROID_CALL_KIT__;
 });
 afterEach(() => {
   dispose?.();
   dispose = undefined;
   setPendingNotificationNavigationId(undefined);
   endNotificationOpen('test_complete');
-  delete window.__MACRO_ANDROID_CALL_KIT__;
+  delete window.__ROX_ANDROID_CALL_KIT__;
 });
 
 describe.each(['ios', 'android'])('%s push notification navigation', (os) => {
@@ -211,7 +211,7 @@ describe('push registration native-call capability', () => {
     async ({ os, version, binary, expected }) => {
       registration.os = os;
       registration.version = version;
-      if (binary) window.__MACRO_ANDROID_CALL_KIT__ = true;
+      if (binary) window.__ROX_ANDROID_CALL_KIT__ = true;
       mountRegistration();
       expect(registration.sync).toBeDefined();
       await registration.sync!();

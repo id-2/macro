@@ -5,16 +5,16 @@ use axum::{
     body::{Body, to_bytes},
     http::Request,
 };
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError, ValidatedCredential};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError, ValidatedCredential};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use model_user::UserContext;
 use rootcause::Report;
 use tower::ServiceExt;
 
 #[derive(Clone)]
 struct Authorization;
-impl MacroAuthorizationService for Authorization {
-    async fn authorize(&self, token: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for Authorization {
+    async fn authorize(&self, token: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         Ok(UserContext {
             user_id: if token == "agent-session" {
                 "macro|agent@example.test"
@@ -30,23 +30,23 @@ impl MacroAuthorizationService for Authorization {
     async fn authorize_identity(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         let mut credential = ValidatedCredential::session(self.authorize(token).await?);
         credential.origin = match token {
             "session" | "agent-session" => CredentialOrigin::Session,
-            "api" => CredentialOrigin::MacroApiJwt,
+            "api" => CredentialOrigin::RoxApiJwt,
             "key" => CredentialOrigin::UserApiKey,
             "agent" => CredentialOrigin::Bot,
             "internal" => CredentialOrigin::Internal,
-            _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         };
         Ok(credential)
     }
     async fn authorize_user_api_key(
         &self,
         _: &str,
-    ) -> Result<macro_authorization::AuthorizedUserApiKey, Report<MacroAuthorizationError>> {
-        Ok(macro_authorization::AuthorizedUserApiKey {
+    ) -> Result<rox_authorization::AuthorizedUserApiKey, Report<RoxAuthorizationError>> {
+        Ok(rox_authorization::AuthorizedUserApiKey {
             user_context: self.authorize("session").await?,
             account_manager: None,
         })
@@ -55,7 +55,7 @@ impl MacroAuthorizationService for Authorization {
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         Ok(Some(self.authorize("session").await?))
     }
 }
@@ -82,14 +82,14 @@ fn flagged_app(
     let provider = Arc::new(FakeProvider::new());
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
     for user in ["macro|synthetic@example.test", "macro|agent@example.test"] {
-        use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+        use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
         flags.set(
-            MacroUserIdStr::parse_from_str(user).unwrap().into_owned(),
+            RoxUserIdStr::parse_from_str(user).unwrap().into_owned(),
             actor_result.clone(),
         );
     }
     let app = router(PasswordRouterState {
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
         service: Arc::new(PasswordService {
             repository: repository.clone(),
             provider: provider.clone(),
@@ -201,7 +201,7 @@ async fn every_route_rejects_non_session_origins_and_keeps_responses_private() {
             let response = app()
                 .oneshot(
                     request
-                        .header("x-macro-passwords", "1")
+                        .header("x-rox-passwords", "1")
                         .header("content-type", "application/json")
                         .body(Body::from(body.to_string()))
                         .expect("request"),
@@ -244,12 +244,12 @@ fn csrf_header_accepts_both_names_and_prefers_the_rox_one() {
         Some("1")
     );
     assert_eq!(
-        csrf_header(&headers(&[("x-macro-passwords", "1")])),
+        csrf_header(&headers(&[("x-rox-passwords", "1")])),
         Some("1")
     );
     assert_eq!(
         csrf_header(&headers(&[
-            ("x-macro-passwords", "1"),
+            ("x-rox-passwords", "1"),
             ("x-rox-passwords", "0")
         ])),
         Some("0")
@@ -271,7 +271,7 @@ async fn mutations_reject_missing_header_and_cross_site_requests() {
                 .header("content-type", "application/json");
             if cross_site {
                 request = request
-                    .header("x-macro-passwords", "1")
+                    .header("x-rox-passwords", "1")
                     .header("sec-fetch-site", "cross-site");
             }
             let response = app()
@@ -296,7 +296,7 @@ async fn invalid_json_never_reflects_private_input() {
                     .method("POST")
                     .uri(format!("/teams/{}/items", Uuid::from_u128(1)))
                     .header("authorization", "Bearer session")
-                    .header("x-macro-passwords", "1")
+                    .header("x-rox-passwords", "1")
                     .header("content-type", "application/json")
                     .body(Body::from(body))
                     .expect("request"),
@@ -325,10 +325,10 @@ impl Availability for Enabled {
         Ok(())
     }
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgPool) {
     use crate::domain::ports::Repository;
-    use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+    use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
     async fn finish_lease_rollbacks(pool: &sqlx::PgPool) {
         // SQLx queues rollback on transaction Drop. Check out every connection so
         // the next independent request cannot race the preceding lease's release.
@@ -348,21 +348,21 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
         ),
         ("macro|other@example.test", "other@example.test", second),
     ] {
-        let macro_user_id = Uuid::now_v7();
+        let rox_user_id = Uuid::now_v7();
         sqlx::query!(
             "INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,$2,$2,$3)",
-            macro_user_id,
+            rox_user_id,
             email,
-            format!("fixture-{macro_user_id}")
+            format!("fixture-{rox_user_id}")
         )
         .execute(&pool)
         .await
         .expect("account");
         sqlx::query!(
-            r#"INSERT INTO "User"(id,email,macro_user_id) VALUES ($1,$2,$3)"#,
+            r#"INSERT INTO "User"(id,email,rox_user_id) VALUES ($1,$2,$3)"#,
             user,
             email,
-            macro_user_id
+            rox_user_id
         )
         .execute(&pool)
         .await
@@ -387,7 +387,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
     let repository = Arc::new(PgRepository::new(pool.clone()).expect("repository capacity"));
     let now = chrono::Utc::now();
     let record = Record {
-        user_id: MacroUserIdStr::parse_from_str("macro|synthetic@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|synthetic@example.test")
             .expect("identity")
             .into_owned(),
         grants: vec![],
@@ -434,7 +434,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
         .await
         .expect("provider fixture");
     let app: Router = router(PasswordRouterState {
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
         service: Arc::new(PasswordService {
             repository: repository.clone(),
             provider: provider.clone(),
@@ -474,7 +474,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
             .method(if copy { "POST" } else { "GET" })
             .uri(path)
             .header("authorization", "Bearer session")
-            .header("x-macro-passwords", "1")
+            .header("x-rox-passwords", "1")
             .body(Body::empty())
             .expect("request");
         let pending = tokio::spawn(app.clone().oneshot(request));
@@ -491,7 +491,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
                         .method("POST")
                         .uri(format!("/teams/{}/items/{item}/reveal", first.0))
                         .header("authorization", "Bearer session")
-                        .header("x-macro-passwords", "1")
+                        .header("x-rox-passwords", "1")
                         .header("content-type", "application/json")
                         .body(Body::from("{}"))
                         .expect("contending request"),
@@ -554,7 +554,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
                     .method(method)
                     .uri(path)
                     .header("authorization", "Bearer session")
-                    .header("x-macro-passwords", "1")
+                    .header("x-rox-passwords", "1")
                     .header("content-type", "application/json")
                     .body(Body::from("{}"))
                     .expect("request"),
@@ -638,7 +638,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
                     .method("PUT")
                     .uri(path)
                     .header("authorization", "Bearer session")
-                    .header("x-macro-passwords", "1")
+                    .header("x-rox-passwords", "1")
                     .header("content-type", "application/json")
                     .body(Body::from(body.to_string()))
                     .expect("request"),
@@ -661,14 +661,14 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
 #[tokio::test]
 async fn every_route_rejects_verified_internal_and_api_key_headers() {
     for (method, path, body) in routes() {
-        for credential_header in ["x-internal-auth-key", "x-macro-user-api-key"] {
+        for credential_header in ["x-internal-auth-key", "x-rox-user-api-key"] {
             let response = app()
                 .oneshot(
                     Request::builder()
                         .method(method)
                         .uri(&path)
                         .header(credential_header, "synthetic-credential")
-                        .header("x-macro-passwords", "1")
+                        .header("x-rox-passwords", "1")
                         .header("content-type", "application/json")
                         .body(Body::from(body.to_string()))
                         .expect("request"),
@@ -752,7 +752,7 @@ async fn lifecycle_routes_reject_human_agent_and_api_credentials_before_any_muta
     use crate::domain::service::test::fakes::FakeRepository;
     let repository = Arc::new(FakeRepository::new());
     let app: Router = internal_router(PasswordRouterState {
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
         service: Arc::new(PasswordService {
             repository: repository.clone(),
             provider: Arc::new(UnavailableProvider),

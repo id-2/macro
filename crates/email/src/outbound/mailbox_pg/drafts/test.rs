@@ -10,14 +10,14 @@ use crate::{
     },
 };
 use email_api_client::domain::models::{MailboxState, SendRequest};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 mod delivery_status;
 mod sent_view;
 
 const ACTOR: &str = "macro|outlook-test@example.com";
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sent_sync_settles_uncertainty_and_fences_a_late_coordinator(db: PgPool) {
     let (sync, _, input, link) = setup(&db, true).await;
     sqlx::query!("INSERT INTO email_scheduled_messages (link_id,message_id,send_time,actor_id,processing) VALUES ($1,$2,now(),$3,true)",link,input.db_id,ACTOR).execute(&db).await.unwrap();
@@ -56,8 +56,8 @@ async fn sent_sync_settles_uncertainty_and_fences_a_late_coordinator(db: PgPool)
     assert_eq!(events[0].payload["actor"], ACTOR);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn sending_in_outlook_is_not_attributed_to_the_last_macro_editor(db: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn sending_in_outlook_is_not_attributed_to_the_last_rox_editor(db: PgPool) {
     let (sync, _, input, link) = setup(&db, true).await;
     let lease = sync
         .claim_draft(
@@ -85,7 +85,7 @@ async fn sending_in_outlook_is_not_attributed_to_the_last_macro_editor(db: PgPoo
     assert!(event.payload["actor"].is_null());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explicit_retry_and_read_only_recheck_have_different_delivery_effects(db: PgPool) {
     use crate::domain::models::mailbox_operation::*;
     let (sync, repo, input, link) = setup(&db, true).await;
@@ -104,7 +104,7 @@ async fn explicit_retry_and_read_only_recheck_have_different_delivery_effects(db
         .await
         .unwrap();
     let actor =
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("outlook-test@example.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("outlook-test@example.com").unwrap();
     let facts = repo
         .message_operation_facts(&[input.db_id])
         .await
@@ -162,7 +162,7 @@ async fn explicit_retry_and_read_only_recheck_have_different_delivery_effects(db
     assert_eq!(row.stage.as_deref(), Some("ready"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn conflict_resolution_rechecks_version_at_commit_and_requires_a_fresh_send(db: PgPool) {
     use crate::domain::models::mailbox_operation::*;
     let (sync, repo, input, link) = setup(&db, true).await;
@@ -179,7 +179,7 @@ async fn conflict_resolution_rechecks_version_at_commit_and_requires_a_fresh_sen
         .await
         .unwrap();
     let actor =
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("outlook-test@example.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("outlook-test@example.com").unwrap();
     let facts = repo
         .message_operation_facts(&[input.db_id])
         .await
@@ -267,7 +267,7 @@ async fn conflict_resolution_rechecks_version_at_commit_and_requires_a_fresh_sen
     assert_eq!(body.as_deref(), Some("Provider's chosen revision"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_save_keeps_the_acknowledged_version_before_sync_catches_up(db: PgPool) {
     let (sync, repo, mut input, link) = setup(&db, true).await;
     let lease = sync
@@ -299,7 +299,7 @@ async fn a_new_save_keeps_the_acknowledged_version_before_sync_catches_up(db: Pg
     assert_eq!(row.base_version.as_deref(), Some("v2"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn confirmed_sent_copy_uses_provider_content_and_retains_local_recovery_data(db: PgPool) {
     let (sync, _, input, link) = setup(&db, true).await;
     let lease = sync
@@ -342,7 +342,7 @@ async fn setup(
     if imported {
         sqlx::query!("INSERT INTO email_messages (id,link_id,thread_id,provider_id,provider_thread_id,provider_version,is_draft,body_text) VALUES ($1,$2,$3,'a','conversation','v1',true,'Original')",id,link,thread).execute(db).await.unwrap();
     }
-    let input:ResolvedDraftInput=serde_json::from_value(serde_json::json!({"db_id":id,"thread_db_id":thread,"subject":"Local subject","body_text":"Local body","body_macro":"Local editor document","to":[],"cc":[],"bcc":[],"actor_id":ACTOR})).unwrap();
+    let input:ResolvedDraftInput=serde_json::from_value(serde_json::json!({"db_id":id,"thread_db_id":thread,"subject":"Local subject","body_text":"Local body","body_rox":"Local editor document","to":[],"cc":[],"bcc":[],"actor_id":ACTOR})).unwrap();
     let repo = EmailPgRepo::new(db.clone());
     repo.insert_message(
         &input,
@@ -408,13 +408,13 @@ async fn sync_draft(sync: &PgMailboxSync, link: Uuid) {
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unsynced_draft_only_thread_stays_out_of_the_inbox(db: PgPool) {
     let (_, _, input, _) = setup(&db, false).await;
     assert_eq!(inbox_state(&db, input.thread_db_id).await, (false, None));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_synced_draft_only_thread_stays_out_of_the_inbox(db: PgPool) {
     let (sync, _, input, link) = setup(&db, false).await;
     sync_draft(&sync, link).await;
@@ -429,7 +429,7 @@ async fn a_synced_draft_only_thread_stays_out_of_the_inbox(db: PgPool) {
     assert_eq!(inbox_state(&db, input.thread_db_id).await, (false, None));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_synced_reply_draft_returns_archived_received_mail_to_the_inbox(db: PgPool) {
     let (sync, _, input, link) = setup(&db, false).await;
     sqlx::query!(
@@ -456,7 +456,7 @@ async fn a_synced_reply_draft_returns_archived_received_mail_to_the_inbox(db: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn saving_an_imported_draft_keeps_its_provider_identity_and_baseline(db: PgPool) {
     let (_, _, input, _) = setup(&db, true).await;
     let row=sqlx::query!("SELECT m.provider_id,d.base_version,d.revision,d.desired_content FROM email_messages m JOIN email_mailbox_drafts d ON d.message_id = m.id WHERE m.id = $1",input.db_id).fetch_one(&db).await.unwrap();
@@ -466,7 +466,7 @@ async fn saving_an_imported_draft_keeps_its_provider_identity_and_baseline(db: P
     assert_eq!(row.desired_content["body_text"], "Local body");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn remote_ingestion_preserves_an_unsynced_local_edit_and_records_remote_content(db: PgPool) {
     let (sync, _, input, link) = setup(&db, true).await;
     let stream = sync.claim_stream(Uuid::now_v7()).await.unwrap().unwrap();
@@ -485,15 +485,15 @@ async fn remote_ingestion_preserves_an_unsynced_local_edit_and_records_remote_co
     remote.content.message.is_draft = true;
     remote.content.message.body_text = Some("Outlook edit".into());
     sync.ingest(&work, remote).await.unwrap();
-    let row=sqlx::query!("SELECT m.body_text,m.body_macro,m.provider_version,d.base_version,d.remote_snapshot FROM email_messages m JOIN email_mailbox_drafts d ON d.message_id = m.id WHERE m.id = $1",input.db_id).fetch_one(&db).await.unwrap();
+    let row=sqlx::query!("SELECT m.body_text,m.body_rox,m.provider_version,d.base_version,d.remote_snapshot FROM email_messages m JOIN email_mailbox_drafts d ON d.message_id = m.id WHERE m.id = $1",input.db_id).fetch_one(&db).await.unwrap();
     assert_eq!(row.body_text.as_deref(), Some("Local body"));
-    assert_eq!(row.body_macro.as_deref(), Some("Local editor document"));
+    assert_eq!(row.body_rox.as_deref(), Some("Local editor document"));
     assert_eq!(row.provider_version.as_deref(), Some("v2"));
     assert_eq!(row.base_version.as_deref(), Some("v1"));
     assert_eq!(row.remote_snapshot.unwrap()["body_text"], "Outlook edit");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn acknowledgement_of_an_older_revision_leaves_a_newer_save_pending(db: PgPool) {
     let (sync, repo, mut input, link) = setup(&db, true).await;
     let lease = sync
@@ -529,7 +529,7 @@ async fn acknowledgement_of_an_older_revision_leaves_a_newer_save_pending(db: Pg
     assert_eq!(row.desired_content["body_text"], "Newer local edit");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn send_marker_and_schedule_claim_commit_together_and_survive_worker_reclaim(db: PgPool) {
     let (sync, _, input, link) = setup(&db, true).await;
     sqlx::query!("INSERT INTO email_scheduled_messages (link_id,message_id,send_time,actor_id) VALUES ($1,$2,now() - interval '1 second',$3)",link,input.db_id,ACTOR).execute(&db).await.unwrap();
@@ -573,7 +573,7 @@ async fn send_marker_and_schedule_claim_commit_together_and_survive_worker_recla
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cancellation_that_wins_before_submission_prevents_delivery(db: PgPool) {
     let (sync, _, input, link) = setup(&db, true).await;
     sqlx::query!("INSERT INTO email_scheduled_messages (link_id,message_id,send_time,actor_id) VALUES ($1,$2,now() - interval '1 second',$3)",link,input.db_id,ACTOR).execute(&db).await.unwrap();
@@ -599,7 +599,7 @@ async fn cancellation_that_wins_before_submission_prevents_delivery(db: PgPool) 
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deletion_retains_a_fenced_remote_cleanup_intent(db: PgPool) {
     let (sync, repo, input, link) = setup(&db, true).await;
     assert!(
@@ -633,7 +633,7 @@ async fn deletion_retains_a_fenced_remote_cleanup_intent(db: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_discard_while_the_worker_writes_a_save_runs_after_that_write(db: PgPool) {
     let (sync, repo, input, link) = setup(&db, false).await;
     let second = ResolvedDraftInput {
@@ -688,8 +688,8 @@ async fn a_discard_while_the_worker_writes_a_save_runs_after_that_write(db: PgPo
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn sync_before_creation_response_binds_the_existing_macro_message(db: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn sync_before_creation_response_binds_the_existing_rox_message(db: PgPool) {
     let (sync, _, input, link) = setup(&db, false).await;
     let lease = sync
         .claim_draft(
@@ -729,7 +729,7 @@ async fn sync_before_creation_response_binds_the_existing_macro_message(db: PgPo
     assert_eq!(messages[0].provider_id.as_deref(), Some("a"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn paused_writes_still_claim_uncertain_outcomes_without_claiming_new_drafts(db: PgPool) {
     let (sync, _, _, _) = setup(&db, true).await;
     assert!(
@@ -759,7 +759,7 @@ async fn paused_writes_still_claim_uncertain_outcomes_without_claiming_new_draft
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn draft_organization_waits_for_binding_and_rebases_queued_edits(db: PgPool) {
     use crate::domain::mailbox::commands::{CommandCompletion, MailboxCommandRepository};
     use crate::domain::models::mailbox_action::MailboxAction;
@@ -768,7 +768,7 @@ async fn draft_organization_waits_for_binding_and_rebases_queued_edits(db: PgPoo
         .mailbox_action_messages(link, input.thread_db_id)
         .await
         .unwrap();
-    let actor = macro_user_id::user_id::MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap();
+    let actor = rox_user_id::user_id::RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap();
     let first = repo
         .enqueue_mailbox_action(
             link,
@@ -924,7 +924,7 @@ async fn draft_organization_waits_for_binding_and_rebases_queued_edits(db: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn queued_local_draft_command_cannot_resurrect_a_discarded_draft(db: PgPool) {
     use crate::domain::mailbox::commands::MailboxCommandRepository;
     use crate::domain::models::mailbox_action::MailboxAction;
@@ -933,7 +933,7 @@ async fn queued_local_draft_command_cannot_resurrect_a_discarded_draft(db: PgPoo
         .mailbox_action_messages(link, input.thread_db_id)
         .await
         .unwrap();
-    let actor = macro_user_id::user_id::MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap();
+    let actor = rox_user_id::user_id::RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap();
     repo.enqueue_mailbox_action(
         link,
         actor,
@@ -971,7 +971,7 @@ async fn queued_local_draft_command_cannot_resurrect_a_discarded_draft(db: PgPoo
     assert_eq!(row.status, "failed");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn late_organization_confirmation_preserves_a_transferred_source_tombstone(db: PgPool) {
     use crate::domain::mailbox::commands::MailboxCommandRepository;
     use crate::domain::models::mailbox_action::MailboxAction;
@@ -980,7 +980,7 @@ async fn late_organization_confirmation_preserves_a_transferred_source_tombstone
         .mailbox_action_messages(link, input.thread_db_id)
         .await
         .unwrap();
-    let actor = macro_user_id::user_id::MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap();
+    let actor = rox_user_id::user_id::RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap();
     repo.enqueue_mailbox_action(
         link,
         actor,
@@ -1019,7 +1019,7 @@ async fn late_organization_confirmation_preserves_a_transferred_source_tombstone
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn native_draft_first_edit_adopts_proven_organization_versions_before_projection(db: PgPool) {
     use crate::domain::mailbox::commands::MailboxCommandRepository;
     use crate::domain::models::mailbox_action::MailboxAction;
@@ -1035,7 +1035,7 @@ async fn native_draft_first_edit_adopts_proven_organization_versions_before_proj
         .mailbox_action_messages(link, input.thread_db_id)
         .await
         .unwrap();
-    let actor = macro_user_id::user_id::MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap();
+    let actor = rox_user_id::user_id::RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap();
     repo.enqueue_mailbox_action(
         link,
         actor,

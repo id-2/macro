@@ -41,7 +41,7 @@ vi.mock('@core/constant/featureFlags', () => ({
   enableProjects: { key: 'enable-projects' },
   enableReminders: false,
   isFeatureEnabled: vi.fn(),
-  USE_MACRO_PR_SUMMARY_BLOCK: true,
+  USE_ROX_PR_SUMMARY_BLOCK: true,
 }));
 vi.mock('@core/util/url', () => ({ openExternalUrl: vi.fn() }));
 vi.mock('@queries/notification/user-notifications', () => ({

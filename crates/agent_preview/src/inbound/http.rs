@@ -40,7 +40,7 @@ pub fn router(service: PreviewService) -> Router {
         .fallback(any(handle))
         .with_state(service)
         .layer(
-            macro_tower_layers::MacroRequestIdAndTracingLayer::new(Duration::from_secs(2))
+            rox_tower_layers::RoxRequestIdAndTracingLayer::new(Duration::from_secs(2))
                 .into_inner(),
         )
 }
@@ -336,7 +336,7 @@ fn clean_request(
     strip_hop_headers(headers);
     let remove: Vec<_> = headers
         .keys()
-        .filter(|k| k.as_str().starts_with("x-forwarded-") || k.as_str().starts_with("x-macro-"))
+        .filter(|k| k.as_str().starts_with("x-forwarded-") || k.as_str().starts_with("x-rox-"))
         .cloned()
         .collect();
     for key in remove {

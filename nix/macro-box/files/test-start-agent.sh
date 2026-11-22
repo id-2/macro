@@ -48,7 +48,7 @@ fresh() {
   git -C "$seed" commit -qm 'template'
   git -C "$seed" push -q "$root/remote.git" HEAD:main
   echo 'lock v1' >"$root/case/runtime/bun.lock"
-  printf 'MACRO_REPO_URL=https://git.test/agent.git\nMACRO_REPO_TOKEN=t\nMACRO_AGENT_USER_ID=macro|agent@example.com\nMACRO_AGENT_NAME=Fox\n' >"$root/case/agent.env"
+  printf 'ROX_REPO_URL=https://git.test/agent.git\nROX_REPO_TOKEN=t\nROX_AGENT_USER_ID=macro|agent@example.com\nROX_AGENT_NAME=Fox\n' >"$root/case/agent.env"
 }
 
 script() { # script <name>: the assembled script, as `_agent.nix` builds it
@@ -138,7 +138,7 @@ check 'B8 the failure count restarts' bash -c "[[ \$(cat '$root/case/state/failu
 check 'B8 boot-head names the rollback' bash -c "[[ \$(cat '$root/case/state/boot-head') == \$(git -C '$root/case/workspace' rev-parse HEAD) ]]"
 check 'B8 the rollback is last-good: the same tree' bash -c "[[ \$(cat '$root/case/state/last-good') == \$(git -C '$root/case/workspace' rev-parse HEAD) ]]"
 # A boot of the rolled-back code that dies before the runtime marks it healthy
-# (Macro unreachable, say) is not the code's fault: it must not count toward
+# (Rox unreachable, say) is not the code's fault: it must not count toward
 # another rollback from the rollback itself.
 EXIT_CODE=exited EXIT_STATUS=1 SERVICE_RESULT=exit-code bash "$(script agent-stopped)"
 check 'B8 an early death of the rolled-back code does not count' bash -c "[[ \$(cat '$root/case/state/failures') == 0 ]]"

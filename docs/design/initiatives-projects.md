@@ -51,7 +51,7 @@ feedback.
 | Assign or move tasks | `PUT /initiatives/{initiative_id}/tasks` |
 | Remove one task | `DELETE /initiatives/{initiative_id}/tasks/{task_id}` |
 
-The [membership schema](../../crates/macro_db_client/migrations/20260910144344_create_initiative.sql) already enforces **at most one initiative per task** through the `task_id` primary key. Deleting an initiative removes associations without deleting its tasks. Assignment deduplicates inputs, caps each request at 100 unique tasks, and reports per-task results.
+The [membership schema](../../crates/rox_db_client/migrations/20260910144344_create_initiative.sql) already enforces **at most one initiative per task** through the `task_id` primary key. Deleting an initiative removes associations without deleting its tasks. Assignment deduplicates inputs, caps each request at 100 unique tasks, and reports per-task results.
 
 [Initiative access](../../crates/entity_access/src/outbound/pg_access_repo/queries/initiative_access.rs) supports explicit user/team/channel grants and link permissions. The [initiative service](../../crates/initiative/src/domain/service.rs) enforces owner-only share-policy changes. Members receive edit grants on the initiative and its description document through [member writes](../../crates/initiative/src/outbound/pg_initiative_repo/members.rs).
 
@@ -74,7 +74,7 @@ Every initiative already has a required, distinct Markdown description document.
 | Share menu | Initiative PATCH supports share policy, but [generic entity mutations](../../services/document_storage_service/src/service/entity_mutation.rs) reject initiative sharing. The [global share modal's type set](../../apps/web/src/features/sharing/global-share-modal/shareable-entity.ts) excludes initiatives. | Add a view-compatible sharing adapter using the initiative service and existing share UI primitives, with current permission data. |
 | Cmd+K | Existing [project commands](../../apps/web/src/features/command/useCommandItems.ts) target folder entities; initiatives are not represented by Soup. | Add an initiative-backed command source, display as Projects, and open native project views. Preserve folder search and folder actions. |
 | Full MCP coverage | Initiative exposes only HTTP inbound adapters. [`ai_tools::tools_for`](../../crates/ai_tools/src/lib.rs) registers existing folder project tools but no initiative tools. [MCP service](../../services/agent_harness_service/src/public_mcp.rs) serves that assembled toolset. | Add domain-backed initiative tools plus coverage through property, activity, message and description tools; wire every supported host, generated schemas, result links and frontend renderers. |
-| Description last | [The description migration](../../crates/macro_db_client/migrations/20260917140621_add_initiative_description_document.up.sql) makes the document mandatory today. Failure compensation can log an orphan if purging fails. | Keep creating the empty backing document. Close lifecycle/cleanup gaps in PR 1, and add the description editor as the last frontend step in PR 6. General project discussions use the initiative parent. |
+| Description last | [The description migration](../../crates/rox_db_client/migrations/20260917140621_add_initiative_description_document.up.sql) makes the document mandatory today. Failure compensation can log an orphan if purging fails. | Keep creating the empty backing document. Close lifecycle/cleanup gaps in PR 1, and add the description editor as the last frontend step in PR 6. General project discussions use the initiative parent. |
 
 ### Architectural assessment
 
@@ -106,7 +106,7 @@ Primary UI references: [project collection](https://linear.app/macro-eng/project
 | Sharing | The inspected header exposes copy URL and notification controls; properties expose lead/members. | Use Rox's actual permissions model and explicit Share menu. Do not infer that copying Linear's membership UI implements Rox sharing. |
 | Visual treatment | Dense type, subtle separators, muted metadata and restrained color on status/priority/avatars; properties open in place. | Use Rox semantic tokens, shared controls and focus styling. Keep navigation, editor state and scroll stable through mutations and background refresh. |
 
-The user request takes precedence over Linear differences: Macro Projects live under Tasks, use task-style assignees/due dates, have default team sharing, and are native views. No Linear-style portfolio initiatives, milestones, dependencies, health updates, charts or roadmap views are required for the first complete release.
+The user request takes precedence over Linear differences: Rox Projects live under Tasks, use task-style assignees/due dates, have default team sharing, and are native views. No Linear-style portfolio initiatives, milestones, dependencies, health updates, charts or roadmap views are required for the first complete release.
 
 ## 3. Proposed product and data contracts
 

@@ -5,7 +5,7 @@ use crate::domain::send_attempt::{
 };
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn durable_send_freezes_the_authorized_alias_through_contact_sync(
@@ -18,9 +18,9 @@ async fn durable_send_freezes_the_authorized_alias_through_contact_sync(
         forwarded_attachment_ids: vec![],
         restore_body_html: None,
         restore_body_text: None,
-        restore_body_macro: None,
+        restore_body_rox: None,
     };
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let admitted = service
         .send_email(actor(), inbox_id(), attempt, snapshot.clone())
         .await?;

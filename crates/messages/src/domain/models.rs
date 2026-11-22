@@ -422,7 +422,7 @@ pub struct SimpleMention {
 
 impl SimpleMention {
     /// Construct a tracked mention of a Rox user.
-    pub fn user(user_id: &macro_user_id::user_id::MacroUserIdStr<'_>) -> Self {
+    pub fn user(user_id: &rox_user_id::user_id::RoxUserIdStr<'_>) -> Self {
         Self {
             entity_type: "user".to_string(),
             entity_id: user_id.as_ref().to_string(),

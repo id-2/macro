@@ -3,12 +3,12 @@
 use super::*;
 use crate::domain::ports::HarnessAgentDeletion;
 
-impl<R: BotRepo, B: MacroEventBroker, T: HarnessTeamAgents, C: McpAppCatalog> HarnessAgentDeletion
+impl<R: BotRepo, B: RoxEventBroker, T: HarnessTeamAgents, C: McpAppCatalog> HarnessAgentDeletion
     for BotServiceImpl<R, B, T, C>
 {
     async fn delete_harness_agents(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         harness: HarnessId,
     ) -> Result<usize, BotError> {
         let deleted = self

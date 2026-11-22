@@ -99,15 +99,15 @@ const emailServiceRedis = new Redis('email-service-redis', {
 
 export const emailServiceRedisEndpoint = emailServiceRedis.endpoint;
 
-const MACRO_DB_URL_SECRET_NAME = config.require(`macro_db_secret_key`);
-const MACRO_DB_URL = aws.secretsmanager
+const ROX_DB_URL_SECRET_NAME = config.require(`rox_db_secret_key`);
+const ROX_DB_URL = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: MACRO_DB_URL_SECRET_NAME,
+    secretId: ROX_DB_URL_SECRET_NAME,
   })
   .apply((secret) => secret.secretString);
 
 const macroDbUrlArn: pulumi.Output<string> = aws.secretsmanager
-  .getSecretVersionOutput({ secretId: MACRO_DB_URL_SECRET_NAME })
+  .getSecretVersionOutput({ secretId: ROX_DB_URL_SECRET_NAME })
   .apply((secret) => secret.arn);
 
 const inbox_sync_queue = new Queue('email-service-gmail-webhook', {
@@ -259,7 +259,7 @@ const contactsQueueArn: pulumi.Output<string> = contactsServiceStack
   .getOutput('contactsQueueArn')
   .apply((arn) => arn as string);
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
 const cfKeyPair = new tls.PrivateKey(`cf-dist-email-key-pair-${stack}`, {
   algorithm: 'RSA',
@@ -276,7 +276,7 @@ const secretKeyArns = [
   authenticationServiceInternalApiKeyArn,
   internalAuthKeyArn,
   macroDbUrlArn,
-  MACRO_API_TOKENS.macroApiTokenPublicKeyArn,
+  ROX_API_TOKENS.macroApiTokenPublicKeyArn,
   cloudfrontSecretKey.arn,
 ];
 
@@ -454,9 +454,9 @@ const emailRefreshHandler = new EmailRefreshHandler('email-refresh-handler', {
   queueArns: [linkManagerQueueArn],
   vpc: coparse_api_vpc,
   envVars: {
-    DATABASE_URL: pulumi.interpolate`${MACRO_DB_URL}`,
+    DATABASE_URL: pulumi.interpolate`${ROX_DB_URL}`,
     ENVIRONMENT: stack,
-    RUST_LOG: 'email_refresh_handler=info,macro_http_request=info',
+    RUST_LOG: 'email_refresh_handler=info,rox_http_request=info',
     DELETE_UNUSED_AFTER_DAYS: pulumi.interpolate`${DELETE_UNUSED_AFTER_DAYS}`,
     DELETE_INACTIVE_AFTER_DAYS: pulumi.interpolate`${DELETE_INACTIVE_AFTER_DAYS}`,
     INBOX_HEALTH_POLL_INTERVAL_HOURS: pulumi.interpolate`${INBOX_HEALTH_POLL_INTERVAL_HOURS}`,
@@ -470,9 +470,9 @@ const emailScheduledHandler = new EmailScheduledHandler(
     queueArns: [scheduledQueueArn],
     vpc: coparse_api_vpc,
     envVars: {
-      DATABASE_URL: pulumi.interpolate`${MACRO_DB_URL}`,
+      DATABASE_URL: pulumi.interpolate`${ROX_DB_URL}`,
       ENVIRONMENT: stack,
-      RUST_LOG: 'email_scheduled_handler=info,macro_http_request=info',
+      RUST_LOG: 'email_scheduled_handler=info,rox_http_request=info',
     },
     tags,
   }

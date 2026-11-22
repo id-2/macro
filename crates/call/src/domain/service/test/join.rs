@@ -6,7 +6,7 @@ struct DisabledProgrammaticCalls;
 
 #[async_trait::async_trait]
 impl ProgrammaticCallGate for DisabledProgrammaticCalls {
-    async fn enabled_for(&self, _caller: MacroUserIdStr<'_>) -> bool {
+    async fn enabled_for(&self, _caller: RoxUserIdStr<'_>) -> bool {
         false
     }
 }

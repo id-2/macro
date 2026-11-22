@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use chrono::{DateTime, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::models::request::NotificationResult;
 use notification::domain::models::{Notification, SendNotificationRequest};
 use notification::domain::service::SendNotificationError;
@@ -19,8 +19,8 @@ fn now() -> DateTime<Utc> {
         .expect("unambiguous instant")
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER)
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER)
         .expect("valid user id")
         .into_owned()
 }

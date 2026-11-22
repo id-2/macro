@@ -68,10 +68,10 @@ pub async fn remove_unsubscribed_item_user(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("user_unsubscribed_item"))
     )]
     async fn test_get_unsubscribed_item_users(
@@ -91,7 +91,7 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("user_unsubscribed_item"))
     )]
     async fn test_upsert_unsubscribed_item_user(
@@ -114,7 +114,7 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("user_unsubscribed_item"))
     )]
     async fn test_remove_unsubscribed_item_user(

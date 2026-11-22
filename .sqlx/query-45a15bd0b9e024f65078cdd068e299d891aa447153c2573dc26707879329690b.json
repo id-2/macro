@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT count(*) > 0 AS \"connected!\",\n            COALESCE(bool_or(a.sync_status IN ('pending', 'syncing')), false) AS \"syncing!\"\n            FROM calendar_accounts a JOIN email_links l ON l.id = a.email_link_id\n            WHERE ((a.owner_id = $1 AND l.macro_id = $1)\n                OR EXISTS (SELECT 1 FROM macro_user_links delegation\n                    WHERE delegation.primary_macro_id = $1 AND delegation.link_id = a.email_link_id))\n              AND a.sync_status NOT IN ('disabled', 'reauth_required')",
+  "query": "SELECT count(*) > 0 AS \"connected!\",\n            COALESCE(bool_or(a.sync_status IN ('pending', 'syncing')), false) AS \"syncing!\"\n            FROM calendar_accounts a JOIN email_links l ON l.id = a.email_link_id\n            WHERE ((a.owner_id = $1 AND l.rox_id = $1)\n                OR EXISTS (SELECT 1 FROM rox_user_links delegation\n                    WHERE delegation.primary_rox_id = $1 AND delegation.link_id = a.email_link_id))\n              AND a.sync_status NOT IN ('disabled', 'reauth_required')",
   "describe": {
     "columns": [
       {

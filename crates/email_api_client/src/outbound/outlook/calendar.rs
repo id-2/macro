@@ -22,12 +22,12 @@ use url::Url;
 use uuid::Uuid;
 
 // Named MAPI property owned by Rox. Email and extra popup reminders are dispatched by
-// Macro; Graph's single native reminder remains the nearest one to the start.
+// Rox; Graph's single native reminder remains the nearest one to the start.
 const CREATION_ID: &str =
-    "String {81f532e3-7ace-4e0b-bae9-312ce0d50c8c} Name MacroCalendarCreation";
+    "String {81f532e3-7ace-4e0b-bae9-312ce0d50c8c} Name RoxCalendarCreation";
 const APPOINTMENT_SEQUENCE_ID: &str = "Integer {00062002-0000-0000-C000-000000000046} Id 0x8201";
 const PREFERENCES_ID: &str =
-    "String {81f532e3-7ace-4e0b-bae9-312ce0d50c8c} Name MacroCalendarPreferences";
+    "String {81f532e3-7ace-4e0b-bae9-312ce0d50c8c} Name RoxCalendarPreferences";
 /// What `instances` selects: every property of Graph's v1.0 `event` that it
 /// returns by default, plus `originalStart`, which it leaves out of the
 /// default set although its documentation says otherwise. Without it an
@@ -638,7 +638,7 @@ fn patch_body(
         {
             return Err(unsupported("Choose an email or notification reminder."));
         }
-        // Graph exposes no per-calendar default reminder setting. Macro's
+        // Graph exposes no per-calendar default reminder setting. Rox's
         // Outlook default is an explicit 15-minute notification, also published
         // in the calendar catalog so the editor and delivery worker agree.
         let minutes = if reminders.use_default {

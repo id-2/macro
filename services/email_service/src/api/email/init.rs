@@ -11,7 +11,7 @@ use email::domain::mailbox::connection::{
 };
 use email::domain::mailbox::initialization::InitializationError;
 use email_api_client::domain::models::EmailApiError;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use thiserror::Error;
 use utoipa::ToSchema;
@@ -65,7 +65,7 @@ enum InitErrorKind {
     BadRequest(String),
 
     #[error("Invalid input")]
-    Parse(#[from] macro_user_id::error::ParseErr),
+    Parse(#[from] rox_user_id::error::ParseErr),
 
     #[error("Inbox is already connected by another user")]
     SharedInboxConflict {
@@ -246,7 +246,7 @@ pub struct InitResponse {
     /// self-link bootstrap and the data-source path it's a freshly upserted row.
     pub link_id: Uuid,
     /// Present when init enqueued a backfill job. Absent for cross-user delegation,
-    /// where the child link's backfill already ran under its own macro_id; present for
+    /// where the child link's backfill already ran under its own rox_id; present for
     /// the self-link bootstrap, where a fresh link is provisioned and backfilled.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub backfill_job_id: Option<Uuid>,
@@ -288,18 +288,18 @@ pub struct InitParams {
 pub(crate) async fn handler(
     State(ctx): State<ApiContext>,
     query: Query<InitParams>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, InitError> {
     // Axiom: a completed admin disable refuses every new init path before mailbox work begins.
     ctx.member_access
-        .ensure_active(&authorization.authorization.user.macro_user_id)
+        .ensure_active(&authorization.authorization.user.rox_user_id)
         .await?;
 
     if query.link_id.is_none() {
         let link = crate::outbound::mailbox_init::ensure_rox_mailbox(
             &ctx.inbox_connection.links.db,
             &authorization.authorization.user.user_context.fusion_user_id,
-            authorization.authorization.user.macro_user_id.clone(),
+            authorization.authorization.user.rox_user_id.clone(),
             ctx.config.rox_mailbox_writes_enabled,
         )
         .await
@@ -321,7 +321,7 @@ pub(crate) async fn handler(
         .into_response());
     }
     let request = ConnectionRequest {
-        actor_macro_id: authorization.authorization.user.macro_user_id.clone(),
+        actor_rox_id: authorization.authorization.user.rox_user_id.clone(),
         actor_id: authorization
             .authorization
             .user

@@ -1,9 +1,9 @@
 use crate::api::context::ApiContext;
 use cookie::{Cookie, SameSite};
 use email::domain::ports::{FirstInboxProvisionOutcome, FirstInboxProvisioner};
-use macro_auth::constant::{MACRO_ACCESS_TOKEN_COOKIE, MACRO_REFRESH_TOKEN_COOKIE};
-use macro_env::Environment;
-use macro_env_var::maybe_env_vars;
+use rox_auth::constant::{ROX_ACCESS_TOKEN_COOKIE, ROX_REFRESH_TOKEN_COOKIE};
+use rox_env::Environment;
+use rox_env_var::maybe_env_vars;
 use rand::{Rng, seq::SliceRandom};
 use url::Url;
 
@@ -84,9 +84,9 @@ pub fn create_access_token_cookie(token: &str) -> Cookie<'static> {
     let same_site = same_site();
     let domain = domain();
     let access_token_cookie_name = match Environment::new_or_prod() {
-        Environment::Production => MACRO_ACCESS_TOKEN_COOKIE.to_string(),
-        Environment::Develop => format!("dev-{MACRO_ACCESS_TOKEN_COOKIE}"),
-        Environment::Local => format!("local-{MACRO_ACCESS_TOKEN_COOKIE}"),
+        Environment::Production => ROX_ACCESS_TOKEN_COOKIE.to_string(),
+        Environment::Develop => format!("dev-{ROX_ACCESS_TOKEN_COOKIE}"),
+        Environment::Local => format!("local-{ROX_ACCESS_TOKEN_COOKIE}"),
     };
 
     let mut cookie = Cookie::new(
@@ -110,9 +110,9 @@ pub fn create_refresh_token_cookie(token: &str) -> Cookie<'static> {
     let same_site = same_site();
     let domain = domain();
     let refresh_token_cookie_name = match Environment::new_or_prod() {
-        Environment::Production => MACRO_REFRESH_TOKEN_COOKIE.to_string(),
-        Environment::Develop => format!("dev-{MACRO_REFRESH_TOKEN_COOKIE}"),
-        Environment::Local => format!("local-{MACRO_REFRESH_TOKEN_COOKIE}"),
+        Environment::Production => ROX_REFRESH_TOKEN_COOKIE.to_string(),
+        Environment::Develop => format!("dev-{ROX_REFRESH_TOKEN_COOKIE}"),
+        Environment::Local => format!("local-{ROX_REFRESH_TOKEN_COOKIE}"),
     };
     let mut cookie = Cookie::new(
         refresh_token_cookie_name,
@@ -136,11 +136,11 @@ pub fn create_refresh_token_cookie(token: &str) -> Cookie<'static> {
 /// redirect URL so the app can attribute the session as a signup for
 /// analytics. Best-effort: never fails the login.
 pub async fn append_signed_up_param_if_new_user(
-    macro_cache_client: &macro_cache_client::MacroCache,
+    rox_cache_client: &rox_cache_client::RoxCache,
     email: &str,
     redirect_url: &mut Url,
 ) -> bool {
-    match macro_cache_client.take_user_just_signed_up(email).await {
+    match rox_cache_client.take_user_just_signed_up(email).await {
         Ok(true) => {
             redirect_url
                 .query_pairs_mut()

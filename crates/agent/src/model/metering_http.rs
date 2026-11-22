@@ -39,7 +39,7 @@ pub struct MeteredHttpClient<H = http_client::ReqwestClient> {
     protocol: WireProtocol,
     /// Whether the key is Rox's own, so a suspended or out-of-credit
     /// response is a Rox outage worth alerting on.
-    macro_account: bool,
+    rox_account: bool,
 }
 
 // Required by Rig's CompletionModel bounds, even for explicitly built clients.
@@ -58,21 +58,21 @@ impl<H> MeteredHttpClient<H> {
             inner,
             provider: provider.into(),
             protocol,
-            macro_account: true,
+            rox_account: true,
         }
     }
 
     /// This client authenticating with an agent's own key: its account
     /// failures are the agent owner's billing, not a Rox outage.
     pub fn with_agent_api_key(mut self) -> Self {
-        self.macro_account = false;
+        self.rox_account = false;
         self
     }
 
     /// Log a response that means Rox's account with the provider is
     /// suspended or out of credit (see [`genai_telemetry::provider_account`]).
     fn report_account_failure<T>(&self, result: &http_client::Result<T>) {
-        if !self.macro_account {
+        if !self.rox_account {
             return;
         }
 

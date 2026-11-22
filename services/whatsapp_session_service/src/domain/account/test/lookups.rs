@@ -4,7 +4,7 @@ use super::*;
 
 const UNREGISTERED: &str = "+5550003";
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lookups_are_answered_on_their_signal_and_list_found_numbers(pool: PgPool) {
     let (account, _, mut calls, started) = connected(&pool, Duration::from_secs(3600)).await;
     let found = Uuid::now_v7();
@@ -75,7 +75,7 @@ async fn lookups_are_answered_on_their_signal_and_list_found_numbers(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 /// A lookup started while no replica ran the account (its signal went
 /// nowhere) is answered once the account connects.
 async fn lookups_pending_before_connecting_are_answered_once_connected(pool: PgPool) {

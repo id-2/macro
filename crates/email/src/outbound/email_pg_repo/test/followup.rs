@@ -28,7 +28,7 @@ async fn archive_operations(
 
 async fn unavailable(
     mailbox: &impl EmailFollowupMailbox,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
 ) -> anyhow::Result<bool> {
     Ok(mailbox
         .followup_thread(owner.clone(), OUTLOOK_RECEIVED)
@@ -38,13 +38,13 @@ async fn unavailable(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_outlook_threads"))
 )]
 async fn outlook_followup_moves_the_thread_through_mailbox_commands(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let mailbox = service(pool.clone());
     let returned_at = Utc.with_ymd_and_hms(2026, 1, 2, 3, 4, 5).unwrap();
     let facts = mailbox
@@ -99,13 +99,13 @@ async fn outlook_followup_moves_the_thread_through_mailbox_commands(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_outlook_threads"))
 )]
 async fn outlook_followup_returns_a_sent_only_thread_to_the_inbox(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let mailbox = service(pool.clone());
     let facts = mailbox
         .followup_thread(owner.clone(), OUTLOOK_SENT_ONLY)
@@ -154,13 +154,13 @@ async fn outlook_followup_returns_a_sent_only_thread_to_the_inbox(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_outlook_threads"))
 )]
 async fn outlook_followup_is_unavailable_in_trash_or_junk(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let mailbox = service(pool.clone());
     sqlx::query!(
         r#"UPDATE email_messages SET mailbox_state = mailbox_state || '{"in_inbox":false,"in_trash":true}' WHERE thread_id = $1"#,
@@ -191,13 +191,13 @@ async fn outlook_followup_is_unavailable_in_trash_or_junk(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_outlook_threads"))
 )]
 async fn outlook_followup_ignores_a_category_named_trash(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let mailbox = service(pool.clone());
     sqlx::query!(
         "INSERT INTO email_labels (id, link_id, provider_label_id, name, message_list_visibility, label_list_visibility, type)
@@ -225,7 +225,7 @@ async fn outlook_followup_ignores_a_category_named_trash(
 
 async fn queue(
     repo: &EmailPgRepo,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     action: MailboxAction,
 ) -> anyhow::Result<()> {
     let messages = repo
@@ -244,7 +244,7 @@ async fn queue(
 async fn assert_return_refused(
     mailbox: &impl EmailFollowupMailbox,
     repo: &EmailPgRepo,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
 ) -> anyhow::Result<()> {
     assert!(matches!(
         mailbox
@@ -263,7 +263,7 @@ async fn assert_return_refused(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_thread_labels", "email_thread_unread", "email_thread_archive")
@@ -275,7 +275,7 @@ async fn gmail_followup_is_unavailable_with_trash_or_spam_labels(
     let thread = uuid::uuid!("11111111-1111-1111-1111-111111111111");
     let link = uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
     let message = uuid::uuid!("11111111-aaaa-aaaa-aaaa-111111111111");
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let mailbox = service(pool.clone());
     assert!(
         !mailbox
@@ -324,7 +324,7 @@ async fn gmail_followup_is_unavailable_with_trash_or_spam_labels(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_thread_labels", "email_thread_unread", "email_thread_archive")
@@ -335,7 +335,7 @@ async fn followup_return_authorizes_the_thread_inbox_and_supports_sent_only(
 ) -> anyhow::Result<()> {
     let thread = uuid::uuid!("11111111-1111-1111-1111-111111111111");
     let link = uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let mailbox = service(pool.clone());
     sqlx::query!(
         "UPDATE email_messages SET is_sent = true WHERE thread_id = $1",
@@ -365,7 +365,7 @@ async fn followup_return_authorizes_the_thread_inbox_and_supports_sent_only(
     );
     assert!(
         mailbox
-            .followup_thread(MacroUserIdStr::try_from_email("outsider@test.com")?, thread)
+            .followup_thread(RoxUserIdStr::try_from_email("outsider@test.com")?, thread)
             .await?
             .is_none()
     );
@@ -401,7 +401,7 @@ async fn followup_return_authorizes_the_thread_inbox_and_supports_sent_only(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_thread_labels", "email_thread_unread", "email_thread_archive")
@@ -416,15 +416,15 @@ async fn followup_uses_delegated_inbox_and_rechecks_revocation(
         ('d1000000-0000-0000-0000-000000000001', 'owner', 'user1@test.com', 'followup_owner'),
         ('d1000000-0000-0000-0000-000000000002', 'delegate', 'delegate@test.com', 'followup_delegate')"#).execute(&pool).await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES
         ('macro|user1@test.com', 'user1@test.com', 'd1000000-0000-0000-0000-000000000001'),
         ('macro|delegate@test.com', 'delegate@test.com', 'd1000000-0000-0000-0000-000000000002')"#
     )
     .execute(&pool)
     .await?;
-    sqlx::query!("INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id) VALUES ('macro|delegate@test.com', 'macro|user1@test.com', $1)", link).execute(&pool).await?;
+    sqlx::query!("INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES ('macro|delegate@test.com', 'macro|user1@test.com', $1)", link).execute(&pool).await?;
     let mailbox = service(pool.clone());
-    let delegate = MacroUserIdStr::try_from_email("delegate@test.com")?;
+    let delegate = RoxUserIdStr::try_from_email("delegate@test.com")?;
     assert_eq!(
         mailbox
             .followup_thread(delegate.clone(), thread)
@@ -440,7 +440,7 @@ async fn followup_uses_delegated_inbox_and_rechecks_revocation(
         .set_followup_inbox(delegate.clone(), thread, link, true, Some(Utc::now()))
         .await?;
     sqlx::query!(
-        "DELETE FROM macro_user_links WHERE primary_macro_id = $1",
+        "DELETE FROM rox_user_links WHERE primary_rox_id = $1",
         delegate.as_ref()
     )
     .execute(&pool)

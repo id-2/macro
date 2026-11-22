@@ -67,7 +67,7 @@ async fn one_at_a_time(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("user_team"))
 )]
 async fn pipelines_access_matches_one_pipeline_at_a_time(pool: PgPool) -> anyhow::Result<()> {

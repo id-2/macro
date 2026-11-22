@@ -15,9 +15,9 @@ use entity_access::{
         },
         ports::EntityAccessService,
     },
-    inbound::axum_extractors::{ExtractorError, MacroUserTeamExtractorV2},
+    inbound::axum_extractors::{ExtractorError, RoxUserTeamExtractorV2},
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use serde::Deserialize;
 
 use super::DocumentRouterState;
@@ -46,7 +46,7 @@ where
     Level: RequiredPermission,
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     type Rejection = Response;
 
@@ -56,11 +56,11 @@ where
         state: &DocumentRouterState<T, Svc, Auth>,
     ) -> Result<Self, Self::Rejection> {
         let user = parts
-            .extract_with_state::<MacroAuthorizationExtractor<Auth, UserOrInternal>, _>(state)
+            .extract_with_state::<RoxAuthorizationExtractor<Auth, UserOrInternal>, _>(state)
             .await
             .map_err(IntoResponse::into_response)?;
         let team = parts
-            .extract_with_state::<MacroUserTeamExtractorV2<MemberTeamRole, Svc, Auth>, _>(state)
+            .extract_with_state::<RoxUserTeamExtractorV2<MemberTeamRole, Svc, Auth>, _>(state)
             .await
             .map_err(IntoResponse::into_response)?;
         let Path(TeamSlugParams { slug }) = parts
@@ -76,7 +76,7 @@ where
         let entity_access_receipt = state
             .access_service
             .generate_entity_access_receipt::<Level>(
-                &user.authorization.user.macro_user_id,
+                &user.authorization.user.rox_user_id,
                 user.authorization
                     .user
                     .user_context
@@ -119,7 +119,7 @@ where
 pub async fn get_document_by_team_slug_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
     access: DocumentTeamSlugAccessExtractor<ViewAccessLevel, T, Svc, Auth>,

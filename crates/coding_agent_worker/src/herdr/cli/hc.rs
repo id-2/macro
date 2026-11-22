@@ -21,7 +21,7 @@ const SPACE_LABEL: &str = "herdr.space";
 const TAB_LABEL: &str = "herdr.tab";
 /// The agent a session terminal was started for, to tell it from the shell
 /// core leaves behind when a kept terminal loses its program.
-const AGENT_LABEL: &str = "macro.agent";
+const AGENT_LABEL: &str = "rox.agent";
 /// The herdr app's CLI; optional, so every call to it is best effort.
 const APP_BIN: &str = "herdr-app";
 /// How long a new agent may take to report it is ready for input.

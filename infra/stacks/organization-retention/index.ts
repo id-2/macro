@@ -41,7 +41,7 @@ export const deleteChatQueueName: pulumi.Output<string> =
 
 const DATABASE_URL_PROXY = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require(`macro_db_proxy_secret_key`),
+    secretId: config.require(`rox_db_proxy_secret_key`),
   })
   .apply((secret) => secret.secretString);
 
@@ -51,7 +51,7 @@ const organizationRetentionHandler = new OrganizationRetentionHandler(
     envVars: {
       DATABASE_URL: pulumi.interpolate`${DATABASE_URL_PROXY}`,
       ENVIRONMENT: stack,
-      RUST_LOG: 'organization_retention_handler=trace,macro_http_request=info',
+      RUST_LOG: 'organization_retention_handler=trace,rox_http_request=info',
     },
     deleteDocumentQueueArn,
     deleteChatQueueArn,
@@ -76,7 +76,7 @@ const organizationRetentionTrigger = new OrganizationRetentionTrigger(
       DATABASE_URL: pulumi.interpolate`${DATABASE_URL_PROXY}`,
       ENVIRONMENT: stack,
       RUST_LOG:
-        'organization_retention_trigger=trace,sqs_client=trace,macro_http_request=info',
+        'organization_retention_trigger=trace,sqs_client=trace,rox_http_request=info',
     },
     organizationRetentionQueueArn,
     vpc: coparse_api_vpc,

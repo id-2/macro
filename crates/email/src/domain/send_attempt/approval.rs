@@ -26,7 +26,7 @@ struct ApprovalV1 {
     forwarded_attachment_ids: Vec<Uuid>,
     restore_body_html: Option<String>,
     restore_body_text: Option<String>,
-    restore_body_macro: Option<String>,
+    restore_body_rox: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -43,7 +43,7 @@ struct MessageV1 {
     bcc: Vec<ContactV1>,
     body_text: Option<String>,
     body_html: Option<String>,
-    body_macro: Option<String>,
+    body_rox: Option<String>,
     headers_json: Option<Value>,
     include_signature: Option<bool>,
 }
@@ -83,7 +83,7 @@ impl From<&SendSnapshot> for ApprovalV1 {
                 bcc: contacts(&message.bcc),
                 body_text: message.body_text.clone(),
                 body_html: message.body_html.clone(),
-                body_macro: message.body_macro.clone(),
+                body_rox: message.body_rox.clone(),
                 headers_json: message.headers_json.clone(),
                 include_signature: message.include_signature,
             },
@@ -91,7 +91,7 @@ impl From<&SendSnapshot> for ApprovalV1 {
             forwarded_attachment_ids: snapshot.forwarded_attachment_ids.clone(),
             restore_body_html: snapshot.restore_body_html.clone(),
             restore_body_text: snapshot.restore_body_text.clone(),
-            restore_body_macro: snapshot.restore_body_macro.clone(),
+            restore_body_rox: snapshot.restore_body_rox.clone(),
         }
     }
 }

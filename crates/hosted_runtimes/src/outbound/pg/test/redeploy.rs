@@ -1,6 +1,6 @@
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn startup_push_only_changes_this_hosts_roxd_timers(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
@@ -38,7 +38,7 @@ async fn startup_push_only_changes_this_hosts_roxd_timers(pool: PgPool) {
     assert_eq!(due[0].kind, TimerKind::RetentionExpired);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn release_only_returns_own_unfinished_fleet_leases(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
@@ -92,7 +92,7 @@ async fn release_only_returns_own_unfinished_fleet_leases(pool: PgPool) {
     assert_eq!(reclaimed[0].id, claimed[0].id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn completion_and_boot_timer_commit_together_or_roll_back_together(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());

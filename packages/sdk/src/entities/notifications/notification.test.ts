@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import type { ApiUserNotification } from '../../../generated/notification/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Notification } from './notification';
 
-const client = new Proxy({} as MacroClient, {
+const client = new Proxy({} as RoxClient, {
   get() {
     throw new Error('Seeded state access must not fetch');
   },

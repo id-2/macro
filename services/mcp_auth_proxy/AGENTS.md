@@ -25,9 +25,9 @@ in front of FusionAuth, which doesn't support DCR itself.
 - `templates/`: the broker's pages (sign-in chooser, consent and its cancellation,
   email sign-in, manual delivery), which share `broker_page.css`.
 - `src/domain/ports.rs`: `ClientRegistrationStore`, `OAuthProvider`,
-  `EmailCodeProvider`, `RefreshTokenBindingStore`, `MacroApiTokenMinter` — the
+  `EmailCodeProvider`, `RefreshTokenBindingStore`, `RoxApiTokenMinter` — the
   ports the service depends on. The harness implements the minter
-  (`agent_harness_service/src/public_mcp/macro_api_tokens.rs`).
+  (`agent_harness_service/src/public_mcp/rox_api_tokens.rs`).
 - `src/inbound/axum_router.rs`: HTTP routes; `src/inbound/middleware.rs`: auth.
 - `src/outbound/postgres.rs`: the store of record for all broker state
   (registrations, refresh token bindings, pending authorizations, issued
@@ -60,7 +60,7 @@ in front of FusionAuth, which doesn't support DCR itself.
   screen. Add its host to `DEFAULT_MCP_ALLOWED_REDIRECT_HOSTS` only to skip that
   screen for a client Rox has vetted.
 - Sign clients in for another MCP server: a `McpResource` variant and its URL
-  in `McpResources` (from `macro_service_urls`) → the token it gets in
+  in `McpResources` (from `rox_service_urls`) → the token it gets in
   `access_token_for` (`src/domain/service.rs`) → `public_mcp.rs` wiring → README.
 - Add a new grant type: `src/domain/models.rs` → `src/domain/service.rs` →
   `src/outbound/fusionauth.rs` → `src/inbound/axum_router.rs`.
@@ -86,7 +86,7 @@ and other library consumers. Both retain OAuth metadata, CORS, and bearer auth.
   client's Referer from FusionAuth, so a new client needs no origin entry.
   See README "Origin versus redirect URI".
 - Every `/authorize` response except the sign-in chooser sets the
-  `__Host-macro_mcp_oauth` cookie and `/oauth/callback` requires it. Don't drop
+  `__Host-rox_mcp_oauth` cookie and `/oauth/callback` requires it. Don't drop
   the check for trusted clients or relax the cookie to `SameSite=None`; see
   README "Consent and browser binding".
   The consent page's CSP has no `form-action`: browsers apply it to the
@@ -128,7 +128,7 @@ and other library consumers. Both retain OAuth metadata, CORS, and bearer auth.
 - `validate_bearer` refuses (403) a Rox API token that signs `agent_scope`: a scoped code-mode session reaches no MCP tools, whose own credentials would carry no scope.
 
 Public MCP may additionally receive the existing `UserApiKeyAuthorizer` through
-`mounted_mcp_router`. `x-macro-user-api-key` resolves only the key owner and is
+`mounted_mcp_router`. `x-rox-user-api-key` resolves only the key owner and is
 rechecked on every request; never trust an acting-user header or client agent
 claim. JWT bearer authentication remains independent and unchanged.
 

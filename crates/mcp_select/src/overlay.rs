@@ -1,7 +1,7 @@
 //! Overlaid catalog apps, answered from the native MCP stack.
 
 use crate::selection::same_endpoint;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::domain::models::McpServerRecord;
 use mcp_client::domain::ports::McpServerStore;
 use pipedream_mcp::domain::models::ConnectorOverlay;
@@ -41,7 +41,7 @@ impl<N: McpServerStore> OverlayConnections for NativeOverlayConnections<N> {
     #[tracing::instrument(skip(self, user), err)]
     async fn connected_name(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         overlay: &ConnectorOverlay,
     ) -> anyhow::Result<Option<String>> {
         let Some(store) = &self.native_store else {

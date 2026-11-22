@@ -23,7 +23,7 @@ far: `start` when it begins, `session` when its model session is first known,
 		"kind": "event", // schedule | message | event | job | manual
 		"source": "ciFailures", // the event source, as the behavior names it
 		"name": "nightly", // what within the source, when it has a name
-		"ids": { "pr": "macro-inc/macro#10357" }, // pr, report, board_item, macro_message, schedule, …
+		"ids": { "pr": "macro-inc/macro#10357" }, // pr, report, board_item, rox_message, schedule, …
 		"summary": "CI failed on #10357"
 	},
 	"startedAt": "2026-11-11T09:00:00.000Z",

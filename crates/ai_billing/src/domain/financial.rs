@@ -6,7 +6,7 @@ use ai_usage::domain::financial::*;
 use ai_usage::domain::financial_service::validate_final_record;
 use ai_usage::domain::ports::{FinancialFuture, InvocationFunding};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::models::{BillingPeriod, NON_BILLABLE_AI_FEATURES, UsagePolicy};
 use super::policy::{FundingAvailability, PolicyError, UsageAllocation};
@@ -40,9 +40,9 @@ impl FundingSubscription {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FundingPeriod {
     /// Seat owns its allowance even after leaving/rejoining a team.
-    pub seat: MacroUserIdStr<'static>,
+    pub seat: RoxUserIdStr<'static>,
     /// Payer owns shared credits and caps.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// Verified subscription identity, retained historically.
     pub subscription: FundingSubscription,
     /// Verified half-open interval, never an extrapolated anchor.
@@ -152,7 +152,7 @@ impl<R: FundingRepo> FundingService<R> {
     /// Recorded policy at occurrence time; absence preserves the legacy path.
     pub async fn period(
         &self,
-        seat: MacroUserIdStr<'static>,
+        seat: RoxUserIdStr<'static>,
         at: DateTime<Utc>,
     ) -> FinancialResult<Option<FundingPeriod>> {
         self.repo.period(seat, at).await
@@ -175,7 +175,7 @@ impl<R: FundingRepo> FundingService<R> {
     }
 
     /// Continue bounded reconciliation after a crash or a large completion backlog.
-    pub async fn reconcile(&self, payer: MacroUserIdStr<'static>) -> FinancialResult<()> {
+    pub async fn reconcile(&self, payer: RoxUserIdStr<'static>) -> FinancialResult<()> {
         self.repo.reconcile(payer).await
     }
 }

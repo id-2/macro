@@ -1,5 +1,5 @@
 import { For, type JSX } from 'solid-js';
-import { MacroMarkIcon } from './MacroMarkIcon';
+import { RoxMarkIcon } from './RoxMarkIcon';
 import { MODULE_LOGOS } from './moduleLogos';
 
 /**
@@ -156,7 +156,7 @@ export function SwitchGraphic(props: {
             'border-color': 'color-mix(in srgb, var(--a0) 34%, transparent)',
           }}
         >
-          <MacroMarkIcon
+          <RoxMarkIcon
             style={{
               color: 'var(--a0)',
               display: 'block',

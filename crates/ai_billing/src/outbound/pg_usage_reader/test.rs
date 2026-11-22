@@ -4,10 +4,10 @@ use ai_usage::{
     AiFeature, CompletionUsage, ModelPricing, Price, Usage, UsageAmount, UsageApiParams, UsageRepo,
 };
 use chrono::{Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 fn completion(
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     feature: AiFeature,
     provider_cost_usd: f32,
 ) -> CompletionUsage {
@@ -39,7 +39,7 @@ fn completion(
     }
 }
 
-fn free_completions(user: MacroUserIdStr<'static>) -> [CompletionUsage; 4] {
+fn free_completions(user: RoxUserIdStr<'static>) -> [CompletionUsage; 4] {
     let mut dictation = completion(user.clone(), AiFeature::Dictation, 8.0);
     dictation.cost.model = "test-audio-model".to_string();
     dictation.cost.amount = UsageAmount::Audio {
@@ -57,12 +57,12 @@ fn free_completions(user: MacroUserIdStr<'static>) -> [CompletionUsage; 4] {
     ]
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn aggregates_only_persisted_counted_rows_for_requested_seats(pool: PgPool) {
-    let first = MacroUserIdStr::try_from("macro|first@example.com".to_string()).unwrap();
-    let second = MacroUserIdStr::try_from("macro|second@example.com".to_string()).unwrap();
-    let outside = MacroUserIdStr::try_from("macro|outside@example.com".to_string()).unwrap();
-    let empty = MacroUserIdStr::try_from("macro|empty@example.com".to_string()).unwrap();
+    let first = RoxUserIdStr::try_from("macro|first@example.com".to_string()).unwrap();
+    let second = RoxUserIdStr::try_from("macro|second@example.com".to_string()).unwrap();
+    let outside = RoxUserIdStr::try_from("macro|outside@example.com".to_string()).unwrap();
+    let empty = RoxUserIdStr::try_from("macro|empty@example.com".to_string()).unwrap();
     let repo = PgUsageRepo::new(pool.clone());
     for (user, total, counted) in [
         (&first, 1.0, true),
@@ -96,7 +96,7 @@ async fn aggregates_only_persisted_counted_rows_for_requested_seats(pool: PgPool
     sqlx::query!(
         r#"INSERT INTO ai_usage (id, feature, user_id, model, input_tokens, output_tokens)
            VALUES ($1, 'chat', $2, 'legacy-model', 1000000, 1000000)"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         first.as_ref(),
     )
     .execute(&pool)
@@ -144,9 +144,9 @@ async fn aggregates_only_persisted_counted_rows_for_requested_seats(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn billing_period_includes_start_and_excludes_end(pool: PgPool) {
-    let user = MacroUserIdStr::try_from("macro|boundary@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|boundary@example.com".to_string()).unwrap();
     let start = chrono::DateTime::from_timestamp(1_800_000_000, 0).unwrap();
     let end = start + Duration::days(30);
     for (created_at, count_usage) in [
@@ -161,7 +161,7 @@ async fn billing_period_includes_start_and_excludes_end(pool: PgPool) {
             r#"INSERT INTO ai_usage (id, feature, user_id, model, input_tokens, output_tokens,
                                     total, created_at, count_usage)
                VALUES ($1, 'chat', $2, 'test-model', 0, 0, 1.0, $3, $4)"#,
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             user.as_ref(),
             created_at,
             count_usage,
@@ -192,9 +192,9 @@ fn current_period() -> BillingPeriod {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn free_features_are_recorded_but_only_chat_and_editing_are_metered(pool: PgPool) {
-    let user = MacroUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
     let usage_repo = PgUsageRepo::new(pool.clone());
     for (usage, count_usage) in free_completions(user.clone())
         .into_iter()
@@ -248,9 +248,9 @@ async fn free_features_are_recorded_but_only_chat_and_editing_are_metered(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn free_features_alone_do_not_produce_billable_usage(pool: PgPool) {
-    let user = MacroUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
     let usage_repo = PgUsageRepo::new(pool.clone());
     for usage in free_completions(user.clone()) {
         usage_repo.insert_usage(&usage, false).await.unwrap();
@@ -263,9 +263,9 @@ async fn free_features_alone_do_not_produce_billable_usage(pool: PgPool) {
     assert!(usage.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unpriced_free_features_are_excluded_from_fallback_billing(pool: PgPool) {
-    let user = MacroUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|billing@example.com".to_string()).unwrap();
     let usage_repo = PgUsageRepo::new(pool.clone());
     for (mut usage, count_usage) in free_completions(user.clone())
         .into_iter()
@@ -296,9 +296,9 @@ async fn unpriced_free_features_are_excluded_from_fallback_billing(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn priced_cache_tokens_count_through_the_stored_total(pool: PgPool) {
-    let user = MacroUserIdStr::try_from("macro|cache-priced@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|cache-priced@example.com".to_string()).unwrap();
     let amount = UsageAmount::Tokens {
         input: 1_000_000,
         output: 0,
@@ -349,9 +349,9 @@ async fn priced_cache_tokens_count_through_the_stored_total(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unpriced_cache_tokens_fall_back_to_the_opus_5_cache_rates(pool: PgPool) {
-    let user = MacroUserIdStr::try_from("macro|cache-unpriced@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|cache-unpriced@example.com".to_string()).unwrap();
     PgUsageRepo::new(pool.clone())
         .insert_usage(
             &CompletionUsage {
@@ -393,12 +393,12 @@ async fn unpriced_cache_tokens_fall_back_to_the_opus_5_cache_rates(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn upgrade_resets_only_the_seat_and_replays_preserve_new_usage(pool: PgPool) {
     use crate::domain::AiPricing;
     use crate::outbound::PgBillingRepo;
-    let first = MacroUserIdStr::try_from("macro|upgraded@example.com").unwrap();
-    let second = MacroUserIdStr::try_from("macro|teammate@example.com").unwrap();
+    let first = RoxUserIdStr::try_from("macro|upgraded@example.com").unwrap();
+    let second = RoxUserIdStr::try_from("macro|teammate@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     for user in [&first, &second] {
@@ -505,11 +505,11 @@ async fn upgrade_resets_only_the_seat_and_replays_preserve_new_usage(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reset_preserves_prior_overage_without_reusing_spent_credits(pool: PgPool) {
     use crate::domain::AiPricing;
     use crate::outbound::PgBillingRepo;
-    let user = MacroUserIdStr::try_from("macro|overage@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("macro|overage@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     let mut usage = completion(user.clone(), AiFeature::Chat, 22.0);
@@ -544,11 +544,11 @@ async fn reset_preserves_prior_overage_without_reusing_spent_credits(pool: PgPoo
     assert_eq!(position[0].chargeable_cost_cents, Some(700));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn free_upgrade_discards_usage_without_creating_billable_overage(pool: PgPool) {
     use crate::domain::AiPricing;
     use crate::outbound::PgBillingRepo;
-    let user = MacroUserIdStr::try_from("macro|free-upgrade@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("macro|free-upgrade@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     let mut usage = completion(user.clone(), AiFeature::Chat, 22.0);
@@ -583,11 +583,11 @@ async fn free_upgrade_discards_usage_without_creating_billable_overage(pool: PgP
     assert_eq!(position[0].chargeable_cost_cents, Some(0));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sequential_free_pro_max_upgrades_do_not_double_bill_public_funded_usage(pool: PgPool) {
     use crate::domain::{AiPricing, PlanTier};
     use crate::outbound::PgBillingRepo;
-    let user = MacroUserIdStr::try_from("macro|sequential-upgrade@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("macro|sequential-upgrade@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     let billing = PgBillingRepo::new(pool.clone(), AiPricing::testing());
@@ -635,15 +635,15 @@ async fn sequential_free_pro_max_upgrades_do_not_double_bill_public_funded_usage
     assert_eq!(position[0].chargeable_cost_cents, Some(0));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn batched_usage_preserves_each_change_at_a_shared_boundary(pool: PgPool) {
     use crate::domain::{AiPricing, BillingRepo, PlanTier};
     use crate::outbound::PgBillingRepo;
 
-    let upgraded = MacroUserIdStr::try_from("macro|batched-upgrade@example.com").unwrap();
-    let unchanged = MacroUserIdStr::try_from("macro|batched-unchanged@example.com").unwrap();
-    let empty = MacroUserIdStr::try_from("macro|batched-empty@example.com").unwrap();
-    let outside = MacroUserIdStr::try_from("macro|batched-outside@example.com").unwrap();
+    let upgraded = RoxUserIdStr::try_from("macro|batched-upgrade@example.com").unwrap();
+    let unchanged = RoxUserIdStr::try_from("macro|batched-unchanged@example.com").unwrap();
+    let empty = RoxUserIdStr::try_from("macro|batched-empty@example.com").unwrap();
+    let outside = RoxUserIdStr::try_from("macro|batched-outside@example.com").unwrap();
     let period = current_period();
     let at = period.start + Duration::seconds(10);
     let billing = PgBillingRepo::new(pool.clone(), AiPricing::testing());
@@ -721,7 +721,7 @@ async fn insert_upgrade_usage(pool: &PgPool, usage: &CompletionUsage) {
 trait UpgradeFixture {
     async fn reset_usage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         start: chrono::DateTime<Utc>,
         at: chrono::DateTime<Utc>,
         previous: Option<i64>,
@@ -731,7 +731,7 @@ trait UpgradeFixture {
 impl UpgradeFixture for crate::outbound::PgBillingRepo {
     async fn reset_usage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         start: chrono::DateTime<Utc>,
         at: chrono::DateTime<Utc>,
         previous: Option<i64>,
@@ -762,11 +762,11 @@ impl UpgradeFixture for crate::outbound::PgBillingRepo {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delayed_plan_cycle_retains_max_consumption_without_creating_downgrade_debt(pool: PgPool) {
     use crate::domain::plan_change::{PlanChange, RecordedPlanChange};
     use crate::domain::{AiPricing, BillingRepo, PlanTier};
-    let user = MacroUserIdStr::try_from("macro|cycle@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("macro|cycle@example.com").unwrap();
     let period = current_period();
     let at = Utc::now();
     let mut usage = completion(user.clone(), AiFeature::Chat, 80.0);

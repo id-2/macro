@@ -6,7 +6,7 @@ use crate::domain::{
     ports::MockChannelRepo,
 };
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::models::{MessageAttachment, SimpleMention};
 use std::time::Duration;
 use std::{
@@ -57,7 +57,7 @@ impl ChannelReferenceSharePermissions for Log {
     type Err = anyhow::Error;
     async fn update_channel_share_permissions_for_referenced_items(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         _: Uuid,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<crate::domain::models::ReferenceShareResult>, Self::Err> {
@@ -89,7 +89,7 @@ impl AgentCreations for Creations {
     async fn request_sent_at(
         &self,
         thread_root: Uuid,
-        person: &MacroUserIdStr<'static>,
+        person: &RoxUserIdStr<'static>,
         _: DateTime<Utc>,
     ) -> Result<Option<DateTime<Utc>>, Self::Err> {
         assert!(
@@ -102,7 +102,7 @@ impl AgentCreations for Creations {
     async fn channel_request_sent_at(
         &self,
         channel_id: Uuid,
-        person: &MacroUserIdStr<'static>,
+        person: &RoxUserIdStr<'static>,
         _: DateTime<Utc>,
     ) -> Result<Option<DateTime<Utc>>, Self::Err> {
         assert_eq!(channel_id, CHANNEL);
@@ -113,7 +113,7 @@ impl AgentCreations for Creations {
     async fn created_since(
         &self,
         bot: BotId,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: DateTime<Utc>,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<ReferencedShareItem>, Self::Err> {

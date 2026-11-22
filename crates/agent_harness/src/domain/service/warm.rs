@@ -179,7 +179,7 @@ where
             // A warm row was created as the owner's own session, so a routine
             // run or an agent's dispatch opens its own and stays recognizable.
             let eligible = kind == AgentKind::InMemory
-                && bot_id == bot_id::MACRO_NEW_BOT_ID
+                && bot_id == bot_id::ROX_NEW_BOT_ID
                 && matches!(mcp_servers, AgentMcpServers::OwnerConnections)
                 && request.repo_url.is_none()
                 && request.source == SessionSource::User
@@ -436,7 +436,7 @@ where
         session_owner_user(&owner)?;
         span.record(
             "agent.session.model",
-            &self.inner.defaults.for_bot(bot_id::MACRO_NEW_BOT_ID).model,
+            &self.inner.defaults.for_bot(bot_id::ROX_NEW_BOT_ID).model,
         );
         if self.warm_lifecycle.is_none() {
             span.record("agent.warm.outcome", "disabled");
@@ -473,7 +473,7 @@ where
             repo_url: None,
             repo_branch: None,
             profile: Some(SelectedManagedPersona {
-                bot_id: bot_id::MACRO_NEW_BOT_ID,
+                bot_id: bot_id::ROX_NEW_BOT_ID,
                 profile: None,
             }),
             instructions: None,

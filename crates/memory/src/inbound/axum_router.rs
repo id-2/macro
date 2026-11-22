@@ -10,11 +10,11 @@ use axum::{
     routing::get,
 };
 use chrono::NaiveDate;
-use macro_authorization::{
-    ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
     UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use utoipa::{IntoParams, ToSchema};
@@ -41,7 +41,7 @@ pub struct MemoryRouterState<T, Auth> {
     /// The memory service implementation.
     pub service: Arc<T>,
     /// The authorization state used by the request extractors.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 // Manual Clone impl so T doesn't need to be Clone (it's behind Arc).
@@ -60,7 +60,7 @@ impl<T, Auth> FromRef<MemoryRouterState<T, Auth>> for Arc<T> {
     }
 }
 
-impl<T, Auth> FromRef<MemoryRouterState<T, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Auth> FromRef<MemoryRouterState<T, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &MemoryRouterState<T, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -69,7 +69,7 @@ impl<T, Auth> FromRef<MemoryRouterState<T, Auth>> for MacroAuthorizationState<Au
 pub fn memory_router<T, Auth, S>(state: MemoryRouterState<T, Auth>) -> Router<S>
 where
     T: MemoryService + Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -104,13 +104,13 @@ where
     skip(service, user),
     fields(actor = %user.acting_entity())
 )]
-pub async fn get_memory_handler<T: MemoryService, Auth: MacroAuthorizationService>(
+pub async fn get_memory_handler<T: MemoryService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Response {
     let user = user.authorization.user;
 
-    match service.get_memory(user.macro_user_id).await {
+    match service.get_memory(user.rox_user_id).await {
         Ok(Some(memory)) => Json(MemoryResponse { memory }).into_response(),
         Ok(None) => StatusCode::NOT_FOUND.into_response(),
         Err(e) => {
@@ -161,13 +161,13 @@ pub struct UserActivityParams {
     tag = "memory"
 )]
 #[tracing::instrument(skip_all, fields(actor = %user.acting_entity()))]
-pub async fn get_explicit_memory_handler<T: MemoryService, Auth: MacroAuthorizationService>(
+pub async fn get_explicit_memory_handler<T: MemoryService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, ActingUser>,
+    user: RoxAuthorizationExtractor<Auth, ActingUser>,
 ) -> Response {
     let user = user.authorization.user;
 
-    match service.explicit(&user.macro_user_id).await {
+    match service.explicit(&user.rox_user_id).await {
         Ok(memory) => Json(memory).into_response(),
         Err(error) => memory_error_response(error),
     }
@@ -192,15 +192,15 @@ pub async fn get_explicit_memory_handler<T: MemoryService, Auth: MacroAuthorizat
     tag = "memory"
 )]
 #[tracing::instrument(skip_all, fields(actor = %user.acting_entity(), revision = request.revision))]
-pub async fn update_explicit_memory_handler<T: MemoryService, Auth: MacroAuthorizationService>(
+pub async fn update_explicit_memory_handler<T: MemoryService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, ActingUser>,
+    user: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(request): Json<UpdateExplicitMemoryRequest>,
 ) -> Response {
     let user = user.authorization.user;
 
     match service
-        .update_memory(user.macro_user_id, request.revision, &request.edit)
+        .update_memory(user.rox_user_id, request.revision, &request.edit)
         .await
     {
         Ok(memory) => Json(memory).into_response(),
@@ -226,15 +226,15 @@ pub async fn update_explicit_memory_handler<T: MemoryService, Auth: MacroAuthori
     tag = "memory"
 )]
 #[tracing::instrument(skip_all, fields(actor = %user.acting_entity(), start = %params.start, end = %params.end))]
-pub async fn get_user_activity_handler<T: MemoryService, Auth: MacroAuthorizationService>(
+pub async fn get_user_activity_handler<T: MemoryService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, ActingUser>,
+    user: RoxAuthorizationExtractor<Auth, ActingUser>,
     Query(params): Query<UserActivityParams>,
 ) -> Response {
-    let caller = user.authorization.user.macro_user_id;
+    let caller = user.authorization.user.rox_user_id;
 
     let subject = match params.user {
-        Some(id) => match MacroUserIdStr::try_from(id) {
+        Some(id) => match RoxUserIdStr::try_from(id) {
             Ok(id) => id,
             Err(_) => {
                 return (

@@ -59,7 +59,7 @@ export const startTelemetry = async ({
     serviceName,
     environment: environment.OTEL_DEPLOYMENT_ENVIRONMENT ?? 'unset',
     tracesUrl: url,
-    resourceAttributes: { 'macro.agent.id': agentTelemetryId(agent) },
+    resourceAttributes: { 'rox.agent.id': agentTelemetryId(agent) },
     enabled: async () => url !== undefined,
     tracingProvider: (resource, getUserId, sampling) =>
       createServerTracingProvider(

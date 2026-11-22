@@ -38,7 +38,7 @@ impl agent_code_mode::domain::ExecutionCredentials for Credentials {
     }
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 #[ignore = "requires pinned Deno runtime"]
 async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: sqlx::PgPool) {
     sqlx::raw_sql(include_str!(
@@ -80,7 +80,7 @@ async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: 
         )),
     ));
     let repo = InMemoryAgentSessionRepo::new();
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(
         1,
     )));
     repo.insert_session(session.clone());
@@ -174,7 +174,7 @@ async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: 
         guides["guides"][1]["markdown"]
             .as_str()
             .unwrap()
-            .contains("macro.ai.decide")
+            .contains("rox.ai.decide")
     );
     let source = "export async function main() { const rows = await Promise.all(['first', 'second'].map(async value => value)); return {data:rows,reviews:[]}; }";
     let (_, response) = rpc(app.clone(), Some("session-secret"), "tools/call", json!({"name": "ExecuteCode", "arguments": {"acting_as": "owner", "turn_id": "00000000-0000-0000-0000-000000000003", "execution_id": ExecutionId::mint(), "source": source}})).await;
@@ -211,7 +211,7 @@ async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: 
     );
     let entry = |token| {
         agent_client_protocol::schema::v1::McpServerHttp::new(
-            "macro_internal",
+            "rox_internal",
             "http://localhost/agent-harness-egress/mcp/internal",
         )
         .headers(vec![agent_client_protocol::schema::v1::HttpHeader::new(
@@ -233,16 +233,16 @@ async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: 
         Arc::new(
             mcp_select::CombinedToolSet::new(Arc::new(AsyncToolCollection::<()>::new()), remote)
                 .with_eager_mcp_tools(&[
-                    "mcp__macro_internal__ExecuteCode",
-                    "mcp__macro_internal__DescribeCodeTools",
+                    "mcp__rox_internal__ExecuteCode",
+                    "mcp__rox_internal__DescribeCodeTools",
                 ]),
         ),
         Arc::from([]),
     );
     let schemas = remote.request_schemas().unwrap();
     for name in [
-        "mcp__macro_internal__ExecuteCode",
-        "mcp__macro_internal__DescribeCodeTools",
+        "mcp__rox_internal__ExecuteCode",
+        "mcp__rox_internal__DescribeCodeTools",
     ] {
         let schema = schemas.iter().find(|schema| schema.name == name).unwrap();
         assert!(!schema.description.is_empty());
@@ -258,7 +258,7 @@ async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: 
         .try_tool_call(
             (),
             RequestContext::new(session.owner_user().unwrap().clone()),
-            "mcp__macro_internal__DescribeCodeTools",
+            "mcp__rox_internal__DescribeCodeTools",
             &json!({"names": ["documents"]}),
         )
         .await
@@ -269,7 +269,7 @@ async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: 
         .try_tool_call(
             (),
             RequestContext::new(session.owner_user().unwrap().clone()),
-            "mcp__macro_internal__ExecuteCode",
+            "mcp__rox_internal__ExecuteCode",
             &json!({"acting_as": "owner", "turn_id": "00000000-0000-0000-0000-000000000003", "execution_id": ExecutionId::mint(), "source": source}),
         )
         .await

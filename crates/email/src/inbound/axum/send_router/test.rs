@@ -1,6 +1,6 @@
 use super::*;
 use axum::response::IntoResponse;
-use macro_authorization::CODE_EXECUTION_HEADER;
+use rox_authorization::CODE_EXECUTION_HEADER;
 
 #[test]
 fn a_program_cannot_send_without_the_users_quoted_approval() {

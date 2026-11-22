@@ -23,7 +23,7 @@ struct State {
     admin_revoked: bool,
     target_denied: bool,
     claims: usize,
-    requester: Option<(TeamId, MacroUserIdStr<'static>)>,
+    requester: Option<(TeamId, RoxUserIdStr<'static>)>,
     claim: Option<ClaimedConversation>,
     search_state: Option<SearchState>,
     search_failure: bool,
@@ -40,8 +40,8 @@ struct Fake(Arc<Mutex<State>>);
 
 type Importer = ConversationImporter<Fake, Fake, Fake, Fake, Fake, Fake>;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 fn ts(seconds: u32) -> SlackTimestamp {
     format!("{seconds}.000001").parse().unwrap()
@@ -196,7 +196,7 @@ impl ImportStorage for Fake {
 }
 
 impl ImportAuthorizer for Fake {
-    async fn require_admin(&self, _: TeamId, _: &MacroUserIdStr<'_>) -> PortResult<()> {
+    async fn require_admin(&self, _: TeamId, _: &RoxUserIdStr<'_>) -> PortResult<()> {
         if self.0.lock().unwrap().admin_revoked {
             Err(ImportError::AdminRequired.into())
         } else {
@@ -206,7 +206,7 @@ impl ImportAuthorizer for Fake {
     async fn require_target(
         &self,
         _: TeamId,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: &ConversationMetadata,
         _: Uuid,
     ) -> PortResult<()> {
@@ -225,7 +225,7 @@ impl ImportLedger for Fake {
     async fn reserve(
         &self,
         team: TeamId,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         metadata: &ConversationMetadata,
         existing: Option<Uuid>,
     ) -> PortResult<TargetReservation> {
@@ -250,7 +250,7 @@ impl ImportLedger for Fake {
 }
 
 impl ImportTargets for Fake {
-    async fn find_dm(&self, _: &[MacroUserIdStr<'static>; 2]) -> PortResult<Option<TargetFacts>> {
+    async fn find_dm(&self, _: &[RoxUserIdStr<'static>; 2]) -> PortResult<Option<TargetFacts>> {
         Ok(self.0.lock().unwrap().dm.clone())
     }
     async fn inspect(&self, id: Uuid) -> PortResult<Option<TargetFacts>> {
@@ -327,7 +327,7 @@ impl ExecutionRepo for Fake {
     async fn requester(
         &self,
         _: &ImportEvent,
-    ) -> PortResult<Option<(TeamId, MacroUserIdStr<'static>)>> {
+    ) -> PortResult<Option<(TeamId, RoxUserIdStr<'static>)>> {
         Ok(self.0.lock().unwrap().requester.clone())
     }
     async fn claim(&self, _: &ImportEvent, _: WorkerId) -> PortResult<ClaimOutcome> {

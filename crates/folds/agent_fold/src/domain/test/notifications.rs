@@ -15,7 +15,7 @@ use agent_runtime_protocol::domain::{
 fn system_events_never_become_messages_and_split_noop_never_streams() {
     let mut machine = LifecycleFold::new();
     let action = AgentAction::notification(vec![Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "connection".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {
@@ -69,7 +69,7 @@ fn quiet_events_do_not_pollute_real_prompts_and_real_prompts_cannot_noop() {
     if let AgentAction::Prompt(prompt) = &mut action {
         prompt.notifications = Some(NotificationInput {
             notifications: vec![Notification {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 subject_id: "app".into(),
                 created_at: "2026-10-21T00:00:00Z".into(),
                 event: NotificationEvent::AppConnected {
@@ -105,7 +105,7 @@ fn quiet_events_do_not_pollute_real_prompts_and_real_prompts_cannot_noop() {
 #[test]
 fn notification_turn_with_tool_activity_preserves_noop_as_text() {
     let request = AgentAction::notification(vec![Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "app".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {
@@ -134,7 +134,7 @@ fn notification_turn_with_tool_activity_preserves_noop_as_text() {
 fn interrupted_delivery_keeps_one_event_attached_to_the_retry_turn() {
     use crate::domain::{fold::FoldMachineImpl, ports::FoldMachine};
     let request = AgentAction::notification(vec![Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "app".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {
@@ -227,7 +227,7 @@ fn successful_notification_noop_does_not_restore_an_older_failure() {
     assert_eq!(machine.inner().metadata().turn, TurnState::Failed);
 
     let request = AgentAction::notification(vec![Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "connection".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {

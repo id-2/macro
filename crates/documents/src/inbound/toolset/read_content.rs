@@ -241,7 +241,7 @@ where
                     })?,
             )
         } else {
-            match file_type.map(|file_type| file_type.macro_app_path()) {
+            match file_type.map(|file_type| file_type.rox_app_path()) {
                 Some(FileAssociation::Pdf(_)) | Some(FileAssociation::Write(_)) => Content::Text(
                     service_context
                         .service

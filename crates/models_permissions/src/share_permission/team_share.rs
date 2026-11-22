@@ -5,7 +5,7 @@
 //! must reload and compare **all** expected facts under the shared transaction guard
 //! before changing canonical state or grants. These types are internal, not wire models.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use model_owner::Owner;
 use uuid::Uuid;
@@ -145,7 +145,7 @@ pub enum TeamSharePolicyError {
 /// Document legacy enable uses Edit; call legacy enable uses View. When both inputs
 /// are supplied, the explicit level wins if their enabled/disabled states agree.
 pub fn authorize_team_share(
-    acting_user: Option<&MacroUserIdStr<'_>>,
+    acting_user: Option<&RoxUserIdStr<'_>>,
     facts: &TeamShareFacts,
     request: TeamShareRequest,
     legacy_enable_default: TeamShareLevel,

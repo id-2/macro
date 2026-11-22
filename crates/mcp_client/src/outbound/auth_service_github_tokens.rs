@@ -3,7 +3,7 @@
 
 use authentication_service_client::AuthServiceClient;
 
-use crate::domain::models::MacroUserIdStr;
+use crate::domain::models::RoxUserIdStr;
 use crate::domain::ports::LinkedGithubTokens;
 
 /// Reads link tokens from the authentication service on every call, so
@@ -24,7 +24,7 @@ impl LinkedGithubTokens for AuthServiceGithubTokens {
     #[tracing::instrument(skip_all, err)]
     async fn access_token(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> anyhow::Result<Option<String>> {
         Ok(self
             .client

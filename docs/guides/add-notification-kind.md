@@ -103,11 +103,11 @@ the domain decides *whether* and *to whom*; an outbound adapter calls
    then `.into_request()`, `.with_apns()` for a push, and `.with_conn_gateway()`
    for live delivery.
 3. **Wire the composition root.** Services construct
-   `SqsNotificationIngress { queue: SqsQueue::new(sqs, macro_queues::NotificationIngressQueue::new().to_string()) }`
+   `SqsNotificationIngress { queue: SqsQueue::new(sqs, rox_queues::NotificationIngressQueue::new().to_string()) }`
    (see `services/agent_harness_service/src/lib.rs`). A service that has never
    notified also needs `sqs:SendMessage` on the ingress queue: take
    `notificationIngressQueueArn` from `getMacroNotify()`
-   (`infra/packages/shared/src/macro_notify.ts`), as `infra/stacks/email-service/index.ts` does.
+   (`infra/packages/shared/src/rox_notify.ts`), as `infra/stacks/email-service/index.ts` does.
 
 Pitfalls, each of which shipped once:
 
@@ -262,7 +262,7 @@ the notification appears (`channels.md`, `home.md`, `notifications.md`, ...).
 - **Renaming.** Keep the old tag readable with `#[serde(alias = "<old>")]` on the
   variant and a migration rewriting `notification.notification_event_type` and
   `user_notification_type_preference.notification_event_type`. Copy
-  `crates/macro_db_client/migrations/20260618152324_rename_call_started_notification_type.sql`
+  `crates/rox_db_client/migrations/20260618152324_rename_call_started_notification_type.sql`
   (generate the file with `sqlx migrate add`; see the
   [database guide](../development/database.md)).
 - **Privacy.** Never put notification payloads on spans or in logs. Use

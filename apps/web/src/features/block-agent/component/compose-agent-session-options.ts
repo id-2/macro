@@ -2,7 +2,7 @@ import { isCoderHarness } from '@app/features/agents-view/core/agent-kind';
 import { modelLabel } from '@core/component/AI/constant/model-label';
 import { isCodexBotId } from '@core/constant/codexAgent';
 import { isCursorBotId } from '@core/constant/cursorAgent';
-import { MACRO_HARNESS_NAME } from '@core/constant/macroAgent';
+import { ROX_HARNESS_NAME } from '@core/constant/macroAgent';
 
 /**
  * The repository a session works in, for the header menu and side panel.
@@ -37,7 +37,7 @@ export function harnessTitle(harness: string | undefined): string {
     harness === 'macro-inmem' ||
     harness === 'sandbox'
   ) {
-    return MACRO_HARNESS_NAME;
+    return ROX_HARNESS_NAME;
   }
   return titledHarness(harness);
 }
@@ -74,7 +74,7 @@ export function harnessDisplayName(harness: string): string {
     case 'in-memory':
     case 'macro-inmem':
     case 'sandbox':
-      return MACRO_HARNESS_NAME;
+      return ROX_HARNESS_NAME;
     case 'cursor':
       return 'Cursor';
     case 'codex-cloud':

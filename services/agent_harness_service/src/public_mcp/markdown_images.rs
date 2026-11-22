@@ -8,7 +8,7 @@ use entity_access::domain::{
     models::{EntityType, ViewAccessLevel},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rmcp::model::{CallToolResult, ContentBlock};
 use std::net::IpAddr;
 use std::sync::OnceLock;
@@ -29,7 +29,7 @@ pub(crate) struct ResolvedImage {
 #[async_trait]
 pub(crate) trait MarkdownImageResolver: Send + Sync {
     async fn resolve_static(&self, url: &str) -> Option<ResolvedImage>;
-    async fn resolve_dss(&self, user_id: &MacroUserIdStr<'_>, id: &str) -> Option<ResolvedImage>;
+    async fn resolve_dss(&self, user_id: &RoxUserIdStr<'_>, id: &str) -> Option<ResolvedImage>;
     /// Resolve an image URL built from the configured static file service and
     /// an attachment ID returned by an authorized channel read.
     async fn resolve_channel_image(&self, url: &str) -> Option<ResolvedImage>;
@@ -42,7 +42,7 @@ impl MarkdownImageResolver for () {
         None
     }
 
-    async fn resolve_dss(&self, _user_id: &MacroUserIdStr<'_>, _id: &str) -> Option<ResolvedImage> {
+    async fn resolve_dss(&self, _user_id: &RoxUserIdStr<'_>, _id: &str) -> Option<ResolvedImage> {
         None
     }
 
@@ -63,7 +63,7 @@ impl MarkdownImageResolver for ToolServiceContext {
         fetch_and_encode(url).await
     }
 
-    async fn resolve_dss(&self, user_id: &MacroUserIdStr<'_>, id: &str) -> Option<ResolvedImage> {
+    async fn resolve_dss(&self, user_id: &RoxUserIdStr<'_>, id: &str) -> Option<ResolvedImage> {
         let ctx = &self.document_tool_context;
         let receipt = ctx
             .entity_access_service
@@ -111,7 +111,7 @@ impl MarkdownImageResolver for ToolServiceContext {
 
 pub(crate) async fn tool_result_with_images<R: MarkdownImageResolver>(
     resolver: &R,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     value: serde_json::Value,
 ) -> CallToolResult {
     let images = resolve_markdown_images(resolver, user_id, &value).await;
@@ -126,7 +126,7 @@ pub(crate) async fn tool_result_with_images<R: MarkdownImageResolver>(
 
 async fn resolve_markdown_images<R: MarkdownImageResolver>(
     resolver: &R,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     value: &serde_json::Value,
 ) -> Vec<ResolvedImage> {
     let refs = markdown_image_refs(value);
@@ -212,7 +212,7 @@ async fn fetch_and_encode(url: &str) -> Option<ResolvedImage> {
 }
 
 async fn fetch_and_encode_inner(url: &str) -> anyhow::Result<ResolvedImage> {
-    let url = macro_aws_config::transform_aws_url_for_internal_fetch(url);
+    let url = rox_aws_config::transform_aws_url_for_internal_fetch(url);
     let url = url.as_str();
     let response = reqwest::get(url).await?;
     encode_response(url, response).await

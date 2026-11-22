@@ -1,24 +1,24 @@
 use ::activity::Action;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use uuid::Uuid;
 
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 
 use super::*;
 use crate::domain::events::{
     ChatCreatedMetadata, ChatMessageSentMetadata, ChatPermanentlyDeletedMetadata,
 };
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn envelope(event: ChatTopicEvent) -> Event<ChatTopicEvent> {
     Event::with_event_id(Uuid::now_v7(), event)
 }
 
-fn message(role: ChatMessageRole, actor: Option<MacroUserIdStr<'static>>) -> ChatTopicEvent {
+fn message(role: ChatMessageRole, actor: Option<RoxUserIdStr<'static>>) -> ChatTopicEvent {
     ChatTopicEvent::MessageSent(ChatMessageSentMetadata {
         chat_id: "chat-1".to_string(),
         message_id: "msg-1".to_string(),
@@ -56,13 +56,13 @@ fn created_and_user_message_map_to_activities() {
 #[test]
 fn created_derives_an_actor_for_every_owner_kind() {
     let user = user("macro|owner@example.com");
-    let bot = bot_id::MACRO_AI_BOT_ID;
+    let bot = bot_id::ROX_AI_BOT_ID;
     for (owner, expected_actor) in [
         (Owner::User(user.clone()), Actor::new_from_user(user)),
         (Owner::Bot(bot), Actor::new_from_bot(bot)),
         (
             Owner::Team(Uuid::from_u128(1)),
-            Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID),
+            Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
         ),
     ] {
         let event = envelope(ChatTopicEvent::Created(ChatCreatedMetadata {

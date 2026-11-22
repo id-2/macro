@@ -20,7 +20,7 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: `MACRO_DEV_HTTPS=false bunx vite --config src/lib/i18n/browser-test/vite.config.ts --port ${port} --strictPort`,
+    command: `ROX_DEV_HTTPS=false bunx vite --config src/lib/i18n/browser-test/vite.config.ts --port ${port} --strictPort`,
     cwd: webDirectory,
     url: `http://localhost:${port}/app/`,
     reuseExistingServer: false,

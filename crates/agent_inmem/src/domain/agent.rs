@@ -349,7 +349,7 @@ impl AgentState {
     }
 
     /// The bot id of the agent this session belongs to, if any.
-    fn agent_bot(&self) -> Option<macro_uuid::Uuid> {
+    fn agent_bot(&self) -> Option<rox_uuid::Uuid> {
         self.store.get(&self.session_id).and_then(|session| {
             session
                 .identity
@@ -695,7 +695,7 @@ pub async fn serve(state: Arc<AgentState>, acp: AcpChannel) -> Result<(), AcpErr
                                 .to_owned(),
                         );
                     }
-                    let acp_id = SessionId::new(macro_uuid::generate_uuid_v7().to_string());
+                    let acp_id = SessionId::new(rox_uuid::generate_uuid_v7().to_string());
                     state.bind_acp_session(acp_id.clone(), false);
                     state.start_connect_mcp(request.mcp_servers);
                     let responded = responder.respond(

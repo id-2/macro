@@ -11,9 +11,9 @@ use entity_access::domain::models::{
 };
 use entity_access::domain::ports::NoOpEntityAccessService;
 use entity_mutation::{DeleteEntityPermanently, UpdateEntitySharePolicy};
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::UpdateSharePermissionRequestV2;
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::team_share::{
@@ -54,10 +54,10 @@ use super::{
 };
 
 #[cfg(feature = "outbound")]
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-fn user(email: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 struct MockRtcClient {
@@ -137,7 +137,7 @@ impl CallRtcClient for MockRtcClient {
     async fn generate_token<'a>(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'a>,
+        participant_identity: RoxUserIdStr<'a>,
     ) -> anyhow::Result<String> {
         let key = participant_identity.as_ref().to_string();
         self.generate_calls
@@ -153,7 +153,7 @@ impl CallRtcClient for MockRtcClient {
     async fn generate_named_token(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'_>,
+        participant_identity: RoxUserIdStr<'_>,
         _name: &str,
     ) -> anyhow::Result<String> {
         self.generate_token(room_name, participant_identity).await
@@ -162,7 +162,7 @@ impl CallRtcClient for MockRtcClient {
     async fn generate_program_token(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'_>,
+        participant_identity: RoxUserIdStr<'_>,
         _program: &str,
         _name: Option<String>,
     ) -> anyhow::Result<String> {
@@ -181,7 +181,7 @@ impl CallRtcClient for MockRtcClient {
     async fn build_voip_push_payloads<'a>(
         &self,
         request: VoipPushPayloadRequest<'a>,
-    ) -> Vec<(MacroUserIdStr<'static>, VoipPushPayload)> {
+    ) -> Vec<(RoxUserIdStr<'static>, VoipPushPayload)> {
         let mut payloads = Vec::new();
         for recipient_id in request.recipients {
             let livekit_token = match self
@@ -212,7 +212,7 @@ impl CallRtcClient for MockRtcClient {
     async fn remove_participant<'a>(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'a>,
+        participant_identity: RoxUserIdStr<'a>,
     ) -> anyhow::Result<()> {
         self.removed.lock().unwrap().push((
             room_name.to_string(),
@@ -333,7 +333,7 @@ impl RecordingEventBroker {
             .lock()
             .unwrap()
             .iter()
-            .filter(|event| event.topic == "macro.calls")
+            .filter(|event| event.topic == "rox.calls")
             .cloned()
             .collect()
     }
@@ -343,7 +343,7 @@ impl RecordingEventBroker {
             .lock()
             .unwrap()
             .iter()
-            .filter(|event| event.topic == "macro.call_notifications")
+            .filter(|event| event.topic == "rox.call_notifications")
             .cloned()
             .collect()
     }
@@ -353,8 +353,8 @@ impl RecordingEventBroker {
     }
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -388,7 +388,7 @@ impl ConnectionService for StubConnectionService {
 
     async fn send_channel_message<'a>(
         &self,
-        _users: &[MacroUserIdStr<'a>],
+        _users: &[RoxUserIdStr<'a>],
         _message_type: &str,
         _message: serde_json::Value,
     ) -> Result<(), ConnectionError> {
@@ -424,7 +424,7 @@ impl ConnectionService for RecordingConnectionService {
 
     async fn send_channel_message<'a>(
         &self,
-        users: &[MacroUserIdStr<'a>],
+        users: &[RoxUserIdStr<'a>],
         message_type: &str,
         message: serde_json::Value,
     ) -> Result<(), ConnectionError> {
@@ -581,7 +581,7 @@ fn mock_get_or_create_repo_storing(
     repo
 }
 
-type BaseGetOrCreateCallService<Cn, B = macro_event_broker::NoopMacroEventBroker> = CallServiceImpl<
+type BaseGetOrCreateCallService<Cn, B = rox_event_broker::NoopMacroEventBroker> = CallServiceImpl<
     MockCallRepository,
     MockRtcClient,
     Cn,
@@ -594,7 +594,7 @@ type BaseGetOrCreateCallService<Cn, B = macro_event_broker::NoopMacroEventBroker
     B,
 >;
 
-fn build_get_or_create_service<B: MacroEventBroker + Clone, Cn: ConnectionService>(
+fn build_get_or_create_service<B: RoxEventBroker + Clone, Cn: ConnectionService>(
     mut repo: MockCallRepository,
     connection_service: Cn,
     event_broker: B,
@@ -678,7 +678,7 @@ struct FakeChannelThreads {
 
 #[async_trait::async_trait]
 impl crate::domain::ports::ChannelThreads for FakeChannelThreads {
-    async fn enabled_for(&self, _: MacroUserIdStr<'_>) -> bool {
+    async fn enabled_for(&self, _: RoxUserIdStr<'_>) -> bool {
         self.enabled
     }
 
@@ -766,7 +766,7 @@ async fn get_or_create_call_publishes_started_event() {
     let [published] = events.as_slice() else {
         panic!("expected exactly one call event")
     };
-    assert_eq!(published.topic, "macro.calls");
+    assert_eq!(published.topic, "rox.calls");
     assert_eq!(published.key, STARTED_EVENT_CALL_ID.to_string());
     assert!(!published.key.starts_with("call|"));
 
@@ -1290,7 +1290,7 @@ fn assert_archived_event(
     let [published] = events.as_slice() else {
         panic!("expected exactly one call event")
     };
-    assert_eq!(published.topic, "macro.calls");
+    assert_eq!(published.topic, "rox.calls");
     assert_eq!(published.key, ARCHIVED_EVENT_CALL_ID.to_string());
 
     let event_id = published.envelope["event_id"]
@@ -1580,7 +1580,7 @@ fn assert_recording_ready_event(event_broker: &RecordingEventBroker) {
     let [published] = events.as_slice() else {
         panic!("expected exactly one recording-ready event")
     };
-    assert_eq!(published.topic, "macro.calls");
+    assert_eq!(published.topic, "rox.calls");
     assert_eq!(published.key, ARCHIVED_EVENT_CALL_ID.to_string());
 
     let event_id = published.envelope["event_id"]
@@ -1851,7 +1851,7 @@ fn assert_updated_event(
     let [published] = events.as_slice() else {
         panic!("expected exactly one call event")
     };
-    assert_eq!(published.topic, "macro.calls");
+    assert_eq!(published.topic, "rox.calls");
     assert_eq!(published.key, MUTATED_EVENT_CALL_ID.to_string());
 
     let mut envelope = published.envelope.clone();
@@ -1880,7 +1880,7 @@ fn assert_deleted_event(event_broker: &RecordingEventBroker) {
     let [published] = events.as_slice() else {
         panic!("expected exactly one call event")
     };
-    assert_eq!(published.topic, "macro.calls");
+    assert_eq!(published.topic, "rox.calls");
     assert_eq!(published.key, MUTATED_EVENT_CALL_ID.to_string());
 
     let mut envelope = published.envelope.clone();
@@ -2898,7 +2898,7 @@ impl CallSummarizer for StubCallSummarizer {
     async fn generate_custom_speakers(
         &self,
         _transcript: Vec<crate::domain::models::EnrichedCallTranscript>,
-        _candidate_speakers: Vec<MacroUserIdStr<'static>>,
+        _candidate_speakers: Vec<RoxUserIdStr<'static>>,
     ) -> Result<Vec<crate::domain::models::CallTranscriptCustomSpeakerResult>, Self::Err> {
         Ok(Vec::new())
     }
@@ -3023,7 +3023,7 @@ type SummarizationCallService<B> = CallServiceImpl<
     B,
 >;
 
-fn build_summarization_service<B: MacroEventBroker>(
+fn build_summarization_service<B: RoxEventBroker>(
     repo: MockCallRepository,
     summarizer: StubCallSummarizer,
     event_broker: B,
@@ -3068,7 +3068,7 @@ fn assert_summarized_event(event_broker: &RecordingEventBroker, ai_name_generate
     let [published] = events.as_slice() else {
         panic!("expected exactly one summarized event")
     };
-    assert_eq!(published.topic, "macro.calls");
+    assert_eq!(published.topic, "rox.calls");
     assert_eq!(published.key, SUMMARIZED_EVENT_CALL_ID.to_string());
 
     let event_id = published.envelope["event_id"]
@@ -3265,9 +3265,9 @@ async fn summarized_event_reports_ai_name_persistence() {
 #[cfg(feature = "outbound")]
 const CALL1: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_0000000ca110);
 #[cfg(feature = "outbound")]
-const MACRO_USER_A: Uuid = Uuid::from_u128(0xaaaaaaaa_aaaa_aaaa_aaaa_aaaaaaaaaaa1);
+const ROX_USER_A: Uuid = Uuid::from_u128(0xaaaaaaaa_aaaa_aaaa_aaaa_aaaaaaaaaaa1);
 #[cfg(feature = "outbound")]
-const MACRO_USER_B: Uuid = Uuid::from_u128(0xbbbbbbbb_bbbb_bbbb_bbbb_bbbbbbbbbbb2);
+const ROX_USER_B: Uuid = Uuid::from_u128(0xbbbbbbbb_bbbb_bbbb_bbbb_bbbbbbbbbbb2);
 
 #[cfg(feature = "outbound")]
 fn axis_unit_vector(axis: usize) -> Vec<f32> {
@@ -3293,8 +3293,8 @@ async fn insert_voice(
 #[cfg(feature = "outbound")]
 async fn insert_user_mapping(
     pool: &sqlx::Pool<sqlx::Postgres>,
-    user_id: &MacroUserIdStr<'_>,
-    macro_user_id: Uuid,
+    user_id: &RoxUserIdStr<'_>,
+    rox_user_id: Uuid,
 ) -> anyhow::Result<()> {
     sqlx::query(
         r#"
@@ -3303,24 +3303,24 @@ async fn insert_user_mapping(
         ON CONFLICT (id) DO NOTHING
         "#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(user_id.as_ref())
     .bind(user_id.email_str())
-    .bind(format!("cus_{macro_user_id}"))
+    .bind(format!("cus_{rox_user_id}"))
     .execute(pool)
     .await?;
 
     sqlx::query(
         r#"
-        INSERT INTO "User" (id, email, "stripeCustomerId", macro_user_id)
+        INSERT INTO "User" (id, email, "stripeCustomerId", rox_user_id)
         VALUES ($1, $2, $3, $4)
-        ON CONFLICT (id) DO UPDATE SET macro_user_id = EXCLUDED.macro_user_id
+        ON CONFLICT (id) DO UPDATE SET rox_user_id = EXCLUDED.rox_user_id
         "#,
     )
     .bind(user_id.as_ref())
     .bind(user_id.email_str())
-    .bind(format!("cus_{macro_user_id}"))
-    .bind(macro_user_id)
+    .bind(format!("cus_{rox_user_id}"))
+    .bind(rox_user_id)
     .execute(pool)
     .await?;
 
@@ -3567,7 +3567,7 @@ async fn build_voip_push_payloads_drops_recipients_whose_token_mint_fails() {
 #[tokio::test]
 async fn build_voip_push_payloads_returns_empty_for_no_recipients() {
     let mock = MockRtcClient::new();
-    let recipients: Vec<MacroUserIdStr<'static>> = Vec::new();
+    let recipients: Vec<RoxUserIdStr<'static>> = Vec::new();
 
     let payloads = mock
         .build_voip_push_payloads(VoipPushPayloadRequest {
@@ -3902,7 +3902,7 @@ async fn get_ring_status_reports_declined_for_the_token_identity() {
 #[cfg(feature = "outbound")]
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn enroll_stable_speaker_voices_links_all_voices_for_consistent_diarized_speakers(
     pool: sqlx::Pool<sqlx::Postgres>,
@@ -3914,14 +3914,14 @@ async fn enroll_stable_speaker_voices_links_all_voices_for_consistent_diarized_s
 
     let call_repo = PgCallRepo::new(pool.clone());
     let voice_repo = PgVoiceRepo::new(pool.clone());
-    let user_a = MacroUserIdStr::parse_from_str("macro|user-a@test.com")?;
-    let user_b = MacroUserIdStr::parse_from_str("macro|user-b@test.com")?;
-    let voice_a = macro_uuid::generate_uuid_v7();
-    let voice_b = macro_uuid::generate_uuid_v7();
+    let user_a = RoxUserIdStr::parse_from_str("macro|user-a@test.com")?;
+    let user_b = RoxUserIdStr::parse_from_str("macro|user-b@test.com")?;
+    let voice_a = rox_uuid::generate_uuid_v7();
+    let voice_b = rox_uuid::generate_uuid_v7();
     let now = Utc::now();
 
-    insert_user_mapping(&pool, &user_a, MACRO_USER_A).await?;
-    insert_user_mapping(&pool, &user_b, MACRO_USER_B).await?;
+    insert_user_mapping(&pool, &user_a, ROX_USER_A).await?;
+    insert_user_mapping(&pool, &user_b, ROX_USER_B).await?;
     insert_voice(&pool, voice_a, 0).await?;
     insert_voice(&pool, voice_b, 1).await?;
 
@@ -3960,12 +3960,12 @@ async fn enroll_stable_speaker_voices_links_all_voices_for_consistent_diarized_s
     super::enroll_stable_speaker_voices_for_call_record(&call_repo, &voice_repo, archived.call_id)
         .await;
 
-    let mut user_a_voices = voice_repo.get_user_voices(&MACRO_USER_A).await?;
+    let mut user_a_voices = voice_repo.get_user_voices(&ROX_USER_A).await?;
     user_a_voices.sort();
     let mut expected = vec![voice_a, voice_b];
     expected.sort();
     assert_eq!(user_a_voices, expected);
-    assert!(voice_repo.get_user_voices(&MACRO_USER_B).await?.is_empty());
+    assert!(voice_repo.get_user_voices(&ROX_USER_B).await?.is_empty());
     Ok(())
 }
 

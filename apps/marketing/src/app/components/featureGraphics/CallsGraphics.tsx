@@ -23,7 +23,7 @@ import { PreviewWindow } from '../graphics/PreviewWindow';
 import { PhoneFrame, PhoneScreenContent } from '../utils/UtilPhoneFrame';
 
 const _HERO_DEMO_VIDEO_ID = 'MMG00RA7kU0'; // "Calls on Rox"
-const MACRO_REPO_URL = 'https://github.com/macro-inc/macro';
+const ROX_REPO_URL = 'https://github.com/macro-inc/macro';
 
 // ---------------------------------------------------------------------------
 // Shared style fragments (matching the homepage / email / docs / channels bento)
@@ -134,7 +134,7 @@ function _GithubStarButton() {
   });
   return (
     <a
-      href={MACRO_REPO_URL}
+      href={ROX_REPO_URL}
       target="_blank"
       rel="noreferrer"
       class="calls-cta-button"
@@ -1992,7 +1992,7 @@ export function SummaryGraphic() {
 
 // Inline @Rox mention — matches the agent-mention style used across the app
 // (amber spark + amber label, no avatar chrome) rather than a faux avatar chip.
-function MacroMention() {
+function RoxMention() {
   return (
     <span
       style={{
@@ -2067,7 +2067,7 @@ export function AgentContextGraphic() {
                 'line-height': 1.5,
               }}
             >
-              <MacroMention /> there's a base64 bug in the email client. Assign
+              <RoxMention /> there's a base64 bug in the email client. Assign
               it to whoever's on email this week.
             </span>
             <span

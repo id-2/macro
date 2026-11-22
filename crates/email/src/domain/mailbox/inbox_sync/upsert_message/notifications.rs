@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::{PreviewCursorQuery, PreviewView, PreviewViewStandardLabel};
-use email_utils::is_macro_notification_sender;
+use email_utils::is_rox_notification_sender;
 use filter_ast::Expr;
 use item_filters::{SharedEmailFilter, ast::email::EmailLiteral};
 use std::sync::Arc;
@@ -18,7 +18,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     // notify user of new messages
     send_notifications(ctx, link, new_message_provider_id).await?;
@@ -39,7 +39,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     if !ctx.features.notifications_enabled {
         return Ok(());
@@ -71,7 +71,7 @@ where
     // Rox's own digest / system emails describe activity the user already
     // has in-app notifications for; never raise a new-email notification
     // (in-app row or push) on top of them.
-    if sender_contact.is_some_and(|contact| is_macro_notification_sender(&contact.email)) {
+    if sender_contact.is_some_and(|contact| is_rox_notification_sender(&contact.email)) {
         tracing::debug!(
             thread_id = %message.thread_db_id,
             "skipping new-email notification for Rox's own notification sender"
@@ -91,7 +91,7 @@ where
     });
 
     let sender_id =
-        sender_contact.and_then(|contact| MacroUserIdStr::try_from_email(&contact.email).ok());
+        sender_contact.and_then(|contact| RoxUserIdStr::try_from_email(&contact.email).ok());
 
     let notification = InboxSyncNotification {
         sender,
@@ -107,7 +107,7 @@ where
 
     let primaries = ctx
         .repository
-        .primaries(link.macro_id.as_ref(), link.id)
+        .primaries(link.rox_id.as_ref(), link.id)
         .await
         .map_err(|e| {
             ProcessingError::Retryable(DetailedError {
@@ -118,7 +118,7 @@ where
             })
         })?;
 
-    let recipient_ids = build_notification_recipients(&link.macro_id, primaries);
+    let recipient_ids = build_notification_recipients(&link.rox_id, primaries);
     let (staff_recipients, customer_recipients) = partition_email_push_recipients(recipient_ids);
 
     if !staff_recipients.is_empty() {
@@ -138,14 +138,14 @@ where
 
 /// Split recipients so only `@rox.one` users are on the APNS path.
 fn partition_email_push_recipients(
-    recipient_ids: HashSet<MacroUserIdStr<'static>>,
+    recipient_ids: HashSet<RoxUserIdStr<'static>>,
 ) -> (
-    HashSet<MacroUserIdStr<'static>>,
-    HashSet<MacroUserIdStr<'static>>,
+    HashSet<RoxUserIdStr<'static>>,
+    HashSet<RoxUserIdStr<'static>>,
 ) {
     recipient_ids
         .into_iter()
-        .partition(|id| id.is_macro_staff())
+        .partition(|id| id.is_rox_staff())
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -176,7 +176,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     let query = PreviewCursorQuery {
         view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
@@ -191,7 +191,7 @@ where
 
     let previews = ctx
         .repository
-        .previews(query, link.macro_id.clone())
+        .previews(query, link.rox_id.clone())
         .await
         .map_err(|e| {
             ProcessingError::Retryable(DetailedError {
@@ -215,12 +215,12 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     if thread_in_inbox(ctx, link, signal_filter(thread_id)).await? {
         return Ok(Some(NewEmailTier::Signal));
     }
-    let staff_inbox = link.macro_id.is_macro_staff()
+    let staff_inbox = link.rox_id.is_rox_staff()
         && thread_in_inbox(ctx, link, Expr::Literal(EmailLiteral::ThreadId(thread_id))).await?;
     Ok(staff_inbox.then_some(NewEmailTier::StaffInbox))
 }
@@ -239,7 +239,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     let new_message = ctx
         .repository
@@ -266,13 +266,13 @@ where
 }
 /// Select the owner and valid delegated primaries for notification delivery.
 pub fn build_notification_recipients(
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     primaries: Vec<String>,
-) -> HashSet<MacroUserIdStr<'static>> {
+) -> HashSet<RoxUserIdStr<'static>> {
     let mut recipient_ids = HashSet::from([owner.clone()]);
 
     for primary in primaries {
-        match MacroUserIdStr::try_from(primary) {
+        match RoxUserIdStr::try_from(primary) {
             Ok(id) => {
                 recipient_ids.insert(id);
             }

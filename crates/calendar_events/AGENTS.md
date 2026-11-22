@@ -33,7 +33,7 @@ reminder dispatch, team availability, and provider/Postgres persistence.
 
 ## Boundaries
 
-- Depends on: `call` (feature `call-meetings`, meeting links), `macro_user_id`,
+- Depends on: `call` (feature `call-meetings`, meeting links), `rox_user_id`,
   `notification` (feature `notify`), `model_notifications`, `aws-sdk-sqs`
   (feature `dispatch-sqs`).
 - Used by: `email`, `ai_tools`, `channel_bots`, `graphql_calendar`, `complete_graph`,
@@ -150,7 +150,7 @@ reminder dispatch, team availability, and provider/Postgres persistence.
   `CalendarSnapshotImporter::import_snapshot`, fed an `EventSnapshot` that
   `crates/email`'s `invitation_import` builds from the email's saved snapshot.
   Only the channel-share path strips the Rox call
-  (`content_without_macro_call`, behind `EventSnapshot::without_macro_call`);
+  (`content_without_rox_call`, behind `EventSnapshot::without_rox_call`);
   a forwarded file keeps the join link it carries.
   The other direction, a guest forwarding their copy of an event, renders it
   through `CalendarEventForwardSource::event_forward`, which also names the
@@ -225,7 +225,7 @@ reminder dispatch, team availability, and provider/Postgres persistence.
   delegate, a muted category never sends it, and the notifier only queues.
   `document_storage_service` hosts the ask, so it has its own
   `CalendarRefreshNotifier` (`src/outbound/calendar_refresh.rs`).
-- `update_event_with_macro_call` (`src/domain/meeting_links.rs`) switches an
+- `update_event_with_rox_call` (`src/domain/meeting_links.rs`) switches an
   existing event to a Rox call in one provider write, so attendees get one
   update: it reads the stored content through `CalendarEventDetailsReader`,
   mints the call, appends the join line and removes the provider conference.
@@ -315,9 +315,9 @@ reminder dispatch, team availability, and provider/Postgres persistence.
   only guard against a guess. UpdateCalendarEvent and DeleteCalendarEvent check
   every call; the update, invite-guests and delete routes check agent runs and
   any request naming `inbox` through `CalendarCopyConfirmation`, answering 409
-  `copy_choice_required`. An agent run (`macro_authorization::is_agent_run`)
+  `copy_choice_required`. An agent run (`rox_authorization::is_agent_run`)
   is a token with `agent_id` (in-app code mode) or a request carrying
-  `x-macro-code-execution`, which
+  `x-rox-code-execution`, which
   `code_execution`'s bootstrap sets on every code-mode program's SDK requests,
   public MCP clients' included. Code-mode agents never see the calendar tools
   (`agent_code_mode::covered_by_code_sdk`), so the routes and the SDK docs are
@@ -340,7 +340,7 @@ reminder dispatch, team availability, and provider/Postgres persistence.
   `COALESCE(preference.contributes_to_availability, true)`; change them
   together. With meetings they are in, it is their own schedule for agents,
   for `TeamSourceOccurrence::is_personally_busy` and for booking links'
-  busy time (`calendar_scheduling`'s `MacroCalendars::busy`); the last two
+  busy time (`calendar_scheduling`'s `RoxCalendars::busy`); the last two
   decide "in the meeting" with `labels::attends_meeting`, which counts a
   guest row, or an organizer row on a writable copy with other guests.
   `viewer_can.organize` stays a

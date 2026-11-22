@@ -112,7 +112,7 @@ restart can find them.
   not such a boundary: the compiler has checked it. If the SDK's types are wrong, parse `unknown`.
 - **Pure functions; no IO outside the context.** A function never reads the
   clock, disk, network, environment or `process` on its own: it is given a
-  `Clock`, `Disk`, `Shell`, `Credentials`, `Macro`, or a port you define, through
+  `Clock`, `Disk`, `Shell`, `Credentials`, `Rox`, or a port you define, through
   the context. The only modules that import `node:*`, `Bun.*`, an SDK client
   constructor, or touch `process` are `behavior/context/*`, an area's
   `context.ts` (where its real ports are built), `index.ts` and `cli.ts`.

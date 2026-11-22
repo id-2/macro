@@ -33,7 +33,7 @@ vi.mock('@queries/client', () => ({
 
 const link = (id: string, owner: string, primary: boolean): Link => ({
   id,
-  macro_id: owner,
+  rox_id: owner,
   is_primary: primary,
   email_address: `${id}@example.com`,
   calendar_disabled: false,

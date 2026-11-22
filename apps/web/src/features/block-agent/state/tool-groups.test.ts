@@ -485,7 +485,7 @@ describe.each(['GenerateImage', 'DispatchCodingAgent'])(
 
 it('folds code executions into the run around them, so one turn segment is one group', () => {
   const execution = tool({
-    name: { kind: 'mcp', server: 'macro_internal', tool: 'ExecuteCode' },
+    name: { kind: 'mcp', server: 'rox_internal', tool: 'ExecuteCode' },
     detail: {
       kind: 'other',
       input: null,
@@ -510,7 +510,7 @@ it('hides how the agent looks up its tools', () => {
   ]) {
     expect(
       isCodeModeSupportCall(
-        tool({ name: { kind: 'mcp', server: 'macro_internal', tool: name } })
+        tool({ name: { kind: 'mcp', server: 'rox_internal', tool: name } })
       )
     ).toBe(true);
   }
@@ -520,7 +520,7 @@ it('hides how the agent looks up its tools', () => {
 describe('persistent review presentation', () => {
   const id = '019a0000-0000-7000-8000-000000000005';
   const presentation = (
-    server = 'macro_internal',
+    server = 'rox_internal',
     callId = `review_${id}`
   ): ToolUsePart =>
     tool({
@@ -545,7 +545,7 @@ describe('persistent review presentation', () => {
   });
   it('does not turn the native invocation receipt or an external tool into another card', () => {
     expect(
-      rendersOwnView(presentation('macro_internal', 'ordinary-call'))
+      rendersOwnView(presentation('rox_internal', 'ordinary-call'))
     ).toBe(false);
     expect(rendersOwnView(presentation('untrusted'))).toBe(false);
   });
@@ -555,7 +555,7 @@ describe('presented views', () => {
   const presentation = (): ToolUsePart =>
     tool({
       id: 'view_019a0000-0000-7000-8000-000000000006',
-      name: { kind: 'mcp', server: 'macro_internal', tool: 'PresentView' },
+      name: { kind: 'mcp', server: 'rox_internal', tool: 'PresentView' },
       detail: {
         kind: 'view',
         view: { title: 'Launch notes', widgets: [] },

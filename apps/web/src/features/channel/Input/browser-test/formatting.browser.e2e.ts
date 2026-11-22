@@ -14,7 +14,7 @@ for (const width of [320, 390]) {
       const url = new URL(route.request().url());
       if (
         url.hostname === 'localhost' &&
-        !url.pathname.startsWith('/__macro_dev/')
+        !url.pathname.startsWith('/__rox_dev/')
       ) {
         await route.continue();
       } else {

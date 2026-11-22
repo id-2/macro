@@ -1,7 +1,7 @@
 use super::*;
 use crate::outbound::pg_activity_repo::{insert_activities, purge_entities};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn transactional_activity_writes_follow_commit_and_rollback(pool: PgPool) {
     let correlation = Uuid::now_v7();
     let event = agent_correlation::context::scope_with_verb(

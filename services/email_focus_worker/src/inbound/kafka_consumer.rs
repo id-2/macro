@@ -22,8 +22,8 @@ use email::domain::{
     },
 };
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
 use rdkafka::{Message as _, consumer::CommitMode};
 use rootcause::Report;
@@ -37,7 +37,7 @@ mod classifications;
 #[cfg(test)]
 mod test;
 
-macro_event_broker::declare_topics!(FocusEvent: EmailMacroEvent);
+rox_event_broker::declare_topics!(FocusEvent: EmailMacroEvent);
 
 struct EmailFocusGroup;
 
@@ -180,7 +180,7 @@ where
     let consumer = KafkaEventConsumer::<EmailFocusGroup>::from_env(brokers)?;
     let consumer =
         KafkaConsumerAdapter::<EmailFocusGroup, ()>::new(consumer).subscribe::<FocusEvent>()?;
-    let consumer = MacroEventConsumerService::new(consumer);
+    let consumer = RoxEventConsumerService::new(consumer);
     tracing::info!(
         topics = ?FocusEvent::topics(),
         group = EmailFocusGroup::GROUP_NAME,

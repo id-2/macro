@@ -7,7 +7,7 @@ use axum::{
 };
 use email::domain::{models::EmailErr, ports::EmailService};
 use email::inbound::axum::api_types::DraftEditPrecondition;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use uuid::Uuid;
 
@@ -55,13 +55,13 @@ impl IntoResponse for DeleteDraftError {
 pub async fn handler(
     Query(precondition): Query<DraftEditPrecondition>,
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(draft_id): Path<Uuid>,
 ) -> Result<StatusCode, DeleteDraftError> {
     ctx.email_service
         .service()
         .delete_draft_for_user(
-            authorization.authorization.user.macro_user_id,
+            authorization.authorization.user.rox_user_id,
             draft_id,
             precondition.draft_generation,
         )

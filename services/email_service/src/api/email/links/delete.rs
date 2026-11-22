@@ -4,7 +4,7 @@ use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use email::domain::mailbox::lifecycle::InboxActor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use uuid::Uuid;
 
@@ -12,7 +12,7 @@ use uuid::Uuid;
 ///
 /// For an inbox the caller owns this enqueues a full cascade teardown
 /// (`LinkManagerMessage::DeleteLink`). For an inbox reached via delegation it
-/// only drops the `macro_user_links` edge, leaving the owner's data intact.
+/// only drops the `rox_user_links` edge, leaving the owner's data intact.
 #[utoipa::path(
     delete,
     tag = "Links",
@@ -32,11 +32,11 @@ use uuid::Uuid;
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id), err)]
 pub async fn delete_link_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(link_id): Path<Uuid>,
 ) -> Result<Response, InboxActionError> {
     let actor = InboxActor {
-        macro_id: authorization.authorization.user.macro_user_id.clone(),
+        rox_id: authorization.authorization.user.rox_user_id.clone(),
         credential_owner: authorization
             .authorization
             .user

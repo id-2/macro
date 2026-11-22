@@ -15,14 +15,14 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 #[allow(deprecated)]
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, InternalAuthConfig, JwtValidator, LEGACY_DSS_INTERNAL_API_KEY_HEADER,
-    MacroAuthorizationError, MacroAuthorizationExtractor, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, UserOrInternal, ValidatedIdentity,
+    RoxAuthorizationError, RoxAuthorizationExtractor, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, UserOrInternal, ValidatedIdentity,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use rootcause::Report;
 use tower::ServiceExt;
@@ -44,7 +44,7 @@ const VALID_USER_ID: &str = "macro|valid@example.com";
 
 type TestPropertiesService =
     PropertiesServiceImpl<MockPropertiesRepo, MockPermissionService, MockNotificationService>;
-type TestAuthorizationService = MacroAuthorizationServiceImpl<FakeJwtValidator>;
+type TestAuthorizationService = RoxAuthorizationServiceImpl<FakeJwtValidator>;
 
 #[derive(Clone, Debug, PartialEq)]
 enum AccessCall {
@@ -95,7 +95,7 @@ impl FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -113,7 +113,7 @@ impl EntityAccessService for FakeEntityAccessService {
             return Err(AccessError::Unauthorized);
         }
 
-        let user_id = MacroUserIdStr::try_from(user_id.as_ref().to_string())
+        let user_id = RoxUserIdStr::try_from(user_id.as_ref().to_string())
             .expect("authorized test user id should be valid");
         Ok(EntityAccessReceipt::dangerously_assert_authenticated_user(
             user_id,
@@ -134,7 +134,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -143,7 +143,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -167,7 +167,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -177,7 +177,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -188,7 +188,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         panic!("unexpected entity-users request")
     }
 
@@ -208,7 +208,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         self.record(AccessCall::UserTeam {
             user_id: user_id.as_ref().to_string(),
@@ -224,10 +224,10 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         match jwt {
-            "valid" => Ok(macro_authorization::ValidatedCredential {
-                origin: macro_authorization::CredentialOrigin::Session,
+            "valid" => Ok(rox_authorization::ValidatedCredential {
+                origin: rox_authorization::CredentialOrigin::Session,
                 identity: ValidatedIdentity {
                     agent_id: None,
                     agent_via: None,
@@ -237,8 +237,8 @@ impl JwtValidator for FakeJwtValidator {
                     permissions: None,
                 },
             }),
-            "expired" => Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            "expired" => Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 }
@@ -251,17 +251,17 @@ fn no_op_properties_service() -> TestPropertiesService {
     )
 }
 
-fn authorization_state() -> MacroAuthorizationState<TestAuthorizationService> {
-    let service = MacroAuthorizationServiceImpl::new(
+fn authorization_state() -> RoxAuthorizationState<TestAuthorizationService> {
+    let service = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: INTERNAL_API_KEY.to_string(),
             default_user_id: Some(DEFAULT_INTERNAL_USER_ID.to_string()),
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
-    MacroAuthorizationState::new(Arc::new(service))
+    RoxAuthorizationState::new(Arc::new(service))
 }
 
 fn test_router(entity_access_service: FakeEntityAccessService) -> Router {
@@ -280,9 +280,9 @@ fn test_router(entity_access_service: FakeEntityAccessService) -> Router {
 }
 
 async fn required_auth_handler(
-    authorization: MacroAuthorizationExtractor<TestAuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<TestAuthorizationService, UserOrInternal>,
 ) -> String {
-    authorization.authorization.user.macro_user_id.to_string()
+    authorization.authorization.user.rox_user_id.to_string()
 }
 
 async fn team_handler(
@@ -958,7 +958,7 @@ async fn writes_to_a_managed_team_definition_are_forbidden() {
 async fn the_guard_only_covers_team_definitions_with_a_managed_name() {
     let definition_id = Uuid::from_u128(0xD003);
     let team_id = Uuid::from_u128(0x7EA3);
-    let user = MacroUserIdStr::try_from(VALID_USER_ID.to_string()).expect("valid user id");
+    let user = RoxUserIdStr::try_from(VALID_USER_ID.to_string()).expect("valid user id");
     let cases = [
         (
             models_properties::PropertyOwner::User {

@@ -1,4 +1,4 @@
-// Macro computers: billing and fleet failures that need a person.
+// Rox computers: billing and fleet failures that need a person.
 //
 // New monitors, not adopted. Each reads an error-level log event with a fixed
 // message, written by crates/hosted_runtimes, so these strings are their

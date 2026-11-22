@@ -11,7 +11,7 @@ use email::domain::{
     followup::{EmailFollowupMailbox, FollowupMessage, FollowupThread},
     models::EmailErr,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
@@ -56,8 +56,8 @@ impl ReminderDispatch for PausedDelivery {
 
 const THREAD: Uuid = Uuid::from_u128(11);
 const LINK: Uuid = Uuid::from_u128(12);
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|followup@test.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|followup@test.com").unwrap()
 }
 #[derive(Clone)]
 struct FixedClock(DateTime<Utc>);
@@ -78,7 +78,7 @@ struct Mail {
 impl EmailFollowupMailbox for Mailbox {
     async fn reminder_threads(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _receipts: Vec<
             entity_access::domain::models::EntityAccessReceipt<
                 entity_access::domain::models::ViewAccessLevel,
@@ -90,7 +90,7 @@ impl EmailFollowupMailbox for Mailbox {
     }
     async fn followup_thread(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         thread: Uuid,
     ) -> Result<Option<FollowupThread>, EmailErr> {
         if actor != user() || thread != THREAD {
@@ -100,7 +100,7 @@ impl EmailFollowupMailbox for Mailbox {
     }
     async fn set_followup_inbox(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         thread: Uuid,
         link: Uuid,
         visible: bool,
@@ -130,8 +130,8 @@ impl EmailFollowupMailbox for Mailbox {
 async fn setup(pool: PgPool) -> EmailFollowupService<PgRemindersRepo, Mailbox, FixedClock> {
     let owner = user();
     sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'followup', 'followup@test.com', 'followup')"#, Uuid::now_v7()).execute(&pool).await.unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, macro_user_id) SELECT $1, 'followup@test.com', id FROM macro_user WHERE email = 'followup@test.com'"#, owner.as_ref()).execute(&pool).await.unwrap();
-    sqlx::query!("INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider) VALUES ($1, $2, 'followup', 'followup@test.com', 'GMAIL')", LINK, owner.as_ref()).execute(&pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) SELECT $1, 'followup@test.com', id FROM macro_user WHERE email = 'followup@test.com'"#, owner.as_ref()).execute(&pool).await.unwrap();
+    sqlx::query!("INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider) VALUES ($1, $2, 'followup', 'followup@test.com', 'GMAIL')", LINK, owner.as_ref()).execute(&pool).await.unwrap();
     sqlx::query!(
         "INSERT INTO email_threads (id, link_id) VALUES ($1, $2)",
         THREAD,
@@ -168,7 +168,7 @@ fn set(at: DateTime<Utc>, condition: EmailReminderCondition) -> EmailFollowupCom
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retry_concurrency_and_stale_undo_do_not_duplicate_or_resurrect(pool: PgPool) {
     let service = setup(pool).await;
     let command = set(
@@ -242,7 +242,7 @@ async fn retry_concurrency_and_stale_undo_do_not_duplicate_or_resurrect(pool: Pg
     assert!(reminder.completed_at.is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reply_cancels_but_regardless_returns_sent_only_and_retry_is_idempotent(pool: PgPool) {
     let service = setup(pool).await;
     let first = service
@@ -364,7 +364,7 @@ async fn reply_cancels_but_regardless_returns_sent_only_and_retry_is_idempotent(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn archive_failure_rolls_back_and_ineligible_mail_never_returns(pool: PgPool) {
     let service = setup(pool).await;
     service.mailbox.0.lock().unwrap().archive_fails = true;
@@ -460,7 +460,7 @@ async fn archive_failure_rolls_back_and_ineligible_mail_never_returns(pool: PgPo
             .await
             .is_err()
     );
-    let other = MacroUserIdStr::parse_from_str("macro|other@test.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@test.com").unwrap();
     assert!(
         service
             .execute(
@@ -476,7 +476,7 @@ async fn archive_failure_rolls_back_and_ineligible_mail_never_returns(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reply_racing_archive_is_durably_restored(pool: PgPool) {
     let service = setup(pool).await;
     service.mailbox.0.lock().unwrap().reply_on_archive =
@@ -521,7 +521,7 @@ async fn reply_racing_archive_is_durably_restored(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn exact_seconds_and_removal_without_source_access(pool: PgPool) {
     let service = setup(pool).await;
     let requested = DateTime::from_timestamp_micros(
@@ -581,7 +581,7 @@ async fn exact_seconds_and_removal_without_source_access(pool: PgPool) {
     assert_eq!(service.mailbox.0.lock().unwrap().writes, writes);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removal_waits_for_delivery_after_inbox_return(pool: PgPool) {
     let service = setup(pool).await;
     let created = service
@@ -658,7 +658,7 @@ async fn removal_waits_for_delivery_after_inbox_return(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn corrupt_email_reconciliation_does_not_suppress_delivery_sweep(pool: PgPool) {
     let service = setup(pool).await;
     let created = service
@@ -707,7 +707,7 @@ async fn corrupt_email_reconciliation_does_not_suppress_delivery_sweep(pool: PgP
     assert_eq!(calls.load(Ordering::SeqCst), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn independent_followups_use_configured_pool_capacity(pool: PgPool) {
     let repo = PgRemindersRepo::with_followup_lock_capacity(pool.clone(), 8);
     let mut guards = Vec::new();
@@ -733,7 +733,7 @@ async fn independent_followups_use_configured_pool_capacity(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn busy_thread_waiters_leave_lock_pool_available(pool: PgPool) {
     // A different process owns the busy key. Four waiters used to occupy every
     // connection in this process's lock pool while blocked inside PostgreSQL.
@@ -774,7 +774,7 @@ async fn busy_thread_waiters_leave_lock_pool_available(pool: PgPool) {
     recovered.rollback().await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn guard_survives_configured_idle_transaction_timeout(pool: PgPool) {
     let mut repo = PgRemindersRepo::new(pool.clone());
     repo.followup_locks = sqlx::postgres::PgPoolOptions::new()
@@ -803,7 +803,7 @@ async fn guard_survives_configured_idle_transaction_timeout(pool: PgPool) {
     guard.rollback().await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undo_and_archive_rollback_restore_original_inbox_order(pool: PgPool) {
     let service = setup(pool).await;
     for original in [None, Some(service.clock.now() - Duration::days(1))] {

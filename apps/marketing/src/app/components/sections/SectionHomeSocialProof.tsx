@@ -7,7 +7,7 @@ import {
   githubStars,
 } from '../../utils/utilGithubStars';
 
-const MACRO_REPO_URL = 'https://github.com/macro-inc/macro';
+const ROX_REPO_URL = 'https://github.com/macro-inc/macro';
 
 // TODO: replace these placeholder wordmarks with real customer logos (SVGs).
 const logos = ['Northwind', 'Lumen', 'Vertex', 'Monarch', 'Cascade', 'Helio'];
@@ -252,7 +252,7 @@ export function SectionHomeSocialProof() {
         }}
       >
         <a
-          href={MACRO_REPO_URL}
+          href={ROX_REPO_URL}
           target="_blank"
           rel="noreferrer"
           style={{

@@ -8,7 +8,7 @@ publish = false
 futures.workspace = true
 ai_toolset = { path = "../ai_toolset" }
 anyhow.workspace = true
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 mcp_client = { path = "../mcp_client" }
 pipedream_mcp = { path = "../pipedream_mcp" }
 serde_json.workspace = true

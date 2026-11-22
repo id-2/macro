@@ -10,9 +10,9 @@ use trigger_context::{TaskAssignedContext, TaskSnapshot, TriggerContext, Trigger
 use crate::domain::context::PeopleDirectory;
 use agent_session::domain::ports::AgentSessionRepo;
 use bot_id::{BotId, BotIdStr};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::{
     api::MessageCommands,
     models::{MessageAttribution, MessageParent, PostMessage, PostMessageNotificationPolicy},
@@ -74,7 +74,7 @@ pub struct TaskAssignment {
     /// Task document whose discussion receives the agent session link.
     pub parent: MessageParent,
     /// User whose assignment starts the work.
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
     /// Agents added by this change, in stable order.
     pub bots: Vec<BotId>,
     /// Who made the assignment, and how.
@@ -116,7 +116,7 @@ impl TaskAssignment {
 /// an agent made it for them.
 fn assignment_origin(
     updated: &EntityPropertyUpdatedMetadata,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
 ) -> TriggerOrigin {
     let acting_bot = updated.actor.as_ref().and_then(|actor| actor.as_bot());
     let by = match acting_bot {
@@ -175,7 +175,7 @@ where
     Replies: ExplicitReplyExtractor,
     Judge: ImplicitTriggerJudge,
     History: ThreadHistory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Context: TaskAssignmentContext,
     People: PeopleDirectory,
 {

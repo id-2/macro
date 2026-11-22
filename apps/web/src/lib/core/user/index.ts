@@ -20,7 +20,7 @@ export { useAugmentUserWithDmActivity } from './dmActivity';
 export { useIsConnectedSecondaryInbox } from './inboxOnly';
 export {
   emailToMacroId,
-  type MacroId,
+  type RoxId,
   macroIdToEmail,
   tryMacroId,
 } from './macroId';

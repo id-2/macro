@@ -12,7 +12,7 @@ use initiative::domain::{
     models::InitiativeDetail,
     reads::{InitiativePageRow, InitiativeRead},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::sync::OnceCell;
 use tracing::Instrument;
 use uuid::Uuid;
@@ -32,7 +32,7 @@ pub struct LoadedInitiative {
 /// Viewer-scoped initiative reader; authorization remains in the capability bridge.
 pub struct InitiativeLoader {
     context: InitiativeGraphqlContext,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
 }
 
 impl Loader<Uuid> for InitiativeLoader {
@@ -71,7 +71,7 @@ impl Loader<Uuid> for InitiativeLoader {
 /// Coalesce concurrent initiative fields without retaining data across mutations or subscription events.
 pub fn initiative_loader(
     context: InitiativeGraphqlContext,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
 ) -> DataLoader<InitiativeLoader> {
     DataLoader::new(InitiativeLoader { context, user }, |batch| {
         tokio::spawn(batch.in_current_span())

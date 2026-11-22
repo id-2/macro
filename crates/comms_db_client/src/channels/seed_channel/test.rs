@@ -1,11 +1,11 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn seeds_channel_without_team(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
     let channel_id: Uuid = "11111111-1111-1111-1111-111111111111".parse().unwrap();
 
     let id = seed_channel(
@@ -41,7 +41,7 @@ async fn seeds_channel_without_team(pool: Pool<Postgres>) -> anyhow::Result<()> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn seeds_team_channel_with_team_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let team_id: Uuid = "22222222-2222-2222-2222-222222222222".parse().unwrap();
     let channel_id: Uuid = "33333333-3333-3333-3333-333333333333".parse().unwrap();
@@ -53,7 +53,7 @@ async fn seeds_team_channel_with_team_id(pool: Pool<Postgres>) -> anyhow::Result
     .execute(&pool)
     .await?;
     sqlx::query(
-        r#"INSERT INTO "User" (id, email, macro_user_id)
+        r#"INSERT INTO "User" (id, email, rox_user_id)
            VALUES ('macro|owner@example.com', 'owner@example.com', '55555555-5555-5555-5555-555555555555')"#,
     )
     .execute(&pool)
@@ -89,7 +89,7 @@ async fn seeds_team_channel_with_team_id(pool: Pool<Postgres>) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rejects_team_channel_without_team_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let channel_id: Uuid = "44444444-4444-4444-4444-444444444444".parse().unwrap();
 

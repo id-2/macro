@@ -6,7 +6,7 @@ import type {
 } from '../generated/storage/types.gen';
 import { DatabaseTable } from '../src/entities/databases/table';
 import { DatabaseView } from '../src/entities/databases/view';
-import { Macro, MacroOpRefusedError } from '../src/macro';
+import { Macro, RoxOpRefusedError } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 const databaseId = '0198a4cc-e138-7670-a308-a6b766602700';
@@ -1140,7 +1140,7 @@ describe('Database', () => {
     const refusal = await database
       .createTable({ name: 'Guests' })
       .catch((error: unknown) => error);
-    expect(refusal).toBeInstanceOf(MacroOpRefusedError);
+    expect(refusal).toBeInstanceOf(RoxOpRefusedError);
     expect(refusal).toMatchObject({
       status: 400,
       message: 'table id already taken',

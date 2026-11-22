@@ -1,6 +1,6 @@
 use super::*;
-fn id(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).unwrap()
+fn id(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).unwrap()
 }
 #[test]
 fn includes_owner_and_all_delegated_primaries() {

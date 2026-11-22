@@ -3,29 +3,29 @@ use crate::domain::agent::ComputerAgents;
 use crate::outbound::pg::PgComputerAgents;
 use harnesses::domain::ports::ComputerTeamAgents;
 
-async fn insert_agent(pool: &PgPool) -> MacroUserIdStr<'static> {
-    let macro_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0022);
+async fn insert_agent(pool: &PgPool) -> RoxUserIdStr<'static> {
+    let rox_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0022);
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'ada-1@agents.macro.invalid', 'ada-1@agents.macro.invalid', 'cus_agent_ada')
         "#,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id, "isAgent") VALUES ('macro|ada-1@agents.macro.invalid', 'ada-1@agents.macro.invalid', $1, TRUE)"#,
-        macro_user_id,
+        r#"INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES ('macro|ada-1@agents.macro.invalid', 'ada-1@agents.macro.invalid', $1, TRUE)"#,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .unwrap();
-    MacroUserIdStr::try_from("macro|ada-1@agents.macro.invalid".to_owned()).unwrap()
+    RoxUserIdStr::try_from("macro|ada-1@agents.macro.invalid".to_owned()).unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_purchase_for_an_agent_links_it_while_confirming_and_after(pool: PgPool) {
     insert_team(&pool).await;
     let agent = insert_agent(&pool).await;
@@ -109,7 +109,7 @@ async fn a_purchase_for_an_agent_links_it_while_confirming_and_after(pool: PgPoo
     assert!(!repo.has_live_computer(TEAM, &agent).await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_agent_gets_only_one_computer(pool: PgPool) {
     insert_team(&pool).await;
     let agent = insert_agent(&pool).await;

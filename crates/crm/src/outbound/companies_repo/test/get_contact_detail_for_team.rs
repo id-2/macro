@@ -2,7 +2,7 @@ use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::domain::model::CrmCompanySummary;
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -20,7 +20,7 @@ async fn summary_of(
     Ok(detail.company)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_is_the_contact_read_with_the_company_named_as_the_company_read_names_it(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -85,7 +85,7 @@ async fn detail_is_the_contact_read_with_the_company_named_as_the_company_read_n
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_summary_of_a_company_without_a_name_falls_back_to_its_domain(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -107,7 +107,7 @@ async fn detail_summary_of_a_company_without_a_name_falls_back_to_its_domain(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_summary_breaks_a_created_at_tie_by_domain_id(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -139,7 +139,7 @@ async fn detail_summary_breaks_a_created_at_tie_by_domain_id(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_of_a_contact_without_a_company_has_no_summary(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -158,7 +158,7 @@ async fn detail_of_a_contact_without_a_company_has_no_summary(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_under_a_hidden_company_is_for_admins_only(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@example.com").await?;
@@ -182,7 +182,7 @@ async fn detail_under_a_hidden_company_is_for_admins_only(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detail_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();

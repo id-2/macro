@@ -1,7 +1,7 @@
 import { CellMentionEditor } from '@app/components/cell-text-editor/CellMentionEditor';
 import type { CellTextEditorProps } from '@app/components/cell-text-editor/types';
 import {
-  type MacroMentionLinkResolver,
+  type RoxMentionLinkResolver,
   useMacroMentionLinkResolver,
 } from '@components/app/split-layout/split-router/mention-links';
 import { DocumentMention } from '@core/component/LexicalMarkdown/component/decorator/DocumentMention';
@@ -28,7 +28,7 @@ import { DateMentionMenu } from './views/DateMentionMenu';
 
 export function linkMentions(
   value: string,
-  resolveAppLink?: MacroMentionLinkResolver
+  resolveAppLink?: RoxMentionLinkResolver
 ): string {
   if (value.startsWith('=')) return value;
   return cellTextParts(value)

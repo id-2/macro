@@ -1,7 +1,7 @@
 use authentication_service_client::error::AuthServiceClientError;
 use email_api_client::domain::models::{TokenError, TokenFreshness};
 use email_api_client::domain::ports::ProviderTokenSource;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -15,7 +15,7 @@ async fn insert_link_needing_reauth(pool: &PgPool) -> Uuid {
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider, needs_reauth
+            id, rox_id, fusionauth_user_id, email_address, provider, needs_reauth
         )
         VALUES ($1, $2, $2, $3, 'GMAIL', true)
         "#,
@@ -39,7 +39,7 @@ async fn needs_reauth(pool: &PgPool, link_id: Uuid) -> bool {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reauth_flagged_row_is_cleared_after_a_successful_fetch(pool: PgPool) {
     let link_id = insert_link_needing_reauth(&pool).await;
 

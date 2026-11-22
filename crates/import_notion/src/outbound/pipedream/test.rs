@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use http::{HeaderMap, Method, StatusCode};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::models::PipedreamConnection;
 use pipedream_mcp::domain::ports::{ConnectedAppProxy, ConnectionStore, ProxyResponse};
 use tokio::time::Instant;
@@ -22,7 +22,7 @@ impl ConnectionStore for OneConnection {
 
     async fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> Result<Option<PipedreamConnection>, String> {
         assert_eq!(app_slug, "notion");
@@ -34,7 +34,7 @@ impl ConnectionStore for OneConnection {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _app_slug: &str,
     ) -> Result<(), String> {
         unreachable!("connections are never deleted by the importer")
@@ -42,7 +42,7 @@ impl ConnectionStore for OneConnection {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<PipedreamConnection>, String> {
         unreachable!("connections are loaded by app")
     }
@@ -88,7 +88,7 @@ impl ConnectedAppProxy for RecordingProxy {
 
 #[tokio::test(start_paused = true)]
 async fn a_connected_user_reaches_notion_through_the_proxy_with_one_pacer_per_account() {
-    let user = MacroUserIdStr::try_from_email("caller@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("caller@example.com").unwrap();
     let store = Arc::new(OneConnection(Some(PipedreamConnection {
         user_id: user.clone(),
         app_slug: "notion".into(),
@@ -137,7 +137,7 @@ async fn a_connected_user_reaches_notion_through_the_proxy_with_one_pacer_per_ac
 
 #[tokio::test]
 async fn no_connection_a_disabled_one_or_no_proxy_means_no_notion() {
-    let user = MacroUserIdStr::try_from_email("caller@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("caller@example.com").unwrap();
     let disabled = PipedreamConnection {
         user_id: user.clone(),
         app_slug: "notion".into(),

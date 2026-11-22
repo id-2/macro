@@ -185,7 +185,7 @@ fn while_planning_the_report_carries_what_notion_has_shown_so_far() {
 }
 
 #[test]
-fn objects_already_in_macro_are_counted_apart_with_who_imported_them() {
+fn objects_already_in_rox_are_counted_apart_with_who_imported_them() {
     let review = Uuid::now_v7();
     let mut handbook = row(
         "Handbook",

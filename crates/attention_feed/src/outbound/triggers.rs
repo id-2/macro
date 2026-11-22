@@ -4,7 +4,7 @@
 use std::sync::Arc;
 
 use activity::{Action, ActivitySubscriptionService, ActivitySubscriptionUpdate, RecordedAction};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_notifications::NotifEvent;
 use notification::domain::{
     models::NotificationSubscriptionUpdate, ports::WebSocketNotificationSubscriptionService,
@@ -42,7 +42,7 @@ impl<NS, AS, R> RealtimeFeedTriggers<NS, AS, R> {
 /// The trigger an activity update implies for `user`: only the viewer's own
 /// non-view actions change own work.
 fn activity_trigger(
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     update: ActivitySubscriptionUpdate,
 ) -> Option<FeedTrigger> {
     match update {
@@ -83,7 +83,7 @@ where
 {
     fn subscribe(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         keying: CandidateKeying,
         own_work: bool,
     ) -> mpsc::Receiver<FeedTrigger> {

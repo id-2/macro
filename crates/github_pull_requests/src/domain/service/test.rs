@@ -17,7 +17,7 @@ use foreign_entity::domain::{
     ports::{ForeignEntityListQuery, ForeignEntityService},
 };
 use item_filters::ast::{LiteralTree, github_pull_request::GithubPullRequestLiteral};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Cursor, CursorVal, Query, SimpleSortMethod};
 use uuid::Uuid;
 
@@ -842,8 +842,8 @@ async fn listing_reports_repository_failures() {
     assert!(error.to_string().contains("listing failed"));
 }
 
-fn facet_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER_ID).unwrap()
+fn facet_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER_ID).unwrap()
 }
 
 #[tokio::test]

@@ -28,7 +28,7 @@ export interface ApiDraftInput {
   /** HTML body (base64 URL_SAFE_NO_PAD encoded). Sanitized before storage. */
   body_html?: ApiDraftInputBodyHtml;
   /** Rox body format. */
-  body_macro?: ApiDraftInputBodyMacro;
+  body_rox?: ApiDraftInputBodyMacro;
   /** Plain text body. */
   body_text?: ApiDraftInputBodyText;
   /** Cc recipients. */

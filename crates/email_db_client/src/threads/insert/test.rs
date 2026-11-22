@@ -1,12 +1,12 @@
 use super::*;
 use crate::threads::get::get_thread_by_id_and_link_id;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use std::time::Duration;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn provider_thread_upsert_advances_existing_thread_timestamp(
@@ -40,7 +40,7 @@ async fn provider_thread_upsert_advances_existing_thread_timestamp(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn unchanged_timestamp_upsert_is_noop(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -88,7 +88,7 @@ async fn unchanged_timestamp_upsert_is_noop(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn blank_upsert_preserves_populated_timestamp(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -131,7 +131,7 @@ async fn blank_upsert_preserves_populated_timestamp(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn blank_insert_creates_new_thread(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -151,7 +151,7 @@ async fn blank_insert_creates_new_thread(pool: Pool<Postgres>) -> anyhow::Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn only_one_of_two_concurrent_blank_inserts_creates_the_thread(
@@ -173,7 +173,7 @@ async fn only_one_of_two_concurrent_blank_inserts_creates_the_thread(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn resyncing_an_unchanged_thread_rewrites_no_messages(
@@ -251,7 +251,7 @@ async fn resyncing_an_unchanged_thread_rewrites_no_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn synced_threads_record_whether_they_have_received_mail(
@@ -309,7 +309,7 @@ async fn synced_threads_record_whether_they_have_received_mail(
 /// The live inbox-sync path funnels through here, so it needs the same
 /// protection from unstorable provider values as the backfill path.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn oversized_provider_values_do_not_block_the_thread_insert(
@@ -373,7 +373,7 @@ async fn oversized_provider_values_do_not_block_the_thread_insert(
             labels: vec![],
             body_text: Some("body".to_string()),
             body_html_sanitized: None,
-            body_macro: None,
+            body_rox: None,
             attachments: vec![],
             attachments_draft: vec![],
             attachments_forwarded: vec![],
@@ -455,7 +455,7 @@ async fn thread_message_count(pool: &Pool<Postgres>, thread_id: Uuid) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn a_backfilled_thread_is_written_with_all_of_its_messages(
@@ -481,7 +481,7 @@ async fn a_backfilled_thread_is_written_with_all_of_its_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn a_thread_another_copy_already_wrote_gets_no_messages_from_this_one(
@@ -511,7 +511,7 @@ async fn a_thread_another_copy_already_wrote_gets_no_messages_from_this_one(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn missing_messages_are_written_into_their_existing_thread(
@@ -539,7 +539,7 @@ async fn missing_messages_are_written_into_their_existing_thread(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn a_message_that_cannot_be_stored_is_skipped_and_the_rest_of_its_thread_is_written(
@@ -572,7 +572,7 @@ async fn a_message_that_cannot_be_stored_is_skipped_and_the_rest_of_its_thread_i
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links"))
 )]
 async fn whole_thread_resync_recomputes_thread_state_from_stored_labels(
@@ -631,7 +631,7 @@ async fn whole_thread_resync_recomputes_thread_state_from_stored_labels(
     let message_id = first_sync.messages[0].db_id;
     let thread_id = insert_thread_and_messages(&pool, first_sync, link_id).await?;
 
-    // Archived in Macro; Gmail has not applied it yet.
+    // Archived in Rox; Gmail has not applied it yet.
     let mut tx = pool.begin().await?;
     crate::labels::delete::delete_message_labels_batch(
         &mut *tx,

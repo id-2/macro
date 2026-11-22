@@ -14,7 +14,7 @@ use std::sync::Arc;
 use ai_toolset::{AsyncToolCollection, ToolCallError};
 use bot_id::BotId;
 use databases::domain::models::Viewer;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::Serialize;
 use uuid::Uuid;
@@ -51,7 +51,7 @@ impl<Transfer> Clone for CrmTransferToolContext<Transfer> {
 
 impl<Transfer> CrmTransferToolContext<Transfer> {
     /// The requesting user, with this context's agent acting for them.
-    fn viewer(&self, user_id: MacroUserIdStr<'static>) -> Viewer {
+    fn viewer(&self, user_id: RoxUserIdStr<'static>) -> Viewer {
         Viewer {
             user_id,
             acting_bot: Some(self.actor),

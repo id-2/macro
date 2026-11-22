@@ -3,7 +3,7 @@
 ## What it is
 
 Part of Calendar: receives cal.com booking-event webhooks and fires
-analytics events in response. Macro's own calendar/booking domain lives in
+analytics events in response. Rox's own calendar/booking domain lives in
 `calendar_events`/`calendar_scheduling`; no other consumers of this crate
 in the workspace yet.
 
@@ -18,7 +18,7 @@ in the workspace yet.
 
 - Owns: cal.com webhook signature verification and the booking→analytics-event
   mapping.
-- Not here: Macro's own calendar/booking domain → `crates/calendar_events`,
+- Not here: Rox's own calendar/booking domain → `crates/calendar_events`,
   `crates/calendar_scheduling`.
 
 ## Boundaries

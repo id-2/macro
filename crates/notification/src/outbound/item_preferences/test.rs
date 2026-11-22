@@ -2,16 +2,16 @@ use super::*;
 use crate::outbound::repository::NotificationDbOps;
 use chrono::Duration;
 use cowlike::CowLike;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|{email}@example.com"))
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|{email}@example.com"))
         .unwrap()
         .into_owned()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("legacy_item_preferences"))
 )]
 async fn lists_supported_preferences_despite_unknown_legacy_types(pool: PgPool) {
@@ -35,7 +35,7 @@ async fn lists_supported_preferences_despite_unknown_legacy_types(pool: PgPool) 
     assert!(listed[1..].iter().all(|item| item.snoozed_until.is_none()));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn snooze_expiry_replacement_and_owner_isolation(pool: PgPool) {
     let repo = PgItemNotificationPreferenceRepository(pool.clone());
     let entity = || EntityType::Document.with_entity_str("document-one");
@@ -94,7 +94,7 @@ async fn snooze_expiry_replacement_and_owner_isolation(pool: PgPool) {
     assert_eq!(repo.list(user("bob")).await.unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bulk_updates_and_removals_are_atomic_and_owner_scoped(pool: PgPool) {
     let repo = PgItemNotificationPreferenceRepository(pool);
     let first = EntityType::Channel.with_entity_string("first".to_owned());

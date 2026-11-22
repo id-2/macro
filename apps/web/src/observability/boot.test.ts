@@ -45,26 +45,26 @@ it('starts at navigation time, lets the first view close its window, and aggrega
       if (type === 'mark')
         return [
           {
-            name: 'macro.auth.refresh-start',
+            name: 'rox.auth.refresh-start',
             startTime: 10,
             detail: { generation: 0 },
           },
           {
-            name: 'macro.auth.refresh-start',
+            name: 'rox.auth.refresh-start',
             startTime: 12,
             detail: { generation: 1 },
           },
           {
-            name: 'macro.auth.refresh-end',
+            name: 'rox.auth.refresh-end',
             startTime: 20,
             detail: { generation: 0 },
           },
           {
-            name: 'macro.auth.refresh-end',
+            name: 'rox.auth.refresh-end',
             startTime: 24,
             detail: { generation: 1 },
           },
-          { name: 'macro.boot.render-start', startTime: 100 },
+          { name: 'rox.boot.render-start', startTime: 100 },
         ];
       if (type === 'resource')
         return [
@@ -105,7 +105,7 @@ it('starts at navigation time, lets the first view close its window, and aggrega
   });
   expect(phase.end).toHaveBeenCalledWith(1700000000024);
   expect(root.event).toHaveBeenCalledWith(
-    'macro.boot.render-start',
+    'rox.boot.render-start',
     undefined,
     1700000000100
   );

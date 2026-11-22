@@ -2,8 +2,8 @@
 
 use std::time::Duration;
 
-use macro_authorization::INTERNAL_API_KEY_HEADER;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::INTERNAL_API_KEY_HEADER;
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::StatusCode;
 use uuid::Uuid;
 
@@ -66,7 +66,7 @@ impl AgentGitClient {
 
     fn headers(&self) -> reqwest::header::HeaderMap {
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         headers
     }
 
@@ -93,7 +93,7 @@ impl AgentGitClient {
     #[tracing::instrument(skip_all, err)]
     pub async fn create_repo(
         &self,
-        agent_user_id: MacroUserIdStr<'static>,
+        agent_user_id: RoxUserIdStr<'static>,
         team_id: Uuid,
         seed: PersonaSeed,
     ) -> Result<CreatedRepoResponse, AgentGitClientError> {
@@ -117,7 +117,7 @@ impl AgentGitClient {
     #[tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref()), %team_id), err)]
     pub async fn ensure_repo(
         &self,
-        agent_user_id: MacroUserIdStr<'static>,
+        agent_user_id: RoxUserIdStr<'static>,
         team_id: Uuid,
         seed: PersonaSeed,
         token: &RepoToken,
@@ -145,7 +145,7 @@ impl AgentGitClient {
     #[tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref()), %team_id), err)]
     pub async fn voice(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> Result<Option<VoiceConfig>, AgentGitClientError> {
         let response = self
@@ -169,7 +169,7 @@ impl AgentGitClient {
     #[tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref()), %team_id), err)]
     pub async fn set_voice(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
         voice: VoiceConfig,
     ) -> Result<(), AgentGitClientError> {
@@ -186,7 +186,7 @@ impl AgentGitClient {
         Ok(())
     }
 
-    fn voice_url(&self, agent_user_id: &MacroUserIdStr<'_>) -> String {
+    fn voice_url(&self, agent_user_id: &RoxUserIdStr<'_>) -> String {
         format!(
             "{}/internal/repos/{}/voice",
             self.base_url,
@@ -198,7 +198,7 @@ impl AgentGitClient {
     #[tracing::instrument(skip_all, err)]
     pub async fn delete_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), AgentGitClientError> {
         let response = self
             .http

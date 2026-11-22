@@ -54,7 +54,7 @@ on standalone meeting calls, never on channel calls. */
   guests: CallRecordGuest[];
   /** Whether the call is currently active (from `calls` table). */
   isActive: boolean;
-  /** Macro-account participants (both active and historic). */
+  /** Rox-account participants (both active and historic). */
   participants: CallRecordParticipant[];
   /** Presigned URL for the call recording preview image, if available. */
   recordingPreviewUrl?: CallRecordRecordingPreviewUrl;

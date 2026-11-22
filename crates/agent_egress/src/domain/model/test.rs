@@ -63,7 +63,7 @@ fn allows_only_the_verbs_mcp_speaks() {
 fn strips_the_sandboxs_own_credentials_from_a_forwarded_request() {
     let mut headers = header_map(&[
         ("authorization", "Bearer session-token"),
-        ("cookie", "macro_session=abc"),
+        ("cookie", "rox_session=abc"),
         ("content-type", "application/json"),
     ]);
 
@@ -368,15 +368,15 @@ fn an_echoed_credential_never_reaches_the_sandbox() {
 }
 
 /// The staff gate is an exact match on the parsed domain part, and the
-/// parser behind `MacroUserIdStr` is what makes the lookalikes
+/// parser behind `RoxUserIdStr` is what makes the lookalikes
 /// unrepresentable - a suffixed domain is a different domain, a second `@`
 /// or a trailing dot is not an email, and casing normalizes before the
 /// compare rather than defeating it.
 #[test]
-fn the_staff_gate_admits_exactly_the_macro_domain() {
+fn the_staff_gate_admits_exactly_the_rox_domain() {
     for staff in ["wolf@rox.one", "wolf@ROX.ONE", "wolf+agents@rox.one"] {
-        let owner = MacroUserIdStr::try_from_email(staff).expect(staff);
-        assert!(is_macro_staff(&owner), "refused {staff}");
+        let owner = RoxUserIdStr::try_from_email(staff).expect(staff);
+        assert!(is_rox_staff(&owner), "refused {staff}");
     }
 
     for visitor in [
@@ -385,8 +385,8 @@ fn the_staff_gate_admits_exactly_the_macro_domain() {
         "evil@xrox.one",
         "evil@rox.org",
     ] {
-        let owner = MacroUserIdStr::try_from_email(visitor).expect(visitor);
-        assert!(!is_macro_staff(&owner), "admitted {visitor}");
+        let owner = RoxUserIdStr::try_from_email(visitor).expect(visitor);
+        assert!(!is_rox_staff(&owner), "admitted {visitor}");
     }
 
     for not_an_email in [
@@ -397,7 +397,7 @@ fn the_staff_gate_admits_exactly_the_macro_domain() {
         "not-an-email",
     ] {
         assert!(
-            MacroUserIdStr::try_from_email(not_an_email).is_err(),
+            RoxUserIdStr::try_from_email(not_an_email).is_err(),
             "parsed {not_an_email}"
         );
     }

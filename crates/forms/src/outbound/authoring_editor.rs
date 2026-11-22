@@ -38,7 +38,7 @@ impl AuthoringEditor for WorkerFormEditor {
             return Err(unavailable());
         }
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let mut response = self
             .client
             .post(&self.endpoint)

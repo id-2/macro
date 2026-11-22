@@ -288,7 +288,7 @@ fn map_meeting(
         .into_iter()
         .filter(|p| emails.insert(p.email.to_lowercase()))
         .map(|p| CallParticipant {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             user_id: None,
             display_name: p.name,
             email: Some(p.email),
@@ -338,7 +338,7 @@ fn map_meeting(
         })
         .collect::<Vec<_>>();
     let transcript = (!segments.is_empty()).then(|| CallTranscript {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         recording_id: None,
         language: None,
         provider: Some(CallProvider::Granola),

@@ -6,9 +6,9 @@ use axum::{
     extract::{FromRef, FromRequestParts},
     http::{StatusCode, request::Parts},
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorizationExtractor, MacroAuthorizationRejection,
-    MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorizationExtractor, RoxAuthorizationRejection,
+    RoxAuthorizationService, RoxAuthorizationState,
 };
 use model_owner::CreationPrincipal;
 
@@ -26,22 +26,22 @@ pub struct CreationPrincipalExtractor<Auth> {
 
 impl<S, Auth> FromRequestParts<S> for CreationPrincipalExtractor<Auth>
 where
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     NonUserOwners: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
-    type Rejection = MacroAuthorizationRejection;
+    type Rejection = RoxAuthorizationRejection;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let caller =
-            MacroAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(parts, state)
+            RoxAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(parts, state)
                 .await?;
         let principal =
             resolve_creation_principal(&caller.authorization, NonUserOwners::from_ref(state))
                 .map_err(|error| {
                     tracing::info!(%error, "caller cannot create entities");
-                    MacroAuthorizationRejection {
+                    RoxAuthorizationRejection {
                         status: StatusCode::FORBIDDEN,
                         message: "forbidden".into(),
                     }

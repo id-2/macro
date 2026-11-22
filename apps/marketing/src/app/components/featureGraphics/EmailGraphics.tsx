@@ -54,7 +54,7 @@ import {
   MagnifyingGlassIcon,
 } from '../graphics/EmailListCardGraphic';
 import { Cube, IsoFigure, Tile } from '../graphics/IsoLineArt';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 import { TabsInset } from '../graphics/MockupChrome';
 import { PreviewListDivider } from '../graphics/PreviewListDivider';
 import { PreviewWindow } from '../graphics/PreviewWindow';
@@ -129,7 +129,7 @@ function navIconStyle(props: {
   };
 }
 
-function MacroNavIcon(props: {
+function RoxNavIcon(props: {
   name: string;
   active?: boolean;
   accent?: boolean;
@@ -2530,19 +2530,19 @@ function _InboxIcon(props: { kind: InboxKind }) {
       }}
     >
       {props.kind === 'email' ? (
-        <MacroNavIcon name="email" size={16} />
+        <RoxNavIcon name="email" size={16} />
       ) : props.kind === 'calendar' ? (
         <CalendarIcon size={16} />
       ) : props.kind === 'message' ? (
-        <MacroNavIcon name="channels" size={16} />
+        <RoxNavIcon name="channels" size={16} />
       ) : props.kind === 'mention' ? (
         <AtGlyph />
       ) : props.kind === 'task' ? (
-        <MacroNavIcon name="tasks" size={16} />
+        <RoxNavIcon name="tasks" size={16} />
       ) : props.kind === 'pr' ? (
         <PrGlyph />
       ) : (
-        <MacroNavIcon name="agents" size={16} accent />
+        <RoxNavIcon name="agents" size={16} accent />
       )}
     </span>
   );
@@ -2562,9 +2562,9 @@ function _InboxHeaderIconEl(props: { icon: InboxHeaderIcon }) {
       }}
     >
       {props.icon === 'channel' ? (
-        <MacroNavIcon name="channels" size={15} />
+        <RoxNavIcon name="channels" size={15} />
       ) : props.icon === 'folder' ? (
-        <MacroNavIcon name="files" size={15} />
+        <RoxNavIcon name="files" size={15} />
       ) : (
         <IconDocMd
           style={{ display: 'block', height: '15px', width: '15px' }}
@@ -2915,9 +2915,9 @@ function UnifiedRowIcon(props: { type: URowKind; unread?: boolean }) {
       ) : props.type === 'pr' ? (
         <PrGlyph />
       ) : props.type === 'task' ? (
-        <MacroNavIcon name="tasks" size={16} color={UNIFIED_META.task.color} />
+        <RoxNavIcon name="tasks" size={16} color={UNIFIED_META.task.color} />
       ) : (
-        <MacroNavIcon
+        <RoxNavIcon
           name="channels"
           size={16}
           color={UNIFIED_META.channel.color}
@@ -3048,7 +3048,7 @@ function UnifiedInboxWindow() {
         }}
       >
         {/* Lead with the Rox mark, like the mockup's chrome. */}
-        <MacroMarkIcon
+        <RoxMarkIcon
           aria-label="Rox"
           style={{
             color: '#bfbfbf',

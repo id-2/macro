@@ -1,12 +1,12 @@
 use super::*;
 use crate::domain::models::{OnboardingStatus, PromptId};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).expect("valid test user id")
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).expect("valid test user id")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_row_removes_only_the_requested_user(pool: PgPool) {
     let repo = PgOnboardingRepo::new(pool);
     let deleted = user("deleted@example.com");
@@ -22,7 +22,7 @@ async fn delete_row_removes_only_the_requested_user(pool: PgPool) {
     assert!(kept_row.skipped);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_row_is_idempotent(pool: PgPool) {
     // Account deletion is retried by the identity provider; a user who never
     // entered the flow, or whose row went away on an earlier attempt, must
@@ -42,7 +42,7 @@ fn prompt(id: &str) -> PromptId {
     PromptId::parse(id).expect("valid prompt id")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn dismissals_are_per_user_idempotent_and_ordered(pool: PgPool) {
     let repo = PgOnboardingRepo::new(pool);
     let alice = user("alice@example.com");
@@ -65,7 +65,7 @@ async fn dismissals_are_per_user_idempotent_and_ordered(pool: PgPool) {
     assert!(repo.dismissed_prompts(&bob).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_row_removes_dismissals_without_an_onboarding_row(pool: PgPool) {
     // Users who never entered onboarding can still dismiss prompts; account
     // deletion must clear those too.

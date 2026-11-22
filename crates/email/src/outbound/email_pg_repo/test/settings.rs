@@ -1,7 +1,7 @@
 use super::*;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn fetch_email_settings_maps_signature_fields(pool: Pool<Postgres>) -> anyhow::Result<()> {

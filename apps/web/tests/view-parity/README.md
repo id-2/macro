@@ -34,7 +34,7 @@ local stack (`just run_local --instance <name>`, then
    pid=$(pgrep -f vite | while read -r p; do
      tr '\0' '\n' </proc/$p/environ | grep -qx "PORT=<stack frontend port>" && echo "$p"
    done)
-   env $(tr '\0' '\n' </proc/$pid/environ | grep -E '^(VITE_|MACRO_LOCAL_|NODE_EXTRA_CA_CERTS=)') \
+   env $(tr '\0' '\n' </proc/$pid/environ | grep -E '^(VITE_|ROX_LOCAL_|NODE_EXTRA_CA_CERTS=)') \
      PORT=<free port> bun run dev:server
    ```
 

@@ -103,7 +103,7 @@ RSVP, and deletion still work; metadata saves preserve its exact provider time.
 Creating an event or changing its time requires positive duration. Shared points
 remain read-only and appear only when their details are shared.
 An existing Rox call can keep its schedule during point metadata edits; adding
-a new Macro call requires giving the event a duration first.
+a new Rox call requires giving the event a duration first.
 
 Calendar reads come from the local GraphQL cache when both `enable-graphql-soup`
 and `enable-graphql-calendar` are on (PostHog in production, on by default in dev
@@ -235,7 +235,7 @@ its color dot: the saved, per-user `calendar_availability_preferences` choice
 and its visible `Busy` label sets it apart from the visibility checkbox on the
 same row; hiding a calendar never changes it. Every calendar counts until the
 user turns Busy off, and one choice governs every reader of busy time: booking
-slots, reschedule slots and the agent's booking tools (`MacroCalendars::busy`),
+slots, reschedule slots and the agent's booking tools (`RoxCalendars::busy`),
 team availability, and the agent and SDK `contributesToAvailability` labels.
 An event still blocks time when another copy sits on a Busy calendar, when its
 calendar is unknown, or when the user is in the meeting and has not declined it

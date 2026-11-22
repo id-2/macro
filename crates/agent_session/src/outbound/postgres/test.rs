@@ -21,13 +21,13 @@ use bots::outbound::pg_bots_repo::PgBotsRepo;
 use entity_access_db_utils::AccessLevel;
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::Row;
 
 async fn migrate_for_test(pool: &PgPool) {
     // Run both colliding migration bodies in an isolated test database,
     // changing only the in-memory version assigned to the mailbox migration.
-    let migrations = MACRO_DB_MIGRATIONS
+    let migrations = ROX_DB_MIGRATIONS
         .iter()
         .map(|migration| {
             let mut migration = migration.clone();
@@ -47,8 +47,8 @@ async fn migrate_for_test(pool: &PgPool) {
     .unwrap();
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid macro user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid macro user id")
 }
 
 /// The fixed owner every [`new_session`] fixture uses.
@@ -60,14 +60,14 @@ async fn insert_user(pool: &PgPool, user_id: &str) {
     let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
     // The no-op update makes the existing row's id come back when the user
     // was already seeded by an earlier call.
-    let macro_user_id = sqlx::query_scalar!(
+    let rox_user_id = sqlx::query_scalar!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username
         RETURNING id
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         email,
         email,
         format!("stripe_{email}"),
@@ -77,13 +77,13 @@ async fn insert_user(pool: &PgPool, user_id: &str) {
     .expect("insert macro_user");
     sqlx::query!(
         r#"
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ($1, $2, $3)
         ON CONFLICT (id) DO NOTHING
         "#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -104,7 +104,7 @@ pub(super) async fn create_test_bot(pool: &PgPool) -> BotId {
             CreateBotRequest {
                 team_id: None,
                 name: "Test Agent".to_string(),
-                handle: format!("test-agent-{}", macro_uuid::generate_uuid_v7()),
+                handle: format!("test-agent-{}", rox_uuid::generate_uuid_v7()),
                 description: None,
                 avatar_url: None,
                 has_agent: None,
@@ -178,9 +178,9 @@ async fn append_system_event<B: entity_registry::BotFacts + 'static>(
 }
 
 pub(super) async fn insert_originating_thread_fixture(pool: &PgPool) -> (Uuid, Uuid, Uuid) {
-    let channel_id = macro_uuid::generate_uuid_v7();
-    let thread_id = macro_uuid::generate_uuid_v7();
-    let originating_message_id = macro_uuid::generate_uuid_v7();
+    let channel_id = rox_uuid::generate_uuid_v7();
+    let thread_id = rox_uuid::generate_uuid_v7();
+    let originating_message_id = rox_uuid::generate_uuid_v7();
     let owner_id = "macro|agent-session-thread-owner@example.com";
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'private', $2)",
@@ -290,7 +290,7 @@ fn acp_notification() -> AcpMessage {
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_refuses_an_owner_that_is_not_a_user(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -313,7 +313,7 @@ async fn create_refuses_an_owner_that_is_not_a_user(pool: PgPool) {
     assert_eq!(entity_row_count(&pool, id).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_registers_the_owner_through_the_registrar(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -349,7 +349,7 @@ async fn create_registers_the_owner_through_the_registrar(pool: PgPool) {
     assert_eq!(grants[0].access_level, "owner");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_rejects_an_unknown_user_owner(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -371,7 +371,7 @@ async fn create_rejects_an_unknown_user_owner(pool: PgPool) {
     assert_eq!(entity_access_row_count(&pool, id).await, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_refuses_a_caller_minted_id_held_by_another_entity(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -431,7 +431,7 @@ async fn create_records_the_chosen_preset_and_rolls_back_duplicate_audit(pool: P
     assert_eq!(audits[0].get::<String, _>("result"), "success");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_and_get_round_trips(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -473,7 +473,7 @@ async fn create_and_get_round_trips(pool: PgPool) {
 /// is resolved at attach, and attach reaches the row through `get`, so a
 /// column the INSERT stores but a SELECT drops would look correct until the
 /// first reconnect.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn instructions_round_trip_on_every_read_path(pool: PgPool) {
     const INSTRUCTIONS: &str = "Answer in one sentence.\nNever open a pull request.";
 
@@ -519,7 +519,7 @@ async fn instructions_round_trip_on_every_read_path(pool: PgPool) {
 /// The MCP selection is a snapshot like `instructions`: whatever was chosen at
 /// creation comes back identically on every read path, servers and names
 /// included, and the default is the owner's connections.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mcp_server_selection_round_trips_on_every_read_path(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -566,7 +566,7 @@ async fn mcp_server_selection_round_trips_on_every_read_path(pool: PgPool) {
     assert_eq!(fetched.mcp_servers, AgentMcpServers::OwnerConnections);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_acp_session_id_updates_only_the_resume_identity(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -592,7 +592,7 @@ async fn set_acp_session_id_updates_only_the_resume_identity(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_model_updates_only_the_model(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -639,7 +639,7 @@ async fn set_model_updates_only_the_model(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_repo_url_replaces_and_clears_the_repository(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -687,7 +687,7 @@ async fn set_repo_url_replaces_and_clears_the_repository(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_name_updates_only_the_name(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -738,7 +738,7 @@ async fn set_name_updates_only_the_name(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_name_errors_for_missing_session(pool: PgPool) {
     let repo = test_repo(&pool);
 
@@ -749,7 +749,7 @@ async fn set_name_errors_for_missing_session(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn generated_name_only_replaces_the_default(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -808,7 +808,7 @@ async fn generated_name_only_replaces_the_default(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sandbox_size_round_trips_and_user_default_falls_back(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -854,7 +854,7 @@ async fn sandbox_size_round_trips_and_user_default_falls_back(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn user_coding_preferences_default_off_and_upsert_both_fields(pool: PgPool) {
     let repo = test_repo(&pool);
     insert_user(&pool, OWNER).await;
@@ -909,7 +909,7 @@ async fn user_coding_preferences_default_off_and_upsert_both_fields(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_missing_session_errors(pool: PgPool) {
     let repo = test_repo(&pool);
     let missing = AgentSessionId::new();
@@ -917,7 +917,7 @@ async fn get_missing_session_errors(pool: PgPool) {
     assert!(AgentSessionRepo::get(&repo, missing).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn find_answers_none_only_for_a_missing_session(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -934,7 +934,7 @@ async fn find_answers_none_only_for_a_missing_session(pool: PgPool) {
     assert!(missing.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_removes_session(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -948,7 +948,7 @@ async fn delete_removes_session(pool: PgPool) {
     assert!(AgentSessionRepo::get(&repo, id).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn log_create_and_list_by_session_orders_chronologically(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1016,7 +1016,7 @@ async fn log_create_and_list_by_session_orders_chronologically(pool: PgPool) {
     assert!(logs[0].created_at <= logs[1].created_at);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn find_for_thread_matches_the_originating_thread_and_bot(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_a = create_test_bot(&pool).await;
@@ -1063,13 +1063,13 @@ async fn find_for_thread_matches_the_originating_thread_and_bot(pool: PgPool) {
     assert!(matches!(wrong_bot, ThreadSession::None));
 
     let wrong_thread = repo
-        .find_for_thread(Some(macro_uuid::generate_uuid_v7()), Some(bot_b))
+        .find_for_thread(Some(rox_uuid::generate_uuid_v7()), Some(bot_b))
         .await
         .expect("look up an unrelated thread");
     assert!(matches!(wrong_thread, ThreadSession::None));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn find_all_for_thread_returns_every_session_on_the_thread(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_a = create_test_bot(&pool).await;
@@ -1117,7 +1117,7 @@ async fn find_all_for_thread_returns_every_session_on_the_thread(pool: PgPool) {
     );
 
     let empty = repo
-        .find_all_for_thread(macro_uuid::generate_uuid_v7())
+        .find_all_for_thread(rox_uuid::generate_uuid_v7())
         .await
         .expect("list an unrelated thread");
     assert!(empty.is_empty());
@@ -1126,7 +1126,7 @@ async fn find_all_for_thread_returns_every_session_on_the_thread(pool: PgPool) {
 /// The recent list is the owner's own, newest first, and stops at `limit` -
 /// a prompt summarizing what someone has been working on must not be handed
 /// somebody else's work, nor an unbounded history.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recent_for_owner_returns_the_owners_newest_sessions(pool: PgPool) {
     const OTHER_OWNER: &str = "macro|agent-session-other-owner@example.com";
 
@@ -1168,7 +1168,7 @@ async fn recent_for_owner_returns_the_owners_newest_sessions(pool: PgPool) {
     assert_eq!(recent[0].created_at, newest.created_at);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn find_for_thread_requires_thread_and_bot_for_originating_match(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -1192,7 +1192,7 @@ async fn find_for_thread_requires_thread_and_bot_for_originating_match(pool: PgP
     assert!(matches!(without_thread, ThreadSession::None));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn thread_and_bot_belong_to_only_one_session(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -1211,7 +1211,7 @@ async fn thread_and_bot_belong_to_only_one_session(pool: PgPool) {
     assert!(duplicate.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sessions_audience_is_its_owner(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -1234,7 +1234,7 @@ async fn a_sessions_audience_is_its_owner(pool: PgPool) {
 
 /// A session nobody can watch resolves to nobody, rather than failing - the
 /// publisher's own early return is what turns that into no gateway call.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unknown_session_has_no_audience(pool: PgPool) {
     let audience = test_repo(&pool)
         .viewers(AgentSessionId::new())
@@ -1247,7 +1247,7 @@ async fn an_unknown_session_has_no_audience(pool: PgPool) {
 /// The grants a session is born with: the owner owns it, and the channel
 /// the bot was mentioned in can steer it. Both are written in the same
 /// transaction as the session, so a session can never exist unreachable.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_grants_the_owner_and_the_originating_channel(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1297,7 +1297,7 @@ async fn create_grants_the_owner_and_the_originating_channel(pool: PgPool) {
 
 /// A session created without a mention has no channel to inherit an audience
 /// from, so it is the owner's alone.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_without_a_mention_grants_only_the_owner(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1326,7 +1326,7 @@ async fn create_without_a_mention_grants_only_the_owner(pool: PgPool) {
 /// Creating a session records it in the owner's history under the
 /// `agent_session` item type, the same row `POST /history/agent_session/{id}`
 /// touches later, so Soup's `viewed_at` is set from the moment it exists.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_records_the_session_in_the_owners_history(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1355,14 +1355,14 @@ async fn create_records_the_session_in_the_owners_history(pool: PgPool) {
 /// A session born on a thread (a mention in a channel, document or call)
 /// starts hidden from lists, whichever agent runs it: the thread is where it
 /// is reached. The same bots started with no thread are listed immediately.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn thread_sessions_start_hidden_for_every_agent(pool: PgPool) {
     let repo = test_repo(&pool);
     let other_bot = create_test_bot(&pool).await;
     let (_channel_id, thread_id, originating_message_id) =
         insert_originating_thread_fixture(&pool).await;
 
-    for bot in [bot_id::MACRO_NEW_BOT_ID, other_bot] {
+    for bot in [bot_id::ROX_NEW_BOT_ID, other_bot] {
         let inline = create_session(
             &repo,
             new_session(bot, Some(thread_id), Some(originating_message_id)),
@@ -1386,7 +1386,7 @@ async fn thread_sessions_start_hidden_for_every_agent(pool: PgPool) {
 /// Replicas still on code that knows only `list_hidden` keep reading and
 /// writing it until it is dropped, so a trigger keeps it in step with
 /// `visibility` both ways.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_hidden_stays_in_step_with_visibility_for_older_replicas(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1449,7 +1449,7 @@ async fn list_hidden_stays_in_step_with_visibility_for_older_replicas(pool: PgPo
 /// created the row knowing them or an external runtime created it first. An
 /// unlisted run is not hidden: lists leave it out by asking to, so the Agents
 /// list can still show it on request.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sessions_record_who_started_them_and_where_they_show(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1519,7 +1519,7 @@ async fn sessions_record_who_started_them_and_where_they_show(pool: PgPool) {
 /// a stranger through none, and an unknown id not at all. Duplicates in the
 /// request are the caller's problem (the service collapses them); the repo
 /// answers what it is asked.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn preview_answers_per_id_by_the_viewers_grants(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1628,7 +1628,7 @@ async fn preview_answers_per_id_by_the_viewers_grants(pool: PgPool) {
 
 /// `entity_access.entity_id` carries no foreign key, so deleting a session
 /// has to take its grants with it or they accumulate forever.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_removes_the_session_grants(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1698,7 +1698,7 @@ fn cursor_external(agent: &str) -> ExternalSession {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn external_session_round_trips_and_upsert_replaces(pool: PgPool) {
     let repo = test_repo(&pool);
     insert_user(&pool, OWNER).await;
@@ -1756,7 +1756,7 @@ async fn external_session_round_trips_and_upsert_replaces(pool: PgPool) {
         .expect("idempotent delete");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_sessions_cannot_claim_the_same_external_agent(pool: PgPool) {
     let repo = test_repo(&pool);
     insert_user(&pool, OWNER).await;
@@ -1772,7 +1772,7 @@ async fn two_sessions_cannot_claim_the_same_external_agent(pool: PgPool) {
     assert!(conflict.is_err(), "second claim of bc-1 must be refused");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_session_cascades_its_external_row(pool: PgPool) {
     let repo = test_repo(&pool);
     insert_user(&pool, OWNER).await;
@@ -1845,7 +1845,7 @@ fn cursor_checkpoint_log(id: AgentSessionId, run: &str) -> AgentSessionLog {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn claiming_is_reentrant_and_every_claim_bumps_the_fence(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1859,7 +1859,7 @@ async fn claiming_is_reentrant_and_every_claim_bumps_the_fence(pool: PgPool) {
     assert_eq!(second.fence, ManagerFence(2));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_live_holder_blocks_a_second_replica(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1874,7 +1874,7 @@ async fn a_live_holder_blocks_a_second_replica(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stale_holder_is_superseded(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1894,7 +1894,7 @@ async fn a_stale_holder_is_superseded(pool: PgPool) {
 /// is leaving. Its published drain is what takes it out of the lease: peers
 /// stop reading it as the live manager and claim the session instead, without
 /// waiting out the heartbeat it is still sending.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_draining_holder_stops_managing_and_can_be_taken_over(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1941,7 +1941,7 @@ async fn a_draining_holder_stops_managing_and_can_be_taken_over(pool: PgPool) {
 /// The drain is a one-way door, and a replica that never beat can still
 /// announce it: the row it creates is stale from birth, which is exactly what
 /// a process on its way out is.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn draining_is_idempotent_and_needs_no_prior_heartbeat(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1971,7 +1971,7 @@ async fn drained_at(pool: &PgPool, replica: ReplicaId) -> Option<chrono::DateTim
     .expect("the replica row exists")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn release_frees_the_lease_but_never_a_successors(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -1996,7 +1996,7 @@ async fn release_frees_the_lease_but_never_a_successors(pool: PgPool) {
     claimed(repo.claim(session.id, third).await.expect("reclaim"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_fenced_append_rejects_a_superseded_writer(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -2033,7 +2033,7 @@ async fn a_fenced_append_rejects_a_superseded_writer(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cursor_checkpoint_advances_atomically_under_the_session_fence(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -2076,7 +2076,7 @@ async fn cursor_checkpoint_advances_atomically_under_the_session_fence(pool: PgP
 }
 
 /// Exercise the generic boundary contract without asking persistence to inspect ACP JSON.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_boundary_selects_initialization_and_keeps_raw_audit(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -2149,7 +2149,7 @@ async fn history_boundary_selects_initialization_and_keeps_raw_audit(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_boundary_rejects_foreign_rows_and_stale_claims_atomically(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -2222,7 +2222,7 @@ async fn history_boundary_rejects_foreign_rows_and_stale_claims_atomically(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_boundary_update_failure_rolls_back_response(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -2263,7 +2263,7 @@ async fn history_boundary_update_failure_rolls_back_response(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_boundary_insert_failure_keeps_previous_selection(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -2314,7 +2314,7 @@ async fn history_boundary_insert_failure_keeps_previous_selection(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_boundary_readers_see_response_and_selection_together(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -2378,7 +2378,7 @@ async fn history_boundary_readers_see_response_and_selection_together(pool: PgPo
     assert_eq!(after[1].id, response.id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_boundary_range_uses_order_index_and_uuid_tie_break(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -2470,7 +2470,7 @@ async fn history_boundary_range_uses_order_index_and_uuid_tie_break(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn participants_are_the_distinct_users_the_log_attributes(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -2509,7 +2509,7 @@ async fn participants_are_the_distinct_users_the_log_attributes(pool: PgPool) {
     assert_eq!(participants, vec![alice, bob]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pull_request_is_atomic_and_survives_history_selection(pool: PgPool) {
     use crate::domain::pull_request::SessionPullRequestRepo;
     let repo = test_repo(&pool);
@@ -2566,7 +2566,7 @@ async fn pull_request_is_atomic_and_survives_history_selection(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pull_request_links_keep_the_pull_request_the_agent_opened(pool: PgPool) {
     use crate::domain::pull_request::SessionPullRequestRepo;
     use crate::domain::pull_request_links::{PullRequestLinkSource, SessionPullRequestLinkRepo};
@@ -2629,7 +2629,7 @@ async fn pull_request_links_keep_the_pull_request_the_agent_opened(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn links_for_pull_requests_returns_every_link_to_the_requested_keys(pool: PgPool) {
     use crate::domain::pull_request::SessionPullRequestRepo;
     use crate::domain::pull_request_links::{PullRequestLinkSource, SessionPullRequestLinkRepo};
@@ -2675,7 +2675,7 @@ async fn links_for_pull_requests_returns_every_link_to_the_requested_keys(pool: 
     assert!(repo.links_for_pull_requests(&[]).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rotating_a_session_credential_revokes_the_previous_one(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -2710,7 +2710,7 @@ async fn rotating_a_session_credential_revokes_the_previous_one(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pull_request_waiting_on_takeover_cannot_overwrite_successor(pool: PgPool) {
     use crate::domain::pull_request::SessionPullRequestRepo;
     let repo = test_repo(&pool);
@@ -2788,7 +2788,7 @@ async fn pull_request_waiting_on_takeover_cannot_overwrite_successor(pool: PgPoo
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_document_session_preserves_its_origin_and_inherits_live_document_access(pool: PgPool) {
     use entity_access::domain::ports::EntityAccessService as _;
     use messages::domain::{
@@ -2796,7 +2796,7 @@ async fn a_document_session_preserves_its_origin_and_inherits_live_document_acce
         ports::{CreateMessage, MessageRepository},
     };
     let bot = create_test_bot(&pool).await;
-    let document = macro_uuid::generate_uuid_v7();
+    let document = rox_uuid::generate_uuid_v7();
     let document_id = document.to_string();
     sqlx::query!(r#"INSERT INTO "Document" (id, name, owner, "fileType") VALUES ($1, 'Agent document', $2, 'md')"#, document_id, OWNER)
         .execute(&pool).await.unwrap();
@@ -2970,7 +2970,7 @@ impl crate::domain::audience::SessionSubscriptions for DocumentSubscriptions {
 /// A batch lands in one write: every frame under the id it arrived with, in
 /// append order by `(created_at, id)` even though one transaction has one
 /// clock.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_batch_fenced_writes_in_order_under_the_given_ids(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -2995,7 +2995,7 @@ async fn create_batch_fenced_writes_in_order_under_the_given_ids(pool: PgPool) {
     };
     let frames: Vec<AgentSessionLog> = ["one", "two", "three"].into_iter().map(streamed).collect();
     let ids: Vec<Uuid> = (0..frames.len())
-        .map(|_| macro_uuid::generate_uuid_v7())
+        .map(|_| rox_uuid::generate_uuid_v7())
         .collect();
     let entries = ids
         .iter()
@@ -3050,7 +3050,7 @@ async fn create_batch_fenced_writes_in_order_under_the_given_ids(pool: PgPool) {
 /// The batch is fenced like every other write: a superseded claim appends
 /// nothing, and a frame from another session is refused before anything is
 /// touched.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_batch_fenced_refuses_stale_claims_and_foreign_frames(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -3061,7 +3061,7 @@ async fn create_batch_fenced_refuses_stale_claims_and_foreign_frames(pool: PgPoo
     let stale = claimed(repo.claim(session.id, replica).await.unwrap());
     let current = claimed(repo.claim(session.id, replica).await.unwrap());
     let entry = |log: AgentSessionLog| StoredAgentSessionLog {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         created_at: chrono::Utc::now(),
         entry: log,
     };
@@ -3095,7 +3095,7 @@ async fn create_batch_fenced_refuses_stale_claims_and_foreign_frames(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn turn_projection_is_atomic_fenced_and_backfill_cannot_overwrite_live_state(pool: PgPool) {
     use crate::domain::turn_state::SessionTurnProjectionRepo;
     use agent_fold::domain::model::TurnState;
@@ -3220,12 +3220,12 @@ async fn channel_grant(pool: &PgPool, session: AgentSessionId, channel_id: Uuid)
 
 /// A private agent's channel watches its session; a team agent's or a
 /// system bot's channel can also steer it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_originating_channel_steers_only_shared_agents_sessions(pool: PgPool) {
     let repo = test_repo(&pool);
     let private_bot = create_test_bot(&pool).await;
 
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     let team_owner = "macro|agent-session-team-owner@example.com";
     insert_user(&pool, team_owner).await;
     sqlx::query!(
@@ -3243,7 +3243,7 @@ async fn the_originating_channel_steers_only_shared_agents_sessions(pool: PgPool
             CreateBotRequest {
                 team_id: Some(team_id),
                 name: "Team Agent".to_string(),
-                handle: format!("team-agent-{}", macro_uuid::generate_uuid_v7()),
+                handle: format!("team-agent-{}", rox_uuid::generate_uuid_v7()),
                 description: None,
                 avatar_url: None,
                 has_agent: None,
@@ -3269,7 +3269,7 @@ async fn the_originating_channel_steers_only_shared_agents_sessions(pool: PgPool
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn warm_sessions_are_hidden_and_claimed_only_once_by_the_owner(pool: PgPool) {
     use crate::domain::warm::{WarmClaim, WarmMissReason, WarmSessionLifecycle};
     let bot = create_test_bot(&pool).await;
@@ -3390,7 +3390,7 @@ async fn warm_sessions_are_hidden_and_claimed_only_once_by_the_owner(pool: PgPoo
     assert!(repo.expire().await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn expired_warm_sessions_cannot_be_claimed(pool: PgPool) {
     use crate::domain::warm::{WarmClaim, WarmMissReason, WarmSessionLifecycle};
     let bot = create_test_bot(&pool).await;
@@ -3438,7 +3438,7 @@ async fn expired_warm_sessions_cannot_be_claimed(pool: PgPool) {
     assert!(repo.expire().await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_warm_session_whose_runtime_answered_expires(pool: PgPool) {
     use crate::domain::warm::WarmSessionLifecycle as _;
     let bot = create_test_bot(&pool).await;
@@ -3467,14 +3467,14 @@ async fn a_warm_session_whose_runtime_answered_expires(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn active_execution_turn_excludes_stopped_archived_and_deleted_sessions(pool: PgPool) {
     use crate::domain::ports::ActiveSessionTurn;
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
     let session = create_session(&repo, new_session(bot, None, None)).await;
     assert!(repo.active_turn(session.id).await.unwrap().is_none());
-    let action = macro_uuid::generate_uuid_v7();
+    let action = rox_uuid::generate_uuid_v7();
     for (state, active) in [
         ("starting", true),
         ("running", true),
@@ -3517,14 +3517,14 @@ async fn active_execution_turn_excludes_stopped_archived_and_deleted_sessions(po
     assert!(repo.active_turn(session.id).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_turn_keeps_its_prompters_tab_and_only_theirs(pool: PgPool) {
     use crate::domain::model::{PrompterKind, TurnPrompter, UiClientId};
     use agent_runtime_protocol::domain::action::AgentActionId;
     sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
     let repo = test_repo(&pool);
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let tab = UiClientId::from_uuid(Uuid::from_u128(0xc1));
     let typed = TurnPrompter {
         kind: PrompterKind::User,
@@ -3558,7 +3558,7 @@ async fn a_turn_keeps_its_prompters_tab_and_only_theirs(pool: PgPool) {
     assert_eq!(read.client, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn system_action_history_and_loads_retain_trusted_provenance(pool: PgPool) {
     use crate::domain::{
         model::{AgentSessionLog, Message},
@@ -3573,7 +3573,7 @@ async fn system_action_history_and_loads_retain_trusted_provenance(pool: PgPool)
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
     let action_id = AgentActionId::mint();
     let request = AgentAction::notification(vec![Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "app".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {
@@ -3588,7 +3588,7 @@ async fn system_action_history_and_loads_retain_trusted_provenance(pool: PgPool)
         &crate::domain::model::TurnPrompter {
             kind: crate::domain::model::PrompterKind::System,
             action_id,
-            user: Some(MacroUserIdStr::try_from_email("owner@example.com").unwrap()),
+            user: Some(RoxUserIdStr::try_from_email("owner@example.com").unwrap()),
             client: None,
         },
     )
@@ -3651,7 +3651,7 @@ async fn system_action_history_and_loads_retain_trusted_provenance(pool: PgPool)
 
 /// A notification that lands after a load still reopens the original frames,
 /// including through the batch writer, and readers see it with the frame.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_notification_after_a_load_reads_across_the_boundary(pool: PgPool) {
     use agent_client_protocol::schema::v1::SessionId;
     use agent_runtime_protocol::domain::{
@@ -3698,7 +3698,7 @@ async fn a_notification_after_a_load_reads_across_the_boundary(pool: PgPool) {
     );
 
     let request = AgentAction::notification(vec![Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "app".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {
@@ -3708,7 +3708,7 @@ async fn a_notification_after_a_load_reads_across_the_boundary(pool: PgPool) {
     .to_runtime(&SessionId::new("s"), AgentActionId::mint().to_request_id())
     .unwrap();
     let entry = |content: Message| StoredAgentSessionLog {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         created_at: chrono::Utc::now(),
         entry: AgentSessionLog {
             agent_session_id: session.id,

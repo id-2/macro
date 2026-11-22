@@ -28,13 +28,13 @@ use crate::util::harness::{EVAL_CONCURRENCY, build_service, openai_key};
 use crate::util::metrics::{PairOutcome, report};
 use crate::util::seed::{EVAL_OWNER, reset_matches, seed_documents};
 use futures::StreamExt;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use task_dedup::outbound::postgres::PgTaskVectorDb;
 use task_dedup::{EmbeddingMarkdown, NewTask, TaskDedupConfig};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../documents/fixtures", scripts("documents_test_data"))
 )]
 #[ignore = "hits OpenAI + Anthropic; run locally with API keys"]

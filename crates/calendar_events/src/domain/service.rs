@@ -8,7 +8,7 @@ use rootcause::Report;
 use uuid::Uuid;
 
 use crate::domain::events::{CalendarEventMetadata, CalendarMacroEvent, CalendarTopicEvent};
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 
 use super::{
     ics::{
@@ -476,7 +476,7 @@ where
 pub struct GoogleCalendarBackfillService<R, G, B> {
     repository: R,
     provider: G,
-    macro_event_broker: B,
+    rox_event_broker: B,
     watch: Option<super::models::GoogleWatchConfig>,
 }
 
@@ -587,7 +587,7 @@ pub struct GoogleCalendarBackfillCoordinator<R, G, L, B> {
     repository: R,
     provider: G,
     lifecycle: L,
-    macro_event_broker: B,
+    rox_event_broker: B,
     watch: Option<super::models::GoogleWatchConfig>,
 }
 
@@ -596,7 +596,7 @@ where
     R: CalendarRepository + Clone,
     G: GoogleCalendarProvider + Clone,
     L: CalendarBackfillRepository,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 {
     /// Construct a coordinator from domain ports; supplying a watch config
     /// makes every backfill maintain push notification channels.
@@ -604,14 +604,14 @@ where
         repository: R,
         provider: G,
         lifecycle: L,
-        macro_event_broker: B,
+        rox_event_broker: B,
         watch: Option<super::models::GoogleWatchConfig>,
     ) -> Self {
         Self {
             repository,
             provider,
             lifecycle,
-            macro_event_broker,
+            rox_event_broker,
             watch,
         }
     }
@@ -669,7 +669,7 @@ where
         let backfill = GoogleCalendarBackfillService::new(
             self.repository.clone(),
             self.provider.clone(),
-            self.macro_event_broker.clone(),
+            self.rox_event_broker.clone(),
             self.watch.clone(),
         );
         let work = backfill.backfill(
@@ -832,19 +832,19 @@ impl<R, G, B> GoogleCalendarBackfillService<R, G, B>
 where
     R: CalendarRepository,
     G: GoogleCalendarProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// Construct the provider backfill service.
     pub fn new(
         repository: R,
         provider: G,
-        macro_event_broker: B,
+        rox_event_broker: B,
         watch: Option<super::models::GoogleWatchConfig>,
     ) -> Self {
         Self {
             repository,
             provider,
-            macro_event_broker,
+            rox_event_broker,
             watch,
         }
     }
@@ -854,7 +854,7 @@ where
     /// than failing the run — the search backfill re-enumerates present rows.
     fn publish_calendar_event(&self, event: CalendarTopicEvent) {
         let _ = self
-            .macro_event_broker
+            .rox_event_broker
             .send_event(&CalendarMacroEvent::for_change(event))
             .inspect_err(|error| {
                 tracing::error!(error=?error, "failed to publish calendar event");

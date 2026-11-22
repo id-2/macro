@@ -7,7 +7,7 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::GenericErrorResponse;
 use model::version::ApiVersionEnum;
 use models_permissions::share_permission::access_level::OwnerAccessLevel;
@@ -35,7 +35,7 @@ pub struct Params {
     )]
 #[allow(unused, reason = "used to generate OpenAPI documentation")]
 pub(in crate::api) async fn get_document_permissions_handler_v2(
-    _user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    _user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     _api_version: Extension<ApiVersionEnum>,
     Path(Params { document_id: _ }): Path<Params>,
 ) -> impl IntoResponse {
@@ -54,7 +54,7 @@ pub async fn get_document_permissions_handler(
 
 #[tracing::instrument(skip(db))]
 async fn get_document_permissions_v2(db: &PgPool, document_id: &str) -> Result<Response, Response> {
-    let document_permissions = macro_db_client::share_permission::get::get_document_share_permission(
+    let document_permissions = rox_db_client::share_permission::get::get_document_share_permission(
         db,
         document_id,
     )

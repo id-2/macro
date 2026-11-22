@@ -34,7 +34,7 @@ const jwtSecretKeyArn = aws.secretsmanager
   .getSecretVersionOutput({ secretId: `fusionauth-jwt-secret-${stack}` })
   .apply((secret) => secret.arn);
 
-// The egress proxy mints GitHub App installation tokens and Macro API tokens
+// The egress proxy mints GitHub App installation tokens and Rox API tokens
 // inline, so the task role needs the App's PEM and the signing key - both
 // held as Secrets Manager secret names the service resolves at runtime.
 const githubSyncAppPemArn = aws.secretsmanager
@@ -43,11 +43,11 @@ const githubSyncAppPemArn = aws.secretsmanager
 
 const macroApiTokenPrivateKeyArn = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require('macro_api_token_private_secret_key'),
+    secretId: config.require('rox_api_token_private_secret_key'),
   })
   .apply((secret) => secret.arn);
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
 // ── Session changes bucket ───────────────────────────────────────────────────
 // The patch behind each agent session's Changes pane, one object per capture
@@ -192,7 +192,7 @@ const service = new AgentHarnessService(
     cloudStorageClusterName,
     secretKeyArns: [
       jwtSecretKeyArn,
-      MACRO_API_TOKENS.macroApiTokenPublicKeyArn,
+      ROX_API_TOKENS.macroApiTokenPublicKeyArn,
       macroApiTokenPrivateKeyArn,
       githubSyncAppPemArn,
       ...aiTools.secretArns,

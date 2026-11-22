@@ -1,6 +1,6 @@
 import type { PropertyInput } from '../../../generated/storage/types.gen';
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { rejectUnknownOptions } from '../../utils/options';
 import { Document } from '../documents/document';
 import type { Initiative } from '../initiatives/initiative';
@@ -61,7 +61,7 @@ export interface SimilarTask {
  */
 export class Task extends Document {
   /** A handle to a task by document id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Task {
+  static byId(client: RoxClient, id: string): Task {
     return new Task(client, id);
   }
 
@@ -70,7 +70,7 @@ export class Task extends Document {
    * request. The task starts Not started.
    */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: {
       name: string;
       markdown?: string;
@@ -88,7 +88,7 @@ export class Task extends Document {
     },
   ): Promise<Task> {
     if (typeof opts !== 'object' || opts === null)
-      throw new MacroError(
+      throw new RoxError(
         'tasks.create takes an options object, { name, markdown, ... }.',
       );
     rejectUnknownOptions('tasks.create', opts, {
@@ -102,7 +102,7 @@ export class Task extends Document {
       shareWithTeam: true,
     });
     if (typeof opts.name !== 'string' || !opts.name.trim())
-      throw new MacroError('tasks.create needs `name`, the task title.');
+      throw new RoxError('tasks.create needs `name`, the task title.');
     const { documentId } = unwrap(
       await client.storage.createTaskHandler({
         body: {
@@ -123,7 +123,7 @@ export class Task extends Document {
    * that no longer exist are left out.
    */
   static async summaries(
-    client: MacroClient,
+    client: RoxClient,
     tasks: Task[],
   ): Promise<TaskSummary[]> {
     if (tasks.length === 0) return [];
@@ -159,11 +159,11 @@ export class Task extends Document {
    * changes nothing; check it before creating a task.
    */
   static async findSimilar(
-    client: MacroClient,
+    client: RoxClient,
     opts: { title: string; body?: string },
   ): Promise<SimilarTask[]> {
     if (typeof opts !== 'object' || opts === null)
-      throw new MacroError(
+      throw new RoxError(
         'tasks.findSimilar takes an options object, { title, body }.',
       );
     rejectUnknownOptions('tasks.findSimilar', opts, {
@@ -171,7 +171,7 @@ export class Task extends Document {
       body: true,
     });
     if (typeof opts.title !== 'string' || !opts.title.trim())
-      throw new MacroError(
+      throw new RoxError(
         'tasks.findSimilar needs `title`, the title of the task you would create.',
       );
     const { results } = unwrap(
@@ -192,7 +192,7 @@ export class Task extends Document {
    * cannot see the pull request; tasks the caller cannot open still appear.
    */
   static async forPullRequest(
-    client: MacroClient,
+    client: RoxClient,
     url: string,
   ): Promise<Task[]> {
     const githubKey = pullRequestKey(url);
@@ -268,7 +268,7 @@ export class Task extends Document {
  * so the defaults are spelled out here.
  */
 async function initialProperties(
-  client: MacroClient,
+  client: RoxClient,
   opts: Parameters<typeof Task.create>[1],
 ): Promise<PropertyInput[] | null> {
   if (!opts.initiative && !opts.assignees && !opts.dueDate) return null;

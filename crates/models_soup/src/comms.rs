@@ -1,5 +1,5 @@
 use bot_id::BotId;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -73,7 +73,7 @@ pub struct Channel {
     pub updated_at: chrono::DateTime<chrono::Utc>,
     /// Channel owner.
     #[cfg_attr(feature = "schema", schema(value_type = String))]
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
 }
 
 /// Lightweight channel message for soup payloads.
@@ -298,7 +298,7 @@ pub struct ChannelParticipant {
     pub channel_id: ChannelId,
     /// Participant user id.
     #[cfg_attr(feature = "schema", schema(value_type = String))]
-    pub user_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub user_id: rox_user_id::user_id::RoxUserIdStr<'static>,
     /// Participant role in the channel.
     pub role: ParticipantRole,
     /// Timestamp when the participant joined the channel.
@@ -447,10 +447,10 @@ impl ChannelParticipant {
     /// Converts a channels-domain participant into a Soup participant.
     pub fn try_new_from_channels(
         participant: channels::domain::models::ChannelParticipant,
-    ) -> Result<Self, macro_user_id::error::ParseErr> {
+    ) -> Result<Self, rox_user_id::error::ParseErr> {
         Ok(Self {
             channel_id: ChannelId(participant.channel_id),
-            user_id: MacroUserIdStr::parse_from_str(&participant.user_id)?.into_owned(),
+            user_id: RoxUserIdStr::parse_from_str(&participant.user_id)?.into_owned(),
             role: ParticipantRole::new_from_channels(participant.role),
             joined_at: participant.joined_at,
             left_at: participant.left_at,

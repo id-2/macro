@@ -5,7 +5,7 @@
 
 use std::collections::BTreeMap;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mention_utils::serialize::ExternalLink;
 
 use crate::domain::models::{ConversationId, SlackUserId};
@@ -161,7 +161,7 @@ impl MrkdwnConverter<'_> {
                 continue;
             }
             if ch == '<' {
-                if let Some(length) = source_macro_tag_span(rest) {
+                if let Some(length) = source_rox_tag_span(rest) {
                     push_text(&mut tokens, &escape_text(&unescape(&rest[..length])));
                     offset += length;
                     continue;
@@ -241,7 +241,7 @@ impl MrkdwnConverter<'_> {
         })
     }
 
-    fn angle(&self, token: &str, user_mentions: &mut Vec<MacroUserIdStr<'static>>) -> Token {
+    fn angle(&self, token: &str, user_mentions: &mut Vec<RoxUserIdStr<'static>>) -> Token {
         let (target, label) = token
             .split_once('|')
             .map_or((token, None), |(a, b)| (a, Some(b)));
@@ -292,7 +292,7 @@ impl MrkdwnConverter<'_> {
         if ExternalLink::new(&url, "").is_ok() {
             return self.link(&url, label.as_deref());
         }
-        // Unsafe/unknown links and arbitrary Macro/HTML tags are display text only.
+        // Unsafe/unknown links and arbitrary Rox/HTML tags are display text only.
         if let Some(label) = label {
             return Token::Text(escape_text(&label));
         }
@@ -327,8 +327,8 @@ impl MrkdwnConverter<'_> {
 /// tokens inside it. This only identifies literal tag boundaries, never decodes
 /// their payload. Unclosed regions remain inert through EOF. Nested tags are
 /// counted in one pass so hostile input cannot cause repeated suffix scans.
-fn source_macro_tag_span(rest: &str) -> Option<usize> {
-    let (first_end, closing, self_closing) = source_macro_tag(rest)?;
+fn source_rox_tag_span(rest: &str) -> Option<usize> {
+    let (first_end, closing, self_closing) = source_rox_tag(rest)?;
     if closing || self_closing {
         return Some(first_end);
     }
@@ -336,7 +336,7 @@ fn source_macro_tag_span(rest: &str) -> Option<usize> {
     let mut offset = first_end;
     while let Some(next) = rest[offset..].find('<') {
         offset += next;
-        if let Some((length, closing, self_closing)) = source_macro_tag(&rest[offset..]) {
+        if let Some((length, closing, self_closing)) = source_rox_tag(&rest[offset..]) {
             if closing {
                 depth -= 1;
             } else if !self_closing {
@@ -353,7 +353,7 @@ fn source_macro_tag_span(rest: &str) -> Option<usize> {
     Some(rest.len())
 }
 
-fn source_macro_tag(rest: &str) -> Option<(usize, bool, bool)> {
+fn source_rox_tag(rest: &str) -> Option<(usize, bool, bool)> {
     let tag = rest.strip_prefix('<')?;
     let closing = tag.starts_with('/');
     let name = tag.strip_prefix('/').unwrap_or(tag);
@@ -382,7 +382,7 @@ fn source_macro_tag(rest: &str) -> Option<(usize, bool, bool)> {
 /// Return only spans the target markdown parser can also recognize as code.
 fn code_span(rest: &str, fence_position: bool) -> Option<(usize, bool)> {
     let run = rest.bytes().take_while(|b| *b == b'`').count();
-    // Slack uses single ticks or triple fences. Macro does not recognize arbitrary
+    // Slack uses single ticks or triple fences. Rox does not recognize arbitrary
     // CommonMark code-span runs, so passing those through could activate <m-*> tags.
     if run != 1 && !(run == 3 && fence_position) {
         return None;

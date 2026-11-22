@@ -45,7 +45,7 @@ profiles AS (
         )) AS full_name
     FROM candidates AS c
     LEFT JOIN "User" AS u ON u.id = c.id
-    LEFT JOIN macro_user_info AS mui ON mui.macro_user_id = u.macro_user_id
+    LEFT JOIN rox_user_info AS mui ON mui.rox_user_id = u.rox_user_id
 ),
 ranked AS (
     SELECT
@@ -63,7 +63,7 @@ ranked AS (
     ORDER BY p.is_teammate DESC, is_prefix DESC, sort_key, p.id COLLATE "C"
     LIMIT $3
 )
--- Same precedence as the directory's names: a Macro profile name wins;
+-- Same precedence as the directory's names: a Rox profile name wins;
 -- otherwise the viewer's own address-book label, read only for the page.
 SELECT
     r.id AS "user_id!",
@@ -86,7 +86,7 @@ LEFT JOIN LATERAL (
         ON ec.link_id = li.id
         AND ec.email_address = r.email
         AND ec.name IS NOT NULL
-    WHERE li.macro_id = $1
+    WHERE li.rox_id = $1
       AND r.first_name IS NULL
       AND r.last_name IS NULL
     LIMIT 1

@@ -6,7 +6,7 @@ use ai_toolset::{
 };
 use attachment::FormattedParts;
 use entity_access_management::domain::models::EntityAccessManagementError;
-use macro_event_broker::{EventBrokerError, MacroEvent};
+use rox_event_broker::{EventBrokerError, RoxEvent};
 use model::chat::Chat;
 use model_owner::Owner;
 
@@ -197,7 +197,7 @@ impl ChatRepo for StubChatRepo {
 
     async fn get_access_level(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _chat_id: &str,
     ) -> Result<models_permissions::share_permission::access_level::AccessLevel> {
         unimplemented!("not exercised")
@@ -257,7 +257,7 @@ impl ChatRepo for StubChatRepo {
 
     async fn patch(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         _chat_id: &str,
         args: PatchChatRepoArgs,
     ) -> Result<()> {
@@ -387,8 +387,8 @@ impl RecordingEventBroker {
     }
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> std::result::Result<
@@ -454,8 +454,8 @@ fn tool_message_content() -> ChatMessageContent {
     ])
 }
 
-pub(super) fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(OWNER.to_string()).expect("valid user id")
+pub(super) fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(OWNER.to_string()).expect("valid user id")
 }
 
 fn owner_receipt(chat_id: &str) -> EntityAccessReceipt<OwnerAccessLevel> {
@@ -466,7 +466,7 @@ fn view_receipt(chat_id: &str) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(owner(), chat_id, EntityType::Chat)
 }
 
-pub(super) fn build_service<B: MacroEventBroker>(
+pub(super) fn build_service<B: RoxEventBroker>(
     repo: StubChatRepo,
     event_broker: B,
 ) -> ChatServiceImpl<StubChatRepo, (), StubEntityAccessManagement, B> {
@@ -600,7 +600,7 @@ async fn create_publishes_chat_created() {
 
     let events = broker.events();
     assert_eq!(events.len(), 1);
-    assert_eq!(events[0].topic, "macro.chats");
+    assert_eq!(events[0].topic, "rox.chats");
     assert_eq!(events[0].key, CHAT_ID);
     assert_eq!(events[0].envelope["event_type"], "chat.created");
     let metadata = &events[0].envelope["metadata"];
@@ -1001,12 +1001,12 @@ use models_permissions::share_permission::team_share::{
     AuthorizedTeamShareCommand, TeamShareFacts, TeamShareLevel,
 };
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn team_share_facts(
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     owner_team_id: Option<uuid::Uuid>,
     revision: i64,
 ) -> TeamShareFacts {

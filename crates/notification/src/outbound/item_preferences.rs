@@ -4,7 +4,7 @@ use crate::domain::item_preferences::{
     ItemNotificationPreference, ItemNotificationPreferenceRepository,
 };
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use rootcause::Report;
 use sqlx::PgPool;
@@ -16,7 +16,7 @@ pub struct PgItemNotificationPreferenceRepository(pub PgPool);
 impl ItemNotificationPreferenceRepository for PgItemNotificationPreferenceRepository {
     async fn list(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> Result<Vec<ItemNotificationPreference>, Report> {
         let rows = sqlx::query!(
             r#"SELECT item_id, item_type, snoozed_until
@@ -55,7 +55,7 @@ impl ItemNotificationPreferenceRepository for PgItemNotificationPreferenceReposi
 
     async fn set(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entity: Entity<'_>,
         until: Option<DateTime<Utc>>,
     ) -> Result<(), Report> {
@@ -71,7 +71,7 @@ impl ItemNotificationPreferenceRepository for PgItemNotificationPreferenceReposi
 
     async fn set_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
         until: Option<DateTime<Utc>>,
     ) -> Result<(), Report> {
@@ -97,7 +97,7 @@ impl ItemNotificationPreferenceRepository for PgItemNotificationPreferenceReposi
 
     async fn remove_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
     ) -> Result<(), Report> {
         let ids: Vec<String> = entities
@@ -112,7 +112,7 @@ impl ItemNotificationPreferenceRepository for PgItemNotificationPreferenceReposi
         Ok(())
     }
 
-    async fn remove(&self, user: MacroUserIdStr<'_>, entity: Entity<'_>) -> Result<(), Report> {
+    async fn remove(&self, user: RoxUserIdStr<'_>, entity: Entity<'_>) -> Result<(), Report> {
         sqlx::query!(
             "DELETE FROM user_notification_item_unsubscribe WHERE user_id = $1 AND item_id = $2",
             user.as_ref(),

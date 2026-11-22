@@ -1,5 +1,5 @@
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 use crate::domain::account_logins::{AccountLoginChange, AgentProvider, ProviderAccountIdentity};
@@ -9,35 +9,35 @@ use crate::domain::tokens;
 const TEAMMATE_ID: &str = "macro|teammate@example.com";
 const OWNER_ID: &str = "macro|harness-repo@example.com";
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(OWNER_ID.to_string()).unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(OWNER_ID.to_string()).unwrap()
 }
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
     let email = user_id.split_once('|').map(|(_, email)| email).unwrap();
-    let macro_user_id = Uuid::new_v4();
+    let rox_user_id = Uuid::new_v4();
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $2, $3)
         ON CONFLICT (id) DO NOTHING
         "#,
-        macro_user_id,
+        rox_user_id,
         email,
-        format!("stripe_{macro_user_id}"),
+        format!("stripe_{rox_user_id}"),
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
         r#"
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ($1, $2, $3)
         ON CONFLICT (id) DO NOTHING
         "#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -69,7 +69,7 @@ fn new_harness() -> NewHarness {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pairing_walks_create_approve_claim_exactly_once(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let pairing = new_pairing("KX7M-4QHD", "secret");
@@ -146,7 +146,7 @@ async fn pairing_walks_create_approve_claim_exactly_once(pool: PgPool) {
     assert_eq!(token_count, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn open_pairing_counts_and_expiry_cleanup(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     assert!(
@@ -170,7 +170,7 @@ async fn open_pairing_counts_and_expiry_cleanup(pool: PgPool) {
     assert!(repo.get_pairing("AAAA-AAAA").await.unwrap().is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn visibility_spans_own_and_team_harnesses(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
 
@@ -240,7 +240,7 @@ async fn visibility_spans_own_and_team_harnesses(pool: PgPool) {
     assert!(repo.user_owns_team(caller(), team_id).await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deletion_soft_deletes_and_revokes_tokens(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let harness_id = Uuid::new_v4();
@@ -284,7 +284,7 @@ async fn deletion_soft_deletes_and_revokes_tokens(pool: PgPool) {
     assert_eq!(unrevoked, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn connected_state_falls_back_to_timestamps_without_connection_rows(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let harness_id = Uuid::new_v4();
@@ -312,7 +312,7 @@ async fn connected_state_falls_back_to_timestamps_without_connection_rows(pool: 
     assert!(!harness.connected);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn connected_state_follows_connection_leases_over_timestamps(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let harness_id = Uuid::new_v4();
@@ -368,7 +368,7 @@ async fn connected_state_follows_connection_leases_over_timestamps(pool: PgPool)
     assert!(!listed.iter().any(|harness| harness.connected));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bound_agents_lists_only_live_agents_of_this_harness(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let harness_id = Uuid::new_v4();
@@ -443,7 +443,7 @@ async fn bound_agents_lists_only_live_agents_of_this_harness(pool: PgPool) {
     assert_eq!(agents[0].name, "Bound agent");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sessions_list_only_this_harness_newest_first(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     // Sessions reference their owner row.
@@ -558,7 +558,7 @@ async fn sessions_list_only_this_harness_newest_first(pool: PgPool) {
     assert_eq!(sessions[0].owner_id, OWNER_ID);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn permission_bypass_survives_registration_and_listing(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     insert_user(&pool, OWNER_ID).await;
@@ -594,7 +594,7 @@ async fn permission_bypass_survives_registration_and_listing(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_harness_changes_only_the_named_columns(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     insert_user(&pool, OWNER_ID).await;
@@ -674,7 +674,7 @@ fn hosted_harness(team_id: Uuid, computer_id: ComputerId) -> NewHarness {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn hosted_pairing_is_born_approved_rotates_on_retry_and_claims_once(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     insert_user(&pool, OWNER_ID).await;
@@ -956,7 +956,7 @@ async fn hosted_pairing_is_born_approved_rotates_on_retry_and_claims_once(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn connected_state_follows_the_presence_timestamps(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let harness_id = Uuid::new_v4();
@@ -1043,11 +1043,11 @@ async fn grant_directly(pool: &PgPool, harness: HarnessId, user: &str) {
     .unwrap();
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_owned()).unwrap()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_owned()).unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_directory_lists_teammates_runtimes_with_the_callers_access(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     team_of(&pool, &[OWNER_ID, TEAMMATE_ID]).await;
@@ -1075,7 +1075,7 @@ async fn the_directory_lists_teammates_runtimes_with_the_callers_access(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_direct_grant_lasts_only_while_its_holder_shares_a_team_with_the_owner(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let team_id = team_of(&pool, &[OWNER_ID, TEAMMATE_ID]).await;
@@ -1101,7 +1101,7 @@ async fn a_direct_grant_lasts_only_while_its_holder_shares_a_team_with_the_owner
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn closing_a_runtime_to_a_team_ends_its_members_access(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let team_id = team_of(&pool, &[OWNER_ID, TEAMMATE_ID]).await;
@@ -1128,7 +1128,7 @@ async fn closing_a_runtime_to_a_team_ends_its_members_access(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn approving_for_a_team_keeps_a_person_as_owner_and_grants_the_team(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let team_id = team_of(&pool, &[OWNER_ID, TEAMMATE_ID]).await;
@@ -1160,7 +1160,7 @@ async fn approving_for_a_team_keeps_a_person_as_owner_and_grants_the_team(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reader_sees_a_runtime_but_cannot_run_on_it(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     team_of(&pool, &[OWNER_ID, TEAMMATE_ID]).await;
@@ -1197,7 +1197,7 @@ async fn a_reader_sees_a_runtime_but_cannot_run_on_it(pool: PgPool) {
 fn claude_sign_in(
     credential_id: &str,
     expires_at: &str,
-    signed_in_by: Option<MacroUserIdStr<'static>>,
+    signed_in_by: Option<RoxUserIdStr<'static>>,
 ) -> AccountLoginChange {
     AccountLoginChange::SignedIn {
         provider: AgentProvider::Claude,
@@ -1209,7 +1209,7 @@ fn claude_sign_in(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn each_claude_sign_in_is_a_login_and_one_account_spans_machines(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     insert_user(&pool, OWNER_ID).await;
@@ -1229,7 +1229,7 @@ async fn each_claude_sign_in_is_a_login_and_one_account_spans_machines(pool: PgP
         .await
         .unwrap();
     }
-    let teammate = MacroUserIdStr::try_from(TEAMMATE_ID.to_owned()).unwrap();
+    let teammate = RoxUserIdStr::try_from(TEAMMATE_ID.to_owned()).unwrap();
 
     assert!(
         repo.record_account_login(
@@ -1334,7 +1334,7 @@ async fn each_claude_sign_in_is_a_login_and_one_account_spans_machines(pool: PgP
     );
     assert_eq!(
         repo.get_harness(mine).await.unwrap().unwrap().claude_mode,
-        ClaudeMode::MacroCredits
+        ClaudeMode::RoxCredits
     );
     let history = sqlx::query_scalar!(
         r#"SELECT count(*) AS "count!" FROM harness_account_logins WHERE harness_id = $1 AND signed_out_at IS NOT NULL"#,
@@ -1386,7 +1386,7 @@ async fn bound_agent(pool: &PgPool, harness: HarnessId, owner: &str, is_coding: 
     bot_id
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bound_agents_leave_out_residents_whose_owner_lost_access(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     team_of(&pool, &[OWNER_ID, TEAMMATE_ID]).await;
@@ -1428,7 +1428,7 @@ async fn bound_agents_leave_out_residents_whose_owner_lost_access(pool: PgPool) 
 
 /// A computer's harness follows its team: admins own it, members use it,
 /// and its buyer keeps nothing once they leave.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_computer_harness_belongs_to_its_team_not_its_buyer(pool: PgPool) {
     const ADMIN_ID: &str = "macro|admin@example.com";
     const MEMBER_ID: &str = "macro|member@example.com";
@@ -1547,7 +1547,7 @@ async fn a_computer_harness_belongs_to_its_team_not_its_buyer(pool: PgPool) {
 /// The Anthropic gateway serves a session only through this lookup: a bot
 /// on a live computer harness has its computer; a paired machine, a deleted
 /// computer harness or no harness at all has none.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_bot_has_a_computer_only_on_a_live_computer_harness(pool: PgPool) {
     let repo = PgHarnessRepo::new(pool.clone());
     let team_id = team_of(&pool, &[OWNER_ID]).await;

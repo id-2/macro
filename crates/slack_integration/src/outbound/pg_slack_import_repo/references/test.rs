@@ -42,7 +42,7 @@ async fn intent(pool: &PgPool, context: &ClaimedConversation) -> HistoricalMessa
     message
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn settlement_waits_for_atomic_references_then_required_search(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     let context = claim(&repo, &event).await;
@@ -113,7 +113,7 @@ async fn settlement_waits_for_atomic_references_then_required_search(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn expired_abandoned_job_retains_resolution_opportunity_without_staging(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     let context = claim(&repo, &event).await;
@@ -148,7 +148,7 @@ async fn expired_abandoned_job_retains_resolution_opportunity_without_staging(po
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn cancellation_expiry_stale_lease_and_cleanup_close_without_reclaim(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     let context = claim(&repo, &event).await;

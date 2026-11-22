@@ -451,7 +451,7 @@ sanitization/color helpers delegate to the package through `@core/email`.
    `email-compose/core/draft-editor-html.ts`. A draft another client wrote
    carries that client's quoted thread as plain markup; it seeds from the
    server's replyless body, so the composer's own appended quote is the only one
-   sent. Bodies with a `.macro_quote` or only editor (`md-quote`) quotes seed
+   sent. Bodies with a `.rox_quote` or only editor (`md-quote`) quotes seed
    unchanged.
 
 ## Shared UI and explicit exceptions
@@ -744,8 +744,8 @@ of these cache files and retains its draft working copies and send attempts.
 
 ## Agent program sends
 
-An agent's program (a code-mode run, marked by `x-macro-code-execution`, or a
-token with agent attribution; `macro_authorization::is_agent_run`) never sends
+An agent's program (a code-mode run, marked by `x-rox-code-execution`, or a
+token with agent attribution; `rox_authorization::is_agent_run`) never sends
 an email the user has not seen. The REST send (`POST /email/messages`) answers
 it 403. It sends through a session review (`execution.reviews.create({kind:
 'email'})`), whose card the user submits, or, for a prompt from a channel or

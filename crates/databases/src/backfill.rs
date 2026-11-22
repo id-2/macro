@@ -4,8 +4,8 @@
 //! changed. Running it again changes nothing.
 
 use anyhow::Context as _;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use properties::outbound::properties_pg_repo::PropertiesPgRepo;
 use sqlx::PgPool;
 
@@ -89,7 +89,7 @@ pub async fn backfill_table(
             changed: false,
         });
     };
-    let owner = MacroUserIdStr::parse_from_str(&database.owner_id)
+    let owner = RoxUserIdStr::parse_from_str(&database.owner_id)
         .context("the database's owner is not a user id")?
         .into_owned();
     let outcome = PgCellStore::new(pool.clone(), properties)

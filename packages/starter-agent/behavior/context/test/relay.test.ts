@@ -98,10 +98,10 @@ describe('relayHandler', () => {
       new Request('http://127.0.0.1:9/storage/documents/1?x=2', {
         method: 'POST',
         headers: {
-          'x-macro-user-api-key': capability,
+          'x-rox-user-api-key': capability,
           authorization: 'Bearer forged',
           cookie: 'session=forged',
-          'x-macro-bot-token': 'mbot_forged',
+          'x-rox-bot-token': 'mbot_forged',
           'content-type': 'application/json',
         },
         body: JSON.stringify({ title: 'a' }),
@@ -111,10 +111,10 @@ describe('relayHandler', () => {
     const [forwarded] = macro.seen;
     expect(forwarded?.url).toBe('https://macro.example/dss/documents/1?x=2');
     expect(forwarded?.method).toBe('POST');
-    expect(forwarded?.headers.get('x-macro-user-api-key')).toBe(apiKey);
+    expect(forwarded?.headers.get('x-rox-user-api-key')).toBe(apiKey);
     expect(forwarded?.headers.get('authorization')).toBeNull();
     expect(forwarded?.headers.get('cookie')).toBeNull();
-    expect(forwarded?.headers.get('x-macro-bot-token')).toBeNull();
+    expect(forwarded?.headers.get('x-rox-bot-token')).toBeNull();
     expect(forwarded?.headers.get('content-type')).toBe('application/json');
     expect(await forwarded?.text()).toBe('{"title":"a"}');
   });
@@ -122,7 +122,7 @@ describe('relayHandler', () => {
   test('refuses a wrong or missing capability, and forwards nothing', async () => {
     const macro = upstream();
     for (const headers of [
-      new Headers({ 'x-macro-user-api-key': 'guess' }),
+      new Headers({ 'x-rox-user-api-key': 'guess' }),
       new Headers(),
     ]) {
       const response = await handler(macro.fetch)(
@@ -138,7 +138,7 @@ describe('relayHandler', () => {
     const response = await handler(macro.fetch)(
       new Request('http://127.0.0.1:9/storage/socket', {
         headers: {
-          'x-macro-user-api-key': capability,
+          'x-rox-user-api-key': capability,
           connection: 'Upgrade',
           upgrade: 'websocket',
         },
@@ -158,7 +158,7 @@ describe('relayHandler', () => {
     ]) {
       const response = await handler(macro.fetch)(
         new Request(`http://127.0.0.1:9${path}`, {
-          headers: { 'x-macro-user-api-key': capability },
+          headers: { 'x-rox-user-api-key': capability },
         })
       );
       expect(response.status).toBe(404);
@@ -171,7 +171,7 @@ describe('relayHandler', () => {
       throw new Error(`connect failed with ${apiKey}`);
     })(
       new Request('http://127.0.0.1:9/auth/user/me', {
-        headers: { 'x-macro-user-api-key': capability },
+        headers: { 'x-rox-user-api-key': capability },
       })
     );
     expect(response.status).toBe(502);
@@ -185,7 +185,7 @@ describe('startRelay', () => {
       hostname: '127.0.0.1',
       port: 0,
       fetch: (request) =>
-        Response.json({ key: request.headers.get('x-macro-user-api-key') }),
+        Response.json({ key: request.headers.get('x-rox-user-api-key') }),
     });
     const first = startRelay({
       targets: { auth: macro.url.href },
@@ -202,7 +202,7 @@ describe('startRelay', () => {
       expect(first.token).not.toBe(second.token);
       expect(first.token.length).toBeGreaterThanOrEqual(32);
       const response = await fetch(`${first.url}/auth/user/me`, {
-        headers: { 'x-macro-user-api-key': first.token },
+        headers: { 'x-rox-user-api-key': first.token },
       });
       expect(await response.json()).toEqual({ key: apiKey });
     } finally {
@@ -236,7 +236,7 @@ describe('startRelay', () => {
     try {
       const response = await fetch(`${relay.url}/storage/call/record/c/join`, {
         method: 'POST',
-        headers: { 'x-macro-user-api-key': relay.token },
+        headers: { 'x-rox-user-api-key': relay.token },
       });
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual(JSON.parse(body));
@@ -273,10 +273,10 @@ describe('socketTarget', () => {
       const found = relayed(
         target(
           upgrade(`/speech/${path}?model=evil&x=1`, {
-            'x-macro-user-api-key': capability,
+            'x-rox-user-api-key': capability,
             authorization: 'Bearer forged',
             cookie: 'session=forged',
-            'x-macro-bot-token': 'mbot_forged',
+            'x-rox-bot-token': 'mbot_forged',
             traceparent:
               '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
           })
@@ -294,7 +294,7 @@ describe('socketTarget', () => {
 
   test('refuses a wrong or missing capability before anything else', () => {
     const given: Record<string, string>[] = [
-      { 'x-macro-user-api-key': 'guess' },
+      { 'x-rox-user-api-key': 'guess' },
       {},
     ];
     for (const headers of given) {
@@ -304,7 +304,7 @@ describe('socketTarget', () => {
   });
 
   test('refuses every other path and service, and any method but GET', () => {
-    const headers = { 'x-macro-user-api-key': capability };
+    const headers = { 'x-rox-user-api-key': capability };
     for (const path of [
       '/speech',
       '/speech/stt/',
@@ -357,7 +357,7 @@ describe('startRelay sockets', () => {
     try {
       const socket = new WebSocket(
         `${relay.url.replace('http', 'ws')}/speech/stt`,
-        { headers: { 'x-macro-user-api-key': relay.token } }
+        { headers: { 'x-rox-user-api-key': relay.token } }
       );
       const answers: string[] = [];
       socket.addEventListener('message', ({ data }) =>
@@ -404,7 +404,7 @@ describe('startRelay sockets', () => {
     try {
       const socket = new WebSocket(
         `${relay.url.replace('http', 'ws')}/speech/tts`,
-        { headers: { 'x-macro-user-api-key': relay.token } }
+        { headers: { 'x-rox-user-api-key': relay.token } }
       );
       const closed = await new Promise<{ code: number; reason: string }>(
         (resolve) =>
@@ -440,7 +440,7 @@ describe('startRelay sockets', () => {
     try {
       const socket = new WebSocket(
         `${relay.url.replace('http', 'ws')}/speech/stt`,
-        { headers: { 'x-macro-user-api-key': relay.token } }
+        { headers: { 'x-rox-user-api-key': relay.token } }
       );
       const closed = await new Promise<{ code: number; reason: string }>(
         (resolve) =>
@@ -473,7 +473,7 @@ describe('startRelay sockets', () => {
     try {
       const response = await fetch(`${relay.url}/agent-harness/socket`, {
         headers: {
-          'x-macro-user-api-key': relay.token,
+          'x-rox-user-api-key': relay.token,
           connection: 'Upgrade',
           upgrade: 'websocket',
           'sec-websocket-key': 'dGhlIHNhbXBsZSBub25jZQ==',

@@ -14,7 +14,7 @@ import {
   type WorkspaceAccent,
 } from '../core/workspace-accent';
 import { ContinueButton } from './controls';
-import { MacroMarkIcon } from './macro-mark-icon';
+import { RoxMarkIcon } from './macro-mark-icon';
 import './workspace-intro.css';
 
 /** An onboarding-only introduction; the public homepage keeps its own hero. */
@@ -135,7 +135,7 @@ export function WorkspaceIntro(props: {
               'var(--onboarding-intro-shadow, inset .5px .5px 1px #ffffff1c, inset -.5px -.5px 1px #0008, 0 1px 1px #131313, 0 4px 10px #0005)',
           }}
         >
-          <MacroMarkIcon class="size-12 overflow-visible" />
+          <RoxMarkIcon class="size-12 overflow-visible" />
         </button>
       </div>
       <fieldset class="mt-6 w-full max-w-[270px]">

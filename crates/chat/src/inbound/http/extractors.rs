@@ -10,9 +10,9 @@ use axum::extract::{FromRef, FromRequestParts};
 use axum::http::StatusCode;
 use axum::http::request::Parts;
 use axum::response::IntoResponse;
-use macro_authorization::{
-    ActingUser, MacroAuthorizationExtractor, MacroAuthorizationRejection,
-    MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    ActingUser, RoxAuthorizationExtractor, RoxAuthorizationRejection,
+    RoxAuthorizationService, RoxAuthorizationState,
 };
 use roles_and_permissions::domain::model::PermissionId;
 use roles_and_permissions::domain::port::UserRolesAndPermissionsService;
@@ -74,7 +74,7 @@ fn is_professional(permissions: &HashSet<PermissionId>) -> bool {
 /// Error returned when [`ChatModelAccess`] cannot be extracted.
 pub enum ChatModelAccessRejection {
     /// The caller's credentials were rejected by the authorization service.
-    Unauthorized(MacroAuthorizationRejection),
+    Unauthorized(RoxAuthorizationRejection),
     /// The caller's permissions could not be loaded.
     PermissionsLookup,
 }
@@ -94,8 +94,8 @@ impl IntoResponse for ChatModelAccessRejection {
 
 impl<S, Auth, P> FromRequestParts<S> for ChatModelAccess<Auth, P>
 where
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     UserPermissionsState<P>: FromRef<S>,
     P: UserRolesAndPermissionsService,
     S: Send + Sync + 'static,
@@ -104,16 +104,16 @@ where
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let user =
-            MacroAuthorizationExtractor::<Auth, ActingUser>::from_request_parts(parts, state)
+            RoxAuthorizationExtractor::<Auth, ActingUser>::from_request_parts(parts, state)
                 .await
                 .map_err(ChatModelAccessRejection::Unauthorized)?;
         let user = &user.authorization.user;
         let UserPermissionsState(permissions_service) = UserPermissionsState::<P>::from_ref(state);
         let permissions = permissions_service
-            .get_user_permissions(&user.macro_user_id)
+            .get_user_permissions(&user.rox_user_id)
             .await
             .map_err(|error| {
-                tracing::error!(error=?error, user_id = %user.macro_user_id, "unable to load user permissions");
+                tracing::error!(error=?error, user_id = %user.rox_user_id, "unable to load user permissions");
                 ChatModelAccessRejection::PermissionsLookup
             })?;
 

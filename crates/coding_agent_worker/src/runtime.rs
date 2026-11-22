@@ -14,7 +14,7 @@ use tokio_tungstenite::tungstenite;
 use tokio_util::task::AbortOnDropHandle;
 
 use crate::computer::Computer;
-use crate::config::{Harness, HarnessCredentials, MacroApi};
+use crate::config::{Harness, HarnessCredentials, RoxApi};
 use crate::harness::{self, BridgeEnd, Handoffs, LineTap};
 use crate::outbound::acp_process::RunningAgent;
 use crate::outbound::link;
@@ -46,7 +46,7 @@ impl Runtime {
     /// available for model discovery and agent sessions until dropped.
     #[expect(clippy::too_many_arguments, reason = "the supervisor's whole input")]
     pub fn start(
-        macro_api: &MacroApi,
+        rox_api: &RoxApi,
         credentials: &HarnessCredentials,
         harness: Harness,
         cwd: &Path,
@@ -58,7 +58,7 @@ impl Runtime {
     ) -> Self {
         let (connected_tx, connected) = watch::channel(false);
         let task = tokio::spawn(serve(
-            macro_api.gateway_url(),
+            rox_api.gateway_url(),
             credentials.token.clone(),
             harness,
             cwd.to_owned(),

@@ -22,7 +22,7 @@ fn ready() -> SetupNotice {
             0x0000_0000_0000_7000_8000_0000_0000_0c0c,
         ))),
         computer_name: "Build box".to_owned(),
-        buyer: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        buyer: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
         agent: None,
         outcome: SetupOutcome::Ready,
     }
@@ -97,15 +97,15 @@ impl TeamAgentRepository for Agents {
         Err(Unused)
     }
 
-    async fn delete_account(&self, _: &MacroUserIdStr<'_>) -> Result<(), Unused> {
+    async fn delete_account(&self, _: &RoxUserIdStr<'_>) -> Result<(), Unused> {
         Err(Unused)
     }
 
-    async fn remove_seat(&self, _: &MacroUserIdStr<'_>) -> Result<(), Unused> {
+    async fn remove_seat(&self, _: &RoxUserIdStr<'_>) -> Result<(), Unused> {
         Err(Unused)
     }
 
-    async fn get(&self, user_id: &MacroUserIdStr<'_>) -> Result<Option<TeamAgentRecord>, Unused> {
+    async fn get(&self, user_id: &RoxUserIdStr<'_>) -> Result<Option<TeamAgentRecord>, Unused> {
         Ok(self
             .0
             .iter()
@@ -120,9 +120,9 @@ impl TeamAgentRepository for Agents {
 
 fn ada(created_by: Option<&str>) -> TeamAgentRecord {
     TeamAgentRecord {
-        user_id: MacroUserIdStr::try_from("macro|ada@agents.macro.invalid".to_owned()).unwrap(),
+        user_id: RoxUserIdStr::try_from("macro|ada@agents.macro.invalid".to_owned()).unwrap(),
         team_id: Uuid::from_u128(2),
-        created_by: created_by.map(|inviter| MacroUserIdStr::try_from(inviter.to_owned()).unwrap()),
+        created_by: created_by.map(|inviter| RoxUserIdStr::try_from(inviter.to_owned()).unwrap()),
         persona_seed: PersonaSeed {
             creator_id: None,
             name: "Ada".to_owned(),
@@ -136,7 +136,7 @@ fn ada(created_by: Option<&str>) -> TeamAgentRecord {
 
 fn agent_ready() -> SetupNotice {
     SetupNotice {
-        agent: Some(MacroUserIdStr::try_from("macro|ada@agents.macro.invalid".to_owned()).unwrap()),
+        agent: Some(RoxUserIdStr::try_from("macro|ada@agents.macro.invalid".to_owned()).unwrap()),
         ..ready()
     }
 }

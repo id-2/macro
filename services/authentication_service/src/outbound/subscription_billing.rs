@@ -14,7 +14,7 @@ use hosted_runtimes::domain::{
     ids::ComputerId, lifecycle::Billing as ComputerBilling, models::BillingInterval,
     ports::ComputerRepo, size::CatalogEntry,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use teams::domain::{
     model::{SeatPrices, TeamRole},
@@ -41,7 +41,7 @@ impl<Teams: TeamRepository, Computers: ComputerRepo> StripeBillingReader<Teams, 
     pub async fn access(
         &self,
         scope: SubscriptionScope,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<BillingAccess, PlanChangeError> {
         match scope {
             SubscriptionScope::Personal => Ok(BillingAccess::Personal),
@@ -75,7 +75,7 @@ impl<Teams: TeamRepository, Computers: ComputerRepo> StripeBillingReader<Teams, 
         stripe: &Arc<stripe::Client>,
         subscription: &stripe::Subscription,
         scope: SubscriptionScope,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<SubscriptionBillingFacts>, PlanChangeError> {
         let (access, seats, computers) = self.directory(scope, user).await?;
         let provider_items = if subscription.items.has_more {
@@ -149,7 +149,7 @@ impl<Teams: TeamRepository, Computers: ComputerRepo> StripeBillingReader<Teams, 
     async fn directory(
         &self,
         scope: SubscriptionScope,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<(BillingAccess, Vec<BillingSeat>, Vec<BillingComputer>), PlanChangeError> {
         match scope {
             SubscriptionScope::Personal => {

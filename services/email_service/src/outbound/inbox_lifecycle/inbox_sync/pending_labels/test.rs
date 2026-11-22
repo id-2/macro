@@ -1,10 +1,10 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const MESSAGE: Uuid = Uuid::from_u128(0xa);
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("gmail_ops_label_revert"))
 )]
 async fn a_write_gmail_confirms_during_the_read_is_not_trusted_from_it(pool: PgPool) {
@@ -31,7 +31,7 @@ async fn a_write_gmail_confirms_during_the_read_is_not_trusted_from_it(pool: PgP
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("gmail_ops_label_revert"))
 )]
 async fn a_write_staged_during_the_read_is_not_trusted_from_it(pool: PgPool) {
@@ -59,7 +59,7 @@ async fn a_write_staged_during_the_read_is_not_trusted_from_it(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("gmail_ops_label_revert"))
 )]
 async fn a_resync_snapshot_has_the_labels_stored_before_the_fetch(pool: PgPool) {

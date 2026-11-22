@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use chrono::Utc;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 
 use super::BrokerInitiativeEventPublisher;
 use crate::domain::events::{
@@ -15,8 +15,8 @@ use crate::domain::models::InitiativeId;
 #[derive(Clone, Default)]
 struct StalledBroker(Arc<Mutex<Vec<String>>>);
 
-impl MacroEventBroker for StalledBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for StalledBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

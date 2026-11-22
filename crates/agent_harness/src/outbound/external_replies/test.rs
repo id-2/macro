@@ -3,14 +3,14 @@ use crate::domain::model::{AnnounceOrigin, ReplyOutcome};
 use agent_fold::domain::model::TurnId;
 use agent_session::domain::agent_conversation::{AgentConversation, AgentConversationRepo};
 use channels::{domain::agent_dm::AgentDmRepo, outbound::pg_channels_repo::PgChannelsRepo};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn completion_before_target_survives_reconnect_and_keeps_the_original_reply(pool: PgPool) {
-    let user = MacroUserIdStr::try_from_email("external@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("external@example.com").unwrap();
     let channel = PgChannelsRepo::new(pool.clone())
-        .ensure(user.clone(), bot_id::MACRO_NEW_BOT_ID)
+        .ensure(user.clone(), bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap()
         .dm
@@ -18,12 +18,12 @@ async fn completion_before_target_survives_reconnect_and_keeps_the_original_repl
     let session = crate::testing::postgres_sessions(pool.clone())
         .current_or_create(AgentConversation {
             channel_id: channel,
-            bot_id: bot_id::MACRO_NEW_BOT_ID,
+            bot_id: bot_id::ROX_NEW_BOT_ID,
         })
         .await
         .unwrap();
-    let action = AgentActionId::from_uuid(macro_uuid::generate_uuid_v7());
-    sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace, for_warming) VALUES ($1, $2, $3, 'fixed', 'roxd', '/workspace', false)", session.as_uuid(), user.as_ref(), bot_id::MACRO_NEW_BOT_ID.as_uuid()).execute(&pool).await.unwrap();
+    let action = AgentActionId::from_uuid(rox_uuid::generate_uuid_v7());
+    sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace, for_warming) VALUES ($1, $2, $3, 'fixed', 'roxd', '/workspace', false)", session.as_uuid(), user.as_ref(), bot_id::ROX_NEW_BOT_ID.as_uuid()).execute(&pool).await.unwrap();
     let store = PgExternalReplyStore::new(pool.clone());
     store
         .complete(
@@ -46,7 +46,7 @@ async fn completion_before_target_survives_reconnect_and_keeps_the_original_repl
             message_id: action.as_uuid(),
         },
         actor: user,
-        message_id: macro_uuid::generate_uuid_v7(),
+        message_id: rox_uuid::generate_uuid_v7(),
     };
     store.reserve(session, action, &target).await.unwrap();
     let reconnected = PgExternalReplyStore::new(pool);
@@ -55,7 +55,7 @@ async fn completion_before_target_survives_reconnect_and_keeps_the_original_repl
             session,
             action,
             &ExternalReplyTarget {
-                message_id: macro_uuid::generate_uuid_v7(),
+                message_id: rox_uuid::generate_uuid_v7(),
                 ..target.clone()
             },
         )
@@ -85,11 +85,11 @@ async fn completion_before_target_survives_reconnect_and_keeps_the_original_repl
     assert!(reconnected.pending(10).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unfinished_and_failed_replies_do_not_starve_later_recovery(pool: PgPool) {
-    let user = MacroUserIdStr::try_from_email("recovery@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("recovery@example.com").unwrap();
     let channel = PgChannelsRepo::new(pool.clone())
-        .ensure(user.clone(), bot_id::MACRO_NEW_BOT_ID)
+        .ensure(user.clone(), bot_id::ROX_NEW_BOT_ID)
         .await
         .unwrap()
         .dm
@@ -97,28 +97,28 @@ async fn unfinished_and_failed_replies_do_not_starve_later_recovery(pool: PgPool
     let session = crate::testing::postgres_sessions(pool.clone())
         .current_or_create(AgentConversation {
             channel_id: channel,
-            bot_id: bot_id::MACRO_NEW_BOT_ID,
+            bot_id: bot_id::ROX_NEW_BOT_ID,
         })
         .await
         .unwrap();
-    sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace, for_warming) VALUES ($1, $2, $3, 'fixed', 'roxd', '/workspace', false)", session.as_uuid(), user.as_ref(), bot_id::MACRO_NEW_BOT_ID.as_uuid()).execute(&pool).await.unwrap();
+    sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace, for_warming) VALUES ($1, $2, $3, 'fixed', 'roxd', '/workspace', false)", session.as_uuid(), user.as_ref(), bot_id::ROX_NEW_BOT_ID.as_uuid()).execute(&pool).await.unwrap();
     let store = PgExternalReplyStore::new(pool.clone());
     let target = ExternalReplyTarget {
         origin: AnnounceOrigin {
             reuse_origin_message: false,
             reply_placement: Default::default(),
             parent: messages::domain::models::MessageParent::Channel(channel),
-            thread_id: macro_uuid::generate_uuid_v7(),
-            message_id: macro_uuid::generate_uuid_v7(),
+            thread_id: rox_uuid::generate_uuid_v7(),
+            message_id: rox_uuid::generate_uuid_v7(),
         },
         actor: user,
-        message_id: macro_uuid::generate_uuid_v7(),
+        message_id: rox_uuid::generate_uuid_v7(),
     };
     for _ in 0..101 {
         store
             .reserve(
                 session,
-                AgentActionId::from_uuid(macro_uuid::generate_uuid_v7()),
+                AgentActionId::from_uuid(rox_uuid::generate_uuid_v7()),
                 &target,
             )
             .await

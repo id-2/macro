@@ -32,7 +32,7 @@ use uuid::Uuid;
 use crate::domain::{
     copies::{CopyChange, check_copy},
     labels::{CalendarLabels, EventRole},
-    meeting_links::{EventWithMacroCall, MacroCallEventError, MeetingLinkError},
+    meeting_links::{EventWithMacroCall, RoxCallEventError, MeetingLinkError},
     models::{
         CalendarAttendeeInput, CalendarEvent, EventReminderOverride, EventReminders, EventTime,
         OutOfOfficeAutoDeclineMode, OutOfOfficeProperties,
@@ -396,7 +396,7 @@ pub struct ToolCalendarEvent {
     pub conference_url: Option<String>,
     /// Join URL of the event's Rox call, when CreateCalendarEvent or
     /// UpdateCalendarEvent was asked for one.
-    pub macro_call_url: Option<String>,
+    pub rox_call_url: Option<String>,
     /// Whether the user's calendar prohibits modifying this event.
     pub is_read_only: bool,
     /// Calendar the event belongs to, when known.
@@ -582,7 +582,7 @@ impl ToolCalendarEvent {
             attendee_count: event.attendees.len(),
             organizer_email: event.organizer_email.clone(),
             conference_url: event.conference_url.clone(),
-            macro_call_url: None,
+            rox_call_url: None,
             is_read_only: event.is_read_only,
             calendar_id: event.calendar_id,
             calendar_name: labels.calendar_name(event.calendar_id),
@@ -591,9 +591,9 @@ impl ToolCalendarEvent {
         }
     }
 
-    fn from_event_with_macro_call(created: &EventWithMacroCall, labels: &CalendarLabels) -> Self {
+    fn from_event_with_rox_call(created: &EventWithMacroCall, labels: &CalendarLabels) -> Self {
         Self {
-            macro_call_url: Some(created.meeting_link.url.clone()),
+            rox_call_url: Some(created.meeting_link.url.clone()),
             ..Self::from_event(&created.event, labels)
         }
     }
@@ -697,12 +697,12 @@ fn mutation_tool_error(action: &str, error: CalendarMutationError) -> ToolCallEr
 /// Map a failure creating an event with a Rox call to an agent-readable
 /// tool error. Calendar failures read exactly like a plain create; meeting
 /// failures say that nothing reached the calendar.
-fn macro_call_create_tool_error(error: MacroCallEventError) -> ToolCallError {
+fn rox_call_create_tool_error(error: RoxCallEventError) -> ToolCallError {
     match error {
-        MacroCallEventError::Calendar(error) => {
+        RoxCallEventError::Calendar(error) => {
             mutation_tool_error("create the calendar event", error)
         }
-        MacroCallEventError::MeetingLink(error) => {
+        RoxCallEventError::MeetingLink(error) => {
             let description = match &error {
                 MeetingLinkError::InvalidInput(message) => {
                     format!("The Rox call could not be created: {message}")
@@ -729,12 +729,12 @@ fn macro_call_create_tool_error(error: MacroCallEventError) -> ToolCallError {
 /// Map a failure switching an event to a Rox call to an agent-readable
 /// tool error. Calendar failures read exactly like a plain update; meeting
 /// failures say that the event was left as it was.
-fn macro_call_update_tool_error(error: MacroCallEventError) -> ToolCallError {
+fn rox_call_update_tool_error(error: RoxCallEventError) -> ToolCallError {
     match error {
-        MacroCallEventError::Calendar(error) => {
+        RoxCallEventError::Calendar(error) => {
             mutation_tool_error("update the calendar event", error)
         }
-        MacroCallEventError::MeetingLink(error) => {
+        RoxCallEventError::MeetingLink(error) => {
             let description = match &error {
                 MeetingLinkError::InvalidInput(message) => {
                     format!("The Rox call could not be created: {message}")

@@ -14,7 +14,7 @@ use documents::domain::events::DocumentMacroEvent;
 use messages::outbound::broker::MessageMacroEvent;
 use user_events::UserMacroEvent;
 
-macro_event_broker::declare_topics!(
+rox_event_broker::declare_topics!(
     DeclaredMacroEvent: DocumentMacroEvent,
     ChannelMacroEvent,
     CallNotificationMacroEvent,

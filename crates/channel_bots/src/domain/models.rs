@@ -1,7 +1,7 @@
 //! Domain models for channel bot triggers.
 
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::events::MessagePostedMetadata;
 use uuid::Uuid;
 
@@ -35,7 +35,7 @@ pub struct BotEvent {
     /// message id; for a reply it is the existing thread id.
     pub reply_thread_id: Uuid,
     /// The user who triggered the bot.
-    pub requesting_user: MacroUserIdStr<'static>,
+    pub requesting_user: RoxUserIdStr<'static>,
 }
 
 /// A thread message rendered for trigger inference, oldest-first.

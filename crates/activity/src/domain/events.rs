@@ -12,8 +12,8 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroActivityTopic;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxActivityTopic;
 use model_entity::EntityType;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -92,7 +92,7 @@ impl ActivityWireRow {
     }
 }
 
-/// Events published to [`MacroActivityTopic`].
+/// Events published to [`RoxActivityTopic`].
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum ActivityTopicEvent {
@@ -130,7 +130,7 @@ impl ActivityTopicEvent {
 }
 
 impl TopicEvent for ActivityTopicEvent {
-    type Topic = MacroActivityTopic;
+    type Topic = RoxActivityTopic;
 
     // Older consumers skip the new session event during rolling deployment.
     const SCHEMA_VERSION: u8 = 2;
@@ -149,7 +149,7 @@ impl ActivityMacroEvent {
     }
 }
 
-impl MacroEvent for ActivityMacroEvent {
+impl RoxEvent for ActivityMacroEvent {
     type EventPayload = ActivityTopicEvent;
 
     fn key(&self) -> &str {

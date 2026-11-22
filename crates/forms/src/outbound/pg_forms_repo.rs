@@ -12,7 +12,7 @@ mod test;
 
 use chrono::{DateTime, Utc};
 use entity_access_db_utils::{AccessLevel, EntityAccessSourceType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_databases::position::PositionError;
 use sqlx::PgPool;
@@ -624,7 +624,7 @@ impl crate::domain::ports::FormsRepo for PgFormsRepo {
     async fn response_of(
         &self,
         form: FormId,
-        respondent: &MacroUserIdStr<'_>,
+        respondent: &RoxUserIdStr<'_>,
     ) -> Result<Option<FormResponse>, Self::Error> {
         // The ledger's functions carry their own spans.
         ledger::response_of(&self.pool, form, respondent).await
@@ -633,7 +633,7 @@ impl crate::domain::ports::FormsRepo for PgFormsRepo {
     async fn record_stop(
         &self,
         form: FormId,
-        respondent: &MacroUserIdStr<'_>,
+        respondent: &RoxUserIdStr<'_>,
         section: FormSectionId,
         at: DateTime<Utc>,
     ) -> Result<(), Self::Error> {
@@ -643,7 +643,7 @@ impl crate::domain::ports::FormsRepo for PgFormsRepo {
     async fn record_submission(
         &self,
         form: FormId,
-        respondent: Option<&MacroUserIdStr<'_>>,
+        respondent: Option<&RoxUserIdStr<'_>>,
         row: RowId,
         at: DateTime<Utc>,
     ) -> Result<RecordedResponse, Self::Error> {
@@ -653,7 +653,7 @@ impl crate::domain::ports::FormsRepo for PgFormsRepo {
     async fn record_anonymous_submission(
         &self,
         form: FormId,
-        voter: Option<&MacroUserIdStr<'_>>,
+        voter: Option<&RoxUserIdStr<'_>>,
         row: RowId,
         day: DateTime<Utc>,
     ) -> Result<RecordedResponse, Self::Error> {
@@ -663,7 +663,7 @@ impl crate::domain::ports::FormsRepo for PgFormsRepo {
     async fn holds_receipt(
         &self,
         form: FormId,
-        voter: &MacroUserIdStr<'_>,
+        voter: &RoxUserIdStr<'_>,
     ) -> Result<bool, Self::Error> {
         ledger::holds_receipt(&self.pool, form, voter).await
     }
@@ -692,7 +692,7 @@ impl crate::domain::ports::FormsRepo for PgFormsRepo {
     async fn respondents_by_row(
         &self,
         form: FormId,
-    ) -> Result<Vec<(RowId, MacroUserIdStr<'static>)>, Self::Error> {
+    ) -> Result<Vec<(RowId, RoxUserIdStr<'static>)>, Self::Error> {
         ledger::respondents_by_row(&self.pool, form).await
     }
 }

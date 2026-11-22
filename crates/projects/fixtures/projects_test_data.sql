@@ -1,9 +1,9 @@
-INSERT INTO public."macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO public."rox_user" (id, username, email, stripe_customer_id)
 VALUES
     ('a1111111-1111-1111-1111-111111111111', 'owner@test.com', 'owner@test.com', 'stripe-owner'),
     ('a2222222-2222-2222-2222-222222222222', 'viewer@test.com', 'viewer@test.com', 'stripe-viewer');
 
-INSERT INTO public."User" (id, email, "stripeCustomerId", macro_user_id)
+INSERT INTO public."User" (id, email, "stripeCustomerId", rox_user_id)
 VALUES
     ('macro|owner@test.com', 'owner@test.com', 'stripe-owner', 'a1111111-1111-1111-1111-111111111111'),
     ('macro|viewer@test.com', 'viewer@test.com', 'stripe-viewer', 'a2222222-2222-2222-2222-222222222222');

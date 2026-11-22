@@ -18,11 +18,11 @@ use std::path::{Path, PathBuf};
 mod test;
 
 mod environment {
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Home;
     }
     // Windows usually sets no `HOME`; this is its home directory.
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Userprofile;
     }
 }
@@ -34,7 +34,7 @@ pub struct Config {
     /// The Rox deployment this harness's sessions live in: production
     /// unless the file overrides it for development.
     #[serde(rename = "macro", default)]
-    pub macro_api: MacroApi,
+    pub rox_api: RoxApi,
     /// The approved harness credential, absent until pairing completes.
     #[serde(default)]
     pub credentials: Option<HarnessCredentials>,
@@ -117,7 +117,7 @@ impl HarnessCredentials {
 /// to production; values in the file are development overrides.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default, deny_unknown_fields)]
-pub struct MacroApi {
+pub struct RoxApi {
     /// Computer-reachable egress base; enrollment overrides local routing.
     #[serde(default)]
     pub egress_url: Option<String>,
@@ -132,7 +132,7 @@ pub struct MacroApi {
     pub web_url: String,
 }
 
-impl Default for MacroApi {
+impl Default for RoxApi {
     fn default() -> Self {
         Self {
             egress_url: None,
@@ -143,7 +143,7 @@ impl Default for MacroApi {
     }
 }
 
-impl MacroApi {
+impl RoxApi {
     /// The dial-in URL for this deployment's runtime gateway:
     /// the API base with a websocket scheme.
     pub fn gateway_url(&self) -> String {

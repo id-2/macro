@@ -111,7 +111,7 @@ where
         attachments: Vec<SourcedAttachment>,
     ) -> Result<(), EmailErr> {
         for sourced in attachments {
-            let attachment_id = macro_uuid::generate_uuid_v7();
+            let attachment_id = rox_uuid::generate_uuid_v7();
             let s3_key = draft_attachment_key(draft.db_id, attachment_id);
             let sha = format!("{:x}", Sha256::digest(&sourced.bytes));
             self.storage

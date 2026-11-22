@@ -9,7 +9,7 @@ use email_api_client::domain::models::{
     CalendarPart, ChangeBatch, MessageWithCalendarParts, SyncCursor,
 };
 use futures::future::BoxFuture;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::attachment::{
     Attachment, AttachmentUploadArgs, AttachmentUploadMetadata,
 };
@@ -149,7 +149,7 @@ pub trait InboxSyncNotificationFacts: InboxSyncRepository {
     fn previews(
         &self,
         query: PreviewCursorQuery,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<EmailThreadPreview>, Self::Err>> + Send;
 }
 
@@ -267,8 +267,8 @@ pub trait InboxSyncContacts: Send + Sync + 'static {
     /// Publish the already selected valid contacts for this owner.
     fn connect<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'static>,
-        contacts: Vec<MacroUserIdStr<'static>>,
+        owner: &'a RoxUserIdStr<'static>,
+        contacts: Vec<RoxUserIdStr<'static>>,
     ) -> BoxFuture<'a, anyhow::Result<()>>;
 }
 
@@ -286,9 +286,9 @@ pub struct InboxSyncNotification {
     /// Message preview, using the original empty fallback.
     pub snippet: String,
     /// Parsed sender identity, when available.
-    pub sender_id: Option<MacroUserIdStr<'static>>,
+    pub sender_id: Option<RoxUserIdStr<'static>>,
     /// Owner and valid delegated recipients in this partition.
-    pub recipients: std::collections::HashSet<MacroUserIdStr<'static>>,
+    pub recipients: std::collections::HashSet<RoxUserIdStr<'static>>,
     /// Send the realtime notification for a Signal message.
     pub realtime: bool,
     /// Enable APNS for the staff Signal partition.

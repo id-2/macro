@@ -1127,7 +1127,7 @@ on desktop, including task, project, calendar event, skill, and agent session co
 Hovering an `@user` mention or a profile picture on desktop opens the user card:
 the person's name and email above Copy email, Copy name, Open contact (CRM teams
 only), DM, and Assign task. An agent's or bot's card offers Settings instead of
-DM when the viewer can configure it: Macro opens Settings → Agents, an agent the
+DM when the viewer can configure it: Rox opens Settings → Agents, an agent the
 viewer manages opens straight into its Edit agent form, and a plain bot opens
 its page under Settings → Bots. An agent's avatar beside its channel messages
 opens the same card. Touch devices have no hover, so tapping the mention

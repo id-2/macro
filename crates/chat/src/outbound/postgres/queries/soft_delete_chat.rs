@@ -27,7 +27,7 @@ pub(crate) async fn soft_delete_chat(
     .execute(tx.as_mut())
     .await?;
 
-    let chat_uuid = macro_uuid::string_to_uuid(chat_id)?;
+    let chat_uuid = rox_uuid::string_to_uuid(chat_id)?;
     entity_registry_db_utils::mark_deleted(tx, chat_uuid, Utc::now()).await?;
 
     Ok(())

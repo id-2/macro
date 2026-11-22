@@ -16,7 +16,7 @@ use agent_session::domain::model::{
 use bot_id::BotId;
 use cursor_api_key::cipher::CursorApiKey;
 use cursor_cloud_agents::domain::ports::NoArtifactStore;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering::SeqCst};
 use std::sync::{Arc, Mutex};
@@ -75,7 +75,7 @@ impl AgentSessionRepo for StubSessions {
 
     async fn preview(
         &self,
-        _viewer: &MacroUserIdStr<'static>,
+        _viewer: &RoxUserIdStr<'static>,
         _ids: &[AgentSessionId],
     ) -> SessionResult<Vec<agent_session::domain::model::SessionPreviewCandidate>> {
         unimplemented!("the manager never previews sessions")
@@ -98,13 +98,13 @@ impl AgentSessionRepo for StubSessions {
             repo_branch: self.repo_branch.clone(),
             id,
             owner_id: model_owner::Owner::User(
-                MacroUserIdStr::try_from("macro|owner@rox.one".to_owned())
+                RoxUserIdStr::try_from("macro|owner@rox.one".to_owned())
                     .expect("valid user id"),
             ),
             thread_id: None,
             thread_parent: None,
             originating_message_id: None,
-            bot_id: BotId::new_from_uuid(macro_uuid::generate_uuid_v7()),
+            bot_id: BotId::new_from_uuid(rox_uuid::generate_uuid_v7()),
             model: "auto".to_owned(),
             harness: "cursor".to_owned(),
             repo_url: self
@@ -136,7 +136,7 @@ impl AgentSessionRepo for StubSessions {
 
     async fn find_for_thread(
         &self,
-        _thread_id: Option<macro_uuid::Uuid>,
+        _thread_id: Option<rox_uuid::Uuid>,
         _bot_id: Option<BotId>,
     ) -> SessionResult<ThreadSession> {
         unimplemented!("the manager never routes channel events")
@@ -144,14 +144,14 @@ impl AgentSessionRepo for StubSessions {
 
     async fn find_all_for_thread(
         &self,
-        _thread_id: macro_uuid::Uuid,
+        _thread_id: rox_uuid::Uuid,
     ) -> SessionResult<Vec<AgentSession>> {
         unimplemented!("the manager never lists thread sessions")
     }
 
     async fn recent_for_owner(
         &self,
-        _owner: &MacroUserIdStr<'_>,
+        _owner: &RoxUserIdStr<'_>,
         _limit: std::num::NonZeroUsize,
     ) -> SessionResult<Vec<agent_session::domain::model::AgentSession>> {
         unimplemented!("the manager never summarizes an owner's recent sessions")
@@ -197,7 +197,7 @@ impl AgentSessionRepo for StubSessions {
     async fn add_follower(
         &self,
         _id: AgentSessionId,
-        _user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _user: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> SessionResult<()> {
         unimplemented!("this adapter does not dispatch turns")
     }
@@ -260,14 +260,14 @@ impl AgentSessionRepo for StubSessions {
 
     async fn user_sandbox_size(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
     ) -> SessionResult<SandboxSize> {
         unimplemented!("resizing is the harness service's job")
     }
 
     async fn set_user_sandbox_size(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _size: SandboxSize,
     ) -> SessionResult<()> {
         unimplemented!("resizing is the harness service's job")
@@ -275,14 +275,14 @@ impl AgentSessionRepo for StubSessions {
 
     async fn user_coding_preferences(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
     ) -> SessionResult<CodingPreferences> {
         unimplemented!("coding preferences are read when a session opens")
     }
 
     async fn set_user_coding_preferences(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _preferences: CodingPreferences,
     ) -> SessionResult<()> {
         unimplemented!("coding preferences are read when a session opens")
@@ -503,7 +503,7 @@ impl StubKeys {
 }
 
 impl CursorApiKeys for StubKeys {
-    async fn resolve(&self, _owner: &MacroUserIdStr<'_>) -> Result<ResolvedCursorConfig> {
+    async fn resolve(&self, _owner: &RoxUserIdStr<'_>) -> Result<ResolvedCursorConfig> {
         let key = self
             .key
             .map(|key| CursorApiKey::parse(key).expect("a well-formed stub key"))
@@ -519,7 +519,7 @@ impl CursorApiKeys for StubKeys {
 struct UnavailableKeys;
 
 impl CursorApiKeys for UnavailableKeys {
-    async fn resolve(&self, _owner: &MacroUserIdStr<'_>) -> Result<ResolvedCursorConfig> {
+    async fn resolve(&self, _owner: &RoxUserIdStr<'_>) -> Result<ResolvedCursorConfig> {
         Err(HarnessError::Container("key decryption failed".to_owned()))
     }
 }
@@ -533,7 +533,7 @@ struct OneRepository;
 impl ReachableRepositories for OneRepository {
     async fn for_user(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
     ) -> Result<Vec<crate::domain::model::ReachableRepository>> {
         Ok(vec![crate::domain::model::ReachableRepository {
             url: "https://github.com/macro-inc/macro".into(),
@@ -778,7 +778,7 @@ async fn session_new_mcp_servers_reach_the_created_agent() {
                 },
                 {
                     "type": "http",
-                    "name": "macro_internal",
+                    "name": "rox_internal",
                     "url": "https://egress.test/mcp/internal",
                     "headers": [{"name": "Authorization", "value": "Bearer test-session-token"}],
                 },
@@ -816,7 +816,7 @@ async fn session_new_mcp_servers_reach_the_created_agent() {
                 "headers": { "Authorization": "Bearer test-session-token" },
             },
             {
-                "name": "macro_internal",
+                "name": "rox_internal",
                 "type": "http",
                 "url": "https://egress.test/mcp/internal",
                 "headers": { "Authorization": "Bearer test-session-token" },
@@ -1021,7 +1021,7 @@ async fn teardown_archives_and_forgets() {
 
 #[tokio::test]
 async fn preflight_only_requests_a_connection_when_no_key_is_saved() {
-    let owner = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     for (keys, expected) in [
         (StubKeys::connected(), None),
         (StubKeys::absent(), Some(SessionBlocker::CursorNotConnected)),
@@ -1045,7 +1045,7 @@ async fn preflight_propagates_key_errors_instead_of_requesting_a_connection() {
         StubSessions::default(),
         UnavailableKeys,
     );
-    let owner = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
 
     let error = manager
         .preflight(AgentKind::Cursor, &owner)

@@ -2,30 +2,30 @@ import type {
   Link as LinkRecord,
   MailboxSettingsOperation,
 } from '../../../generated/email/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 
 /**
  * An email link: a connected inbox (e.g. Gmail or Outlook) that threads and
  * messages sync through. A free-to-construct handle, resolved from the
  * caller's connected links.
  */
-export class Link extends MacroEntity<LinkRecord> {
+export class Link extends RoxEntity<LinkRecord> {
   protected async fetch(): Promise<LinkRecord> {
     const { links } = unwrap(await this.client.email.listLinks());
     const link = links.find((l) => l.id === this.id);
-    if (!link) throw new MacroNotFoundError(`email link ${this.id} not found`);
+    if (!link) throw new RoxNotFoundError(`email link ${this.id} not found`);
     return link;
   }
 
   /** A handle to an email link by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Link {
+  static byId(client: RoxClient, id: string): Link {
     return new Link(client, id);
   }
 
   /** The caller's connected email links. */
-  static async list(client: MacroClient): Promise<Link[]> {
+  static async list(client: RoxClient): Promise<Link[]> {
     const { links } = unwrap(await client.email.listLinks());
     return links.map((l) => new Link(client, l.id, l));
   }

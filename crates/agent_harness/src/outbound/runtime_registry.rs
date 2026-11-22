@@ -351,7 +351,7 @@ where
     async fn access_facts(
         &self,
         bot: BotId,
-        actor: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        actor: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) -> anyhow::Result<Option<crate::domain::model::RuntimeAccessFacts>> {
         self.bindings.access_facts(bot, actor).await
     }

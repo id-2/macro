@@ -133,7 +133,7 @@ export function restoreEmailSendTransaction(
                 include_signature: input.includeSignature,
                 body_html: input.restoreBodyHtml ?? frozen.bodyHtml,
                 body_text: input.restoreBodyText ?? frozen.bodyText,
-                body_macro: input.restoreBodyMacro ?? frozen.bodyMacro,
+                body_rox: input.restoreBodyMacro ?? frozen.bodyMacro,
               },
               attachments: restoreAttachments(intent),
             };

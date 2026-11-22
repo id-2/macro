@@ -1,6 +1,6 @@
 use comms_db_client::messages::create_message::{CreateMessageOptions, create_message};
 use comms_db_client::messages::get_messages::get_channel_messages;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -43,7 +43,7 @@ async fn thread_rows(pool: &Pool<Postgres>, root_id: Uuid) -> anyhow::Result<i64
 }
 
 async fn insert_channel_root(pool: &Pool<Postgres>, channel_id: Uuid) -> anyhow::Result<Uuid> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content) VALUES ($1, 'channel', $2, $3, 'root')",
     )
@@ -56,7 +56,7 @@ async fn insert_channel_root(pool: &Pool<Postgres>, channel_id: Uuid) -> anyhow:
 }
 
 async fn insert_document_root(pool: &Pool<Postgres>, document_id: &str) -> anyhow::Result<Uuid> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content)
          VALUES ($1, 'document', $2, $3, 'root')",
@@ -91,13 +91,13 @@ fn constraint_name(err: &sqlx::Error) -> Option<&str> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("channels"))
 )]
 async fn channel_insert_gets_parent_columns_and_thread_row(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
     let id = insert_channel_root(&pool, CH1).await?;
 
     assert_eq!(parent_columns(&pool, id).await?, channel_parent(CH1));
@@ -124,11 +124,11 @@ async fn channel_insert_gets_parent_columns_and_thread_row(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("channels"))
 )]
 async fn parent_only_channel_insert_gets_thread_row(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content)
          VALUES ($1, 'channel', $2, $3, 'hi')",
@@ -144,7 +144,7 @@ async fn parent_only_channel_insert_gets_thread_row(pool: Pool<Postgres>) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn document_root_without_channel_inserts_and_gets_thread_row(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -159,7 +159,7 @@ async fn document_root_without_channel_inserts_and_gets_thread_row(
     );
     assert_eq!(thread_rows(&pool, root_id).await?, 1);
 
-    let reply_id = macro_uuid::generate_uuid_v7();
+    let reply_id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, thread_id, sender_id, content)
          VALUES ($1, 'document', $2, $3, $4, 'reply')",
@@ -187,7 +187,7 @@ async fn document_root_without_channel_inserts_and_gets_thread_row(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("channels"))
 )]
 async fn reply_with_different_parent_than_root_is_rejected(
@@ -198,7 +198,7 @@ async fn reply_with_different_parent_than_root_is_rejected(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, thread_id, sender_id, content)
          VALUES ($1, 'document', $2, $3, $4, 'reply')",
     )
-    .bind(macro_uuid::generate_uuid_v7())
+    .bind(rox_uuid::generate_uuid_v7())
     .bind(OTHER_DOC)
     .bind(doc_root)
     .bind(USER2)
@@ -215,7 +215,7 @@ async fn reply_with_different_parent_than_root_is_rejected(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, thread_id, sender_id, content)
          VALUES ($1, 'channel', $2, $3, $4, 'reply')",
     )
-    .bind(macro_uuid::generate_uuid_v7())
+    .bind(rox_uuid::generate_uuid_v7())
     .bind(CH3.to_string())
     .bind(channel_root)
     .bind(USER2)
@@ -230,7 +230,7 @@ async fn reply_with_different_parent_than_root_is_rejected(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("channels"))
 )]
 async fn anchor_on_channel_root_is_rejected(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -258,7 +258,7 @@ async fn anchor_on_channel_root_is_rejected(pool: Pool<Postgres>) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn duplicate_live_markdown_mark_in_one_document_is_rejected(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -286,7 +286,7 @@ async fn duplicate_live_markdown_mark_in_one_document_is_rejected(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("channels"))
 )]
 async fn create_message_channel_reply_path_is_unchanged(
@@ -326,7 +326,7 @@ async fn create_message_channel_reply_path_is_unchanged(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("channels"))
 )]
 async fn channel_message_backfill_scan_skips_document_rows(
@@ -340,7 +340,7 @@ async fn channel_message_backfill_scan_skips_document_rows(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pdf_anchors_reference_document_thread_rows(pool: Pool<Postgres>) -> anyhow::Result<()> {
     sqlx::query(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id)
@@ -349,7 +349,7 @@ async fn pdf_anchors_reference_document_thread_rows(pool: Pool<Postgres>) -> any
     .execute(&pool)
     .await?;
     sqlx::query(
-        r#"INSERT INTO "User" (id, email, macro_user_id)
+        r#"INSERT INTO "User" (id, email, rox_user_id)
            VALUES ($1, 'owner@example.com', '55555555-5555-5555-5555-555555555555')"#,
     )
     .bind(USER1)
@@ -403,7 +403,7 @@ async fn pdf_anchors_reference_document_thread_rows(pool: Pool<Postgres>) -> any
     .bind(Uuid::from_u128(0xf0000000_0000_0000_0000_000000000003))
     .bind(DOC)
     .bind(USER1)
-    .bind(macro_uuid::generate_uuid_v7())
+    .bind(rox_uuid::generate_uuid_v7())
     .execute(&pool)
     .await
     .expect_err("root_id must reference a thread row");

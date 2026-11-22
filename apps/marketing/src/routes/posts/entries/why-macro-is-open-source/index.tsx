@@ -20,7 +20,7 @@ export const postMeta: PostMeta = {
   coverBrand: 'open-source',
   image: '/og/why-macro-is-open-source.png',
   author: { name: 'Jacob Beckerman', role: 'Rox', avatar: avatarJacob },
-  ctaButtonName: 'blog_why_macro_is_open_source_cta',
+  ctaButtonName: 'blog_why_rox_is_open_source_cta',
 };
 
 export default function WhyMacroIsOpenSourcePost() {

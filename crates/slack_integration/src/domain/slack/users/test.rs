@@ -122,7 +122,7 @@ fn embedded_profile_supplies_email_without_modifying_membership_directory() {
         assert_eq!(
             author(&directory, &json),
             ResolvedAuthor::User(
-                MacroUserIdStr::try_from_email("connect.user+alias@example.test").unwrap()
+                RoxUserIdStr::try_from_email("connect.user+alias@example.test").unwrap()
             )
         );
         assert!(directory.participant(&id.parse().unwrap()).is_none());

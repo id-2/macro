@@ -28,8 +28,8 @@ use axum::{
     Router,
     routing::{delete, get, post, put},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
-use macro_middleware::cloud_storage::{
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
+use rox_middleware::cloud_storage::{
     document::ensure_document_exists, thread::ensure_thread_exists,
 };
 
@@ -214,7 +214,7 @@ pub fn router(state: ApiContext) -> Router<ApiContext> {
 }
 
 async fn health_handler(
-    _auth: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _auth: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
 ) -> &'static str {
     "healthy"
 }

@@ -22,7 +22,7 @@ producers' dependencies.
 
 ## Boundaries
 
-- Depends on: `bot_id`, `macro_user_id`.
+- Depends on: `bot_id`, `rox_user_id`.
 - Used by: `agent_trigger`, `agent_session`, `agent_harness`, `scheduled_action`,
   and `coding_agent_worker`.
 

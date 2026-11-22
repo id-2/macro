@@ -6,7 +6,7 @@ export interface EmailDraft {
   sender_email?: string;
   bcc?: EmailContact[] | null;
   body_html?: string | null;
-  body_macro?: string | null;
+  body_rox?: string | null;
   body_text?: string | null;
   cc?: EmailContact[] | null;
   db_id?: string | null;

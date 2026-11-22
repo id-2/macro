@@ -1,7 +1,7 @@
 use super::*;
 
 mod connection;
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::UserProvider;
 use std::sync::{Arc, Mutex};
 
@@ -233,7 +233,7 @@ fn job(id: Uuid, link_id: Option<Uuid>, status: BackfillJobStatus, fusion_id: &s
 fn inbox(id: Uuid, active: bool, provider: UserProvider) -> Link {
     Link {
         id,
-        macro_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
         fusionauth_user_id: "fusion-owner".into(),
         email_address: EmailStr::try_from("inbox@example.com".to_string()).unwrap(),
         provider,

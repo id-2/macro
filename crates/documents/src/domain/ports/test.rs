@@ -4,7 +4,7 @@ use entity_access::domain::models::{
     AccessLevel, BotId, CallChannelInfo, EntityAccessAuth, EntityPermission, RequiredPermission,
     TeamRole, UserTeamInfo,
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use uuid::Uuid;
 
 /// Grants edit access on every entity to the listed users and nobody else.
@@ -16,7 +16,7 @@ struct EditorsOnly {
 impl EntityAccessService for EditorsOnly {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -25,7 +25,7 @@ impl EntityAccessService for EditorsOnly {
             return Err(AccessError::Unauthorized);
         }
         EntityAccessReceipt::try_new_authenticated_user(
-            MacroUserIdStr::try_from(user_id.as_ref().to_string())
+            RoxUserIdStr::try_from(user_id.as_ref().to_string())
                 .expect("test user id should be valid"),
             entity_access::domain::models::Entity {
                 entity_id: entity_id.to_string(),
@@ -49,7 +49,7 @@ impl EntityAccessService for EditorsOnly {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -58,7 +58,7 @@ impl EntityAccessService for EditorsOnly {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -77,7 +77,7 @@ impl EntityAccessService for EditorsOnly {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -87,7 +87,7 @@ impl EntityAccessService for EditorsOnly {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -98,7 +98,7 @@ impl EntityAccessService for EditorsOnly {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         panic!("unexpected get_users_by_entity call")
     }
 
@@ -118,7 +118,7 @@ impl EntityAccessService for EditorsOnly {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         panic!("unexpected get_user_team call")
     }
@@ -130,7 +130,7 @@ async fn status_change_is_credited_to_a_user_who_can_edit_the_task() {
         "task-1",
         EntityType::Document,
     );
-    let merger = MacroUserIdStr::parse_from_str("macro|merger@example.com").unwrap();
+    let merger = RoxUserIdStr::parse_from_str("macro|merger@example.com").unwrap();
     let entity_access = EditorsOnly {
         editors: vec!["macro|merger@example.com"],
     };
@@ -151,7 +151,7 @@ async fn status_change_stays_uncredited_when_the_user_cannot_edit_the_task() {
         "task-1",
         EntityType::Document,
     );
-    let merger = MacroUserIdStr::parse_from_str("macro|merger@example.com").unwrap();
+    let merger = RoxUserIdStr::parse_from_str("macro|merger@example.com").unwrap();
     let entity_access = EditorsOnly { editors: vec![] };
 
     let receipt = credited_task_edit_receipt(&entity_access, &access, Some(&merger)).await;

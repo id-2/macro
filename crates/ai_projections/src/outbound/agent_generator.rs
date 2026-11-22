@@ -20,7 +20,7 @@ use agent::{PredefinedModel, structured_output::DynamicSchema};
 use ai_tools::{AiToolSet, ToolServiceContext, ToolSetWithPrompt};
 use ai_usage::{AiFeature, UsageContext};
 use futures::StreamExt;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
 use crate::domain::{
     model::AiProjectionError,
@@ -51,7 +51,7 @@ impl AgentProjectionGenerator {
     /// stream parts (text, tool calls/responses) for downstream use.
     async fn run_agent_loop(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: &GenerationRequest<'_>,
     ) -> Result<StreamAccumulator, AiProjectionError> {
         let usage_ctx = UsageContext::new(AiFeature::AiProjection, user_id.clone().into_owned());
@@ -102,7 +102,7 @@ impl AgentProjectionGenerator {
     /// `output_schema` via a prompted (non-strict) structured completion.
     async fn structured_result(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: &GenerationRequest<'_>,
         accumulator: StreamAccumulator,
     ) -> Result<String, AiProjectionError> {
@@ -171,7 +171,7 @@ impl ProjectionGenerator for AgentProjectionGenerator {
     )]
     async fn generate(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: GenerationRequest<'_>,
     ) -> Result<String, AiProjectionError> {
         let accumulator = self.run_agent_loop(user_id, &request).await?;

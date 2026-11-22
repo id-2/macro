@@ -60,9 +60,9 @@ pub async fn get_user_mute_notification_bulk(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn test_upsert_user_mute_notification(
         pool: sqlx::Pool<sqlx::Postgres>,
     ) -> anyhow::Result<()> {
@@ -81,7 +81,7 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn test_get_user_mute_notification_bulk(
         pool: sqlx::Pool<sqlx::Postgres>,
     ) -> anyhow::Result<()> {

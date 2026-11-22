@@ -9,7 +9,7 @@ use crate::domain::companies_repo::CompaniesRepository;
 use crate::domain::email_privacy::{EmailBlockScope, EmailPrivacyChange, EmailPrivacyRepository};
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -25,7 +25,7 @@ async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
         .await?;
     let before_privacy = sqlx::migrate::Migrator {
         migrations: std::borrow::Cow::Owned(
-            MACRO_DB_MIGRATIONS
+            ROX_DB_MIGRATIONS
                 .iter()
                 .filter(|m| m.version < 20261106021950)
                 .cloned()
@@ -52,7 +52,7 @@ async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
     let error = tokio::time::timeout(
         std::time::Duration::from_secs(10),
         sqlx::raw_sql(include_str!(
-            "../../../../../macro_db_client/migrations/20261106021950_crm_email_contribution.up.sql"
+            "../../../../../rox_db_client/migrations/20261106021950_crm_email_contribution.up.sql"
         ))
         .execute(&mut *cutover),
     )
@@ -79,7 +79,7 @@ async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
         .await?
     );
     old_writer.commit().await?;
-    MACRO_DB_MIGRATIONS.run(&pool).await?;
+    ROX_DB_MIGRATIONS.run(&pool).await?;
     assert!(
         !sqlx::query_scalar!(
             "SELECT crm_enabled FROM team_crm_settings WHERE team_id = $1",
@@ -144,15 +144,15 @@ async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
     }
 
     sqlx::raw_sql(include_str!(
-        "../../../../../macro_db_client/migrations/20261106031523_crm_email_backfill_trace_context.down.sql"
+        "../../../../../rox_db_client/migrations/20261106031523_crm_email_backfill_trace_context.down.sql"
     )).execute(&pool).await?;
     sqlx::raw_sql(include_str!(
-        "../../../../../macro_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.down.sql"
+        "../../../../../rox_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.down.sql"
     ))
     .execute(&pool)
     .await?;
     sqlx::raw_sql(include_str!(
-        "../../../../../macro_db_client/migrations/20261106021950_crm_email_contribution.down.sql"
+        "../../../../../rox_db_client/migrations/20261106021950_crm_email_contribution.down.sql"
     ))
     .execute(&pool)
     .await?;
@@ -169,21 +169,21 @@ async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mailbox_lifecycle_migration_times_out_without_blocking_writers(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     // Only this disposable test database is changed; production migrations
     // and previously applied development migration histories stay untouched.
     sqlx::raw_sql(include_str!(
-        "../../../../../macro_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.down.sql"
+        "../../../../../rox_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.down.sql"
     )).execute(&pool).await?;
     let mut writer = pool.begin().await?;
     sqlx::raw_sql("LOCK TABLE email_links IN ROW EXCLUSIVE MODE")
         .execute(&mut *writer)
         .await?;
     let migration = include_str!(
-        "../../../../../macro_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.up.sql"
+        "../../../../../rox_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.up.sql"
     );
     let mut deploy = pool.begin().await?;
     let error = tokio::time::timeout(
@@ -249,7 +249,7 @@ async fn deliver(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn consent_controls_ingestion_and_reads_without_deleting_records(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -316,7 +316,7 @@ async fn consent_controls_ingestion_and_reads_without_deleting_records(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn blocklist_is_retroactive_and_blocks_untracked_domains_and_subdomains(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -368,7 +368,7 @@ async fn blocklist_is_retroactive_and_blocks_untracked_domains_and_subdomains(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_blocked_bcc_participant_excludes_the_entire_thread_and_its_timestamps(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -408,7 +408,7 @@ async fn one_blocked_bcc_participant_excludes_the_entire_thread_and_its_timestam
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_blocks_only_affect_the_contributors_mailbox(pool: PgPool) -> anyhow::Result<()> {
     let (repo, team, link) = setup(&pool).await?;
     consent_to_mailbox(&pool, team, link).await?;
@@ -422,7 +422,7 @@ async fn personal_blocks_only_affect_the_contributors_mailbox(pool: PgPool) -> a
     .execute(&pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         other,
         user
     )
@@ -474,7 +474,7 @@ async fn personal_blocks_only_affect_the_contributors_mailbox(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn consent_does_not_extend_to_secondary_mailboxes_or_survive_team_removal(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -503,7 +503,7 @@ async fn consent_does_not_extend_to_secondary_mailboxes_or_survive_team_removal(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn consent_requires_the_displayed_primary_and_does_not_survive_reconnect(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -578,7 +578,7 @@ async fn consent_requires_the_displayed_primary_and_does_not_survive_reconnect(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn consent_admission_rechecks_mailbox_after_a_concurrent_disconnect(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -625,7 +625,7 @@ async fn consent_admission_rechecks_mailbox_after_a_concurrent_disconnect(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn company_less_capture_rechecks_consent_and_eligible_message_direction(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -697,7 +697,7 @@ async fn company_less_capture_rechecks_consent_and_eligible_message_direction(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ingestion_waits_for_disconnect_and_rechecks_before_writing(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -731,7 +731,7 @@ async fn ingestion_waits_for_disconnect_and_rechecks_before_writing(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ingestion_waits_for_membership_removal_before_writing(pool: PgPool) -> anyhow::Result<()> {
     let (repo, team, link) = setup(&pool).await?;
     consent_to_mailbox(&pool, team, link).await?;
@@ -764,7 +764,7 @@ async fn ingestion_waits_for_membership_removal_before_writing(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ordinary_refresh_keeps_consent_but_reauthentication_requires_new_opt_in(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -808,7 +808,7 @@ async fn ordinary_refresh_keeps_consent_but_reauthentication_requires_new_opt_in
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unavailable_primary_is_not_offered_for_consent(pool: PgPool) -> anyhow::Result<()> {
     let (repo, team, link) = setup(&pool).await?;
     for needs_reauth in [true, false] {

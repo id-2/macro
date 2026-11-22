@@ -1,4 +1,4 @@
-import { MACRO_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
 import { throwOnErr } from '@core/util/result';
 import { agentHarnessServiceClient } from '@service-agent-harness/client';
 import {
@@ -80,7 +80,7 @@ export function takeWarmAgentSession(
 ): { id?: string; claim: WarmClaim } {
   if (
     !options.userId ||
-    (options.botId && options.botId !== MACRO_NEW_BOT_ID) ||
+    (options.botId && options.botId !== ROX_NEW_BOT_ID) ||
     options.repoUrl
   )
     return { claim: 'not_attempted' };

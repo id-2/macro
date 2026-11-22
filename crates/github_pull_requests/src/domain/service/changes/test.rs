@@ -43,7 +43,7 @@ impl StubReader {
 impl GithubPullRequestDiffReader for Arc<StubReader> {
     async fn read(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         pull_request: &PullRequestRef,
     ) -> Result<GithubPullRequestDiff, GithubPullRequestDiffError> {
         *self.calls.lock().unwrap() += 1;
@@ -133,8 +133,8 @@ fn store(reader: &Arc<StubReader>, patches: &MemoryPatches) -> Store {
     )
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER).unwrap()
 }
 
 fn pull_request() -> PullRequestRef {

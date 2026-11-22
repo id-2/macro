@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 use whatsmeow::signal::CurveSignatures;
@@ -44,7 +44,7 @@ pub(crate) async fn insert_user(pool: &Pool<Postgres>, user_id: &str) {
             VALUES (gen_random_uuid(), $2, $2, $3)
             RETURNING id
         )
-        INSERT INTO "User" ("id", "email", "macro_user_id")
+        INSERT INTO "User" ("id", "email", "rox_user_id")
         SELECT $1, $2, new_macro_user.id FROM new_macro_user
         "#,
         user_id,
@@ -96,7 +96,7 @@ async fn set_lease_epoch(pool: &Pool<Postgres>, account_id: Uuid, lease_epoch: i
     .expect("the account exists");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_data_key_is_generated_once_and_unwrapped_on_every_later_open(pool: Pool<Postgres>) {
     let account_id = insert_account(&pool, "macro|data-key").await;
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
@@ -126,7 +126,7 @@ async fn the_data_key_is_generated_once_and_unwrapped_on_every_later_open(pool: 
     assert_eq!((kms.generate_calls(), kms.decrypt_calls()), (1, 1));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_first_opens_agree_on_one_data_key(pool: Pool<Postgres>) {
     let account_id = insert_account(&pool, "macro|first-opens").await;
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
@@ -163,7 +163,7 @@ async fn concurrent_first_opens_agree_on_one_data_key(pool: Pool<Postgres>) {
     assert_eq!(devices, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn values_are_stored_as_ciphertext(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let session = b"a very recognizable session record".to_vec();
@@ -208,7 +208,7 @@ async fn values_are_stored_as_ciphertext(pool: Pool<Postgres>) {
     assert_ne!(rewritten.value, stored.value);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_value_moved_to_another_key_does_not_decrypt(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     store.put_session("111:0", b"alice".to_vec()).await.unwrap();
@@ -245,7 +245,7 @@ async fn a_value_moved_to_another_key_does_not_decrypt(pool: Pool<Postgres>) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_value_moved_to_another_store_does_not_decrypt(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     store.put_identity("111:0", [9; 32]).await.unwrap();
@@ -266,7 +266,7 @@ async fn a_value_moved_to_another_store_does_not_decrypt(pool: Pool<Postgres>) {
     assert!(store.get_session("111:0").await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_value_moved_to_another_account_does_not_decrypt(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let alice_account = insert_account(&pool, "macro|alice").await;
@@ -299,7 +299,7 @@ async fn a_value_moved_to_another_account_does_not_decrypt(pool: Pool<Postgres>)
     assert!(bob.get_session("111:0").await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_data_key_moved_to_another_account_does_not_unwrap(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let alice_account = insert_account(&pool, "macro|alice").await;
@@ -331,7 +331,7 @@ async fn a_data_key_moved_to_another_account_does_not_unwrap(pool: Pool<Postgres
     assert!(matches!(error, WhatsAppStoreError::Kms(_)), "{error:?}");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_data_key_does_not_unwrap_for_another_owner_or_kms_key(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let account_id = insert_account(&pool, "macro|owner").await;
@@ -361,7 +361,7 @@ async fn a_data_key_does_not_unwrap_for_another_owner_or_kms_key(pool: Pool<Post
     assert!(matches!(error, WhatsAppStoreError::Kms(_)), "{error:?}");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_device_whose_key_kms_lost_is_reset_without_unwrapping_it(pool: Pool<Postgres>) {
     let account_id = insert_account(&pool, "macro|lost-key").await;
     let lost = FakeWhatsAppKms::new(KMS_KEY_ID);
@@ -415,7 +415,7 @@ fn only_refusals_and_undecryptable_devices_are_unreadable() {
     assert!(!WhatsAppStoreError::Fenced.is_unreadable_device());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unknown_encryption_version_is_refused_before_calling_kms(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let account_id = insert_account(&pool, "macro|version").await;
@@ -440,7 +440,7 @@ async fn an_unknown_encryption_version_is_refused_before_calling_kms(pool: Pool<
     assert_eq!(kms.decrypt_calls(), 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn opening_a_missing_account_fails(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let error = PgWhatsAppStore::open(pool.clone(), Uuid::now_v7(), 0, &kms)
@@ -453,7 +453,7 @@ async fn opening_a_missing_account_fails(pool: Pool<Postgres>) {
     assert_eq!(kms.generate_calls(), 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_takeover_fences_out_the_previous_holder(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let account_id = insert_account(&pool, "macro|fencing").await;
@@ -507,7 +507,7 @@ async fn a_takeover_fences_out_the_previous_holder(pool: Pool<Postgres>) {
 
 /// The epoch bump of a takeover waits for an in-flight write of the previous
 /// holder, so the write either lands before the takeover or not at all.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_takeover_waits_for_an_in_flight_write(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let account_id = insert_account(&pool, "macro|in-flight").await;
@@ -562,7 +562,7 @@ async fn a_takeover_waits_for_an_in_flight_write(pool: Pool<Postgres>) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_writers_do_not_lose_writes_or_reuse_prekey_ids(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let account_id = insert_account(&pool, "macro|concurrent").await;
@@ -620,7 +620,7 @@ async fn concurrent_writers_do_not_lose_writes_or_reuse_prekey_ids(pool: Pool<Po
     assert_eq!(first.uploaded_pre_key_count().await.unwrap(), ids.len());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sealed_blobs_open_only_for_their_account_and_purpose(pool: Pool<Postgres>) {
     let kms = FakeWhatsAppKms::new(KMS_KEY_ID);
     let alice_account = insert_account(&pool, "macro|alice").await;
@@ -661,7 +661,7 @@ async fn sealed_blobs_open_only_for_their_account_and_purpose(pool: Pool<Postgre
     assert!(alice.unseal("media-locator", &[]).is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sealed_blob_is_not_a_store_value(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     // A blob sealed for purpose "111:0" can't be planted as the session "111:0".

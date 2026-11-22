@@ -13,9 +13,9 @@ use axum::{
     routing::get,
 };
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_authorization::{
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
+use rox_authorization::{
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
     ValidatedIdentity,
 };
 use serde_json::Value;
@@ -35,19 +35,19 @@ impl JwtValidator for FixtureCredential {
     fn validate_credential(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, rootcause::Report<RoxAuthorizationError>> {
         let user = match token {
             "owner" => OWNER,
             "member" => MEMBER,
             "outsider" => OUTSIDER,
             _ => {
                 return Err(rootcause::Report::new(
-                    MacroAuthorizationError::InvalidCredentials,
+                    RoxAuthorizationError::InvalidCredentials,
                 ));
             }
         };
         Ok(ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -70,8 +70,8 @@ fn app(pool: &PgPool) -> Router {
         entity_access_service: Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
             pool.clone(),
         ))),
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
                 FixtureCredential,
                 InternalAuthConfig {
                     api_key: "fixture-only".into(),
@@ -153,7 +153,7 @@ async fn add_member(pool: &PgPool, team_id: Uuid, user: &str) -> anyhow::Result<
     .execute(pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         user,
         id,
     )
@@ -185,7 +185,7 @@ async fn seed(pool: &PgPool) -> anyhow::Result<(Uuid, Uuid)> {
     Ok((team_id, company_id))
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn company_read_includes_contacts_unless_asked_not_to(pool: PgPool) -> anyhow::Result<()> {
     let (_, company_id) = seed(&pool).await?;
     let app = app(&pool);
@@ -212,7 +212,7 @@ async fn company_read_includes_contacts_unless_asked_not_to(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn page_route_defaults_clamps_and_trims(pool: PgPool) -> anyhow::Result<()> {
     let (_, company_id) = seed(&pool).await?;
     // 201 more visible contacts: more than the largest page.
@@ -253,7 +253,7 @@ async fn page_route_defaults_clamps_and_trims(pool: PgPool) -> anyhow::Result<()
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn page_route_refuses_cursors_from_another_list(pool: PgPool) -> anyhow::Result<()> {
     let (team_id, company_id) = seed(&pool).await?;
     let other_company = insert_company(&pool, team_id, true, &["other.test"]).await?;
@@ -329,7 +329,7 @@ async fn page_route_refuses_cursors_from_another_list(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn page_route_refuses_outsiders_and_hides_archived_rows_from_members(
     pool: PgPool,
 ) -> anyhow::Result<()> {

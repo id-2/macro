@@ -85,7 +85,7 @@ query metadata. If a test reports missing SQLx cache data, follow the
 do not enable offline mode to work around it.
 
 Some suites also talk to Redis: `email_service`, `authentication_service`,
-`documents`, and `macro_cache_client` connect to `REDIS_URL`, or to
+`documents`, and `rox_cache_client` connect to `REDIS_URL`, or to
 `redis://127.0.0.1:6379` when it is unset. `just run_dbs` brings that Redis up
 with the database, so a local run expects it too. Without it those suites fail
 every Redis-backed case with `Connection refused`, which hides the real result

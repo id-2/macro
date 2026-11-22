@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
   await page.route(/^http:\/\/localhost:\d+\//, async (route) => {
     await route.fulfill({ response: await route.fetch({ maxRetries: 2 }) });
   });
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   // Local container network changes can cancel Vite's initial module requests.
   // Retry only that startup failure, never an editor interaction.
   let networkChanged = false;

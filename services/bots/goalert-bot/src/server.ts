@@ -23,7 +23,7 @@ const app = createApp({
     channelId: process.env.CHANNEL_ID!,
     botToken: process.env.BOT_TOKEN!,
     actingUserId: process.env.ACTING_USER_ID!,
-    env: (process.env.MACRO_ENV as 'prod' | 'dev' | 'local') || 'prod',
+    env: (process.env.ROX_ENV as 'prod' | 'dev' | 'local') || 'prod',
   }),
   store: createMemoryAlertStore(),
 });

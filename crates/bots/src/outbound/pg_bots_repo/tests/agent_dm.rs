@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::ports::AgentDmEligibility;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_personas_are_private_and_webhook_bots_are_not_personas(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -42,11 +42,11 @@ async fn personal_personas_are_private_and_webhook_bots_are_not_personas(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_members_can_dm_and_revocation_takes_effect_immediately(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -78,21 +78,21 @@ async fn team_members_can_dm_and_revocation_takes_effect_immediately(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_runnable_system_personas_are_available(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     service
-        .authorize_agent_dm(user_id(USER_OWNER), bot_id::MACRO_NEW_BOT_ID)
+        .authorize_agent_dm(user_id(USER_OWNER), bot_id::ROX_NEW_BOT_ID)
         .await?;
     assert!(matches!(
         service
-            .authorize_agent_dm(user_id(USER_OWNER), bot_id::MACRO_SYSTEM_BOT_ID)
+            .authorize_agent_dm(user_id(USER_OWNER), bot_id::ROX_SYSTEM_BOT_ID)
             .await,
         Err(BotError::Unauthorized)
     ));
     assert!(matches!(
         service
-            .authorize_agent_dm(user_id(USER_OWNER), bot_id::MACRO_AI_BOT_ID)
+            .authorize_agent_dm(user_id(USER_OWNER), bot_id::ROX_AI_BOT_ID)
             .await,
         Err(BotError::Unauthorized)
     ));
@@ -135,9 +135,9 @@ pub(super) async fn insert_direct_conversation(
 
 /// A team persona's tokens are minted by any member of its team, so none of
 /// them may post into the conversation one member has with the persona.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn persona_tokens_cannot_post_into_a_direct_conversation(pool: PgPool) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -181,11 +181,11 @@ async fn persona_tokens_cannot_post_into_a_direct_conversation(pool: PgPool) -> 
 /// and leaves the channel to the persona's membership, which a direct
 /// conversation does not lend it: the webhook refuses the conversation as it
 /// refuses a channel the persona is not in.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn persona_bot_tokens_cannot_post_into_a_direct_conversation(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -235,11 +235,11 @@ async fn persona_bot_tokens_cannot_post_into_a_direct_conversation(
 /// A persona's channels are the ones it was put in. The conversations people
 /// have with it are theirs: editing the persona neither lists them, checks
 /// them against the editor's memberships, nor takes the persona out of them.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn editing_a_team_persona_leaves_its_direct_conversations_alone(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -328,11 +328,11 @@ async fn editing_a_team_persona_leaves_its_direct_conversations_alone(
 /// A conversation with a persona is not a channel shared with it: only the
 /// people the persona already serves have one, so once someone leaves its
 /// team, their conversation keeps nothing of a selected-channel persona.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_direct_conversation_does_not_share_a_selected_persona(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let channel_id = Uuid::new_v4();

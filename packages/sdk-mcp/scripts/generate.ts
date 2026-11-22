@@ -1,7 +1,7 @@
 /**
  * Read the SDK's declarations and write the MCP operation catalog
  * (`src/generated/catalog.ts`): one operation per public method of every
- * namespace under `Macro` and every handle class, with parameter schemas
+ * namespace under `Rox` and every handle class, with parameter schemas
  * from its TypeScript types and the hint class from its TSDoc tags.
  *
  * Usage: bun scripts/generate.ts
@@ -195,7 +195,7 @@ function addressable(declaration: ts.ClassDeclaration): boolean {
   for (const parameter of byId.parameters) {
     const parameterName = parameter.name.getText();
     const type = checker.getTypeAtLocation(parameter);
-    if (type.getSymbol()?.name === 'MacroClient') {
+    if (type.getSymbol()?.name === 'RoxClient') {
       parameters.push({ name: parameterName, client: true });
       continue;
     }
@@ -757,7 +757,7 @@ const macroClass = macroFile?.statements.find(
 );
 if (!macroClass) throw new Error('Rox class not found');
 
-// Namespaces are `Macro`'s readonly properties, recursively.
+// Namespaces are `Rox`'s readonly properties, recursively.
 addOperations(macroClass, { kind: 'namespace', path: [] }, 'macro', 'core');
 
 // Handle classes: every SDK class with a `static byId` and tagged methods.

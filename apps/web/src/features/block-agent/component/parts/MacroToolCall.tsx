@@ -30,7 +30,7 @@ import type { ToolCallCommon, ToolCallContext } from './shared';
 type RoxDetail = Extract<ToolDetail, { kind: 'macro' }>;
 type ToolResponse = NamedTool<ToolName, 'response'>;
 
-export function MacroToolCall(props: {
+export function RoxToolCall(props: {
   detail: RoxDetail;
   common: ToolCallCommon;
   grouped?: boolean;

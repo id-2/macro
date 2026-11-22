@@ -2,6 +2,14 @@
 @import "./components/icon/system/icon-styles.css";
 
 @font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./assets/fonts/InterVariable.ttf') format('truetype');
+}
+
+@font-face {
   font-family: 'Roboto Slab Variable';
   font-style: normal;
   font-weight: 100 900;

@@ -8,7 +8,7 @@
 //! - `DATABASE_URL`: The connection string for the PostgreSQL database.
 //! - `DSS_URL`: The URL for the Document Storage Service.
 //! - `INTERNAL_AUTH_KEY`: An access token for authenticating with internal Rox services.
-//! - `MACRO_IDS`: The Rox IDs of the user accounts to backfill attachments for
+//! - `ROX_IDS`: The Rox IDs of the user accounts to backfill attachments for
 //! - `UPLOAD_CONCURRENCY`: Number of concurrent uploads to process (optional, defaults to 10).
 //! - `FUSIONAUTH_API_KEY`: The API key for authenticating with FusionAuth.
 //! - `FUSIONAUTH_BASE_URL`: The base URL for the FusionAuth service.
@@ -23,11 +23,11 @@ mod process;
 mod upload;
 
 use anyhow::Context;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     println!("Loading configuration...");
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = config::Config::from_env().context("Failed to load configuration")?;
 
     println!("Connecting to the database...");
@@ -42,39 +42,39 @@ async fn main() -> anyhow::Result<()> {
     let email_api_repository =
         email_api_client::GmailApiClientRepository::from_subscription_topic("unused");
 
-    let macro_ids: Vec<String> = config
-        .macro_ids
+    let rox_ids: Vec<String> = config
+        .rox_ids
         .split(',')
         .map(|id| id.trim().to_string())
         .collect();
 
-    println!("Processing {} macro IDs: {:?}", macro_ids.len(), macro_ids);
+    println!("Processing {} macro IDs: {:?}", rox_ids.len(), rox_ids);
 
-    for (index, macro_id) in macro_ids.iter().enumerate() {
+    for (index, rox_id) in rox_ids.iter().enumerate() {
         println!(
             "\n=== Processing macro ID {} ({}/{}) ===",
-            macro_id,
+            rox_id,
             index + 1,
-            macro_ids.len()
+            rox_ids.len()
         );
 
-        match process::process_macro_id(
+        match process::process_rox_id(
             &config,
             &db_pool,
             &dss_client,
             &email_api_repository,
-            macro_id,
+            rox_id,
         )
         .await
         {
             Ok((success_count, total_attachments)) => {
                 println!(
                     "Completed processing for {}. Successfully uploaded {} out of {} attachments.",
-                    macro_id, success_count, total_attachments
+                    rox_id, success_count, total_attachments
                 );
             }
             Err(e) => {
-                println!("Failed to process macro ID {}: {:?}", macro_id, e);
+                println!("Failed to process macro ID {}: {:?}", rox_id, e);
                 // Continue with next macro ID instead of failing completely
             }
         }

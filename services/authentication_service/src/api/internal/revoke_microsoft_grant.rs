@@ -1,6 +1,6 @@
 use crate::api::context::{ApiContext, AuthorizationService};
 use axum::{Json, extract::State, http::StatusCode};
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use uuid::Uuid;
 
 #[derive(serde::Deserialize)]
@@ -12,7 +12,7 @@ pub struct Request {
 
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Json(request): Json<Request>,
 ) -> StatusCode {
     let Some(service) = ctx.microsoft_auth else {

@@ -9,7 +9,7 @@ use crate::domain::models::{
     grouping::ItemGroupingInfo,
 };
 use entity_access::domain::models::{EntityAccessReceipt, MemberTeamRole};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{
     Frecency, NotifiedAt, PaginatedCursor, PaginatedOpaqueCursor, SimpleSortMethod, TouchedByMe,
     TypeEraseCursor,
@@ -75,7 +75,7 @@ pub trait SoupRepo: Send + Sync + 'static {
     /// caller's own and their team's).
     fn populate_properties<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         items: Vec<SoupItem<()>>,
     ) -> impl Future<Output = Result<Vec<SoupItem<SoupPropertiesField>>, Self::Err>> + Send;
 
@@ -83,7 +83,7 @@ pub trait SoupRepo: Send + Sync + 'static {
     /// teams' — with options attached.
     fn caller_tag_sets<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Vec<PropertyDefinitionWithOptions>, Self::Err>> + Send;
 
     /// Fetches expanded soup items with group metadata.
@@ -367,7 +367,7 @@ pub trait SoupService: Send + Sync + 'static {
     /// out.
     fn group_labels<'a>(
         &'a self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         group_by: &'a GroupByField,
         keys: &'a [String],
     ) -> impl Future<Output = Result<GroupLabels, SoupErr>> + Send;
@@ -376,7 +376,7 @@ pub trait SoupService: Send + Sync + 'static {
     /// teams' — with options attached.
     fn caller_tag_sets<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Vec<PropertyDefinitionWithOptions>, SoupErr>> + Send;
 
     /// Fetch one hydrated page of one of the viewer's attention feeds (Home's
@@ -502,7 +502,7 @@ where
 
     async fn group_labels<'a>(
         &'a self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         group_by: &'a GroupByField,
         keys: &'a [String],
     ) -> Result<GroupLabels, SoupErr> {
@@ -511,7 +511,7 @@ where
 
     async fn caller_tag_sets<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, SoupErr> {
         (**self).caller_tag_sets(user_id).await
     }
@@ -593,7 +593,7 @@ impl SoupService for NoOpSoupService {
 
     async fn group_labels<'a>(
         &'a self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
         _group_by: &'a GroupByField,
         _keys: &'a [String],
     ) -> Result<GroupLabels, SoupErr> {
@@ -602,7 +602,7 @@ impl SoupService for NoOpSoupService {
 
     async fn caller_tag_sets<'a>(
         &self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, SoupErr> {
         Err(no_op_soup_err())
     }

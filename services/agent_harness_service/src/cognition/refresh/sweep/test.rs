@@ -4,7 +4,7 @@
 //! step is a thin wrapper over `sqs_client` and needs no DB).
 
 use chrono::{DateTime, Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 use super::*;
@@ -81,7 +81,7 @@ async fn status_of(
     Ok(status)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_inactive_removes_only_inactive_of_cadence(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -157,7 +157,7 @@ async fn delete_inactive_removes_only_inactive_of_cadence(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn claim_stale_selects_and_marks_refreshing(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_projection(&pool, "high/day", "high", "day").await?;
     insert_projection(&pool, "med/day", "medium", "day").await?;
@@ -338,7 +338,7 @@ async fn claim_stale_selects_and_marks_refreshing(pool: Pool<Postgres>) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn claim_stale_moves_instance_onto_current_version(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -381,7 +381,7 @@ async fn claim_stale_moves_instance_onto_current_version(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn expiry_window_scales_with_definition(pool: Pool<Postgres>) -> anyhow::Result<()> {
     // Same cadence, different expiry windows.
     insert_projection(&pool, "high/week", "high", "week").await?;

@@ -1,4 +1,4 @@
-import { MacroError } from './unwrap';
+import { RoxError } from './unwrap';
 
 /**
  * Throws when `options` carries a key outside `allowed`. JavaScript callers,
@@ -20,7 +20,7 @@ export function rejectUnknownOptions<Options extends object>(
   const quote = (keys: readonly string[]) =>
     keys.map((key) => `\`${key}\``).join(', ');
 
-  throw new MacroError(
+  throw new RoxError(
     `${method} does not take ${quote(unknown)}; its options are ${quote(Object.keys(allowed))}.`,
   );
 }

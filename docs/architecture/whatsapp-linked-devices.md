@@ -72,7 +72,7 @@ at most once per 30 s. There is no periodic refresh and no freshness rule:
 adoption and can-send read the stored roster, and WhatsApp's own rejection of
 a send is the final check.
 
-Groups with disappearing messages are added like any other: Macro keeps their
+Groups with disappearing messages are added like any other: Rox keeps their
 messages permanently, the roster keeps WhatsApp's timer
 (`GroupInfo.disappearing_seconds`, shown on the detail), and Rox's sends
 carry it as `contextInfo.expiration` so members' phones expire them like their

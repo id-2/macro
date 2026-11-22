@@ -72,7 +72,7 @@ impl ToolCallSpan {
             let (arguments, truncated) = bounded_json_string(arguments, &policy.limits);
             span.set_str(attr::TOOL_CALL_ARGUMENTS, arguments);
             if truncated {
-                span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
             }
         }
         Self {
@@ -147,7 +147,7 @@ impl ToolCallSpan {
         let (result, truncated) = bounded_json_string(value, &self.policy.limits);
         self.span.set_str(attr::TOOL_CALL_RESULT, result);
         if truncated {
-            self.span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+            self.span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
         }
     }
 }

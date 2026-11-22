@@ -1,7 +1,7 @@
 //! Shared matching and durable sort-key semantics for the name-first people path.
 //! The active menu reader is switched only with its storage/host integration.
 use super::PeopleError;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use subsequence_match::{
     MAX_QUERY_BYTES,
     names::{NameMatch, NameQuery},
@@ -36,7 +36,7 @@ pub enum NameSearch {
     /// Only actual email prefixes, never a display-name alias.
     EmailPrefix(String),
     /// Canonical explicit identity, including complete email input.
-    Identity(MacroUserIdStr<'static>),
+    Identity(RoxUserIdStr<'static>),
 }
 impl NameSearch {
     /// Parse before reading storage. Preserve strict identity markers; do not
@@ -50,12 +50,12 @@ impl NameSearch {
             .get(..6)
             .is_some_and(|prefix| prefix.eq_ignore_ascii_case("macro|"))
         {
-            return MacroUserIdStr::parse_from_str(input)
+            return RoxUserIdStr::parse_from_str(input)
                 .map(|id| Self::Identity(id.into_owned()))
                 .map_err(|_| PeopleError::InvalidInput);
         }
         if input.contains('@') {
-            return Ok(match MacroUserIdStr::try_from_email(input) {
+            return Ok(match RoxUserIdStr::try_from_email(input) {
                 Ok(id) => Self::Identity(id.into_owned()),
                 Err(_) => Self::EmailPrefix(input.to_lowercase()),
             });
@@ -66,7 +66,7 @@ impl NameSearch {
     }
     /// Classify normalized name and canonical identity; callers establish
     /// membership before invoking this method or exposing the label.
-    pub fn classify(&self, normalized_name: &str, user: &MacroUserIdStr<'_>) -> Option<NameStage> {
+    pub fn classify(&self, normalized_name: &str, user: &RoxUserIdStr<'_>) -> Option<NameStage> {
         match self {
             Self::Identity(id) => (id.as_ref() == user.as_ref()).then_some(NameStage::Identity),
             Self::EmailPrefix(prefix) => user
@@ -93,7 +93,7 @@ impl NameSearch {
 pub struct RecentKey(Vec<u8>);
 impl RecentKey {
     /// Missing activity retains the existing zero-timestamp convention.
-    pub fn new(timestamp: Option<i64>, user: &MacroUserIdStr<'_>) -> Self {
+    pub fn new(timestamp: Option<i64>, user: &RoxUserIdStr<'_>) -> Self {
         let mut time = timestamp.unwrap_or(0).to_be_bytes();
         time[0] ^= 0x80;
         for byte in &mut time {

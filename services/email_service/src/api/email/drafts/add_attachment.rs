@@ -9,7 +9,7 @@ use email::inbound::axum::api_types::DraftEditPrecondition;
 use email::{
     domain::draft_attachments::DraftAttachmentUpload, inbound::axum::axum_impls::EmailLinkExtractor,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
@@ -64,12 +64,12 @@ pub struct AddDraftAttachmentResponse {
 pub async fn handler(
     Query(precondition): Query<DraftEditPrecondition>,
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<EmailSvc, AuthorizationService>>,
     Path(PathParams { id: draft_id }): Path<PathParams>,
     Json(req): Json<AddDraftAttachmentRequest>,
 ) -> Result<Json<AddDraftAttachmentResponse>, AttachmentApiError> {
-    let actor = &authorization.authorization.user.macro_user_id;
+    let actor = &authorization.authorization.user.rox_user_id;
     let (attachment, upload_url) = ctx
         .draft_attachments
         .upload(

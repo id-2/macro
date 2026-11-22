@@ -1,6 +1,6 @@
 use axum::{Json, extract::State, http::StatusCode};
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
+use rox_user_id::user_id::RoxUserIdStr;
 use model::response::ErrorResponse;
 use teams::domain::team_repo::TeamService;
 use user_api_key::domain::{ports::UserApiKeyService, service::UserApiKeyServiceImpl};
@@ -48,14 +48,14 @@ fn error(status: StatusCode, message: &str) -> (StatusCode, Json<ErrorResponse<'
 #[tracing::instrument(
     name = "agent.setup",
     skip_all,
-    fields(user_id = %authorization.authorization.user.macro_user_id, joined_team_id),
+    fields(user_id = %authorization.authorization.user.rox_user_id, joined_team_id),
 )]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<AgentSetupResponse>, (StatusCode, Json<ErrorResponse<'static>>)> {
-    let macro_user_id = &authorization.authorization.user.macro_user_id;
-    let user = macro_db_client::user::get::get_legacy_user_info(&ctx.db, macro_user_id)
+    let rox_user_id = &authorization.authorization.user.rox_user_id;
+    let user = rox_db_client::user::get::get_legacy_user_info(&ctx.db, rox_user_id)
         .await
         .map_err(|e| {
             tracing::error!(error=?e, "unable to load user");
@@ -69,7 +69,7 @@ pub async fn handler(
         return Err(error(StatusCode::CONFLICT, "setup is already confirmed"));
     }
 
-    let user_id = MacroUserIdStr::parse_from_str(macro_user_id.as_ref()).map_err(|e| {
+    let user_id = RoxUserIdStr::parse_from_str(rox_user_id.as_ref()).map_err(|e| {
         tracing::error!(error=?e, "unable to parse user id");
         error(StatusCode::INTERNAL_SERVER_ERROR, "invalid user id")
     })?;
@@ -93,7 +93,7 @@ pub async fn handler(
 /// Joins the oldest pending agent invite. A failure leaves the invite pending:
 /// the agent still gets its token, and the next attempt tries the join again.
 /// Returns `false` when a pending invite could not be joined.
-async fn join_inviting_team(ctx: &ApiContext, user_id: &MacroUserIdStr<'_>) -> bool {
+async fn join_inviting_team(ctx: &ApiContext, user_id: &RoxUserIdStr<'_>) -> bool {
     let invites = match ctx.teams_service.get_user_invites(user_id).await {
         Ok(invites) => invites,
         Err(e) => {

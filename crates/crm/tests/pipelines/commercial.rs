@@ -7,14 +7,14 @@ use super::*;
 async fn run_backfill(pool: &PgPool) {
     let mut transaction = pool.begin().await.unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../macro_db_client/migrations/20261113162435_crm_pipeline_commercial_fields_backfill.sql"
+        "../../../rox_db_client/migrations/20261113162435_crm_pipeline_commercial_fields_backfill.sql"
     ))
     .execute(&mut *transaction)
     .await
     .unwrap();
     transaction.commit().await.unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../macro_db_client/migrations/20261113174353_crm_pipeline_commercial_fields_seed_rows.sql"
+        "../../../rox_db_client/migrations/20261113174353_crm_pipeline_commercial_fields_seed_rows.sql"
     ))
     .execute(pool)
     .await
@@ -31,7 +31,7 @@ async fn forget_commercial_fields(pool: &PgPool, pipeline: Uuid) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn backfill_preserves_reserved_fields_and_explicit_currency(pool: PgPool) {
     let (s, _, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -104,7 +104,7 @@ async fn backfill_preserves_reserved_fields_and_explicit_currency(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn commercial_backfill_preserves_amounts_stages_and_row_identity(pool: PgPool) {
     let (s, _, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;
@@ -258,7 +258,7 @@ async fn commercial_backfill_preserves_amounts_stages_and_row_identity(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn board_moves_cannot_clear_system_fields_even_after_regrouping(pool: PgPool) {
     let (s, _, a, team, company) = fixture(&pool).await;
     let p = create(&s, team, PipelineRecordType::Company).await;

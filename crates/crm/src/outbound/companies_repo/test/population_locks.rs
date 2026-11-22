@@ -3,7 +3,7 @@ use crate::domain::companies_repo::CompaniesRepository;
 use crate::domain::model::CrmError;
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::time::Duration;
 use uuid::Uuid;
@@ -23,7 +23,7 @@ async fn advisory_lock_held(pool: &PgPool, key: &str) -> anyhow::Result<bool> {
     Ok(!acquired)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn population_scans_the_mailbox_before_taking_the_domain_lock(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -102,7 +102,7 @@ async fn population_scans_the_mailbox_before_taking_the_domain_lock(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn population_behind_a_held_domain_lock_gives_up_as_contended(
     pool: PgPool,
 ) -> anyhow::Result<()> {

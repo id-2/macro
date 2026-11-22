@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use uuid::Uuid;
 
 #[cfg(test)]
@@ -97,7 +97,7 @@ pub struct EmailInboxDetails {
     /// Stable email link identifier.
     pub id: Uuid,
     /// Rox user that owns the inbox.
-    pub macro_id: MacroUserIdStr<'static>,
+    pub rox_id: RoxUserIdStr<'static>,
     /// Provider email address for the inbox.
     pub email_address: EmailStr<'static>,
     /// SFS URL of the inbox's self-contact photo, when available.
@@ -137,7 +137,7 @@ pub struct UserEmailLink {
     /// Stable email link identifier.
     pub id: Uuid,
     /// Rox user that owns the inbox.
-    pub macro_id: MacroUserIdStr<'static>,
+    pub rox_id: RoxUserIdStr<'static>,
     /// Provider email address for the inbox.
     pub email_address: EmailStr<'static>,
     /// SFS URL of the inbox's self-contact photo, when available.
@@ -173,7 +173,7 @@ impl UserEmailLink {
         Self {
             draft_is_signal,
             id: details.id,
-            macro_id: details.macro_id,
+            rox_id: details.rox_id,
             email_address: details.email_address,
             photo_url: details.photo_url,
             provider: details.provider,
@@ -198,7 +198,7 @@ impl UserEmailLink {
 #[derive(Clone)]
 pub struct Link {
     pub id: Uuid,
-    pub macro_id: MacroUserIdStr<'static>,
+    pub rox_id: RoxUserIdStr<'static>,
     pub fusionauth_user_id: String,
     pub email_address: EmailStr<'static>,
     pub provider: UserProvider,

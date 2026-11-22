@@ -8,7 +8,7 @@ version = "0.1.0"
 default = []
 inbound = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:utoipa",
   "ports",
@@ -19,8 +19,8 @@ postgres = ["dep:sqlx", "model_user/sqlx", "outbound"]
 
 [dependencies]
 axum = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = ["axum"] }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = ["axum"] }
+rox_user_id = { path = "../rox_user_id" }
 model-error-response = { path = "../model-error-response", optional = true }
 model_user = { path = "../model_user" }
 rootcause = { workspace = true }
@@ -31,5 +31,5 @@ utoipa = { workspace = true, optional = true }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

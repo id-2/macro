@@ -5,7 +5,7 @@ export APPDIR="${APPDIR:-"$(dirname "$(realpath "$0")")"}"
 # caller's environment rather than exporting AppImage libraries to host apps.
 # shellcheck disable=SC1091
 source "$APPDIR/usr/libexec/macro/host-environment.sh"
-macro_capture_host_environment
+rox_capture_host_environment
 export WEBKIT_INJECTED_BUNDLE_PATH="$APPDIR/usr/lib"
 # Nix's libxkbcommon embeds a store path that does not exist on other distros.
 export XKB_CONFIG_ROOT="$APPDIR/usr/share/X11/xkb"
@@ -13,7 +13,7 @@ export XKB_CONFIG_ROOT="$APPDIR/usr/share/X11/xkb"
 export GSETTINGS_SCHEMA_DIR="$APPDIR/usr/share/glib-2.0/schemas"
 # Use the host's managed TLS trust, not a build-time Nix path. Preserve explicit
 # overrides (including invalid ones): the TLS backend must fail closed on those.
-macro_find_ca_bundle() {
+rox_find_ca_bundle() {
   local root="${1:-}" candidate
   for candidate in \
     etc/ssl/certs/ca-certificates.crt \
@@ -29,7 +29,7 @@ macro_find_ca_bundle() {
   return 1
 }
 if [ -z "${SSL_CERT_FILE:-}" ]; then
-  if ca_file=$(macro_find_ca_bundle); then
+  if ca_file=$(rox_find_ca_bundle); then
     export SSL_CERT_FILE="$ca_file"
   fi
 fi

@@ -23,7 +23,7 @@ import { Button, Dialog, Panel, Tooltip } from '@ui';
 import { createSignal, For, type JSX, Show } from 'solid-js';
 import { SettingsCard, SettingsPage, SettingsSection } from './primitives';
 
-const USER_API_KEY_HEADER = 'x-macro-user-api-key';
+const USER_API_KEY_HEADER = 'x-rox-user-api-key';
 
 export function ApiKeys() {
   const keysQuery = useUserApiKeysQuery();

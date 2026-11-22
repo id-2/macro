@@ -2,7 +2,7 @@ use crate::api::context::{ApiContext, AuthorizationService};
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Json, Response};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use thiserror::Error;
 
@@ -50,10 +50,10 @@ impl IntoResponse for HealthCheckError {
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id), err)]
 pub async fn health_check_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, HealthCheckError> {
     ctx.inbox_health
-        .request(&authorization.authorization.user.macro_user_id)
+        .request(&authorization.authorization.user.rox_user_id)
         .await
         .map_err(|error| HealthCheckError::DatabaseError(anyhow::Error::new(error)))?;
 

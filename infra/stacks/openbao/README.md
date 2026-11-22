@@ -151,6 +151,6 @@ Not built. A separate design decides:
   team creation.
 - **Key rotation:** roles that trust the old and new signing keys together
   (`jwt_validation_pubkeys` takes a list), so rotation needs no outage.
-- **Service URL:** `OPENBAO_ADDRESS` becomes a typed `macro_service_urls` entry.
+- **Service URL:** `OPENBAO_ADDRESS` becomes a typed `rox_service_urls` entry.
 - **Monitoring:** telemetry to Grafana/Datadog; seal, leader, and Raft-commit
   alerts; audit logs retained in immutable storage.

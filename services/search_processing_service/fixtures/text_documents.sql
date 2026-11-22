@@ -1,7 +1,7 @@
-INSERT INTO public."macro_user" ("id", "username", "email", "stripe_customer_id")
+INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id")
 VALUES ('b2222222-2222-2222-2222-222222222222', 'owner@example.com', 'owner@example.com', 'stripe_id');
 
-INSERT INTO public."User" ("id", "email", "stripeCustomerId", "macro_user_id")
+INSERT INTO public."User" ("id", "email", "stripeCustomerId", "rox_user_id")
 VALUES ('macro|owner@example.com', 'owner@example.com', 'stripe_id', 'b2222222-2222-2222-2222-222222222222');
 
 INSERT INTO public."Document" ("id", "name", "fileType", "owner")

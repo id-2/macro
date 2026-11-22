@@ -7,10 +7,10 @@ use call::domain::notification_events::{CallNotificationEvent, CallNotificationM
 use channel_sender::ChannelSender;
 use channels::domain::broker_events::{ChannelDeletedMetadata, ChannelTopicEvent};
 use documents::domain::events::{DocumentDeletedMetadata, DocumentTopicEvent};
-use macro_event_broker::{
-    Event, EventBrokerError, MacroEvent as _, MacroEventCollection as _, MessageParts,
+use rox_event_broker::{
+    Event, EventBrokerError, RoxEvent as _, RoxEventCollection as _, MessageParts,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, Ordering};
 use uuid::Uuid;
@@ -53,7 +53,7 @@ fn webhook_event() -> Event<WebhookTopicEvent> {
     Event::new(WebhookTopicEvent::Deleted(WebhookDeletedMetadata {
         webhook_id: "wh_1".to_string(),
         workspace_id: "macro|owner@example.com".to_string(),
-        actor_user_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string())
+        actor_user_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string())
             .expect("valid user id"),
     }))
 }
@@ -67,14 +67,14 @@ fn subscribes_to_all_ingestion_topics() {
     assert_eq!(
         DeclaredMacroEvent::topics(),
         [
-            "macro.documents",
-            "macro.channels",
-            "macro.call_notifications",
-            "macro.messages",
-            "macro.webhooks",
-            "macro.agent_sessions",
-            "macro.agent_session_lifecycle",
-            "macro.users"
+            "rox.documents",
+            "rox.channels",
+            "rox.call_notifications",
+            "rox.messages",
+            "rox.webhooks",
+            "rox.agent_sessions",
+            "rox.agent_session_lifecycle",
+            "rox.users"
         ]
     );
 }
@@ -87,7 +87,7 @@ fn decodes_call_notifications() {
     )));
     let payload = serde_json::to_vec(&event).expect("serializable");
 
-    let decoded = decode_message("macro.call_notifications", &payload).expect("decodable");
+    let decoded = decode_message("rox.call_notifications", &payload).expect("decodable");
     match decoded {
         DeclaredMacroEvent::CallNotificationMacroEvent(decoded) => {
             assert_eq!(decoded.event(), &event);
@@ -101,7 +101,7 @@ fn decodes_document_events() {
     let event = document_event();
     let payload = serde_json::to_vec(&event).expect("serializable");
 
-    let decoded = decode_message("macro.documents", &payload).expect("decodable");
+    let decoded = decode_message("rox.documents", &payload).expect("decodable");
 
     match decoded {
         DeclaredMacroEvent::DocumentMacroEvent(decoded) => assert_eq!(decoded.event(), &event),
@@ -118,7 +118,7 @@ fn decodes_channel_events() {
     }));
     let payload = serde_json::to_vec(&event).expect("serializable");
 
-    let decoded = decode_message("macro.channels", &payload).expect("decodable");
+    let decoded = decode_message("rox.channels", &payload).expect("decodable");
 
     match decoded {
         DeclaredMacroEvent::ChannelMacroEvent(decoded) => assert_eq!(decoded.event(), &event),
@@ -131,7 +131,7 @@ fn decodes_webhook_events() {
     let event = webhook_event();
     let payload = serde_json::to_vec(&event).expect("serializable");
 
-    let decoded = decode_message("macro.webhooks", &payload).expect("decodable");
+    let decoded = decode_message("rox.webhooks", &payload).expect("decodable");
 
     match decoded {
         DeclaredMacroEvent::WebhookMacroEvent(decoded) => assert_eq!(decoded.event(), &event),
@@ -141,15 +141,15 @@ fn decodes_webhook_events() {
 
 #[test]
 fn rejects_unknown_topics() {
-    let err = decode_message("macro.example", b"{}")
+    let err = decode_message("rox.example", b"{}")
         .err()
         .expect("unknown topic");
-    assert!(matches!(err, EventBrokerError::UnknownTopic(topic) if topic == "macro.example"));
+    assert!(matches!(err, EventBrokerError::UnknownTopic(topic) if topic == "rox.example"));
 }
 
 #[test]
 fn rejects_malformed_webhook_payloads() {
-    let err = decode_message("macro.webhooks", b"not json")
+    let err = decode_message("rox.webhooks", b"not json")
         .err()
         .expect("malformed payload");
     assert!(matches!(err, EventBrokerError::Serialization(_)));
@@ -188,7 +188,7 @@ impl FlakyIngestionService {
 impl WebhookEventIngestionService for FlakyIngestionService {
     async fn ingest_call_notification_event(
         &self,
-        _event: macro_event_broker::Event<call::domain::notification_events::CallNotificationEvent>,
+        _event: rox_event_broker::Event<call::domain::notification_events::CallNotificationEvent>,
     ) -> Result<(), WebhookEventIngestionError> {
         self.ingest()
     }

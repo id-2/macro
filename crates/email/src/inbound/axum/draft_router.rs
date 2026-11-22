@@ -6,8 +6,8 @@ use axum::{
     routing::{get, post},
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use thiserror::Error;
@@ -25,9 +25,9 @@ pub fn draft_router<S, T, Auth>() -> Router<S>
 where
     S: Send + Sync + Clone + 'static,
     T: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     EmailRouterState<T>: axum::extract::FromRef<S>,
-    MacroAuthorizationState<Auth>: axum::extract::FromRef<S>,
+    RoxAuthorizationState<Auth>: axum::extract::FromRef<S>,
 {
     Router::new()
         .route(
@@ -114,17 +114,17 @@ impl From<EmailErr> for CreateDraftError {
     )
 )]
 #[tracing::instrument(err, skip(state, link, accessible_inboxes, authorization, body))]
-pub async fn create_draft_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn create_draft_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<T, Auth>>,
     Cached(MultiEmailLinkExtractor(accessible_inboxes, _)): Cached<
         MultiEmailLinkExtractor<T, Auth>,
     >,
-    Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Json(body): Json<CreateDraftRequest>,
 ) -> Result<impl IntoResponse, CreateDraftError> {
     let mut input = body.into_domain()?;
-    input.actor = Some(authorization.authorization.user.macro_user_id.clone());
+    input.actor = Some(authorization.authorization.user.rox_user_id.clone());
     let draft = state
         .inner
         .create_draft(&link, &accessible_inboxes, input)
@@ -144,9 +144,9 @@ pub async fn create_draft_handler<T: EmailService, Auth: MacroAuthorizationServi
     params(("id"=uuid::Uuid,Path,description="Message ID")),
     responses((status=204),(status=400,body=ErrorResponse),(status=403,body=ErrorResponse),(status=404,body=ErrorResponse),(status=409,body=ErrorResponse)))]
 #[tracing::instrument(skip_all, err)]
-pub async fn resolve_message_operation_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn resolve_message_operation_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
-    Cached(actor): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(actor): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Path(message_id): Path<uuid::Uuid>,
     Json(input): Json<super::api_types::ResolveMessageOperationRequest>,
 ) -> Result<StatusCode, super::thread_labels_router::UpdateThreadLabelError> {
@@ -154,7 +154,7 @@ pub async fn resolve_message_operation_handler<T: EmailService, Auth: MacroAutho
     state
         .inner
         .resolve_message_operation(
-            actor.authorization.user.macro_user_id,
+            actor.authorization.user.rox_user_id,
             crate::domain::models::mailbox_operation::MessageResolutionRequest {
                 message_id,
                 revision: input
@@ -175,9 +175,9 @@ pub async fn resolve_message_operation_handler<T: EmailService, Auth: MacroAutho
     params(("id"=uuid::Uuid,Path,description="Message ID")),
     responses((status=200,body=super::api_types::MessageOperationResponse),(status=403,body=ErrorResponse),(status=404,body=ErrorResponse)))]
 #[tracing::instrument(skip_all, err)]
-pub async fn message_operation_status_handler<T: EmailService, Auth: MacroAuthorizationService>(
+pub async fn message_operation_status_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
-    Cached(actor): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(actor): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Path(message_id): Path<uuid::Uuid>,
 ) -> Result<
     Json<super::api_types::MessageOperationResponse>,
@@ -186,7 +186,7 @@ pub async fn message_operation_status_handler<T: EmailService, Auth: MacroAuthor
     Ok(Json(super::api_types::MessageOperationResponse {
         operation: state
             .inner
-            .message_operation_status(actor.authorization.user.macro_user_id, message_id)
+            .message_operation_status(actor.authorization.user.rox_user_id, message_id)
             .await?
             .map(Into::into),
     }))

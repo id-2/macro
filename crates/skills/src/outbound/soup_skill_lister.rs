@@ -12,7 +12,7 @@ use item_filters::ast::{
     crm_company::CrmCompanyLiteral, document::DocumentLiteral, email::EmailLiteral,
     foreign_entity::ForeignEntityLiteral, project::ProjectLiteral,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{SimpleSortMethod, TypeEraseCursor};
 use models_soup::item::SoupItem;
 use soup::domain::{
@@ -84,7 +84,7 @@ impl<S: SoupService> SkillLister for SoupSkillLister<S> {
     #[tracing::instrument(skip(self), err)]
     async fn list_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         limit: u16,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         let result = self

@@ -116,7 +116,7 @@ const otherPages = [
     '/',
     'Home',
     'Website',
-    'features/marketing/components/homepage/MacroHero.tsx',
+    'features/marketing/components/homepage/RoxHero.tsx',
   ],
   ['/pricing', 'Pricing', 'Website', 'app/routes/RoutePricing.tsx'],
   [

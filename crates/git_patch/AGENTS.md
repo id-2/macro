@@ -24,7 +24,7 @@ status/line counts whichever produced the patch.
 
 ## Boundaries
 
-- Depends on: nothing Macro-specific.
+- Depends on: nothing Rox-specific.
 - Used by: `github_pull_requests`, `agent_changes`.
 
 ## Checks

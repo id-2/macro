@@ -23,7 +23,7 @@ fn assignment_open_command() -> OpenSession {
     command.origin = SessionOrigin::TaskAssignment(TaskAssignmentOrigin {
         trigger_origin: trigger_context::TriggerOrigin::Unknown,
         parent: messages::domain::models::MessageParent::parse("document", "task-1").unwrap(),
-        discussion_id: macro_uuid::generate_uuid_v7(),
+        discussion_id: rox_uuid::generate_uuid_v7(),
         actor: sender(),
         prompt: "Private assignment instructions".to_owned(),
         context: None,
@@ -82,7 +82,7 @@ async fn revoked_task_access_blocks_assignment_before_provisioning() {
 async fn task_assignment_keeps_the_coder_staff_gate() {
     let (service, repo, containers, announcer, _) = harness();
     let mut command = assignment_open_command();
-    command.bot_id = bot_id::MACRO_CODER_BOT_ID;
+    command.bot_id = bot_id::ROX_CODER_BOT_ID;
     command.runtime.kind = AgentKind::SandboxedCoder;
     let id = AgentSessionId::new();
     assert!(
@@ -390,7 +390,7 @@ async fn a_persona_that_chose_to_chat_gets_a_reply_on_a_coding_runtime() {
     let ((service, _, containers, announcer, _), turns) = harness_with_coding_choice(false);
     let id = AgentSessionId::new();
     let mut command = open_command();
-    command.bot_id = bot_id::MACRO_CODER_BOT_ID;
+    command.bot_id = bot_id::ROX_CODER_BOT_ID;
     mention_origin_mut(&mut command).sender = staff_sender();
     let container = session_with_a_running_turn(&service, &containers, id, command).await;
     let agent = container.agent();

@@ -6,11 +6,11 @@ use axum::{
     http::{Request, StatusCode, header},
 };
 use chrono::{TimeZone, Utc};
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState, ValidatedCredential,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState, ValidatedCredential,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rootcause::Report;
 use serde_json::{Value, json};
@@ -52,7 +52,7 @@ fn catch_me_up() -> &'static system_skills::SystemSkill {
 impl SkillService for FakeSkills {
     async fn read_skill(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         document_id: Uuid,
     ) -> Result<SkillContent, SkillError> {
         self.calls
@@ -80,7 +80,7 @@ impl SkillService for FakeSkills {
 
     async fn search_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         query: &str,
         match_type: SkillMatchType,
     ) -> Result<Vec<SkillSummary>, SkillError> {
@@ -99,7 +99,7 @@ impl SkillService for FakeSkills {
 
     async fn list_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         self.calls
             .lock()
@@ -118,7 +118,7 @@ impl SkillService for FakeSkills {
 
     async fn list_routable_skills(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         unreachable!("routing is not served over HTTP")
     }
@@ -127,21 +127,21 @@ impl SkillService for FakeSkills {
 #[derive(Clone, Default)]
 struct FakeAuthorization;
 
-impl MacroAuthorizationService for FakeAuthorization {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorization {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             "valid" => Ok(UserContext {
                 user_id: USER_ID.to_owned(),
                 ..UserContext::default()
             }),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt).await.map(ValidatedCredential::session)
     }
 
@@ -149,15 +149,15 @@ impl MacroAuthorizationService for FakeAuthorization {
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
 fn router(skills: Arc<FakeSkills>) -> Router {
     skills_router::<_, _, ()>(SkillRouterState::new(
         skills,
-        MacroAuthorizationState::new(Arc::new(FakeAuthorization)),
+        RoxAuthorizationState::new(Arc::new(FakeAuthorization)),
     ))
 }
 

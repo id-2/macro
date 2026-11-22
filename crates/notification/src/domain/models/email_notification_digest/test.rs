@@ -3,7 +3,7 @@
 use super::*;
 use crate::domain::models::{Notification, UserNotificationRow};
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use rootcause::Report;
 use serde::{Deserialize, Serialize};
@@ -69,7 +69,7 @@ impl MockUserExistenceChecker {
 impl UserExistenceChecker for MockUserExistenceChecker {
     fn user_exists<'a>(
         &self,
-        _id: MacroUserIdStr<'a>,
+        _id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<bool, Report>> + Send {
         let error = self.error.clone();
         let user_exists = self.user_exists;
@@ -115,7 +115,7 @@ impl MockPushNotificationChecker {
 impl PushNotificationChecker for MockPushNotificationChecker {
     fn push_notification_enabled<'a>(
         &self,
-        _user: MacroUserIdStr<'a>,
+        _user: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<bool, Report>> + Send {
         let error = self.error.clone();
         let push_enabled = self.push_enabled;
@@ -197,7 +197,7 @@ impl MockLastOnlineChecker {
 impl LastOnlineChecker for MockLastOnlineChecker {
     fn last_online_checker<'a>(
         &self,
-        _user: MacroUserIdStr<'a>,
+        _user: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Duration, Report>> + Send {
         let error = self.error.clone();
         let last_online = self.last_online;
@@ -215,8 +215,8 @@ impl LastOnlineChecker for MockLastOnlineChecker {
 // Test Helpers
 // ============================================================================
 
-fn test_user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("test@example.com").unwrap()
+fn test_user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("test@example.com").unwrap()
 }
 
 fn create_test_notification_row<T: Notification>(metadata: T) -> UserNotificationRow<Arc<T>> {

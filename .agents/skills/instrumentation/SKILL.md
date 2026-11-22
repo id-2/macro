@@ -197,8 +197,8 @@ telemetry with its own volume budget.
 
 ## Rust services
 
-- HTTP handlers already get spans from `macro_tower_layers`; outbound HTTP calls
-  `macro_tower_layers::inject_trace_headers`.
+- HTTP handlers already get spans from `rox_tower_layers`; outbound HTTP calls
+  `rox_tower_layers::inject_trace_headers`.
 - `#[tracing::instrument(skip_all, fields(document_id = %id), err)]` on domain
   operations and outbound adapters (CS-22: `err` only on `Result`, no
   `level = "info"`).

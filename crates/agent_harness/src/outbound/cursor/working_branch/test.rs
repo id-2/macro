@@ -17,7 +17,7 @@ impl SessionWorkingBranches for Branches {
     fn set_working_branch<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         repository_url: &'a str,
         branch: &'a str,
         claim: Option<SessionClaim>,
@@ -44,7 +44,7 @@ async fn branch_reports_require_activation_and_forward_repository_identity_and_f
     let reporter = CursorWorkingBranchReporter {
         service: service.clone(),
         session: AgentSessionId::new_from_uuid(uuid::Uuid::now_v7()),
-        owner: MacroUserIdStr::try_from_email("branch@example.com").unwrap(),
+        owner: RoxUserIdStr::try_from_email("branch@example.com").unwrap(),
         claim: Arc::new(OnceLock::new()),
     };
     assert!(

@@ -1,6 +1,6 @@
 import type { InputAttachmentData } from '@channel/Input/types';
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { MACRO_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
 import {
   cleanup,
   fireEvent,
@@ -336,7 +336,7 @@ describe('agent-led new conversation', () => {
     mocks.touch = false;
     localStorage.clear();
     mocks.attachments = [];
-    mocks.recentIds = [MACRO_CODER_BOT_ID];
+    mocks.recentIds = [ROX_CODER_BOT_ID];
     mocks.recentUrls = [];
     mocks.preferredInmemModel = undefined;
     mocks.repositories = [

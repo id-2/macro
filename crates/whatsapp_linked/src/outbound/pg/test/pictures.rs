@@ -31,7 +31,7 @@ async fn released_files(pool: &PgPool) -> Vec<Uuid> {
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_owner_tracks_the_added_group_and_new_senders_once_and_stores_what_it_sees(
     pool: PgPool,
 ) {
@@ -210,7 +210,7 @@ async fn the_owner_tracks_the_added_group_and_new_senders_once_and_stores_what_i
     assert_eq!(released_files(&pool).await.len(), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_picture_that_moved_on_during_import_is_never_stored(pool: PgPool) {
     let (_, session, repository, _, alice, _) = adopted(&pool).await;
     let checks = session.claim_picture_checks(alice, 10).await.unwrap();
@@ -252,7 +252,7 @@ async fn a_picture_that_moved_on_during_import_is_never_stored(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn checks_stop_when_the_hourly_or_daily_budget_is_spent(pool: PgPool) {
     let (_, session, _, _, alice, _) = adopted(&pool).await;
     sqlx::query!(
@@ -325,7 +325,7 @@ async fn checks_stop_when_the_hourly_or_daily_budget_is_spent(pool: PgPool) {
     assert_eq!(counted, PICTURE_QUERIES_PER_HOUR + 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_picture_whose_import_failed_is_never_offered_as_unchanged(pool: PgPool) {
     let (_, session, repository, _, alice, _) = adopted(&pool).await;
     let checks = session.claim_picture_checks(alice, 10).await.unwrap();
@@ -403,7 +403,7 @@ async fn a_picture_whose_import_failed_is_never_offered_as_unchanged(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ending_consent_drops_what_the_account_saw_and_checks_again(pool: PgPool) {
     let (linked, session, repository, _, alice, _) = adopted(&pool).await;
     let checks = session.claim_picture_checks(alice, 10).await.unwrap();
@@ -450,7 +450,7 @@ async fn ending_consent_drops_what_the_account_saw_and_checks_again(pool: PgPool
     assert_eq!(released_files(&pool).await, vec![file]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_answer_overtaken_by_a_removal_is_dropped(pool: PgPool) {
     let (_, session, repository, _, alice, _) = adopted(&pool).await;
     let checks = session.claim_picture_checks(alice, 10).await.unwrap();
@@ -481,7 +481,7 @@ async fn an_answer_overtaken_by_a_removal_is_dropped(pool: PgPool) {
     assert!(repository.staged_pictures(10).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn storing_the_same_file_again_keeps_it(pool: PgPool) {
     let (_, session, repository, _, alice, _) = adopted(&pool).await;
     let checks = session.claim_picture_checks(alice, 10).await.unwrap();
@@ -526,7 +526,7 @@ async fn storing_the_same_file_again_keeps_it(pool: PgPool) {
 
 /// The migration that tracks chats and people added before pictures were.
 const BACKFILL: &str = include_str!(
-    "../../../../../macro_db_client/migrations/20261113035846_whatsapp_profile_picture_backfill.sql"
+    "../../../../../rox_db_client/migrations/20261113035846_whatsapp_profile_picture_backfill.sql"
 );
 const CUSTOMER_LID: &str = "100000000000001@lid";
 
@@ -536,7 +536,7 @@ async fn backfill(pool: &PgPool) {
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_backfill_tracks_added_chats_and_their_people_as_live_tracking_would(pool: PgPool) {
     let (linked, session, _, binding, alice, bob) = adopted(&pool).await;
     session
@@ -603,7 +603,7 @@ async fn the_backfill_tracks_added_chats_and_their_people_as_live_tracking_would
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn detaching_a_chat_stops_checks_only_it_needed_and_releases_their_files(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     // Another of Alice's groups.

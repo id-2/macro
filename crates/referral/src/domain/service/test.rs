@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use notification::domain::{
     models::SendNotificationRequest, service::NotificationIngress, service::SendNotificationError,
 };
@@ -69,9 +69,9 @@ fn with_parts(
     }
 }
 
-fn referred() -> macro_user_id::user_id::MacroUserId<macro_user_id::lowercased::Lowercase<'static>>
+fn referred() -> rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'static>>
 {
-    macro_user_id::user_id::MacroUserId::parse_from_str("macro|new@example.com")
+    rox_user_id::user_id::RoxUserId::parse_from_str("macro|new@example.com")
         .unwrap()
         .lowercase()
 }
@@ -86,7 +86,7 @@ async fn a_first_referral_rewards_the_referrer_and_completes() {
             Box::pin(async move {
                 Ok(Some(TrackedReferral {
                     tracking_id,
-                    referrer: MacroUserIdStr::try_from_email("referrer@example.com").unwrap(),
+                    referrer: RoxUserIdStr::try_from_email("referrer@example.com").unwrap(),
                 }))
             })
         });
@@ -133,7 +133,7 @@ async fn a_failed_reward_leaves_the_referral_incomplete() {
         Box::pin(async {
             Ok(Some(TrackedReferral {
                 tracking_id: uuid::Uuid::from_u128(8),
-                referrer: MacroUserIdStr::try_from_email("referrer@example.com").unwrap(),
+                referrer: RoxUserIdStr::try_from_email("referrer@example.com").unwrap(),
             }))
         })
     });
@@ -150,8 +150,8 @@ async fn a_failed_reward_leaves_the_referral_incomplete() {
         .unwrap();
 }
 
-fn test_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("test@example.com").unwrap()
+fn test_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("test@example.com").unwrap()
 }
 
 fn test_recipient() -> EmailStr<'static> {

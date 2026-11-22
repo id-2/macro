@@ -10,12 +10,12 @@ use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
 use github::outbound::pg_installation_claims::PgGithubInstallationClaims;
 use jev::{domain::JevClassifier, outbound::SystemOneJev};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_service_urls::{ConnectionGatewayUrl, EmailServiceUrl, LexicalServiceUrl};
+use rox_service_urls::{ConnectionGatewayUrl, EmailServiceUrl, LexicalServiceUrl};
 pub mod config;
 mod routine_analytics;
 mod routine_drafting;
@@ -187,7 +187,7 @@ struct EntitlementPlans(ai_billing::composition::PgEntitlementSource);
 impl suggestion_generation::domain::ports::Plans for EntitlementPlans {
     async fn paid(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> Result<bool, rootcause::Report> {
         use ai_billing::domain::EntitlementSource as _;
         let entitlement = self
@@ -415,7 +415,7 @@ where
 {
     async fn dismiss_suggestion(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         suggestion: uuid::Uuid,
     ) -> Result<bool, rootcause::Report> {
         match self.0.dismiss(user, suggestion).await {
@@ -434,7 +434,7 @@ where
 
     async fn texts(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         suggestions: &[uuid::Uuid],
         timezone: chrono_tz::Tz,
     ) -> Result<Vec<(uuid::Uuid, suggestions::domain::model::RoutineText)>, rootcause::Report> {
@@ -481,7 +481,7 @@ pub async fn build<Ingress: notification::domain::service::NotificationIngress>(
     let generation_ready = ready.clone();
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
-        aws_sdk_secretsmanager::Client::new(&macro_aws_config::get_macro_aws_config().await),
+        aws_sdk_secretsmanager::Client::new(&rox_aws_config::get_rox_aws_config().await),
     );
     let conn_gateway_client = Arc::new(ConnectionGatewayClient::new(
         config.internal_api_key.to_string(),
@@ -602,16 +602,16 @@ pub async fn build<Ingress: notification::domain::service::NotificationIngress>(
         .await
         .context("failed to build jwt validation args")?;
 
-    let authorization_service = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(jwt_args),
+    let authorization_service = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(jwt_args),
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     );
-    let authorization_state = MacroAuthorizationState::new(Arc::new(authorization_service));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(authorization_service));
 
     // Finish fallible startup before launching intake or claiming any work.
 
@@ -742,7 +742,7 @@ pub async fn build<Ingress: notification::domain::service::NotificationIngress>(
             Arc::clone(&sessions),
             hand_backs,
             DraftAgent {
-                bot: bot_id::MACRO_NEW_BOT_ID,
+                bot: bot_id::ROX_NEW_BOT_ID,
                 // Generated from the SDK at build time, so it is always there.
                 guide: agent_code_mode::domain::entity_guide("routines").unwrap_or_default(),
             },
@@ -860,7 +860,7 @@ pub async fn build<Ingress: notification::domain::service::NotificationIngress>(
                     registrar.clone(),
                 ),
             }),
-            bot_id::MACRO_NEW_BOT_ID.as_uuid(),
+            bot_id::ROX_NEW_BOT_ID.as_uuid(),
         )
         .with_sdk_reference(agent_code_mode::domain::index_digest(
             suggestions::domain::prompt::SYMBOLS,
@@ -882,7 +882,7 @@ pub async fn build<Ingress: notification::domain::service::NotificationIngress>(
             Arc::clone(&feed),
             routine_flags.clone(),
             GenerationAgent {
-                bot: bot_id::MACRO_NEW_BOT_ID,
+                bot: bot_id::ROX_NEW_BOT_ID,
                 model: chat::domain::models::FREE_MODEL.to_owned(),
             },
             lifecycle.workers.clone(),
@@ -1042,9 +1042,9 @@ pub async fn build<Ingress: notification::domain::service::NotificationIngress>(
         .merge(generation_router::<_, _, ()>(generation_state));
 
     let router = mount_router(authed_routes)
-        .layer(macro_cors::cors_layer())
+        .layer(rox_cors::cors_layer())
         .layer(
-            macro_tower_layers::MacroRequestIdAndTracingLayer::new(Duration::from_millis(200))
+            rox_tower_layers::RoxRequestIdAndTracingLayer::new(Duration::from_millis(200))
                 .into_inner(),
         );
     Ok(SchedulingRuntime { router, lifecycle })

@@ -1,6 +1,6 @@
 import type { InitiativePageRow } from '../../../generated/storage/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { User } from '../users/user';
 import { Initiative, type InitiativeOptions } from './initiative';
 
@@ -102,7 +102,7 @@ export interface InitiativeListing {
  * @routing Use when grouping tasks and members into initiatives, finding initiatives by status, priority, assignee or due date, or reading an initiative's description, tasks or discussion; not a single task.
  */
 export class InitiativeNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a lazy initiative handle. */
   byId(id: string): Initiative {

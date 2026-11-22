@@ -3,7 +3,7 @@
 #[cfg(not(test))]
 use cached::proc_macro::cached;
 
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -21,7 +21,7 @@ use uuid::Uuid;
 pub async fn get_channel_users(
     pool: &PgPool,
     channel_id: &Uuid,
-) -> Result<Vec<MacroUserIdStr<'static>>, sqlx::Error> {
+) -> Result<Vec<RoxUserIdStr<'static>>, sqlx::Error> {
     let users = sqlx::query_scalar!(
         r#"
         SELECT DISTINCT cp.user_id
@@ -34,7 +34,7 @@ pub async fn get_channel_users(
     .await?
     .into_iter()
     .filter_map(|u| {
-        MacroUserIdStr::parse_from_str(u.as_str())
+        RoxUserIdStr::parse_from_str(u.as_str())
             .ok()
             .map(|u| u.into_owned())
     })

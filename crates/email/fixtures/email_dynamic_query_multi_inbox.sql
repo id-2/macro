@@ -2,7 +2,7 @@
 -- as email_dynamic_query's link, with its own sent thread.
 -- Composes on top of the email_dynamic_query fixture.
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES
     ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'macro|user1@test.com', 'user1', 'user1.alt@gmail.com', 'GMAIL', true, NOW(), NOW());
 

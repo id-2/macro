@@ -1,13 +1,13 @@
 use super::*;
 use harnesses::domain::ports::HarnessRepo as _;
 use harnesses::outbound::pg_harness_repo::PgHarnessRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 
 const OWNER: &str = "macro|bindings@example.com";
 
 async fn insert_harness(pool: &PgPool) -> HarnessId {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO harnesses (id, kind, name, owner_user_id, created_by)
@@ -23,7 +23,7 @@ async fn insert_harness(pool: &PgPool) -> HarnessId {
 }
 
 async fn insert_bot(pool: &PgPool, harness: HarnessId) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO bots (id, kind, name, handle, owner_user_id)
@@ -52,7 +52,7 @@ async fn insert_bot(pool: &PgPool, harness: HarnessId) -> Uuid {
 }
 
 async fn insert_session(pool: &PgPool, bot: Uuid, acp_session_id: &str) -> AgentSessionId {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO agent_session
@@ -70,7 +70,7 @@ async fn insert_session(pool: &PgPool, bot: Uuid, acp_session_id: &str) -> Agent
     AgentSessionId::new_from_uuid(id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn live_sessions_resolve_only_on_the_harness_their_bot_is_bound_to(pool: PgPool) {
     let laptop = insert_harness(&pool).await;
     let other = insert_harness(&pool).await;
@@ -95,7 +95,7 @@ async fn live_sessions_resolve_only_on_the_harness_their_bot_is_bound_to(pool: P
     assert_eq!(found, [mine]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_deleted_harness_reattaches_nothing(pool: PgPool) {
     let laptop = insert_harness(&pool).await;
     let bot = insert_bot(&pool, laptop).await;
@@ -129,7 +129,7 @@ async fn reads_connected(pool: &PgPool, harness: HarnessId) -> bool {
         .connected
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stale_close_on_another_replica_leaves_a_redialed_harness_connected(pool: PgPool) {
     let harness = insert_harness(&pool).await;
     let replica_a = presence_on_a_replica(&pool);
@@ -162,7 +162,7 @@ async fn a_stale_close_on_another_replica_leaves_a_redialed_harness_connected(po
     assert!(!reads_connected(&pool, harness).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_replica_crash_ends_its_connections_when_their_lease_lapses(pool: PgPool) {
     let harness = insert_harness(&pool).await;
     let crashed = presence_on_a_replica(&pool);
@@ -195,7 +195,7 @@ async fn a_replica_crash_ends_its_connections_when_their_lease_lapses(pool: PgPo
     assert_eq!(rows, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn renewal_extends_a_lease_and_restores_a_missing_row(pool: PgPool) {
     let harness = insert_harness(&pool).await;
     let replica = presence_on_a_replica(&pool);
@@ -228,7 +228,7 @@ async fn renewal_extends_a_lease_and_restores_a_missing_row(pool: PgPool) {
     assert!(reads_connected(&pool, harness).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn simultaneous_final_closes_leave_a_harness_offline(pool: PgPool) {
     // Racing writes interleave differently each time, so give them many chances.
     for _ in 0..25 {
@@ -249,7 +249,7 @@ async fn simultaneous_final_closes_leave_a_harness_offline(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_resident_runs_on_its_owners_access_and_a_coding_agent_on_the_prompters(pool: PgPool) {
     let laptop = insert_harness(&pool).await;
     let coding = BotId::new_from_uuid(insert_bot(&pool, laptop).await);
@@ -261,7 +261,7 @@ async fn a_resident_runs_on_its_owners_access_and_a_coding_agent_on_the_prompter
     .execute(&pool)
     .await
     .unwrap();
-    let stranger = MacroUserIdStr::try_from("macro|stranger@example.com".to_owned()).unwrap();
+    let stranger = RoxUserIdStr::try_from("macro|stranger@example.com".to_owned()).unwrap();
     let bindings = PgHarnessBindings::new(pool.clone());
 
     let facts = bindings
@@ -292,17 +292,17 @@ async fn a_resident_runs_on_its_owners_access_and_a_coding_agent_on_the_prompter
     assert!(facts.may_run(), "its owner's own agent runs unprompted");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reader_cannot_prompt_a_coding_agent(pool: PgPool) {
     let laptop = insert_harness(&pool).await;
     let coding = BotId::new_from_uuid(insert_bot(&pool, laptop).await);
-    let reader = MacroUserIdStr::try_from("macro|reader@example.com".to_owned()).unwrap();
-    let team_id = macro_uuid::generate_uuid_v7();
+    let reader = RoxUserIdStr::try_from("macro|reader@example.com".to_owned()).unwrap();
+    let team_id = rox_uuid::generate_uuid_v7();
     for (id, email) in [
         (OWNER, "bindings@example.com"),
         (reader.as_ref(), "reader@example.com"),
     ] {
-        let macro_user = macro_uuid::generate_uuid_v7();
+        let macro_user = rox_uuid::generate_uuid_v7();
         sqlx::query!(
             "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
             macro_user,
@@ -313,7 +313,7 @@ async fn a_reader_cannot_prompt_a_coding_agent(pool: PgPool) {
         .await
         .unwrap();
         sqlx::query!(
-            r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+            r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
             id,
             email,
             macro_user,

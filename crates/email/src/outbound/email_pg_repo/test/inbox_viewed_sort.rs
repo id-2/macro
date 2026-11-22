@@ -128,7 +128,7 @@ fn thread_rows_in_plan(plan: &serde_json::Value) -> u64 {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_inbox_viewed_sort"))
 )]
 async fn viewed_at_pages_follow_the_whole_inbox_sort(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -160,7 +160,7 @@ async fn viewed_at_pages_follow_the_whole_inbox_sort(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_inbox_viewed_sort"))
 )]
 async fn viewed_updated_pages_follow_the_whole_inbox_sort(
@@ -187,7 +187,7 @@ async fn viewed_updated_pages_follow_the_whole_inbox_sort(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_inbox_viewed_sort"))
 )]
 async fn viewed_updated_keeps_newer_unopened_threads_above_older_views(
@@ -211,7 +211,7 @@ async fn viewed_updated_keeps_newer_unopened_threads_above_older_views(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_inbox_viewed_sort"))
 )]
 async fn an_inbox_that_archives_what_it_reads_pages_like_the_whole_inbox_sort(
@@ -242,7 +242,7 @@ async fn an_inbox_that_archives_what_it_reads_pages_like_the_whole_inbox_sort(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_inbox_viewed_sort"))
 )]
 async fn viewed_sorts_read_a_page_of_threads_not_the_inbox(
@@ -276,7 +276,7 @@ async fn viewed_sorts_read_a_page_of_threads_not_the_inbox(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_inbox_viewed_sort"))
 )]
 async fn a_deep_recency_page_reads_a_page_of_threads_under_a_generic_plan(

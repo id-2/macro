@@ -45,7 +45,7 @@ it.each(['macro|self@example.com', 'macro|delegated@example.com'])(
     });
     const args = queuedDraftSaveArgs({
       ...input,
-      senderAccount: { macro_id: owner, draft_is_signal: false },
+      senderAccount: { rox_id: owner, draft_is_signal: false },
     });
     expect(await executeGraphqlSaveEmailDraft(client, args)).toMatchObject({
       kind: 'queued',
@@ -75,7 +75,7 @@ it.each(['macro|self@example.com', 'macro|delegated@example.com'])(
   }
 );
 
-it.each([undefined, { macro_id: '' }])(
+it.each([undefined, { rox_id: '' }])(
   'does not accept an invisible new draft when account metadata is %j',
   (senderAccount) => {
     expect(() => queuedDraftSaveArgs({ ...input, senderAccount })).toThrow(
@@ -84,7 +84,7 @@ it.each([undefined, { macro_id: '' }])(
     expect(
       queuedDraftSaveArgs({
         ...input,
-        senderAccount: { macro_id: 'macro|owner' },
+        senderAccount: { rox_id: 'macro|owner' },
       }).newThreadOwnerId
     ).toBe('macro|owner');
   }

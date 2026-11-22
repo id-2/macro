@@ -98,14 +98,14 @@ fn every_intent_response_field_has_an_extraction_or_domain_owner() {
 impl AiAdmissionService for Denied {
     fn admit<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
         _: AiFeature,
     ) -> ai_billing::AdmissionFuture<'a> {
         Box::pin(async { Err(AiAdmissionError::Denied(DenyReason::AllowanceExhausted)) })
     }
 }
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|universal-input@example.com".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|universal-input@example.com".to_owned()).unwrap()
 }
 fn request() -> ExtractInputRequest {
     ExtractInputRequest {

@@ -8,7 +8,7 @@ use std::{
 };
 
 use chrono::{DateTime, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use model_notifications::NotifEvent;
 use notification::domain::models::{NotificationState, UserNotificationRow};
@@ -33,8 +33,8 @@ pub fn at(minute: u32) -> DateTime<Utc> {
 }
 
 /// [`USER`]'s id.
-pub fn viewer_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER).unwrap()
+pub fn viewer_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER).unwrap()
 }
 
 /// [`USER`] without a team.
@@ -451,7 +451,7 @@ impl FakeNotifications {
 impl FeedNotifications for FakeNotifications {
     async fn active(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> Result<HashMap<Entity<'static>, Vec<FeedNotification>>, Report> {
         self.loads.lock().unwrap().push(entities.clone());
@@ -473,7 +473,7 @@ impl FeedNotifications for FakeNotifications {
 
     async fn transition(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         transition: NotificationTransition,
     ) -> Result<Vec<Uuid>, Report> {
@@ -507,7 +507,7 @@ impl FeedNotifications for FakeNotifications {
 
     async fn reopen(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         unseen: Vec<Uuid>,
     ) -> Result<Vec<Uuid>, Report> {
@@ -550,7 +550,7 @@ pub struct FakeMail {
 impl FeedMail for FakeMail {
     async fn set_archived(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> Result<(), Report> {
@@ -567,7 +567,7 @@ pub struct FakeSignals {
 }
 
 impl FeedSignals for FakeSignals {
-    async fn changed(&self, _user: MacroUserIdStr<'static>, entities: Vec<Entity<'static>>) {
+    async fn changed(&self, _user: RoxUserIdStr<'static>, entities: Vec<Entity<'static>>) {
         self.calls.lock().unwrap().push(entities);
     }
 }

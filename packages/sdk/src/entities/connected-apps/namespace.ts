@@ -1,6 +1,6 @@
 import type { ConnectMcpServerResponse } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { CodeExecution } from '../agent-sessions/code-execution';
 import { ConnectedApp, type ConnectedTool } from './connected-app';
 import { Connector } from './connector';
@@ -36,7 +36,7 @@ export type { ConnectMcpServerResponse };
  * ```
  */
 export class ConnectedAppNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * List the apps a running code execution's session agent may use; pass the

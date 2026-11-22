@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            DELETE FROM macro_user\n            WHERE id = (SELECT macro_user_id FROM \"User\" WHERE id = $1)\n            ",
+  "query": "\n            DELETE FROM rox_user\n            WHERE id = (SELECT rox_user_id FROM \"User\" WHERE id = $1)\n            ",
   "describe": {
     "columns": [],
     "parameters": {

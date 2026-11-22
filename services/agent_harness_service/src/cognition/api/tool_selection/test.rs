@@ -1,6 +1,6 @@
 use super::*;
 use ai_toolset::{RequestContext, ToolSet as _, ToolSetError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[tokio::test]
 async fn none_does_not_load_or_dispatch_any_tools() {
@@ -13,7 +13,7 @@ async fn none_does_not_load_or_dispatch_any_tools() {
     .await;
     assert!(tools.request_schemas().is_none());
     assert!(tools.searchable_catalog().is_empty());
-    let caller = MacroUserIdStr::try_from_email("test@rox.one").unwrap();
+    let caller = RoxUserIdStr::try_from_email("test@rox.one").unwrap();
     let error = tools
         .try_tool_call(
             (),

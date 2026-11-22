@@ -21,9 +21,9 @@ impl ToolSet<()> for Catalog {
 
     fn searchable_catalog(&self) -> Vec<SearchableTool> {
         [
-            "mcp__macro_internal__ExecuteCode",
-            "mcp__macro_internal__DescribeCodeTools",
-            "mcp__macro_internal__set_pull_request",
+            "mcp__rox_internal__ExecuteCode",
+            "mcp__rox_internal__DescribeCodeTools",
+            "mcp__rox_internal__set_pull_request",
             "mcp__external__ExecuteCode",
         ]
         .into_iter()
@@ -49,8 +49,8 @@ fn mcp_tools_remain_deferred_by_default() {
 #[tokio::test]
 async fn eager_tools_have_full_schemas_without_being_deferred_or_changing_dispatch() {
     let eager = [
-        "mcp__macro_internal__ExecuteCode",
-        "mcp__macro_internal__DescribeCodeTools",
+        "mcp__rox_internal__ExecuteCode",
+        "mcp__rox_internal__DescribeCodeTools",
     ];
     let tools = CombinedToolSet::new(Arc::new(AsyncToolCollection::<()>::new()), Catalog)
         .with_eager_mcp_tools(&eager);
@@ -76,7 +76,7 @@ async fn eager_tools_have_full_schemas_without_being_deferred_or_changing_dispat
             .map(|t| t.name.as_str())
             .collect::<Vec<_>>(),
         [
-            "mcp__macro_internal__set_pull_request",
+            "mcp__rox_internal__set_pull_request",
             "mcp__external__ExecuteCode",
         ]
     );

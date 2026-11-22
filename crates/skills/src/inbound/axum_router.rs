@@ -13,8 +13,8 @@ use axum::{
 };
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::AccessError;
-use macro_authorization::{
-    ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
@@ -29,7 +29,7 @@ mod test;
 /// Router state: the skill use cases and caller authentication.
 pub struct SkillRouterState<Svc, Auth> {
     service: Arc<Svc>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Svc, Auth> Clone for SkillRouterState<Svc, Auth> {
@@ -43,7 +43,7 @@ impl<Svc, Auth> Clone for SkillRouterState<Svc, Auth> {
 
 impl<Svc, Auth> SkillRouterState<Svc, Auth> {
     /// Compose the skill service with the host's authorization.
-    pub fn new(service: Arc<Svc>, authorization: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<Svc>, authorization: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization,
@@ -51,7 +51,7 @@ impl<Svc, Auth> SkillRouterState<Svc, Auth> {
     }
 }
 
-impl<Svc, Auth> FromRef<SkillRouterState<Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<Svc, Auth> FromRef<SkillRouterState<Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &SkillRouterState<Svc, Auth>) -> Self {
         state.authorization.clone()
     }
@@ -232,7 +232,7 @@ impl IntoResponse for SkillFailure {
 pub fn skills_router<Svc, Auth, S>(state: SkillRouterState<Svc, Auth>) -> Router<S>
 where
     Svc: SkillService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -258,15 +258,15 @@ where
     )
 )]
 pub async fn list_skills_handler<Svc, Auth>(
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<SkillRouterState<Svc, Auth>>,
     Query(query): Query<SkillsQuery>,
 ) -> Result<Json<SkillsResponse>, SkillFailure>
 where
     Svc: SkillService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
-    let user_id = &caller.authorization.user.macro_user_id;
+    let user_id = &caller.authorization.user.rox_user_id;
     let skills = match query.query {
         Some(name) => {
             state
@@ -298,17 +298,17 @@ where
     )
 )]
 pub async fn read_skill_handler<Svc, Auth>(
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<SkillRouterState<Svc, Auth>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<SkillContentResponse>, SkillFailure>
 where
     Svc: SkillService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let skill = state
         .service
-        .read_skill(&caller.authorization.user.macro_user_id, id)
+        .read_skill(&caller.authorization.user.rox_user_id, id)
         .await?;
     Ok(Json(skill.into()))
 }

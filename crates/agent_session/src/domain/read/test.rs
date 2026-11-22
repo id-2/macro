@@ -2,7 +2,7 @@ use super::*;
 use crate::testing::{InMemoryAgentSessionRepo, test_agent_session};
 use agent_fold::testing::{TURN, parse_log_as};
 use entity_access::domain::models::{AccessLevel, Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[tokio::test]
 async fn reads_only_the_authorized_session_and_folds_streamed_chunks() {
@@ -15,7 +15,7 @@ async fn reads_only_the_authorized_session_and_folds_streamed_chunks() {
         &TURN.replace("list the examples", "PRIVATE OTHER SESSION"),
     ));
     let access = EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::try_from_email("viewer@example.com").expect("viewer"),
+        RoxUserIdStr::try_from_email("viewer@example.com").expect("viewer"),
         Entity {
             entity_id: session.to_string(),
             entity_type: EntityType::AgentSession,
@@ -47,7 +47,7 @@ async fn reads_only_the_authorized_session_and_folds_streamed_chunks() {
 async fn refuses_a_receipt_for_another_entity_type_before_reading_storage() {
     let repo = InMemoryAgentSessionRepo::new();
     let access = EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::try_from_email("viewer@example.com").expect("viewer"),
+        RoxUserIdStr::try_from_email("viewer@example.com").expect("viewer"),
         Entity {
             entity_id: AgentSessionId::TEST_A.to_string(),
             entity_type: EntityType::Document,

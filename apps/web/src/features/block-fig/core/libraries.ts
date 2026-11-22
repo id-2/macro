@@ -223,7 +223,7 @@ export function updateSummary(updates: readonly LibraryUpdate[]): string {
 }
 
 /** The drag data type of a library component dragged from the Assets panel. */
-export const LIBRARY_ASSET_MIME = 'application/x-macro-fig-asset';
+export const LIBRARY_ASSET_MIME = 'application/x-rox-fig-asset';
 
 /** A dragged library component: its library and key. */
 export interface DraggedAsset {

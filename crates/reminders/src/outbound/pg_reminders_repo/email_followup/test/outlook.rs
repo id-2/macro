@@ -30,8 +30,8 @@ impl ReminderDispatch for Delivered {
 async fn outlook(pool: PgPool) -> EmailFollowupService<PgRemindersRepo, Email, FixedClock> {
     let owner = user();
     sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'followup', 'followup@test.com', 'followup')"#, Uuid::now_v7()).execute(&pool).await.unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, macro_user_id) SELECT $1, 'followup@test.com', id FROM macro_user WHERE email = 'followup@test.com'"#, owner.as_ref()).execute(&pool).await.unwrap();
-    sqlx::query!("INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active) VALUES ($1, $2, 'followup', 'followup@test.com', 'OUTLOOK', true)", LINK, owner.as_ref()).execute(&pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) SELECT $1, 'followup@test.com', id FROM macro_user WHERE email = 'followup@test.com'"#, owner.as_ref()).execute(&pool).await.unwrap();
+    sqlx::query!("INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active) VALUES ($1, $2, 'followup', 'followup@test.com', 'OUTLOOK', true)", LINK, owner.as_ref()).execute(&pool).await.unwrap();
     sqlx::query!(
         "INSERT INTO email_threads (id, link_id, inbox_visible) VALUES ($1, $2, true)",
         THREAD,
@@ -85,7 +85,7 @@ async fn pending_mailbox_intents(pool: &PgPool) -> Vec<serde_json::Value> {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outlook_reminder_archives_then_returns_the_thread_when_due(pool: PgPool) {
     let service = outlook(pool.clone()).await;
     let created = service
@@ -124,7 +124,7 @@ async fn outlook_reminder_archives_then_returns_the_thread_when_due(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stuck_outlook_returning_reminder_reconciles_on_get(pool: PgPool) {
     let service = outlook(pool.clone()).await;
     sqlx::query!(

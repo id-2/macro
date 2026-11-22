@@ -164,11 +164,11 @@ fn delivered_notifications_keep_their_destination_without_webview_callbacks() {
 fn legacy_and_unrelated_notification_identifiers_cannot_route() {
     for identifier in [
         "legacy-delivery-id",
-        "macro:///notification?notificationId=",
-        "macro:///notification?deliveryId=123",
-        "macro:///task/123?notificationId=123",
+        "rox:///notification?notificationId=",
+        "rox:///notification?deliveryId=123",
+        "rox:///task/123?notificationId=123",
         "https://example.com/notification?notificationId=123",
-        "macro://external/notification?notificationId=123",
+        "rox://external/notification?notificationId=123",
     ] {
         assert!(activation::notification_url(identifier).is_none());
     }

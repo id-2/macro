@@ -90,7 +90,7 @@ export function createFakeWhatsApp(initial: {
     passkey: initial.passkey ?? {
       kind: 'handoff',
       desktopUrl: (pairingId: string) =>
-        `macro:///external?whatsappPairing=${pairingId}`,
+        `rox:///external?whatsappPairing=${pairingId}`,
     },
     pairing: vi.fn(pairingRead),
     connect: vi.fn(

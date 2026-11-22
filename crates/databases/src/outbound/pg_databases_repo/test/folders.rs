@@ -44,7 +44,7 @@ async fn grants(pool: &PgPool, database_id: DatabaseId) -> Vec<(String, Option<S
     .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_database_in_a_folder_holds_the_grants_of_every_folder_above_it(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     shared_folders(&pool).await;
@@ -74,7 +74,7 @@ async fn a_database_in_a_folder_holds_the_grants_of_every_folder_above_it(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_trashed_or_missing_database_stays_where_it_was(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     shared_folders(&pool).await;
@@ -98,7 +98,7 @@ async fn a_trashed_or_missing_database_stays_where_it_was(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn purging_its_folder_returns_a_database_to_the_root(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     shared_folders(&pool).await;
@@ -116,7 +116,7 @@ async fn purging_its_folder_returns_a_database_to_the_root(pool: PgPool) {
     assert_eq!(database.project_id, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn trashing_its_folder_returns_a_database_to_the_root_without_its_grants(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     shared_folders(&pool).await;
@@ -138,7 +138,7 @@ async fn trashing_its_folder_returns_a_database_to_the_root_without_its_grants(p
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn trashing_another_folder_leaves_a_database_filed(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     shared_folders(&pool).await;

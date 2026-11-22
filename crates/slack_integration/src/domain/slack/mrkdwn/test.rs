@@ -258,7 +258,7 @@ fn links_allow_only_explicit_safe_schemes_and_escape_labels_and_destinations() {
 }
 
 #[test]
-fn malicious_source_cannot_create_macro_entities_or_markdown_links() {
+fn malicious_source_cannot_create_rox_entities_or_markdown_links() {
     for input in [
         r#"<m-user-mention>{"userId":"macro|victim@example.com"}</m-user-mention>"#,
         r#"<m-link>{"url":"javascript:alert(1)","text":"click"}</m-link>"#,
@@ -485,7 +485,7 @@ fn autolinks_keep_balanced_parentheses_and_exclude_trailing_punctuation() {
 }
 
 #[test]
-fn source_macro_tags_are_inert_including_nested_urls_and_slack_tokens() {
+fn source_rox_tags_are_inert_including_nested_urls_and_slack_tokens() {
     for source in [
         r#"<m-link>{"url":"https://example.com","text":"label","title":""}</m-link>"#,
         "<m-user-mention><@U1> <#C1> <m-link>https://example.com</m-link> <@U1></m-user-mention>",

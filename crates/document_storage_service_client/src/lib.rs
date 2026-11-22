@@ -1,4 +1,4 @@
-use constants::MACRO_DOCUMENT_STORAGE_SERVICE_AUTH_HEADER_KEY;
+use constants::ROX_DOCUMENT_STORAGE_SERVICE_AUTH_HEADER_KEY;
 
 pub(crate) mod constants;
 pub mod delete;
@@ -22,7 +22,7 @@ impl DocumentStorageServiceClient {
     pub fn new(internal_auth_key: String, url: String) -> Self {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.insert(
-            MACRO_DOCUMENT_STORAGE_SERVICE_AUTH_HEADER_KEY,
+            ROX_DOCUMENT_STORAGE_SERVICE_AUTH_HEADER_KEY,
             internal_auth_key.parse().unwrap(),
         );
 

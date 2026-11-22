@@ -16,7 +16,7 @@ use agent_session::domain::ports::{AgentSessionLogRepo as _, NoOpRealtime};
 use agent_session::domain::service::{AgentSessionService, AgentSessionServiceImpl};
 use agent_session::testing::InMemoryAgentSessionRepo;
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 
 use super::*;
@@ -137,7 +137,7 @@ fn without_invocation_context(message: &str) -> &str {
     let Some((turn, _)) = invocation.split_once('"') else {
         return message;
     };
-    if context["version"] == 1 && turn.parse::<macro_uuid::Uuid>().is_ok() {
+    if context["version"] == 1 && turn.parse::<rox_uuid::Uuid>().is_ok() {
         prose
     } else {
         message
@@ -168,8 +168,8 @@ async fn await_turns(engine: &ScriptedEngine, prompt: &str) {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id")
 }
 
 fn manager(repo: &InMemoryAgentSessionRepo, engine: Arc<ScriptedEngine>) -> InMemAgentManager {
@@ -1342,7 +1342,7 @@ async fn mcp_tool_calls_rebuild_identically_and_the_session_releases() {
     let mut listed = Vec::new();
     for (server_name, tool_name, title) in [
         ("Google Sheets", "add_row", Some("Add a row")),
-        ("macro_internal", "ExecuteCode", None),
+        ("rox_internal", "ExecuteCode", None),
     ] {
         let (server_io, client_io) = tokio::io::duplex(4096);
         let (server, client) = tokio::join!(
@@ -1382,7 +1382,7 @@ async fn mcp_tool_calls_rebuild_identically_and_the_session_releases() {
             .clone()
     };
     let (sheets, execute_code) = (mangled("add_row"), mangled("ExecuteCode"));
-    assert_eq!(execute_code, "mcp__macro_internal__ExecuteCode");
+    assert_eq!(execute_code, "mcp__rox_internal__ExecuteCode");
     let routed = |name: &str| {
         ai_toolset::ToolSet::<()>::routing_description(&remote, name).map(
             |ai_toolset::ToolInfo::ExternalTool {
@@ -1497,7 +1497,7 @@ async fn mcp_tool_calls_rebuild_identically_and_the_session_releases() {
             HistoryEntry::Assistant(parts) if parts.iter().any(|part| matches!(
                 part,
                 agent::types::AssistantMessagePart::McpToolCall { name, service, .. }
-                    if name == "ExecuteCode" && service == "macro_internal"
+                    if name == "ExecuteCode" && service == "rox_internal"
             ))
         )),
         "the live agent recorded ExecuteCode as an MCP call: {live:#?}"
@@ -1555,10 +1555,10 @@ impl TurnEngine for FailingMidCallEngine {
             let _ = parts
                 .send(Ok(StreamPart::ToolCall(agent::ToolCall {
                     id: "call-code".to_owned(),
-                    name: "mcp__macro_internal__ExecuteCode".to_owned(),
+                    name: "mcp__rox_internal__ExecuteCode".to_owned(),
                     json: serde_json::json!({"code": "return 1"}),
                     mcp: Some(agent::McpInfo {
-                        service: "macro_internal".to_owned(),
+                        service: "rox_internal".to_owned(),
                         tool_name: "ExecuteCode".to_owned(),
                         display_name: None,
                     }),
@@ -1716,7 +1716,7 @@ impl TurnEngine for HeldCallEngine {
         let started = self.started.lock().expect("unpoisoned").take();
         let proceed = self.proceed.lock().expect("unpoisoned").take();
         let execute_code = agent::McpInfo {
-            service: "macro_internal".to_owned(),
+            service: "rox_internal".to_owned(),
             tool_name: "ExecuteCode".to_owned(),
             display_name: None,
         };
@@ -1724,7 +1724,7 @@ impl TurnEngine for HeldCallEngine {
             let _ = parts
                 .send(Ok(StreamPart::ToolCall(agent::ToolCall {
                     id: "call-code".to_owned(),
-                    name: "mcp__macro_internal__ExecuteCode".to_owned(),
+                    name: "mcp__rox_internal__ExecuteCode".to_owned(),
                     json: serde_json::json!({"code": "execution.views.present(view)"}),
                     mcp: Some(execute_code),
                 })))
@@ -1737,7 +1737,7 @@ impl TurnEngine for HeldCallEngine {
                 .send(Ok(StreamPart::ToolResponse(agent::ToolResponse::Json {
                     id: "call-code".to_owned(),
                     json: serde_json::json!({"status": "succeeded"}),
-                    name: "mcp__macro_internal__ExecuteCode".to_owned(),
+                    name: "mcp__rox_internal__ExecuteCode".to_owned(),
                 })))
                 .await;
             let _ = parts
@@ -1822,7 +1822,7 @@ async fn a_view_presented_mid_turn_rebuilds_identically() {
             owner(),
             agent_session::domain::model::SessionToolPresentation {
                 tool_call_id: "view_01".to_owned(),
-                title: "mcp__macro_internal__PresentView".to_owned(),
+                title: "mcp__rox_internal__PresentView".to_owned(),
                 raw_input: serde_json::json!({"view": {"widgets": [{"type": "cards"}]}}),
                 raw_output: serde_json::json!({"view": "presented"}),
             },

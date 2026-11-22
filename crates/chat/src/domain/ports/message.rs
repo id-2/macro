@@ -1,6 +1,6 @@
 use agent::types::ChatMessageContent;
 use attachment::FormattedParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::chat::{ChatMessageWithAttachments, NewChatMessage};
 use std::future::Future;
 
@@ -83,7 +83,7 @@ pub trait MessageService: Send + Sync + 'static {
     /// Create a message, resolve its attachments, store both, and return the result.
     fn create(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         chat_id: &str,
         message: NewChatMessage,
     ) -> impl Future<Output = Result<ResolvedMessageContent>> + Send;
@@ -98,7 +98,7 @@ pub trait MessageService: Send + Sync + 'static {
     /// Update the content of a message.
     fn update(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         chat_id: &str,
         message_id: &str,
         content: &ChatMessageContent,

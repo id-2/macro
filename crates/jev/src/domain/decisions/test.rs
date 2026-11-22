@@ -8,8 +8,8 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
 };
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|decisions@example.com".to_owned()).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|decisions@example.com".to_owned()).unwrap()
 }
 
 fn request() -> DecisionRequest {
@@ -37,7 +37,7 @@ impl Admission {
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {
@@ -308,7 +308,7 @@ async fn a_stalled_provider_releases_capacity_at_the_deadline() {
 struct StalledAdmission;
 
 impl AiAdmissionService for StalledAdmission {
-    fn admit<'a>(&'a self, _: &'a MacroUserIdStr<'_>, _: AiFeature) -> AdmissionFuture<'a> {
+    fn admit<'a>(&'a self, _: &'a RoxUserIdStr<'_>, _: AiFeature) -> AdmissionFuture<'a> {
         Box::pin(std::future::pending())
     }
 }

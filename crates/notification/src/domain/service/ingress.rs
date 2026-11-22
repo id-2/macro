@@ -28,8 +28,8 @@ use crate::domain::ports::{
 };
 use crate::domain::service::SendNotificationError;
 use ::futures::future::join_all;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use models_pagination::{CreatedAt, PaginateOn, Paginated, Query, TypeEraseCursor};
 use rootcause::Report;
@@ -82,7 +82,7 @@ pub trait NotificationReader: Send + Sync + 'static {
     /// the status filters, ordered by creation time descending.
     fn get_user_notifications<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         limit: Option<u32>,
         cursor: Query<Uuid, CreatedAt, ()>,
         filters: NotificationListFilters,
@@ -99,7 +99,7 @@ pub trait NotificationReader: Send + Sync + 'static {
     /// the event-type-tagged notification representation.
     fn get_entity_notifications_batch<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         entities: Vec<Entity<'static>>,
         query: crate::domain::models::entity_query::EntityNotificationQuery,
     ) -> impl Future<Output = Result<HashMap<Entity<'static>, Vec<UserNotificationRow<T>>>, Report>> + Send;
@@ -107,21 +107,21 @@ pub trait NotificationReader: Send + Sync + 'static {
     /// Get a single user notification by ID.
     fn get_user_notification_by_id<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> impl Future<Output = Result<Option<UserNotificationRow<T>>, Report>> + Send;
 
     /// Soft-delete a single user notification.
     fn delete_user_notification(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     /// Soft-delete multiple user notifications.
     fn bulk_delete_user_notifications(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
@@ -131,7 +131,7 @@ pub trait NotificationReader: Send + Sync + 'static {
     /// then upserts the device registration in the database.
     fn register_device(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_type: &DeviceType,
         native_call_capable: bool,
@@ -146,7 +146,7 @@ pub trait NotificationReader: Send + Sync + 'static {
     /// registration state.
     fn unregister_device(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_type: &DeviceType,
     ) -> impl std::future::Future<Output = Result<(), Report>> + Send;
@@ -154,20 +154,20 @@ pub trait NotificationReader: Send + Sync + 'static {
     /// Get all disabled notification types for a user.
     fn get_disabled_notification_types(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<DisabledNotificationType>, Report>> + Send;
 
     /// Disable a notification type for a user.
     fn disable_notification_type(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         type_name: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     /// Re-enable a notification type for a user.
     fn enable_notification_type(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         type_name: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 }
@@ -621,9 +621,9 @@ where
 /// Group a user's registered devices into push targets, dropping users with
 /// no push-capable device. VoIP endpoints are delivered separately.
 fn group_mobile_endpoints(
-    device_endpoints: HashMap<MacroUserIdStr<'static>, Vec<DeviceEndpoint>>,
+    device_endpoints: HashMap<RoxUserIdStr<'static>, Vec<DeviceEndpoint>>,
     exclusions: &MobilePushRecipients,
-) -> HashMap<MacroUserIdStr<'static>, UserApnsEndpoints> {
+) -> HashMap<RoxUserIdStr<'static>, UserApnsEndpoints> {
     device_endpoints
         .into_iter()
         .filter_map(|(user_id, endpoints)| {
@@ -734,7 +734,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn get_user_notifications<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         limit: Option<u32>,
         cursor: Query<Uuid, CreatedAt, ()>,
         filters: NotificationListFilters,
@@ -785,7 +785,7 @@ where
     #[tracing::instrument(err, skip(self, user_id))]
     async fn get_entity_notifications_batch<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         entities: Vec<Entity<'static>>,
         query: crate::domain::models::entity_query::EntityNotificationQuery,
     ) -> Result<HashMap<Entity<'static>, Vec<UserNotificationRow<T>>>, Report> {
@@ -826,7 +826,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn get_user_notification_by_id<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> Result<Option<UserNotificationRow<T>>, Report> {
         self.repository
@@ -837,7 +837,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn delete_user_notification(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> Result<(), Report> {
         self.repository
@@ -848,7 +848,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn bulk_delete_user_notifications(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
     ) -> Result<(), Report> {
         self.repository
@@ -859,7 +859,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn register_device(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_type: &DeviceType,
         native_call_capable: bool,
@@ -945,7 +945,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn unregister_device(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_type: &DeviceType,
     ) -> Result<(), Report> {
@@ -973,7 +973,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn get_disabled_notification_types(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<Vec<DisabledNotificationType>, Report> {
         self.repository
             .get_disabled_notification_types(user_id)
@@ -983,7 +983,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn disable_notification_type(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         type_name: &str,
     ) -> Result<(), Report> {
         self.repository
@@ -994,7 +994,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn enable_notification_type(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         type_name: &str,
     ) -> Result<(), Report> {
         self.repository

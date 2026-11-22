@@ -114,7 +114,7 @@ attempt, so a busy database never fails a computer or abandons a removal.
   `ComputerStatus` exposes `vcpus`, `memoryGib`, `diskGib`, `catalogEntry`.
   Read configured offers without billing through `ComputerService::catalog()`
   and `size_spec(size)`; omitted sizes return `ComputerError::SizeNotOffered`.
-  The schema is one migration (`*_macro_computers.sql`, plus the concurrent
+  The schema is one migration (`*_rox_computers.sql`, plus the concurrent
   harness index); a row with both or neither of a price and a comp reason is
   quarantined.
   `created_by` keeps the purchaser's id without a foreign key, so deleting the
@@ -235,7 +235,7 @@ attempt, so a busy database never fails a computer or abandons a removal.
   selects funding on `PurchaseRequest`; it is saved as `Funding` (price id or
   comp reason; `price_id`/`comp_reason` columns). `CompPolicy::comp_reason(team_id)`
   returns `Result<Option<String>, Self::Err>`; inject it with `with_comp_policy`.
-  authentication_service wires `MacroStaffCompPolicy`. Team purchase calls
+  authentication_service wires `RoxStaffCompPolicy`. Team purchase calls
   `purchase_for_team(PurchaseRequest)` and overwrites billing from policy; its
   JSON body only accepts `purchaseKey`, `size` and `name`. Offers also use
   policy. Computers are for paying teams:
@@ -413,7 +413,7 @@ runtime lists read `useRunnableHarnessesQuery` /
 ## Typed boundaries
 
 - Use shared `computer_id::ComputerId`, `pairing_id::PairingId` (re-exported by `domain::ids`), `domain::ids::HostId` and `harness_id::HarnessId`; keep team IDs as UUIDs until a shared team identity exists. Convert only at external/storage boundaries.
-- Pass `MacroUserIdStr<'static>` through domain models, ports and services; parse inbound strings and stored buyers at their adapter boundaries. Keep wire fields as strings.
+- Pass `RoxUserIdStr<'static>` through domain models, ports and services; parse inbound strings and stored buyers at their adapter boundaries. Keep wire fields as strings.
 - Construct `ComputerName` to trim and validate display names. `DeviceSecret` redacts Debug/Display and zeroizes on drop; expose only for pairing or enrollment transport. It deliberately has no Serialize implementation.
 - Keep serde newtypes transparent and validate string deserialization through `TryFrom<String>`; serde does not allow `transparent` together with its `try_from` container attribute.
 

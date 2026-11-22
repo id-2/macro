@@ -5,9 +5,9 @@ mod test;
 
 use agent::types::ChatMessageContent;
 use attachment::{Attachable, AttachmentService, FormattedParts};
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{RoxEventBroker, NoopMacroEventBroker};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::chat::{AttachmentType, NewChatMessage};
 use model_entity::{Entity, EntityType};
 use non_empty::NonEmpty;
@@ -19,7 +19,7 @@ use crate::domain::ports::{MessageRepo, MessageService};
 /// Concrete [`MessageService`] backed by a [`MessageRepo`] and [`AttachmentService`].
 pub struct MessageServiceImpl<R, A, B = NoopMacroEventBroker>
 where
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     repo: R,
     attachment_service: A,
@@ -37,9 +37,9 @@ impl<R: MessageRepo, A: AttachmentService> MessageServiceImpl<R, A> {
     }
 }
 
-impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageServiceImpl<R, A, B> {
+impl<R: MessageRepo, A: AttachmentService, B: RoxEventBroker> MessageServiceImpl<R, A, B> {
     /// Replaces the event broker while preserving the other dependencies.
-    pub fn with_event_broker<B2: MacroEventBroker>(
+    pub fn with_event_broker<B2: RoxEventBroker>(
         self,
         event_broker: B2,
     ) -> MessageServiceImpl<R, A, B2> {
@@ -58,7 +58,7 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageServiceIm
 
     async fn resolve_attachments(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         attachments: &[Entity<'_>],
     ) -> Result<Option<FormattedParts>> {
         if attachments.is_empty() {
@@ -77,13 +77,13 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageServiceIm
     }
 }
 
-impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageService
+impl<R: MessageRepo, A: AttachmentService, B: RoxEventBroker> MessageService
     for MessageServiceImpl<R, A, B>
 {
     #[tracing::instrument(err, skip(self, message))]
     async fn create(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         chat_id: &str,
         message: NewChatMessage,
     ) -> Result<ResolvedMessageContent> {
@@ -150,7 +150,7 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageService
     #[tracing::instrument(err, skip(self, content))]
     async fn update(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         chat_id: &str,
         message_id: &str,
         content: &ChatMessageContent,

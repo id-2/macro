@@ -3,8 +3,8 @@ import type {
   WebhookFilter,
   WebhookScope,
 } from '../../generated/storage/types.gen';
-import { MacroError } from '../utils';
-import type { MacroClient } from '../utils/client';
+import { RoxError } from '../utils';
+import type { RoxClient } from '../utils/client';
 import { hydrateAgentSessionEvent } from './hydrate/agentSession';
 import { hydrateCallEvent } from './hydrate/call';
 import { hydrateChannelEvent } from './hydrate/channel';
@@ -16,7 +16,7 @@ import type {
   EventHandler,
   EventMap,
   EventName,
-  MacroEvent,
+  RoxEvent,
 } from './types';
 import { verifySignature } from './verify';
 
@@ -25,12 +25,12 @@ type AnyHandler = (event: unknown) => void | Promise<void>;
 /** Sent by Rox when validating a newly registered endpoint; acked, never dispatched. */
 const VALIDATION_EVENT = 'webhook.validation.test';
 
-/** Options for {@link MacroEvents.listen}. */
+/** Options for {@link RoxEvents.listen}. */
 export interface ListenOptions {
   /**
    * Event/entity-id filters, identical to persisted webhook `filters`.
    * Defaults to one filter covering every event currently registered with
-   * {@link MacroEvents.on}.
+   * {@link RoxEvents.on}.
    */
   filters?: WebhookFilter[];
   /**
@@ -44,8 +44,8 @@ export interface ListenOptions {
 
 /** Attach the entity handles defined for each webhook event. */
 function hydrate(
-  client: MacroClient,
-  event: MacroEvent,
+  client: RoxClient,
+  event: RoxEvent,
 ): EventMap[EventName] | undefined {
   return match(event)
     .with({ event_type: P.string.startsWith('document.') }, (documentEvent) =>
@@ -72,19 +72,19 @@ function hydrate(
 }
 
 /**
- * Per-instance event receiver. Subscribe with {@link MacroEvents.on}, then
- * either {@link MacroEvents.listen} (SSE, the default) or mount
- * {@link MacroEvents.webhook} at a persisted webhook URL.
+ * Per-instance event receiver. Subscribe with {@link RoxEvents.on}, then
+ * either {@link RoxEvents.listen} (SSE, the default) or mount
+ * {@link RoxEvents.webhook} at a persisted webhook URL.
  *
  * Obtain via `macro.events` — do not construct directly.
  *
  * @mcp-exclude Registers live event handlers and listeners; MCP calls carry JSON only.
  */
-export class MacroEvents {
+export class RoxEvents {
   private readonly handlers = new Map<EventName, Set<AnyHandler>>();
 
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     private readonly secret?: string,
   ) {}
 
@@ -147,7 +147,7 @@ export class MacroEvents {
       filters.length === 0 ||
       filters.every((filter) => filter.events.length === 0)
     ) {
-      throw new MacroError(
+      throw new RoxError(
         'listen() needs filters — pass filters or register handlers with .on() first',
       );
     }
@@ -178,7 +178,7 @@ export class MacroEvents {
         }
       } catch {
         if (controller.signal.aborted) return;
-        throw new MacroError('event stream failed');
+        throw new RoxError('event stream failed');
       }
     })();
     consume.catch(() => {
@@ -196,12 +196,12 @@ export class MacroEvents {
    * Feed a raw webhook delivery in: verifies the signature, parses, and
    * dispatches to matching handlers.
    *
-   * @throws {MacroError} if no signing secret was configured, or if the
+   * @throws {RoxError} if no signing secret was configured, or if the
    *   signature is missing or invalid.
    */
   async handle(rawBody: string, headers: DeliveryHeaders): Promise<void> {
     if (!this.secret) {
-      throw new MacroError(
+      throw new RoxError(
         'webhookSecret is required to verify incoming webhook deliveries',
       );
     }
@@ -211,7 +211,7 @@ export class MacroEvents {
       rawBody,
       signature: headers.signature ?? '',
     });
-    if (!ok) throw new MacroError('invalid webhook signature');
+    if (!ok) throw new RoxError('invalid webhook signature');
 
     if (headers.event === VALIDATION_EVENT) return;
 
@@ -221,23 +221,23 @@ export class MacroEvents {
   /**
    * A Fetch-style handler to mount at your persisted webhook route.
    *
-   * Requires `webhookSecret` (or `MACRO_WEBHOOK_SECRET`).
+   * Requires `webhookSecret` (or `ROX_WEBHOOK_SECRET`).
    *
    * @example
    * app.post('/webhook', macro.events.webhook()); // Hono
    */
   webhook(): (req: Request) => Promise<Response> {
     if (!this.secret) {
-      throw new MacroError(
+      throw new RoxError(
         'webhookSecret is required to verify incoming webhook deliveries',
       );
     }
     return async (req: Request) => {
       await this.handle(await req.text(), {
-        event: req.headers.get('x-macro-event') ?? undefined,
-        eventId: req.headers.get('x-macro-event-id') ?? undefined,
-        timestamp: req.headers.get('x-macro-timestamp') ?? undefined,
-        signature: req.headers.get('x-macro-signature') ?? undefined,
+        event: req.headers.get('x-rox-event') ?? undefined,
+        eventId: req.headers.get('x-rox-event-id') ?? undefined,
+        timestamp: req.headers.get('x-rox-timestamp') ?? undefined,
+        signature: req.headers.get('x-rox-signature') ?? undefined,
       });
       return new Response('ok');
     };
@@ -260,7 +260,7 @@ export class MacroEvents {
     ) {
       return;
     }
-    const typed = event as MacroEvent;
+    const typed = event as RoxEvent;
     const handlers = this.handlers.get(typed.event_type);
     if (!handlers || handlers.size === 0) return;
 

@@ -10,12 +10,12 @@ use crate::util::corpus::{full_text, load_corpus};
 use crate::util::harness::{EVAL_CONCURRENCY, openai_key};
 use crate::util::metrics::{PairOutcome, report};
 use futures::StreamExt;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use task_dedup::domain::ports::TaskDuplicateJudge;
 use task_dedup::outbound::judge::AgentDuplicateJudge;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 #[ignore = "hits Anthropic; run locally with API keys"]
 async fn judge_accuracy_baseline(pool: PgPool) {
     // Fail early with a clear message if the embedder key (and thus the router's

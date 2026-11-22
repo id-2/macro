@@ -7,7 +7,7 @@ use http::{Method, Uri};
 use http_body_util::{BodyExt, Full};
 
 use crate::domain::approval::{
-    HeldCall, MACRO_SERVER_SLUG, OwnerApprovals, RefuseHeldCalls, ToolsCall, spends_owner_access,
+    HeldCall, ROX_SERVER_SLUG, OwnerApprovals, RefuseHeldCalls, ToolsCall, spends_owner_access,
 };
 use crate::domain::error::EgressError;
 use crate::domain::model::{
@@ -51,7 +51,7 @@ pub trait SessionMcpExchange: Send + Sync {
     fn exchange_as(
         &self,
         grant: &crate::domain::model::SessionGrant,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         destination: &McpDestination,
         request: serde_json::Value,
     ) -> impl Future<Output = Result<serde_json::Value, EgressError>> + Send;
@@ -212,7 +212,7 @@ where
                 let public = matches!(destination, McpDestination::Macro)
                     && rpc.method == "tools/call"
                     && !spends_owner_access(
-                        MACRO_SERVER_SLUG,
+                        ROX_SERVER_SLUG,
                         value["params"]["name"].as_str().unwrap_or_default(),
                     );
                 if public {
@@ -394,7 +394,7 @@ where
             let (server_slug, server_name) = match destination {
                 // Session-scoped previews spend nobody's access; exempt above.
                 McpDestination::Macro | McpDestination::Preview => {
-                    (MACRO_SERVER_SLUG.to_owned(), "Rox".to_owned())
+                    (ROX_SERVER_SLUG.to_owned(), "Rox".to_owned())
                 }
                 McpDestination::Connected(slug) => {
                     (slug.as_str().to_owned(), grant.display_name(slug))

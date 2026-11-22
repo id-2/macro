@@ -8,9 +8,9 @@ mod config;
 use chrono::{DateTime, Utc};
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
 use import::outbound::pg_import_repo::PgImportRepo;
-use macro_entrypoint::{MacroEntrypoint, shutdown_signal};
-use macro_queues::{SlackImportDlq, SlackImportQueue};
-use macro_service_urls::SearchProcessingServiceUrl;
+use rox_entrypoint::{RoxEntrypoint, shutdown_signal};
+use rox_queues::{SlackImportDlq, SlackImportQueue};
+use rox_service_urls::SearchProcessingServiceUrl;
 use slack_import_worker::composition::{
     authorizer::WorkerAuthorizer, channel_sink::ChannelImportSink,
     reference_reconciliation::WorkerReferenceReconciler,
@@ -43,14 +43,14 @@ impl Clock for SystemClock {
 
 #[tokio::main]
 async fn main() -> Result<(), rootcause::Report> {
-    let entrypoint = MacroEntrypoint::default().init();
+    let entrypoint = RoxEntrypoint::default().init();
     let result = run().await;
     entrypoint.shutdown();
     result
 }
 
 async fn run() -> Result<(), rootcause::Report> {
-    let config = macro_config::ConfigLoader::load::<config::Config>()?;
+    let config = rox_config::ConfigLoader::load::<config::Config>()?;
     let worker_config = config.worker()?;
     let limits = ImportLimits::default();
     let pool = PgPoolOptions::new()
@@ -67,11 +67,11 @@ async fn run() -> Result<(), rootcause::Report> {
     );
     let sink = ChannelImportSink::new(pool.clone(), authorizer.clone(), limits)?;
     let storage = S3ImportStorage::new(
-        macro_aws_config::s3_client().await,
+        rox_aws_config::s3_client().await,
         config.upload_staging_bucket,
         limits,
     )?;
-    let sqs = aws_sdk_sqs::Client::new(&macro_aws_config::get_macro_aws_config().await);
+    let sqs = aws_sdk_sqs::Client::new(&rox_aws_config::get_rox_aws_config().await);
     let queue = SqsImportQueue::new(sqs, &SlackImportQueue::new(), &SlackImportDlq::new())
         .await
         .map_err(|error| *error.current_context())?;

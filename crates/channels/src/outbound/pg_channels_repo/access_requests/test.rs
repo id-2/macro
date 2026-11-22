@@ -9,7 +9,7 @@ use entity_access::domain::models::{
     Entity, EntityAccessReceipt, EntityPermission, EntityType, MemberParticipantRole,
     ParticipantRole as AccessRole,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
 
@@ -44,8 +44,8 @@ fn service(pool: &PgPool) -> (Service, RecordedEvents) {
     (service, events)
 }
 
-fn user(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{name}@join.test")).unwrap()
+fn user(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{name}@join.test")).unwrap()
 }
 
 fn participant(name: &str, channel_id: Uuid) -> EntityAccessReceipt<MemberParticipantRole> {
@@ -72,7 +72,7 @@ async fn is_participant(pool: &PgPool, channel_id: Uuid, name: &str) -> bool {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("channel_access_requests"))
 )]
 async fn a_request_is_announced_once_and_approval_adds_the_requester(pool: PgPool) {
@@ -149,7 +149,7 @@ async fn a_request_is_announced_once_and_approval_adds_the_requester(pool: PgPoo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("channel_access_requests"))
 )]
 async fn approving_someone_who_already_joined_adds_no_member(pool: PgPool) {
@@ -183,7 +183,7 @@ async fn approving_someone_who_already_joined_adds_no_member(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("channel_access_requests"))
 )]
 async fn denial_and_withdrawal_make_the_requester_wait(pool: PgPool) {
@@ -261,7 +261,7 @@ async fn denial_and_withdrawal_make_the_requester_wait(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("channel_access_requests"))
 )]
 async fn only_private_and_team_channels_accept_requests(pool: PgPool) {
@@ -288,7 +288,7 @@ async fn only_private_and_team_channels_accept_requests(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("channel_access_requests"))
 )]
 async fn concurrent_requests_share_one_pending_attempt(pool: PgPool) {

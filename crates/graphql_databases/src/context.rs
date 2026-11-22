@@ -6,7 +6,7 @@ use databases::domain::{models::Viewer, receipt::database_receipt};
 use databases_sql::view_rows::{ViewRowsPage, ViewRowsRequest, ViewRowsService};
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
 use graphql_soup::SoupItemDataLoader;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::DatabaseId;
 
 pub(crate) type PageFuture<'a> =
@@ -15,7 +15,7 @@ pub(crate) type PageFuture<'a> =
 pub(crate) trait DatabaseRowsApi: Send + Sync {
     fn page(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         database: DatabaseId,
         request: ViewRowsRequest,
     ) -> PageFuture<'_>;
@@ -50,7 +50,7 @@ struct Adapter<S, A> {
 impl<S: ViewRowsService, A: EntityAccessService> DatabaseRowsApi for Adapter<S, A> {
     fn page(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         database: DatabaseId,
         request: ViewRowsRequest,
     ) -> PageFuture<'_> {

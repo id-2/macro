@@ -8,15 +8,15 @@ use axum::{
     http::StatusCode,
     routing::post,
 };
-use macro_authorization::{
-    InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 use std::sync::Arc;
 
 /// Authorization and the independent producer service.
 pub struct NotificationRouterState<Auth> {
     /// Internal credential verifier.
-    pub authorization: MacroAuthorizationState<Auth>,
+    pub authorization: RoxAuthorizationState<Auth>,
     /// Owning-domain use case.
     pub service: Arc<NotificationService>,
 }
@@ -28,21 +28,21 @@ impl<Auth> Clone for NotificationRouterState<Auth> {
         }
     }
 }
-impl<Auth> FromRef<NotificationRouterState<Auth>> for MacroAuthorizationState<Auth> {
+impl<Auth> FromRef<NotificationRouterState<Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &NotificationRouterState<Auth>) -> Self {
         state.authorization.clone()
     }
 }
 /// Mount the trusted producer endpoint independently of public session control.
-pub fn notification_router<Auth: MacroAuthorizationService>(
+pub fn notification_router<Auth: RoxAuthorizationService>(
     state: NotificationRouterState<Auth>,
 ) -> Router {
     Router::new()
         .route("/internal/notifications", post(produce::<Auth>))
         .with_state(state)
 }
-async fn produce<Auth: MacroAuthorizationService>(
-    _: MacroAuthorizationExtractor<Auth, InternalOnly>,
+async fn produce<Auth: RoxAuthorizationService>(
+    _: RoxAuthorizationExtractor<Auth, InternalOnly>,
     State(state): State<NotificationRouterState<Auth>>,
     Json(input): Json<ProduceNotification>,
 ) -> Result<StatusCode, AgentSessionApiError> {

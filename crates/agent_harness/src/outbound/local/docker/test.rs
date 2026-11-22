@@ -4,12 +4,12 @@ fn spec() -> RunSpec {
     RunSpec {
         image: "macro-agent-harness:latest".to_owned(),
         name: "macro-agent-abc".to_owned(),
-        labels: vec![("macro.agent_session_id".to_owned(), "abc".to_owned())],
+        labels: vec![("rox.agent_session_id".to_owned(), "abc".to_owned())],
         env: vec![(
             "REPO_URL".to_owned(),
             "https://github.com/macro-inc/macro".to_owned(),
         )],
-        network: "macro_services".to_owned(),
+        network: "rox_services".to_owned(),
     }
 }
 
@@ -32,7 +32,7 @@ fn run_passes_labels_and_environment_as_key_equals_value() {
     let args = run_args(&spec());
 
     let label = args.iter().position(|arg| arg == "--label").unwrap();
-    assert_eq!(args[label + 1], "macro.agent_session_id=abc");
+    assert_eq!(args[label + 1], "rox.agent_session_id=abc");
     let env = args.iter().position(|arg| arg == "--env").unwrap();
     assert_eq!(args[env + 1], "REPO_URL=https://github.com/macro-inc/macro");
 }
@@ -45,7 +45,7 @@ fn a_sandbox_joins_the_compose_network_and_publishes_nothing() {
     let args = run_args(&spec());
 
     let network = args.iter().position(|arg| arg == "--network").unwrap();
-    assert_eq!(args[network + 1], "macro_services");
+    assert_eq!(args[network + 1], "rox_services");
     assert!(!args.contains(&"--publish".to_owned()));
 }
 
@@ -62,7 +62,7 @@ fn exec_runs_the_command_through_a_login_shell() {
 /// lookup must not be limited to running ones.
 #[test]
 fn finding_by_label_includes_stopped_containers() {
-    let args = find_by_label_args("macro.agent_session_id", "abc");
+    let args = find_by_label_args("rox.agent_session_id", "abc");
 
     assert!(args.contains(&"--all".to_owned()));
     assert!(args.contains(&"label=macro.agent_session_id=abc".to_owned()));
@@ -72,7 +72,7 @@ fn finding_by_label_includes_stopped_containers() {
 /// them behind.
 #[test]
 fn listing_by_label_key_includes_stopped_containers() {
-    let args = find_all_by_label_key_args("macro.agent_session_id");
+    let args = find_all_by_label_key_args("rox.agent_session_id");
 
     assert!(args.contains(&"--all".to_owned()));
     assert!(args.contains(&"label=macro.agent_session_id".to_owned()));

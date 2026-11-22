@@ -6,7 +6,7 @@ fn native_codex_mcp_keeps_headers_and_stdio_secrets_out_of_arguments() {
     use std::os::unix::fs::PermissionsExt as _;
     let root = tempfile::tempdir().unwrap();
     let prepared = codex(root.path(), &[
-        json!({"name":"macro.tools", "type":"http", "url":"https://example.com/mcp", "headers":[{"name":"Authorization","value":"Bearer private-test-token"}]}),
+        json!({"name":"rox.tools", "type":"http", "url":"https://example.com/mcp", "headers":[{"name":"Authorization","value":"Bearer private-test-token"}]}),
         json!({"name":"local", "command":"example", "args":["private-argument"], "env":[{"name":"TOKEN","value":"private-environment"}]}),
     ]).unwrap();
     assert!(!prepared.args.join(" ").contains("private-"));

@@ -1,7 +1,7 @@
  use super::cursor::{Cursor, Position, fingerprint};
  use super::*;
  use crate::value::{CacheValue, Record};
- use macro_user_id::{cowlike::CowLike, email::ReadEmailParts};
+ use rox_user_id::{cowlike::CowLike, email::ReadEmailParts};
  use std::{
      cmp::Ordering,
      collections::{BinaryHeap, HashSet},
@@ -104,7 +104,7 @@
          if user.len() > 1024 {
              return;
          }
-         let Ok(user_id) = MacroUserIdStr::parse_from_str(user) else {
+         let Ok(user_id) = RoxUserIdStr::parse_from_str(user) else {
              return;
          };
          if self.excluded.contains(user_id.as_ref()) {
@@ -376,6 +376,5 @@
      }
  }
 
- #[cfg(test)]
- mod test;
-+++++++ wutxzvym 66251716 "docs(sql): refresh generated people-query reference" (rebased revision)
+#[cfg(test)]
+mod test;

@@ -1,12 +1,12 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::Pool;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn records_mentions_against_their_source_document(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
     let mentions = vec![
         NewEntityMention {
             entity_type: "thread".to_string(),
@@ -52,9 +52,9 @@ async fn records_mentions_against_their_source_document(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recording_nothing_writes_nothing(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
     let inserted = create_entity_mentions(&pool, "document", "task-1", None, &[]).await?;
     assert_eq!(inserted, 0);
 

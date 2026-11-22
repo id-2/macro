@@ -1,7 +1,7 @@
 use super::*;
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{AccessLevel, Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MockMessageReader,
     models::{BotSenderProfile, ImportedAuthor, MessageAttachment, MessageThread, ThreadState},
@@ -100,8 +100,8 @@ fn person(email: &str) -> ContextPerson {
     }
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("actor@example.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("actor@example.com").unwrap()
 }
 fn document() -> MessageParent {
     MessageParent::parse("document", "doc").unwrap()
@@ -128,7 +128,7 @@ fn posted(
         parent: parent.clone(),
         thread_id: thread.map(Uuid::from_u128),
         sender_id: channel_sender::ChannelSender::new_from_user(
-            MacroUserIdStr::try_from_email(email).unwrap(),
+            RoxUserIdStr::try_from_email(email).unwrap(),
         ),
         triggered_via: None,
         triggered_by: None,
@@ -1278,7 +1278,7 @@ async fn an_agent_asking_for_a_person_names_them_and_counts_its_hop() {
         }),
         ..posted(&parent, id, Some(1), "unused@example.com", content, minute)
     };
-    let macro_reply = by_bot(2, bot_id::MACRO_NEW_BOT_ID, "Macro", "@Cursor fix it", 1);
+    let rox_reply = by_bot(2, bot_id::ROX_NEW_BOT_ID, "Macro", "@Cursor fix it", 1);
     let prompt = by_bot(3, bot_id::CURSOR_BOT_ID, "Cursor", "@Rox done, check", 2);
 
     let mut source = MockMessageReader::new();
@@ -1287,7 +1287,7 @@ async fn an_agent_asking_for_a_person_names_them_and_counts_its_hop() {
         .expect_get()
         .returning(move |_, _| Ok(prompt_message.clone()));
     source.expect_preceding().never();
-    let replies = vec![macro_reply, prompt.clone()];
+    let replies = vec![rox_reply, prompt.clone()];
     source
         .expect_get_thread()
         .once()

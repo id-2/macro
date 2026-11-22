@@ -15,7 +15,7 @@ use super::connection::ConnectionSourceError;
 use super::inbox_sync::build_notification_recipients;
 use crate::domain::events::{EmailMacroEvent, LinkReauthRequiredMetadata};
 use anyhow::{Context, anyhow};
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_email::service::link::Link;
 use models_email::service::pubsub::LinkManagerMessage;
 use std::future::Future;
@@ -52,7 +52,7 @@ where
     H: LinkManagerHealth,
     L: LinkManagerLifecycle,
     N: LinkManagerNotifications,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     D: LinkDeletion,
 {
     /// Decide acknowledgement after decoding and processing one delivery.
@@ -117,14 +117,14 @@ where
     async fn handle_notify_reauth_required(&self, link: &Link) -> anyhow::Result<()> {
         let primaries = self
             .repository
-            .primaries(link.macro_id.as_ref(), link.id)
+            .primaries(link.rox_id.as_ref(), link.id)
             .await
             .map_err(ConnectionSourceError::into_original)
             .context("Failed to fetch delegated primaries for reauth notification")?;
-        let recipient_ids = build_notification_recipients(&link.macro_id, primaries);
+        let recipient_ids = build_notification_recipients(&link.rox_id, primaries);
         self.notifications
             .send(ReauthNotification {
-                owner: link.macro_id.clone(),
+                owner: link.rox_id.clone(),
                 email_address: link.email_address.0.as_ref().to_string(),
                 recipient_ids,
             })
@@ -138,7 +138,7 @@ where
             .send_event(&EmailMacroEvent::link_reauth_required(
                 LinkReauthRequiredMetadata {
                     link_id: link.id,
-                    owner: link.macro_id.clone(),
+                    owner: link.rox_id.clone(),
                     email_address: link.email_address.0.as_ref().to_string(),
                     observed_at: link.last_sync_error_at.unwrap_or_else(chrono::Utc::now),
                 },

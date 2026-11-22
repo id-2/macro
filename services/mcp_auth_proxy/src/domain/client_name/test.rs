@@ -68,7 +68,7 @@ fn a_name_with_nothing_left_is_no_name() {
 }
 
 #[test]
-fn names_claiming_to_be_macro_itself_are_reserved() {
+fn names_claiming_to_be_rox_itself_are_reserved() {
     for name in [
         "Rox",
         "macro",
@@ -93,7 +93,7 @@ fn names_claiming_to_be_macro_itself_are_reserved() {
 }
 
 #[test]
-fn a_name_that_only_mentions_macro_is_allowed() {
+fn a_name_that_only_mentions_rox_is_allowed() {
     assert_eq!(
         ClientName::parse("Claude Code (rox)"),
         Ok(Some(ClientName("Claude Code (rox)".to_owned())))

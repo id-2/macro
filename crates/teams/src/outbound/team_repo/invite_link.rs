@@ -1,6 +1,6 @@
 //! Queries for a team's shareable invite link.
 
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 
 use crate::domain::model::{TeamError, TeamInviteLinkTeam, TeamInviteLinkToken};
@@ -27,7 +27,7 @@ pub(super) async fn set_team_invite_link(
     pool: &PgPool,
     team_id: &uuid::Uuid,
     token: &TeamInviteLinkToken,
-    created_by: &MacroUserIdStr<'_>,
+    created_by: &RoxUserIdStr<'_>,
 ) -> Result<(), TeamError> {
     sqlx::query!(
         r#"
@@ -86,7 +86,7 @@ pub(super) async fn get_team_by_invite_link(
 pub(super) async fn get_team_invite_link_creator(
     pool: &PgPool,
     token: &TeamInviteLinkToken,
-) -> Result<Option<MacroUserIdStr<'static>>, TeamError> {
+) -> Result<Option<RoxUserIdStr<'static>>, TeamError> {
     let created_by = sqlx::query_scalar!(
         r#"
         SELECT created_by
@@ -101,7 +101,7 @@ pub(super) async fn get_team_invite_link_creator(
     // A creator id that no longer parses is skipped, not an error: it only
     // decides who gets a reward.
     Ok(created_by.and_then(|id| {
-        MacroUserIdStr::parse_from_str(&id)
+        RoxUserIdStr::parse_from_str(&id)
             .ok()
             .map(|id| id.into_owned())
     }))

@@ -31,7 +31,7 @@ const reference: ShapeItem<'document'> = {
 };
 const file = new Blob(
   [JSON.stringify({ version: 2, document: createScene([reference]) })],
-  { type: 'application/x-macro-canvas' }
+  { type: 'application/x-rox-canvas' }
 );
 const editable = new URLSearchParams(location.search).has('edit');
 

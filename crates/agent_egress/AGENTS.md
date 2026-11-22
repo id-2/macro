@@ -17,7 +17,7 @@ MCP app, a custom server, or a GitHub installation token) on each request.
   grant → credential).
 - `src/domain/ports.rs`: `SessionAuthority`, `McpCredentials`, `GithubTokens`,
   `Forwarder`.
-- `src/outbound/mcp_credentials.rs` / `macro_mcp.rs` / `custom_mcp.rs` /
+- `src/outbound/mcp_credentials.rs` / `rox_mcp.rs` / `custom_mcp.rs` /
   `github_tokens.rs`: the credential resolvers.
 - `src/inbound/axum_router.rs`: the HTTP entry point the sandbox calls.
 - `SessionMcpExchange` (`src/domain/service/actor.rs`): in-process
@@ -65,12 +65,12 @@ retain their existing session/repository identities.
 
 - `cargo test -p agent_egress` (`SQLX_OFFLINE` unset).
 
-Session-egress Rox API tokens (`MacroApiTokens::mint`) carry the session's
+Session-egress Rox API tokens (`RoxApiTokens::mint`) carry the session's
 bound agent (`agent_session.bot_id`, read off the row as `SessionGrant.agent`) as
 their signed `agent_id` claim and retain `agent_session_id` provenance, so
 code mode can mint a fresh invocation correlation. Cache credentials by owner,
 agent, and session. The bot
-never comes from the request. `MacroApiTokenSigner::mint_for_agent` callers
+never comes from the request. `RoxApiTokenSigner::mint_for_agent` callers
 (code mode) choose the claim themselves, plus an optional signed `agent_via`
 client label (public MCP code mode signs the MCP client's name) and a
 `SignedCorrelation`: the code-mode correlation and its session's scope, signed

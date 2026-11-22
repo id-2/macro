@@ -517,7 +517,7 @@ async fn a_write_is_applied_under_an_edit_receipt_for_its_database() {
         vec![AppliedOps {
             database: OFFSITE,
             level: AccessLevel::Owner,
-            acting_bot: Some(bot_id::MACRO_AI_BOT_ID),
+            acting_bot: Some(bot_id::ROX_AI_BOT_ID),
             ops: vec![DatabaseOp::Rows {
                 table: GUESTS,
                 change: RowsChange::Update {

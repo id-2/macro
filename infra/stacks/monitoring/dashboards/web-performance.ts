@@ -56,14 +56,14 @@ function distribution(
 // Roots: app.boot, navigation, interactions and views that started their own
 // trace. ui.elapsed_ms is the root's duration in milliseconds.
 distribution(
-  'macro.web.flow.elapsed_ms',
+  'rox.web.flow.elapsed_ms',
   `${WEB} @flow.kind:*`,
   '@ui.elapsed_ms',
   [...SPLITS, tag('flow.kind'), tag('route.id'), tag('ui.outcome')]
 );
 // Main-thread blocking during each root (overlapping long animation frames).
 distribution(
-  'macro.web.flow.blocking_ms',
+  'rox.web.flow.blocking_ms',
   `${WEB} @flow.kind:* @ui.outcome:success`,
   '@ui.long_animation_frame_blocking_ms',
   [...SPLITS, tag('flow.kind')]
@@ -71,32 +71,32 @@ distribution(
 // Every view, whether a root or a phase of a navigation. @duration is in
 // nanoseconds.
 distribution(
-  'macro.web.view.duration',
+  'rox.web.view.duration',
   `${WEB} resource_name:view.* -@flow.outcome:cancelled -@ui.outcome:(cancelled OR hidden OR timeout)`,
   '@duration',
   [...SPLITS, tag('route.id')]
 );
 // Phases that completed, by the root they belong to.
 distribution(
-  'macro.web.phase.duration',
+  'rox.web.phase.duration',
   `${WEB} @flow.root:* @flow.outcome:success`,
   '@duration',
   [...SPLITS, tag('flow.root')]
 );
 distribution(
-  'macro.web.runtime.js_heap_used_bytes',
+  'rox.web.runtime.js_heap_used_bytes',
   `${WEB} resource_name:app.runtime.sample`,
   '@macro.memory.js_heap.used_bytes',
   [...SPLITS, tag('app.runtime')]
 );
 distribution(
-  'macro.web.runtime.blocking_ms',
+  'rox.web.runtime.blocking_ms',
   `${WEB} resource_name:app.runtime.sample`,
   '@runtime.long_animation_frame.blocking_ms',
   [...SPLITS, tag('app.runtime')]
 );
 distribution(
-  'macro.web.typing.event_duration_p95_ms',
+  'rox.web.typing.event_duration_p95_ms',
   `${WEB} resource_name:input.typing_burst`,
   '@typing.event_duration_p95_ms',
   [...SPLITS, tag('typing.surface')]

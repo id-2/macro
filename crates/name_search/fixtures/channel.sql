@@ -1,4 +1,4 @@
-INSERT INTO macro_user (id, username, email, stripe_customer_id)
+INSERT INTO rox_user (id, username, email, stripe_customer_id)
 VALUES
     ('a0000000-0000-0000-0000-000000000000', 'member', 'member@test.com', 'cus_member'),
     ('a0000000-0000-0000-0000-000000000001', 'gabriel', 'gabriel@test.com', 'cus_gabriel'),
@@ -6,7 +6,7 @@ VALUES
     ('a0000000-0000-0000-0000-000000000003', 'teo', 'teo@test.com', 'cus_teo'),
     ('a0000000-0000-0000-0000-000000000004', 'hollis', 'hollis@test.com', 'cus_hollis');
 
-INSERT INTO "User" (id, email, macro_user_id)
+INSERT INTO "User" (id, email, rox_user_id)
 VALUES
     ('macro|member@test.com', 'member@test.com', 'a0000000-0000-0000-0000-000000000000'),
     ('macro|gabriel@test.com', 'gabriel@test.com', 'a0000000-0000-0000-0000-000000000001'),
@@ -16,7 +16,7 @@ VALUES
 
 -- The member has no profile and nameless@test.com has no user row at all:
 -- both fall back to the local part of their email.
-INSERT INTO macro_user_info (macro_user_id, first_name, last_name)
+INSERT INTO rox_user_info (rox_user_id, first_name, last_name)
 VALUES
     ('a0000000-0000-0000-0000-000000000001', 'Gabriel', 'Birman'),
     ('a0000000-0000-0000-0000-000000000002', 'Peter', 'Chinman'),

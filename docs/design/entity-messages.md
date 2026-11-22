@@ -167,7 +167,7 @@ Lifecycle events keep their schema too: `ThreadOrigin` carries `parent` and its
 ## What remains
 
 The contract PR removed the legacy document comment handlers and their
-`macro_db_client` writers, the legacy CRM comment API, the channel message routes
+`rox_db_client` writers, the legacy CRM comment API, the channel message routes
 and adapters, the channel realtime frames, the `channel.message_*` broker events
 (search, webhooks, soup, activity, and scheduled actions consume `macro.messages`),
 and every application read and write of the message and attachment `channel_id`

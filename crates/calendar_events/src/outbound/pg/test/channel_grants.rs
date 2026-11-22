@@ -15,8 +15,8 @@ async fn granted_event_ids(pool: &PgPool) -> Vec<Uuid> {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn deleting_an_event_through_macro_removes_its_channel_grants(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn deleting_an_event_through_rox_removes_its_channel_grants(pool: PgPool) {
     let sharer_id = "macro|grant-sharer@example.com";
     let member_id = "macro|grant-member@example.com";
     let sharer_link = insert_link(&pool, sharer_id).await;
@@ -110,7 +110,7 @@ async fn deleting_an_event_through_macro_removes_its_channel_grants(pool: PgPool
     assert_eq!(granted_event_ids(&pool).await, vec![member_event_id]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_cancelled_occurrence_keeps_the_series_grant_and_a_cancelled_series_drops_it(
     pool: PgPool,
 ) {
@@ -192,7 +192,7 @@ async fn a_cancelled_occurrence_keeps_the_series_grant_and_a_cancelled_series_dr
     assert_eq!(granted_event_ids(&pool).await, Vec::<Uuid>::new());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_the_calendar_or_the_inbox_removes_its_events_grants(pool: PgPool) {
     let owner_id = "macro|grant-inbox@example.com";
     let disconnected_link = insert_link(&pool, owner_id).await;

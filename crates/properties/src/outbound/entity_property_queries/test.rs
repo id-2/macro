@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use system_properties::SystemPropertyKey;
 
 fn assignment() -> PropertyValue {
@@ -31,7 +31,7 @@ fn malformed_stored_values_have_a_typed_error_and_preserve_the_decode_failure() 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inheritance_rejects_non_reference_values_without_overwriting_them(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -73,7 +73,7 @@ async fn inheritance_rejects_non_reference_values_without_overwriting_them(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inherited_agents_preserve_assignees_and_dedupe_retries(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -83,8 +83,8 @@ async fn inherited_agents_preserve_assignees_and_dedupe_retries(
         bot_id::CODEX_BOT_ID.into_storage_id().as_ref(),
         EntityType::User,
     );
-    let macro_agent = EntityReference::new(
-        bot_id::MACRO_NEW_BOT_ID.into_storage_id().as_ref(),
+    let rox_agent = EntityReference::new(
+        bot_id::ROX_NEW_BOT_ID.into_storage_id().as_ref(),
         EntityType::User,
     );
     let existing = PropertyValue::EntityRef(vec![human.clone(), codex.clone()]);
@@ -102,13 +102,13 @@ async fn inherited_agents_preserve_assignees_and_dedupe_retries(
         &task_id,
         EntityType::Task,
         SystemPropertyKey::ASSIGNEES_UUID,
-        vec![codex.clone(), macro_agent.clone(), macro_agent.clone()],
+        vec![codex.clone(), rox_agent.clone(), rox_agent.clone()],
     )
     .await?;
     let combined = Some(PropertyValue::EntityRef(vec![
         human,
         codex,
-        macro_agent.clone(),
+        rox_agent.clone(),
     ]));
     assert_eq!(inherited.previous_value, Some(existing));
     assert_eq!(inherited.value, combined);
@@ -118,7 +118,7 @@ async fn inherited_agents_preserve_assignees_and_dedupe_retries(
         &task_id,
         EntityType::Task,
         SystemPropertyKey::ASSIGNEES_UUID,
-        vec![macro_agent],
+        vec![rox_agent],
     )
     .await?;
     assert_eq!(repeated.previous_value, combined);
@@ -126,7 +126,7 @@ async fn inherited_agents_preserve_assignees_and_dedupe_retries(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inherited_agents_merge_with_a_concurrent_assignment(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -196,7 +196,7 @@ async fn wait_for_blocked_writer(pool: &Pool<Postgres>, blocker: i32) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_identical_assignments_report_only_one_new_assignment(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -251,7 +251,7 @@ async fn concurrent_identical_assignments_report_only_one_new_assignment(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn assignment_snapshot_waits_for_writers_using_only_row_locks(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -299,7 +299,7 @@ async fn assignment_snapshot_waits_for_writers_using_only_row_locks(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_statement_sets_and_clears_a_property_across_entities(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {

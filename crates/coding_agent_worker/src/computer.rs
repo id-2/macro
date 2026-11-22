@@ -1,6 +1,6 @@
 //! What roxd does differently on a Rox computer: every Claude Code
 //! session starts with Rox's Anthropic gateway in its environment, derived
-//! from the session's `macro_internal` MCP server, and first-party traffic
+//! from the session's `rox_internal` MCP server, and first-party traffic
 //! goes through the computer's egress route. The env reaches Claude Code
 //! through the ACP adapter's `_meta.claudeCode.options.env`.
 //!
@@ -12,15 +12,15 @@ use std::path::PathBuf;
 
 use serde_json::{Map, Value};
 
-use crate::config::MacroApi;
+use crate::config::RoxApi;
 
 #[cfg(test)]
 mod test;
 
 /// `agent_harness::domain::model::INTERNAL_MCP_NAME`, which roxd cannot
 /// depend on.
-const INTERNAL_MCP_NAME: &str = "macro_internal";
-/// The `macro_internal` MCP server's path, and the gateway's in its place.
+const INTERNAL_MCP_NAME: &str = "rox_internal";
+/// The `rox_internal` MCP server's path, and the gateway's in its place.
 const INTERNAL_MCP_PATH: &str = "/mcp/internal";
 const ANTHROPIC_GATEWAY_PATH: &str = "/anthropic";
 /// ACP methods that start a Claude Code query.
@@ -30,7 +30,7 @@ const SESSION_METHODS: &[&str] = &["session/new", "session/load", "session/resum
 pub const ENROLLED_MARKER: &str = "/var/lib/roxd/enrolled";
 
 /// Whether this machine is an enrolled Rox computer.
-pub fn is_macro_computer() -> bool {
+pub fn is_rox_computer() -> bool {
     cfg!(unix) && std::path::Path::new(ENROLLED_MARKER).exists()
 }
 
@@ -42,10 +42,10 @@ pub struct Computer {
 
 impl Computer {
     /// The enrolled computer's settings.
-    pub fn new(macro_api: &MacroApi, workspace: &std::path::Path) -> Self {
+    pub fn new(rox_api: &RoxApi, workspace: &std::path::Path) -> Self {
         Self {
             workspace: workspace.to_owned(),
-            egress_url: macro_api.egress_url.clone(),
+            egress_url: rox_api.egress_url.clone(),
         }
     }
 
@@ -84,7 +84,7 @@ fn prepare_session(
         route_egress(params, egress_url);
     }
     let env = gateway_env(params.get("mcpServers")).ok_or_else(|| {
-        rootcause::report!("a computer session needs the macro_internal gateway credentials")
+        rootcause::report!("a computer session needs the rox_internal gateway credentials")
     })?;
     let mut target = params;
     for key in ["_meta", "claudeCode", "options", "env"] {
@@ -120,7 +120,7 @@ fn object_at<'object>(
     entry.as_object_mut()
 }
 
-/// The gateway variables, from the session's `macro_internal` MCP server:
+/// The gateway variables, from the session's `rox_internal` MCP server:
 /// its URL with `/mcp/internal` replaced by `/anthropic`, and its bearer.
 fn gateway_env(mcp_servers: Option<&Value>) -> Option<Map<String, Value>> {
     let server = mcp_servers?

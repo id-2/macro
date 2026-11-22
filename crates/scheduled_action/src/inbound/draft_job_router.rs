@@ -9,10 +9,10 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Json, Router};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use serde::Deserialize;
 use utoipa::ToSchema;
@@ -27,7 +27,7 @@ mod test;
 
 pub struct RoutineDraftJobRouterState<J, Auth> {
     pub service: Arc<J>,
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<J, Auth> Clone for RoutineDraftJobRouterState<J, Auth> {
@@ -39,7 +39,7 @@ impl<J, Auth> Clone for RoutineDraftJobRouterState<J, Auth> {
     }
 }
 
-impl<J, Auth> FromRef<RoutineDraftJobRouterState<J, Auth>> for MacroAuthorizationState<Auth> {
+impl<J, Auth> FromRef<RoutineDraftJobRouterState<J, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &RoutineDraftJobRouterState<J, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -50,7 +50,7 @@ pub fn routine_draft_job_router<J, Auth, St>(
 ) -> Router<St>
 where
     J: RoutineDraftJobService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Send + Sync,
 {
     Router::new()
@@ -69,7 +69,7 @@ where
 /// work on other replicas can name the trace it started in.
 fn current_traceparent() -> Option<String> {
     let mut headers = HeaderMap::new();
-    macro_tower_layers::inject_trace_headers(&mut headers);
+    rox_tower_layers::inject_trace_headers(&mut headers);
     headers
         .get("traceparent")
         .and_then(|value| value.to_str().ok())
@@ -107,18 +107,18 @@ pub struct StartDraftJobRequest {
 )]
 pub async fn start_draft_job<J, Auth>(
     State(state): State<RoutineDraftJobRouterState<J, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     request: Result<Json<StartDraftJobRequest>, JsonRejection>,
 ) -> Result<impl IntoResponse, ScheduledActionApiError>
 where
     J: RoutineDraftJobService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = request.map_err(ScheduledActionApiError::InvalidRequest)?;
     let job = state
         .service
         .start(
-            user.authorization.macro_user_id.clone(),
+            user.authorization.rox_user_id.clone(),
             request.client_id,
             request.draft,
             request.context,
@@ -141,16 +141,16 @@ where
 )]
 pub async fn list_draft_jobs<J, Auth>(
     State(state): State<RoutineDraftJobRouterState<J, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
 ) -> Result<Json<Vec<DraftJob>>, ScheduledActionApiError>
 where
     J: RoutineDraftJobService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
             .service
-            .jobs(user.authorization.macro_user_id.clone())
+            .jobs(user.authorization.rox_user_id.clone())
             .await?,
     ))
 }
@@ -170,17 +170,17 @@ where
 )]
 pub async fn get_draft_job<J, Auth>(
     State(state): State<RoutineDraftJobRouterState<J, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<DraftJob>, ScheduledActionApiError>
 where
     J: RoutineDraftJobService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
             .service
-            .job(user.authorization.macro_user_id.clone(), id)
+            .job(user.authorization.rox_user_id.clone(), id)
             .await?,
     ))
 }
@@ -200,16 +200,16 @@ where
 )]
 pub async fn discard_draft_job<J, Auth>(
     State(state): State<RoutineDraftJobRouterState<J, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, ScheduledActionApiError>
 where
     J: RoutineDraftJobService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service
-        .discard(user.authorization.macro_user_id.clone(), id)
+        .discard(user.authorization.rox_user_id.clone(), id)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }

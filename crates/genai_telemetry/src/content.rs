@@ -20,7 +20,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_env_var::maybe_env_vars;
+use rox_env_var::maybe_env_vars;
 use std::borrow::Cow;
 use std::sync::OnceLock;
 

@@ -14,7 +14,7 @@ entity_mutation = ["dep:entity_mutation", "ports"]
 # Axum HTTP router.
 inbound = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:utoipa",
   "databases/ports",
   "entity_access/inbound",
@@ -23,7 +23,7 @@ inbound = [
 # Liveness pings through the connection gateway.
 gateway = ["dep:anyhow", "dep:connection_gateway_client", "dep:serde_json", "outbound"]
 # Driven adapters share the port contracts.
-outbound = ["dep:collab_surface", "dep:reqwest", "dep:base64", "dep:macro_tower_layers", "ports"]
+outbound = ["dep:collab_surface", "dep:reqwest", "dep:base64", "dep:rox_tower_layers", "ports"]
 ports = ["dep:schemars", "models_forms/schema", "models_databases/schema", "databases/ports", "dep:entity_access", "dep:tracing", "dep:loro", "dep:serde_json"]
 # Branding images read through the static-file service.
 static_files = ["dep:anyhow", "dep:static_file_service_client", "outbound"]
@@ -33,7 +33,7 @@ postgres = ["activity/outbound", "dep:entity_access_db_utils", "dep:serde_json",
 [dependencies]
 base64 = { workspace = true, optional = true }
 reqwest = { workspace = true, optional = true }
-macro_tower_layers = { path = "../macro_tower_layers", optional = true }
+rox_tower_layers = { path = "../rox_tower_layers", optional = true }
 calendar_scheduling = { path = "../calendar_scheduling", optional = true }
 ai_toolset = { path = "../ai_toolset", optional = true }
 async-trait = { workspace = true, optional = true }
@@ -52,10 +52,10 @@ entity_access = { path = "../entity_access", optional = true, default-features =
 entity_access_db_utils = { path = "../entity_access_db_utils", optional = true }
 entity_mutation = { path = "../entity_mutation", optional = true }
 loro = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = ["axum"] }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = ["axum"] }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 models_databases = { path = "../models_databases" }
 models_forms = { path = "../models_forms" }
@@ -74,7 +74,7 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 [dev-dependencies]
 bot_id = { path = "../bot_id", features = ["test-utils"] }
 entity_access = { path = "../entity_access", default-features = false, features = ["outbound"] }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 models_properties = { path = "../models_properties" }
 serde_json = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync"] }

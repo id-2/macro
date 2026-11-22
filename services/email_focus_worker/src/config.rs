@@ -1,9 +1,9 @@
-//! Configuration for the email focus worker, loaded with `macro_config` from
+//! Configuration for the email focus worker, loaded with `rox_config` from
 //! the email-service Doppler project it shares with the other email binaries.
 
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::env_vars;
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::env_vars;
 
 env_vars! {
     /// The connection URL for the Rox database.
@@ -13,14 +13,14 @@ env_vars! {
 }
 
 /// The email focus worker's configuration.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// The environment we are in.
-    #[macro_config_default(Environment::new_or_prod())]
+    #[rox_config_default(Environment::new_or_prod())]
     pub environment: Environment,
     /// The connection URL for the Rox database.
-    pub macro_db_url: RoxDbUrl,
+    pub rox_db_url: RoxDbUrl,
     /// Kafka bootstrap servers; the worker reads `macro.email`.
     pub kafka_brokers: KafkaBrokers,
     /// Authenticates the worker's pushes to the connection gateway.
@@ -29,20 +29,20 @@ pub struct Config {
     pub typesafe_api_key: jev::outbound::TypesafeApiKey,
     /// Comma-separated inbox domains to classify, e.g. `rox.one`. Mail from
     /// any other inbox never leaves the system. Empty classifies nothing.
-    #[macro_config_default(String::new())]
+    #[rox_config_default(String::new())]
     pub focus_enabled_email_domains: String,
     /// Seconds between sweeps for threads the event stream missed.
-    #[macro_config_default(3600)]
+    #[rox_config_default(3600)]
     pub focus_sweep_interval_secs: u64,
     /// Days of mail the sweep and the Focus list cover.
-    #[macro_config_default(30)]
+    #[rox_config_default(30)]
     pub focus_window_days: u16,
 }
 
 impl Config {
     /// Load and validate the configuration from the environment.
     pub fn from_env() -> Result<Self, rootcause::Report> {
-        Ok(macro_config::ConfigLoader::load::<Config>()?)
+        Ok(rox_config::ConfigLoader::load::<Config>()?)
     }
 
     /// The allowlisted inbox domains, trimmed and lowercased.

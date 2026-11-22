@@ -8,7 +8,7 @@ use attention_feed::{
     inbound::viewers::{FeedViewerResolver, resolve_viewer},
 };
 use futures::future::BoxFuture;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use soup::domain::models::SoupProjectionHydration;
 use work_feed::domain::{
     models::{
@@ -121,7 +121,7 @@ impl WorkFeedGraphqlContext {
     /// The viewer a request for `user` is evaluated as.
     pub(crate) async fn viewer(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> async_graphql::Result<FeedViewer> {
         resolve_viewer(self.viewers.as_ref(), user)
             .await

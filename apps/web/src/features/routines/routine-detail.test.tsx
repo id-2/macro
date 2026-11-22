@@ -1068,7 +1068,7 @@ describe('routine code that needs an update', () => {
   const paused: ScheduledAction = {
     ...cron,
     enabled: false,
-    task: code('macro.tasks.create(x)', '0.2.0+old'),
+    task: code('rox.tasks.create(x)', '0.2.0+old'),
   };
   const upgrade = (task?: RoutineTask): CodeUpgrade => ({
     id: 'upgrade',
@@ -1086,16 +1086,16 @@ describe('routine code that needs an update', () => {
     setSchedules([paused]);
     mocks.update.mockResolvedValue({
       ...paused,
-      task: code('macro.tasks.add(x)', '0.3.0+new'),
+      task: code('rox.tasks.add(x)', '0.3.0+new'),
     });
     mocks.codeUpgrades = () => [
-      upgrade(code('macro.tasks.add(x)', '0.3.0+new')),
+      upgrade(code('rox.tasks.add(x)', '0.3.0+new')),
     ];
     render(() => <Routine />);
     expect(screen.getByText('Paused: its code needs an update')).toBeTruthy();
     expect(screen.getByText('“File invoices” failed a dry run.')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Review the update' }));
-    expect(screen.getByText('macro.tasks.add(x)')).toBeTruthy();
+    expect(screen.getByText('rox.tasks.add(x)')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Approve and resume' }));
     await vi.advanceTimersByTimeAsync(0);
     expect(mocks.update).toHaveBeenCalledWith({
@@ -1106,7 +1106,7 @@ describe('routine code that needs an update', () => {
             {
               type: 'code',
               title: 'File invoices',
-              source: 'macro.tasks.add(x)',
+              source: 'rox.tasks.add(x)',
             },
           ],
         }),

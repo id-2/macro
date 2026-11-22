@@ -37,7 +37,7 @@ vi.mock('@core/constant/featureFlags', async (importOriginal) => ({
   enableReminders: { key: 'enable-reminders' },
   isFeatureEnabled: (flag: { key: string }) =>
     flag.key === 'enable-reminders' && flags.reminders,
-  USE_MACRO_PR_SUMMARY_BLOCK: true,
+  USE_ROX_PR_SUMMARY_BLOCK: true,
 }));
 vi.mock('@core/util/url', () => ({
   buildSimpleEntityUrl: ({ type, id }: { type: string; id: string }) =>

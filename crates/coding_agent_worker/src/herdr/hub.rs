@@ -13,7 +13,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use agent_client_protocol::LineDirection;
 use agent_runtime_protocol::domain::action::AgentAction;
 use agent_session::domain::model::AgentSessionId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 use tokio::io::{AsyncBufReadExt as _, AsyncWriteExt as _, BufReader};
 use tokio::net::{UnixListener, UnixStream};
@@ -34,7 +34,7 @@ mod test;
 const BACKLOG_LIMIT: usize = 20_000;
 const TITLE_LIMIT: usize = 48;
 
-type Owner = MacroUserIdStr<'static>;
+type Owner = RoxUserIdStr<'static>;
 
 /// A handle on the running integration. Cheap to clone; the socket and its
 /// tasks stop when the last clone drops.
@@ -153,7 +153,7 @@ pub(crate) enum Work {
 
 #[derive(Default)]
 struct SessionView {
-    macro_session: Option<AgentSessionId>,
+    rox_session: Option<AgentSessionId>,
     backlog: VecDeque<ToPane>,
     subscribers: Vec<mpsc::UnboundedSender<ToPane>>,
     titled: bool,
@@ -209,7 +209,7 @@ impl HubState {
         if self
             .sessions
             .values()
-            .any(|view| view.macro_session == Some(session))
+            .any(|view| view.rox_session == Some(session))
         {
             return;
         }
@@ -223,20 +223,20 @@ impl HubState {
         self.unclaimed_macro
             .retain(|unclaimed| *unclaimed != session);
         let view = self.sessions.entry(acp.to_owned()).or_default();
-        view.macro_session = Some(session);
+        view.rox_session = Some(session);
     }
 
     pub(crate) fn apply(&mut self, event: TapEvent) {
         match event {
             TapEvent::Opened {
                 session,
-                macro_session,
+                rox_session,
             } => {
                 let known = self
                     .sessions
                     .get(&session)
-                    .and_then(|view| view.macro_session);
-                match (macro_session, known) {
+                    .and_then(|view| view.rox_session);
+                match (rox_session, known) {
                     (Some(named), _) => self.bind(&session, named),
                     (None, Some(_)) => {}
                     (None, None) => match self.unclaimed_macro.pop_front() {
@@ -352,9 +352,9 @@ impl HubState {
 
     /// Who may steer `session` from a window, and as whom.
     fn control_target(&self, session: &str) -> Option<(AgentSessionId, Owner)> {
-        let macro_session = self.sessions.get(session)?.macro_session?;
-        let owner = self.owners.get(&macro_session)?.clone();
-        Some((macro_session, owner))
+        let rox_session = self.sessions.get(session)?.rox_session?;
+        let owner = self.owners.get(&rox_session)?.clone();
+        Some((rox_session, owner))
     }
 }
 
@@ -475,7 +475,7 @@ async fn serve_window(inner: Arc<Inner>, stream: UnixStream) {
         let view = state.sessions.entry(session.clone()).or_default();
         let _ = tx.send(ToPane::Hello {
             session: session.clone(),
-            web_url: inner.web_url(view.macro_session),
+            web_url: inner.web_url(view.rox_session),
         });
         for message in &view.backlog {
             let _ = tx.send(message.clone());
@@ -517,14 +517,14 @@ async fn steer(inner: &Inner, session: &str, request: FromPane) -> Result<(), St
         FromPane::Stop => AgentAction::Stop,
     };
     let target = inner.lock().control_target(session);
-    let Some((macro_session, owner)) = target else {
+    let Some((rox_session, owner)) = target else {
         return Err(
             "this session was not opened by this roxd run; steer it from Rox".to_owned(),
         );
     };
     inner
         .api
-        .control(macro_session, &owner, action, None)
+        .control(rox_session, &owner, action, None)
         .await
         .map_err(|error| format!("Rox refused: {error}"))
 }

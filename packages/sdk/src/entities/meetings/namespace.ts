@@ -1,6 +1,6 @@
 import type { CreateMeetingRequest } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Meeting } from './meeting';
 
 /**
@@ -9,7 +9,7 @@ import { Meeting } from './meeting';
  * @routing Use when managing a recurring meeting series' schedule, invitations or sharing link; not finding a time, calendar events or booking links.
  */
 export class MeetingNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a handle to one of the caller's newest 100 standalone meetings. Use lookup for invitations. */
   byId(id: string): Meeting {

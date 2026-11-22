@@ -1,4 +1,4 @@
-export default function MacroLogo(props: { class?: string }) {
+export default function RoxLogo(props: { class?: string }) {
   return (
     <svg
       viewBox="0 0 649 84"

@@ -8,8 +8,8 @@ pin="$here/../../../crates/coding_agent_worker/src/tui/agent_catalog/claude_code
 version="$(sed -n 's|.*"@agentclientprotocol/claude-agent-acp@\([^"]*\)".*|\1|p' "$pin")"
 [ -n "$version" ] || { echo "no adapter pin in $pin" >&2; exit 1; }
 
-if [ -z "${MACRO_BOX_LOCK_IN_SHELL:-}" ]; then
-  export MACRO_BOX_LOCK_IN_SHELL=1
+if [ -z "${ROX_BOX_LOCK_IN_SHELL:-}" ]; then
+  export ROX_BOX_LOCK_IN_SHELL=1
   exec nix shell nixpkgs#nodejs_24 nixpkgs#jq --command bash "${BASH_SOURCE[0]}"
 fi
 

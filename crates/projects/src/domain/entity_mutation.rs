@@ -11,7 +11,7 @@ use entity_mutation::{
     RenameEntity, RestoreEntity, TrashEntity, UpdateEntitySharePolicy,
     capability::MoveEntityRequest, project_refs,
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use model::project::{BasicProject, request::PatchProjectRequestV2};
 use model_entity::{Entity, EntityType};
 use models_permissions::share_permission::UpdateSharePermissionRequestV2;
@@ -99,7 +99,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: ProjectService,
 {
     type Receipt = EditAccessLevel;
@@ -142,7 +142,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: ProjectService,
 {
     type Receipt = OwnerAccessLevel;
@@ -199,7 +199,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: ProjectService,
 {
     type Receipt = OwnerAccessLevel;
@@ -238,7 +238,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: ProjectService,
 {
     type Receipt = OwnerAccessLevel;
@@ -285,7 +285,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: ProjectService,
 {
     type Receipt = OwnerAccessLevel;
@@ -328,7 +328,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: ProjectService,
 {
     type Receipt = OwnerAccessLevel;

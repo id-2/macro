@@ -14,7 +14,7 @@ use crate::outbound::entity_access::EntityAccessExpander;
 /// users are the same come back as one audience. Counts every lookup.
 #[derive(Clone)]
 struct GroupingLookup {
-    users_by_entity: Arc<HashMap<(EntityType, String), Vec<MacroUserIdStr<'static>>>>,
+    users_by_entity: Arc<HashMap<(EntityType, String), Vec<RoxUserIdStr<'static>>>>,
     lookups: Arc<AtomicUsize>,
 }
 
@@ -57,8 +57,8 @@ impl SoupRealtimePublisher for RecordingPublisher {
     }
 }
 
-fn person(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{name}@example.com")).expect("valid user id")
+fn person(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{name}@example.com")).expect("valid user id")
 }
 
 struct Folder {
@@ -102,7 +102,7 @@ fn trashed(folder: &Folder) -> DeclaredMacroEvent {
 /// access source, sorted for comparison.
 fn per_entity_messages(
     event: &DeclaredMacroEvent,
-    users_by_entity: &HashMap<(EntityType, String), Vec<MacroUserIdStr<'static>>>,
+    users_by_entity: &HashMap<(EntityType, String), Vec<RoxUserIdStr<'static>>>,
 ) -> Vec<(String, Patch<Entity<'static>>)> {
     let mut messages: Vec<_> = patches_from_event(event)
         .into_iter()
@@ -131,7 +131,7 @@ struct Run {
 
 async fn run(
     event: &DeclaredMacroEvent,
-    users_by_entity: HashMap<(EntityType, String), Vec<MacroUserIdStr<'static>>>,
+    users_by_entity: HashMap<(EntityType, String), Vec<RoxUserIdStr<'static>>>,
 ) -> Run {
     let lookups = Arc::new(AtomicUsize::new(0));
     let published = Arc::new(Mutex::new(Vec::new()));
@@ -161,8 +161,8 @@ async fn run(
 
 fn folder_access(
     folder: &Folder,
-    users: &[MacroUserIdStr<'static>],
-) -> HashMap<(EntityType, String), Vec<MacroUserIdStr<'static>>> {
+    users: &[RoxUserIdStr<'static>],
+) -> HashMap<(EntityType, String), Vec<RoxUserIdStr<'static>>> {
     let mut users_by_entity = HashMap::new();
     for folder_id in folder.folder_ids.iter().chain([&folder.parent_id]) {
         users_by_entity.insert((EntityType::Project, folder_id.clone()), users.to_vec());

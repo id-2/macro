@@ -22,7 +22,7 @@ use entity_access::domain::models::{AccessError, EntityType};
 use entity_access::domain::ports::EntityAccessService;
 use futures::StreamExt as _;
 use futures::stream::BoxStream;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::future::Future;
 use std::sync::Arc;
 use tokio::sync::broadcast;
@@ -106,7 +106,7 @@ pub trait WebhookEventStreamService: Clone + Send + Sync + 'static {
     ///
     fn open_stream(
         &self,
-        subscriber: MacroUserIdStr<'static>,
+        subscriber: RoxUserIdStr<'static>,
         scope: WebhookScope,
         filters: WebhookFilters,
     ) -> impl Future<Output = Result<BoxStream<'static, NormalizedWebhookEvent>, WebhookStreamError>>
@@ -155,7 +155,7 @@ struct StreamState<A, R, C> {
     entity_access_service: Arc<A>,
     workspace_resolver: R,
     contact_checker: C,
-    subscriber: MacroUserIdStr<'static>,
+    subscriber: RoxUserIdStr<'static>,
     scope: WebhookScope,
     filters: WebhookFilters,
 }
@@ -202,7 +202,7 @@ where
                     return Ok(true);
                 }
                 // An unparseable id cannot be anyone's contact.
-                let Ok(user) = MacroUserIdStr::try_from(user_id.clone()) else {
+                let Ok(user) = RoxUserIdStr::try_from(user_id.clone()) else {
                     return Ok(false);
                 };
                 self.contact_checker
@@ -316,7 +316,7 @@ where
     #[tracing::instrument(skip(self, filters), fields(filter_count = filters.len()))]
     async fn open_stream(
         &self,
-        subscriber: MacroUserIdStr<'static>,
+        subscriber: RoxUserIdStr<'static>,
         scope: WebhookScope,
         filters: WebhookFilters,
     ) -> Result<BoxStream<'static, NormalizedWebhookEvent>, WebhookStreamError> {

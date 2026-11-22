@@ -1,7 +1,7 @@
 use super::*;
 use crate::outbound::pg_access_repo::queries::get_user_source_ids;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 const OWNER: &str = "macro|owner@team.com";
 const MEMBER: &str = "macro|member@team.com";
@@ -47,12 +47,12 @@ async fn insert_form(pool: &PgPool, audience: &str) -> Uuid {
 }
 
 async fn source_ids(pool: &PgPool, email: &str) -> SourceIds {
-    let user = MacroUserIdStr::try_from_email(email).unwrap();
+    let user = RoxUserIdStr::try_from_email(email).unwrap();
     get_user_source_ids(pool, Some(&user)).await.unwrap()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_members_form_answers_the_highest_grant_and_nothing_to_strangers(pool: PgPool) {
@@ -98,7 +98,7 @@ async fn a_members_form_answers_the_highest_grant_and_nothing_to_strangers(pool:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_public_form_is_viewable_by_anyone_and_never_more(pool: PgPool) {
@@ -134,7 +134,7 @@ async fn a_public_form_is_viewable_by_anyone_and_never_more(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_trashed_public_form_is_not_public(pool: PgPool) {
@@ -161,7 +161,7 @@ async fn a_trashed_public_form_is_not_public(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_missing_form_has_no_public_access(pool: PgPool) {
@@ -174,7 +174,7 @@ async fn a_missing_form_has_no_public_access(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn a_channel_grant_on_a_form_reaches_its_active_participants(pool: PgPool) {
@@ -222,7 +222,7 @@ async fn a_channel_grant_on_a_form_reaches_its_active_participants(pool: PgPool)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn deleting_a_form_or_its_database_deletes_the_form_grants(pool: PgPool) {
@@ -283,7 +283,7 @@ async fn deleting_a_form_or_its_database_deletes_the_form_grants(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn every_live_form_granted_to_the_caller_is_listed_at_its_highest_grant(pool: PgPool) {

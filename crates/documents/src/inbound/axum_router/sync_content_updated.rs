@@ -7,8 +7,8 @@ use axum::{
     http::StatusCode,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 
 use super::{DocumentRouterState, Params};
@@ -34,10 +34,10 @@ pub struct SyncContentUpdatedRequest {
 pub async fn sync_content_updated_handler<
     T: DocumentContentEventService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    _internal_authorization: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Path(Params { document_id }): Path<Params>,
     Json(request): Json<SyncContentUpdatedRequest>,
 ) -> Result<StatusCode, DocumentError> {
@@ -50,7 +50,7 @@ pub async fn sync_content_updated_handler<
             actor,
             on_behalf_of: request
                 .on_behalf_of
-                .and_then(|user| MacroUserIdStr::try_from(user).ok()),
+                .and_then(|user| RoxUserIdStr::try_from(user).ok()),
         });
     }
     state

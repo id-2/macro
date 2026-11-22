@@ -92,7 +92,7 @@ impl HttpPromptImageFetcher {
                 return None;
             }
             let mut headers = reqwest::header::HeaderMap::new();
-            macro_tower_layers::inject_trace_headers(&mut headers);
+            rox_tower_layers::inject_trace_headers(&mut headers);
             let response = match self.http.get(&current).headers(headers).send().await {
                 Ok(response) => response,
                 Err(error) => {

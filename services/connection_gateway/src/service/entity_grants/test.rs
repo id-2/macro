@@ -7,7 +7,7 @@ use std::{
 };
 
 use entity_access::domain::models::AccessError;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 
 use super::{Admission, EntityGrants, EntityViewAccess, viewable};
@@ -57,7 +57,7 @@ impl FakeAccess {
 impl EntityViewAccess for FakeAccess {
     async fn can_view(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         _organization_id: Option<i64>,
         entity: &Entity<'_>,
     ) -> Result<bool, AccessError> {
@@ -75,7 +75,7 @@ impl EntityViewAccess for FakeAccess {
 }
 
 fn grants() -> EntityGrants {
-    EntityGrants::new(MacroUserIdStr::parse_from_str(VIEWER).unwrap(), None)
+    EntityGrants::new(RoxUserIdStr::parse_from_str(VIEWER).unwrap(), None)
 }
 
 fn entity(entity_type: EntityType, entity_id: &str) -> Entity<'_> {

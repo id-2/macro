@@ -11,7 +11,7 @@ async fn presentation_bypasses_the_prompt_queue_and_retries_without_duplicate_fr
     let owner = repo.get(id).await.unwrap().owner_user().unwrap().to_owned();
     let presentation = SessionToolPresentation {
         tool_call_id: "review_harness-test".into(),
-        title: "mcp__macro_internal__PresentReview".into(),
+        title: "mcp__rox_internal__PresentReview".into(),
         raw_input: serde_json::json!({"reviewId":"harness-test","kind":"email","title":"Choice"}),
         raw_output: serde_json::json!({"reviewId":"harness-test","message":"Presented to the user"}),
     };
@@ -85,7 +85,7 @@ async fn presentation_forward_ack_waits_for_the_remote_durable_pair() {
     );
     let presentation = SessionToolPresentation {
         tool_call_id: "review_remote".into(),
-        title: "mcp__macro_internal__PresentReview".into(),
+        title: "mcp__rox_internal__PresentReview".into(),
         raw_input: serde_json::json!({"reviewId":"remote"}),
         raw_output: serde_json::json!({"message":"Presented to the user"}),
     };

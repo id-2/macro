@@ -30,7 +30,7 @@ import { sopsCredentials } from "./sops.ts";
 import { type State, state as makeState } from "./state.ts";
 
 /** The credential holding the key of the agent's own Rox account. */
-export const macroKey = "MACRO_API_KEY";
+export const macroKey = "ROX_API_KEY";
 
 export type Base = {
 	readonly config: Config;

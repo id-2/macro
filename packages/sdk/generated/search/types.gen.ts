@@ -879,7 +879,7 @@ export type CrmCompanySearchResponseItem = {
      */
     name?: string | null;
     /**
-     * `name` with matched spans wrapped in `<macro_em>…</macro_em>`.
+     * `name` with matched spans wrapped in `<rox_em>…</rox_em>`.
      */
     nameHighlighted?: string | null;
     /**

@@ -10,8 +10,8 @@ use axum::{
     extract::{FromRef, FromRequestParts, Path},
     http::request::Parts,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
     OptionalMacroAuthorizationExtractor,
 };
 use tracing::Level;
@@ -46,9 +46,9 @@ pub struct EntityPermissionExtractor<Svc, Auth> {
 impl<S, Svc, Auth> FromRequestParts<S> for EntityPermissionExtractor<Svc, Auth>
 where
     Arc<Svc>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -73,7 +73,7 @@ where
 
         let parsed_type = parse_entity_type(&entity_type)?;
 
-        if let Some(MacroAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
+        if let Some(RoxAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
         {
             let entity_access_receipt = generate_bot_entity_access_receipt::<AnyEntityPermission>(
                 service.as_ref(),
@@ -90,17 +90,17 @@ where
         }
 
         let (is_internal_access, acting_user) = match authorization.authorization.as_ref() {
-            Some(MacroAuthorization::User(user)) => (false, Some(user)),
-            Some(MacroAuthorization::Internal(user)) => (true, user.as_ref()),
-            Some(MacroAuthorization::Harness(_)) => return Err(ExtractorError::Unauthorized),
-            Some(MacroAuthorization::Bot(_)) => unreachable!("bot authorization returned above"),
+            Some(RoxAuthorization::User(user)) => (false, Some(user)),
+            Some(RoxAuthorization::Internal(user)) => (true, user.as_ref()),
+            Some(RoxAuthorization::Harness(_)) => return Err(ExtractorError::Unauthorized),
+            Some(RoxAuthorization::Bot(_)) => unreachable!("bot authorization returned above"),
             None => (false, None),
         };
-        let (macro_user_id, user_context) = acting_user
-            .map(|user| (Some(user.macro_user_id.clone()), user.user_context.clone()))
+        let (rox_user_id, user_context) = acting_user
+            .map(|user| (Some(user.rox_user_id.clone()), user.user_context.clone()))
             .unwrap_or_default();
 
-        if is_internal_access && macro_user_id.is_none() {
+        if is_internal_access && rox_user_id.is_none() {
             return Ok(Self {
                 entity_access_receipt: EntityAccessReceipt {
                     entity: Entity {
@@ -119,9 +119,9 @@ where
 
         let user_org_id = user_context.organization_id.map(|id| id as i64);
 
-        let permission = match macro_user_id.as_ref() {
-            Some(macro_user_id) => service
-                .get_entity_permission(Some(macro_user_id), &entity_id, parsed_type, user_org_id)
+        let permission = match rox_user_id.as_ref() {
+            Some(rox_user_id) => service
+                .get_entity_permission(Some(rox_user_id), &entity_id, parsed_type, user_org_id)
                 .await
                 .map_err(ExtractorError::from)?,
             None => {
@@ -140,7 +140,7 @@ where
                     entity_id,
                     entity_type: parsed_type,
                 },
-                auth: macro_user_id
+                auth: rox_user_id
                     .map(EntityAccessAuth::Authenticated)
                     .unwrap_or(EntityAccessAuth::Unauthenticated),
                 entity_permission: permission,

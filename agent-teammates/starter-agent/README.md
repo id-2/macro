@@ -81,7 +81,7 @@ the exact input. The agent can also be told, in chat, to add one.
 
 | Credential                                                   | What it turns on                                                     |
 | ------------------------------------------------------------ | -------------------------------------------------------------------- |
-| `MACRO_API_KEY`                                              | The agent itself: chat, schedules, memory. Set by `bin/setup`.       |
+| `ROX_API_KEY`                                              | The agent itself: chat, schedules, memory. Set by `bin/setup`.       |
 | `DEEPGRAM_API_KEY`                                           | Calls: hearing, and the default voice. Without it no call is joined. |
 | `INWORLD_API_KEY`                                            | Only if the agent's voice is changed to an Inworld one.              |
 | `MAIL_CLIENT_ID`, `MAIL_CLIENT_SECRET`, `MAIL_REFRESH_TOKEN` | Mail: a Gmail account's OAuth client and refresh token.              |

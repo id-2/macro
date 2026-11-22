@@ -16,7 +16,7 @@ Internal scheduled notification cleanup. The owning notification domain enforces
 ## Checks
 
 - `cargo test -p notification_retention_handler` (`SQLX_OFFLINE` unset).
-- `cargo test -p notification -p macro_entrypoint` for policy and flush behavior.
+- `cargo test -p notification -p rox_entrypoint` for policy and flush behavior.
 - From `infra/`: `bun test stacks/notification-service/retention.test.ts`.
 
 ## Gotchas

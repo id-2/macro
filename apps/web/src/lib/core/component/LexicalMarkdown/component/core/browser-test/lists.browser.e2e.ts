@@ -5,7 +5,7 @@ async function openEmptyComposer(page: import('@playwright/test').Page) {
     const url = new URL(route.request().url());
     if (
       url.hostname === 'localhost' &&
-      !url.pathname.includes('/__macro_dev/')
+      !url.pathname.includes('/__rox_dev/')
     ) {
       await route.continue();
     } else {

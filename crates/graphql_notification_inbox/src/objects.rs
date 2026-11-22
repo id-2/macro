@@ -109,7 +109,7 @@ pub struct GraphqlNotificationInboxRowAction {
     /// What the action acts on when it is not the row's group: an access or
     /// join request.
     target_id: Option<ID>,
-    /// The page the action opens outside Macro, such as a pull request.
+    /// The page the action opens outside Rox, such as a pull request.
     url: Option<String>,
 }
 

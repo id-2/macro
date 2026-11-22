@@ -5,8 +5,8 @@ use axum::extract::{FromRef, State, rejection::JsonRejection};
 use axum::response::IntoResponse;
 use axum::routing::post;
 use axum::{Json, Router};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
 use serde::Deserialize;
 use utoipa::ToSchema;
@@ -20,7 +20,7 @@ mod test;
 
 pub struct RoutineDraftRouterState<D, Auth> {
     pub service: Arc<D>,
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<D, Auth> Clone for RoutineDraftRouterState<D, Auth> {
@@ -32,7 +32,7 @@ impl<D, Auth> Clone for RoutineDraftRouterState<D, Auth> {
     }
 }
 
-impl<D, Auth> FromRef<RoutineDraftRouterState<D, Auth>> for MacroAuthorizationState<Auth> {
+impl<D, Auth> FromRef<RoutineDraftRouterState<D, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &RoutineDraftRouterState<D, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -41,7 +41,7 @@ impl<D, Auth> FromRef<RoutineDraftRouterState<D, Auth>> for MacroAuthorizationSt
 pub fn routine_draft_router<D, Auth, St>(state: RoutineDraftRouterState<D, Auth>) -> Router<St>
 where
     D: RoutineDraftService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Send + Sync,
 {
     Router::new()
@@ -74,18 +74,18 @@ pub struct DraftRoutineRequest {
 )]
 pub async fn draft_routine<D, Auth>(
     State(state): State<RoutineDraftRouterState<D, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     request: Result<Json<DraftRoutineRequest>, JsonRejection>,
 ) -> Result<impl IntoResponse, ScheduledActionApiError>
 where
     D: RoutineDraftService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = request.map_err(ScheduledActionApiError::InvalidRequest)?;
     let draft = state
         .service
         .draft(
-            user.authorization.macro_user_id.clone(),
+            user.authorization.rox_user_id.clone(),
             request.draft,
             request.context,
         )

@@ -8,7 +8,7 @@ use attention_feed::{
     inbound::viewers::{FeedViewerResolver, resolve_viewer},
 };
 use futures::future::BoxFuture;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification_inbox::domain::{
     models::{
         ClearAction, ClearRun, InboxChange, InboxClearRequest, InboxDoneOutcome,
@@ -284,7 +284,7 @@ impl NotificationInboxGraphqlContext {
     /// The viewer a request for `user` is evaluated as.
     pub(crate) async fn viewer(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> async_graphql::Result<FeedViewer> {
         resolve_viewer(self.viewers.as_ref(), user)
             .await

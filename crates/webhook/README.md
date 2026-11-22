@@ -17,7 +17,7 @@ The inbound Axum API supports:
 Validation sends a signed `webhook.validation.test` event to the configured
 endpoint and persists the result in `is_valid`. Validation attempts use the
 existing `rate_limit` crate with the key
-`per-user-validate-webhook:{macro_user_id}:{webhook_id}` and a limit of 10
+`per-user-validate-webhook:{rox_user_id}:{webhook_id}` and a limit of 10
 attempts per 3600-second window.
 
 ### Management lifecycle events
@@ -244,8 +244,8 @@ The request includes:
 - `X-Rox-Timestamp`: the request time as Unix seconds
 - `X-Rox-Signature`: `v1=<hex HMAC-SHA256>`
 
-Each of those is also sent under the `X-Macro-*` names earlier releases used
-(`X-Macro-Event`, `X-Macro-Event-Id`, `X-Macro-Timestamp`, `X-Macro-Signature`)
+Each of those is also sent under the `X-Rox-*` names earlier releases used
+(`X-Rox-Event`, `X-Rox-Event-Id`, `X-Rox-Timestamp`, `X-Rox-Signature`)
 with the same values, so a receiver written before the rename keeps working.
 
 The signature input is the raw byte sequence
@@ -315,13 +315,13 @@ prevents another request. There is still an unavoidable crash window: an
 endpoint can accept the HTTP request before the process records the result. A
 redelivery can then recover the interrupted attempt and call the endpoint again.
 Webhook receivers should use `X-Rox-Event-Id` (or its legacy
-`X-Macro-Event-Id` alias) as an idempotency key.
+`X-Rox-Event-Id` alias) as an idempotency key.
 
 ## Operations
 
 ### Queue configuration and local setup
 
-`macro_queues::WebhookEventQueue` selects these FIFO queue names:
+`rox_queues::WebhookEventQueue` selects these FIFO queue names:
 
 | Environment | Queue name |
 | --- | --- |

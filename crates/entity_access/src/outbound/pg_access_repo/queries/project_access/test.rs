@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -7,7 +7,7 @@ const OWNER: &str = "macro|owner@corp.test";
 const REQUESTER: &str = "macro|requester@corp.test";
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::new_v4();
+    let rox_user_id = Uuid::new_v4();
     let email = user_id.trim_start_matches("macro|");
 
     sqlx::query!(
@@ -15,7 +15,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $2)
         "#,
-        macro_user_id,
+        rox_user_id,
         user_id,
         email,
     )
@@ -23,10 +23,10 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     .await?;
 
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await?;
@@ -200,7 +200,7 @@ async fn setup_project(pool: &PgPool, link_share: Option<&str>) -> anyhow::Resul
     Ok(project_id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn public_link_grants_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, Some("PUBLIC")).await?;
 
@@ -210,7 +210,7 @@ async fn public_link_grants_anonymous_access(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn public_link_grants_authenticated_access(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, Some("PUBLIC")).await?;
 
@@ -220,7 +220,7 @@ async fn public_link_grants_authenticated_access(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn null_link_denies_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, None).await?;
 
@@ -230,7 +230,7 @@ async fn null_link_denies_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn null_link_denies_authenticated_access(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, None).await?;
 
@@ -240,7 +240,7 @@ async fn null_link_denies_authenticated_access(pool: PgPool) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, Some("TEAM")).await?;
 
@@ -250,7 +250,7 @@ async fn team_link_denies_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_grants_same_team_access(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, Some("TEAM")).await?;
     let team_id = Uuid::new_v4();
@@ -266,7 +266,7 @@ async fn team_link_grants_same_team_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_other_team_access(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, Some("TEAM")).await?;
     let owner_team_id = Uuid::new_v4();
@@ -288,7 +288,7 @@ async fn team_link_denies_other_team_access(pool: PgPool) -> anyhow::Result<()> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_when_owner_has_no_team(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, Some("TEAM")).await?;
     let requester_team_id = Uuid::new_v4();
@@ -307,7 +307,7 @@ async fn team_link_denies_when_owner_has_no_team(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explicit_project_access_is_preserved(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, None).await?;
     insert_entity_access(&pool, project_id, REQUESTER, AccessLevel::Edit, None).await?;
@@ -318,7 +318,7 @@ async fn explicit_project_access_is_preserved(pool: PgPool) -> anyhow::Result<()
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inherited_project_access_is_preserved(pool: PgPool) -> anyhow::Result<()> {
     let project_id = setup_project(&pool, None).await?;
     let parent_project_id = Uuid::new_v4();
@@ -338,7 +338,7 @@ async fn inherited_project_access_is_preserved(pool: PgPool) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn direct_team_grant_without_link_share_grants_teammate_access(
     pool: PgPool,
 ) -> anyhow::Result<()> {

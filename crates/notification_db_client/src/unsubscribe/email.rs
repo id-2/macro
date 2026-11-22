@@ -62,10 +62,10 @@ pub async fn remove_email_unsubscribe(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("email_unsubscribe_list"))
     )]
     async fn test_is_email_unsubscribed_batch(
@@ -95,7 +95,7 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("email_unsubscribe_list"))
     )]
     async fn test_upsert_email_unsubscribe(pool: sqlx::Pool<sqlx::Postgres>) -> anyhow::Result<()> {
@@ -115,7 +115,7 @@ mod tests {
     }
 
     #[sqlx::test(
-        migrator = "MACRO_DB_MIGRATIONS",
+        migrator = "ROX_DB_MIGRATIONS",
         fixtures(path = "../../fixtures", scripts("email_unsubscribe_list"))
     )]
     async fn test_remove_email_unsubscribe(pool: sqlx::Pool<sqlx::Postgres>) -> anyhow::Result<()> {

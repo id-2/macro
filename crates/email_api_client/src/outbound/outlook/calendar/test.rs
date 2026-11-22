@@ -382,7 +382,7 @@ async fn calendars_carry_the_iana_zone_of_the_mailbox() {
 }
 
 #[tokio::test]
-async fn a_mailbox_time_zone_macro_cannot_map_leaves_its_calendars_without_one() {
+async fn a_mailbox_time_zone_rox_cannot_map_leaves_its_calendars_without_one() {
     for named in ["tzone://Microsoft/Custom", "Atlantis Standard Time", ""] {
         let discovery = discover(Some(named)).await;
         assert_eq!(discovery.calendars.len(), 1, "{named:?}");
@@ -776,7 +776,7 @@ async fn cancelling_an_unacknowledged_booking_resolves_its_provider_assigned_id(
 }
 
 #[test]
-fn native_reminder_edits_supersede_macro_extra_reminders() {
+fn native_reminder_edits_supersede_rox_extra_reminders() {
     let mut current = event("e");
     current["isReminderOn"] = json!(true);
     current["reminderMinutesBeforeStart"] = json!(60);
@@ -1104,7 +1104,7 @@ fn an_imported_series_ended_by_its_organizer_reads_graphs_utc_alias() {
 }
 
 #[test]
-fn an_end_date_in_a_zone_macro_cannot_resolve_is_read_in_the_events_own_zone() {
+fn an_end_date_in_a_zone_rox_cannot_resolve_is_read_in_the_events_own_zone() {
     let mut series = ended_imported_series("series");
     series["originalStartTimeZone"] = json!("Pacific Standard Time");
     series["recurrence"]["range"]["recurrenceTimeZone"] = json!("tzone://Microsoft/Custom");
@@ -1119,7 +1119,7 @@ fn an_end_date_in_a_zone_macro_cannot_resolve_is_read_in_the_events_own_zone() {
 }
 
 #[tokio::test]
-async fn an_event_macro_cannot_read_names_the_rejected_field() {
+async fn an_event_rox_cannot_read_names_the_rejected_field() {
     let (server, api) = setup().await;
     let mut hourly = event("hourly");
     hourly["type"] = json!("seriesMaster");
@@ -1312,7 +1312,7 @@ fn an_exception_without_its_original_start_is_left_out_of_an_imported_series() {
 }
 
 #[test]
-fn an_original_start_macro_cannot_parse_rejects_the_series_at_its_own_field() {
+fn an_original_start_rox_cannot_parse_rejects_the_series_at_its_own_field() {
     let (master, mut instances) = documented_series();
     instances[0]["originalStart"] = json!("2019-04-15");
     assert_eq!(

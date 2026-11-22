@@ -22,9 +22,9 @@ us-east-1. `README.md` is the full operations guide.
   copy in `infra/stacks/monitoring/monitors/` by hand. A new entry takes the next
   free `panelId`; never renumber one, since sent notifications link to it.
 - Change a CI percentile, queue or CI hours query: edit `nixos/ci-report.json`;
-  the `Macro CI` dashboard's Loki panels and `scripts/ci-report.ts` both read it.
+  the `Rox CI` dashboard's Loki panels and `scripts/ci-report.ts` both read it.
 - Change a run_local query: edit `nixos/local-report.json`, read by the
-  `Macro run_local` dashboard and `scripts/ci-report.ts --spec local`. Both
+  `Rox run_local` dashboard and `scripts/ci-report.ts --spec local`. Both
   dashboards share their Loki panel builders in `nixos/loki-report-panels.nix`.
 - Add a runtime setting: `settings.ts` → `render.ts` (bump the schema version) →
   `nixos/read-user-data.py` (keys, pattern, version) → the consuming `.nix` file.
@@ -43,7 +43,7 @@ us-east-1. `README.md` is the full operations guide.
 From this directory:
 - `nix build --dry-run .#nixosConfigurations.observability.config.system.build.toplevel`
 - `nix fmt -- <changed .nix files>`; `python3 -m py_compile` on changed Python.
-- `python3 -m unittest test_macro_alerts_relay` from `nixos/goalert/` when the
+- `python3 -m unittest test_rox_alerts_relay` from `nixos/goalert/` when the
   relay's channel post format changes.
 
 From `infra/`: `bun run check` (includes `bun test stacks/observability/deploy`),

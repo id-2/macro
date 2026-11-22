@@ -5,13 +5,13 @@ use agent_trigger::domain::broker_events::{
     AgentMentionedEvent, AgentTriggerTopicEvent, ChannelEventMetadata, ExistingAgentSessionEvent,
     NewAgentSessionEvent, ThreadEventMetadata, ThreadMessageKind,
 };
-use bot_id::{BotId, MACRO_CODER_BOT_ID};
+use bot_id::{BotId, ROX_CODER_BOT_ID};
 use channel_sender::ChannelSender;
 use channels::domain::broker_events::ChannelMessagePostedMetadata;
 use channels::domain::models::ChannelType;
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::events::MessagePostedMetadata;
 use messages::domain::models::MessageParent;
 use trigger_context::{
@@ -56,8 +56,8 @@ fn links() -> StaticFileLinks {
     StaticFileLinks::new("https://static.example/")
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("asker@rox.one").expect("a valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("asker@rox.one").expect("a valid user id")
 }
 
 /// A channel post in the channel-only shape channel triggers travel in.
@@ -177,7 +177,7 @@ fn a_foreign_bots_open_is_skipped() {
 #[test]
 fn an_unresolved_existing_session_is_treated_as_external() {
     assert!(matches!(
-        route_agent_trigger(channel_message(MACRO_CODER_BOT_ID), None, &links()),
+        route_agent_trigger(channel_message(ROX_CODER_BOT_ID), None, &links()),
         Ok(RoutedTrigger::Announce(_, _))
     ));
 }
@@ -197,7 +197,7 @@ fn an_unattributed_bot_mention_is_skipped() {
 
 #[test]
 fn any_user_mention_can_open_a_managed_agent() {
-    let user = MacroUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
+    let user = RoxUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
 
     assert!(matches!(
         route_agent_trigger(
@@ -212,7 +212,7 @@ fn any_user_mention_can_open_a_managed_agent() {
 #[test]
 fn a_managed_channel_message_forwards_to_its_session() {
     let routed = route_agent_trigger(
-        channel_message(MACRO_CODER_BOT_ID),
+        channel_message(ROX_CODER_BOT_ID),
         runtime(AgentKind::SandboxedCoder),
         &links(),
     )
@@ -312,7 +312,7 @@ fn a_document_mention_opens_and_follows_up_on_its_document() {
 
     let followed =
         AgentTriggerTopicEvent::Existing(ExistingAgentSessionEvent::Thread(ThreadEventMetadata {
-            bot_id: MACRO_CODER_BOT_ID,
+            bot_id: ROX_CODER_BOT_ID,
             session_id: AgentSessionId::TEST_A,
             kind: ThreadMessageKind::MentionThread,
             message: document_message(ChannelSender::new_from_user(user())),
@@ -508,7 +508,7 @@ fn task_discussion_followups_keep_the_managed_and_external_session_origin() {
 
 #[test]
 fn any_user_can_follow_up_to_their_cursor_session() {
-    let user = MacroUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
+    let user = RoxUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
     assert!(matches!(
         route_agent_trigger(
             channel_message_from(bot_id::CURSOR_BOT_ID, ChannelSender::new_from_user(user)),
@@ -522,9 +522,9 @@ fn any_user_can_follow_up_to_their_cursor_session() {
 /// Managed sessions accept follow-ups from channel users regardless of email domain.
 #[test]
 fn any_user_can_follow_up_to_a_coder_session() {
-    let user = MacroUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
+    let user = RoxUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
     let routed = route_agent_trigger(
-        channel_message_from(MACRO_CODER_BOT_ID, ChannelSender::new_from_user(user)),
+        channel_message_from(ROX_CODER_BOT_ID, ChannelSender::new_from_user(user)),
         runtime(AgentKind::SandboxedCoder),
         &links(),
     )
@@ -539,7 +539,7 @@ fn any_user_can_follow_up_to_a_coder_session() {
 fn a_bot_authored_follow_up_to_a_managed_session_still_delivers() {
     let routed = route_agent_trigger(
         channel_message_from(
-            MACRO_CODER_BOT_ID,
+            ROX_CODER_BOT_ID,
             ChannelSender::new_from_bot(BotId::TEST_B),
         ),
         runtime(AgentKind::SandboxedCoder),
@@ -671,7 +671,7 @@ fn a_mention_with_attached_files_opens_with_them_as_prompt_attachments() {
 fn a_managed_channel_message_with_files_delivers_them_as_prompt_attachments() {
     let event = AgentTriggerTopicEvent::Existing(ExistingAgentSessionEvent::Channel(
         ChannelEventMetadata {
-            bot_id: MACRO_CODER_BOT_ID,
+            bot_id: ROX_CODER_BOT_ID,
             session_id: AgentSessionId::TEST_A,
             kind: ThreadMessageKind::MentionThread,
             message: message_with_files(ChannelSender::new_from_user(user())),
@@ -754,7 +754,7 @@ fn a_follow_up_sends_only_its_own_files_and_links_the_thread_in_context() {
     const ROOT_FILE: &str = "9ec21122-4bd8-473f-bfb0-21d2e6e5f03b";
     let event = AgentTriggerTopicEvent::Existing(ExistingAgentSessionEvent::Channel(
         ChannelEventMetadata {
-            bot_id: MACRO_CODER_BOT_ID,
+            bot_id: ROX_CODER_BOT_ID,
             session_id: AgentSessionId::TEST_A,
             kind: ThreadMessageKind::MentionThread,
             message: message(ChannelSender::new_from_user(user())),
@@ -866,13 +866,13 @@ fn a_conversation_message_without_files_still_carries_the_thread_root_image() {
 fn attributed_bot_mentions_keep_the_user_for_open_and_follow_up() {
     for (source, target, kind) in [
         (
-            bot_id::MACRO_NEW_BOT_ID,
+            bot_id::ROX_NEW_BOT_ID,
             bot_id::CURSOR_BOT_ID,
             AgentKind::Cursor,
         ),
         (
             bot_id::CURSOR_BOT_ID,
-            bot_id::MACRO_NEW_BOT_ID,
+            bot_id::ROX_NEW_BOT_ID,
             AgentKind::InMemory,
         ),
     ] {

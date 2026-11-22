@@ -117,7 +117,7 @@ async fn read_and_summarize(
     Ok((count, shown))
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reading_a_project_checks_its_tasks_together(pool: PgPool) -> anyhow::Result<()> {
     let statements = Statements::default();
     let _guard = tracing::subscriber::set_default(statements.clone());

@@ -153,7 +153,7 @@ impl GenAiContext {
             let (json, truncated) = bound_tool_definitions(definitions, &policy.limits);
             span.set_str(attr::TOOL_DEFINITIONS, json);
             if truncated {
-                span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
             }
         }
         if policy.capture {
@@ -162,16 +162,16 @@ impl GenAiContext {
                 let bounded = bound_messages(messages::system_instructions(system), &policy.limits);
                 span.set_str(attr::SYSTEM_INSTRUCTIONS, bounded.json);
                 if bounded.truncated {
-                    span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                    span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
                 }
             }
             let bounded = bound_messages(input, &policy.limits);
             span.set_str(attr::INPUT_MESSAGES, bounded.json);
             if bounded.omitted > 0 {
-                span.set_u64(attr::MACRO_INPUT_MESSAGES_OMITTED, bounded.omitted as u64);
+                span.set_u64(attr::ROX_INPUT_MESSAGES_OMITTED, bounded.omitted as u64);
             }
             if bounded.truncated {
-                span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
             }
         }
     }
@@ -202,10 +202,10 @@ impl GenAiContext {
             .as_ref()
         {
             span.set_i64(
-                attr::MACRO_CHAT_TIME_TO_FIRST_CHUNK_MS,
+                attr::ROX_CHAT_TIME_TO_FIRST_CHUNK_MS,
                 i64::try_from(time_to_first_chunk.as_millis()).unwrap_or(i64::MAX),
             );
-            span.set_str(attr::MACRO_CHAT_FIRST_CHUNK_KIND, kind);
+            span.set_str(attr::ROX_CHAT_FIRST_CHUNK_KIND, kind);
         }
     }
 
@@ -255,7 +255,7 @@ impl GenAiContext {
             let bounded = bound_messages(vec![message], &self.0.policy.limits);
             span.set_str(attr::OUTPUT_MESSAGES, bounded.json);
             if bounded.truncated {
-                span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
             }
         }
     }
@@ -345,7 +345,7 @@ impl GenAiContext {
         let bounded = bound_messages(message_json(prompt), &self.0.policy.limits);
         agent_span.set_str(attr::INPUT_MESSAGES, bounded.json);
         if bounded.truncated {
-            agent_span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+            agent_span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
         }
     }
 
@@ -375,7 +375,7 @@ impl GenAiContext {
         let bounded = bound_messages(vec![message], &self.0.policy.limits);
         agent_span.set_str(attr::OUTPUT_MESSAGES, bounded.json);
         if bounded.truncated {
-            agent_span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+            agent_span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
         }
     }
 }

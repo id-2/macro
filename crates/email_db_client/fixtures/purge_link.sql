@@ -10,7 +10,7 @@ INSERT INTO purge_fixture_links (tag, id)
 VALUES ('a', '00000000-0000-0000-0000-00000000a001'),
        ('b', '00000000-0000-0000-0000-00000000b001');
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active)
 SELECT id, 'macro|purge_' || tag || '@example.com', id::text, 'purge_' || tag || '@example.com', 'GMAIL', true
 FROM purge_fixture_links;
 

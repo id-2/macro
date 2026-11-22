@@ -21,7 +21,7 @@
 //! UUID — both of which the new ANY-based resolution must cover.
 
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 // === Constants matching the fixture ===
 
@@ -71,7 +71,7 @@ async fn run_and_collect_ids(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -118,7 +118,7 @@ async fn crm_scope_off_returns_only_callers_link(pool: Pool<Postgres>) -> anyhow
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -165,7 +165,7 @@ async fn crm_scope_returns_all_team_member_threads(pool: Pool<Postgres>) -> anyh
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -204,7 +204,7 @@ async fn crm_scope_with_domain_filter(pool: Pool<Postgres>) -> anyhow::Result<()
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -252,7 +252,7 @@ async fn crm_scope_with_complete_sender_resolves_across_links(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -292,7 +292,7 @@ async fn crm_scope_excludes_trash_in_every_team_link(pool: Pool<Postgres>) -> an
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -330,7 +330,7 @@ async fn crm_scope_with_unknown_complete_sender_short_circuits(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -382,7 +382,7 @@ async fn crm_scope_uses_team_mailboxes_not_caller_link(pool: Pool<Postgres>) -> 
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -417,7 +417,7 @@ async fn crm_scope_with_complete_recipient_resolves_across_links(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -445,7 +445,7 @@ async fn crm_scope_with_complete_cc_resolves_across_links(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -477,7 +477,7 @@ async fn crm_scope_with_complete_bcc_resolves_across_links(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -521,7 +521,7 @@ async fn crm_scope_not_unresolved_sender_does_not_short_circuit(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -554,7 +554,7 @@ async fn crm_scope_with_asymmetric_complete_sender(pool: Pool<Postgres>) -> anyh
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -592,7 +592,7 @@ async fn crm_scope_or_of_known_and_unknown_complete_senders(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -633,7 +633,7 @@ async fn crm_scope_composed_and_sender_domain_and_recipient_domain(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -723,7 +723,7 @@ async fn crm_scope_pagination_across_team_links(pool: Pool<Postgres>) -> anyhow:
 
 // Withdrawing consent after scope resolution must close every candidate source.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -755,7 +755,7 @@ async fn crm_scope_collapses_to_empty_when_consent_withdrawn(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -789,7 +789,7 @@ async fn crm_scope_honors_contributor_blocks_while_ordinary_inbox_is_unchanged(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -873,7 +873,7 @@ async fn run_dedupe_query(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_dedupe")
@@ -906,7 +906,7 @@ async fn crm_scope_dedupes_team_copies_own_copy_wins(pool: Pool<Postgres>) -> an
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_dedupe")
@@ -940,7 +940,7 @@ async fn crm_scope_dedupe_is_caller_relative(pool: Pool<Postgres>) -> anyhow::Re
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_dedupe")
@@ -1014,7 +1014,7 @@ async fn crm_scope_dedupe_stable_across_cursor_pages(pool: Pool<Postgres>) -> an
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_dedupe")
@@ -1044,7 +1044,7 @@ async fn crm_scope_dedupe_root_skips_drafts(pool: Pool<Postgres>) -> anyhow::Res
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts(
@@ -1108,7 +1108,7 @@ async fn crm_scope_dedupe_collapses_externally_shared_copy(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts(
@@ -1141,8 +1141,8 @@ async fn crm_scope_dedupe_mid_thread_join_copies_stay_separate(
 
 // =====================================================================
 // Non-primary links — alice has a connected secondary mailbox
-// (alice.personal@gmail.com) on the same macro_id. Team scope must only
-// read primary links (email_address = the owner's macro_id email), so the
+// (alice.personal@gmail.com) on the same rox_id. Team scope must only
+// read primary links (email_address = the owner's rox_id email), so the
 // personal link's threads/contacts/labels never feed team-scoped results.
 // =====================================================================
 
@@ -1153,11 +1153,11 @@ const TP2_ALICE_PERSONAL_INBOX_SECRET: &str = "22220004-0000-0000-0000-000000000
 // =====================================================================
 // 23. Broad team-scoped query: alice's personal-mailbox threads must not
 //     appear even though their senders match the filter and the link's
-//     macro_id is a team member.
+//     rox_id is a team member.
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -1198,7 +1198,7 @@ async fn crm_scope_excludes_non_primary_link_threads(pool: Pool<Postgres>) -> an
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -1232,7 +1232,7 @@ async fn crm_scope_complete_sender_skips_non_primary_link(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -1264,7 +1264,7 @@ async fn crm_scope_non_primary_only_contact_does_not_resolve(
 // =====================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")
@@ -1303,7 +1303,7 @@ async fn me_path_still_spans_non_primary_links(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_scope")

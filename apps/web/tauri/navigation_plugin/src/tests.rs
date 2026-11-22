@@ -1,10 +1,10 @@
 use super::*;
-use crate::scheme::MacroScheme;
+use crate::scheme::RoxScheme;
 
 /// Mirrors the app's real config: the allowlist holds only the SPA's own
 /// origins, and the macro hosts are app-link hosts.
-fn test_plugin() -> MacroNavigationPlugin {
-    MacroNavigationPlugin::new(&[
+fn test_plugin() -> RoxNavigationPlugin {
+    RoxNavigationPlugin::new(&[
         "tauri://localhost",
         "http://tauri.localhost",
         "http://localhost:3000",
@@ -14,7 +14,7 @@ fn test_plugin() -> MacroNavigationPlugin {
 }
 
 #[test]
-fn get_destination_app_link_for_macro_app_path() {
+fn get_destination_app_link_for_rox_app_path() {
     let plugin = test_plugin();
     let url = Url::parse("https://rox.one/app/component/doc123").unwrap();
     match plugin.get_destination(&url) {
@@ -50,7 +50,7 @@ fn get_destination_app_link_strips_www() {
 }
 
 #[test]
-fn get_destination_external_for_non_app_path_on_macro_host() {
+fn get_destination_external_for_non_app_path_on_rox_host() {
     let plugin = test_plugin();
     for url in ["https://rox.one/pricing", "https://dev.rox.one/pricing"] {
         assert!(
@@ -96,7 +96,7 @@ fn get_destination_internal_for_spa_origins() {
 /// in the webview — the app-link check runs before the allowlist.
 #[test]
 fn get_destination_app_link_wins_over_allowlist() {
-    let plugin = MacroNavigationPlugin::new(&["https://rox.one"])
+    let plugin = RoxNavigationPlugin::new(&["https://rox.one"])
         .unwrap()
         .with_app_link_hosts(&["rox.one"]);
     let app_url = Url::parse("https://rox.one/app/component/doc123").unwrap();
@@ -113,7 +113,7 @@ fn get_destination_app_link_wins_over_allowlist() {
 
 #[test]
 fn get_destination_no_app_link_hosts_keeps_old_behavior() {
-    let plugin = MacroNavigationPlugin::new(&["https://rox.one"]).unwrap();
+    let plugin = RoxNavigationPlugin::new(&["https://rox.one"]).unwrap();
     let url = Url::parse("https://rox.one/app/component/doc123").unwrap();
     assert!(matches!(
         plugin.get_destination(&url),
@@ -147,13 +147,13 @@ fn popup_and_main_frame_share_external_url_policy() {
 }
 
 #[test]
-fn popup_app_links_include_same_origin_and_macro_scheme() {
+fn popup_app_links_include_same_origin_and_rox_scheme() {
     let plugin = test_plugin();
     for input in [
         "https://rox.one/app/mail?view=all",
         "https://dev.rox.one/app/mail?view=all",
         "https://www.rox.one/app/mail?view=all",
-        "macro:///mail?view=all",
+        "rox:///mail?view=all",
         "tauri://localhost/app/mail?view=all",
         "http://tauri.localhost/app/mail?view=all",
         "http://localhost:3000/app/mail?view=all",
@@ -354,7 +354,7 @@ fn blocked_popup_neither_opens_nor_emits_navigation() {
 
 const PIPEDREAM_CONNECT: &str = "https://pipedream.com/_static/connect.html";
 
-fn embedding_plugin() -> MacroNavigationPlugin {
+fn embedding_plugin() -> RoxNavigationPlugin {
     test_plugin()
         .with_embedded_documents(&[PIPEDREAM_CONNECT])
         .unwrap()
@@ -421,7 +421,7 @@ fn documents_are_not_embedded_unless_configured() {
 #[test]
 fn from_url_extracts_correct_path_from_universal_link() {
     let url = Url::parse("https://rox.one/app/component/doc123").unwrap();
-    let result = MacroScheme::from_url(&url).unwrap();
+    let result = RoxScheme::from_url(&url).unwrap();
     assert_eq!(result.path(), "/component/doc123");
     assert_eq!(result.query(), None);
 }
@@ -429,7 +429,7 @@ fn from_url_extracts_correct_path_from_universal_link() {
 #[test]
 fn from_url_extracts_path_and_query_from_universal_link() {
     let url = Url::parse("https://rox.one/app/component/doc123?foo=bar").unwrap();
-    let result = MacroScheme::from_url(&url).unwrap();
+    let result = RoxScheme::from_url(&url).unwrap();
     assert_eq!(result.path(), "/component/doc123");
     assert_eq!(result.query(), Some("foo=bar"));
 }
@@ -437,7 +437,7 @@ fn from_url_extracts_path_and_query_from_universal_link() {
 #[test]
 fn from_url_keeps_the_fragment_of_a_universal_link() {
     let url = Url::parse("https://rox.one/app/booking/id?foo=bar#token").unwrap();
-    let result = MacroScheme::from_url(&url).unwrap();
+    let result = RoxScheme::from_url(&url).unwrap();
     assert_eq!(result.path(), "/booking/id");
     assert_eq!(result.query(), Some("foo=bar"));
     assert_eq!(result.fragment(), Some("token"));
@@ -446,12 +446,12 @@ fn from_url_keeps_the_fragment_of_a_universal_link() {
 #[test]
 fn from_url_reads_the_route_from_a_webview_fragment() {
     let url = Url::parse("tauri://localhost/#/app/booking/id#token").unwrap();
-    let result = MacroScheme::from_url(&url).unwrap();
+    let result = RoxScheme::from_url(&url).unwrap();
     assert_eq!(result.path(), "/booking/id");
     assert_eq!(result.fragment(), Some("token"));
 
     let url = Url::parse("tauri://localhost/#/mail?view=all").unwrap();
-    let result = MacroScheme::from_url(&url).unwrap();
+    let result = RoxScheme::from_url(&url).unwrap();
     assert_eq!(result.path(), "/mail");
     assert_eq!(result.query(), Some("view=all"));
     assert_eq!(result.fragment(), None);
@@ -460,14 +460,14 @@ fn from_url_reads_the_route_from_a_webview_fragment() {
 #[test]
 fn from_url_strips_bare_app_path() {
     let url = Url::parse("https://rox.one/app").unwrap();
-    let result = MacroScheme::from_url(&url).unwrap();
+    let result = RoxScheme::from_url(&url).unwrap();
     assert_eq!(result.path(), "/");
 }
 
 #[test]
 fn from_url_handles_nested_path() {
     let url = Url::parse("https://rox.one/app/component/nested/path/here").unwrap();
-    let result = MacroScheme::from_url(&url).unwrap();
+    let result = RoxScheme::from_url(&url).unwrap();
     assert_eq!(result.path(), "/component/nested/path/here");
 }
 

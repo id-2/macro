@@ -1,6 +1,6 @@
 use super::*;
 use entity_access_db_utils::{EntityAccessSourceType, insert_entity_access_row};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const PDF_DOCUMENT_ID: &str = "20000000-0000-0000-0000-000000000001";
 const MD_DOCUMENT_ID: &str = "20000000-0000-0000-0000-000000000002";
@@ -25,7 +25,7 @@ async fn document_channel_levels(
         r#"SELECT access_level AS "access_level: AccessLevel" FROM entity_access
         WHERE entity_id = $1 AND entity_type = 'document' AND source_id = $2
             AND source_type = 'channel' AND granted_from_project_id IS NULL"#,
-        macro_uuid::string_to_uuid(document_id).unwrap(),
+        rox_uuid::string_to_uuid(document_id).unwrap(),
         channel_id.to_string(),
     )
     .fetch_optional(pool)
@@ -36,7 +36,7 @@ async fn document_channel_levels(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("reference_share_documents")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn pdf_references_grant_the_channel_comment_access(pool: PgPool) {
     let item = ReferencedShareItem::from_raw(PDF_DOCUMENT_ID, "document").unwrap();
@@ -54,7 +54,7 @@ async fn pdf_references_grant_the_channel_comment_access(pool: PgPool) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("reference_share_documents")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn pdf_references_never_grant_more_than_the_sharer_holds(pool: PgPool) {
     let channel_id = Uuid::now_v7();
@@ -82,7 +82,7 @@ async fn pdf_references_never_grant_more_than_the_sharer_holds(pool: PgPool) {
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("reference_share_documents")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn non_pdf_document_references_grant_the_channel_view_access(pool: PgPool) {
     let channel_id = Uuid::now_v7();
@@ -98,7 +98,7 @@ async fn non_pdf_document_references_grant_the_channel_view_access(pool: PgPool)
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("reference_share_documents")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn pdf_references_keep_the_channel_access_the_owner_already_chose(pool: PgPool) {
     let channel_id = Uuid::now_v7();
@@ -115,7 +115,7 @@ async fn pdf_references_keep_the_channel_access_the_owner_already_chose(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn session_references_grant_view_and_preserve_existing_channel_access(pool: PgPool) {
     let channel_id = Uuid::now_v7();
     for existing in [
@@ -164,7 +164,7 @@ async fn session_references_grant_view_and_preserve_existing_channel_access(pool
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_event_references_grant_the_channel_view_without_a_share_permission(pool: PgPool) {
     let channel_id = Uuid::now_v7();
     let event_id = Uuid::now_v7();
@@ -188,7 +188,7 @@ async fn calendar_event_references_grant_the_channel_view_without_a_share_permis
     assert_eq!(levels, vec![AccessLevel::View]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn form_references_grant_the_channel_view_and_keep_an_existing_grant(pool: PgPool) {
     let channel_id = Uuid::now_v7();
     for existing in [None, Some(AccessLevel::View), Some(AccessLevel::Edit)] {
@@ -228,7 +228,7 @@ async fn form_references_grant_the_channel_view_and_keep_an_existing_grant(pool:
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn external_chat_mentions_let_the_channel_read_the_chat(pool: PgPool) {
     let channel_id = Uuid::now_v7();
     let chat_id = Uuid::now_v7();
@@ -261,7 +261,7 @@ async fn external_chat_mentions_let_the_channel_read_the_chat(pool: PgPool) {
 /// Explicit sharing refuses a direct agent conversation's sessions, which are
 /// private to their owner. Posting one's link in another channel must not
 /// share it either, while a session from anywhere else still is.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn direct_conversation_session_references_grant_nothing(pool: PgPool) {
     const OWNER: &str = "macro|dm-owner@example.com";
     let conversation_id = Uuid::now_v7();
@@ -325,7 +325,7 @@ async fn direct_conversation_session_references_grant_nothing(pool: PgPool) {
     assert_eq!(granted(shared_session_id).await, Some(AccessLevel::View));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_external_chat_mention_by_someone_it_was_shared_with_shares_nothing(pool: PgPool) {
     let channel_id = Uuid::now_v7();
     let chat_id = Uuid::now_v7();

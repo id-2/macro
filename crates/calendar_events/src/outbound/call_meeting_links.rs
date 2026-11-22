@@ -9,7 +9,7 @@ use std::sync::Arc;
 use call::domain::meetings::{CreateMeetingRequest, MAX_MEETING_TITLE_CHARS};
 use call::domain::models::CallError;
 use call::domain::ports::CallService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::meeting_links::{MeetingLink, MeetingLinkError, MeetingLinkRequest};
@@ -61,8 +61,8 @@ fn meeting_title(title: &str) -> Option<String> {
     (!title.is_empty()).then_some(title)
 }
 
-fn requester<'a>(requester_id: &'a str) -> Result<MacroUserIdStr<'a>, MeetingLinkError> {
-    MacroUserIdStr::parse_from_str(requester_id)
+fn requester<'a>(requester_id: &'a str) -> Result<RoxUserIdStr<'a>, MeetingLinkError> {
+    RoxUserIdStr::parse_from_str(requester_id)
         .map_err(|error| MeetingLinkError::InvalidInput(format!("invalid requester id: {error}")))
 }
 

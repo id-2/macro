@@ -4,7 +4,7 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -51,8 +51,8 @@ fn decode_error(message: impl std::fmt::Display) -> sqlx::Error {
     sqlx::Error::Decode(message.to_string().into())
 }
 
-fn parse_user_id(raw: &str) -> Result<MacroUserIdStr<'static>, sqlx::Error> {
-    MacroUserIdStr::parse_from_str(raw)
+fn parse_user_id(raw: &str) -> Result<RoxUserIdStr<'static>, sqlx::Error> {
+    RoxUserIdStr::parse_from_str(raw)
         .map(CowLike::into_owned)
         .map_err(|e| decode_error(format!("stored macro user id is invalid: {e:?}")))
 }
@@ -238,7 +238,7 @@ impl GtmInviteRepo for PgGtmInviteRepo {
     async fn redeem_link<'a>(
         &self,
         id: Uuid,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         now: DateTime<Utc>,
     ) -> Result<Option<InviteLink>, Self::Err> {
         // Single statement so two accounts racing for one link, or a signup
@@ -272,7 +272,7 @@ impl GtmInviteRepo for PgGtmInviteRepo {
     #[tracing::instrument(skip(self, user_id), fields(user_id = %user_id.as_ref()), err)]
     async fn get_redeemed_link_for_user<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
     ) -> Result<Option<InviteLink>, Self::Err> {
         sqlx::query_as!(
             InviteLinkRow,
@@ -295,7 +295,7 @@ impl GtmInviteRepo for PgGtmInviteRepo {
     #[tracing::instrument(skip(self, user_id), fields(user_id = %user_id.as_ref()), err)]
     async fn mark_converted<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         stripe_subscription_id: &str,
         now: DateTime<Utc>,
     ) -> Result<bool, Self::Err> {

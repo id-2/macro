@@ -46,7 +46,7 @@ describe('getMacroApiToken', () => {
 
   test('reuses an unexpired cached token', async () => {
     const token = jwt(Math.floor(Date.now() / 1000) + 3600);
-    macroApiToken.mockResolvedValue(ok({ macro_api_token: token }));
+    macroApiToken.mockResolvedValue(ok({ rox_api_token: token }));
     const { getMacroApiToken } = await import('./fetch');
 
     await expect(getMacroApiToken()).resolves.toBe(token);
@@ -59,8 +59,8 @@ describe('getMacroApiToken', () => {
     const expired = jwt(Math.floor(Date.now() / 1000) - 60);
     const fresh = jwt(Math.floor(Date.now() / 1000) + 3600);
     macroApiToken
-      .mockResolvedValueOnce(ok({ macro_api_token: expired }))
-      .mockResolvedValueOnce(ok({ macro_api_token: fresh }));
+      .mockResolvedValueOnce(ok({ rox_api_token: expired }))
+      .mockResolvedValueOnce(ok({ rox_api_token: fresh }));
     const { getMacroApiToken } = await import('./fetch');
 
     await expect(getMacroApiToken()).resolves.toBe(expired);
@@ -73,8 +73,8 @@ describe('getMacroApiToken', () => {
     const malformed = jwt([Math.floor(Date.now() / 1000) + 3600]);
     const fresh = jwt(Math.floor(Date.now() / 1000) + 3600);
     macroApiToken
-      .mockResolvedValueOnce(ok({ macro_api_token: malformed }))
-      .mockResolvedValueOnce(ok({ macro_api_token: fresh }));
+      .mockResolvedValueOnce(ok({ rox_api_token: malformed }))
+      .mockResolvedValueOnce(ok({ rox_api_token: fresh }));
     const { getMacroApiToken } = await import('./fetch');
 
     await expect(getMacroApiToken()).resolves.toBe(malformed);
@@ -91,7 +91,7 @@ describe('getMacroApiToken', () => {
     });
     macroApiToken.mockImplementation(async () => {
       await gate;
-      return ok({ macro_api_token: token });
+      return ok({ rox_api_token: token });
     });
     const { getMacroApiToken } = await import('./fetch');
 
@@ -106,7 +106,7 @@ describe('getMacroApiToken', () => {
   test('deduplicates concurrent refreshes of an expired cached token', async () => {
     const expired = jwt(Math.floor(Date.now() / 1000) - 60);
     const fresh = jwt(Math.floor(Date.now() / 1000) + 3600);
-    macroApiToken.mockResolvedValueOnce(ok({ macro_api_token: expired }));
+    macroApiToken.mockResolvedValueOnce(ok({ rox_api_token: expired }));
     const { getMacroApiToken } = await import('./fetch');
 
     await expect(getMacroApiToken()).resolves.toBe(expired);
@@ -117,7 +117,7 @@ describe('getMacroApiToken', () => {
     });
     macroApiToken.mockImplementationOnce(async () => {
       await gate;
-      return ok({ macro_api_token: fresh });
+      return ok({ rox_api_token: fresh });
     });
 
     const first = getMacroApiToken();
@@ -133,10 +133,10 @@ describe('getMacroApiToken', () => {
     const old = jwt(Math.floor(Date.now() / 1000) + 3600);
     const next = jwt(Math.floor(Date.now() / 1000) + 7200);
     const held =
-      Promise.withResolvers<Ok<{ macro_api_token: string }, unknown>>();
+      Promise.withResolvers<Ok<{ rox_api_token: string }, unknown>>();
     macroApiToken
       .mockReturnValueOnce(held.promise)
-      .mockResolvedValueOnce(ok({ macro_api_token: next }));
+      .mockResolvedValueOnce(ok({ rox_api_token: next }));
     const { getMacroApiToken, resetMacroApiToken } = await import('./fetch');
     const obsolete = getMacroApiToken();
     const rejected = expect(obsolete).rejects.toThrow(
@@ -144,19 +144,19 @@ describe('getMacroApiToken', () => {
     );
     resetMacroApiToken();
     await expect(getMacroApiToken()).resolves.toBe(next);
-    held.resolve(ok({ macro_api_token: old }));
+    held.resolve(ok({ rox_api_token: old }));
     await rejected;
     await expect(getMacroApiToken()).resolves.toBe(next);
     expect(macroApiToken).toHaveBeenCalledTimes(2);
     resetMacroApiToken();
-    macroApiToken.mockResolvedValueOnce(ok({ macro_api_token: old }));
+    macroApiToken.mockResolvedValueOnce(ok({ rox_api_token: old }));
     await expect(getMacroApiToken()).resolves.toBe(old);
     expect(macroApiToken).toHaveBeenCalledTimes(3);
   });
 
   test('does not dispatch an authenticated request after its token generation changes', async () => {
     const held =
-      Promise.withResolvers<Ok<{ macro_api_token: string }, unknown>>();
+      Promise.withResolvers<Ok<{ rox_api_token: string }, unknown>>();
     macroApiToken.mockReturnValueOnce(held.promise);
     const nativeFetch = vi.spyOn(globalThis, 'fetch');
     const { fetchWithAuth, resetMacroApiToken } = await import('./fetch');
@@ -168,7 +168,7 @@ describe('getMacroApiToken', () => {
     );
     resetMacroApiToken();
     held.resolve(
-      ok({ macro_api_token: jwt(Math.floor(Date.now() / 1000) + 3600) })
+      ok({ rox_api_token: jwt(Math.floor(Date.now() / 1000) + 3600) })
     );
     await rejected;
     expect(nativeFetch).not.toHaveBeenCalled();
@@ -177,7 +177,7 @@ describe('getMacroApiToken', () => {
 
   test('rejects an authenticated response that lands after session replacement', async () => {
     macroApiToken.mockResolvedValue(
-      ok({ macro_api_token: jwt(Math.floor(Date.now() / 1000) + 3600) })
+      ok({ rox_api_token: jwt(Math.floor(Date.now() / 1000) + 3600) })
     );
     const entered = Promise.withResolvers<void>();
     const response = Promise.withResolvers<Response>();
@@ -213,7 +213,7 @@ describe('getMacroApiToken', () => {
       .mockResolvedValueOnce(
         err([{ code: 'UNAUTHORIZED' as const, message: 'Unauthorized access' }])
       )
-      .mockResolvedValueOnce(ok({ macro_api_token: fresh }));
+      .mockResolvedValueOnce(ok({ rox_api_token: fresh }));
     const { getMacroApiToken } = await import('./fetch');
 
     await expect(getMacroApiToken()).rejects.toBeDefined();

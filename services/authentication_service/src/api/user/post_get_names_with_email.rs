@@ -4,10 +4,10 @@ use axum::{
     extract::{self, State},
     http::StatusCode,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::user::get_user_name::get_user_names_with_email;
-use macro_user_id::user_id::MacroUserId;
-use macro_user_id::{cowlike::CowLike, lowercased::Lowercase};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::user::get_user_name::get_user_names_with_email;
+use rox_user_id::user_id::RoxUserId;
+use rox_user_id::{cowlike::CowLike, lowercased::Lowercase};
 
 use model::response::ErrorResponse;
 use model::user::UserNames;
@@ -33,14 +33,14 @@ pub struct GetNamesWithEmailRequestBody {
 #[tracing::instrument(skip_all, fields(user_count = req.user_ids.len()))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(req): extract::Json<GetNamesWithEmailRequestBody>,
 ) -> Result<Json<UserNames>, (StatusCode, String)> {
-    let user_profile_ids: NonEmpty<Vec<MacroUserId<Lowercase>>> = NonEmpty::new(
+    let user_profile_ids: NonEmpty<Vec<RoxUserId<Lowercase>>> = NonEmpty::new(
         req.user_ids
             .into_iter()
             .filter_map(|id| {
-                MacroUserId::parse_from_str(&id)
+                RoxUserId::parse_from_str(&id)
                     .map(|i| i.into_owned().lowercase())
                     .ok()
             })
@@ -55,7 +55,7 @@ pub async fn handler(
 
     let user_names = get_user_names_with_email(
         &ctx.db,
-        authorization.authorization.user.macro_user_id.as_ref(),
+        authorization.authorization.user.rox_user_id.as_ref(),
         user_profile_ids,
     )
     .await

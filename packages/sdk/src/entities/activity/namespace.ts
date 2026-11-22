@@ -3,7 +3,7 @@ import type {
   ToolActivityEvent,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { EntityReference } from '../reference';
 import { User } from '../users/user';
 import { activityEntity } from './entity';
@@ -47,7 +47,7 @@ export interface ActivityRange {
  * events; when `truncated` is true, split the range and read each part.
  */
 export class ActivityNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * The acting user's actions in `[from, to)`, newest first, at most 100; when
@@ -82,7 +82,7 @@ export class ActivityNamespace {
 }
 
 function activityEvent(
-  client: MacroClient,
+  client: RoxClient,
   event: ToolActivityEvent,
 ): ActivityEvent {
   return {

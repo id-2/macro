@@ -1,7 +1,7 @@
 use super::*;
 use crate::outbound::pg::source_access::verify_calendar_snapshot;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_metadata_changes_never_certify_unchanged_ooo(pool: PgPool) {
     let owner = "macro|calendar-refresh@example.com";
     let link = insert_link(&pool, owner).await;
@@ -48,7 +48,7 @@ async fn calendar_metadata_changes_never_certify_unchanged_ooo(pool: PgPool) {
     tx.rollback().await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn refresh_hint_preserves_unrelated_events_but_clears_old_and_new_ooo(pool: PgPool) {
     let owner = "macro|refresh@example.com";
     insert_user(&pool, owner).await;

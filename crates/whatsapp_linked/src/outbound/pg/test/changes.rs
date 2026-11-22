@@ -14,7 +14,7 @@ async fn next(listener: &mut PgListener) -> Change {
     ChangeSignal::parse(notification.payload()).unwrap().change
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rosters_signal_only_real_changes_and_rename_the_owners_group(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let mut listener = listen(&pool).await;
@@ -78,7 +78,7 @@ async fn rosters_signal_only_real_changes_and_rename_the_owners_group(pool: PgPo
     assert_eq!(detail.chat.send_reason, Some(ReplyBlock::NotAdded));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn messages_and_send_outcomes_signal_their_group(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let mut listener = listen(&pool).await;
@@ -131,7 +131,7 @@ async fn messages_and_send_outcomes_signal_their_group(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_retried_send_returns_the_original_whatever_happened_since(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let request = SendReply {
@@ -185,7 +185,7 @@ async fn a_retried_send_returns_the_original_whatever_happened_since(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn change_audiences_come_from_the_store(pool: PgPool) {
     use external_chat::domain::ports::{AudienceRepository, MessageNotice};
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;

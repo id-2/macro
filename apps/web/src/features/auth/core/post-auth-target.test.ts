@@ -106,8 +106,8 @@ describe('desktopAuthCallbackUrl', () => {
     'carries a redirect through the auth service (double decode: %o)',
     (doubleDecode) => {
       const redirect = '/team-invite?id=abc&source=email';
-      const callback = desktopAuthCallbackUrl('macro:///login', redirect);
-      expect(callback.startsWith('macro:///login?redirect=')).toBe(true);
+      const callback = desktopAuthCallbackUrl('rox:///login', redirect);
+      expect(callback.startsWith('rox:///login?redirect=')).toBe(true);
       expect(redirectAfterAuthService(callback, doubleDecode)).toBe(redirect);
     }
   );
@@ -115,8 +115,8 @@ describe('desktopAuthCallbackUrl', () => {
   it.each<[unknown]>([[null], ['https://evil.example'], ['//evil.example']])(
     'leaves the callback alone for %o',
     (redirect) => {
-      expect(desktopAuthCallbackUrl('macro:///login', redirect)).toBe(
-        'macro:///login'
+      expect(desktopAuthCallbackUrl('rox:///login', redirect)).toBe(
+        'rox:///login'
       );
     }
   );

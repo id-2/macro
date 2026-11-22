@@ -4,7 +4,7 @@ import type {
   RunMode,
 } from '../../../generated/scheduled-action/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { rejectUnknownOptions } from '../../utils/options';
 import {
   outcome,
@@ -98,7 +98,7 @@ export type SuggestionInput =
  * @mcp-exclude Suggestions are written by hidden generation sessions and acted on in the app, not over MCP.
  */
 export class SuggestionNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * The user's feed: their open suggestions about items they can still open, best

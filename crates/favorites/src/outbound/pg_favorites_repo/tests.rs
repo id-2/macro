@@ -1,6 +1,6 @@
 use cowlike::CowLike;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -12,23 +12,23 @@ use crate::domain::ports::FavoritesRepo;
 const USER_A: &str = "macro|user-a@rox.one";
 const USER_B: &str = "macro|user-b@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(id)
     .execute(pool)
     .await
     .expect("macro_user should insert");
-    sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#)
+    sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#)
         .bind(id)
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .execute(pool)
         .await
         .expect("user should insert");
@@ -44,7 +44,7 @@ async fn insert_document(pool: &PgPool, id: &str, name: &str, owner: &str) {
         .expect("document should insert");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn add_favorite_appends_and_is_idempotent(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = PgFavoritesRepo::new(pool);
@@ -82,7 +82,7 @@ async fn add_favorite_appends_and_is_idempotent(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn count_favorites_counts_user_collection(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = PgFavoritesRepo::new(pool);
@@ -118,7 +118,7 @@ async fn count_favorites_counts_user_collection(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_favorites_skips_deleted(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_document(&pool, "doc-live", "Launch plan", USER_A).await;
@@ -154,7 +154,7 @@ async fn list_favorites_skips_deleted(pool: PgPool) {
     assert_eq!(favorites[1].entity_type, EntityType::EmailThread);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_favorites_hydrates_uuid_keyed_entities(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let channel_id = Uuid::now_v7().to_string();
@@ -195,7 +195,7 @@ async fn list_favorites_hydrates_uuid_keyed_entities(pool: PgPool) {
     assert_eq!(favorites[1].channel_type, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_favorites_skips_agent_sessions_that_no_longer_exist(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let bot_id = Uuid::now_v7();
@@ -265,7 +265,7 @@ async fn insert_filter_fixture(pool: &PgPool, repo: &PgFavoritesRepo) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_favorites_filters_on_each_dimension_and_on_both(pool: PgPool) {
     let repo = PgFavoritesRepo::new(pool.clone());
     insert_filter_fixture(&pool, &repo).await;
@@ -351,7 +351,7 @@ async fn list_favorites_filters_on_each_dimension_and_on_both(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_filtered_list_keeps_the_manual_order_and_the_soft_delete_guard(pool: PgPool) {
     let repo = PgFavoritesRepo::new(pool.clone());
     insert_filter_fixture(&pool, &repo).await;
@@ -390,7 +390,7 @@ async fn a_filtered_list_keeps_the_manual_order_and_the_soft_delete_guard(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn remove_favorite_by_entity_scopes_to_user(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -419,7 +419,7 @@ async fn remove_favorite_by_entity_scopes_to_user(pool: PgPool) {
     assert_eq!(b_favorites.len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reorder_favorites_sets_manual_order(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     for entity_id in ["a", "b", "c"] {
@@ -450,7 +450,7 @@ async fn reorder_favorites_sets_manual_order(pool: PgPool) {
     assert_eq!(listed, ["c", "b", "a"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn favorited_entities_returns_user_favorites(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;

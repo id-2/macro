@@ -1,8 +1,8 @@
 use super::*;
 use agent_runtime_protocol::domain::notification::NotificationEvent;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outbox_is_transactional_deduplicated_and_cascades(pool: PgPool) {
     sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
@@ -48,7 +48,7 @@ async fn outbox_is_transactional_deduplicated_and_cascades(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn quiet_events_coalesce_and_expired_leases_keep_their_action_identity(pool: PgPool) {
     sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
@@ -118,7 +118,7 @@ async fn quiet_events_coalesce_and_expired_leases_keep_their_action_identity(poo
     assert_ne!(next.action_id, first.action_id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn waking_turn_leaves_quiet_events_for_a_real_prompt(pool: PgPool) {
     sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
@@ -153,13 +153,13 @@ async fn waking_turn_leaves_quiet_events_for_a_real_prompt(pool: PgPool) {
     assert_eq!(quiet.notifications[0].subject_id, "quiet");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_review_writes_during_rollout_enter_the_typed_outbox_once(pool: PgPool) {
     sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
-    let review = macro_uuid::generate_uuid_v7();
-    let action = macro_uuid::generate_uuid_v7();
-    let mut record = serde_json::json!({"notificationId":action,"items":[{"id": macro_uuid::generate_uuid_v7(),"status":"submitting"}]});
+    let review = rox_uuid::generate_uuid_v7();
+    let action = rox_uuid::generate_uuid_v7();
+    let mut record = serde_json::json!({"notificationId":action,"items":[{"id": rox_uuid::generate_uuid_v7(),"status":"submitting"}]});
     sqlx::query!(
         "INSERT INTO agent_session_review (id, agent_session_id, record) VALUES ($1,$2,$3)",
         review,
@@ -200,9 +200,9 @@ async fn legacy_review_writes_during_rollout_enter_the_typed_outbox_once(pool: P
         .await
         .unwrap();
 
-    let newer = macro_uuid::generate_uuid_v7();
+    let newer = rox_uuid::generate_uuid_v7();
     set_owner_prompt(&pool, session, newer).await;
-    record["notificationId"] = serde_json::json!(macro_uuid::generate_uuid_v7());
+    record["notificationId"] = serde_json::json!(rox_uuid::generate_uuid_v7());
     sqlx::query!(
         "UPDATE agent_session_review SET record = $2 WHERE id = $1",
         review,
@@ -244,7 +244,7 @@ async fn read_prompter(
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn prior_actions_reconcile_before_fresh_inputs_and_interrupted_quiet_events_defer(
     pool: PgPool,
 ) {
@@ -296,7 +296,7 @@ async fn prior_actions_reconcile_before_fresh_inputs_and_interrupted_quiet_event
     assert_ne!(next_prompt.action_id, quiet.action_id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn discovery_pages_advance_while_previous_sessions_remain_eligible(pool: PgPool) {
     sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) SELECT lpad(to_hex(n),32,'0')::uuid,'macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace' FROM generate_series(1,101) n").execute(&pool).await.unwrap();
     let store = PgNotificationStore(pool.clone());
@@ -332,7 +332,7 @@ async fn discovery_pages_advance_while_previous_sessions_remain_eligible(pool: P
     assert_eq!(store.pending_sessions(None).await.unwrap(), first);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unreadable_fresh_events_wait_without_blocking_or_sharing_a_delivered_action(pool: PgPool) {
     sqlx::query!("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
@@ -387,7 +387,7 @@ async fn unreadable_fresh_events_wait_without_blocking_or_sharing_a_delivered_ac
     assert_ne!(next.action_id, first.action_id);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unreadable_bound_events_keep_the_entire_original_action_for_a_compatible_consumer(
     pool: PgPool,
 ) {
@@ -439,7 +439,7 @@ async fn unreadable_bound_events_keep_the_entire_original_action_for_a_compatibl
     assert_eq!(recovered.notifications.len(), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stored_settlements_read_back_as_the_kind_they_were_written(pool: PgPool) {
     use agent_runtime_protocol::domain::notification::{
         DecisionOutcome, DecisionVia, ImportOutcome, ImportSettlement, ImportWorkspace,

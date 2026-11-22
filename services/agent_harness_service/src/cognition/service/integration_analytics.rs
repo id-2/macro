@@ -7,7 +7,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::domain::models::McpServerRecord;
 use serde::Serialize;
 use sqlx::PgPool;
@@ -106,7 +106,7 @@ impl IntegrationAnalytics {
     /// the connect or disconnect request.
     pub fn record(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         change: IntegrationChange,
         event: IntegrationEvent,
     ) {

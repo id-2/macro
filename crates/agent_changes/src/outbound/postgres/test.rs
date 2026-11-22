@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::model::FileChangeKind;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const OWNER: &str = "macro|changes-owner@example.com";
 
@@ -8,14 +8,14 @@ const OWNER: &str = "macro|changes-owner@example.com";
 /// rows it needs in turn.
 async fn seed_session(pool: &PgPool) -> AgentSessionId {
     let email = OWNER.strip_prefix("macro|").unwrap_or(OWNER);
-    let macro_user_id = sqlx::query_scalar!(
+    let rox_user_id = sqlx::query_scalar!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username
         RETURNING id
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         email,
         email,
         format!("stripe_{email}"),
@@ -24,15 +24,15 @@ async fn seed_session(pool: &PgPool) -> AgentSessionId {
     .await
     .expect("insert macro_user");
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING"#,
         OWNER,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
     .expect("insert User");
-    let bot_id = macro_uuid::generate_uuid_v7();
+    let bot_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO bots (id, kind, name, handle, has_agent, owner_user_id) VALUES ($1, 'owned', 'Changes Bot', $2, true, $3)"#,
         bot_id,
@@ -91,7 +91,7 @@ fn changeset(session: AgentSessionId) -> Changeset {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_without_captures_reads_as_empty(pool: PgPool) {
     let repo = PgChangesetRepo::new(pool.clone());
     let session = seed_session(&pool).await;
@@ -99,7 +99,7 @@ async fn a_session_without_captures_reads_as_empty(pool: PgPool) {
     assert!(repo.patch_location(session).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn working_branches_are_batched_without_base_fallback(pool: PgPool) {
     let repo = PgChangesetRepo::new(pool.clone());
     let captured = seed_session(&pool).await;
@@ -144,7 +144,7 @@ async fn working_branches_are_batched_without_base_fallback(pool: PgPool) {
     assert!(repo.working_branches(&[captured]).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_attempt_is_visible_while_it_runs_and_when_it_ends(pool: PgPool) {
     let repo = PgChangesetRepo::new(pool.clone());
     let session = seed_session(&pool).await;
@@ -174,7 +174,7 @@ async fn an_attempt_is_visible_while_it_runs_and_when_it_ends(pool: PgPool) {
     assert_eq!(attempt.error.as_deref(), Some("not yet"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_captured_changeset_round_trips_and_reports_what_it_superseded(pool: PgPool) {
     let repo = PgChangesetRepo::new(pool.clone());
     let session = seed_session(&pool).await;
@@ -235,7 +235,7 @@ async fn a_captured_changeset_round_trips_and_reports_what_it_superseded(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_shared_pull_request_changeset_replaces_the_sessions_own_patch(pool: PgPool) {
     let repo = PgChangesetRepo::new(pool.clone());
     let session = seed_session(&pool).await;
@@ -249,7 +249,7 @@ async fn a_shared_pull_request_changeset_replaces_the_sessions_own_patch(pool: P
     .await
     .unwrap();
 
-    let shared = macro_uuid::generate_uuid_v7();
+    let shared = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO github_pull_request_changeset (
@@ -288,7 +288,7 @@ async fn a_shared_pull_request_changeset_replaces_the_sessions_own_patch(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_attempt_keeps_the_previous_changeset(pool: PgPool) {
     let repo = PgChangesetRepo::new(pool.clone());
     let session = seed_session(&pool).await;
@@ -309,7 +309,7 @@ async fn a_failed_attempt_keeps_the_previous_changeset(pool: PgPool) {
     assert_eq!(attempt.error.as_deref(), Some("boom"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_the_session_takes_its_changes_with_it(pool: PgPool) {
     let repo = PgChangesetRepo::new(pool.clone());
     let session = seed_session(&pool).await;

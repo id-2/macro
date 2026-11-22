@@ -880,7 +880,7 @@
       tauriDesktopDmgProvisioningProfile = lib.optionalString (tauriDesktopDmgProvisioningProfilePath != "") (
         builtins.path {
           path = /. + tauriDesktopDmgProvisioningProfilePath;
-          name = "macro.provisionprofile";
+          name = "rox.provisionprofile";
         }
       );
       tauriDesktopDmgAppleLd = pkgs.writeShellScriptBin "ld" ''

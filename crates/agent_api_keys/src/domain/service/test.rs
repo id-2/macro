@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 use crate::domain::models::{AgentKeyStatus, AgentOwner, EncryptedProviderApiKey};
@@ -10,7 +10,7 @@ const BOT: &str = "00000000-0000-0000-0000-0000000000b0";
 fn agent(harness: &str, model: &str) -> KeyedAgent {
     KeyedAgent {
         bot_id: BOT.parse().expect("uuid"),
-        owner: AgentOwner::User(MacroUserIdStr::try_from(OWNER.to_owned()).expect("user id")),
+        owner: AgentOwner::User(RoxUserIdStr::try_from(OWNER.to_owned()).expect("user id")),
         harness: harness.to_owned(),
         model: model.to_owned(),
     }
@@ -76,7 +76,7 @@ impl AgentKeyRepo for FakeRepo {
             }))
     }
 
-    async fn is_team_member(&self, user: &MacroUserIdStr<'_>, _team_id: Uuid) -> Result<bool> {
+    async fn is_team_member(&self, user: &RoxUserIdStr<'_>, _team_id: Uuid) -> Result<bool> {
         Ok(self
             .team_members
             .lock()
@@ -88,8 +88,8 @@ impl AgentKeyRepo for FakeRepo {
 
 const OWNER: &str = "macro|owner@example.com";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_owned()).expect("user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_owned()).expect("user id")
 }
 
 #[derive(Default)]

@@ -1,7 +1,7 @@
 use base64::Engine;
 use livekit_api::access_token::AccessToken;
 use livekit_api::services::{ServiceError, TwirpError, TwirpErrorCode};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sha2::{Digest, Sha256};
 
 use super::*;
@@ -79,7 +79,7 @@ fn room_composite_egress_uses_speaker_layout() {
 #[tokio::test]
 async fn verify_access_token_round_trips_identity_and_room() {
     let client = client();
-    let identity = MacroUserIdStr::try_from_email("alice@example.com").unwrap();
+    let identity = RoxUserIdStr::try_from_email("alice@example.com").unwrap();
 
     let token = client
         .generate_token("room-1", identity.clone())
@@ -93,7 +93,7 @@ async fn verify_access_token_round_trips_identity_and_room() {
 
 #[tokio::test]
 async fn verify_access_token_rejects_token_signed_with_a_different_secret() {
-    let identity = MacroUserIdStr::try_from_email("alice@example.com").unwrap();
+    let identity = RoxUserIdStr::try_from_email("alice@example.com").unwrap();
     let token = client()
         .generate_token("room-1", identity)
         .await

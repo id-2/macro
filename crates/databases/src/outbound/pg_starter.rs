@@ -131,7 +131,7 @@ where
             .create_database_definition_in(
                 &mut transaction,
                 NewDatabaseDefinition {
-                    id: macro_uuid::generate_uuid_v7(),
+                    id: rox_uuid::generate_uuid_v7(),
                     database_id: database_id.into_uuid(),
                     name: blueprint.title_name,
                     data_type: DataType::String,
@@ -157,7 +157,7 @@ where
             .create_database_definition_in(
                 &mut transaction,
                 NewDatabaseDefinition {
-                    id: macro_uuid::generate_uuid_v7(),
+                    id: rox_uuid::generate_uuid_v7(),
                     database_id: database_id.into_uuid(),
                     name: blueprint.stage_name,
                     data_type: DataType::SelectString,

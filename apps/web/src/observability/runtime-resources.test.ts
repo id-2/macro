@@ -66,7 +66,7 @@ it('installs no work at all in unsampled sessions', async () => {
 it('reports visible windows, live route owners, session age and existing native fields', async () => {
   releases.push(trackRouteView(), trackRouteView());
   const read = vi.fn(() => ({
-    'macro.memory.web_content.footprint_bytes': 1024,
+    'rox.memory.web_content.footprint_bytes': 1024,
   }));
   dispose = startRuntimeResourceSampling(read);
   await vi.advanceTimersByTimeAsync(60_000);
@@ -79,7 +79,7 @@ it('reports visible windows, live route owners, session age and existing native 
       'runtime.route_views.count': 2,
       'runtime.long_task.ms': 120,
       'runtime.long_animation_frame.blocking_ms': 40,
-      'macro.memory.web_content.footprint_bytes': 1024,
+      'rox.memory.web_content.footprint_bytes': 1024,
     }),
     performance.timeOrigin + 60_000,
     'perf'
@@ -120,7 +120,7 @@ it('does not publish a stale asynchronous memory read after hide and resume', as
   await vi.advanceTimersByTimeAsync(60_000);
   visible(false);
   visible(true);
-  finish({ 'macro.memory.web_content.footprint_bytes': 1 });
+  finish({ 'rox.memory.web_content.footprint_bytes': 1 });
   await Promise.resolve();
   await Promise.resolve();
   expect(Telemetry.recordSample).not.toHaveBeenCalled();
@@ -158,8 +158,8 @@ it('reads aggregate memory only when isolated, with an explicit source', async (
     value: vi.fn(async () => ({ bytes: 2048 })),
   });
   expect(await browserMemoryAttributes()).toEqual({
-    'macro.memory.browser.source': 'user_agent_specific',
-    'macro.memory.browser.bytes': 2048,
+    'rox.memory.browser.source': 'user_agent_specific',
+    'rox.memory.browser.bytes': 2048,
   });
 });
 it('falls back to Chromium heap when aggregate memory rejects', async () => {
@@ -175,10 +175,10 @@ it('falls back to Chromium heap when aggregate memory rejects', async () => {
     value: { usedJSHeapSize: 10, totalJSHeapSize: 20, jsHeapSizeLimit: 30 },
   });
   expect(await browserMemoryAttributes()).toEqual({
-    'macro.memory.browser.source': 'js_heap',
-    'macro.memory.js_heap.used_bytes': 10,
-    'macro.memory.js_heap.total_bytes': 20,
-    'macro.memory.js_heap.limit_bytes': 30,
+    'rox.memory.browser.source': 'js_heap',
+    'rox.memory.js_heap.used_bytes': 10,
+    'rox.memory.js_heap.total_bytes': 20,
+    'rox.memory.js_heap.limit_bytes': 30,
   });
 });
 

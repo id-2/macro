@@ -33,7 +33,7 @@ async function readMacroApiToken(generation: number) {
   const result = await authServiceClient.macroApiToken();
   assertTokenGeneration(generation);
   if (result.isErr()) throw result.error;
-  return result.value.macro_api_token;
+  return result.value.rox_api_token;
 }
 async function releaseFailedToken(promise: Promise<string>) {
   try {

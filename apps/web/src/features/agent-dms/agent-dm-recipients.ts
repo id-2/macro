@@ -1,5 +1,5 @@
-import { MACRO_AGENT_NAME } from '@core/constant/macroAgent';
-import { MACRO_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_NAME } from '@core/constant/macroAgent';
+import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
 import { useUserId } from '@core/context/user';
 import { type CombinedRecipientItem, recipientEntityMapper } from '@core/user';
 import { useAgentsQuery } from '@queries/agents/agents';
@@ -17,10 +17,10 @@ export function useAgentDmRecipients() {
     const visibleAgents = agents.isSuccess ? agents.data : [];
     return [
       recipientEntityMapper('agent')({
-        id: MACRO_NEW_BOT_ID,
-        name: MACRO_AGENT_NAME,
+        id: ROX_NEW_BOT_ID,
+        name: ROX_AGENT_NAME,
         handle: 'macro',
-        description: `Your private conversation with ${MACRO_AGENT_NAME}`,
+        description: `Your private conversation with ${ROX_AGENT_NAME}`,
       }),
       ...visibleAgents
         .filter((agent) =>

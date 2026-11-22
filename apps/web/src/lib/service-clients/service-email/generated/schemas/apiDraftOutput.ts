@@ -27,7 +27,7 @@ export interface ApiDraftOutput {
   /** HTML body (decoded). */
   body_html?: ApiDraftOutputBodyHtml;
   /** Rox body. */
-  body_macro?: ApiDraftOutputBodyMacro;
+  body_rox?: ApiDraftOutputBodyMacro;
   /** Plain text body. */
   body_text?: ApiDraftOutputBodyText;
   /** Cc recipients. */

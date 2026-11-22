@@ -5,7 +5,7 @@ use attention_feed::domain::models::{
     DoneReceipt, FeedKey, FeedNotification, FeedPosition, FeedRevision,
 };
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::bulk_action::BulkActionLease;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -116,7 +116,7 @@ impl InboxRowId {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InboxActor {
     /// A Rox user.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
     /// An agent, by the bot it runs as.
     Agent {
         /// The bot.
@@ -158,7 +158,7 @@ pub struct InboxRowAction {
     /// What the action acts on when it is not the row's group: an access or
     /// join request.
     pub target_id: Option<String>,
-    /// The page the action opens outside Macro, such as a pull request.
+    /// The page the action opens outside Rox, such as a pull request.
     pub url: Option<String>,
 }
 
@@ -358,7 +358,7 @@ pub struct ClearRun {
 
 impl ClearRun {
     /// Whose inbox the clear belongs to.
-    pub fn user(&self) -> &MacroUserIdStr<'static> {
+    pub fn user(&self) -> &RoxUserIdStr<'static> {
         &self.lease.user_id
     }
 

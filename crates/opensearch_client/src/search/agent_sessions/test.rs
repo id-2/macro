@@ -88,7 +88,7 @@ fn folded_hits_keep_turn_author_and_deduplicate_across_terms() {
     let message = serde_json::json!({
         "_id":"session:3:agent", "_score":2.0,
         "_source":{"message_turn":3,"author":"agent"},
-        "highlight":{"content":["<macro_em>burger</macro_em> and fries"]}
+        "highlight":{"content":["<rox_em>burger</rox_em> and fries"]}
     });
     let hit = Hit {
         source: AgentSessionIndex {
@@ -100,7 +100,7 @@ fn folded_hits_keep_turn_author_and_deduplicate_across_terms() {
         score: Some(1.0),
         highlight: Some(std::collections::HashMap::from([(
             "name".into(),
-            vec!["<macro_em>burger</macro_em>".into()],
+            vec!["<rox_em>burger</rox_em>".into()],
         )])),
         inner_hits: Some(serde_json::json!({
             "agent_term_0":{"hits":{"hits":[message.clone()]}},

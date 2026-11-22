@@ -70,7 +70,7 @@ const record = (
 
 /**
  * The real SDK client with the namespaces under test replaced, so the adapter
- * is typed against the real `Macro` and nothing here can reach the network:
+ * is typed against the real `Rox` and nothing here can reach the network:
  * a namespace a test didn't replace would need a request, and the key is fake.
  */
 const fakeMacro = (

@@ -3,7 +3,7 @@
 use agent_session::domain::model::AgentSessionId;
 use agent_session::inbound::axum_router::{CreateAgentSessionRequest, CreateSessionThread};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::config::Workspace;
 use crate::outbound::agent_session::{ApiError, HarnessApi};
@@ -105,7 +105,7 @@ impl Dispatcher {
         Ok(self.workspace.path.to_string_lossy().into_owned())
     }
 
-    fn created(&self, session: AgentSessionId, sender: &MacroUserIdStr<'static>) {
+    fn created(&self, session: AgentSessionId, sender: &RoxUserIdStr<'static>) {
         #[cfg(unix)]
         if let Some(hub) = &self.herdr {
             hub.session_created(session, sender.clone());
@@ -114,7 +114,7 @@ impl Dispatcher {
         let _ = (session, sender);
     }
 
-    fn prompted(&self, session: AgentSessionId, sender: &MacroUserIdStr<'static>) {
+    fn prompted(&self, session: AgentSessionId, sender: &RoxUserIdStr<'static>) {
         #[cfg(unix)]
         if let Some(hub) = &self.herdr {
             hub.owner_seen(session, sender.clone());

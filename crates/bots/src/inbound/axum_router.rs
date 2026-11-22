@@ -26,12 +26,12 @@ use entity_access::{
     },
     inbound::axum_extractors::ChannelAccessLevelExtractor,
 };
-use macro_authorization::{
-    AccountHolderOrInternal, AnyPrincipal, BotOnly, MacroAuthorization,
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AccountHolderOrInternal, AnyPrincipal, BotOnly, RoxAuthorization,
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
     UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
 use std::sync::Arc;
@@ -41,7 +41,7 @@ use uuid::Uuid;
 pub struct BotsRouterState<S, Svc, Auth> {
     service: Arc<S>,
     access_service: Arc<Svc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Svc, Auth> Clone for BotsRouterState<S, Svc, Auth> {
@@ -59,7 +59,7 @@ impl<S: BotService, Svc: EntityAccessService, Auth> BotsRouterState<S, Svc, Auth
     pub fn new(
         service: S,
         access_service: Svc,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service: Arc::new(service),
@@ -75,7 +75,7 @@ impl<S, Svc, Auth> FromRef<BotsRouterState<S, Svc, Auth>> for Arc<Svc> {
     }
 }
 
-impl<S, Svc, Auth> FromRef<BotsRouterState<S, Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Svc, Auth> FromRef<BotsRouterState<S, Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &BotsRouterState<S, Svc, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -144,7 +144,7 @@ pub fn bots_router<S, Svc, Auth, T>(state: BotsRouterState<S, Svc, Auth>) -> Rou
 where
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync,
 {
     Router::new()
@@ -216,15 +216,15 @@ where
 pub async fn create_agent_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<CreateAgentRequest>,
 ) -> Result<(StatusCode, Json<Agent>), BotsHandlerErr> {
     let agent = state
         .service
-        .create_agent(authorization.authorization.user.macro_user_id, req)
+        .create_agent(authorization.authorization.user.rox_user_id, req)
         .await?;
     Ok((StatusCode::CREATED, Json(agent)))
 }
@@ -244,15 +244,15 @@ pub async fn create_agent_handler<
 pub async fn list_agents_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<Agent>>, BotsHandlerErr> {
     Ok(Json(
         state
             .service
-            .list_agents(authorization.authorization.user.macro_user_id)
+            .list_agents(authorization.authorization.user.rox_user_id)
             .await?,
     ))
 }
@@ -278,10 +278,10 @@ pub async fn list_agents_handler<
 pub async fn update_agent_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<AgentPath>,
     Json(req): Json<UpdateAgentRequest>,
 ) -> Result<Json<Agent>, BotsHandlerErr> {
@@ -289,7 +289,7 @@ pub async fn update_agent_handler<
         state
             .service
             .update_agent(
-                authorization.authorization.user.macro_user_id,
+                authorization.authorization.user.rox_user_id,
                 path.agent_id,
                 req,
             )
@@ -319,10 +319,10 @@ pub async fn update_agent_handler<
 pub async fn patch_agent_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<AgentPath>,
     Json(req): Json<PatchAgentRequest>,
 ) -> Result<Json<Agent>, BotsHandlerErr> {
@@ -330,7 +330,7 @@ pub async fn patch_agent_handler<
         state
             .service
             .patch_agent(
-                authorization.authorization.user.macro_user_id,
+                authorization.authorization.user.rox_user_id,
                 path.agent_id,
                 req,
             )
@@ -340,7 +340,7 @@ pub async fn patch_agent_handler<
 
 fn caller_from_receipt(
     receipt: &EntityAccessReceipt<MemberParticipantRole>,
-) -> Result<MacroUserIdStr<'static>, BotsHandlerErr> {
+) -> Result<RoxUserIdStr<'static>, BotsHandlerErr> {
     receipt
         .get_authenticated_user()
         .cloned()
@@ -364,15 +364,15 @@ fn caller_from_receipt(
 pub async fn create_bot_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<CreateBotRequest>,
 ) -> Result<(StatusCode, Json<Bot>), BotsHandlerErr> {
     let bot = state
         .service
-        .create_bot(authorization.authorization.user.macro_user_id, req)
+        .create_bot(authorization.authorization.user.rox_user_id, req)
         .await?;
     Ok((StatusCode::CREATED, Json(bot)))
 }
@@ -392,15 +392,15 @@ pub async fn create_bot_handler<
 pub async fn list_bots_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<Bot>>, BotsHandlerErr> {
     Ok(Json(
         state
             .service
-            .list_bots(authorization.authorization.user.macro_user_id)
+            .list_bots(authorization.authorization.user.rox_user_id)
             .await?,
     ))
 }
@@ -422,10 +422,10 @@ pub async fn list_bots_handler<
 pub async fn get_self_bot_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, BotOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, BotOnly>,
 ) -> Result<Json<Bot>, BotsHandlerErr> {
     Ok(Json(
         state
@@ -456,10 +456,10 @@ pub async fn get_self_bot_handler<
 pub async fn get_bot_owner_profiles_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    _authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    _authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(query): Query<BotOwnerProfilesQuery>,
 ) -> Result<Json<Vec<BotOwnerProfile>>, BotsHandlerErr> {
     Ok(Json(state.service.get_owner_profiles(&query.ids).await?))
@@ -484,16 +484,16 @@ pub async fn get_bot_owner_profiles_handler<
 pub async fn get_bot_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<BotPath>,
 ) -> Result<Json<Bot>, BotsHandlerErr> {
     Ok(Json(
         state
             .service
-            .get_bot(authorization.authorization.user.macro_user_id, path.bot_id)
+            .get_bot(authorization.authorization.user.rox_user_id, path.bot_id)
             .await?,
     ))
 }
@@ -519,10 +519,10 @@ pub async fn get_bot_handler<
 pub async fn patch_bot_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<BotPath>,
     Json(req): Json<PatchBotRequest>,
 ) -> Result<Json<Bot>, BotsHandlerErr> {
@@ -530,7 +530,7 @@ pub async fn patch_bot_handler<
         state
             .service
             .patch_bot(
-                authorization.authorization.user.macro_user_id,
+                authorization.authorization.user.rox_user_id,
                 path.bot_id,
                 req,
             )
@@ -557,15 +557,15 @@ pub async fn patch_bot_handler<
 pub async fn delete_bot_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<BotPath>,
 ) -> Result<StatusCode, BotsHandlerErr> {
     state
         .service
-        .delete_bot(authorization.authorization.user.macro_user_id, path.bot_id)
+        .delete_bot(authorization.authorization.user.rox_user_id, path.bot_id)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -591,17 +591,17 @@ pub async fn delete_bot_handler<
 pub async fn create_token_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     Path(path): Path<BotPath>,
     Json(req): Json<CreateBotTokenRequest>,
 ) -> Result<(StatusCode, Json<CreateBotTokenResponse>), BotsHandlerErr> {
     let token = state
         .service
         .create_token(
-            authorization.authorization.user.macro_user_id,
+            authorization.authorization.user.rox_user_id,
             path.bot_id,
             req,
         )
@@ -628,16 +628,16 @@ pub async fn create_token_handler<
 pub async fn list_tokens_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<BotPath>,
 ) -> Result<Json<Vec<BotToken>>, BotsHandlerErr> {
     Ok(Json(
         state
             .service
-            .list_tokens(authorization.authorization.user.macro_user_id, path.bot_id)
+            .list_tokens(authorization.authorization.user.rox_user_id, path.bot_id)
             .await?,
     ))
 }
@@ -662,16 +662,16 @@ pub async fn list_tokens_handler<
 pub async fn revoke_token_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<BotTokenPath>,
 ) -> Result<StatusCode, BotsHandlerErr> {
     state
         .service
         .revoke_token(
-            authorization.authorization.user.macro_user_id,
+            authorization.authorization.user.rox_user_id,
             path.bot_id,
             path.token_id,
         )
@@ -698,19 +698,19 @@ pub async fn revoke_token_handler<
 pub async fn list_bot_channels_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    authorization: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Path(path): Path<BotPath>,
 ) -> Result<Json<Vec<BotChannel>>, BotsHandlerErr> {
     let caller = match authorization.authorization {
-        MacroAuthorization::User(user) => BotChannelListCaller::User(user.macro_user_id),
-        MacroAuthorization::Bot(bot) => BotChannelListCaller::Bot(bot.bot_id),
-        MacroAuthorization::Harness(_) => {
+        RoxAuthorization::User(user) => BotChannelListCaller::User(user.rox_user_id),
+        RoxAuthorization::Bot(bot) => BotChannelListCaller::Bot(bot.bot_id),
+        RoxAuthorization::Harness(_) => {
             return Err(BotsHandlerErr::Bot(BotError::Unauthorized));
         }
-        MacroAuthorization::Internal(_) => BotChannelListCaller::Internal,
+        RoxAuthorization::Internal(_) => BotChannelListCaller::Internal,
     };
     Ok(Json(
         state.service.list_bot_channels(caller, path.bot_id).await?,
@@ -737,16 +737,16 @@ pub async fn list_bot_channels_handler<
 pub async fn remove_bot_channel_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<BotChannelPath>,
 ) -> Result<StatusCode, BotsHandlerErr> {
     state
         .service
         .remove_bot_from_channel(
-            authorization.authorization.user.macro_user_id,
+            authorization.authorization.user.rox_user_id,
             path.channel_id,
             path.bot_id,
         )
@@ -772,7 +772,7 @@ pub async fn remove_bot_channel_handler<
 pub async fn list_channel_bots_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
     _access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -804,7 +804,7 @@ pub async fn list_channel_bots_handler<
 pub async fn add_channel_bot_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -821,7 +821,7 @@ pub async fn add_channel_bot_handler<
 async fn remove_channel_bot_handler<
     S: BotService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<BotsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,

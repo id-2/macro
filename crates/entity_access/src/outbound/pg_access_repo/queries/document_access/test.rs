@@ -1,6 +1,6 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -8,13 +8,13 @@ const OWNER_WITH_TEAM: &str = "macro|document-owner@team.test";
 const OWNER_WITHOUT_TEAM: &str = "macro|document-owner@personal.test";
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::new_v4();
+    let rox_user_id = Uuid::new_v4();
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $2, $2)
         "#,
-        macro_user_id,
+        rox_user_id,
         user_id,
     )
     .execute(pool)
@@ -22,11 +22,11 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
 
     sqlx::query!(
         r#"
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ($1, $1, $2)
         "#,
         user_id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await?;
@@ -138,7 +138,7 @@ async fn insert_document_entity_access(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn public_link_allows_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id =
@@ -151,7 +151,7 @@ async fn public_link_allows_anonymous_access(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn null_link_denies_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id = insert_link_shared_document(&pool, OWNER_WITHOUT_TEAM, None, None).await?;
@@ -163,7 +163,7 @@ async fn null_link_denies_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_allows_same_team_access(pool: PgPool) -> anyhow::Result<()> {
     let owner_team_id = Uuid::new_v4();
     insert_user(&pool, OWNER_WITH_TEAM).await?;
@@ -178,7 +178,7 @@ async fn team_link_allows_same_team_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_other_team_access(pool: PgPool) -> anyhow::Result<()> {
     let owner_team_id = Uuid::new_v4();
     insert_user(&pool, OWNER_WITH_TEAM).await?;
@@ -193,7 +193,7 @@ async fn team_link_denies_other_team_access(pool: PgPool) -> anyhow::Result<()> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     let owner_team_id = Uuid::new_v4();
     insert_user(&pool, OWNER_WITH_TEAM).await?;
@@ -207,7 +207,7 @@ async fn team_link_denies_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_access_when_owner_has_no_team(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id =
@@ -220,7 +220,7 @@ async fn team_link_denies_access_when_owner_has_no_team(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn public_link_requires_an_access_level(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id =
@@ -232,7 +232,7 @@ async fn public_link_requires_an_access_level(pool: PgPool) -> anyhow::Result<()
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn returns_highest_link_or_explicit_access_level(pool: PgPool) -> anyhow::Result<()> {
     const REQUESTER: &str = "macro|requester@team.test";
 
@@ -249,7 +249,7 @@ async fn returns_highest_link_or_explicit_access_level(pool: PgPool) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn direct_owner_grant_returns_owner(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let document_id =
@@ -265,7 +265,7 @@ async fn direct_owner_grant_returns_owner(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn link_share_above_direct_grant_wins(pool: PgPool) -> anyhow::Result<()> {
     const REQUESTER: &str = "macro|requester@team.test";
 
@@ -282,7 +282,7 @@ async fn link_share_above_direct_grant_wins(pool: PgPool) -> anyhow::Result<()> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_sources_owner_grant_is_ignored(pool: PgPool) -> anyhow::Result<()> {
     const REQUESTER: &str = "macro|requester@team.test";
 
@@ -302,15 +302,15 @@ async fn another_sources_owner_grant_is_ignored(pool: PgPool) -> anyhow::Result<
 
 // ---------------------------------------------------------------------------
 // Email-attachment documents: access inherited from the linked thread
-// (inbox owner, macro_user_links delegation, or a thread-level grant)
+// (inbox owner, rox_user_links delegation, or a thread-level grant)
 // ---------------------------------------------------------------------------
 
 const INBOX_OWNER: &str = "macro|inbox-owner@corp.test";
 const DELEGATE: &str = "macro|delegate@corp.test";
 const OTHER_USER: &str = "macro|other@corp.test";
 
-fn user(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).unwrap()
+fn user(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).unwrap()
 }
 
 /// Runs `get_document_access` as an authenticated `user_id` whose only source
@@ -339,17 +339,17 @@ async fn insert_document(pool: &PgPool, owner: &str) -> Uuid {
     document_id
 }
 
-/// An inbox link for `owner_macro_id` holding one thread with one message.
+/// An inbox link for `owner_rox_id` holding one thread with one message.
 /// Returns `(link_id, thread_id)`.
-async fn insert_link_and_thread(pool: &PgPool, owner_macro_id: &str) -> (Uuid, Uuid) {
+async fn insert_link_and_thread(pool: &PgPool, owner_rox_id: &str) -> (Uuid, Uuid) {
     let link_id = Uuid::new_v4();
     let thread_id = Uuid::new_v4();
 
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
         link_id,
-        owner_macro_id,
+        owner_rox_id,
         format!("{link_id}@mail.test"),
     )
     .execute(pool)
@@ -411,26 +411,26 @@ async fn attach_document_to_thread(
 }
 
 /// Inbox + thread + message + attachment linked to a fresh document owned by
-/// `owner_macro_id`. Returns `(link_id, thread_id, document_id)`.
-async fn insert_attachment_document(pool: &PgPool, owner_macro_id: &str) -> (Uuid, Uuid, Uuid) {
-    let document_id = insert_document(pool, owner_macro_id).await;
-    let (link_id, thread_id) = insert_link_and_thread(pool, owner_macro_id).await;
+/// `owner_rox_id`. Returns `(link_id, thread_id, document_id)`.
+async fn insert_attachment_document(pool: &PgPool, owner_rox_id: &str) -> (Uuid, Uuid, Uuid) {
+    let document_id = insert_document(pool, owner_rox_id).await;
+    let (link_id, thread_id) = insert_link_and_thread(pool, owner_rox_id).await;
     attach_document_to_thread(pool, link_id, thread_id, document_id).await;
     (link_id, thread_id, document_id)
 }
 
-/// `primary_macro_id` is delegated `child_macro_id`'s `link_id` inbox.
+/// `primary_rox_id` is delegated `child_rox_id`'s `link_id` inbox.
 async fn insert_delegation(
     pool: &PgPool,
-    primary_macro_id: &str,
-    child_macro_id: &str,
+    primary_rox_id: &str,
+    child_rox_id: &str,
     link_id: Uuid,
 ) {
     sqlx::query!(
-        r#"INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        r#"INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
            VALUES ($1, $2, $3)"#,
-        primary_macro_id,
-        child_macro_id,
+        primary_rox_id,
+        child_rox_id,
         link_id,
     )
     .execute(pool)
@@ -457,7 +457,7 @@ async fn insert_thread_entity_access(
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_delegate_gets_edit_on_attachment_document(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, INBOX_OWNER).await?;
     insert_user(&pool, DELEGATE).await?;
@@ -471,7 +471,7 @@ async fn email_delegate_gets_edit_on_attachment_document(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_inbox_owner_gets_edit_without_entity_access_row(pool: PgPool) -> anyhow::Result<()> {
     // The owner normally holds an entity_access Owner row from document
     // creation; this proves the email arm alone also reaches them.
@@ -485,7 +485,7 @@ async fn email_inbox_owner_gets_edit_without_entity_access_row(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_thread_grant_gives_view_capped_below_thread_level(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -502,7 +502,7 @@ async fn email_thread_grant_gives_view_capped_below_thread_level(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_no_thread_relationship_denies_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, INBOX_OWNER).await?;
     insert_user(&pool, OTHER_USER).await?;
@@ -512,7 +512,7 @@ async fn email_no_thread_relationship_denies_access(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_delegation_on_another_link_denies_access(pool: PgPool) -> anyhow::Result<()> {
     // The delegate holds a grant on a different inbox of the same owner; the
     // link-scoped delegation must not reach this attachment.
@@ -526,7 +526,7 @@ async fn email_delegation_on_another_link_denies_access(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_any_linked_thread_grants_access(pool: PgPool) -> anyhow::Result<()> {
     // SHA dedupe links one document to attachments in several threads; access
     // to any one of them is enough.
@@ -544,7 +544,7 @@ async fn email_any_linked_thread_grants_access(pool: PgPool) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_arm_never_grants_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     // With no user the anonymous branch runs and consults only PUBLIC link
     // shares — the email relationship grants nothing.
@@ -557,7 +557,7 @@ async fn email_arm_never_grants_anonymous_access(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn email_direct_document_grant_wins_over_inherited_view(pool: PgPool) -> anyhow::Result<()> {
     // Thread-grant inheritance contributes View; a direct document Edit grant
     // must win the max.
@@ -575,7 +575,7 @@ async fn email_direct_document_grant_wins_over_inherited_view(pool: PgPool) -> a
 }
 
 #[cfg(feature = "explain_binary")]
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explain_lists_public_and_entity_access_and_matches_effective(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -619,7 +619,7 @@ async fn explain_lists_public_and_entity_access_and_matches_effective(
 }
 
 #[cfg(feature = "explain_binary")]
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explain_email_attachment_reasons(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, INBOX_OWNER).await?;
     insert_user(&pool, DELEGATE).await?;
@@ -679,7 +679,7 @@ async fn explain_email_attachment_reasons(pool: PgPool) -> anyhow::Result<()> {
 }
 
 #[cfg(feature = "explain_binary")]
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explain_team_link_matches_access_level(pool: PgPool) -> anyhow::Result<()> {
     let owner_team_id = Uuid::new_v4();
     insert_user(&pool, OWNER_WITH_TEAM).await?;

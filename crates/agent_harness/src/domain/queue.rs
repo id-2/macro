@@ -33,8 +33,8 @@ use agent_session::domain::ports::QueuedControl;
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use trigger_context::TriggerContext;
 
 use super::model::{AnnounceOrigin, HeldToolCall};
@@ -56,7 +56,7 @@ pub struct QueuedEntry {
     /// What to deliver, carrying raw prompt text (see module docs).
     pub action: AgentAction,
     /// The user who queued it, absent when a bot acted on nobody's behalf.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Where to announce the prompt at dispatch, when it came from somewhere
     /// the session should answer back into.
     pub announce: Option<AnnounceOrigin>,
@@ -86,7 +86,7 @@ pub struct InFlightTurn {
     /// Position in the session's log.
     pub turn: TurnId,
     /// The user who prompted it, absent when a bot acted on nobody's behalf.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Where the prompt came from, when it came from somewhere the session
     /// answers back into. Kept so the turn's end can speak into the same
     /// thread the announcement did.
@@ -184,7 +184,7 @@ impl QueuedEntry {
     /// triggered prompt carries its `context`; neither counts. A tool that
     /// prompts on a person's behalf with no trigger counts as theirs.
     /// Following a session is what lists a hidden one for this person.
-    pub fn direct_prompter(&self) -> Option<&MacroUserIdStr<'static>> {
+    pub fn direct_prompter(&self) -> Option<&RoxUserIdStr<'static>> {
         let typed = matches!(self.action, AgentAction::Prompt(_))
             && self.prompter_kind() == PrompterKind::User
             && self.announce.is_none()
@@ -366,7 +366,7 @@ impl SessionQueues {
         session: AgentSessionId,
         action_id: AgentActionId,
         prompt: String,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> Result<(), QueueError> {
         let mut queue = self.queues.get_mut(&session).ok_or(QueueError::NotFound)?;
         let entry = queue

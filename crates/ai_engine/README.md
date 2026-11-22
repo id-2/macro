@@ -130,15 +130,15 @@ An unedited document saves byte for byte. Otherwise the file is written
 again as a PDF: one page per artboard (the original page boxes and rotation
 when the artboard kept its size), layers as optional content groups (hidden
 and locked ones listed off and locked), groups as marked content
-(`/MacroGroup` with the name; transparency groups as forms), and each
+(`/RoxGroup` with the name; transparency groups as forms), and each
 object either as the file drew it — its operators, renamed into the page's
 resources, with any move written in front as a `cm` — or, when it was
 redrawn, from the model. Edited text is written as outlines (so every
 application shows it as laid out here) with an invisible copy of its
-characters (search and copy work) inside `/MacroText` marked content that
+characters (search and copy work) inside `/RoxText` marked content that
 reads back as editable text. Hidden objects go in an optional content group
 that is off. A gradient with transparent stops is painted under a soft
-mask of its stops' opacities, as Illustrator writes it, inside `/MacroPath`
+mask of its stops' opacities, as Illustrator writes it, inside `/RoxPath`
 marked content that reads back as the path. Illustrator's private data is
 left out, so Illustrator reads
 the edited PDF instead of its stale copy. Saving every sample file after

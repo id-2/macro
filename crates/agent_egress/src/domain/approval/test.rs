@@ -40,7 +40,7 @@ impl RecordingAnnouncer {
 }
 
 impl ToolApprovalAnnouncer for RecordingAnnouncer {
-    async fn requested(&self, approval: &ToolApproval, owner: &MacroUserIdStr<'static>) {
+    async fn requested(&self, approval: &ToolApproval, owner: &RoxUserIdStr<'static>) {
         self.heard
             .lock()
             .unwrap()
@@ -67,12 +67,12 @@ fn service() -> (Service, MemoryStore, RecordingAnnouncer) {
     service_with(HoldTiming::default())
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").unwrap()
 }
 
-fn asker() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("asker@rox.one").unwrap()
+fn asker() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("asker@rox.one").unwrap()
 }
 
 fn tools_call(progress_token: Option<serde_json::Value>) -> ToolsCall {
@@ -487,11 +487,11 @@ fn only_approval_lets_a_call_run() {
 }
 
 #[test]
-fn only_public_lookups_on_macro_skip_the_owner() {
-    assert!(!spends_owner_access(MACRO_SERVER_SLUG, "WebSearch"));
-    assert!(!spends_owner_access(MACRO_SERVER_SLUG, "WebFetch"));
-    assert!(spends_owner_access(MACRO_SERVER_SLUG, "ListEmails"));
-    assert!(spends_owner_access(MACRO_SERVER_SLUG, "ReadContent"));
+fn only_public_lookups_on_rox_skip_the_owner() {
+    assert!(!spends_owner_access(ROX_SERVER_SLUG, "WebSearch"));
+    assert!(!spends_owner_access(ROX_SERVER_SLUG, "WebFetch"));
+    assert!(spends_owner_access(ROX_SERVER_SLUG, "ListEmails"));
+    assert!(spends_owner_access(ROX_SERVER_SLUG, "ReadContent"));
     assert!(
         spends_owner_access("linear", "WebSearch"),
         "a connected app is always the owner's own account"
@@ -526,7 +526,7 @@ fn only_drives_writes_wait_for_the_owner_in_their_own_turn() {
         !owner_confirms("linear", "create_file"),
         "another app's tool of the same name is not Drive's"
     );
-    assert!(!owner_confirms(MACRO_SERVER_SLUG, "trash_file"));
+    assert!(!owner_confirms(ROX_SERVER_SLUG, "trash_file"));
 }
 
 /// Hold `call` in-process on a task, and the approval it is waiting on once
@@ -556,7 +556,7 @@ async fn waiting_in_process(
 }
 
 #[tokio::test]
-async fn approving_for_good_lets_that_person_use_that_macro_tool_without_asking_again() {
+async fn approving_for_good_lets_that_person_use_that_rox_tool_without_asking_again() {
     let (service, store, announcer) = service();
     let session = AgentSessionId::new();
     let (waiting, id) = waiting_in_process(&service, &store, &announcer, in_process(session)).await;
@@ -592,7 +592,7 @@ async fn approving_for_good_lets_that_person_use_that_macro_tool_without_asking_
 }
 
 #[tokio::test]
-async fn approving_one_macro_tool_for_good_still_asks_about_anything_else() {
+async fn approving_one_rox_tool_for_good_still_asks_about_anything_else() {
     let (service, store, announcer) = service();
     let session = AgentSessionId::new();
     let (waiting, id) = waiting_in_process(&service, &store, &announcer, in_process(session)).await;
@@ -613,7 +613,7 @@ async fn approving_one_macro_tool_for_good_still_asks_about_anything_else() {
         prompter: TurnPrompter {
             kind: agent_session::domain::model::PrompterKind::User,
             action_id: AgentActionId::mint(),
-            user: Some(MacroUserIdStr::try_from_email("someone@rox.one").unwrap()),
+            user: Some(RoxUserIdStr::try_from_email("someone@rox.one").unwrap()),
             client: None,
         },
         ..in_process(session)

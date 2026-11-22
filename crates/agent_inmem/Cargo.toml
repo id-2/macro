@@ -30,12 +30,12 @@ dashmap = { workspace = true }
 futures = { workspace = true }
 feature_flags = { path = "../feature_flags" }
 genai_telemetry = { path = "../genai_telemetry" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model_owner = { path = "../model_owner" }
 roles_and_permissions = { path = "../roles_and_permissions", default-features = false, features = ["ports"] }
 http = { workspace = true }
 http-body-util = { workspace = true }
-macro_uuid = { path = "../macro_uuid" }
+rox_uuid = { path = "../rox_uuid" }
 mcp_select = { path = "../mcp_select" }
 mcp_toolset = { path = "../mcp_toolset" }
 memory = { path = "../memory" }

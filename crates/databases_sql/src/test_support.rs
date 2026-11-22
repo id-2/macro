@@ -26,8 +26,8 @@ use filter_ast::Expr;
 use item_filters::ast::EntityFilterAst;
 use item_filters::ast::database_row::DatabaseRowLiteral;
 use item_filters::ast::properties::{PropertiesLiteral, PropertyMatchValue};
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
 use model_owner::Owner;
 use models_databases::{DatabaseOp, OpResult};
 use models_grouping::GroupByField;
@@ -52,15 +52,15 @@ pub(crate) const OWNER: &str = "macro|owner@rox.one";
 pub(crate) const VIEWER: &str = "macro|viewer@rox.one";
 pub(crate) const STRANGER: &str = "macro|stranger@rox.one";
 
-pub(crate) fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+pub(crate) fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 /// `id` acting through the Rox AI bot, as the agent tools act.
 pub(crate) fn agent_for(id: &'static str) -> Viewer {
     Viewer {
         user_id: user(id),
-        acting_bot: Some(bot_id::MACRO_AI_BOT_ID),
+        acting_bot: Some(bot_id::ROX_AI_BOT_ID),
     }
 }
 
@@ -370,12 +370,12 @@ impl FakeAccess {
 impl EntityAccessService for FakeAccess {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<EntityAccessReceipt<T>, AccessError> {
-        let user = MacroUserIdStr::try_from(user_id.as_ref().to_string()).expect("valid user id");
+        let user = RoxUserIdStr::try_from(user_id.as_ref().to_string()).expect("valid user id");
         let access_level = self
             .level(user.as_ref(), entity_id)
             .ok_or(AccessError::Unauthorized)?;
@@ -413,7 +413,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_access_level(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -421,7 +421,7 @@ impl EntityAccessService for FakeAccess {
     }
     async fn check_access(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: AccessLevel,
@@ -438,7 +438,7 @@ impl EntityAccessService for FakeAccess {
     }
     async fn get_entity_permission(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: Option<i64>,
@@ -447,7 +447,7 @@ impl EntityAccessService for FakeAccess {
     }
     async fn get_crm_entity_permission_with_team(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -457,7 +457,7 @@ impl EntityAccessService for FakeAccess {
         &self,
         _: &str,
         _: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unimplemented!("SQL only mints receipts")
     }
     async fn get_call_channel(&self, _: &Uuid) -> Result<Option<CallChannelInfo>, AccessError> {
@@ -471,7 +471,7 @@ impl EntityAccessService for FakeAccess {
     }
     async fn get_user_team(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!("SQL never touches teams")
     }
@@ -695,7 +695,7 @@ impl SoupService for FakeSoup {
     }
     async fn group_labels<'a>(
         &'a self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
         _group_by: &'a soup::domain::models::grouping::GroupByField,
         _keys: &'a [String],
     ) -> Result<soup::domain::models::grouping::GroupLabels, SoupErr> {
@@ -704,7 +704,7 @@ impl SoupService for FakeSoup {
 
     async fn caller_tag_sets<'a>(
         &self,
-        _: MacroUserIdStr<'a>,
+        _: RoxUserIdStr<'a>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, SoupErr> {
         unimplemented!("SQL never reads tag sets")
     }
@@ -716,8 +716,8 @@ pub(crate) struct FakeContacts(pub(crate) Shared);
 impl ContactsService for FakeContacts {
     async fn query_contacts(
         &self,
-        _: MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, rootcause::Report> {
+        _: RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, rootcause::Report> {
         Ok(self
             .0
             .lock()

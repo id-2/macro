@@ -4,9 +4,9 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::user::claim_handle::{ClaimHandleError, claim_handle};
-use macro_user_id::handle::{MailboxHandle, ROX_MAIL_DOMAIN};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::user::claim_handle::{ClaimHandleError, claim_handle};
+use rox_user_id::handle::{MailboxHandle, ROX_MAIL_DOMAIN};
 use model::response::ErrorResponse;
 
 use crate::api::context::{ApiContext, AuthorizationService};
@@ -45,7 +45,7 @@ pub struct ClaimHandleResponse {
 #[tracing::instrument(skip(ctx, authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(request): Json<ClaimHandleRequest>,
 ) -> Result<Response, Response> {
     let handle = MailboxHandle::parse(&request.handle).map_err(|_| {

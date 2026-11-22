@@ -3,8 +3,8 @@
 
 use crate::domain::{self, AiFeature, ModelPricing, UsageAmount};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -117,7 +117,7 @@ pub struct CompletionUsage {
     /// Feature that performed the invocation.
     pub feature: AiFeature,
     /// User the invocation was performed for.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// Related entity, if any.
     pub entity: Option<Uuid>,
     /// Measured usage and resolved cost.

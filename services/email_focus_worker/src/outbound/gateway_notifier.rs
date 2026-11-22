@@ -14,7 +14,7 @@ use std::{
 
 use connection_gateway_client::ConnectionGatewayClient;
 use email::domain::focus::FocusNotifier;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::api::refresh::RefreshEmailEvent;
 use sqlx::PgPool;
 use tokio_util::{sync::CancellationToken, task::TaskTracker};
@@ -33,7 +33,7 @@ pub trait FocusDelivery: Send + Sync + 'static {
     /// Tell everyone reading `link_id` to read Focus again. Failures are logged.
     fn deliver(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         link_id: Uuid,
     ) -> impl Future<Output = ()> + Send;
 }
@@ -73,7 +73,7 @@ impl<D: FocusDelivery> CoalescingNotifier<D> {
 }
 
 impl<D: FocusDelivery> FocusNotifier for CoalescingNotifier<D> {
-    fn focus_changed(&self, owner: &MacroUserIdStr<'static>, link_id: Uuid) {
+    fn focus_changed(&self, owner: &RoxUserIdStr<'static>, link_id: Uuid) {
         let classification = tracing::Span::current().context();
         {
             let mut windows = locked(&self.windows);
@@ -100,7 +100,7 @@ async fn run_window<D: FocusDelivery>(
     delivery: Arc<D>,
     windows: OpenWindows,
     shutdown: CancellationToken,
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     link_id: Uuid,
     classification: opentelemetry::Context,
 ) {
@@ -169,11 +169,11 @@ fn traceparent() -> Option<String> {
 }
 
 impl FocusDelivery for GatewayDelivery {
-    async fn deliver(&self, owner: &MacroUserIdStr<'static>, link_id: Uuid) {
+    async fn deliver(&self, owner: &RoxUserIdStr<'static>, link_id: Uuid) {
         let span = tracing::Span::current();
         let mut readers = vec![owner.as_ref().to_owned()];
         match sqlx::query_scalar!(
-            "SELECT primary_macro_id FROM macro_user_links WHERE link_id = $1",
+            "SELECT primary_rox_id FROM rox_user_links WHERE link_id = $1",
             link_id,
         )
         .fetch_all(&self.db)

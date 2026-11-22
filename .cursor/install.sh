@@ -55,7 +55,7 @@ ensure_test_envs
 just initialize_dbs
 cargo fetch --locked
 unset SQLX_OFFLINE
-cargo test --no-run -p macro_db_client
+cargo test --no-run -p rox_db_client
 
 echo "cursor-cloud install: test-ready"
 

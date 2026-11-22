@@ -5,7 +5,7 @@
 //! builds on the same helpers.
 
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde_json::Value;
 use sqlx::PgConnection;
 

@@ -3,9 +3,9 @@ use std::sync::Arc;
 use anyhow::{Result, bail};
 use axum::Router;
 use axum::http::StatusCode;
-use macro_authorization::MacroAuthorizationState;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_authorization::RoxAuthorizationState;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::CreationPrincipal;
 use routine_program::Surface;
 use serde_json::{Value, json};
@@ -46,7 +46,7 @@ fn one(status: GenerationStatus) -> RoutineSuggestions {
 impl RoutineSuggestionApi for Suggestions {
     async fn suggestions(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         surface: Option<Surface>,
     ) -> Result<RoutineSuggestions> {
         assert_eq!(surface, Some(Surface::Email));
@@ -55,7 +55,7 @@ impl RoutineSuggestionApi for Suggestions {
 
     async fn brief(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &[Surface],
         _: suggestions::domain::model::GenerationTrigger,
         _: chrono_tz::Tz,
@@ -65,20 +65,20 @@ impl RoutineSuggestionApi for Suggestions {
 
     async fn texts(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &[Uuid],
         _: chrono_tz::Tz,
     ) -> Result<Vec<(Uuid, suggestions::domain::model::RoutineText)>> {
         unreachable!("routes never word cards")
     }
 
-    async fn suggested(&self, _: &MacroUserIdStr<'static>, _: Uuid) -> Result<u32> {
+    async fn suggested(&self, _: &RoxUserIdStr<'static>, _: Uuid) -> Result<u32> {
         unreachable!("routes never count")
     }
 
     async fn record(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: crate::domain::suggestions::model::RoutineGenerationReport,
     ) {
         unreachable!("routes never log generations")
@@ -104,7 +104,7 @@ impl RoutineSuggestionApi for Suggestions {
         bail!(ActionPolicyError::NotSuggesting)
     }
 
-    async fn dismiss(&self, _: &MacroUserIdStr<'static>, id: Uuid) -> Result<()> {
+    async fn dismiss(&self, _: &RoxUserIdStr<'static>, id: Uuid) -> Result<()> {
         if id != KNOWN {
             bail!(ActionPolicyError::NotFound);
         }
@@ -125,7 +125,7 @@ impl RoutineSuggestionApi for Suggestions {
 fn router() -> Router {
     routine_suggestion_router(RoutineSuggestionRouterState {
         service: Arc::new(Suggestions),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuth)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuth)),
     })
 }
 

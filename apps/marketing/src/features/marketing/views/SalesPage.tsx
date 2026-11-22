@@ -7,7 +7,7 @@ import { HomepageTrustBadges } from '../components/HomepageTrustBadges';
 import { DemoBookingInline } from '../components/sales/DemoBookingInline';
 import { SalesCalculator } from '../components/sales/SalesCalculator';
 import { formatWholeUsd } from '../core/sales-savings';
-import { MACRO_SEAT_CENTS } from '../core/savings-calculator';
+import { ROX_SEAT_CENTS } from '../core/savings-calculator';
 import '../components/homepage-scroll-cue.css';
 import '../components/homepage-unification.css';
 import '../components/workspace-story.css';
@@ -78,7 +78,7 @@ export function RouteTour() {
                     for your entire company.
                   </>
                 }
-                description={`Email, chat, documents, tasks, CRM, and agents in one workspace, for ${formatWholeUsd(MACRO_SEAT_CENTS)} a seat.`}
+                description={`Email, chat, documents, tasks, CRM, and agents in one workspace, for ${formatWholeUsd(ROX_SEAT_CENTS)} a seat.`}
                 action={
                   <div class="homepage-hero-action mt-6 flex justify-center pb-5">
                     <a

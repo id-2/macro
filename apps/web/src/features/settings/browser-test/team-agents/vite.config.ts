@@ -26,7 +26,7 @@ export default defineConfig({
     alias: { 'loro-crdt': 'loro-crdt/base64' },
   },
   // Claude sign-in for an agent's computer sits behind the computers rollout.
-  define: { 'import.meta.env.VITE_ENABLE_MACRO_COMPUTERS': '"true"' },
+  define: { 'import.meta.env.VITE_ENABLE_ROX_COMPUTERS': '"true"' },
   optimizeDeps: { esbuildOptions: { target: 'esnext' } },
   server: {
     host: '127.0.0.1',

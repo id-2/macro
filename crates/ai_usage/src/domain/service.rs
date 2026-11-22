@@ -7,8 +7,8 @@ use chrono::Utc;
 use super::counting::AiUsageEnforcement;
 use super::ports::*;
 
-/// The existing Macro-admin policy for usage reporting and price changes.
-fn require_admin(actor: &macro_user_id::user_id::MacroUserIdStr<'_>) -> Result<()> {
+/// The existing Rox-admin policy for usage reporting and price changes.
+fn require_admin(actor: &rox_user_id::user_id::RoxUserIdStr<'_>) -> Result<()> {
     if actor.email_str().ends_with("@rox.one") {
         Ok(())
     } else {
@@ -154,7 +154,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn get_usage(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         params: UsageApiParams,
     ) -> Result<UsageSummary> {
         require_admin(&actor)?;
@@ -165,7 +165,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn set_pricing(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         model: String,
         pricing: ModelPricing,
     ) -> Result<()> {

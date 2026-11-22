@@ -373,8 +373,8 @@ in
       # Agent discovery records adapter paths usable by the daemon user.
       environment = {
         HOME = home;
-        MACRO_ENROLL_FROM = cfg.enrollFrom;
-        MACRO_ENROLLED_MARKER = enrolledMarker;
+        ROX_ENROLL_FROM = cfg.enrollFrom;
+        ROX_ENROLLED_MARKER = enrolledMarker;
       };
       serviceConfig = {
         Type = "oneshot";
@@ -392,7 +392,7 @@ in
             text = builtins.readFile ./files/check-enrollment-source;
           }
         );
-        ExecStart = "${lib.getExe' cfg.roxd "roxd"} enroll --from \${MACRO_ENROLL_FROM} --config ${roxdConfig}";
+        ExecStart = "${lib.getExe' cfg.roxd "roxd"} enroll --from \${ROX_ENROLL_FROM} --config ${roxdConfig}";
         # A retry that succeeds after boot gave up on roxd still starts it.
         # (OnSuccess= never fires: with RemainAfterExit the unit stays active.)
         ExecStartPost = "${lib.getExe' config.systemd.package "systemctl"} --no-block start roxd.service";

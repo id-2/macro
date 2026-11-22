@@ -5,7 +5,7 @@ fn call_invitation_links_directly_to_guest_join_and_escapes_titles() {
     let invitation = CallInvite {
         title: "Review <script>alert(1)</script>".to_string(),
         share_token: "server-issued-test-token".to_string(),
-        invited_by: MacroUserIdStr::try_from_email("host@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("host@example.com").unwrap(),
         recipient_email: "guest@outside.example".to_string(),
     };
     let email = invitation.format_email();
@@ -23,7 +23,7 @@ fn call_invitation_links_directly_to_guest_join_and_escapes_titles() {
 fn make_colleague_joined() -> ColleagueJoinedMacro {
     ColleagueJoinedMacro {
         team_name: "Acme".to_string(),
-        joined_by: MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        joined_by: RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
         joined_name: Some("Alice Example".to_string()),
         recipient_email: EmailStr::try_from("bob@example.com".to_string()).unwrap(),
     }
@@ -127,7 +127,7 @@ fn team_invite_rate_limit_key_is_per_invite() {
         team_name: "Acme".to_string(),
         team_id: Uuid::from_u128(1),
         team_invite_id: Uuid::from_u128(10),
-        invited_by: MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
         role: None,
         sender_profile_picture_url: None,
         invitee_plan: InviteePlan::Free,
@@ -167,7 +167,7 @@ fn colleague_joined_serde_round_trip_keeps_the_wire_shape() {
 
 fn make_channel_invite() -> ChannelInviteMetadata {
     ChannelInviteMetadata {
-        invited_by: MacroUserIdStr::try_from_email("sender@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("sender@example.com").unwrap(),
         channel_name: "general".to_string(),
         is_direct_message: false,
         message_id: None,
@@ -317,7 +317,7 @@ fn invitation_headers_use_the_rox_text_wordmark() {
         team_name: "Acme".to_string(),
         team_id: Uuid::nil(),
         team_invite_id: Uuid::nil(),
-        invited_by: MacroUserIdStr::try_from_email("sender@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("sender@example.com").unwrap(),
         role: None,
         sender_profile_picture_url: None,
         invitee_plan: InviteePlan::Free,
@@ -438,7 +438,7 @@ fn dm_emails_deduplicate_retries_without_suppressing_later_messages() {
         ..make_channel_invite()
     };
     let other_recipient = ChannelInviteMetadata {
-        email_recipient: Some(MacroUserIdStr::try_from_email("other@example.com").unwrap()),
+        email_recipient: Some(RoxUserIdStr::try_from_email("other@example.com").unwrap()),
         ..first.clone()
     };
     assert_ne!(
@@ -476,7 +476,7 @@ fn make_team_invite(invitee_plan: InviteePlan) -> InviteToTeamMetadata {
         team_name: "Acme".to_string(),
         team_id: Uuid::from_u128(1),
         team_invite_id: Uuid::from_u128(10),
-        invited_by: MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
         role: None,
         sender_profile_picture_url: None,
         invitee_plan,

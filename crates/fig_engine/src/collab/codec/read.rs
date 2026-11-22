@@ -644,7 +644,7 @@ impl<'a> Reader<'a> {
                     publish_id: r.opt(Self::guid)?,
                 }))
             })?,
-            macro_data: self.opt(|r| r.arc_list(|r| Ok((r.arc_str()?, r.arc_str()?))))?,
+            rox_data: self.opt(|r| r.arc_list(|r| Ok((r.arc_str()?, r.arc_str()?))))?,
             recomputed: self.bool()?,
             arc_data: if self.version >= 2 {
                 self.opt(|r| Ok([r.f32()?, r.f32()?, r.f32()?]))?

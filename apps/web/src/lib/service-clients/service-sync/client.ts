@@ -189,7 +189,7 @@ export const syncServiceClient = {
   },
   /**
    * Look up who last edited a given Lexical node and when. `user_id` is a
-   * MacroId resolved server-side; `null` if the peer has no recorded user
+   * RoxId resolved server-side; `null` if the peer has no recorded user
    * (anonymous edits or legacy data not yet mirrored locally). `actor` is the
    * signed agent actor (`bot|<uuid>`) the peer edited as, null for humans.
    */

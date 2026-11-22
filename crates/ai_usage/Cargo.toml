@@ -9,12 +9,12 @@ rootcause = { workspace = true }
 anyhow = { workspace = true }
 axum = { workspace = true }
 chrono = { workspace = true }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", default-features = false, features = [
   "axum",
 ] }
-macro_env_var = { path = "../macro_env_var" }
-macro_user_id = { path = "../macro_user_id", features = ["schema"] }
-macro_uuid = { path = "../macro_uuid" }
+rox_env_var = { path = "../rox_env_var" }
+rox_user_id = { path = "../rox_user_id", features = ["schema"] }
+rox_uuid = { path = "../rox_uuid" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 sqlx = { workspace = true }
@@ -26,4 +26,4 @@ utoipa = { workspace = true }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }

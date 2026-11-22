@@ -24,7 +24,7 @@ impl LegacyDocumentPurgeRepository {
 impl DocumentPurgeRepository for LegacyDocumentPurgeRepository {
     #[tracing::instrument(skip(self), err)]
     async fn find(&self, document_id: &str) -> Result<Option<PurgeTarget>, DocumentError> {
-        match macro_db_client::document::get_deleted_document_info(&self.pool, document_id).await {
+        match rox_db_client::document::get_deleted_document_info(&self.pool, document_id).await {
             Ok(document) => Ok(Some(PurgeTarget {
                 owner: document.owner,
                 file_type: document.file_type,
@@ -41,7 +41,7 @@ impl DocumentPurgeRepository for LegacyDocumentPurgeRepository {
         target: &PurgeTarget,
     ) -> Result<PurgedRows, DocumentError> {
         let docx_part_shas = if target.file_type.as_deref() == Some("docx") {
-            macro_db_client::document::get_bom_parts(&self.pool, document_id)
+            rox_db_client::document::get_bom_parts(&self.pool, document_id)
                 .await
                 .map_err(DocumentError::Internal)?
                 .into_iter()
@@ -50,7 +50,7 @@ impl DocumentPurgeRepository for LegacyDocumentPurgeRepository {
         } else {
             Vec::new()
         };
-        macro_db_client::document::delete_document(&self.pool, document_id)
+        rox_db_client::document::delete_document(&self.pool, document_id)
             .await
             .map_err(DocumentError::Internal)?;
         comms_db_client::entity_mentions::delete_entity_mentions_by_source(
@@ -89,12 +89,12 @@ impl DocumentPurgeQueue for SqsDocumentPurgeQueue {
 
 /// Docx part references in the shared SHA counter.
 pub struct RedisDocxPartReferences {
-    sha_counts: Arc<macro_sha_count_client::Redis>,
+    sha_counts: Arc<rox_sha_count_client::Redis>,
 }
 
 impl RedisDocxPartReferences {
     /// Compose from the application's SHA counter client.
-    pub fn new(sha_counts: Arc<macro_sha_count_client::Redis>) -> Self {
+    pub fn new(sha_counts: Arc<rox_sha_count_client::Redis>) -> Self {
         Self { sha_counts }
     }
 }

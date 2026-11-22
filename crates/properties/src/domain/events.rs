@@ -8,9 +8,9 @@ mod test;
 
 use activity::Actor;
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroPropertiesTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxPropertiesTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::property_change_source::PropertyChangeSource;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::service::property_value::PropertyValue;
@@ -24,7 +24,7 @@ pub struct PropertyCreatedMetadata {
     /// Identifier of the created property definition.
     pub property_definition_id: Uuid,
     /// Authenticated user who created the property, or `None` for a system operation.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Scope that owns the property definition.
     pub owner: PropertyOwner,
     /// Human-readable property name.
@@ -45,7 +45,7 @@ pub struct PropertyDeletedMetadata {
     /// Identifier of the deleted property definition.
     pub property_definition_id: Uuid,
     /// Authenticated user who deleted the property, or `None` for a system operation.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Scope that owned the property definition.
     pub owner: PropertyOwner,
     /// Property name at deletion time.
@@ -62,7 +62,7 @@ pub struct PropertyOptionCreatedMetadata {
     /// Identifier of the option's property definition.
     pub property_definition_id: Uuid,
     /// Authenticated user who created the option, or `None` for a system operation.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Selectable option value.
     pub value: PropertyOptionValue,
     /// Optional hexadecimal display color.
@@ -79,7 +79,7 @@ pub struct PropertyOptionUpdatedMetadata {
     /// Identifier of the option's property definition.
     pub property_definition_id: Uuid,
     /// Authenticated user who updated the option, or `None` for a system operation.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Full option value after the update.
     pub value: PropertyOptionValue,
     /// Full optional display color after the update.
@@ -96,7 +96,7 @@ pub struct PropertyOptionDeletedMetadata {
     /// Identifier of the option's property definition.
     pub property_definition_id: Uuid,
     /// Authenticated user who deleted the option, or `None` for a system operation.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Option value at deletion time.
     pub value: PropertyOptionValue,
 }
@@ -113,7 +113,7 @@ pub struct EntityPropertyUpdatedMetadata {
     /// Identifier of the property definition.
     pub property_definition_id: Uuid,
     /// Authenticated user who changed the value, or `None` for a system operation.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Who mechanically changed the value. Absent on events published
     /// before attribution: ingest then treats [`Self::actor_user_id`] as
     /// the actor.
@@ -122,7 +122,7 @@ pub struct EntityPropertyUpdatedMetadata {
     /// The user whose feed this change belongs on, when different from
     /// [`Self::actor`]. Absent means the actor is also the subject.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
     /// The outside event behind the change, when an integration made it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<PropertyChangeSource>,
@@ -153,7 +153,7 @@ pub struct EntityPropertyDeletedMetadata {
     /// Identifier of the property definition.
     pub property_definition_id: Uuid,
     /// Authenticated user who deleted the value, or `None` for a system operation.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Who mechanically deleted the value. Absent on events published
     /// before attribution: ingest then treats [`Self::actor_user_id`] as
     /// the actor.
@@ -162,7 +162,7 @@ pub struct EntityPropertyDeletedMetadata {
     /// The user whose feed this deletion belongs on, when different from
     /// [`Self::actor`]. Absent means the actor is also the subject.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
 }
 
 /// Metadata for [`PropertyTopicEvent::EntityPropertiesCleared`].
@@ -173,7 +173,7 @@ pub struct EntityPropertiesClearedMetadata {
     /// Type of the entity whose properties were cleared.
     pub entity_type: EntityType,
     /// Authenticated user who cleared the values, or `None` for a system operation.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Who mechanically cleared the values. Absent on events published
     /// before attribution: ingest then treats [`Self::actor_user_id`] as
     /// the actor.
@@ -182,10 +182,10 @@ pub struct EntityPropertiesClearedMetadata {
     /// The user whose feed this clear belongs on, when different from
     /// [`Self::actor`]. Absent means the actor is also the subject.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
 }
 
-/// Property mutation events published to [`MacroPropertiesTopic`].
+/// Property mutation events published to [`RoxPropertiesTopic`].
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum PropertyTopicEvent {
@@ -216,12 +216,12 @@ pub enum PropertyTopicEvent {
 }
 
 impl TopicEvent for PropertyTopicEvent {
-    type Topic = MacroPropertiesTopic;
+    type Topic = RoxPropertiesTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroPropertiesTopic`].
+/// Publishable event for [`RoxPropertiesTopic`].
 pub struct PropertyMacroEvent {
     key: String,
     event: Event<PropertyTopicEvent>,
@@ -301,7 +301,7 @@ impl PropertyMacroEvent {
     }
 }
 
-impl MacroEvent for PropertyMacroEvent {
+impl RoxEvent for PropertyMacroEvent {
     type EventPayload = PropertyTopicEvent;
 
     fn key(&self) -> &str {

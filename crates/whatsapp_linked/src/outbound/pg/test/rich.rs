@@ -28,7 +28,7 @@ fn person(name: &str, user: Option<&str>) -> ExternalChatPersonRef {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_system_line_names_people_and_never_notifies_or_counts_as_unread(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let added = with(
@@ -124,7 +124,7 @@ async fn tallies(linked: &Linked, group: Uuid) -> Vec<ExternalChatPollOption> {
     poll.options.clone()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn poll_votes_tally_per_voter_and_the_latest_vote_wins(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     // A vote that arrives before its poll waits for it.
@@ -177,7 +177,7 @@ async fn poll_votes_tally_per_voter_and_the_latest_vote_wins(pool: PgPool) {
     assert_eq!(options[1].voters, vec![person("Customer", None)]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_re_imported_placeholder_gains_its_content_and_mentions_read_as_names(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let mut placeholder = text(
@@ -237,7 +237,7 @@ async fn a_re_imported_placeholder_gains_its_content_and_mentions_read_as_names(
     assert_eq!(ping.mentions[0].person, person("Customer", None));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_change_whatsapp_made_without_naming_anyone_is_the_groups_own_line(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let mut renamed = with(

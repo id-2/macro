@@ -8,7 +8,7 @@ use entity_mutation::{
 };
 use graphql_permission::GraphqlEntityAccessLevel;
 use graphql_soup::SoupEntityEdges;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use models_permissions::share_permission::{LinkShare, access_level::AccessLevel};
 use tracing::{
@@ -169,7 +169,7 @@ impl QueryRoot {
 async fn mutation_results_return_typed_errors() {
     let service = Arc::new(UnavailableEntityMutationService);
     let actor = EntityMutationActor {
-        user_id: MacroUserIdStr::parse_from_str("macro|graphql-test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|graphql-test@example.com").unwrap(),
         organization_id: Some(42),
     };
     let request = Request::new(
@@ -228,7 +228,7 @@ async fn mutation_results_return_typed_errors() {
 #[tokio::test]
 async fn unsupported_soup_deletion_is_a_graphql_error() {
     let actor = EntityMutationActor {
-        user_id: MacroUserIdStr::parse_from_str("macro|graphql-test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|graphql-test@example.com").unwrap(),
         organization_id: Some(42),
     };
     let response = Schema::build(QueryRoot, async_graphql::EmptyMutation, EmptySubscription)
@@ -247,7 +247,7 @@ async fn unsupported_soup_deletion_is_a_graphql_error() {
 #[tokio::test]
 async fn database_and_form_effects_have_no_soup_patches() {
     let actor = EntityMutationActor {
-        user_id: MacroUserIdStr::parse_from_str("macro|graphql-test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|graphql-test@example.com").unwrap(),
         organization_id: Some(42),
     };
     let response = Schema::build(QueryRoot, async_graphql::EmptyMutation, EmptySubscription)
@@ -538,7 +538,7 @@ async fn batch_span_records_per_item_failures() {
     let fields = RecordedSpanFields::default();
     let _guard = tracing::subscriber::set_default(Registry::default().with(fields.clone()));
     let actor = EntityMutationActor {
-        user_id: MacroUserIdStr::parse_from_str("macro|graphql-test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|graphql-test@example.com").unwrap(),
         organization_id: Some(42),
     };
     let response = Schema::build(

@@ -10,7 +10,7 @@ alwaysApply: false
 # Web libraries
 
 Reach for these before writing a helper or adding a dependency. `packages/sdk`
-throws `MacroApiError` instead of returning `Result`, and the Bun/Worker services
+throws `RoxApiError` instead of returning `Result`, and the Bun/Worker services
 under `services/` throw and validate with zod; elsewhere in `apps/web` and
 `packages/` these rules apply.
 

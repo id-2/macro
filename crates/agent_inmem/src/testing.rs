@@ -3,7 +3,7 @@
 use agent::{AgentError, StreamPart};
 use ai_billing::domain::{AdmissionFuture, AiAdmissionError, AiAdmissionService};
 use ai_usage::AiFeature;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 use tokio::sync::mpsc;
 
@@ -27,7 +27,7 @@ impl TestAdmission {
 impl AiAdmissionService for TestAdmission {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         self.calls.lock().unwrap().push((user.to_string(), feature));
@@ -49,7 +49,7 @@ struct UnavailableBilling;
 impl ai_billing::domain::BillingService for UnavailableBilling {
     async fn change_plan(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: ai_billing::domain::plan_change::PlanChange,
     ) -> ai_billing::domain::Result<()> {
         panic!("this use case must not change plans")
@@ -57,25 +57,25 @@ impl ai_billing::domain::BillingService for UnavailableBilling {
 
     async fn check_allowance(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> ai_billing::domain::Result<ai_billing::domain::AllowanceDecision> {
         panic!("disabled policy must not contact unavailable billing")
     }
 
     async fn snapshot(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> ai_billing::domain::Result<ai_billing::domain::UsageSnapshot> {
         panic!("admission must not fetch snapshots")
     }
 
-    async fn settle(&self, _: &MacroUserIdStr<'_>) -> ai_billing::domain::Result<()> {
+    async fn settle(&self, _: &RoxUserIdStr<'_>) -> ai_billing::domain::Result<()> {
         panic!("admission must not settle")
     }
 
     async fn update_overage(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: bool,
         _: i64,
     ) -> ai_billing::domain::Result<ai_billing::domain::UsageSnapshot> {
@@ -84,7 +84,7 @@ impl ai_billing::domain::BillingService for UnavailableBilling {
 
     async fn update_auto_reload(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: bool,
         _: ai_billing::domain::AutoReloadThresholds,
     ) -> ai_billing::domain::Result<ai_billing::domain::UsageSnapshot> {
@@ -93,7 +93,7 @@ impl ai_billing::domain::BillingService for UnavailableBilling {
 
     async fn purchase_credits(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: i64,
     ) -> ai_billing::domain::Result<ai_billing::domain::CreditPurchase> {
         panic!("admission must not purchase credits")
@@ -101,7 +101,7 @@ impl ai_billing::domain::BillingService for UnavailableBilling {
 
     async fn create_credit_checkout(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: i64,
         _: String,
         _: String,
@@ -111,7 +111,7 @@ impl ai_billing::domain::BillingService for UnavailableBilling {
 
     async fn apply_credit_purchase(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: i64,
         _: &str,
     ) -> ai_billing::domain::Result<()> {
@@ -120,7 +120,7 @@ impl ai_billing::domain::BillingService for UnavailableBilling {
 
     async fn sync_period(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: sqlx::types::chrono::DateTime<sqlx::types::chrono::Utc>,
         _: sqlx::types::chrono::DateTime<sqlx::types::chrono::Utc>,
         _: Option<ai_billing::domain::period::SubscriptionPeriod>,
@@ -135,7 +135,7 @@ impl ai_billing::domain::BillingService for UnavailableBilling {
     async fn mark_credit_reload_invoice(
         &self,
         _: &str,
-        _: Option<macro_uuid::Uuid>,
+        _: Option<rox_uuid::Uuid>,
         _: bool,
     ) -> ai_billing::domain::Result<()> {
         panic!("admission must not handle invoices")
@@ -175,7 +175,7 @@ pub(crate) struct RecordedTurn {
     /// Who the agent is, as handed to the engine.
     pub(crate) identity: Option<AgentIdentity>,
     /// The agent whose own key the turn ran on, if any.
-    pub(crate) agent_key: Option<macro_uuid::Uuid>,
+    pub(crate) agent_key: Option<rox_uuid::Uuid>,
     /// What the turn's usage is metered as.
     pub(crate) feature: AiFeature,
 }

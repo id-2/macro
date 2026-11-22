@@ -62,7 +62,7 @@ type SeedManifest = {
 };
 
 export type SeedUser = {
-  macro_user_id: string;
+  rox_user_id: string;
   fusion_user_id: string;
   user_id: string;
   username: string;
@@ -158,7 +158,7 @@ const channelMessages = readJson<SeedChannelMessage[]>(
 
 const usersById = indexBy(users, (row) => row.user_id);
 const usersByEmail = indexBy(users, (row) => row.email);
-const usersByMacroUserId = indexBy(users, (row) => row.macro_user_id);
+const usersByMacroUserId = indexBy(users, (row) => row.rox_user_id);
 const documentsById = indexBy(documents, (row) => row.document_id);
 const documentsByName = indexBy(documents, (row) => row.document_name);
 const channelsById = indexBy(channels, (row) => row.channel_id);

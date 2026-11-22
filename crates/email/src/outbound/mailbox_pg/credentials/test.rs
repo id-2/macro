@@ -1,7 +1,7 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reauthorization_is_edge_triggered_and_commits_with_its_notification(db: sqlx::PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     let mailbox = MailboxAccess {
@@ -37,7 +37,7 @@ async fn reauthorization_is_edge_triggered_and_commits_with_its_notification(db:
     assert_eq!(sqlx::query_scalar!("SELECT count(*) FROM email_projection_outbox WHERE link_id = $1 AND payload->>'kind' = 'reauthorization_required' ",link).fetch_one(&db).await.unwrap(),Some(2));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn old_credential_failures_cannot_revoke_a_reconnected_mailbox(db: sqlx::PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     sqlx::query!(

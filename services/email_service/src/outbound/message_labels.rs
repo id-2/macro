@@ -27,12 +27,12 @@ impl MessageLabelRepository for PgMessageLabels {
 
     async fn inbox_for_message(
         &self,
-        caller_macro_id: &str,
+        caller_rox_id: &str,
         message_id: Uuid,
     ) -> Result<Option<MessageLabelInbox>, Self::Err> {
         let link = email_db_client::links::get::fetch_owned_link_for_message(
             &self.0,
-            caller_macro_id,
+            caller_rox_id,
             message_id,
         )
         .await
@@ -41,7 +41,7 @@ impl MessageLabelRepository for PgMessageLabels {
         })?;
         Ok(link.map(|link| MessageLabelInbox {
             id: link.id,
-            macro_id: link.macro_id,
+            rox_id: link.rox_id,
         }))
     }
 

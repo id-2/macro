@@ -4,7 +4,7 @@ use std::{
 };
 
 use chrono::{DateTime, NaiveDate, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::Value;
 use uuid::Uuid;
@@ -90,7 +90,7 @@ impl FocusStore for FakeStore {
 
     async fn focus_thread_ids(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _since: DateTime<Utc>,
         waiting_before: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -103,7 +103,7 @@ impl FocusStore for FakeStore {
 
     async fn focus_for_threads(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _thread_ids: &[Uuid],
         waiting_before: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -117,11 +117,11 @@ impl FocusStore for FakeStore {
 struct FakeProfiles(Option<String>, Option<String>);
 
 impl ProfileSource for FakeProfiles {
-    async fn profile(&self, _owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn profile(&self, _owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(self.0.clone())
     }
 
-    async fn time_zone(&self, _owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn time_zone(&self, _owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(self.1.clone())
     }
 }
@@ -152,7 +152,7 @@ impl FakeDueDates {
 impl DueDateExtractor for FakeDueDates {
     async fn due_on(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _thread_id: Uuid,
         input: &DueDateInput,
     ) -> Result<Option<NaiveDate>, Report> {
@@ -167,11 +167,11 @@ impl DueDateExtractor for FakeDueDates {
 
 #[derive(Clone, Default)]
 struct FakeNotifier {
-    changed: Arc<Mutex<Vec<(MacroUserIdStr<'static>, Uuid)>>>,
+    changed: Arc<Mutex<Vec<(RoxUserIdStr<'static>, Uuid)>>>,
 }
 
 impl FocusNotifier for FakeNotifier {
-    fn focus_changed(&self, owner: &MacroUserIdStr<'static>, link_id: Uuid) {
+    fn focus_changed(&self, owner: &RoxUserIdStr<'static>, link_id: Uuid) {
         self.changed.lock().unwrap().push((owner.clone(), link_id));
     }
 }
@@ -194,7 +194,7 @@ impl FakeClassifier {
 impl FocusClassifier for FakeClassifier {
     async fn answer(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _thread_id: Uuid,
         input: &Value,
         questions: &[&'static str],
@@ -218,7 +218,7 @@ fn thread(owner_email: &str) -> FocusThread {
     FocusThread {
         thread_id: Uuid::new_v4(),
         link_id: Uuid::new_v4(),
-        owner: MacroUserIdStr::try_from_email(owner_email).unwrap(),
+        owner: RoxUserIdStr::try_from_email(owner_email).unwrap(),
         owner_email: owner_email.to_owned(),
         is_signal: true,
         inbox_visible: true,
@@ -930,7 +930,7 @@ async fn a_thread_of_only_sent_mail_never_reaches_the_classifier() {
 async fn the_lists_apply_a_three_day_wait() {
     let store = FakeStore::default();
     let queries = FocusQueries::new(store.clone());
-    let owner = MacroUserIdStr::try_from_email("owner@acme.example").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@acme.example").unwrap();
 
     let before = Utc::now() - Duration::days(FOLLOW_UP_AFTER_DAYS);
     queries.focus_thread_ids(&owner, 30).await.unwrap();

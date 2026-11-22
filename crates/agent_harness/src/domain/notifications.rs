@@ -64,14 +64,14 @@ mod test;
 
 use std::collections::HashSet;
 
-use agent_egress::domain::approval::MACRO_SERVER_SLUG;
+use agent_egress::domain::approval::ROX_SERVER_SLUG;
 use agent_session::domain::events::{
     AgentSessionLifecycleEvent, SessionIdentity, SessionMentionedMetadata, SessionSettledMetadata,
     WaitingForInputMetadata,
 };
 use agent_session::domain::model::{SessionSource, TurnId};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::{Entity, EntityType};
 use model_notifications::{
     AgentSessionMentionedMetadata, AgentSessionNotificationRef, AgentSessionOriginParent,
@@ -102,7 +102,7 @@ pub struct Notify<Metadata> {
     /// Unused for agent sessions; kept so the request shape stays uniform.
     pub secondary_entity: Option<Entity<'static>>,
     /// Who is told.
-    pub recipients: Vec<MacroUserIdStr<'static>>,
+    pub recipients: Vec<RoxUserIdStr<'static>>,
     /// The kind-specific payload.
     pub metadata: Metadata,
 }
@@ -251,7 +251,7 @@ fn plan_waiting(waiting: &WaitingForInputMetadata, is_coding: bool) -> Vec<Plann
 pub fn plan_tool_approval(
     identity: &SessionIdentity,
     approval_id: Uuid,
-    requested_by: Option<&MacroUserIdStr<'static>>,
+    requested_by: Option<&RoxUserIdStr<'static>>,
     server_slug: &str,
     server_name: &str,
     tool_name: &str,
@@ -259,10 +259,10 @@ pub fn plan_tool_approval(
     let (entity, secondary_entity) = entities(identity);
     let asker = requested_by.map_or_else(
         || "A bot".to_owned(),
-        |user| macro_user_id::email::ReadEmailParts::local_part(&user.email_part()).to_owned(),
+        |user| rox_user_id::email::ReadEmailParts::local_part(&user.email_part()).to_owned(),
     );
     // People never see that the agent works in code; the step stands for itself.
-    let action = if server_slug == MACRO_SERVER_SLUG && tool_name == "ExecuteCode" {
+    let action = if server_slug == ROX_SERVER_SLUG && tool_name == "ExecuteCode" {
         "work in your workspace".to_owned()
     } else {
         format!("use {server_name} {tool_name}")
@@ -346,11 +346,11 @@ fn session_ref(
 
 /// The session's audience, owner first, never empty: an event published
 /// before the audience existed still reaches the owner.
-fn audience(identity: &SessionIdentity) -> Vec<MacroUserIdStr<'static>> {
+fn audience(identity: &SessionIdentity) -> Vec<RoxUserIdStr<'static>> {
     dedup(std::iter::once(identity.owner_id.clone()).chain(identity.audience.iter().cloned()))
 }
 
-fn dedup(users: impl Iterator<Item = MacroUserIdStr<'static>>) -> Vec<MacroUserIdStr<'static>> {
+fn dedup(users: impl Iterator<Item = RoxUserIdStr<'static>>) -> Vec<RoxUserIdStr<'static>> {
     let mut seen = HashSet::new();
     users.filter(|user| seen.insert(user.clone())).collect()
 }

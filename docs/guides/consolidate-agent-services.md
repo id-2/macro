@@ -46,7 +46,7 @@ The cognition CloudFront signer setting must retain its Secrets Manager
 reference, replacing any obsolete inline harness value under that name. The
 AI tool context uses the separate `_SECRET_NAME` setting for the same key.
 
-Stable public origins now come from `macro_service_urls`: `McpPublicUrl` is the
+Stable public origins now come from `rox_service_urls`: `McpPublicUrl` is the
 original `https://mcp-server[-dev].rox.one` server base and `CognitionPublicUrl`
 is the original `https://document-cognition[-dev].rox.one` integration callback
 base. Keep these distinct from internal gateway API routes. The shared gateway
@@ -241,7 +241,7 @@ Use an isolated, migrated test database and run the affected packages:
 
 ```sh
 cargo test -p agent_harness_service -p scheduled_action -p mcp_auth_proxy
-cargo test -p macro_service_urls -p xtask_local
+cargo test -p rox_service_urls -p xtask_local
 just check
 bun run --cwd infra check
 ```

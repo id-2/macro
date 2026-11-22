@@ -3,7 +3,7 @@ use super::*;
 #[test]
 fn callback_original_url_allows_trusted_destinations() {
     for original_url in [
-        "macro://login",
+        "rox://login",
         "tauri://localhost/app/login",
         "http://localhost/app/login",
         "https://dev.rox.one/app/login",

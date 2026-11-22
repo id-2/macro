@@ -11,7 +11,7 @@ use ::messages::{
 use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessReceipt, EntityPermission, RequiredPermission,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -29,7 +29,7 @@ async fn setup(pool: &PgPool) {
     .execute(pool)
     .await
     .unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, 'message-test@example.com', $2)"#, USER, user_id)
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, 'message-test@example.com', $2)"#, USER, user_id)
         .execute(pool).await.unwrap();
 }
 
@@ -117,7 +117,7 @@ fn repo(pool: &PgPool) -> PgMessageRepository {
     PgMessageRepository::new(pool.clone()).with_crm(PgCrmParentReader::new(pool.clone()))
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn crm_discussion_lifecycle_cascades_on_company_deletion(pool: PgPool) {
     setup(&pool).await;
     let team = create_team(&pool).await;
@@ -239,7 +239,7 @@ async fn crm_discussion_lifecycle_cascades_on_company_deletion(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn crm_threads_stay_within_their_record(pool: PgPool) {
     setup(&pool).await;
     let team = create_team(&pool).await;

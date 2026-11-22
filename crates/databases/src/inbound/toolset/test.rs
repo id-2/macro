@@ -11,8 +11,8 @@ use entity_access::domain::models::{
     EntityAccessReceipt, EntityPermission, EntityType as AccessEntityType, OwnerAccessLevel,
     RequiredPermission, TeamRole, UserTeamInfo,
 };
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::RoxUserId;
 use models_databases::position::Position;
 use models_databases::{ColumnId, DatabaseId, TableId, ViewId};
 use models_properties::service::property_definition::PropertyDefinition;
@@ -31,8 +31,8 @@ use crate::domain::models::{Column, ColumnDetail, Database, Table, TableDetail, 
 
 const USER: &str = "macro|wolf@rox.one";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER).expect("valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER).expect("valid user id")
 }
 
 fn request_context() -> RequestContext {
@@ -436,7 +436,7 @@ impl FakeAccess {
 impl EntityAccessService for FakeAccess {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: AccessEntityType,
@@ -477,7 +477,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: AccessEntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -486,7 +486,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: AccessEntityType,
         _required_level: AccessLevel,
@@ -505,7 +505,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: AccessEntityType,
         _user_org_id: Option<i64>,
@@ -517,7 +517,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: AccessEntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -528,7 +528,7 @@ impl EntityAccessService for FakeAccess {
         &self,
         _entity_id: &str,
         _entity_type: AccessEntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Ok(vec![user()])
     }
 
@@ -548,7 +548,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(None)
     }

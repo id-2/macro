@@ -8,7 +8,7 @@ use contacts::domain::{
     },
     ports::ContactDirectory,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::Base64Str;
 use rootcause::Report;
 use std::sync::{Arc, Mutex};
@@ -34,7 +34,7 @@ struct Reader {
 impl ContactDirectory for Reader {
     async fn search_contacts(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         search: &ContactSearch,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
@@ -49,7 +49,7 @@ impl ContactDirectory for Reader {
     }
     async fn lookup_contacts(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
     ) -> Result<Vec<Contact>, Report> {
         self.lookups
@@ -66,7 +66,7 @@ impl ContactDirectory for Reader {
     }
     async fn contact_page(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> Result<ContactPage, Report> {
@@ -78,7 +78,7 @@ impl ContactDirectory for Reader {
         if self.fail {
             return Err(rootcause::report!("private implementation detail"));
         }
-        let user_id = MacroUserIdStr::try_from_email("person@example.com").unwrap();
+        let user_id = RoxUserIdStr::try_from_email("person@example.com").unwrap();
         Ok(ContactPage {
             contacts: if self.empty {
                 vec![]
@@ -100,7 +100,7 @@ async fn search_and_exact_lookups_are_validated_and_scoped_to_the_root_viewer() 
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
         .data(ContactsGraphqlContext::new(reader.clone()))
         .finish();
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     let response = schema.execute(Request::new(r#"{ user {
         contacts(search: "  CAFÉ   PLN ") { nextCursor }
         contactsByUserIds(userIds: ["macro|PERSON@example.com", "macro|person@example.com"]) { userId }
@@ -174,7 +174,7 @@ async fn reference_matching_is_additive_validated_and_delegated_to_the_domain() 
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
         .data(ContactsGraphqlContext::new(reader.clone()))
         .finish();
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     let response = schema
         .execute(
             Request::new(
@@ -224,7 +224,7 @@ async fn bounds_and_cursor_validation_precede_domain_reads() {
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
         .data(ContactsGraphqlContext::new(reader.clone()))
         .finish();
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     for arguments in [
         "limit: 0",
         "limit: -1",
@@ -270,7 +270,7 @@ async fn enriched_rows_and_empty_pages_preserve_opaque_continuations() {
         let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
             .data(ContactsGraphqlContext::new(reader.clone()))
             .finish();
-        let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+        let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
         let result = schema
             .execute(
                 Request::new("{ user { contacts { nodes { id userId email name } nextCursor } } }")
@@ -326,7 +326,7 @@ async fn unauthenticated_reads_do_not_reach_the_domain_and_errors_are_sanitized(
     assert!(reader.requests.lock().unwrap().is_empty());
     let response = schema
         .execute(
-            Request::new(query).data(MacroUserIdStr::try_from_email("viewer@example.com").unwrap()),
+            Request::new(query).data(RoxUserIdStr::try_from_email("viewer@example.com").unwrap()),
         )
         .await;
     assert_eq!(response.errors[0].message, "contact directory unavailable");

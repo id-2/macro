@@ -44,8 +44,8 @@ import {
  * On web, `isTouchDevice()` (checks `pointer: coarse` media query) distinguishes
  * a phone/tablet browser ('mobile-web') from a desktop browser ('desktop-web').
  */
-const DEVICE_PROPERTY = 'macro_device' as const;
-const ENVIRONMENT_PROPERTY = 'macro_environment' as const;
+const DEVICE_PROPERTY = 'rox_device' as const;
+const ENVIRONMENT_PROPERTY = 'rox_environment' as const;
 const PLAN_TIER_AT_EVENT_PROPERTY = 'plan_tier_at_event' as const;
 const HAS_PAID_ACCESS_AT_EVENT_PROPERTY = 'has_paid_access_at_event' as const;
 /**
@@ -105,7 +105,7 @@ interface UserIdentifyInfo {
   setOnce: Record<string, string>;
 }
 
-const MERGED_EMAIL_KEY = 'macro_ph_merged_email:';
+const MERGED_EMAIL_KEY = 'rox_ph_merged_email:';
 
 const readMergedEmail = (userId: string): string | null => {
   try {

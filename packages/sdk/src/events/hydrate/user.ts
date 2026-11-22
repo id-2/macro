@@ -1,13 +1,13 @@
 import { match } from 'ts-pattern';
 import { StaticImage } from '../../entities/images/image';
 import { User } from '../../entities/users/user';
-import type { MacroClient } from '../../utils/client';
-import type { MacroEvent } from '../types';
+import type { RoxClient } from '../../utils/client';
+import type { RoxEvent } from '../types';
 
-export type UserEvent = Extract<MacroEvent, { event_type: `user.${string}` }>;
+export type UserEvent = Extract<RoxEvent, { event_type: `user.${string}` }>;
 
 /** Attach SDK entity handles to a user webhook event. */
-export function hydrateUserEvent(client: MacroClient, event: UserEvent) {
+export function hydrateUserEvent(client: RoxClient, event: UserEvent) {
   return match(event)
     .with({ event_type: 'user.picture_changed' }, ({ metadata }) => ({
       event_type: 'user.picture_changed' as const,

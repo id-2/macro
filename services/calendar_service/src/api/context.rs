@@ -4,8 +4,8 @@ use calendar_events::{
     domain::{mutations::CalendarMutationServiceImpl, service::CalendarService},
     outbound::{google::GoogleCalendarClient, pg::PgCalendarRepository},
 };
-use macro_authorization::{
-    MacroAuthJwtValidator, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_authorization::{
+    RoxAuthJwtValidator, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
 
 use crate::calendar_backfill::CalendarEventBroker;
@@ -15,7 +15,7 @@ use crate::calendar_tokens::CalendarTokenProviderAdapter;
 use crate::config::Config;
 
 /// JWT-validating authorization service used by the mutation routes.
-pub type AuthorizationService = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+pub type AuthorizationService = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 /// Calendar grant/watch service backing the push webhook.
 pub type CalendarGrantService = CalendarService<PgCalendarRepository>;
 /// Team-sharing policy service with viewer refresh notifications.
@@ -26,12 +26,12 @@ pub type CalendarTeamSvc = calendar_events::domain::team::CalendarTeamServiceImp
 /// Booking policy backed by calendar services and the team directory.
 pub type SchedulingService = calendar_scheduling::domain::service::Service<
     calendar_scheduling::outbound::postgres::PostgresRepository,
-    calendar_scheduling::outbound::macro_services::MacroCalendars<
+    calendar_scheduling::outbound::rox_services::RoxCalendars<
         CalendarGrantService,
         CalendarMutationSvc,
         calendar_scheduling::outbound::meeting_links::HttpMeetingLinks,
     >,
-    calendar_scheduling::outbound::macro_services::RoxDirectory<
+    calendar_scheduling::outbound::rox_services::RoxDirectory<
         teams::outbound::team_repo::TeamRepositoryImpl,
     >,
 >;
@@ -55,7 +55,7 @@ pub struct ApiContext {
     /// Resolved service configuration.
     pub config: Arc<Config>,
     /// Authorization state for authenticated mutation routes.
-    pub authorization_state: MacroAuthorizationState<AuthorizationService>,
+    pub authorization_state: RoxAuthorizationState<AuthorizationService>,
     /// Calendar grant/watch service backing the push webhook.
     pub calendar_service: Arc<CalendarGrantService>,
     /// User-initiated calendar mutation service.

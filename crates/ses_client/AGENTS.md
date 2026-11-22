@@ -21,7 +21,7 @@ used by `authentication_service` for invite emails.
 
 ## Boundaries
 
-- Depends on: `macro_env_var` (the `SMTP_HOST`/`SMTP_PORT` escape hatch).
+- Depends on: `rox_env_var` (the `SMTP_HOST`/`SMTP_PORT` escape hatch).
 - Used by: `authentication_service`.
 
 ## Recipes

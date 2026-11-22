@@ -12,8 +12,8 @@ use entity_access::domain::{
     models::{AccessError, EntityAccessReceipt, EntityType},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::{
     api::MessageReader, models::MessageParent, ports::MessageError, service::MessageWrite,
 };
@@ -22,7 +22,7 @@ use std::sync::Arc;
 trait InvocationAuthorizer: Send + Sync + 'static {
     fn capability(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> impl Future<Output = std::result::Result<EntityAccessReceipt<MessageWrite>, AccessError>> + Send;
 }
@@ -30,7 +30,7 @@ trait InvocationAuthorizer: Send + Sync + 'static {
 impl<Access: EntityAccessService> InvocationAuthorizer for Access {
     async fn capability(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> std::result::Result<EntityAccessReceipt<MessageWrite>, AccessError> {
         self.generate_entity_access_receipt::<MessageWrite>(
@@ -66,7 +66,7 @@ impl<Access> MessageThreadHistory<Access> {
 impl<Access: InvocationAuthorizer> ThreadHistory for MessageThreadHistory<Access> {
     async fn authorize_invocation(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
         root_id: Uuid,
     ) -> Result<Option<AuthorizedInvocation>> {

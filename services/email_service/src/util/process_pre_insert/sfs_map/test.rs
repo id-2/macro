@@ -3,7 +3,7 @@ use axum::Json;
 use axum::Router;
 use axum::routing::put;
 use bytes::Bytes;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 use static_file_service_client::StaticFileServiceClient;
@@ -30,7 +30,7 @@ impl ImageSource for Images {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn shares_only_copies_of_public_images(db: PgPool) {
     let sfs = FakeSfs::start().await;
     let html = format!(

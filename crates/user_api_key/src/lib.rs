@@ -4,7 +4,7 @@
 //!
 //! Keys are user-owned rows in `"UserApiKey"`. This crate owns that table's
 //! lifecycle. Authenticating a request *with* a key lives in
-//! `macro_authorization` (`x-macro-user-api-key`). The repository port still
+//! `rox_authorization` (`x-rox-user-api-key`). The repository port still
 //! exposes a lookup-by-key method for that use case.
 //!
 //! # Architecture

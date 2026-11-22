@@ -1,11 +1,11 @@
 use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_returns_owned_visible_company_with_contacts(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -40,7 +40,7 @@ async fn get_company_returns_owned_visible_company_with_contacts(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_returns_company_with_no_contacts(pool: PgPool) -> anyhow::Result<()> {
     // A company with zero contacts should still resolve — `contacts` is
     // empty, not the whole record collapsing to None.
@@ -59,7 +59,7 @@ async fn get_company_returns_company_with_no_contacts(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_returns_none_for_unknown_id(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;
@@ -72,7 +72,7 @@ async fn get_company_returns_none_for_unknown_id(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -95,7 +95,7 @@ async fn get_company_does_not_leak_across_teams(pool: PgPool) -> anyhow::Result<
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_returns_none_for_hidden_company_member(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;
@@ -113,7 +113,7 @@ async fn get_company_returns_none_for_hidden_company_member(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_admin_sees_hidden_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@test.com";
@@ -146,7 +146,7 @@ async fn get_company_admin_sees_hidden_company(pool: PgPool) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_filters_hidden_contacts_for_member(pool: PgPool) -> anyhow::Result<()> {
     // Company itself is visible; one of its contacts is hidden.
     // Member: contacts list excludes the hidden one. Admin: both.
@@ -182,7 +182,7 @@ async fn get_company_filters_hidden_contacts_for_member(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_hydrates_name_and_description_from_primary_domain(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -219,7 +219,7 @@ async fn get_company_hydrates_name_and_description_from_primary_domain(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_returns_none_for_negative_cache_directory_row(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -246,7 +246,7 @@ async fn get_company_returns_none_for_negative_cache_directory_row(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_company_without_contacts_skips_the_list(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@owner.test";

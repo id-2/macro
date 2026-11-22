@@ -3,7 +3,7 @@ import { botOwnerName, parseOwner } from './owner';
 
 const BOT_ID = '5f0c8a4e-2d1b-4c3a-9e7f-6a5b4c3d2e1f';
 const TEAM_ID = '01234567-89ab-cdef-0123-456789abcdef';
-const MACRO_BOT_ID = '00000000-0000-0000-0000-00000000a1a1';
+const ROX_BOT_ID = '00000000-0000-0000-0000-00000000a1a1';
 
 describe('parseOwner', () => {
   it.each([
@@ -13,14 +13,14 @@ describe('parseOwner', () => {
     },
     { principal: `bot|${BOT_ID}`, owner: { kind: 'bot', botId: BOT_ID } },
     {
-      principal: `bot|${MACRO_BOT_ID}`,
-      owner: { kind: 'bot', botId: MACRO_BOT_ID },
+      principal: `bot|${ROX_BOT_ID}`,
+      owner: { kind: 'bot', botId: ROX_BOT_ID },
     },
     {
       principal: 'bot|not-a-uuid',
       owner: { kind: 'unknown', raw: 'bot|not-a-uuid' },
     },
-    { principal: MACRO_BOT_ID, owner: { kind: 'bot', botId: MACRO_BOT_ID } },
+    { principal: ROX_BOT_ID, owner: { kind: 'bot', botId: ROX_BOT_ID } },
     { principal: TEAM_ID, owner: { kind: 'team', teamId: TEAM_ID } },
     {
       principal: 'system:nightly',

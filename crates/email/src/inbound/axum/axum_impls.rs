@@ -12,11 +12,11 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationRejection, MacroAuthorizationService,
-    MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationRejection, RoxAuthorizationService,
+    RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use std::{marker::PhantomData, str::FromStr};
 use thiserror::Error;
@@ -99,7 +99,7 @@ pub enum EmailLinkErr {
     #[error("No inbox specified; provide the X-Email-Link-Id header")]
     NoInboxSelected,
     #[error(transparent)]
-    Authorization(#[from] MacroAuthorizationRejection),
+    Authorization(#[from] RoxAuthorizationRejection),
 }
 
 impl IntoResponse for EmailLinkErr {
@@ -120,14 +120,14 @@ impl IntoResponse for EmailLinkErr {
 /// Resolve the single inbox a mutating request targets from the caller's owned
 /// `links`. With an `X-Email-Link-Id` value, the matching owned link is used
 /// (404 when it isn't one of theirs). Without a header, the caller's primary
-/// inbox is used — their own `is_primary` link. The `macro_id` guard matters:
+/// inbox is used — their own `is_primary` link. The `rox_id` guard matters:
 /// the links list includes delegated inboxes, which are primary for *their*
 /// account. A caller with no primary inbox (e.g. it was removed) must name an
 /// inbox explicitly.
 fn resolve_target_link(
     links: Vec<Link>,
     header_link_id: Option<Uuid>,
-    caller: &MacroUserIdStr<'_>,
+    caller: &RoxUserIdStr<'_>,
 ) -> Result<Link, EmailLinkErr> {
     match header_link_id {
         Some(id) => links
@@ -136,7 +136,7 @@ fn resolve_target_link(
             .ok_or(EmailLinkErr::NotFound),
         None => links
             .into_iter()
-            .find(|link| link.is_primary && &link.macro_id == caller)
+            .find(|link| link.is_primary && &link.rox_id == caller)
             .ok_or(EmailLinkErr::NoInboxSelected),
     }
 }
@@ -158,25 +158,25 @@ fn parse_link_id_header(parts: &Parts) -> Result<Option<Uuid>, EmailLinkErr> {
 impl<S, U, Auth> FromRequestParts<S> for EmailLinkExtractor<U, Auth>
 where
     EmailRouterState<U>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     U: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = EmailLinkErr;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let header_link_id = parse_link_id_header(parts)?;
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>> =
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>> =
             parts
                 .extract_with_state(state)
                 .await
                 .map_err(EmailLinkErr::Authorization)?;
-        let macro_user_id = authorization.authorization.user.macro_user_id.clone();
-        let caller = macro_user_id.clone();
+        let rox_user_id = authorization.authorization.user.rox_user_id.clone();
+        let caller = rox_user_id.clone();
         let links = <EmailRouterState<U>>::from_ref(state)
             .inner
-            .get_inboxes_for_macro_id(macro_user_id)
+            .get_inboxes_for_rox_id(rox_user_id)
             .await?;
         let link = resolve_target_link(links, header_link_id, &caller)?;
         Ok(Self(link, PhantomData))
@@ -184,7 +184,7 @@ where
 }
 
 /// Extractor that resolves *every* inbox the caller can read — their own inboxes
-/// plus any delegated/shared inboxes reachable via `macro_user_links`. Read
+/// plus any delegated/shared inboxes reachable via `rox_user_links`. Read
 /// endpoints fan out over all returned links. A caller with no inboxes yields an
 /// empty `Vec` (and hence empty results) rather than a 404 — the union over zero
 /// inboxes is empty, not missing.
@@ -199,23 +199,23 @@ impl<U, Auth> Clone for MultiEmailLinkExtractor<U, Auth> {
 impl<S, U, Auth> FromRequestParts<S> for MultiEmailLinkExtractor<U, Auth>
 where
     EmailRouterState<U>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     U: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = EmailLinkErr;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>> =
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>> =
             parts
                 .extract_with_state(state)
                 .await
                 .map_err(EmailLinkErr::Authorization)?;
-        let macro_user_id = authorization.authorization.user.macro_user_id.clone();
+        let rox_user_id = authorization.authorization.user.rox_user_id.clone();
         let links = <EmailRouterState<U>>::from_ref(state)
             .inner
-            .get_inboxes_for_macro_id(macro_user_id)
+            .get_inboxes_for_rox_id(rox_user_id)
             .await?;
         Ok(Self(links, PhantomData))
     }

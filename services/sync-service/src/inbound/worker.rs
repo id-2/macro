@@ -1,5 +1,5 @@
 use bebop::{Record, SubRecord};
-use macro_sync_service_jwt::session::{SessionIdentity, SessionKind};
+use rox_sync_service_jwt::session::{SessionIdentity, SessionKind};
 use tracing::{Instrument, error};
 use wasm_bindgen::JsValue;
 use worker::{Env, Headers, Method, Request, RequestInit, Response, Result, Stub};
@@ -7,7 +7,7 @@ use worker::{Env, Headers, Method, Request, RequestInit, Response, Result, Stub}
 use crate::{
     constants::{
         USER_PEER_D1_BINDING,
-        header_names::{AUTHORIZATION, MACRO_INTERNAL_AUTH_KEY_HEADER_KEY},
+        header_names::{AUTHORIZATION, ROX_INTERNAL_AUTH_KEY_HEADER_KEY},
     },
     d1::copy_user_mappings,
     durable_object::{CopyDocumentRequest, GetSnapshotRequest, response, status_codes},
@@ -166,7 +166,7 @@ pub async fn copy_handler(env: Env, mut req: Request, document_id: &str) -> Resu
         mv_header(
             og_req.headers(),
             &headers,
-            MACRO_INTERNAL_AUTH_KEY_HEADER_KEY,
+            ROX_INTERNAL_AUTH_KEY_HEADER_KEY,
         )?;
         mv_header(og_req.headers(), &headers, worker_rs_otel::TRACEPARENT)?;
         ss_req.with_headers(headers);

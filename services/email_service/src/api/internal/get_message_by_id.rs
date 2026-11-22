@@ -5,7 +5,7 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use email::domain::message_reads::InternalMessageReadError;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::ErrorResponse;
 use sqlx::types::Uuid;
 
@@ -18,7 +18,7 @@ pub struct PathParams {
 #[tracing::instrument(skip(ctx))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path(PathParams { id }): Path<PathParams>,
 ) -> Result<Response, Response> {
     let messages = ctx
@@ -48,7 +48,7 @@ pub async fn handler(
 #[tracing::instrument(skip(ctx))]
 pub async fn get_message_by_id_batch_handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Json(ids): Json<Vec<Uuid>>,
 ) -> Result<Response, Response> {
     let messages = ctx

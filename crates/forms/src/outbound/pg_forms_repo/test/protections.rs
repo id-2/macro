@@ -6,7 +6,7 @@ use crate::domain::models::FormCreation;
 /// starts from an empty `public` schema.
 const EMPTY_PUBLIC_SCHEMA: &str = "DROP SCHEMA public CASCADE; CREATE SCHEMA public;";
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn managed_column_cannot_be_deleted_while_its_form_exists(pool: PgPool) {
     let table = insert_table(&pool).await;
     let form = form_over(&table);
@@ -28,7 +28,7 @@ async fn managed_column_cannot_be_deleted_while_its_form_exists(pool: PgPool) {
     assert!(deletion.is_err(), "the managed column must remain intact");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn managed_column_type_is_protected_but_name_and_position_can_change(pool: PgPool) {
     let table = insert_table(&pool).await;
     let form = form_over(&table);
@@ -54,7 +54,7 @@ async fn managed_column_type_is_protected_but_name_and_position_can_change(pool:
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_form_reserves_its_table_until_permanently_deleted(pool: PgPool) {
     let table = insert_table(&pool).await;
     let form = form_over(&table);
@@ -108,7 +108,7 @@ async fn one_form_reserves_its_table_until_permanently_deleted(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_form_preserves_response_rows_and_releases_column_protection(pool: PgPool) {
     let table = insert_table(&pool).await;
     let form = form_over(&table);
@@ -147,7 +147,7 @@ async fn deleting_form_preserves_response_rows_and_releases_column_protection(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_database_can_cascade_protected_columns_and_form(pool: PgPool) {
     let table = insert_table(&pool).await;
     let form = form_over(&table);
@@ -169,7 +169,7 @@ async fn deleting_database_can_cascade_protected_columns_and_form(pool: PgPool) 
     assert!(repository.form(form.id).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn both_metadata_columns_are_protected_and_table_deletion_still_cascades(pool: PgPool) {
     let table = insert_table(&pool).await;
     let respondent = insert_column(
@@ -218,7 +218,7 @@ async fn both_metadata_columns_are_protected_and_table_deletion_still_cascades(p
     assert!(repository.form(form.id).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn metadata_retyped_after_discovery_refuses_creation_without_leaving_a_form(pool: PgPool) {
     let table = insert_table(&pool).await;
     let form = form_over(&table);
@@ -242,7 +242,7 @@ async fn metadata_retyped_after_discovery_refuses_creation_without_leaving_a_for
 async fn protection_upgrade_refuses_legacy_retyped_metadata_without_freezing_it(pool: PgPool) {
     let before_protections = sqlx::migrate::Migrator {
         migrations: std::borrow::Cow::Owned(
-            MACRO_DB_MIGRATIONS
+            ROX_DB_MIGRATIONS
                 .iter()
                 .filter(|migration| migration.version < 20261006165503)
                 .cloned()
@@ -265,14 +265,14 @@ async fn protection_upgrade_refuses_legacy_retyped_metadata_without_freezing_it(
         "UPDATE property_definitions SET data_type = 'STRING' WHERE id = (SELECT property_definition_id FROM database_columns WHERE id = $1)",
         table.second.into_uuid()
     ).execute(&pool).await.unwrap();
-    let error = MACRO_DB_MIGRATIONS.run(&pool).await.unwrap_err();
+    let error = ROX_DB_MIGRATIONS.run(&pool).await.unwrap_err();
     assert!(error.to_string().contains("Restore Submitted"), "{error}");
     // A failed upgrade must leave the old column repairable; retry then succeeds.
     sqlx::query!(
         "UPDATE property_definitions SET data_type = 'DATE' WHERE id = (SELECT property_definition_id FROM database_columns WHERE id = $1)",
         table.second.into_uuid()
     ).execute(&pool).await.unwrap();
-    MACRO_DB_MIGRATIONS.run(&pool).await.unwrap();
+    ROX_DB_MIGRATIONS.run(&pool).await.unwrap();
     assert_eq!(
         sqlx::query_scalar!(
             "SELECT count(*) FROM database_column_protections WHERE column_id = $1",

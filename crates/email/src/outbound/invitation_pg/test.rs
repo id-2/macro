@@ -3,7 +3,7 @@ use crate::domain::{
     calendar_invitation_parser::parse_invitation_parts,
     invitation_extraction::InvitationExtractionRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const MESSAGE: Uuid = uuid::uuid!("11111111-aaaa-0001-aaaa-111111111111");
 const THREAD: Uuid = uuid::uuid!("11111111-1111-1111-1111-111111111111");
@@ -32,7 +32,7 @@ async fn thread_flagged(pool: &PgPool) -> Result<bool, Report> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_thread"))
 )]
 async fn saving_is_idempotent_and_flags_the_thread(pool: PgPool) -> Result<(), Report> {
@@ -55,7 +55,7 @@ async fn saving_is_idempotent_and_flags_the_thread(pool: PgPool) -> Result<(), R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_thread"))
 )]
 async fn thread_invitations_are_newest_first_and_bounded(pool: PgPool) -> Result<(), Report> {
@@ -78,7 +78,7 @@ async fn thread_invitations_are_newest_first_and_bounded(pool: PgPool) -> Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("email_thread"))
 )]
 async fn undecodable_snapshots_are_skipped_instead_of_failing_reads(

@@ -1,6 +1,6 @@
 //! Checks that Doppler `dev` and `prd` hold every key [`Config`] reads.
 
-use macro_env::Environment;
+use rox_env::Environment;
 use whatsapp_session_service::config::Config;
 
 const DOPPLER_PROJECT: &str = "whatsapp-session-service";

@@ -16,7 +16,7 @@ impl InitiativeResources for VisibleResources {
     }
     fn set_initial_properties(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: InitiativeId,
         _: Vec<crate::domain::models::InitialPropertyValue>,
     ) -> ResourceFuture<'_, ()> {
@@ -67,7 +67,7 @@ impl InitiativeResources for VisibleResources {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn tool_cursors_enumerate_projects_and_more_than_two_hundred_visible_tasks(
     pool: PgPool,
 ) -> anyhow::Result<()> {

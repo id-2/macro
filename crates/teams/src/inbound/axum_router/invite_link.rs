@@ -9,9 +9,9 @@ use entity_access::{
         models::{AdminTeamRole, MemberTeamRole},
         ports::EntityAccessService,
     },
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model_error_response::ErrorResponse;
 
 use crate::domain::{
@@ -123,9 +123,9 @@ impl IntoResponse for JoinTeamByInviteLinkError {
 pub async fn get_handler<
     T: TeamService + TeamInviteLinkService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<TeamRouterState<T, Eas, Auth>>,
 ) -> Result<Json<TeamInviteLinkResponse>, ManageTeamInviteLinkError> {
     let token = state
@@ -153,9 +153,9 @@ pub async fn get_handler<
 pub async fn create_handler<
     T: TeamService + TeamInviteLinkService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<TeamRouterState<T, Eas, Auth>>,
 ) -> Result<(StatusCode, Json<CreatedTeamInviteLinkResponse>), ManageTeamInviteLinkError> {
     let token = state
@@ -184,9 +184,9 @@ pub async fn create_handler<
 pub async fn delete_handler<
     T: TeamService + TeamInviteLinkService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<TeamRouterState<T, Eas, Auth>>,
 ) -> Result<StatusCode, TeamError> {
     state
@@ -213,10 +213,10 @@ pub async fn delete_handler<
 pub async fn get_team_handler<
     T: TeamService + TeamInviteLinkService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<TeamRouterState<T, Eas, Auth>>,
-    _authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    _authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(TeamInviteLinkTokenRequest { token }): Json<TeamInviteLinkTokenRequest>,
 ) -> Result<Json<TeamInviteLinkTeam>, JoinTeamByInviteLinkError> {
     let team = state.service.get_team_by_invite_link(&token).await?;
@@ -241,15 +241,15 @@ pub async fn get_team_handler<
 pub async fn join_handler<
     T: TeamService + TeamInviteLinkService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<TeamRouterState<T, Eas, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(TeamInviteLinkTokenRequest { token }): Json<TeamInviteLinkTokenRequest>,
 ) -> Result<Json<JoinTeamByInviteLinkResponse>, JoinTeamByInviteLinkError> {
     let outcome = state
         .service
-        .join_team_by_invite_link(&token, &authorization.authorization.user.macro_user_id)
+        .join_team_by_invite_link(&token, &authorization.authorization.user.rox_user_id)
         .await?;
     Ok(Json(JoinTeamByInviteLinkResponse {
         team_id: outcome.team_id(),

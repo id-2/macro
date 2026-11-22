@@ -21,7 +21,7 @@ fn claude_code_reads_its_namespaced_tool_name() {
         Some(ToolName::native("Bash"))
     );
 
-    let mcp = Frame::new().meta(json!({"claudeCode": {"toolName": "mcp__macro__ReadContent"}}));
+    let mcp = Frame::new().meta(json!({"claudeCode": {"toolName": "mcp__rox__ReadContent"}}));
     assert_eq!(
         claude_code::ClaudeCode.reported_tool_name(&mcp.view()),
         Some(ToolName::Mcp {
@@ -32,7 +32,7 @@ fn claude_code_reads_its_namespaced_tool_name() {
 }
 
 #[test]
-fn macro_inmem_reads_its_namespaced_tool_name() {
+fn rox_inmem_reads_its_namespaced_tool_name() {
     let frame = Frame::new().meta(json!({"macro": {"toolName": "ReadContent"}}));
     assert_eq!(
         Harness::Macro.reader().reported_tool_name(&frame.view()),
@@ -133,8 +133,8 @@ fn sniffs_a_harness_from_the_frames_it_wrote() {
     let claude =
         Frame::new().meta(json!({"claudeCode": {"toolName": "Bash"}, "terminal_output": {}}));
     assert_eq!(Harness::sniff(&claude.view()), Some(Harness::ClaudeCode));
-    let macro_ = Frame::new().meta(json!({"macro": {"toolName": "ReadContent"}}));
-    assert_eq!(Harness::sniff(&macro_.view()), Some(Harness::Macro));
+    let rox_ = Frame::new().meta(json!({"macro": {"toolName": "ReadContent"}}));
+    assert_eq!(Harness::sniff(&rox_.view()), Some(Harness::Macro));
     let anonymous = Frame::new().meta(json!({"terminal_output": {"data": "x"}}));
     assert_eq!(Harness::sniff(&anonymous.view()), None);
     assert_eq!(Harness::sniff(&Frame::new().view()), None);

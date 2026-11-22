@@ -117,11 +117,11 @@ export async function login(at: Stack, email: string): Promise<string> {
         `${at.auth}/oauth/passwordless/${code}?email=${encodeURIComponent(email)}&disable_redirect=true`,
       );
       const { access_token } = (await tokens.json()) as { access_token: string };
-      const api = await fetch(`${at.auth}/jwt/macro_api_token`, {
+      const api = await fetch(`${at.auth}/jwt/rox_api_token`, {
         headers: { Authorization: `Bearer ${access_token}` },
       });
-      if (!api.ok) throw new Error(`macro_api_token ${api.status}`);
-      return ((await api.json()) as { macro_api_token: string }).macro_api_token;
+      if (!api.ok) throw new Error(`rox_api_token ${api.status}`);
+      return ((await api.json()) as { rox_api_token: string }).rox_api_token;
     } catch (error) {
       // FusionAuth sometimes refuses a login while it's busy.
       if (attempt >= 4) throw error;
@@ -349,7 +349,7 @@ async function recreateHarness(at: Stack, override?: string) {
   const env = join(generated, 'local.generated.env');
   const compose = [
     `COMPOSE_PROJECT_NAME=macro-${at.instance}`,
-    `MACRO_ENV_FILE=${env}`,
+    `ROX_ENV_FILE=${env}`,
     'docker compose --project-directory .',
     `--env-file ${env}`,
     '-f docker/docker-compose.yml',

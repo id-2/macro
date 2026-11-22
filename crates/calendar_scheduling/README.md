@@ -1,6 +1,6 @@
 # Calendar scheduling
 
-Personal and Macro-team booking pages, event types, weekly schedules/date overrides,
+Personal and Rox-team booking pages, event types, weekly schedules/date overrides,
 collective and round-robin hosts, booking limits/buffers, custom questions, host
 legacy approval management, cancellation, rescheduling, and recorded attendance. `domain::Service` owns
 authorization and booking policy. HTTP adapters expose public presentation types and authenticate
@@ -15,7 +15,7 @@ updated calendar service with its existing `CALENDAR_SYNC_ENABLED` setting enabl
 The migration uses PostgreSQL multiranges (PostgreSQL 14+) and `btree_gist` for
 atomic host conflict exclusion. Each host needs a connected, writable primary
 calendar whose grant works, and every calendar that counts toward their busy time
-must be current (`macro_services/sync_health.rs`, over
+must be current (`rox_services/sync_health.rs`, over
 `CalendarSyncHealthReader`): a calendar failing transiently still offers time
 around its stored events for 45 minutes after its next sync was due (its last
 successful sync; for a Google system calendar such as holidays, which Rox

@@ -2,7 +2,7 @@ use std::future::Future;
 
 use channels::domain::models::Sender;
 use entity_access::domain::{models::EntityType, ports::EntityAccessService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mention_utils::serialize::user_mention;
 use messages::domain::{
     api::MessageCommands,
@@ -72,8 +72,8 @@ impl<A: EntityAccessService> SupportChannelMessageGateway for AuthorizedSupportC
     }
 }
 
-fn support_user(email: &str) -> Result<MacroUserIdStr<'static>, Report> {
-    Ok(MacroUserIdStr::try_from_email(email)
+fn support_user(email: &str) -> Result<RoxUserIdStr<'static>, Report> {
+    Ok(RoxUserIdStr::try_from_email(email)
         .context_with(|| format!("invalid Rox support user email: {email}"))?)
 }
 
@@ -81,7 +81,7 @@ fn support_user(email: &str) -> Result<MacroUserIdStr<'static>, Report> {
 pub async fn post_support_channel_welcome(
     gateway: &impl SupportChannelMessageGateway,
     channel_id: &str,
-    new_user: MacroUserIdStr<'static>,
+    new_user: RoxUserIdStr<'static>,
 ) -> Result<(), Report> {
     let channel_id =
         Uuid::parse_str(channel_id).context("support channel returned an invalid id")?;

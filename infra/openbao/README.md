@@ -1,7 +1,7 @@
 # Hosted Passwords provisioning (dev)
 
 Provision one team in the hosted dev OpenBao. Run this only for teams you mean
-to enable; creating a Macro team does not create its namespace. Runs are
+to enable; creating a Rox team does not create its namespace. Runs are
 idempotent: a repeat run keeps existing values and versions and reapplies the
 mounts, policies, and roles.
 

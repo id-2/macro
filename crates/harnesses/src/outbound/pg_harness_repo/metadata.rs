@@ -175,7 +175,7 @@ impl PgHarnessRepo {
             },
             signed_in_by: row
                 .signed_in_by
-                .map(MacroUserIdStr::try_from)
+                .map(RoxUserIdStr::try_from)
                 .transpose()
                 .map_err(|_| invalid("signer"))?,
             signed_in_at: row.signed_in_at,

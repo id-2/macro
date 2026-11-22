@@ -8,7 +8,7 @@ use std::{
 
 use bebop::Record;
 use loro::{ExportMode, awareness::EphemeralStore};
-use macro_sync_service_jwt::session::SessionKind;
+use rox_sync_service_jwt::session::SessionKind;
 use serde::{Deserialize, Serialize};
 use tracing::{Instrument, debug, error, info, instrument, trace, warn};
 use worker::{

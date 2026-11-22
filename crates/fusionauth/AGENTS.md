@@ -19,16 +19,16 @@ passwordless/password flows against the FusionAuth HTTP API.
 ## Scope
 
 - Owns: typed request/response shapes and calls for FusionAuth's REST API.
-- Not here: Macro's own session/cookie handling or route wiring → the calling
+- Not here: Rox's own session/cookie handling or route wiring → the calling
   service (`authentication_service`).
 
 ## Boundaries
 
 - Depends on: `upstream_error` for outage classification, and
-  `macro_service_urls` for Google's OAuth token and revocation endpoints
+  `rox_service_urls` for Google's OAuth token and revocation endpoints
   (overridable, so a local stack can use `crates/gmail_emulator`); otherwise a
   plain HTTP client crate.
-- Microsoft's login and Graph hosts come from `macro_service_urls`
+- Microsoft's login and Graph hosts come from `rox_service_urls`
   (`MicrosoftLoginUrl`, `MicrosoftLoginPageUrl`, `MicrosoftGraphUrl`), so a
   local stack can use `crates/outlook_emulator`. ID tokens are still only
   accepted from Microsoft's issuer, which the emulator's tokens carry.

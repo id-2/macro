@@ -3,13 +3,13 @@
 use std::{future::Future, pin::Pin, sync::Arc};
 
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Shared web and backend rollout key.
-pub const ENABLE_MACRO_COMPUTERS: &str = "enable-macro-computers";
+pub const ENABLE_ROX_COMPUTERS: &str = "enable-macro-computers";
 
 type Evaluate =
-    dyn Fn(MacroUserIdStr<'static>) -> Pin<Box<dyn Future<Output = bool> + Send>> + Send + Sync;
+    dyn Fn(RoxUserIdStr<'static>) -> Pin<Box<dyn Future<Output = bool> + Send>> + Send + Sync;
 
 /// Missing providers, failed evaluations and missing flags all disable rollout.
 #[derive(Clone, Default)]
@@ -32,7 +32,7 @@ impl ComputerRollout {
                             tracing::warn!(?error, "computer rollout unavailable; refusing access");
                         })
                         .unwrap_or_default()
-                        .is_enabled(ENABLE_MACRO_COMPUTERS)
+                        .is_enabled(ENABLE_ROX_COMPUTERS)
                 })
             })),
         }
@@ -40,7 +40,7 @@ impl ComputerRollout {
 
     /// Evaluate the authenticated Rox user, never a team or derived identity.
     #[tracing::instrument(skip_all)]
-    pub async fn enabled(&self, user_id: &MacroUserIdStr<'static>) -> bool {
+    pub async fn enabled(&self, user_id: &RoxUserIdStr<'static>) -> bool {
         let Some(evaluate) = &self.evaluate else {
             return false;
         };

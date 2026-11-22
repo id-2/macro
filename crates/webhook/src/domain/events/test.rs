@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use uuid::Uuid;
 
@@ -10,8 +10,8 @@ use crate::domain::models::WebhookFilter;
 const WEBHOOK_ID: &str = "wh_01998a2f-aaaa-7bbb-8ccc-dddddddddddd";
 const WORKSPACE_ID: &str = "team_0123";
 
-fn user_id(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user_id(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn timestamp(value: &str) -> DateTime<Utc> {
@@ -285,7 +285,7 @@ fn constructors_key_events_by_subject_webhook_id() {
 
     for (event, expected_event_type) in cases.into_iter().zip(expected_event_types) {
         assert_eq!(event.key(), WEBHOOK_ID);
-        assert_eq!(event.topic(), "macro.webhooks");
+        assert_eq!(event.topic(), "rox.webhooks");
         assert_eq!(event.event().schema_version, 1);
         assert_eq!(
             serde_json::to_value(event.event()).expect("serializable event")["event_type"],
@@ -295,7 +295,7 @@ fn constructors_key_events_by_subject_webhook_id() {
 }
 
 #[test]
-fn macro_event_round_trips_without_exposing_secrets_or_header_values() {
+fn rox_event_round_trips_without_exposing_secrets_or_header_values() {
     let original = WebhookMacroEvent::created(
         WEBHOOK_ID,
         WebhookCreatedMetadata {
@@ -322,5 +322,5 @@ fn macro_event_round_trips_without_exposing_secrets_or_header_values() {
     let decoded = WebhookMacroEvent::decode(original.key(), &payload).expect("decodable event");
     assert_eq!(decoded.key(), WEBHOOK_ID);
     assert_eq!(decoded.event(), original.event());
-    assert_eq!(decoded.topic(), "macro.webhooks");
+    assert_eq!(decoded.topic(), "rox.webhooks");
 }

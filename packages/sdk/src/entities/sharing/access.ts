@@ -4,15 +4,15 @@ import type {
   ResolveRequest,
   ShareEntityType,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 
 /** Access requests and direct grants scoped to a shareable entity. */
 export class EntityAccess {
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     private readonly entityType: ShareEntityType,
     private readonly entity: { readonly id: string },
   ) {}
@@ -54,7 +54,7 @@ export class EntityAccess {
    * menu's Request access does, superseding the caller's latest request.
    *
    * Agents: call this only when the user asked for it or agreed after being
-   * offered it, typically after a write failed with `MacroForbiddenError`
+   * offered it, typically after a write failed with `RoxForbiddenError`
    * because the user can only view the item; never request access on your
    * own. It never grants access: the request stays pending until a reviewer
    * decides. Tell the user it is pending and who reviews it (`state().owner`),
@@ -187,11 +187,11 @@ export class EntityAccess {
  *
  * @mcp-exclude Built from a listing record; no id-only reference an MCP call can pass.
  */
-export class AccessRequest extends MacroEntity<RequestRecord> {
+export class AccessRequest extends RoxEntity<RequestRecord> {
   private resolvedRecord?: RequestRecord;
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** Entity access surface owning the request. */
     readonly access: EntityAccess,
     record: RequestRecord,
@@ -201,7 +201,7 @@ export class AccessRequest extends MacroEntity<RequestRecord> {
 
   /** Seed a request from a state or submission response. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     access: EntityAccess,
     record: RequestRecord,
   ): AccessRequest {
@@ -219,7 +219,7 @@ export class AccessRequest extends MacroEntity<RequestRecord> {
       if (found) return found.detail.get();
       offset = state.nextOffset;
     } while (offset !== undefined);
-    throw new MacroNotFoundError(`Access request ${this.id} is unavailable`);
+    throw new RoxNotFoundError(`Access request ${this.id} is unavailable`);
   }
 
   /** Request revision. */

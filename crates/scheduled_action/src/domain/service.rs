@@ -11,8 +11,8 @@ use entity_access::domain::{
 };
 use entity_registry::OwnedPurgeOutcome;
 use github::domain::{models::GithubError, ports::GithubInstallationClaims};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityAppearance;
 use model_owner::{CreationPrincipal, Owner};
 use tokio::sync::mpsc::Sender;
@@ -83,13 +83,13 @@ struct DraftChecks {
 pub struct NoGithubLinks;
 
 impl GithubInstallationClaims for NoGithubLinks {
-    async fn is_linked(&self, _user: &MacroUserIdStr<'_>) -> Result<bool, GithubError> {
+    async fn is_linked(&self, _user: &RoxUserIdStr<'_>) -> Result<bool, GithubError> {
         Ok(false)
     }
 
     async fn has_claim(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _installation_id: u64,
     ) -> Result<bool, GithubError> {
         Ok(false)
@@ -283,7 +283,7 @@ impl<Rpo: ScheduledActionRepo, Exe, Grants, Targets, Github, Code, Upgrades, Rol
     async fn check_event_management(
         &self,
         trigger: &ActionTrigger,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> Result<()>
     where
         Rollout: EventRoutineRollout,
@@ -387,7 +387,7 @@ impl<Rpo: ScheduledActionRepo, Exe, Grants, Targets, Github, Code, Upgrades, Rol
     /// makes, and the routine as it would be stored. Nothing is saved.
     async fn check(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         input: ActionConfiguration,
     ) -> Result<RoutineCheck>
     where
@@ -440,7 +440,7 @@ impl<Rpo: ScheduledActionRepo, Exe, Grants, Targets, Github, Code, Upgrades, Rol
     /// answer alone.
     async fn hand_back(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         correlation: Option<Uuid>,
         check: &RoutineCheck,
         created: &[CreatedItem],
@@ -467,7 +467,7 @@ impl<Rpo: ScheduledActionRepo, Exe, Grants, Targets, Github, Code, Upgrades, Rol
     }
 
     /// An enabled GitHub trigger needs its owner to have linked GitHub.
-    async fn check_github(&self, trigger: &ActionTrigger, owner: &MacroUserIdStr<'_>) -> Result<()>
+    async fn check_github(&self, trigger: &ActionTrigger, owner: &RoxUserIdStr<'_>) -> Result<()>
     where
         Github: GithubInstallationClaims,
     {
@@ -707,7 +707,7 @@ fn next_run(
 pub(crate) async fn list_accessible_actions<R, G>(
     repo: &R,
     grants: &G,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
 ) -> Result<Vec<ScheduledAction>>
 where
     R: SubRoutines,
@@ -767,7 +767,7 @@ where
         self.load_granted(receipt).await
     }
 
-    async fn delete_user_actions(&self, user_id: MacroUserIdStr<'static>) -> Result<()> {
+    async fn delete_user_actions(&self, user_id: RoxUserIdStr<'static>) -> Result<()> {
         // Use the repository list, not the legacy cron-only service list, so
         // event-triggered actions are also removed regardless of rollout gates.
         for action in self.repo.get_owned_actions(&user_id).await? {
@@ -952,7 +952,7 @@ where
 
     async fn get_actions(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         include_events: bool,
         scope: ListScope,
     ) -> Result<Vec<ListedAction>> {
@@ -1022,7 +1022,7 @@ where
                 id,
                 appearance: appearance.clone(),
                 attribution,
-                event_id: macro_uuid::generate_uuid_v7(),
+                event_id: rox_uuid::generate_uuid_v7(),
                 occurred_at: Utc::now(),
             })
             .await?;

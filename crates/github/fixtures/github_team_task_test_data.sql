@@ -1,11 +1,11 @@
 INSERT INTO
-    public.macro_user (id, username, email, stripe_customer_id)
+    public.rox_user (id, username, email, stripe_customer_id)
 VALUES
     ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'::uuid, 'testuser', 'testuser@test.com', 'cus_test'),
     ('cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'owner2', 'owner2@test.com', 'cus_test2');
 
 INSERT INTO
-    public."User" (id, email, macro_user_id)
+    public."User" (id, email, rox_user_id)
 VALUES
     ('macro|user@user.com', 'testuser@test.com', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'::uuid),
     ('macro|owner2@user.com', 'owner2@test.com', 'cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid);

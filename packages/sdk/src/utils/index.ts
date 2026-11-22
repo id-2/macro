@@ -1,11 +1,11 @@
-export { MacroClient } from './client';
+export { RoxClient } from './client';
 export { mapConcurrently } from './concurrency';
 export { Lazy } from './lazy';
 export { type Page, paginate } from './pagination';
 export {
-  MacroApiError,
-  MacroError,
-  MacroForbiddenError,
-  MacroNotFoundError,
+  RoxApiError,
+  RoxError,
+  RoxForbiddenError,
+  RoxNotFoundError,
   unwrap,
 } from './unwrap';

@@ -2,7 +2,7 @@
 
 use std::pin::Pin;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::error::{AgentSessionError, Result};
 use super::model::{AgentSessionId, SessionClaim};
@@ -19,7 +19,7 @@ pub trait SessionWorkingBranches: Send + Sync {
     fn set_working_branch<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         repository_url: &'a str,
         branch: &'a str,
         claim: Option<SessionClaim>,
@@ -44,7 +44,7 @@ pub trait SessionWorkingBranchRepo: Send + Sync {
     fn record_working_branch(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         expected_repository_url: &str,
         branch: &RepositoryBranch,
         claim: Option<SessionClaim>,
@@ -72,7 +72,7 @@ where
     fn set_working_branch<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         repository_url: &'a str,
         branch: &'a str,
         claim: Option<SessionClaim>,

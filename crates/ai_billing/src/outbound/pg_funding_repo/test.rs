@@ -5,7 +5,7 @@ use crate::outbound::pg_billing_repo::PgBillingRepo;
 use ai_usage::AiFeature;
 use ai_usage::domain::ports::InvocationFunding;
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const DOLLAR: u64 = 1_000_000_000_000;
 
@@ -54,7 +54,7 @@ fn next_renewal(mut observation: SeatPeriodObservation) -> SeatPeriodObservation
     observation
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn verified_renewal_freezes_history_and_preserves_shared_money(pool: PgPool) {
     let repo = PgFundingRepo::new(pool.clone(), AiPricing::testing());
     let billing = PgBillingRepo::new(pool, AiPricing::testing());
@@ -139,7 +139,7 @@ async fn verified_renewal_freezes_history_and_preserves_shared_money(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cancellation_departure_and_rejoin_cannot_replenish_allowance(pool: PgPool) {
     let repo = PgFundingRepo::new(pool.clone(), AiPricing::testing());
     let billing = PgBillingRepo::new(pool, AiPricing::testing());
@@ -193,7 +193,7 @@ async fn cancellation_departure_and_rejoin_cannot_replenish_allowance(pool: PgPo
     assert!(repo.authorize(request, rate).await.is_ok());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn activation_exceptions_are_durable_and_mixed_policy_seats_stay_separate(pool: PgPool) {
     let repo = PgFundingRepo::new(pool.clone(), AiPricing::testing());
     let billing = PgBillingRepo::new(pool.clone(), AiPricing::testing());
@@ -259,7 +259,7 @@ async fn activation_exceptions_are_durable_and_mixed_policy_seats_stay_separate(
     assert_eq!(count, 6);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn late_seat_uses_existing_item_proof_but_cannot_renew_it(pool: PgPool) {
     let repo = PgFundingRepo::new(pool, AiPricing::testing());
     let (rollout, baseline) = rollout_observation();
@@ -295,7 +295,7 @@ async fn late_seat_uses_existing_item_proof_but_cannot_renew_it(pool: PgPool) {
     assert!(repo.observe(&changed_rollout, renewal, true).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delayed_renewal_does_not_convert_a_legacy_period_already_in_use(pool: PgPool) {
     let repo = PgFundingRepo::new(pool.clone(), AiPricing::testing());
     let billing = PgBillingRepo::new(pool, AiPricing::testing());
@@ -380,8 +380,8 @@ async fn delayed_renewal_does_not_convert_a_legacy_period_already_in_use(pool: P
     );
 }
 
-fn user(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap()
+fn user(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap()
 }
 
 fn period() -> FundingPeriod {
@@ -486,7 +486,7 @@ async fn allocated(
     repo.allocation(id).await.unwrap().unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn allowance_and_credits_are_not_double_billed(pool: PgPool) {
     let (repo, billing) = setup(&pool, 1_050, true, 5_000).await;
     let invocation = admit(&repo, 30 * DOLLAR).await;
@@ -514,7 +514,7 @@ async fn allowance_and_credits_are_not_double_billed(pool: PgPool) {
         CustomerMoney::from_cents(1_050).unwrap()
     );
     assert_eq!(allocation.postpaid.units(), 0);
-    assert_eq!(allocation.macro_absorbed.units(), 0);
+    assert_eq!(allocation.rox_absorbed.units(), 0);
     assert_eq!(
         allocation.extra_money().unwrap(),
         CustomerMoney::from_cents(1_050).unwrap()
@@ -533,7 +533,7 @@ async fn allowance_and_credits_are_not_double_billed(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn opt_out_credit_only_and_exhaustion(pool: PgPool) {
     let (repo, billing) = setup(&pool, 1_050, false, 5_000).await;
     let first = admit(&repo, 30 * DOLLAR).await;
@@ -584,7 +584,7 @@ async fn opt_out_credit_only_and_exhaustion(pool: PgPool) {
     assert!(repo.finalize(completed(unknown, 1)).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reversed_completions_release_allowance_before_pricing(pool: PgPool) {
     let (repo, billing) = setup(&pool, 1_050, true, 5_000).await;
     let first = admit(&repo, 20 * DOLLAR).await;
@@ -603,7 +603,7 @@ async fn reversed_completions_release_allowance_before_pricing(pool: PgPool) {
     assert_eq!(allocation.extra_money().unwrap().units(), 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn earlier_credit_releases_remain_available_to_eligible_invocations(pool: PgPool) {
     let (repo, billing) = setup(&pool, 2_100, true, 5_000).await;
     let included = admit(&repo, 20 * DOLLAR).await;
@@ -636,7 +636,7 @@ async fn earlier_credit_releases_remain_available_to_eligible_invocations(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn later_purchase_and_disable_do_not_reclassify_authorized_liability(pool: PgPool) {
     let (repo, billing) = setup(&pool, 1_050, true, 2_000).await;
     let invocation = admit(&repo, 30 * DOLLAR).await;
@@ -660,7 +660,7 @@ async fn later_purchase_and_disable_do_not_reclassify_authorized_liability(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unfunded_overshoot_is_absorbed_not_debt(pool: PgPool) {
     let (repo, _) = setup(&pool, 0, false, 5_000).await;
     let invocation = admit(&repo, 20 * DOLLAR).await;
@@ -668,12 +668,12 @@ async fn unfunded_overshoot_is_absorbed_not_debt(pool: PgPool) {
     assert_eq!(allocation.prepaid.units(), 0);
     assert_eq!(allocation.postpaid.units(), 0);
     assert_eq!(
-        allocation.macro_absorbed,
+        allocation.rox_absorbed,
         CustomerMoney::from_cents(1_050).unwrap()
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pending_evidence_blocks_watermark_and_is_discoverable(pool: PgPool) {
     let (repo, _) = setup(&pool, 105, true, 5_000).await;
     let first = admit(&repo, 20 * DOLLAR).await;
@@ -708,7 +708,7 @@ async fn pending_evidence_blocks_watermark_and_is_discoverable(pool: PgPool) {
     assert!(pending.contains(&second_id));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bounded_reconciliation_resumes_after_restart(pool: PgPool) {
     let (repo, _) = setup(&pool, 0, false, 0).await;
     let mut admissions = Vec::new();
@@ -743,7 +743,7 @@ async fn bounded_reconciliation_resumes_after_restart(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_and_completion_conflicting_replays_fail(pool: PgPool) {
     let (repo, billing) = setup(&pool, 0, false, 0).await;
     let invocation = admit(&repo, DOLLAR).await;
@@ -777,7 +777,7 @@ async fn admission_and_completion_conflicting_replays_fail(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fractional_credit_cannot_be_spent_by_legacy_or_a_later_invocation(pool: PgPool) {
     let (repo, billing) = setup(&pool, 1, false, 0).await;
     let included = admit(&repo, 20 * DOLLAR).await;
@@ -816,7 +816,7 @@ async fn fractional_credit_cannot_be_spent_by_legacy_or_a_later_invocation(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn racing_admissions_share_allowance_credits_and_cap(pool: PgPool) {
     let (repo, _) = setup(&pool, 1_050, false, 0).await;
     let mut tasks = tokio::task::JoinSet::new();
@@ -836,7 +836,7 @@ async fn racing_admissions_share_allowance_credits_and_cap(pool: PgPool) {
     assert_eq!(admitted, 3);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn duplicate_admissions_reserve_once_even_after_lost_acknowledgement(pool: PgPool) {
     let (repo, _) = setup(&pool, 0, false, 0).await;
     let rate = rate();
@@ -862,7 +862,7 @@ async fn duplicate_admissions_reserve_once_even_after_lost_acknowledgement(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn historical_v1_charges_are_not_legacy_coverage(pool: PgPool) {
     let (repo, billing) = setup(&pool, 210, true, 210).await;
     let first = admit(&repo, 21 * DOLLAR).await;
@@ -873,7 +873,7 @@ async fn historical_v1_charges_are_not_legacy_coverage(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO ai_overage_charge (id, user_id, period_start, amount_cents, status, accounting_policy)
          VALUES ($1, $2, $3, 105, 'paid', 'public_allowance_v1')",
-        macro_uuid::generate_uuid_v7(), payer.as_ref(), period().period.start,
+        rox_uuid::generate_uuid_v7(), payer.as_ref(), period().period.start,
     ).execute(&pool).await.unwrap();
     let ledger = billing
         .period_ledger(&user("payer"), period().period.start)
@@ -887,7 +887,7 @@ async fn historical_v1_charges_are_not_legacy_coverage(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn racing_admissions_never_use_a_legacy_postpaid_cap(pool: PgPool) {
     let (repo, _) = setup(&pool, 0, true, 105).await;
     let included = admit(&repo, 20 * DOLLAR).await;
@@ -907,7 +907,7 @@ async fn racing_admissions_never_use_a_legacy_postpaid_cap(pool: PgPool) {
     assert_eq!(admitted, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn legacy_settlement_cannot_spend_new_holds_or_cap(pool: PgPool) {
     let (repo, billing) = setup(&pool, 1_050, true, 1_050).await;
     let _held = admit(&repo, 30 * DOLLAR).await;
@@ -925,7 +925,7 @@ async fn legacy_settlement_cannot_spend_new_holds_or_cap(pool: PgPool) {
     assert!(outcome.pending_charge.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mixed_policy_seats_and_immutable_period_binding(pool: PgPool) {
     let (repo, billing) = setup(&pool, 0, false, 0).await;
     let seats = vec![
@@ -964,7 +964,7 @@ async fn mixed_policy_seats_and_immutable_period_binding(pool: PgPool) {
     assert!(repo.authorize(request, rate).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn purchases_toggles_cap_reductions_and_admission_use_the_same_lock(pool: PgPool) {
     let (repo, billing) = setup(&pool, 0, false, 1_050).await;
     let mut tx = pool.begin().await.unwrap();
@@ -1028,7 +1028,7 @@ async fn purchases_toggles_cap_reductions_and_admission_use_the_same_lock(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn renewal_expires_only_allowance_and_preserves_old_authorizations(pool: PgPool) {
     let (repo, billing) = setup(&pool, 1_050, false, 0).await;
     let old = admit(&repo, 30 * DOLLAR).await;
@@ -1065,7 +1065,7 @@ async fn renewal_expires_only_allowance_and_preserves_old_authorizations(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn domain_facade_rejects_exemption_and_exclusion_on_billable_funding(pool: PgPool) {
     let (repo, _) = setup(&pool, 0, false, 0).await;
     let service = FundingService::new(repo.clone());
@@ -1085,7 +1085,7 @@ async fn domain_facade_rejects_exemption_and_exclusion_on_billable_funding(pool:
     assert!(service.finalize(record).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn max_upgrade_stops_using_the_old_pro_funding_policy_but_preserves_history(pool: PgPool) {
     let repo = PgFundingRepo::new(pool.clone(), AiPricing::testing());
     let billing = PgBillingRepo::new(pool, AiPricing::testing());
@@ -1129,7 +1129,7 @@ async fn max_upgrade_stops_using_the_old_pro_funding_policy_but_preserves_histor
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn free_to_pro_upgrade_preserves_the_new_public_funding_policy(pool: PgPool) {
     let repo = PgFundingRepo::new(pool.clone(), AiPricing::testing());
     let billing = PgBillingRepo::new(pool, AiPricing::testing());
@@ -1174,7 +1174,7 @@ async fn free_to_pro_upgrade_preserves_the_new_public_funding_policy(pool: PgPoo
 trait UpgradeFixture {
     async fn reset_usage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         start: chrono::DateTime<Utc>,
         at: chrono::DateTime<Utc>,
         previous: Option<i64>,
@@ -1184,7 +1184,7 @@ trait UpgradeFixture {
 impl UpgradeFixture for crate::outbound::PgBillingRepo {
     async fn reset_usage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         start: chrono::DateTime<Utc>,
         at: chrono::DateTime<Utc>,
         previous: Option<i64>,

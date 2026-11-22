@@ -13,7 +13,7 @@ use super::schema::FieldType::Prim;
 use super::schema::{BOOL, FLOAT, NewField, NewType, STRING};
 use crate::error::Result;
 use crate::kiwi::{Kind, Msg, Value};
-use crate::model::library::MACRO_PLUGIN;
+use crate::model::library::ROX_PLUGIN;
 use crate::model::{NodeType, Props, Variable, VariableMode, VariableValue};
 
 impl Build<'_> {
@@ -185,15 +185,15 @@ impl Build<'_> {
                 .iter()
                 .filter(|v| {
                     !matches!(v, Value::Msg(e)
-                        if matches!(e.get(s, "pluginID"), Some(Value::Str(id)) if &**id == MACRO_PLUGIN))
+                        if matches!(e.get(s, "pluginID"), Some(Value::Str(id)) if &**id == ROX_PLUGIN))
                 })
                 .cloned()
                 .collect(),
             _ => Vec::new(),
         };
-        for (key, value) in p.macro_data.iter().flat_map(|d| d.iter()) {
+        for (key, value) in p.rox_data.iter().flat_map(|d| d.iter()) {
             let mut e = Msg::new(def);
-            e.set(s, "pluginID", Value::Str(MACRO_PLUGIN.into()));
+            e.set(s, "pluginID", Value::Str(ROX_PLUGIN.into()));
             e.set(s, "key", Value::Str(key.as_ref().into()));
             e.set(s, "value", Value::Str(value.as_ref().into()));
             list.push(Value::Msg(Box::new(e)));

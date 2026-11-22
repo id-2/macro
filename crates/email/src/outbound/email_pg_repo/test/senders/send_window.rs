@@ -13,7 +13,7 @@ impl EmailSenderProvider for CheckpointProvider {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn alias_validation_does_not_consume_the_undo_window(

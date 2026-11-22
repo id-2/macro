@@ -30,7 +30,7 @@ the socket themselves.
 
 ## Boundaries
 
-- Depends on: `connection_gateway_models`, `macro_authorization`,
+- Depends on: `connection_gateway_models`, `rox_authorization`,
   `entity_access`.
 - Used by: nearly every other service, through `connection_gateway_client`
   (document_storage_service, document_cognition_service, email_service,

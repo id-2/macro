@@ -130,7 +130,7 @@ export type AgentActor = {
     /**
      * The person it acts for.
      */
-    on_behalf_of: MacroUserIdStr;
+    on_behalf_of: RoxUserIdStr;
 };
 
 /**
@@ -979,7 +979,7 @@ export type Caller = {
     /**
      * Who.
      */
-    user: MacroUserIdStr;
+    user: RoxUserIdStr;
 } | (AgentActor & {
     type: 'agent';
 });
@@ -1193,7 +1193,7 @@ export type ClaudeAccountStatus = {
  * How Claude Code on a Rox computer is paid for: its own Claude account
  * when it has an active Claude login, otherwise Rox credits.
  */
-export type ClaudeMode = 'macro_credits' | 'own_account';
+export type ClaudeMode = 'rox_credits' | 'own_account';
 
 /**
  * How Claude Code on a computer is paid for, and its Claude sign-in when it
@@ -1899,7 +1899,7 @@ export type EmailSuggestions = {
 };
 
 /**
- * The type of an entity in Macro
+ * The type of an entity in Rox
  */
 export type EntityType = 'user' | 'chat' | 'channel' | 'channel_message' | 'document' | 'project' | 'email_thread' | 'calendar_event' | 'team' | 'call' | 'foreign_entity' | 'static_file' | 'crm_company' | 'crm_contact' | 'crm_pipeline' | 'reminder' | 'harness' | 'skill' | 'agent_session' | 'scheduled_action' | 'initiative' | 'database' | 'database_row' | 'form' | 'external_chat';
 
@@ -2273,7 +2273,7 @@ export type LogFrameDto = {
     direction: LogDirectionDto;
 };
 
-export type MacroUserIdStr = string;
+export type RoxUserIdStr = string;
 
 /**
  * The entity whose permissions and lifecycle govern a message.
@@ -2815,7 +2815,7 @@ export type Root = {
     /**
      * Who.
      */
-    user: MacroUserIdStr;
+    user: RoxUserIdStr;
 } | {
     /**
      * The routine.
@@ -3096,7 +3096,7 @@ export type TriggerOrigin = {
     /**
      * Who wrote.
      */
-    by: MacroUserIdStr;
+    by: RoxUserIdStr;
     /**
      * The message.
      */
@@ -3130,13 +3130,13 @@ export type TriggerOrigin = {
     /**
      * Who opened it.
      */
-    by: MacroUserIdStr;
+    by: RoxUserIdStr;
     origin: 'requested';
 } | {
     /**
      * The user whose authority the work runs under.
      */
-    on_behalf_of: MacroUserIdStr;
+    on_behalf_of: RoxUserIdStr;
     origin: 'dispatched';
 } | {
     /**

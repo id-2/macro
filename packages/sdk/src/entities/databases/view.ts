@@ -4,7 +4,7 @@ import type {
   ViewLayout,
   ViewQuery,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError } from '../../utils';
+import { RoxNotFoundError } from '../../utils';
 import type { DatabaseTable } from './table';
 
 /**
@@ -38,7 +38,7 @@ export class DatabaseView {
     const { views } = await this.table.detail();
     const found = views.find((view) => view.id === this.id);
     if (!found) {
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `view ${this.id} is not on table ${this.table.id}`,
       );
     }

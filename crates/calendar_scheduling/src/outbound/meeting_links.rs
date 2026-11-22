@@ -15,7 +15,7 @@ use uuid::Uuid;
 /// Header carrying the shared key for internal service authorization.
 const INTERNAL_API_KEY_HEADER: &str = "x-internal-auth-key";
 /// Header carrying the acting Rox user for internal authorization.
-const INTERNAL_MACRO_USER_ID_HEADER: &str = "x-internal-macro-user-id";
+const INTERNAL_ROX_USER_ID_HEADER: &str = "x-internal-macro-user-id";
 /// Router path of meeting management, relative to the document storage origin.
 const MEETINGS_PATH: &str = "/call/meetings";
 /// Router path of the meeting setup page, relative to the app origin.
@@ -63,7 +63,7 @@ impl HttpMeetingLinks {
         self.http
             .request(method, format!("{}{path}", self.document_storage_url))
             .header(INTERNAL_API_KEY_HEADER, &self.internal_api_key)
-            .header(INTERNAL_MACRO_USER_ID_HEADER, requester_id)
+            .header(INTERNAL_ROX_USER_ID_HEADER, requester_id)
     }
 }
 

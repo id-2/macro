@@ -1,16 +1,16 @@
 use std::collections::HashSet;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 
 const TEAM1: Uuid = Uuid::from_u128(0x1111_1111_1111_1111_1111_1111_1111_1111);
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
-fn users(emails: &[&str]) -> Vec<MacroUserIdStr<'static>> {
+fn users(emails: &[&str]) -> Vec<RoxUserIdStr<'static>> {
     emails.iter().map(|email| user(email)).collect()
 }
 
@@ -43,7 +43,7 @@ async fn set_auto_join_domain(pool: &PgPool, domain: &str) {
 
 async fn ledger(pool: &PgPool) -> Vec<String> {
     sqlx::query_scalar!(
-        "SELECT email FROM team_joined_macro_email WHERE team_id = $1 ORDER BY email",
+        "SELECT email FROM team_joined_rox_email WHERE team_id = $1 ORDER BY email",
         TEAM1
     )
     .fetch_all(pool)
@@ -52,7 +52,7 @@ async fn ledger(pool: &PgPool) -> Vec<String> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn a_team_without_an_auto_join_domain_claims_nobody(pool: PgPool) {
@@ -69,7 +69,7 @@ async fn a_team_without_an_auto_join_domain_claims_nobody(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn only_same_domain_outsiders_without_an_invite_are_claimed(pool: PgPool) {
@@ -93,7 +93,7 @@ async fn only_same_domain_outsiders_without_an_invite_are_claimed(pool: PgPool) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn an_address_is_claimed_once_per_team(pool: PgPool) {
@@ -111,7 +111,7 @@ async fn an_address_is_claimed_once_per_team(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn concurrent_claims_never_share_an_address(pool: PgPool) {
@@ -121,7 +121,7 @@ async fn concurrent_claims_never_share_an_address(pool: PgPool) {
     let emails: Vec<String> = (0..50)
         .map(|i| format!("colleague{i:02}@user.com"))
         .collect();
-    let candidates: Vec<MacroUserIdStr<'static>> = emails.iter().map(|email| user(email)).collect();
+    let candidates: Vec<RoxUserIdStr<'static>> = emails.iter().map(|email| user(email)).collect();
 
     let (left, right) = tokio::join!(
         left_repo.claim(TEAM1, &candidates, 100),
@@ -144,7 +144,7 @@ async fn concurrent_claims_never_share_an_address(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn a_released_address_can_be_claimed_again(pool: PgPool) {
@@ -162,7 +162,7 @@ async fn a_released_address_can_be_claimed_again(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn deleting_the_team_deletes_its_claims(pool: PgPool) {
@@ -180,25 +180,25 @@ async fn deleting_the_team_deletes_its_claims(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
-async fn people_already_on_macro_are_not_claimed(pool: PgPool) {
+async fn people_already_on_rox_are_not_claimed(pool: PgPool) {
     set_auto_join_domain(&pool, "user.com").await;
-    let macro_user_id = Uuid::from_u128(0xe1);
+    let rox_user_id = Uuid::from_u128(0xe1);
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, 'cus_existing')"#,
-        macro_user_id,
+        rox_user_id,
         "Existing@user.com",
     )
     .execute(&pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         "macro|Existing@user.com",
         "Existing@user.com",
-        macro_user_id,
+        rox_user_id,
     )
     .execute(&pool)
     .await
@@ -212,7 +212,7 @@ async fn people_already_on_macro_are_not_claimed(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn claims_stop_at_the_team_limit_across_calls(pool: PgPool) {
@@ -241,7 +241,7 @@ async fn claims_stop_at_the_team_limit_across_calls(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn concurrent_claims_share_the_team_limit(pool: PgPool) {

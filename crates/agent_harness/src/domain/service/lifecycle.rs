@@ -51,7 +51,7 @@ where
     async fn present_tool(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         presentation: agent_session::domain::model::SessionToolPresentation,
     ) -> agent_session::domain::error::Result<()> {
         // Authorize before forwarding, and allow acknowledgment recovery even if
@@ -94,7 +94,7 @@ where
 
     async fn delete_user_sessions(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> agent_session::domain::error::Result<()> {
         loop {
             let sessions = self
@@ -190,7 +190,7 @@ where
         id: AgentSessionId,
         action_id: AgentActionId,
         prompt: String,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> agent_session::domain::error::Result<()> {
         self.execute(
             id,
@@ -209,7 +209,7 @@ where
         &self,
         id: AgentSessionId,
         action_id: AgentActionId,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> agent_session::domain::error::Result<()> {
         self.execute(id, HarnessCommand::RemoveQueued { action_id, actor })
             .await
@@ -221,7 +221,7 @@ where
         &self,
         id: AgentSessionId,
         action_id: AgentActionId,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> agent_session::domain::error::Result<()> {
         self.execute(id, HarnessCommand::SteerQueued { action_id, actor })
             .await
@@ -472,7 +472,7 @@ where
         &self,
         session_id: AgentSessionId,
         kind: AgentKind,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         selection: &AgentMcpServers,
     ) -> Result<Vec<agent_client_protocol::schema::v1::McpServer>> {
         if let Some(session_token) = self.containers.session_token(session_id).await? {

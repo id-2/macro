@@ -2,7 +2,7 @@
 //! An ACP agent backed by Cursor cloud agents.
 //!
 //! Cursor's cloud agents are driven over a REST API and observed over SSE;
-//! ACP clients (Zed, Macro, any editor) speak newline-delimited JSON-RPC over
+//! ACP clients (Zed, Rox, any editor) speak newline-delimited JSON-RPC over
 //! stdio or an in-process pipe. This crate is the bridge: one ACP session is
 //! one Cursor *agent*,
 //! one `session/prompt` is one Cursor *run*, and the run's SSE stream is

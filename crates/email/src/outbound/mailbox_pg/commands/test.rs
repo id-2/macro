@@ -1,8 +1,8 @@
 use super::*;
 use crate::domain::{models::mailbox_action::MailboxAction, ports::EmailRepo};
 use crate::outbound::mailbox_pg::test::{fixture, page, snapshot};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 async fn setup(
     db: &PgPool,
@@ -14,13 +14,13 @@ async fn setup(
 ) {
     let (sync, link) = fixture(db).await;
     let stream = sync
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     sync.commit_page(&stream, &page()).await.unwrap();
     let work = sync
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -45,11 +45,11 @@ async fn setup(
         thread,
     )
 }
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("outlook-test@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("outlook-test@example.com").unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn newer_intent_survives_sync_and_ack_of_an_older_command(db: PgPool) {
     let (sync, repo, work, thread) = setup(&db).await;
     let messages = repo
@@ -67,7 +67,7 @@ async fn newer_intent_survives_sync_and_ack_of_an_older_command(db: PgPool) {
         .await
         .unwrap();
     let lease = sync
-        .claim_command(macro_uuid::generate_uuid_v7())
+        .claim_command(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -128,7 +128,7 @@ async fn newer_intent_survives_sync_and_ack_of_an_older_command(db: PgPool) {
         .await
         .unwrap();
     assert_eq!(
-        sync.claim_command(macro_uuid::generate_uuid_v7())
+        sync.claim_command(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .unwrap()
@@ -137,7 +137,7 @@ async fn newer_intent_survives_sync_and_ack_of_an_older_command(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn acceptance_rechecks_access_and_expired_worker_cannot_confirm(db: PgPool) {
     let (sync, repo, work, thread) = setup(&db).await;
     let messages = repo
@@ -148,7 +148,7 @@ async fn acceptance_rechecks_access_and_expired_worker_cannot_confirm(db: PgPool
     assert!(
         repo.enqueue_mailbox_action(
             work.mailbox.link_id,
-            MacroUserIdStr::try_from_email("stranger@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("stranger@example.com").unwrap(),
             &MailboxAction::Flagged(true),
             &targets
         )
@@ -171,7 +171,7 @@ async fn acceptance_rechecks_access_and_expired_worker_cannot_confirm(db: PgPool
     .await
     .unwrap();
     let old = sync
-        .claim_command(macro_uuid::generate_uuid_v7())
+        .claim_command(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -184,7 +184,7 @@ async fn acceptance_rechecks_access_and_expired_worker_cannot_confirm(db: PgPool
     .await
     .unwrap();
     let new = sync
-        .claim_command(macro_uuid::generate_uuid_v7())
+        .claim_command(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -280,7 +280,7 @@ impl MailboxCommandGateway for UncertainProvider {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unknown_write_is_confirmed_before_retry_and_revoked_access_stops_execution(db: PgPool) {
     use std::sync::{
         Arc, Mutex,
@@ -353,7 +353,7 @@ async fn unknown_write_is_confirmed_before_retry_and_revoked_access_stops_execut
         .await
         .unwrap();
     sqlx::query!(
-        "UPDATE email_links SET macro_id = 'macro|new-owner@example.com' WHERE id = $1",
+        "UPDATE email_links SET rox_id = 'macro|new-owner@example.com' WHERE id = $1",
         work.mailbox.link_id
     )
     .execute(&db)
@@ -378,7 +378,7 @@ async fn unknown_write_is_confirmed_before_retry_and_revoked_access_stops_execut
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn category_projection_keeps_latest_intent_across_sync_failure_and_deletion(db: PgPool) {
     use crate::domain::mailbox::settings::MailboxSettingsRepository;
     let (sync, repo, work, thread) = setup(&db).await;
@@ -504,7 +504,7 @@ async fn category_projection_keeps_latest_intent_across_sync_failure_and_deletio
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn acceptance_order_wins_over_transaction_start_order(db: PgPool) {
     let (sync, repo, work, thread) = setup(&db).await;
     let messages = repo
@@ -565,7 +565,7 @@ async fn acceptance_order_wins_over_transaction_start_order(db: PgPool) {
     assert_eq!(operations[0].id, second);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reopening_a_read_thread_queues_no_command(db: PgPool) {
     let (_, repo, work, thread) = setup(&db).await;
     let link = work.mailbox.link_id;
@@ -583,7 +583,7 @@ async fn reopening_a_read_thread_queues_no_command(db: PgPool) {
     assert!(MailboxAction::Read(true).targets(&messages).is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unresumable_commands_are_not_reported_as_pending(db: PgPool) {
     let (sync, repo, work, thread) = setup(&db).await;
     let link = work.mailbox.link_id;

@@ -8,8 +8,8 @@ use entity_access::domain::{
     models::{EditAccessLevel, EntityType},
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal, UserOrInternalCaller,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal, UserOrInternalCaller,
 };
 use model::{
     folder::{UploadFolderRequest, UploadFolderResponseData},
@@ -56,24 +56,24 @@ pub struct UploadExtractParams {
 )]
 #[tracing::instrument(
     skip(state, user, request),
-    fields(user_id = %user.authorization.user.macro_user_id),
+    fields(user_id = %user.authorization.user.rox_user_id),
     err
 )]
 pub async fn upload_folder_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<UploadFolderRequest>,
 ) -> Result<Json<UploadFolderResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     ensure_parent_edit_access(&state, &user, request.parent_id.as_deref()).await?;
     let data = state
         .service
         .upload_folder(
-            user.authorization.user.macro_user_id.clone(),
+            user.authorization.user.rox_user_id.clone(),
             user.authorization.caller == UserOrInternalCaller::Internal,
             request,
         )
@@ -96,23 +96,23 @@ where
 )]
 #[tracing::instrument(
     skip(state, user, request),
-    fields(user_id = %user.authorization.user.macro_user_id),
+    fields(user_id = %user.authorization.user.rox_user_id),
     err
 )]
 pub async fn upload_extract_folder_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<UploadExtractFolderRequest>,
 ) -> Result<Json<UploadExtractFolderResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     ensure_parent_edit_access(&state, &user, request.parent_id.as_deref()).await?;
     let data = state
         .service
-        .create_upload_extract_request(user.authorization.user.macro_user_id.clone(), request)
+        .create_upload_extract_request(user.authorization.user.rox_user_id.clone(), request)
         .await?;
 
     Ok(Json(UploadExtractFolderResponse { error: false, data }))
@@ -134,22 +134,22 @@ where
 )]
 #[tracing::instrument(
     skip(state, user),
-    fields(user_id = %user.authorization.user.macro_user_id),
+    fields(user_id = %user.authorization.user.rox_user_id),
     err
 )]
 pub async fn get_upload_extract_status_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(UploadExtractParams { request_id }): Path<UploadExtractParams>,
 ) -> Result<Json<UploadExtractStatusResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let data = state
         .service
-        .get_upload_extract_status(user.authorization.user.macro_user_id.clone(), &request_id)
+        .get_upload_extract_status(user.authorization.user.rox_user_id.clone(), &request_id)
         .await?;
 
     Ok(Json(UploadExtractStatusResponse { error: false, data }))
@@ -157,7 +157,7 @@ where
 
 async fn ensure_parent_edit_access<T, Svc, Auth>(
     state: &ProjectRouterState<T, Svc, Auth>,
-    user: &MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: &RoxAuthorizationExtractor<Auth, UserOrInternal>,
     parent_id: Option<&str>,
 ) -> Result<(), ProjectError>
 where
@@ -174,7 +174,7 @@ where
     let _receipt = state
         .access_service
         .generate_entity_access_receipt::<EditAccessLevel>(
-            &user.macro_user_id,
+            &user.rox_user_id,
             user.user_context.organization_id.map(i64::from),
             parent_id,
             EntityType::Project,
@@ -187,18 +187,18 @@ where
 /// Mark a project tree as uploaded. This handler is mounted only on the internal router.
 #[tracing::instrument(
     skip(state, user, request),
-    fields(user_id = %user.authorization.user.macro_user_id),
+    fields(user_id = %user.authorization.user.rox_user_id),
     err
 )]
 pub async fn mark_uploaded_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<MarkProjectUploadedRequest>,
 ) -> Result<Json<MarkProjectUploadedResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let project_ids = state
         .service

@@ -20,7 +20,7 @@ let
   dataDisk = {
     macro.box.dataDisk = "/dev/disk/by-id/virtio-data";
     # No Incus here; do not wait the full minute for its socket.
-    systemd.services.roxd-enroll.environment.MACRO_INCUS_SOCKET_WAIT = "3";
+    systemd.services.roxd-enroll.environment.ROX_INCUS_SOCKET_WAIT = "3";
     virtualisation.fileSystems."/home" = {
       device = "/dev/disk/by-id/virtio-data";
       fsType = "ext4";
@@ -34,8 +34,8 @@ let
   agentEnvironment =
     repoUrl:
     pkgs.writeText "agent.env" ''
-      MACRO_API_KEY="mak_test"
-      MACRO_GATEWAY="http://127.0.0.1:9"
+      ROX_API_KEY="mak_test"
+      ROX_GATEWAY="http://127.0.0.1:9"
       OVERRIDE_DOCUMENT_STORAGE_SERVICE_URL="http://127.0.0.1:9"
       OVERRIDE_AUTH_SERVICE_URL="http://127.0.0.1:9"
       OVERRIDE_DOCUMENT_COGNITION_SERVICE_URL="http://127.0.0.1:9"
@@ -45,10 +45,10 @@ let
       OVERRIDE_CONNECTION_GATEWAY_WEBSOCKET_URL="ws://127.0.0.1:9"
       ANTHROPIC_BASE_URL="http://127.0.0.1:9/anthropic"
       ANTHROPIC_AUTH_TOKEN="test-gateway-token"
-      MACRO_REPO_URL="${repoUrl}"
-      MACRO_REPO_TOKEN="test-token"
-      MACRO_AGENT_USER_ID="macro|ada@example.com"
-      MACRO_AGENT_NAME="Ada"
+      ROX_REPO_URL="${repoUrl}"
+      ROX_REPO_TOKEN="test-token"
+      ROX_AGENT_USER_ID="macro|ada@example.com"
+      ROX_AGENT_NAME="Ada"
     '';
   goodAgentEnvironment = agentEnvironment "http://127.0.0.1:8080/repo.git";
   credentialedAgentEnvironment = agentEnvironment "http://agent:test-token@127.0.0.1:8080/repo.git";
@@ -263,7 +263,7 @@ pkgs.testers.runNixOSTest {
           agent.wait_for_open_port(8080)
           # Enrollment writes the file; the path unit starts the agent.
           agent.succeed("install -m 0600 -o macro -g macro ${credentialedAgentEnvironment} /var/lib/roxd/agent.env")
-          agent.wait_until_succeeds("journalctl -u macro-agent.service | grep -F 'MACRO_REPO_URL must be an HTTP(S) URL without credentials'")
+          agent.wait_until_succeeds("journalctl -u macro-agent.service | grep -F 'ROX_REPO_URL must be an HTTP(S) URL without credentials'")
           agent.fail("test -e /home/macro/agent/workspace")
           # Rejected before git sends any request.
           agent.fail("test -e /srv/git/traceparents")
@@ -290,7 +290,7 @@ pkgs.testers.runNixOSTest {
           agent.succeed(f"[ -z \"$(printf 'protocol=http\\nhost=other.invalid\\npath=repo.git\\n\\n' | {program} /var/lib/roxd/agent.env get)\" ]")
           # agent.env is a credential, not process environment.
           pid = agent.succeed("systemctl show macro-agent.service --property=MainPID --value").strip()
-          agent.fail(f"tr '\\0' '\\n' < /proc/{pid}/environ | grep -F MACRO_API_KEY")
+          agent.fail(f"tr '\\0' '\\n' < /proc/{pid}/environ | grep -F ROX_API_KEY")
           agent.succeed(f"tr '\\0' '\\n' < /proc/{pid}/environ | grep -Fx MUPPET_CREDENTIALS_FILE=/run/credentials/macro-agent.service/agent.env")
           agent.succeed(f"nsenter -t {pid} -m -- test -r /run/credentials/macro-agent.service/agent.env")
 

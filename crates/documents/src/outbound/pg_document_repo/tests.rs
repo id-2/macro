@@ -1,7 +1,7 @@
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use model_entity::EntityType;
 use model_owner::Owner;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -18,7 +18,7 @@ mod email_import_deleted;
 async fn migrate_for_test(pool: &Pool<Postgres>) {
     // Keep both colliding migration bodies in the isolated test database,
     // remapping only the mailbox migration's in-memory version.
-    let migrations = MACRO_DB_MIGRATIONS
+    let migrations = ROX_DB_MIGRATIONS
         .iter()
         .map(|migration| {
             let mut migration = migration.clone();
@@ -155,12 +155,12 @@ async fn team_edit_args(repo: &TestRepo, level: Option<AccessLevel>) -> EditDocu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn get_user_name_reads_the_name_a_user_set(pool: Pool<Postgres>) {
     sqlx::query!(
-        "INSERT INTO macro_user_info (macro_user_id, first_name, last_name) VALUES ($1, 'Jacob', 'Beckerman')",
+        "INSERT INTO rox_user_info (rox_user_id, first_name, last_name) VALUES ($1, 'Jacob', 'Beckerman')",
         uuid::Uuid::parse_str("a2222222-2222-2222-2222-222222222222").unwrap(),
     )
     .execute(&pool)
@@ -183,7 +183,7 @@ async fn get_user_name_reads_the_name_a_user_set(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn team_edit_exact_levels_omission_and_legacy_preservation(pool: Pool<Postgres>) {
@@ -269,7 +269,7 @@ async fn team_edit_exact_levels_omission_and_legacy_preservation(pool: Pool<Post
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn team_edit_stale_command_rolls_back_accompanying_changes(pool: Pool<Postgres>) {
@@ -305,7 +305,7 @@ async fn team_edit_stale_command_rolls_back_accompanying_changes(pool: Pool<Post
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn team_edit_channel_failure_rolls_back_metadata_permissions_and_grant(pool: Pool<Postgres>) {
@@ -356,7 +356,7 @@ async fn team_edit_channel_failure_rolls_back_metadata_permissions_and_grant(poo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn inherited_team_grant_does_not_enable_explicit_toggle(pool: Pool<Postgres>) {
@@ -395,7 +395,7 @@ async fn inherited_team_grant_does_not_enable_explicit_toggle(pool: Pool<Postgre
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn creation_team_consent_is_explicit_and_uses_owner_membership(pool: Pool<Postgres>) {
@@ -454,7 +454,7 @@ async fn creation_team_consent_is_explicit_and_uses_owner_membership(pool: Pool<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn team_bot_task_does_not_manage_the_sponsor_owner_grant_as_a_share(pool: Pool<Postgres>) {
@@ -505,7 +505,7 @@ async fn team_bot_task_does_not_manage_the_sponsor_owner_grant_as_a_share(pool: 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn task_creation_failure_rolls_back_all_initialization(pool: Pool<Postgres>) {
@@ -611,8 +611,8 @@ const TEST_DOCUMENT_ID: &str = "d0000000-0000-0000-0000-000000000001";
 const TEST_DOCUMENT_OWNER_ID: &str = "macro|user@user.com";
 const TEST_DOCUMENT_NON_OWNER_ID: &str = "macro|teammate1@user.com";
 
-fn user_id(user_id: &str) -> macro_user_id::user_id::MacroUserIdStr<'static> {
-    macro_user_id::user_id::MacroUserIdStr::parse_from_str(user_id)
+fn user_id(user_id: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
+    rox_user_id::user_id::RoxUserIdStr::parse_from_str(user_id)
         .unwrap()
         .into_owned()
 }
@@ -718,8 +718,8 @@ async fn team_task_numbers(pool: &Pool<Postgres>, team_id: uuid::Uuid) -> Vec<i3
 }
 
 fn short_id_for_document_id(document_id: &str) -> String {
-    let uuid = macro_uuid::string_to_uuid(document_id).unwrap();
-    macro_uuid::ShortUuidConverter::default().from_uuid(&uuid)
+    let uuid = rox_uuid::string_to_uuid(document_id).unwrap();
+    rox_uuid::ShortUuidConverter::default().from_uuid(&uuid)
 }
 
 async fn insert_github_pr_task(
@@ -775,7 +775,7 @@ async fn share_permission_columns(
 }
 
 async fn insert_non_owner_user_access(pool: &Pool<Postgres>) {
-    let document_id = macro_uuid::string_to_uuid(TEST_DOCUMENT_ID).unwrap();
+    let document_id = rox_uuid::string_to_uuid(TEST_DOCUMENT_ID).unwrap();
 
     sqlx::query!(
         r#"
@@ -792,7 +792,7 @@ async fn insert_non_owner_user_access(pool: &Pool<Postgres>) {
 }
 
 async fn direct_user_access_sources(pool: &Pool<Postgres>) -> Vec<String> {
-    let document_id = macro_uuid::string_to_uuid(TEST_DOCUMENT_ID).unwrap();
+    let document_id = rox_uuid::string_to_uuid(TEST_DOCUMENT_ID).unwrap();
 
     sqlx::query_scalar!(
         r#"
@@ -826,7 +826,7 @@ async fn insert_second_team(pool: &Pool<Postgres>) {
 
     sqlx::query(
         r#"
-        INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "macro_user_id")
+        INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
         VALUES ('macro|other@user.com', 'other@user.com', 'stripe_id_other', 1, $1)
         ON CONFLICT DO NOTHING
         "#,
@@ -862,7 +862,7 @@ async fn insert_second_team(pool: &Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_document_metadata(pool: Pool<Postgres>) {
@@ -888,7 +888,7 @@ async fn test_get_document_metadata(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_basic_document(pool: Pool<Postgres>) {
@@ -912,7 +912,7 @@ async fn test_get_basic_document(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn get_document_metadata_and_basic_document_decode_bot_and_team_owners(pool: Pool<Postgres>) {
@@ -921,7 +921,7 @@ async fn get_document_metadata_and_basic_document_decode_bot_and_team_owners(poo
 
     sqlx::query(
         r#"
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ($1, $2, $3), ($4, $5, $6)
         ON CONFLICT (id) DO NOTHING
         "#,
@@ -969,7 +969,7 @@ async fn get_document_metadata_and_basic_document_decode_bot_and_team_owners(poo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_soft_delete_document(pool: Pool<Postgres>) {
@@ -1004,7 +1004,7 @@ async fn test_soft_delete_document(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn create_document_keeps_the_dates_it_is_given(pool: Pool<Postgres>) {
@@ -1039,7 +1039,7 @@ async fn create_document_keeps_the_dates_it_is_given(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn extend_project_dates_widens_the_project_and_those_above_it(pool: Pool<Postgres>) {
@@ -1120,7 +1120,7 @@ async fn extend_project_dates_widens_the_project_and_those_above_it(pool: Pool<P
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_update_document_modified(pool: Pool<Postgres>) {
@@ -1157,7 +1157,7 @@ async fn test_update_document_modified(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_latest_document_version_id(pool: Pool<Postgres>) {
@@ -1171,7 +1171,7 @@ async fn test_get_latest_document_version_id(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_document_version_id(pool: Pool<Postgres>) {
@@ -1185,7 +1185,7 @@ async fn test_get_document_version_id(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_user_view_location(pool: Pool<Postgres>) {
@@ -1262,7 +1262,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_create_document_writes_link_share_fields(pool: Pool<Postgres>) {
@@ -1282,7 +1282,7 @@ async fn test_create_document_writes_link_share_fields(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_create_document_persists_resolved_team_share_permission(pool: Pool<Postgres>) {
@@ -1305,7 +1305,7 @@ async fn test_create_document_persists_resolved_team_share_permission(pool: Pool
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_name(pool: Pool<Postgres>) {
@@ -1332,7 +1332,7 @@ async fn test_edit_document_name(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_set_file_type(pool: Pool<Postgres>) {
@@ -1359,7 +1359,7 @@ async fn test_edit_document_set_file_type(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_clear_file_type(pool: Pool<Postgres>) {
@@ -1386,7 +1386,7 @@ async fn test_edit_document_clear_file_type(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_project(pool: Pool<Postgres>) {
@@ -1416,7 +1416,7 @@ async fn test_edit_document_project(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_remove_project(pool: Pool<Postgres>) {
@@ -1467,7 +1467,7 @@ async fn test_edit_document_remove_project(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_public_to_null_revokes_non_owner_access(pool: Pool<Postgres>) {
@@ -1503,7 +1503,7 @@ async fn test_edit_document_public_to_null_revokes_non_owner_access(pool: Pool<P
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_public_to_team_revokes_non_owner_access(pool: Pool<Postgres>) {
@@ -1539,7 +1539,7 @@ async fn test_edit_document_public_to_team_revokes_non_owner_access(pool: Pool<P
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_omitted_link_share_does_not_revoke(pool: Pool<Postgres>) {
@@ -1600,7 +1600,7 @@ async fn test_edit_document_omitted_link_share_does_not_revoke(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_name_and_project(pool: Pool<Postgres>) {
@@ -1646,7 +1646,7 @@ async fn test_edit_document_name_and_project(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_share_with_team_creates_access_for_team_members(pool: Pool<Postgres>) {
@@ -1655,7 +1655,7 @@ async fn test_share_with_team_creates_access_for_team_members(pool: Pool<Postgre
     set_comment_share(&repo).await;
 
     // The owner and team have independent direct access rows.
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
     let rows = sqlx::query!(
         r#"
         SELECT source_id, access_level::text as "access_level"
@@ -1687,7 +1687,7 @@ async fn test_share_with_team_creates_access_for_team_members(pool: Pool<Postgre
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_team_ids_for_user_returns_empty_when_user_not_on_team(pool: Pool<Postgres>) {
@@ -1702,7 +1702,7 @@ async fn test_get_team_ids_for_user_returns_empty_when_user_not_on_team(pool: Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_share_with_team_idempotent(pool: Pool<Postgres>) {
@@ -1719,7 +1719,7 @@ async fn test_share_with_team_idempotent(pool: Pool<Postgres>) {
         2
     );
 
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
     let count = sqlx::query_scalar!(
         r#"
         SELECT COUNT(*) as "count!"
@@ -1736,7 +1736,7 @@ async fn test_share_with_team_idempotent(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_team_share_roundtrip(pool: Pool<Postgres>) {
@@ -1755,7 +1755,7 @@ async fn test_team_share_roundtrip(pool: Pool<Postgres>) {
     assert_eq!(state.team_id, Some(TEST_TEAM_ID));
     assert!(state.shared_with_team);
 
-    let doc_uuid = macro_uuid::string_to_uuid(document_id).unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid(document_id).unwrap();
     let team_row = sqlx::query!(
         r#"
         SELECT access_level::text as "access_level"
@@ -1820,7 +1820,7 @@ async fn direct_team_grant_levels(pool: &Pool<Postgres>) -> Vec<Option<String>> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn historical_team_grant_is_adopted_as_explicit_consent(pool: Pool<Postgres>) {
@@ -1880,7 +1880,7 @@ async fn historical_team_grant_is_adopted_as_explicit_consent(pool: Pool<Postgre
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn untracked_grant_after_canonical_history_still_conflicts(pool: Pool<Postgres>) {
@@ -1914,7 +1914,7 @@ async fn untracked_grant_after_canonical_history_still_conflicts(pool: Pool<Post
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn owner_level_historical_grant_is_not_adopted(pool: Pool<Postgres>) {
@@ -1947,7 +1947,7 @@ async fn owner_level_historical_grant_is_not_adopted(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_team_share_no_team_owner(pool: Pool<Postgres>) {
@@ -1980,13 +1980,13 @@ async fn test_team_share_no_team_owner(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_share_with_team_skips_user_with_existing_direct_access(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
 
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
 
     // Give teammate1 direct user-sourced edit access before team sharing
     sqlx::query!(
@@ -2022,7 +2022,7 @@ async fn test_share_with_team_skips_user_with_existing_direct_access(pool: Pool<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_share_with_owner_team(pool: Pool<Postgres>) {
@@ -2030,7 +2030,7 @@ async fn test_share_with_owner_team(pool: Pool<Postgres>) {
 
     set_comment_share(&repo).await;
 
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
     let rows = sqlx::query!(
         r#"
         SELECT source_id, access_level::text as "access_level"
@@ -2061,7 +2061,7 @@ async fn test_share_with_owner_team(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_create_first_task_assigns_team_task_id_one(pool: Pool<Postgres>) {
@@ -2079,7 +2079,7 @@ async fn test_create_first_task_assigns_team_task_id_one(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_team_task_number_names_the_team_slug(pool: Pool<Postgres>) {
@@ -2104,7 +2104,7 @@ async fn test_get_team_task_number_names_the_team_slug(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_document_id_by_team_task_number(pool: Pool<Postgres>) {
@@ -2136,7 +2136,7 @@ async fn test_get_document_id_by_team_task_number(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_create_multiple_tasks_same_team_assigns_sequence(pool: Pool<Postgres>) {
@@ -2150,7 +2150,7 @@ async fn test_create_multiple_tasks_same_team_assigns_sequence(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_create_tasks_different_teams_have_independent_sequences(pool: Pool<Postgres>) {
@@ -2166,7 +2166,7 @@ async fn test_create_tasks_different_teams_have_independent_sequences(pool: Pool
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_concurrent_task_creates_same_team_get_unique_numbers(pool: Pool<Postgres>) {
@@ -2191,7 +2191,7 @@ async fn test_concurrent_task_creates_same_team_get_unique_numbers(pool: Pool<Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_non_task_document_does_not_create_team_task_row(pool: Pool<Postgres>) {
@@ -2214,7 +2214,7 @@ async fn test_non_task_document_does_not_create_team_task_row(pool: Pool<Postgre
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_task_without_team_id_does_not_create_team_task_row(pool: Pool<Postgres>) {
@@ -2237,7 +2237,7 @@ async fn test_task_without_team_id_does_not_create_team_task_row(pool: Pool<Post
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_deleting_document_cascades_team_task_row(pool: Pool<Postgres>) {
@@ -2266,7 +2266,7 @@ async fn test_deleting_document_cascades_team_task_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_delete_document_by_id_removes_entity_row(pool: Pool<Postgres>) {
@@ -2291,7 +2291,7 @@ async fn test_delete_document_by_id_removes_entity_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_copying_task_allocates_new_team_task_number(pool: Pool<Postgres>) {
@@ -2323,7 +2323,7 @@ async fn test_copying_task_allocates_new_team_task_number(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_branch_name_context_prefers_github_and_team_task(pool: Pool<Postgres>) {
@@ -2342,7 +2342,7 @@ async fn test_get_branch_name_context_prefers_github_and_team_task(pool: Pool<Po
 
     sqlx::query!(
         r#"
-        INSERT INTO github_links (id, macro_id, fusionauth_user_id, github_username, github_user_id)
+        INSERT INTO github_links (id, rox_id, fusionauth_user_id, github_username, github_user_id)
         VALUES ($1, 'macro|user@user.com', $2, 'octocat', '12345')
         "#,
         uuid::uuid!("b0000000-0000-0000-0000-000000000001"),
@@ -2365,7 +2365,7 @@ async fn test_get_branch_name_context_prefers_github_and_team_task(pool: Pool<Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_branch_name_context_falls_back_for_unknown_user(pool: Pool<Postgres>) {
@@ -2386,7 +2386,7 @@ async fn test_get_branch_name_context_falls_back_for_unknown_user(pool: Pool<Pos
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_github_pull_request_keys_orders_and_parses(pool: Pool<Postgres>) {
@@ -2491,7 +2491,7 @@ async fn test_get_github_pull_request_keys_orders_and_parses(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_channel_share_creates_user_item_access(pool: Pool<Postgres>) {
@@ -2538,7 +2538,7 @@ async fn test_edit_document_channel_share_creates_user_item_access(pool: Pool<Po
     );
 
     // Verify entity_access rows were created for the channel
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
 
     let access_rows = sqlx::query!(
         r#"
@@ -2567,7 +2567,7 @@ async fn test_edit_document_channel_share_creates_user_item_access(pool: Pool<Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_edit_document_channel_share_idempotent(pool: Pool<Postgres>) {
@@ -2598,7 +2598,7 @@ async fn test_edit_document_channel_share_idempotent(pool: Pool<Postgres>) {
     repo.edit_document(make_args()).await.unwrap();
     repo.edit_document(make_args()).await.unwrap();
 
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
     let count = sqlx::query_scalar!(
         r#"
         SELECT COUNT(*) as "count!"
@@ -2621,7 +2621,7 @@ async fn test_edit_document_channel_share_idempotent(pool: Pool<Postgres>) {
     );
 }
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_project_name(pool: Pool<Postgres>) {
@@ -2638,7 +2638,7 @@ async fn test_get_project_name(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_project_children(pool: Pool<Postgres>) {
@@ -2665,7 +2665,7 @@ async fn test_get_project_children(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_project_children_empty(pool: Pool<Postgres>) {
@@ -2684,7 +2684,7 @@ fn pdf_share_permission() -> SharePermissionV2 {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn email_import_does_not_initialize_team_consent(pool: Pool<Postgres>) {
@@ -2766,7 +2766,7 @@ async fn insert_email_attachments(pool: &Pool<Postgres>, count: usize) -> Vec<uu
 
     sqlx::query(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active)
         VALUES ($1, $2, $3, $4, 'GMAIL', true)
         "#,
     )
@@ -2854,7 +2854,7 @@ async fn document_email_rows(pool: &Pool<Postgres>, document_id: &str) -> Vec<uu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_import_email_attachment_reuses_document_by_sha(pool: Pool<Postgres>) {
@@ -2889,7 +2889,7 @@ async fn test_import_email_attachment_reuses_document_by_sha(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_import_email_attachment_same_attachment_id_reuses_document(pool: Pool<Postgres>) {
@@ -2928,7 +2928,7 @@ async fn test_import_email_attachment_same_attachment_id_reuses_document(pool: P
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_import_email_attachment_does_not_reuse_non_email_document_by_sha(
@@ -2960,7 +2960,7 @@ async fn test_import_email_attachment_does_not_reuse_non_email_document_by_sha(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_import_email_attachment_does_not_reuse_other_owner_sha(pool: Pool<Postgres>) {
@@ -2992,7 +2992,7 @@ async fn test_import_email_attachment_does_not_reuse_other_owner_sha(pool: Pool<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_create_document_does_not_reuse_email_document_by_sha(pool: Pool<Postgres>) {
@@ -3023,7 +3023,7 @@ async fn test_create_document_does_not_reuse_email_document_by_sha(pool: Pool<Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_import_email_attachment_only_reuses_latest_instance_sha(pool: Pool<Postgres>) {
@@ -3076,7 +3076,7 @@ async fn test_import_email_attachment_only_reuses_latest_instance_sha(pool: Pool
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn create_document_registers_entity_row(pool: Pool<Postgres>) {
@@ -3101,7 +3101,7 @@ async fn create_document_registers_entity_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn copy_document_registers_distinct_entity_row(pool: Pool<Postgres>) {
@@ -3145,7 +3145,7 @@ async fn copy_document_registers_distinct_entity_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn import_email_created_registers_one_entity_row(pool: Pool<Postgres>) {
@@ -3172,7 +3172,7 @@ async fn import_email_created_registers_one_entity_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn import_email_reuse_keeps_one_entity_row_on_original(pool: Pool<Postgres>) {
@@ -3212,7 +3212,7 @@ async fn import_email_reuse_keeps_one_entity_row_on_original(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn soft_delete_document_sets_entity_deleted_at(pool: Pool<Postgres>) {
@@ -3234,7 +3234,7 @@ async fn soft_delete_document_sets_entity_deleted_at(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn delete_document_by_id_removes_entity_row(pool: Pool<Postgres>) {
@@ -3258,7 +3258,7 @@ async fn delete_document_by_id_removes_entity_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn soft_delete_and_hard_delete_tolerate_missing_entity_row(pool: Pool<Postgres>) {
@@ -3293,7 +3293,7 @@ async fn soft_delete_and_hard_delete_tolerate_missing_entity_row(pool: Pool<Post
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn task_snippet_and_skill_register_one_document_entity_row(pool: Pool<Postgres>) {
@@ -3426,7 +3426,7 @@ fn ownership_cases() -> [(Owner, OwnershipRecords); 2] {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn create_records_the_owner_its_grants_and_user_only_history(pool: Pool<Postgres>) {
@@ -3444,7 +3444,7 @@ async fn create_records_the_owner_its_grants_and_user_only_history(pool: Pool<Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn copy_records_the_copy_owner_its_grants_and_user_only_history(pool: Pool<Postgres>) {
@@ -3498,7 +3498,7 @@ async fn test_bot_rows(pool: &Pool<Postgres>) -> TestBotRows {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn failed_sponsor_grant_leaves_no_bot_owned_rows(pool: Pool<Postgres>) {
@@ -3563,7 +3563,7 @@ async fn failed_sponsor_grant_leaves_no_bot_owned_rows(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn test_get_github_pull_request_task_links_returns_requested_keys_oldest_first(
@@ -3615,7 +3615,7 @@ async fn test_get_github_pull_request_task_links_returns_requested_keys_oldest_f
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn appearance_persists_copies_and_preserves_content_dates(pool: Pool<Postgres>) {
@@ -3706,7 +3706,7 @@ async fn appearance_persists_copies_and_preserves_content_dates(pool: Pool<Postg
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn appearance_history_failure_rolls_back_and_retry_is_idempotent(pool: Pool<Postgres>) {
@@ -3799,7 +3799,7 @@ async fn appearance_history_failure_rolls_back_and_retry_is_idempotent(pool: Poo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn skill_descriptions_are_stored_replaced_and_read_by_id(pool: Pool<Postgres>) {
@@ -3854,7 +3854,7 @@ async fn document_count(pool: &Pool<Postgres>) -> i64 {
 /// someone new, and a refused write leaves nothing behind. A folder only the
 /// owner can open still takes new documents.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn a_scoped_session_cant_share_a_document_through_creation_or_a_folder(pool: Pool<Postgres>) {
@@ -3954,7 +3954,7 @@ fn move_args(document_id: &str, project_id: &str) -> EditDocumentRepoArgs {
 /// that reaches someone new; a folder only its owner reaches takes it, and an
 /// edit that keeps it where it is stays allowed once that folder is shared.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("documents_test_data"))
 )]
 async fn a_scoped_session_cant_file_an_unregistered_document_in_a_shared_folder(

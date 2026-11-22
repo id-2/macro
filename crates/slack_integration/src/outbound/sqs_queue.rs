@@ -6,7 +6,7 @@ use aws_sdk_sqs::{
     Client,
     types::{Message, MessageSystemAttributeName, SendMessageBatchRequestEntry},
 };
-use macro_queues::{SlackImportDlq, SlackImportQueue};
+use rox_queues::{SlackImportDlq, SlackImportQueue};
 
 use crate::domain::{
     models::{ImportError, ImportEvent},

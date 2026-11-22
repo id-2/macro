@@ -31,8 +31,8 @@ entity_access = { path = "../entity_access", default-features = false, features 
 ] }
 indexmap = { workspace = true }
 item_filters = { path = "../item_filters" }
-macro_authorization = { path = "../macro_authorization" }
-macro_db_client = { path = "../macro_db_client" }
+rox_authorization = { path = "../rox_authorization" }
+rox_db_client = { path = "../rox_db_client" }
 models_properties = { path = "../models_properties" }
 models_soup = { path = "../models_soup" }
 properties = { path = "../properties", default-features = false, features = [
@@ -40,7 +40,7 @@ properties = { path = "../properties", default-features = false, features = [
 ] }
 system_properties = { path = "../system_properties" }
 readonly_pool = { path = "../readonly_pool" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model = { path = "../model" }
 models_email = { path = "../models_email" }
 models_opensearch = { path = "../models_opensearch" }

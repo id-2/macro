@@ -64,7 +64,7 @@ test('person search makes one ranked server search and keeps its order', async (
   expect(requests.map((request) => request.url)).toEqual([
     'https://contacts.test/contacts/search?query=ALICE',
   ]);
-  expect(requests[0].headers.get('x-macro-user-api-key')).toBe('mak_test');
+  expect(requests[0].headers.get('x-rox-user-api-key')).toBe('mak_test');
 });
 
 test('person search failures propagate and a blank query is refused', async () => {

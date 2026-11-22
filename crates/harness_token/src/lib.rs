@@ -1,6 +1,6 @@
 //! Hash and display-prefix helpers for harness bearer tokens.
 //!
-//! Mint (`harnesses`) and auth-time lookup (`macro_authorization`) both
+//! Mint (`harnesses`) and auth-time lookup (`rox_authorization`) both
 //! persist or match `token_hash`. This crate owns that digest so the two
 //! sides cannot drift, without either crate depending on the other. It is the
 //! harness sibling of `bot_token`.

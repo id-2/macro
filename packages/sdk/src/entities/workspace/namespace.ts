@@ -1,6 +1,6 @@
 import type { PostSoupAstRequest } from '../../../generated/storage/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { properties, workspaceItem } from './items';
 import { WorkspaceQuery } from './query';
 import type {
@@ -83,7 +83,7 @@ import type {
  * @routing Use when browsing the user's recent or filtered workspace items, such as what changed today; not keyword search (`macro.search`).
  */
 export class WorkspaceNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * One bounded page of recent items, newest first by default; resume using nextCursor and the same options.

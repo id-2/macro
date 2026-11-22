@@ -4,19 +4,19 @@ use crate::attachments::draft::{
     insert_draft_attachment,
 };
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::service;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn fetch_draft_attachments_returns_attachments_ordered_by_filename(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-000000000d01")?;
     let draft_id = Uuid::parse_str("00000000-0000-0000-0000-00000000d501")?;
@@ -38,7 +38,7 @@ async fn fetch_draft_attachments_returns_attachments_ordered_by_filename(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn fetch_draft_attachments_returns_empty_for_wrong_link_id(
@@ -55,7 +55,7 @@ async fn fetch_draft_attachments_returns_empty_for_wrong_link_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn get_total_attachments_size_returns_correct_sum(pool: Pool<Postgres>) -> Result<()> {
@@ -71,7 +71,7 @@ async fn get_total_attachments_size_returns_correct_sum(pool: Pool<Postgres>) ->
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn get_total_attachments_size_returns_zero_for_empty_draft(
@@ -88,7 +88,7 @@ async fn get_total_attachments_size_returns_zero_for_empty_draft(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn get_total_attachments_size_returns_zero_for_wrong_link_id(
@@ -105,7 +105,7 @@ async fn get_total_attachments_size_returns_zero_for_wrong_link_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn delete_draft_attachment_removes_attachment(pool: Pool<Postgres>) -> Result<()> {
@@ -129,7 +129,7 @@ async fn delete_draft_attachment_removes_attachment(pool: Pool<Postgres>) -> Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn delete_draft_attachment_returns_zero_for_wrong_link_id(
@@ -153,7 +153,7 @@ async fn delete_draft_attachment_returns_zero_for_wrong_link_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn delete_draft_attachment_returns_zero_for_nonexistent_attachment(
@@ -171,7 +171,7 @@ async fn delete_draft_attachment_returns_zero_for_nonexistent_attachment(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn insert_draft_attachment_creates_new_attachment(pool: Pool<Postgres>) -> Result<()> {
@@ -208,7 +208,7 @@ async fn insert_draft_attachment_creates_new_attachment(pool: Pool<Postgres>) ->
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("draft_attachments"))
 )]
 async fn insert_draft_attachment_rejects_wrong_link_id(pool: Pool<Postgres>) -> Result<()> {
@@ -249,7 +249,7 @@ async fn insert_draft_attachment_rejects_wrong_link_id(pool: Pool<Postgres>) -> 
 // ============================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_db_draft_attachments_in_bulk")
@@ -277,7 +277,7 @@ async fn fetch_db_draft_attachments_in_bulk_returns_attachments_grouped_by_draft
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_db_draft_attachments_in_bulk")
@@ -301,7 +301,7 @@ async fn fetch_db_draft_attachments_in_bulk_orders_by_draft_id_and_filename(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_db_draft_attachments_in_bulk")
@@ -332,7 +332,7 @@ async fn fetch_db_draft_attachments_in_bulk_returns_correct_fields(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_db_draft_attachments_in_bulk")
@@ -359,7 +359,7 @@ async fn fetch_db_draft_attachments_in_bulk_excludes_drafts_without_attachments(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_db_draft_attachments_in_bulk")
@@ -376,7 +376,7 @@ async fn fetch_db_draft_attachments_in_bulk_returns_empty_for_empty_input(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("fetch_db_draft_attachments_in_bulk")

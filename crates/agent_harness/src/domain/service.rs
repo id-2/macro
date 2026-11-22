@@ -54,7 +54,7 @@ use bot_id::BotId;
 use dashmap::DashMap;
 use dashmap::DashSet;
 use dashmap::mapref::entry::Entry;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::sync::{mpsc, oneshot};
 use tracing::Instrument as _;
 use tracing::instrument::WithSubscriber as _;
@@ -64,7 +64,7 @@ use crate::domain::error::{HarnessError, Result};
 use crate::domain::model::{
     AgentKind, AnnounceOrigin, AnnouncePrompt, CommandOutcome, DeclinedMention, DeliverAction,
     HarnessCommand, HarnessDefaults, OpenSession, PromptPeople, ReplyOutcome, ResolvedReply,
-    SessionAnnouncement, SpawnContainer, ToolApprovalChange, is_macro_staff,
+    SessionAnnouncement, SpawnContainer, ToolApprovalChange, is_rox_staff,
 };
 use crate::domain::pending::PendingCommands;
 use crate::domain::ports::{
@@ -210,7 +210,7 @@ struct AgentHarnessInner<
     typing_phases: DashMap<AgentSessionId, agent_fold::domain::model::TurnPhase>,
     /// The shape each reply message was last shown with, so a report that
     /// changes nothing it shows does not rewrite it.
-    presented_shapes: DashMap<macro_uuid::Uuid, Vec<crate::domain::presenter::SegmentShape>>,
+    presented_shapes: DashMap<rox_uuid::Uuid, Vec<crate::domain::presenter::SegmentShape>>,
     /// How long a session's command worker waits for its next command before
     /// it releases the quiet session and exits.
     worker_idle_timeout: std::time::Duration,

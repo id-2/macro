@@ -42,8 +42,8 @@ fn covers_every_seeded_table() {
         "team_user",
         "team",
         "\"RolesOnUsers\"",
-        "macro_user_email_verification",
-        "macro_user_info",
+        "rox_user_email_verification",
+        "rox_user_info",
         "\"User\"",
         "macro_user",
     ] {

@@ -6,8 +6,8 @@ use channels::domain::models::{ChannelMetadata, ChannelType as ChannelKind};
 use chrono::{DateTime, TimeZone, Utc};
 use document_sub_type::DocumentSubType;
 use email::domain::models::{ContactInfo, ParsedLabel, ParsedMessage};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::models::{Message, MessageParent, MessageThread, ThreadState};
 use model::document::DocumentBasic;
 use model_owner::Owner;
@@ -57,7 +57,7 @@ fn at(minute: u32) -> DateTime<Utc> {
 
 fn segment(speaker_id: &str, content: &str, minute: u32) -> CallRecordTranscriptSegment {
     CallRecordTranscriptSegment {
-        transcript_id: macro_uuid::generate_uuid_v7(),
+        transcript_id: rox_uuid::generate_uuid_v7(),
         segment_id: None,
         speaker_id: speaker_id.into(),
         diarized_speaker_id: None,
@@ -218,7 +218,7 @@ fn a_deleted_call_or_another_calls_record_does_not_become_the_event() {
     assert!(routine_event(&call_started(), EventContent::Call(None)).is_err());
     assert!(routine_event(&call_ended(), EventContent::Call(None)).is_err());
     let mut other = ended_call(Vec::new());
-    other.call_id = macro_uuid::generate_uuid_v7();
+    other.call_id = rox_uuid::generate_uuid_v7();
     assert!(routine_event(&call_started(), EventContent::Call(Some(other.clone()))).is_err());
     assert!(routine_event(&call_ended(), EventContent::Call(Some(other))).is_err());
 }
@@ -238,7 +238,7 @@ fn a_task_status_change_carries_the_task_as_it_reads_now() {
         document: DocumentBasic {
             document_id: "01928f3e-6a2b-7c3d-8e4f-000000007a5c".into(),
             document_name: "Login page crashes on Safari".into(),
-            owner: Owner::User(MacroUserIdStr::parse_from_str("macro|dana@example.com").unwrap()),
+            owner: Owner::User(RoxUserIdStr::parse_from_str("macro|dana@example.com").unwrap()),
             file_type: Some("md".into()),
             sub_type: Some(DocumentSubType::Task),
             branched_from_id: None,
@@ -357,7 +357,7 @@ fn a_status_change_from_a_pull_request_names_it_and_who_acted() {
         document: DocumentBasic {
             document_id: "01928f3e-6a2b-7c3d-8e4f-000000007a5c".into(),
             document_name: "Login page crashes on Safari".into(),
-            owner: Owner::User(MacroUserIdStr::parse_from_str("macro|dana@example.com").unwrap()),
+            owner: Owner::User(RoxUserIdStr::parse_from_str("macro|dana@example.com").unwrap()),
             file_type: Some("md".into()),
             sub_type: Some(DocumentSubType::Task),
             branched_from_id: None,
@@ -431,7 +431,7 @@ fn a_received_email_carries_its_headers_and_reply_free_body() {
         body_parsed: Some("Your invoice for October is $420.".into()),
         body_text: Some("full text with quoted replies".into()),
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         body_replyless: None,
         internal_date_ts: Some(received_at),
         sent_at: None,

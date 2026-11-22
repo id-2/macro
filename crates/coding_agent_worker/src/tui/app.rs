@@ -224,7 +224,7 @@ impl App {
     fn pairing_url(&self) -> Option<String> {
         match &self.mode {
             Mode::Pairing { created, .. } => {
-                Some(self.config.macro_api.pairing_approval_url(&created.code))
+                Some(self.config.rox_api.pairing_approval_url(&created.code))
             }
             _ => None,
         }
@@ -306,7 +306,7 @@ impl App {
             Ok(created) => {
                 // The approval page pre-fills the code, so opening the
                 // browser is usually the whole remaining gesture.
-                let url = self.config.macro_api.pairing_approval_url(&created.code);
+                let url = self.config.rox_api.pairing_approval_url(&created.code);
                 self.pending_browser = Some(BrowserTarget::Pairing(url));
                 self.mode = Mode::Pairing {
                     created,
@@ -625,7 +625,7 @@ impl App {
             KeyCode::Char('d') if self.paired() => self.mode = Mode::ConfirmDelete,
             KeyCode::Char('o') if self.tab == Tab::Config => {
                 self.pending_browser = Some(BrowserTarget::Settings(
-                    self.config.macro_api.settings_url(),
+                    self.config.rox_api.settings_url(),
                 ));
             }
             KeyCode::Up | KeyCode::Char('k') if self.tab == Tab::Config => {

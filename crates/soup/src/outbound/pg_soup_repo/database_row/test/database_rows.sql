@@ -1,10 +1,10 @@
 -- Three people: the owner of the CRM database, a viewer it was shared
 -- with, and a stranger who owns a database of their own.
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
 ('d0000000-0000-0000-0000-000000000001', 'owner@databases.test', 'owner@databases.test', 'stripe_owner'),
 ('d0000000-0000-0000-0000-000000000002', 'viewer@databases.test', 'viewer@databases.test', 'stripe_viewer'),
 ('d0000000-0000-0000-0000-000000000003', 'stranger@databases.test', 'stranger@databases.test', 'stripe_stranger');
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
 ('macro|owner@databases.test', 'owner@databases.test', 'd0000000-0000-0000-0000-000000000001'),
 ('macro|viewer@databases.test', 'viewer@databases.test', 'd0000000-0000-0000-0000-000000000002'),
 ('macro|stranger@databases.test', 'stranger@databases.test', 'd0000000-0000-0000-0000-000000000003');

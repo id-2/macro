@@ -1,7 +1,7 @@
 //! A lib crate to support AI attachment consumers and providers
 #![deny(missing_docs)]
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 pub use models::{
     AttachmentContent, AttachmentError, AttachmentPart, Attachments, FormattedParts,
@@ -31,7 +31,7 @@ pub trait AttachmentService: Send + Sync + 'static {
     /// returned [`AttachmentContents`](super::models::AttachmentContents).
     fn resolve_attachments<'a>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&'a Entity<'a>]>,
     ) -> impl Future<Output = Attachments<'a>> + Send;
 }

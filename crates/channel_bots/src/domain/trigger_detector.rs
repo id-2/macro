@@ -139,7 +139,7 @@ where
 
     /// Rox AI never infers a reply to its own message.
     async fn infer(&self, candidate: &MessagePostedMetadata) -> Option<BotInvocation> {
-        if candidate.sender.as_bot().map(|sender| sender.bot_id()) == Some(bot_id::MACRO_AI_BOT_ID)
+        if candidate.sender.as_bot().map(|sender| sender.bot_id()) == Some(bot_id::ROX_AI_BOT_ID)
         {
             return None;
         }
@@ -170,7 +170,7 @@ where
             .await
         {
             Ok(true) => Some(BotInvocation {
-                bot_id: bot_id::MACRO_AI_BOT_ID,
+                bot_id: bot_id::ROX_AI_BOT_ID,
                 trigger: BotTrigger::Inferred,
             }),
             Ok(false) => None,
@@ -185,7 +185,7 @@ where
 /// Rox AI's messages are the agent's; other bots go by their public name.
 fn transcript_message(message: &Message) -> TranscriptMessage {
     let from_agent =
-        message.sender_id.as_bot().map(|bot| bot.bot_id()) == Some(bot_id::MACRO_AI_BOT_ID);
+        message.sender_id.as_bot().map(|bot| bot.bot_id()) == Some(bot_id::ROX_AI_BOT_ID);
     let sender = match &message.bot_profile {
         Some(profile) if !from_agent => profile.name.clone(),
         _ => sender_label(message.sender_id.as_ref()),

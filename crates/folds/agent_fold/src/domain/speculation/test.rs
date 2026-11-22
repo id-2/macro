@@ -11,7 +11,7 @@ use crate::testing::{TURN, parse_log, test_session};
 use agent_client_protocol::schema::v1::SessionId;
 use agent_runtime_protocol::domain::action::{ElicitationAnswer, ElicitationContentValue};
 use chrono::{Duration, TimeZone, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 /// The ACP session the `TURN` fixture runs in.
 const ACP_SESSION: &str = "s1";
@@ -35,8 +35,8 @@ fn rows(log: Vec<AgentSessionLog>) -> Vec<(LogCursor, AgentSessionLog)> {
         .collect()
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("eric@example.com").expect("test email parses")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("eric@example.com").expect("test email parses")
 }
 
 /// The row the harness logs for `action` under `action_id` - built the way

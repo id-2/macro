@@ -82,7 +82,7 @@ use favorites::{
     inbound::axum_router::FavoritesRouterState,
     outbound::pg_favorites_repo::PgFavoritesRepo,
 };
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use user_api_key::{
     domain::service::UserApiKeyServiceImpl, inbound::axum_router::UserApiKeyRouterState,
     outbound::pg_user_api_keys_repo::PgUserApiKeysRepo,
@@ -128,12 +128,12 @@ use initiative::{
     domain::service::InitiativeServiceImpl, inbound::axum_router::InitiativeRouterState,
     outbound::PgInitiativeRepo,
 };
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    MacroAuthJwtValidator, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    RoxAuthJwtValidator, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
-use macro_env_var::env_var;
-use macro_sha_count_client::Redis;
+use rox_env_var::env_var;
+use rox_sha_count_client::Redis;
 use models_properties::service::property_change_source::PropertyChangeSource;
 use models_properties::service::property_value::PropertyValue;
 use notification::domain::service::SqsNotificationIngress;
@@ -174,7 +174,7 @@ use tokio_util::task::TaskTracker;
 use webhook::{
     domain::service::WebhookServiceImpl,
     domain::stream::WebhookEventStreamServiceImpl,
-    inbound::axum_router::WebhookRouterState as MacroWebhookRouterState,
+    inbound::axum_router::WebhookRouterState as RoxWebhookRouterState,
     inbound::stream_router::WebhookStreamRouterState,
     outbound::{
         http_validator::ReqwestWebhookValidationClient,
@@ -183,7 +183,7 @@ use webhook::{
 };
 
 /// Event broker shared by DSS services.
-pub(crate) type DssEventBroker = MacroEventBrokerService<KafkaEventPublisher, TaskTracker>;
+pub(crate) type DssEventBroker = RoxEventBrokerService<KafkaEventPublisher, TaskTracker>;
 
 /// CRM service for DSS — no-op resolver since DSS doesn't populate.
 pub(crate) type DssCrmService = crm::domain::service::CrmServiceImpl<
@@ -366,7 +366,7 @@ impl TaskPropertiesPort for TaskPropertiesAdapter {
     async fn update_task_status(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        credited_user: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        credited_user: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
         source: Option<&PropertyChangeSource>,
         status: &str,
     ) -> anyhow::Result<()> {
@@ -466,7 +466,7 @@ pub(crate) type DssDocumentPurger = DocumentPurger<
 >;
 
 /// Type alias for the authorization service.
-pub(crate) type AuthorizationService = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+pub(crate) type AuthorizationService = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 
 pub(crate) type AccessRequestsState =
     access_requests::inbound::axum_router::AccessRequestsRouterState<
@@ -570,7 +570,7 @@ pub(crate) type DssDiscussionDelivery = messages::domain::delivery::DiscussionDe
 
 /// PDF annotation geometry edits and deletes authorized through document access.
 pub(crate) type DssAnnotationService = messages::domain::annotations::AnnotationService<
-    macro_db_client::annotations::repository::PgAnnotationRepository,
+    rox_db_client::annotations::repository::PgAnnotationRepository,
     EntityAccessService,
     DssDiscussionDelivery,
 >;
@@ -752,7 +752,7 @@ pub(crate) struct SlackAdminAuthorizer(
 impl slack_integration::domain::ports::ImportProgressAccess for SlackAdminAuthorizer {
     async fn participating_targets(
         &self,
-        viewer: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        viewer: &rox_user_id::user_id::RoxUserIdStr<'_>,
         targets: &[uuid::Uuid],
     ) -> slack_integration::domain::ports::PortResult<Vec<uuid::Uuid>> {
         use entity_access::domain::ports::AccessRepository as _;
@@ -770,7 +770,7 @@ impl slack_integration::domain::ports::ImportAuthorizer for SlackAdminAuthorizer
     async fn require_admin(
         &self,
         team: slack_integration::domain::models::TeamId,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> slack_integration::domain::ports::PortResult<()> {
         use entity_access::domain::{
             models::{AdminTeamRole, EntityType},
@@ -791,7 +791,7 @@ impl slack_integration::domain::ports::ImportAuthorizer for SlackAdminAuthorizer
     async fn require_target(
         &self,
         _: slack_integration::domain::models::TeamId,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &slack_integration::domain::models::ConversationMetadata,
         _: uuid::Uuid,
     ) -> slack_integration::domain::ports::PortResult<()> {
@@ -929,7 +929,7 @@ pub(crate) type DssWebhookRateLimiter =
 
 /// Type alias for the product webhook router state.
 pub(crate) type DssWebhookState =
-    MacroWebhookRouterState<DssWebhookService, DssWebhookRateLimiter, AuthorizationService>;
+    RoxWebhookRouterState<DssWebhookService, DssWebhookRateLimiter, AuthorizationService>;
 
 /// Type alias for the service backing the webhook-event SSE endpoint.
 pub(crate) type DssSseStreamService = WebhookEventStreamServiceImpl<
@@ -1013,7 +1013,7 @@ pub(crate) struct ApiContext {
     pub database_starter_state: DssDatabaseStarterState,
     pub collab_surface_state: DssCollabSurfaceState,
     pub foreign_entity_state: DssForeignEntityState,
-    pub macro_event_broker: DssEventBroker,
+    pub rox_event_broker: DssEventBroker,
     pub sqs_client: Arc<sqs_client::SQS>,
     pub document_purger: Arc<DssDocumentPurger>,
     pub contacts_ingress: Arc<SqsContactsIngress<SqsContactsQueue>>,
@@ -1027,7 +1027,7 @@ pub(crate) struct ApiContext {
     pub system_properties_service: Arc<SystemPropertiesService>,
     pub properties_service: Arc<PropertiesService>,
     pub opensearch_client: Arc<OpensearchClient>,
-    pub authorization_state: MacroAuthorizationState<AuthorizationService>,
+    pub authorization_state: RoxAuthorizationState<AuthorizationService>,
     pub jwt_validation_args: JwtValidationArgs,
     pub config: Arc<Config>,
     pub dss_auth_key: DocumentStorageServiceAuthKey,

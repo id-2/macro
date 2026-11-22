@@ -3,7 +3,7 @@ import * as pulumi from '@pulumi/pulumi';
 // Where every monitor in this stack notifies: GoAlert, and nothing else.
 //
 // GoAlert (infra/stacks/observability) has two services. Notify posts each
-// alert to the Macro Alerts channel and re-posts it hourly until someone
+// alert to the Rox Alerts channel and re-posts it hourly until someone
 // acknowledges it; the paging service also phones the on-call engineer.
 // Datadog never posts to the channel itself, so an alert shows up once, from
 // GoAlert. The one exception is the GoAlert health check in goalert.ts.

@@ -1,6 +1,6 @@
 use super::*;
 use crate::{SYSTEM_USER_ID, UsageTrackingService};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::sync::Arc;
 
 fn request() -> TrackedInvocation {
@@ -15,7 +15,7 @@ fn request() -> TrackedInvocation {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn observations_are_idempotent_and_never_enter_financial_accounting(pool: PgPool) {
     let service = UsageTrackingService::new(Arc::new(PgTrackingRepo::new(pool.clone())));
     let request = request();

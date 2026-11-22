@@ -140,7 +140,7 @@ pub struct MintedAccessToken {
 /// Mints the token a resource that hands its bearer straight to Rox's APIs
 /// gets in place of the upstream access token. Those APIs cannot look up which
 /// client a token went to, so the token carries the attribution, signed.
-pub trait MacroApiTokenMinter: Send + Sync {
+pub trait RoxApiTokenMinter: Send + Sync {
     /// A Rox API token for the user `upstream` names, valid for at most
     /// `lifetime`,
     /// acting as the Rox bot via the client named `client_name` (`None` when

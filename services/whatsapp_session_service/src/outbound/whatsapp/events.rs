@@ -213,7 +213,7 @@ pub async fn picture_changed(lids: &dyn LidStore, picture: &Picture) -> SessionE
 }
 
 /// A direct chat as Rox keys it: by phone number when the store knows it.
-pub async fn macro_chat(lids: &dyn LidStore, chat: &str) -> String {
+pub async fn rox_chat(lids: &dyn LidStore, chat: &str) -> String {
     let Ok(jid) = chat.parse::<Jid>() else {
         return chat.to_owned();
     };

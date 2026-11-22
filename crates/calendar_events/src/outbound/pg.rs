@@ -25,7 +25,7 @@ use uuid::Uuid;
 
 use crate::domain::{
     changes::CalendarChangeOp,
-    ics::{CalendarEventExport, content_without_macro_call},
+    ics::{CalendarEventExport, content_without_rox_call},
     labels::EventCopy,
     models::{
         ActorInboxes, AlignedGuestCopy, AppliedGoogleGrant, AttendeeResponseStatus,
@@ -265,7 +265,7 @@ impl PgCalendarRepository {
             GrantRow,
             r#"
             SELECT
-                l.macro_id,
+                l.rox_id,
                 l.email_address::text AS "email_address!",
                 COALESCE(g.granted_scopes, '{}') AS "granted_scopes!",
                 COALESCE(g.grant_version, 0) AS "grant_version!",
@@ -280,7 +280,7 @@ impl PgCalendarRepository {
         .await
         .map_err(report)?;
         let id =
-            upsert_google_account_tx(&mut tx, email_link_id, &row.macro_id, &row.email_address)
+            upsert_google_account_tx(&mut tx, email_link_id, &row.rox_id, &row.email_address)
                 .await?;
         tx.commit().await.map_err(report)?;
         Ok(id)
@@ -288,7 +288,7 @@ impl PgCalendarRepository {
 }
 
 struct GrantRow {
-    macro_id: String,
+    rox_id: String,
     email_address: String,
     granted_scopes: Vec<String>,
     grant_version: i64,
@@ -526,7 +526,7 @@ impl CalendarRepository for PgCalendarRepository {
             GrantRow,
             r#"
             SELECT
-                l.macro_id,
+                l.rox_id,
                 l.email_address::text AS "email_address!",
                 COALESCE(g.granted_scopes, '{}') AS "granted_scopes!",
                 COALESCE(g.grant_version, 0) AS "grant_version!",
@@ -607,7 +607,7 @@ impl CalendarRepository for PgCalendarRepository {
         }
         if has_calendar_capability {
             let account_id =
-                upsert_google_account_tx(&mut tx, email_link_id, &row.macro_id, &row.email_address)
+                upsert_google_account_tx(&mut tx, email_link_id, &row.rox_id, &row.email_address)
                     .await?;
             for kind in [CalendarBackfillKind::GoogleCalendar] {
                 let job_id = Uuid::now_v7();
@@ -684,7 +684,7 @@ impl CalendarRepository for PgCalendarRepository {
                 COALESCE(g.granted_scopes, '{}') AS "granted_scopes!"
             FROM email_links l
             LEFT JOIN email_link_google_scopes g ON g.link_id = l.id
-            WHERE l.id = $1 AND l.macro_id = $2
+            WHERE l.id = $1 AND l.rox_id = $2
             FOR UPDATE OF l
             "#,
             email_link_id,
@@ -1251,9 +1251,9 @@ impl CalendarRepository for PgCalendarRepository {
             WHERE occurrence.owner_id IN (
                     SELECT $1::text
                     UNION
-                    SELECT link.child_macro_id
-                    FROM macro_user_links link
-                    WHERE link.primary_macro_id = $1
+                    SELECT link.child_rox_id
+                    FROM rox_user_links link
+                    WHERE link.primary_rox_id = $1
               )
               AND event.status <> 'cancelled'
               AND NOT occurrence.is_cancelled
@@ -1261,9 +1261,9 @@ impl CalendarRepository for PgCalendarRepository {
                     event.owner_id = $1
                     OR EXISTS (
                         SELECT 1
-                        FROM macro_user_links link
+                        FROM rox_user_links link
                         WHERE link.link_id = event.source_link_id
-                          AND link.primary_macro_id = $1
+                          AND link.primary_rox_id = $1
                     )
               )
               AND (
@@ -1487,7 +1487,7 @@ impl CalendarRepository for PgCalendarRepository {
                     FROM calendar_events candidate
                     LEFT JOIN email_links copy_inbox
                         ON copy_inbox.id = candidate.source_link_id
-                       AND copy_inbox.macro_id = $1
+                       AND copy_inbox.rox_id = $1
                     WHERE calendar_meeting_uid(candidate.ical_uid)
                         = calendar_meeting_uid(mentioned.ical_uid)
                       AND candidate.status <> 'cancelled'
@@ -1495,9 +1495,9 @@ impl CalendarRepository for PgCalendarRepository {
                             candidate.owner_id = $1
                             OR EXISTS (
                                 SELECT 1
-                                FROM macro_user_links link
+                                FROM rox_user_links link
                                 WHERE link.link_id = candidate.source_link_id
-                                  AND link.primary_macro_id = $1
+                                  AND link.primary_rox_id = $1
                             )
                       )
                     UNION ALL
@@ -1647,7 +1647,7 @@ impl CalendarRepository for PgCalendarRepository {
                = calendar_meeting_uid(addressed.ical_uid)
             JOIN email_links copy_inbox
               ON copy_inbox.id = candidate.source_link_id
-             AND copy_inbox.macro_id = $1
+             AND copy_inbox.rox_id = $1
             WHERE addressed.id = $2
               AND candidate.owner_id = $1
               AND candidate.status <> 'cancelled'
@@ -1744,9 +1744,9 @@ impl CalendarRepository for PgCalendarRepository {
                         account.owner_id = $1
                         OR EXISTS (
                             SELECT 1
-                            FROM macro_user_links link
+                            FROM rox_user_links link
                             WHERE link.link_id = account.email_link_id
-                              AND link.primary_macro_id = $1
+                              AND link.primary_rox_id = $1
                         )
                   )
             ) AS "is_syncing!"
@@ -2427,9 +2427,9 @@ impl CalendarRepository for PgCalendarRepository {
                     event.owner_id = $2
                     OR EXISTS (
                         SELECT 1
-                        FROM macro_user_links delegation
+                        FROM rox_user_links delegation
                         WHERE delegation.link_id = event.source_link_id
-                          AND delegation.primary_macro_id = $2
+                          AND delegation.primary_rox_id = $2
                     )
               )
             ORDER BY
@@ -2565,7 +2565,7 @@ impl CalendarRepository for PgCalendarRepository {
         let row = sqlx::query!(
             r#"
             SELECT
-                link.macro_id AS owner_id,
+                link.rox_id AS owner_id,
                 link.id AS email_link_id,
                 account.id AS account_id,
                 calendar.id AS calendar_id,
@@ -2586,16 +2586,16 @@ impl CalendarRepository for PgCalendarRepository {
               )
               AND ($2::uuid IS NULL OR link.id = $2)
               AND (
-                    link.macro_id = $1
+                    link.rox_id = $1
                     OR EXISTS (
                         SELECT 1
-                        FROM macro_user_links delegation
+                        FROM rox_user_links delegation
                         WHERE delegation.link_id = link.id
-                          AND delegation.primary_macro_id = $1
+                          AND delegation.primary_rox_id = $1
                     )
               )
             ORDER BY
-                (link.macro_id = $1) DESC,
+                (link.rox_id = $1) DESC,
                 link.is_primary DESC,
                 link.created_at ASC
             LIMIT 1
@@ -2648,16 +2648,16 @@ impl CalendarRepository for PgCalendarRepository {
               AND account.sync_status <> 'disabled'
               AND calendar.is_primary
               AND (
-                    link.macro_id = $1
+                    link.rox_id = $1
                     OR EXISTS (
                         SELECT 1
-                        FROM macro_user_links delegation
+                        FROM rox_user_links delegation
                         WHERE delegation.link_id = link.id
-                          AND delegation.primary_macro_id = $1
+                          AND delegation.primary_rox_id = $1
                     )
               )
             ORDER BY
-                (link.macro_id = $1) DESC,
+                (link.rox_id = $1) DESC,
                 link.is_primary DESC,
                 link.created_at ASC
             LIMIT 1
@@ -2701,16 +2701,16 @@ impl CalendarRepository for PgCalendarRepository {
             WHERE NOT calendar.is_deleted
               AND account.sync_status <> 'disabled'
               AND (
-                    link.macro_id = $1
+                    link.rox_id = $1
                     OR EXISTS (
                         SELECT 1
-                        FROM macro_user_links delegation
+                        FROM rox_user_links delegation
                         WHERE delegation.link_id = link.id
-                          AND delegation.primary_macro_id = $1
+                          AND delegation.primary_rox_id = $1
                     )
               )
             ORDER BY
-                (link.macro_id = $1) DESC,
+                (link.rox_id = $1) DESC,
                 link.is_primary DESC,
                 link.created_at ASC,
                 calendar.is_primary DESC,
@@ -2792,7 +2792,7 @@ impl CalendarRepository for PgCalendarRepository {
                       AND calendar.access_role IN ('owner', 'writer')
                 ) AS "writable_calendar_ids!"
             FROM email_links link
-            WHERE link.macro_id = $1
+            WHERE link.rox_id = $1
             "#,
             requester_id,
         )
@@ -4998,7 +4998,7 @@ fn mention_preview_from_row(row: MentionPreviewRow) -> Result<CalendarMentionPre
     };
     let is_channel_shared = row.is_channel_shared.unwrap_or_default();
     let (description, location) = if is_channel_shared {
-        let (description, location) = content_without_macro_call(row.description, row.location);
+        let (description, location) = content_without_rox_call(row.description, row.location);
         let description = description.map(|description| {
             description
                 .chars()
@@ -5371,7 +5371,7 @@ impl CalendarReminderDispatchRepo for PgCalendarRepository {
                         SELECT 1
                         FROM calendar_event_override_attendees attendee
                         JOIN email_links owner_inbox
-                          ON owner_inbox.macro_id = event.owner_id
+                          ON owner_inbox.rox_id = event.owner_id
                          AND lower(owner_inbox.email_address::text) = attendee.email
                         WHERE attendee.event_id = event.id
                           AND attendee.recurrence_id = occurrence.recurrence_id
@@ -5381,7 +5381,7 @@ impl CalendarReminderDispatchRepo for PgCalendarRepository {
                         SELECT 1
                         FROM calendar_event_attendees attendee
                         JOIN email_links owner_inbox
-                          ON owner_inbox.macro_id = event.owner_id
+                          ON owner_inbox.rox_id = event.owner_id
                          AND lower(owner_inbox.email_address::text) = attendee.email
                         WHERE attendee.event_id = event.id
                           AND attendee.response_status = 'declined'

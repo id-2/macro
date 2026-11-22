@@ -46,7 +46,7 @@ where
         if let Some(attempt) = request.attempt {
             let mailbox = InitializeMailbox {
                 attempt,
-                actor: request.actor_macro_id.clone(),
+                actor: request.actor_rox_id.clone(),
                 actor_fusion_id: request
                     .actor_fusion_id
                     .parse()

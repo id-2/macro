@@ -5,8 +5,8 @@ use crate::domain::models::{
 use models_entity_access_management::EntityAccessSourceType;
 use uuid::Uuid;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("explain@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("explain@example.com").unwrap()
 }
 
 fn document() -> Entity {

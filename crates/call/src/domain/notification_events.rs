@@ -3,8 +3,8 @@
 #[cfg(test)]
 mod test;
 
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroCallNotificationsTopic;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxCallNotificationsTopic;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -127,7 +127,7 @@ impl CallNotificationEvent {
 }
 
 impl TopicEvent for CallNotificationEvent {
-    type Topic = MacroCallNotificationsTopic;
+    type Topic = RoxCallNotificationsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
@@ -149,7 +149,7 @@ impl CallNotificationMacroEvent {
     }
 }
 
-impl MacroEvent for CallNotificationMacroEvent {
+impl RoxEvent for CallNotificationMacroEvent {
     type EventPayload = CallNotificationEvent;
 
     fn key(&self) -> &str {

@@ -29,7 +29,7 @@ function macroAnswering(outcome: unknown) {
   return { macro, execution, requests };
 }
 
-describe('macro.ui', () => {
+describe('rox.ui', () => {
   test('opens an item beside the agent, sending its app path only', async () => {
     const { macro, execution, requests } = macroAnswering({
       status: 'sent',

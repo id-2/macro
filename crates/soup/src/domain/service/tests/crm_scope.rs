@@ -29,7 +29,7 @@ impl EmailPreviewServiceReadOnly for FailingEmailPreviewService {
 }
 
 async fn crm_domain_soup(make: MakeEmailErr) -> (Result<Vec<String>, SoupErr>, usize) {
-    let user = MacroUserIdStr::parse_from_str(USER).unwrap();
+    let user = RoxUserIdStr::parse_from_str(USER).unwrap();
     let mut soup_mock = MockSoupRepo::new();
     soup_mock
         .expect_unexpanded_generic_cursor_soup()

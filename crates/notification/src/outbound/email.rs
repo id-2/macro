@@ -7,8 +7,8 @@ use aws_sdk_sesv2::types::{
     Body, Content, Destination, EmailContent as SesEmailContent, Message, MessageTag,
 };
 use hmac::Hmac;
-use macro_user_id::email::ReadEmailParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::email::ReadEmailParts;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sha2::Sha256;
 use std::fmt::Write;
@@ -18,7 +18,7 @@ use crate::domain::models::queue_message::EmailContent;
 use crate::domain::models::signing::sign_unsubscribe_placeholders;
 use crate::domain::ports::EmailSender;
 
-/// Longest sender name shown before the "via Macro" suffix.
+/// Longest sender name shown before the "via Rox" suffix.
 const FROM_NAME_MAX_CHARS: usize = 64;
 
 /// Marks a display name as someone Rox sends for, so it never reads as Rox's own mail.
@@ -67,7 +67,7 @@ pub struct DeliveryTracking<'a> {
 /// One email, ready for the email service.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OutgoingEmail<'a> {
-    /// The From header: Macro's address, with the sender's name when there is one.
+    /// The From header: Rox's address, with the sender's name when there is one.
     pub from: String,
     /// The recipient's address.
     pub to: &'a str,
@@ -223,7 +223,7 @@ fn tag_value(notification_type: &str) -> String {
 impl<E: EmailServiceOps + Send + Sync + 'static> EmailSender for EmailAdapter<E> {
     async fn send_email(
         &self,
-        recipient: MacroUserIdStr<'_>,
+        recipient: RoxUserIdStr<'_>,
         notification_type: &str,
         content: &EmailContent,
     ) -> Result<(), Report> {
@@ -276,7 +276,7 @@ impl<S> SignedUnsubscribeLinks<S> {
 impl<S: EmailSender> EmailSender for SignedUnsubscribeLinks<S> {
     async fn send_email(
         &self,
-        recipient: MacroUserIdStr<'_>,
+        recipient: RoxUserIdStr<'_>,
         notification_type: &str,
         content: &EmailContent,
     ) -> Result<(), Report> {

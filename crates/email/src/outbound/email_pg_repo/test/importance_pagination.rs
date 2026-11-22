@@ -16,7 +16,7 @@ fn importance_exclude_filter() -> Arc<Expr<EmailLiteral>> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_importance_pagination"))
 )]
 async fn test_importance_inbox_pagination_fills_page_and_advances_cursor(
@@ -106,7 +106,7 @@ async fn test_importance_inbox_pagination_fills_page_and_advances_cursor(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_importance_pagination"))
 )]
 async fn test_importance_inbox_underfilled_page_has_no_more(
@@ -166,7 +166,7 @@ async fn test_importance_inbox_underfilled_page_has_no_more(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_importance_pagination"))
 )]
 async fn test_importance_pagination_multi_inbox_counts_agree(

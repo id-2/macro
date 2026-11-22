@@ -305,7 +305,7 @@ function CanvasDocumentSession(
                   : { ...initial, document: current.document }
               ),
             ],
-            { type: 'application/x-macro-canvas' }
+            { type: 'application/x-rox-canvas' }
           );
         },
         location: currentLocation,

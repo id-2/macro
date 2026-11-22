@@ -4,7 +4,7 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -36,13 +36,13 @@ pub struct GetAttachmentDocumentIDResponse {
 #[tracing::instrument(skip(ctx, authorization), err)]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(attachment_id): Path<Uuid>,
 ) -> Result<Json<GetAttachmentDocumentIDResponse>, AttachmentApiError> {
     let document_id = ctx
         .attachment_reads
         .document(
-            &authorization.authorization.user.macro_user_id,
+            &authorization.authorization.user.rox_user_id,
             attachment_id,
         )
         .await?;

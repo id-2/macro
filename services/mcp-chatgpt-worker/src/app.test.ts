@@ -4,11 +4,11 @@ import { parseConfig } from './config';
 
 const BINDINGS = {
   ENVIRONMENT: 'test',
-  MACRO_ENV: 'dev',
+  ROX_ENV: 'dev',
   RESOURCE_URL: 'https://mcp-chatgpt.test/mcp',
   AUTHORIZATION_SERVER_URL: 'https://auth.test',
   TOOL_GROUPING: 'entity',
-  MACRO_HOSTS: JSON.stringify({ storage: 'https://storage.test' }),
+  ROX_HOSTS: JSON.stringify({ storage: 'https://storage.test' }),
 };
 
 function rpc(method: string, params: object, token?: string) {

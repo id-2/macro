@@ -1,17 +1,17 @@
 use device::{IsIpad, detect_is_ipad, is_ipad};
 use logger::Logger;
-use macro_bundle_updater_plugin::domain::{
+use rox_bundle_updater_plugin::domain::{
     asset_service::BundleAssetResolver, bundle_routes::BundleRoutes,
 };
 #[cfg(feature = "auto_apply_update")]
-use macro_bundle_updater_plugin::inbound::plugin::apply_completed_update_from;
+use rox_bundle_updater_plugin::inbound::plugin::apply_completed_update_from;
 #[cfg(mobile)]
-use macro_bundle_updater_plugin::inbound::plugin::retry_waiting_for_wifi;
+use rox_bundle_updater_plugin::inbound::plugin::retry_waiting_for_wifi;
 #[cfg(all(mobile, feature = "auto_apply_update"))]
-use macro_bundle_updater_plugin::inbound::plugin::{allow_update_reload_retry, start_update_check};
-use macro_bundle_updater_plugin::outbound::fs::FileSystem;
-use navigation_plugin::scheme::MacroScheme;
-use navigation_plugin::{MacroNavigationPlugin, NavigatePayload};
+use rox_bundle_updater_plugin::inbound::plugin::{allow_update_reload_retry, start_update_check};
+use rox_bundle_updater_plugin::outbound::fs::FileSystem;
+use navigation_plugin::scheme::RoxScheme;
+use navigation_plugin::{RoxNavigationPlugin, NavigatePayload};
 use reqwest::cookie::CookieStore;
 use reqwest::header::{COOKIE, ORIGIN};
 use rootcause::{Report, report};
@@ -59,10 +59,10 @@ enum AppEnvironment {
 
 impl AppEnvironment {
     fn current() -> Self {
-        match env!("MACRO_TAURI_APP_ENV") {
+        match env!("ROX_TAURI_APP_ENV") {
             "development" => Self::Development,
             "production" => Self::Production,
-            other => unreachable!("invalid MACRO_TAURI_APP_ENV: {other}"),
+            other => unreachable!("invalid ROX_TAURI_APP_ENV: {other}"),
         }
     }
 
@@ -74,7 +74,7 @@ impl AppEnvironment {
     }
 
     fn bundle_update_base_url(self) -> &'static str {
-        option_env!("MACRO_BUNDLE_UPDATE_BASE_URL")
+        option_env!("ROX_BUNDLE_UPDATE_BASE_URL")
             .filter(|url| !url.trim().is_empty())
             .unwrap_or_else(|| self.auth_service_url())
     }
@@ -88,18 +88,18 @@ impl AppEnvironment {
 }
 
 fn embedded_bundle_build() -> u64 {
-    env!("MACRO_EMBEDDED_BUNDLE_BUILD")
+    env!("ROX_EMBEDDED_BUNDLE_BUILD")
         .parse()
-        .expect("MACRO_EMBEDDED_BUNDLE_BUILD must be an unsigned integer")
+        .expect("ROX_EMBEDDED_BUNDLE_BUILD must be an unsigned integer")
 }
 
 /// When this native binary was compiled, in Unix milliseconds. Unlike the
 /// JavaScript build time, OTA bundle updates do not change it.
 #[tauri::command]
 fn get_native_build_time() -> u64 {
-    env!("MACRO_NATIVE_BUILD_TIME_MS")
+    env!("ROX_NATIVE_BUILD_TIME_MS")
         .parse()
-        .expect("MACRO_NATIVE_BUILD_TIME_MS must be an unsigned integer")
+        .expect("ROX_NATIVE_BUILD_TIME_MS must be an unsigned integer")
 }
 
 /// This module provides debuging utilities and should not be compiled in prodiction builds
@@ -220,7 +220,7 @@ pub fn run_with(builder: tauri::Builder<AppRuntime>, configure_window: Configure
         }
         (context, windows)
     };
-    let navigation = MacroNavigationPlugin::new(ALLOWED_DOMAINS)
+    let navigation = RoxNavigationPlugin::new(ALLOWED_DOMAINS)
         .expect("Domains must be valid urls")
         .with_app_link_hosts(APP_LINK_HOSTS)
         .with_embedded_documents(EMBEDDED_DOCUMENTS)
@@ -334,7 +334,7 @@ pub fn run_with(builder: tauri::Builder<AppRuntime>, configure_window: Configure
         .plugin(navigation.clone())
         .manage(navigation.clone())
         .plugin(
-            macro_bundle_updater_plugin::inbound::plugin::MacroBundleUpdaterPlugin::new(
+            rox_bundle_updater_plugin::inbound::plugin::RoxBundleUpdaterPlugin::new(
                 AppEnvironment::current()
                     .bundle_update_base_url()
                     .parse()
@@ -453,14 +453,14 @@ pub fn run_with(builder: tauri::Builder<AppRuntime>, configure_window: Configure
             graphql_cache_plugin::commands::graphql_cache_delete_records,
             graphql_cache_plugin::commands::graphql_cache_teardown,
             graphql_cache_plugin::commands::graphql_cache_clear,
-            macro_bundle_updater_plugin::inbound::plugin::grant_bundle_update,
-            macro_bundle_updater_plugin::inbound::plugin::perform_update,
-            macro_bundle_updater_plugin::inbound::plugin::ack_bundle_update_reload,
-            macro_bundle_updater_plugin::inbound::plugin::set_bundle_reload_hold,
-            macro_bundle_updater_plugin::inbound::plugin::check_for_update,
-            macro_bundle_updater_plugin::inbound::plugin::get_bundle_debug_info,
-            macro_bundle_updater_plugin::inbound::plugin::get_bundle_update_status,
-            macro_bundle_updater_plugin::inbound::plugin::clear_bundle,
+            rox_bundle_updater_plugin::inbound::plugin::grant_bundle_update,
+            rox_bundle_updater_plugin::inbound::plugin::perform_update,
+            rox_bundle_updater_plugin::inbound::plugin::ack_bundle_update_reload,
+            rox_bundle_updater_plugin::inbound::plugin::set_bundle_reload_hold,
+            rox_bundle_updater_plugin::inbound::plugin::check_for_update,
+            rox_bundle_updater_plugin::inbound::plugin::get_bundle_debug_info,
+            rox_bundle_updater_plugin::inbound::plugin::get_bundle_update_status,
+            rox_bundle_updater_plugin::inbound::plugin::clear_bundle,
             is_ipad,
             get_native_build_time,
             get_pending_share_filenames,
@@ -694,7 +694,7 @@ enum LaunchState {
 #[tauri::command]
 fn open_external_url(
     app: AppHandle<AppRuntime>,
-    navigation: tauri::State<'_, MacroNavigationPlugin>,
+    navigation: tauri::State<'_, RoxNavigationPlugin>,
     url: Url,
 ) -> bool {
     navigation.open_external(&app, &url)
@@ -708,11 +708,11 @@ fn emit_navigate_for_deep_link(url: Url, handle: &AppHandle) -> Result<(), Repor
     if url.scheme() == APP_SCHEME && url.host_str() == Some("android-auth") {
         return Ok(());
     }
-    // Universal/App links come in as https:// URLs, custom scheme links come in as macro://
-    let macro_scheme = match url.scheme() {
-        s if s == APP_SCHEME => MacroScheme::new(url)?,
+    // Universal/App links come in as https:// URLs, custom scheme links come in as rox://
+    let rox_scheme = match url.scheme() {
+        s if s == APP_SCHEME => RoxScheme::new(url)?,
         "http" | "https" if navigation_plugin::is_app_link(APP_LINK_HOSTS, &url) => {
-            MacroScheme::from_url(&url)?
+            RoxScheme::from_url(&url)?
         }
         scheme => {
             return Err(report!("unexpected deep link scheme: {}", scheme));
@@ -720,9 +720,9 @@ fn emit_navigate_for_deep_link(url: Url, handle: &AppHandle) -> Result<(), Repor
     };
 
     let payload = NavigatePayload {
-        path: macro_scheme.0.path(),
-        query: macro_scheme.0.query().unwrap_or_default(),
-        fragment: macro_scheme.0.fragment(),
+        path: rox_scheme.0.path(),
+        query: rox_scheme.0.query().unwrap_or_default(),
+        fragment: rox_scheme.0.fragment(),
     };
     // we send a navigate event instead of calling navigate directly
     // because navigate performs a full browser navigation

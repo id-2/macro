@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::user_id::RoxUserId;
 use roles_and_permissions::domain::model::PermissionId;
 use user_quota::UserQuota;
 
@@ -40,7 +40,7 @@ pub async fn handler(
         return Ok(StatusCode::NO_CONTENT.into_response());
     }
 
-    let user_id = MacroUserId::parse_from_str(&user_context.user_id)
+    let user_id = RoxUserId::parse_from_str(&user_context.user_id)
         .map_err(|e| {
             tracing::error!(error=?e, user_id=?user_context.user_id, "unable to parse user id");
             (
@@ -53,7 +53,7 @@ pub async fn handler(
         })?
         .lowercase();
 
-    let quota = macro_db_client::user_quota::get_user_quota(&ctx.db, &user_id)
+    let quota = rox_db_client::user_quota::get_user_quota(&ctx.db, &user_id)
         .await
         .map_err(|e| {
             tracing::error!(error=?e, user_id=?user_context.user_id, "unable to get user quota");

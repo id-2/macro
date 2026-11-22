@@ -35,7 +35,7 @@ export function composeDraftInput(
     bcc: draft.bcc?.map(draftContactInput),
     bodyHtml: draft.body_html,
     bodyText: draft.body_text,
-    bodyMacro: draft.body_macro,
+    bodyMacro: draft.body_rox,
   };
 }
 

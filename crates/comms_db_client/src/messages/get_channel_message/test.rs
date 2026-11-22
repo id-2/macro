@@ -1,13 +1,13 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("channels"))
 )]
 async fn search_projection_preserves_author_and_sender(pool: sqlx::PgPool) -> anyhow::Result<()> {
     let channel_id = Uuid::from_u128(0x11111111_1111_1111_1111_111111111111);
-    let message_id = macro_uuid::generate_uuid_v7();
+    let message_id = rox_uuid::generate_uuid_v7();
     for author in [Some("unique-archive-bot"), None] {
         sqlx::query!(
             r#"

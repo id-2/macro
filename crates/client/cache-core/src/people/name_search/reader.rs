@@ -7,7 +7,7 @@ use crate::{
     },
     value::{CacheValue, EntityKey, Record},
 };
-use macro_user_id::{cowlike::CowLike, email::ReadEmailParts, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, email::ReadEmailParts, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashSet;
@@ -37,7 +37,7 @@ struct Continuation {
 }
 
 struct Evaluated<'a> {
-    user: MacroUserIdStr<'a>,
+    user: RoxUserIdStr<'a>,
     name: &'a str,
     email: &'a str,
     facts: PersonFacts,
@@ -129,7 +129,7 @@ impl<'a> NameSearchRead<'a> {
             if after.fingerprint != fingerprint
                 || after.priority > SELF_PRIORITY
                 || after.user.len() > 1024
-                || !MacroUserIdStr::parse_from_str(&after.user)
+                || !RoxUserIdStr::parse_from_str(&after.user)
                     .is_ok_and(|user| user.as_ref() == after.user)
             {
                 return Err(PeopleError::StaleCursor);
@@ -211,7 +211,7 @@ impl<'a> NameSearchRead<'a> {
             .after
             .as_ref()
             .filter(|a| a.priority == priority(stage))?;
-        let user = MacroUserIdStr::parse_from_str(&after.user).ok()?;
+        let user = RoxUserIdStr::parse_from_str(&after.user).ok()?;
         Some(
             RecentKey::new(Some(after.timestamp), &user)
                 .as_bytes()
@@ -223,7 +223,7 @@ impl<'a> NameSearchRead<'a> {
         if raw.len() > 1024 {
             return None;
         }
-        let user = MacroUserIdStr::parse_from_str(raw).ok()?;
+        let user = RoxUserIdStr::parse_from_str(raw).ok()?;
         if self.excluded.contains(user.as_ref()) {
             return None;
         }

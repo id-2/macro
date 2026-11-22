@@ -1,11 +1,11 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { User } from '../users/user';
 import { AccountManagerGrant } from './grant';
 
 /** Account managers: an agent account's full access to a person's account. */
 export class AccountManagerNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a lazy grant handle. */
   byId(id: string): AccountManagerGrant {

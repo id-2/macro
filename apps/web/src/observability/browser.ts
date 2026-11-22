@@ -182,7 +182,7 @@ export async function initializeBrowserObservability(
   if (memoryRecording && desktop) {
     memoryRecording.accept(desktop);
     Telemetry.info('Desktop memory recording enabled', {
-      'macro.recording.id': desktop.identity.recordingId ?? undefined,
+      'rox.recording.id': desktop.identity.recordingId ?? undefined,
       'service.instance.id': desktop.identity.instanceId,
     });
     fireAndForget(memoryRecording.start(), 'desktop-memory-recording');

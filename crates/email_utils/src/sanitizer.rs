@@ -3,7 +3,7 @@
 //! Every HTML body that reaches the `body_html_sanitized` column must pass
 //! through one of these entry points: [`sanitize_email_html`] for
 //! provider-fetched messages, [`sanitize_authored_html`] for bodies composed in
-//! Macro, and [`sanitize_html_fragment`] for standalone fragments such as
+//! Rox, and [`sanitize_html_fragment`] for standalone fragments such as
 //! signatures.
 
 use ammonia::Builder;

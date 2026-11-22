@@ -19,15 +19,15 @@ use anyhow::Context;
 use config::Config;
 use email_formatting::EmailDigestNotification;
 use hmac::{Hmac, Mac};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_env::Environment;
-use macro_event_broker::{GlobalSpawner, KafkaEventPublisher, MacroEventBrokerService};
-use macro_service_urls::ConnectionGatewayUrl;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env::Environment;
+use rox_event_broker::{GlobalSpawner, KafkaEventPublisher, RoxEventBrokerService};
+use rox_service_urls::ConnectionGatewayUrl;
 use secretsmanager_client::SecretManager;
 use sha2::Sha256;
 use sqlx::postgres::PgPoolOptions;
@@ -41,7 +41,7 @@ mod notification;
 
 #[tokio::main]
 pub async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     // Parse our configuration from the environment.
     let config = Config::from_env().context("expected to be able to generate config")?;
@@ -67,7 +67,7 @@ pub async fn main() -> anyhow::Result<()> {
         "initialized db connection"
     );
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
@@ -121,7 +121,7 @@ pub async fn main() -> anyhow::Result<()> {
         let event_queue =
             ::notification::outbound::push_notification_event_queue::SqsPushNotificationEventQueue::new(
                 aws_sdk_sqs::Client::new(&aws_config),
-                macro_queues::PushNotificationEventHandlerQueue::new().to_string(),
+                rox_queues::PushNotificationEventHandlerQueue::new().to_string(),
                 config.notification_queue_max_messages,
                 config.notification_queue_wait_time_seconds,
             );
@@ -138,13 +138,13 @@ pub async fn main() -> anyhow::Result<()> {
     let jwt_args =
         JwtValidationArgs::new_with_secret_manager(config.environment, &secretsmanager_client)
             .await?;
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.as_ref().to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
 
@@ -153,7 +153,7 @@ pub async fn main() -> anyhow::Result<()> {
 
     let notification_queue = ::notification::outbound::queue::SqsQueue::new(
         aws_sdk_sqs::Client::new(&aws_config),
-        macro_queues::NotificationQueue::new().to_string(),
+        rox_queues::NotificationQueue::new().to_string(),
     );
     let sns_endpoint_manager =
         ::notification::outbound::sns_endpoint::SnsEndpointManagerAdapter::new(
@@ -164,7 +164,7 @@ pub async fn main() -> anyhow::Result<()> {
         fcm_platform_arn: config.sns_fcm_platform_arn.as_ref().to_string(),
         apns_voip_platform_arn: config.sns_apns_voip_platform_arn().to_string(),
     };
-    let realtime_event_broker = MacroEventBrokerService::new(
+    let realtime_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create Kafka realtime notification publisher")?,
         GlobalSpawner,
@@ -238,7 +238,7 @@ pub async fn main() -> anyhow::Result<()> {
             crate::env::SENDER_ADDRESS.clone(),
             config.ses_configuration_set.value().map(str::to_owned),
         ),
-        macro_service_urls::NotificationServiceUrl::new_for_environment(config.environment)?
+        rox_service_urls::NotificationServiceUrl::new_for_environment(config.environment)?
             .parse_url()?,
         hmac_key.clone(),
     );
@@ -336,7 +336,7 @@ pub async fn main() -> anyhow::Result<()> {
         ::notification::outbound::repository::DbNotificationRepository::new(db.clone());
     let ingress_delivery_queue = ::notification::outbound::queue::SqsQueue::new(
         aws_sdk_sqs::Client::new(&aws_config),
-        macro_queues::NotificationQueue::new().to_string(),
+        rox_queues::NotificationQueue::new().to_string(),
     );
     let ingress_service = ::notification::domain::service::NotificationIngressService::new(
         ingress_repository,
@@ -346,7 +346,7 @@ pub async fn main() -> anyhow::Result<()> {
 
     let ingress_queue = ::notification::outbound::queue::SqsQueue::new(
         aws_sdk_sqs::Client::new(&aws_config),
-        macro_queues::NotificationIngressQueue::new().to_string(),
+        rox_queues::NotificationIngressQueue::new().to_string(),
     );
     let ingress_worker =
         ::notification::inbound::ingress_worker::IngressWorker::new(ingress_service, ingress_queue);

@@ -20,8 +20,8 @@ use crate::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
     OptionalMacroAuthorizationExtractor,
 };
 use tracing::Level;
@@ -47,8 +47,8 @@ where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -68,7 +68,7 @@ where
             .await
             .map_err(|_| ExtractorError::BadRequest("missing channel_id path parameter"))?;
 
-        if let Some(MacroAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
+        if let Some(RoxAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
         {
             let entity_access_receipt = generate_bot_entity_access_receipt::<T>(
                 service.as_ref(),
@@ -87,15 +87,15 @@ where
         let is_internal_access = authorization
             .authorization
             .as_ref()
-            .is_some_and(MacroAuthorization::is_internal);
-        let (macro_user_id, user_context) = authorization
+            .is_some_and(RoxAuthorization::is_internal);
+        let (rox_user_id, user_context) = authorization
             .authorization
             .as_ref()
-            .and_then(MacroAuthorization::acting_user)
-            .map(|user| (Some(user.macro_user_id.clone()), user.user_context.clone()))
+            .and_then(RoxAuthorization::acting_user)
+            .map(|user| (Some(user.rox_user_id.clone()), user.user_context.clone()))
             .unwrap_or_default();
 
-        if macro_user_id.is_none() && is_internal_access {
+        if rox_user_id.is_none() && is_internal_access {
             return Ok(Self {
                 entity_access_receipt: EntityAccessReceipt {
                     entity: Entity {
@@ -112,13 +112,13 @@ where
             });
         }
 
-        let Some(macro_user_id) = macro_user_id else {
+        let Some(rox_user_id) = rox_user_id else {
             return Err(ExtractorError::Unauthorized);
         };
 
         let permission = service
             .get_entity_permission(
-                Some(&macro_user_id),
+                Some(&rox_user_id),
                 &channel_id,
                 EntityType::Channel,
                 user_context.organization_id.map(i64::from),
@@ -136,7 +136,7 @@ where
                     entity_id: channel_id,
                     entity_type: EntityType::Channel,
                 },
-                auth: EntityAccessAuth::Authenticated(macro_user_id),
+                auth: EntityAccessAuth::Authenticated(rox_user_id),
                 entity_permission: permission,
                 _marker: PhantomData,
             },

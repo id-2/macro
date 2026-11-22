@@ -56,8 +56,8 @@ fn a_nightly_brief_reviews_and_retires_before_suggesting() {
         trigger: GenerationTrigger::Nightly,
         ..data(&[Surface::Email], &[], false)
     });
-    assert!(nightly.contains("macro.routines.review()"));
-    assert!(!brief(&data(&[Surface::Email], &[], false)).contains("macro.routines.review()"));
+    assert!(nightly.contains("rox.routines.review()"));
+    assert!(!brief(&data(&[Surface::Email], &[], false)).contains("rox.routines.review()"));
 }
 
 /// Only onboarding tells the session the person is waiting; a manual run
@@ -75,7 +75,7 @@ fn only_an_onboarding_brief_asks_for_speed() {
         let text = of(trigger);
         assert!(!text.contains("Be quick"), "{trigger:?}");
         assert!(!text.contains("they are waiting"), "{trigger:?}");
-        assert!(text.contains("macro.routines.review()"), "{trigger:?}");
+        assert!(text.contains("rox.routines.review()"), "{trigger:?}");
     }
     assert!(of(GenerationTrigger::Manual).contains("asked for fresh suggestions"));
     assert_ne!(

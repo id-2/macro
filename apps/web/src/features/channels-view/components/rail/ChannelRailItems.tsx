@@ -11,7 +11,7 @@ import { toast } from '@core/component/Toast/Toast';
 import { useUserId } from '@core/context/user';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { getDisplayName, tryMacroId } from '@core/user';
-import type { MacroId } from '@core/user/macroId';
+import type { RoxId } from '@core/user/macroId';
 import { type ChannelEntity, Entity } from '@entity';
 import PhoneIncomingIcon from '@icon/system/fill/phone-incoming-fill.svg';
 import ReplyIcon from '@icon/system/regular/arrow-bend-up-left.svg';
@@ -260,7 +260,7 @@ export type ConversationCardProps = ChannelRailItemProps & {
   mentions?: number;
 };
 
-function UserDisplayName(props: { id: MacroId }) {
+function UserDisplayName(props: { id: RoxId }) {
   const displayName = () =>
     getDisplayName(props.id, {
       emailFallback: 'local-part',

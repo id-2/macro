@@ -9,7 +9,7 @@ use crate::domain::{
     side_effects::{ChannelDocumentMention, ThreadNotificationContext},
 };
 use anyhow::Context;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -24,7 +24,7 @@ struct UserIdRow {
 
 struct DocumentMentionRow {
     document_name: String,
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     file_type: Option<String>,
     sub_type: Option<String>,
 }
@@ -51,7 +51,7 @@ impl ChannelSideEffectContext for PgChannelSideEffectContext {
 
     async fn get_existing_user_ids(
         &self,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> Result<HashSet<String>, Self::Err> {
         if user_ids.is_empty() {
             return Ok(HashSet::new());
@@ -88,7 +88,7 @@ impl ChannelSideEffectContext for PgChannelSideEffectContext {
             r#"
             SELECT
                 d.name AS document_name,
-                d.owner AS "owner: MacroUserIdStr",
+                d.owner AS "owner: RoxUserIdStr",
                 d."fileType" AS file_type,
                 dst.sub_type::text AS sub_type
             FROM "Document" d
@@ -120,7 +120,7 @@ impl ChannelSideEffectContext for PgChannelSideEffectContext {
             .await
             .ok()
             .and_then(|id| {
-                MacroUserIdStr::parse_from_str(&id)
+                RoxUserIdStr::parse_from_str(&id)
                     .ok()
                     .map(|id| id.into_owned())
             });
@@ -145,7 +145,7 @@ impl ChannelSideEffectContext for PgChannelSideEffectContext {
 
     async fn get_sender_profile_picture_url(
         &self,
-        sender_id: MacroUserIdStr<'static>,
+        sender_id: RoxUserIdStr<'static>,
     ) -> Option<String> {
         get_sender_profile_picture_url(&self.pool, &sender_id).await
     }
@@ -183,14 +183,14 @@ async fn get_bot_sender_profile(db: &PgPool, bot_id: BotId) -> Option<BotSenderP
 
 async fn get_sender_profile_picture_url(
     db: &PgPool,
-    sender_id: &MacroUserIdStr<'_>,
+    sender_id: &RoxUserIdStr<'_>,
 ) -> Option<String> {
     sqlx::query_scalar!(
         r#"
         SELECT mui.profile_picture as "profile_picture!"
         FROM "User" u
-        JOIN macro_user mu ON mu.id = u.macro_user_id
-        JOIN macro_user_info mui ON mui.macro_user_id = mu.id
+        JOIN macro_user mu ON mu.id = u.rox_user_id
+        JOIN rox_user_info mui ON mui.rox_user_id = mu.id
         WHERE u.id = $1
           AND mui.profile_picture IS NOT NULL
         LIMIT 1
@@ -238,7 +238,7 @@ async fn get_channel_message_count(pool: &PgPool, channel_id: Uuid) -> anyhow::R
 async fn get_connected_call_participants(
     pool: &PgPool,
     thread_id: Uuid,
-) -> anyhow::Result<Vec<MacroUserIdStr<'static>>> {
+) -> anyhow::Result<Vec<RoxUserIdStr<'static>>> {
     let rows = sqlx::query_as!(
         UserIdRow,
         r#"
@@ -254,9 +254,9 @@ async fn get_connected_call_participants(
     Ok(rows
         .into_iter()
         .filter_map(|row| {
-            MacroUserIdStr::parse_from_str(&row.user_id)
+            RoxUserIdStr::parse_from_str(&row.user_id)
                 .ok()
-                .map(MacroUserIdStr::into_owned)
+                .map(RoxUserIdStr::into_owned)
         })
         .collect())
 }
@@ -264,7 +264,7 @@ async fn get_connected_call_participants(
 async fn get_channel_participants_for_thread_id(
     pool: &PgPool,
     thread_id: Uuid,
-) -> anyhow::Result<Vec<MacroUserIdStr<'static>>> {
+) -> anyhow::Result<Vec<RoxUserIdStr<'static>>> {
     let rows = sqlx::query_as!(
         UserIdRow,
         r#"
@@ -296,6 +296,6 @@ async fn get_channel_participants_for_thread_id(
     .await?;
     Ok(rows
         .into_iter()
-        .filter_map(|row| MacroUserIdStr::try_from(row.user_id).ok())
+        .filter_map(|row| RoxUserIdStr::try_from(row.user_id).ok())
         .collect())
 }

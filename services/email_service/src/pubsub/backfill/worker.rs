@@ -35,7 +35,7 @@ pub async fn run_worker(
     dss_client: DocumentStorageServiceClient,
     system_properties_service: Arc<SystemPropertiesServiceImpl<PgSystemPropertiesRepository>>,
     crm_service: CrmServiceType,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     notifications_enabled: bool,
 ) {
     run_worker_with_cancellation(
@@ -51,7 +51,7 @@ pub async fn run_worker(
         dss_client,
         system_properties_service,
         crm_service,
-        macro_event_broker,
+        rox_event_broker,
         notifications_enabled,
         CancellationToken::new(),
     )
@@ -76,7 +76,7 @@ pub(crate) fn context(
     dss_client: DocumentStorageServiceClient,
     system_properties_service: Arc<SystemPropertiesServiceImpl<PgSystemPropertiesRepository>>,
     crm_service: CrmServiceType,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     _notifications_enabled: bool,
 ) -> BackfillContext {
     use crate::outbound::backfill_jobs::worker::*;
@@ -94,7 +94,7 @@ pub(crate) fn context(
         connection_gateway_client,
         dss_client,
         system_properties_service,
-        macro_event_broker,
+        rox_event_broker,
     };
     BackfillContext {
         sqs_worker: worker.clone(),
@@ -129,7 +129,7 @@ pub async fn run_worker_with_cancellation(
     dss_client: DocumentStorageServiceClient,
     system_properties_service: Arc<SystemPropertiesServiceImpl<PgSystemPropertiesRepository>>,
     crm_service: CrmServiceType,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     notifications_enabled: bool,
     cancellation_token: CancellationToken,
 ) {
@@ -146,7 +146,7 @@ pub async fn run_worker_with_cancellation(
         dss_client,
         system_properties_service,
         crm_service,
-        macro_event_broker,
+        rox_event_broker,
         notifications_enabled,
     );
 

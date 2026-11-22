@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { MemoryNamespace } from './namespace';
 
 describe('memory', () => {
@@ -14,7 +14,7 @@ describe('memory', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const memory = await new MemoryNamespace(client).edit(
       { action: 'insert', line: 1, content: 'Prefers metric units' },

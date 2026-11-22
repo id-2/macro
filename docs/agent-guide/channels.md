@@ -758,7 +758,7 @@ respond there. The chip follows the agent's next activity after the answer.
 A tool call explicitly acting as the session owner in a turn somebody else
 prompted, held for that owner’s approval reads `Waiting for approval`; only the owner approves it, in the session.
 
-Coding agents use `macro_internal.set_pull_request` to register an existing or
+Coding agents use `rox_internal.set_pull_request` to register an existing or
 new GitHub PR with their session. Rox Internal MCP is hosted by the harness
 service at `/mcp/internal` on its egress listener, separately from workspace MCP.
 Cursor, sandbox, and roxd sessions receive session-scoped credentials; the
@@ -794,7 +794,7 @@ in Chromium with mocked session snapshots and realtime invalidation. This UI che
 does not prove live provider discovery; backend tests separately cover delayed
 provider metadata.
 
-When an agent links its session to a task with `macro_internal.link_task`, the
+When an agent links its session to a task with `rox_internal.link_task`, the
 session header (and the side panel's **Task** row) shows a task chip before the
 PR chip: the task title, or `Task` while loading or without access. Clicking it
 opens the task in a new split (in place on touch devices). Linking a different

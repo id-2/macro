@@ -5,7 +5,7 @@ import type {
   PropertyOption as PropertyOptionRecord,
   TagSetResponse,
 } from '../../../generated/properties/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { PropertiesNamespace } from './namespace';
 
 describe('PropertiesNamespace.createTag', () => {
@@ -63,7 +63,7 @@ describe('PropertiesNamespace.createTag', () => {
           return { data: created };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const tag = await new PropertiesNamespace(client).createTag({
       label: 'Follow-up',
@@ -122,7 +122,7 @@ describe('PropertiesNamespace.createTag', () => {
           } satisfies PropertyOptionRecord,
         }),
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const tag = await new PropertiesNamespace(client).createTag({
       label: 'Reading',

@@ -17,8 +17,8 @@ use email::domain::events::EmailTopicEvent;
 use github::broker::GithubWebhookTopicEvent;
 use github::domain::models::GithubWebhookReceived;
 use jev::domain::YesNoQuestion;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::{
     events::{
         MessageAttachmentCreatedMetadata, MessageMentionedMetadata, MessagePatchedMetadata,
@@ -911,7 +911,7 @@ fn require_human(actor: Option<&Actor<'static>>, delegated: bool) -> Result<(), 
 
 fn document_actor(
     actor: Option<&Actor<'static>>,
-    fallback: Option<&MacroUserIdStr<'static>>,
+    fallback: Option<&RoxUserIdStr<'static>>,
     delegated: bool,
 ) -> Result<(), EventRejection> {
     if actor.is_some() || delegated {
@@ -928,7 +928,7 @@ impl IncomingEvent {
     /// a started call to who created it, and an ended call to who joined it.
     /// Entity access is checked separately at admission and dispatch. These
     /// audience restrictions never turn an event into an access grant.
-    pub fn is_for_owner(&self, owner: &MacroUserIdStr<'static>) -> bool {
+    pub fn is_for_owner(&self, owner: &RoxUserIdStr<'static>) -> bool {
         match &self.payload {
             EventPayload::Message(MessageFact::Mentioned(data)) => {
                 data.mentioned.entity_type == "user" && data.mentioned.entity_id == owner.as_ref()

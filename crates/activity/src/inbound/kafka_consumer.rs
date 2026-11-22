@@ -17,7 +17,7 @@ use std::future::Future;
 use std::marker::PhantomData;
 
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{KafkaConsumerAdapter, MacroEventCollection, MacroEventConsumerService};
+use rox_event_broker::{KafkaConsumerAdapter, RoxEventCollection, RoxEventConsumerService};
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message as _};
 use rootcause::prelude::{Report, ResultExt as _};
@@ -52,7 +52,7 @@ pub struct ActivityConsumer<R, C, F, P> {
 impl<R, C, F, P, Fut> ActivityConsumer<R, C, F, P>
 where
     R: ActivityRepo,
-    C: MacroEventCollection + 'static,
+    C: RoxEventCollection + 'static,
     F: Fn(C) -> Fut + Send + Sync,
     Fut: Future<Output = Ingest> + Send,
     P: ActivityRealtimePublisher,
@@ -94,7 +94,7 @@ where
         let consumer = KafkaConsumerAdapter::<ActivityConsumerGroup, ()>::new(consumer)
             .subscribe::<C>()
             .context("failed to subscribe to activity topics")?;
-        let consumer = MacroEventConsumerService::<C, _>::new(consumer);
+        let consumer = RoxEventConsumerService::<C, _>::new(consumer);
         tracing::info!(
             topics = ?C::topics(),
             group = ActivityConsumerGroup::GROUP_NAME,
@@ -158,8 +158,8 @@ where
     }
 }
 
-fn commit_logged<C: MacroEventCollection + 'static>(
-    consumer: &MacroEventConsumerService<C, KafkaConsumerAdapter<ActivityConsumerGroup, C>>,
+fn commit_logged<C: RoxEventCollection + 'static>(
+    consumer: &RoxEventConsumerService<C, KafkaConsumerAdapter<ActivityConsumerGroup, C>>,
     message: &BorrowedMessage<'_>,
 ) {
     match consumer.inner().commit_message(message, CommitMode::Async) {

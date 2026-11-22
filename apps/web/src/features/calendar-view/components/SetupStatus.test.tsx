@@ -54,7 +54,7 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
   ({
     id,
     provider: 'GMAIL',
-    macro_id: 'macro|self',
+    rox_id: 'macro|self',
     email_address: `${id}@example.com`,
     is_sync_active: true,
     needs_calendar_permission: false,
@@ -64,7 +64,7 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
   }) as unknown as EmailLink;
 
 const delegated = (id: string, overrides: Partial<EmailLink> = {}) =>
-  link(id, { macro_id: 'macro|someone-else', ...overrides });
+  link(id, { rox_id: 'macro|someone-else', ...overrides });
 
 beforeEach(() => {
   mocks.startAddInbox.mockResolvedValue(undefined);

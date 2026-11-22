@@ -7,7 +7,7 @@ const SLACK_SERVER_URL: &str = "https://mcp.slack.com/mcp";
 use super::models::GITHUB_MCP_SERVER_URL as GITHUB_SERVER_URL;
 const LINEAR_SERVER_URL: &str = "https://mcp.linear.app/mcp";
 
-macro_env_var::env_var! {
+rox_env_var::env_var! {
     /// Environment variables for pre-registered MCP providers.
     #[allow(missing_docs)]
     pub struct ProviderEnvVars {

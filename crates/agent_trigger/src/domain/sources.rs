@@ -13,12 +13,12 @@ mod test;
 use super::processing::TriggerInput;
 use super::project_assignment::ProjectTaskAdded;
 use super::task_assignment::TaskAssignment;
-use macro_event_broker::{MacroEvent as _, MacroEventCollection};
-use macro_uuid::Uuid;
+use rox_event_broker::{RoxEvent as _, RoxEventCollection};
+use rox_uuid::Uuid;
 use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
 use properties::domain::events::{PropertyMacroEvent, PropertyTopicEvent};
 
-macro_event_broker::declare_topics!(MessageTriggerEvents: MessageMacroEvent, PropertyMacroEvent);
+rox_event_broker::declare_topics!(MessageTriggerEvents: MessageMacroEvent, PropertyMacroEvent);
 
 /// A decoded broker record from the trigger source.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub struct DecodedTrigger {
 }
 
 /// A topic collection whose records may carry a committed post.
-pub trait TriggerEvents: MacroEventCollection + Send + 'static {
+pub trait TriggerEvents: RoxEventCollection + Send + 'static {
     /// Reduce a decoded record to the post it carries, if any.
     fn into_trigger(self) -> DecodedTrigger;
 }

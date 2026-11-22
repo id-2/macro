@@ -71,6 +71,6 @@ pub trait ConnectedApps: Send + Sync + 'static {
     /// App slugs of the user's enabled connections.
     fn connected_app_slugs(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> impl Future<Output = anyhow::Result<Vec<String>>> + Send;
 }

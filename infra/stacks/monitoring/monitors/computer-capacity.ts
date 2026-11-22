@@ -1,4 +1,4 @@
-// Macro computer capacity: order another bare-metal Incus host before the
+// Rox computer capacity: order another bare-metal Incus host before the
 // fleet sells out.
 //
 // New monitors, not adopted. They read two gauges agent_harness_service's

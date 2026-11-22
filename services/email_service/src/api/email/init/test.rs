@@ -8,7 +8,7 @@ fn classify_provider_init_error(error: EmailApiError) -> ConnectionError {
     email::domain::mailbox::connection::classify_provider_init_error(error)
 }
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 async fn insert_email_link(pool: &PgPool) -> Uuid {
@@ -17,7 +17,7 @@ async fn insert_email_link(pool: &PgPool) -> Uuid {
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
@@ -38,7 +38,7 @@ async fn body_json(response: Response) -> serde_json::Value {
     serde_json::from_slice(&bytes).unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn zero_grant_is_unrecorded(pool: PgPool) {
     let link_id = insert_email_link(&pool).await;
     sqlx::query!(
@@ -52,14 +52,14 @@ async fn zero_grant_is_unrecorded(pool: PgPool) {
     assert!(has_unrecorded_google_grant(&pool, link_id).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn missing_side_table_state_is_unrecorded(pool: PgPool) {
     let link_id = insert_email_link(&pool).await;
 
     assert!(has_unrecorded_google_grant(&pool, link_id).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recorded_side_table_grant_is_not_unrecorded(pool: PgPool) {
     let link_id = insert_email_link(&pool).await;
     sqlx::query!(
@@ -73,7 +73,7 @@ async fn recorded_side_table_grant_is_not_unrecorded(pool: PgPool) {
     assert!(!has_unrecorded_google_grant(&pool, link_id).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn missing_email_link_is_not_unrecorded(pool: PgPool) {
     assert!(!has_unrecorded_google_grant(&pool, Uuid::now_v7()).await);
 }
@@ -84,10 +84,10 @@ async fn missing_email_link_is_not_unrecorded(pool: PgPool) {
 /// provider client. This module has no fake Gmail client or call counter to
 /// observe the absence directly, so the assertion is its observable footprint —
 /// the returned ROX link plus no GMAIL link and no backfill row for the account.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(pool: PgPool) {
     let fusionauth_user_id = Uuid::now_v7();
-    let macro_user_id = format!("macro|init-{fusionauth_user_id}@example.com");
+    let rox_user_id = format!("macro|init-{fusionauth_user_id}@example.com");
     sqlx::query(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
     )
@@ -102,7 +102,7 @@ async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(po
     let rox_link = crate::outbound::mailbox_init::ensure_rox_mailbox(
         &pool,
         &fusionauth_user_id.to_string(),
-        MacroUserIdStr::try_from(macro_user_id.clone()).unwrap(),
+        RoxUserIdStr::try_from(rox_user_id.clone()).unwrap(),
         true,
     )
     .await
@@ -111,14 +111,14 @@ async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(po
 
     assert_eq!(rox_link.provider, link::UserProvider::Rox);
     assert!(rox_link.is_primary);
-    let expected_address = format!("ada@{}", macro_user_id::handle::ROX_MAIL_DOMAIN);
+    let expected_address = format!("ada@{}", rox_user_id::handle::ROX_MAIL_DOMAIN);
     assert_eq!(rox_link.email_address.0.as_ref(), expected_address);
-    assert_eq!(rox_link.macro_id.as_ref(), macro_user_id.as_str());
+    assert_eq!(rox_link.rox_id.as_ref(), rox_user_id.as_str());
 
     let gmail_links: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM email_links WHERE macro_id = $1 AND provider = 'GMAIL'",
+        "SELECT count(*) FROM email_links WHERE rox_id = $1 AND provider = 'GMAIL'",
     )
-    .bind(&macro_user_id)
+    .bind(&rox_user_id)
     .fetch_one(&pool)
     .await
     .unwrap();
@@ -139,14 +139,14 @@ async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(po
     );
 }
 
-/// One primary `email_links` row per `macro_id`, enforced by both the migration's
+/// One primary `email_links` row per `rox_id`, enforced by both the migration's
 /// trigger and its partial unique index: the account's Rox mailbox takes primary
 /// from a legacy Gmail row, and an account with no Rox row keeps the legacy row
 /// primary so the pre-deployment value survives. Every insert here omits
 /// `is_primary`, the way old writers do, so the trigger decides the fact.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_primary_link_per_account_after_the_rox_rollout(pool: PgPool) {
-    use macro_user_id::handle::ROX_MAIL_DOMAIN;
+    use rox_user_id::handle::ROX_MAIL_DOMAIN;
 
     // Placeholders are assembled from the domain constant and a local example
     // domain so the source carries no address literals.
@@ -161,7 +161,7 @@ async fn one_primary_link_per_account_after_the_rox_rollout(pool: PgPool) {
     let gmail_link_id = Uuid::now_v7();
     let legacy_link_id = Uuid::now_v7();
 
-    for (id, macro_id, address, provider) in [
+    for (id, rox_id, address, provider) in [
         (rox_link_id, with_rox.as_str(), rox_address.as_str(), "ROX"),
         (
             gmail_link_id,
@@ -177,11 +177,11 @@ async fn one_primary_link_per_account_after_the_rox_rollout(pool: PgPool) {
         ),
     ] {
         sqlx::query(
-            "INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+            "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
              VALUES ($1, $2, $3, $4, $5::email_user_provider_enum)",
         )
         .bind(id)
-        .bind(macro_id)
+        .bind(rox_id)
         .bind(&fusionauth_user_id)
         .bind(address)
         .bind(provider)
@@ -191,7 +191,7 @@ async fn one_primary_link_per_account_after_the_rox_rollout(pool: PgPool) {
     }
 
     let primaries: Vec<Uuid> =
-        sqlx::query_scalar("SELECT id FROM email_links WHERE macro_id = $1 AND is_primary")
+        sqlx::query_scalar("SELECT id FROM email_links WHERE rox_id = $1 AND is_primary")
             .bind(with_rox)
             .fetch_all(&pool)
             .await
@@ -199,7 +199,7 @@ async fn one_primary_link_per_account_after_the_rox_rollout(pool: PgPool) {
     assert_eq!(primaries, vec![rox_link_id]);
 
     let legacy_primaries: Vec<Uuid> =
-        sqlx::query_scalar("SELECT id FROM email_links WHERE macro_id = $1 AND is_primary")
+        sqlx::query_scalar("SELECT id FROM email_links WHERE rox_id = $1 AND is_primary")
             .bind(without_rox)
             .fetch_all(&pool)
             .await
@@ -242,7 +242,7 @@ async fn already_initialized_is_a_coded_400() {
 fn gmail_import_is_not_primary() {
     let link = new_gmail_link(
         Uuid::now_v7().to_string(),
-        MacroUserIdStr::try_from("macro|ada@example.com".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|ada@example.com".to_owned()).unwrap(),
         "ada@gmail.example".to_owned(),
     )
     .unwrap();
@@ -307,7 +307,7 @@ fn only_shared_inbox_conflict_keeps_the_in_progress_link() {
     let should_clean_up_in_progress_link = |error: &InitError| error.should_cleanup_attempt();
     // SharedInboxConflict is held open for the force_share retry, so its row must be kept;
     // every other terminal failure must clean up the row so it stops counting toward the
-    // /link/gmail start cap. The delete itself is covered by macro_db_client's own tests.
+    // /link/gmail start cap. The delete itself is covered by rox_db_client's own tests.
     assert!(
         !should_clean_up_in_progress_link(&InitError::SharedInboxConflict {
             email_address: "shared@example.com".to_string(),

@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use entity_access::domain::models::{
     Entity, EntityAccessReceipt, EntityPermission, EntityType, TeamRole,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use system_properties::StageOption;
 
 use super::*;
@@ -196,7 +196,7 @@ fn service(
 }
 
 fn receipt_with_role(role: TeamRole) -> CrmTeamReceipt<MemberTeamRole> {
-    let user = MacroUserIdStr::parse_from_str("macro|user@example.com")
+    let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
         .unwrap()
         .into_owned();
     CrmTeamReceipt::from_team_receipt(

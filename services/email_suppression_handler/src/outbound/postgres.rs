@@ -12,6 +12,6 @@ impl PostgresSuppressionStore {
 
 impl SuppressionStore for PostgresSuppressionStore {
     async fn bulk_upsert_block_email(&self, emails: &[&str]) -> anyhow::Result<()> {
-        macro_db_client::blocked_email::bulk_upsert_block_email(&self.db, emails).await
+        rox_db_client::blocked_email::bulk_upsert_block_email(&self.db, emails).await
     }
 }

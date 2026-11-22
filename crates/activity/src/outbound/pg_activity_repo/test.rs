@@ -1,6 +1,6 @@
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -10,7 +10,7 @@ use crate::domain::ports::EntityActivityReads;
 mod teammate_feed;
 mod transaction;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sdk_verb_survives_activity_storage_and_read(pool: PgPool) {
     let correlation = Uuid::now_v7();
     let activity = agent_correlation::context::scope_with_verb(
@@ -50,15 +50,15 @@ async fn sdk_verb_survives_activity_storage_and_read(pool: PgPool) {
     );
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn nz(limit: u32) -> NonZeroU32 {
     NonZeroU32::new(limit).expect("non-zero test limit")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn entity_history_cursor_is_stable_and_scoped_to_one_entity(
     pool: PgPool,
 ) -> Result<(), sqlx::Error> {
@@ -104,7 +104,7 @@ fn seed(source_event: u128, action: CommonAction, entity_id: &str) -> Activity {
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inserts_activities_with_split_action_columns(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
 
@@ -130,7 +130,7 @@ async fn inserts_activities_with_split_action_columns(pool: PgPool) {
     assert_eq!(row.entity_id, "doc-1");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replayed_activities_are_absorbed_by_the_id_conflict(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let seed_activity = seed(2, CommonAction::Edited, "doc-2");
@@ -149,7 +149,7 @@ async fn replayed_activities_are_absorbed_by_the_id_conflict(pool: PgPool) {
     assert_eq!(count, Some(1));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn purge_removes_only_that_entitys_activities(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     repo.insert_activities(&[
@@ -226,7 +226,7 @@ fn seed_for_subject_at(
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_feed_pages_by_keyset_newest_first(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let t = base_time();
@@ -278,7 +278,7 @@ async fn subject_feed_pages_by_keyset_newest_first(pool: PgPool) {
     assert_eq!(other.next, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_feed_breaks_timestamp_ties_by_id(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let t = base_time();
@@ -317,7 +317,7 @@ async fn subject_feed_breaks_timestamp_ties_by_id(pool: PgPool) {
     assert_eq!(fetched_ids, expected_ids);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_activity_range_filters_half_open_interval_and_subject(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let from = base_time();
@@ -365,7 +365,7 @@ async fn subject_activity_range_filters_half_open_interval_and_subject(pool: PgP
     assert!(!range.truncated);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_activity_range_reports_truncation(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let from = base_time();
@@ -397,7 +397,7 @@ async fn subject_activity_range_reports_truncation(pool: PgPool) {
     assert!(range.truncated);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn entity_activity_batches_with_a_per_entity_limit(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let t = base_time();
@@ -444,7 +444,7 @@ async fn entity_activity_batches_with_a_per_entity_limit(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn appearance_changes_remain_in_entity_history_but_not_personal_feeds(pool: PgPool) {
     let repo = PgActivityRepo::new(pool);
     let change = crate::AppearanceChange {
@@ -480,7 +480,7 @@ async fn appearance_changes_remain_in_entity_history_but_not_personal_feeds(pool
     assert!(feed.records.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rows_written_by_a_newer_vocabulary_read_as_unknown(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     sqlx::query!(
@@ -513,7 +513,7 @@ async fn rows_written_by_a_newer_vocabulary_read_as_unknown(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn corrupt_rows_are_skipped_not_page_failures(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     // An actor without a recognizable principal prefix is unrepresentable in
@@ -549,7 +549,7 @@ async fn corrupt_rows_are_skipped_not_page_failures(pool: PgPool) {
     assert_eq!(feed.records[0].entity_id, "doc-fine");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_corrupt_row_shrinks_the_page_but_never_ends_pagination(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let t = base_time();
@@ -598,7 +598,7 @@ async fn a_corrupt_row_shrinks_the_page_but_never_ends_pagination(pool: PgPool) 
     assert_eq!(second.next, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_overview_filters_subject_and_window_and_orders_sparse_aggregates(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let subject = "macro|overview@example.com";
@@ -687,7 +687,7 @@ async fn subject_overview_filters_subject_and_window_and_orders_sparse_aggregate
     assert_eq!(empty.total(), 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_overview_buckets_fifteen_minute_rows_across_havana_midnights(pool: PgPool) {
     let repo = PgActivityRepo::new(pool);
     let subject = "macro|havana@example.com";
@@ -745,7 +745,7 @@ async fn subject_overview_buckets_fifteen_minute_rows_across_havana_midnights(po
     assert_eq!(total, 18);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_overview_ranks_known_entities_when_unknown_type_outcounts_them(pool: PgPool) {
     let repo = PgActivityRepo::new(pool.clone());
     let subject = "macro|rank-unknown@example.com";
@@ -803,7 +803,7 @@ async fn subject_overview_ranks_known_entities_when_unknown_type_outcounts_them(
     assert_eq!(ranked, expected);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subject_overview_includes_first_havana_midnight_when_window_starts_on_fallback(
     pool: PgPool,
 ) {
@@ -871,7 +871,7 @@ async fn subject_overview_includes_first_havana_midnight_when_window_starts_on_f
     assert_eq!(ending_on_fallback.total(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn timeline_filters_parents_actions_and_pages_both_directions(pool: PgPool) {
     use crate::domain::timeline::{ActivityTimeline, ActivityTimelineQuery, TimelineSelection};
     let repo = PgActivityRepo::new(pool);
@@ -949,7 +949,7 @@ async fn timeline_filters_parents_actions_and_pages_both_directions(pool: PgPool
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn timeline_properties_narrow_property_changes_in_storage(pool: PgPool) {
     use crate::domain::timeline::{ActivityTimeline, ActivityTimelineQuery, TimelineSelection};
     const STATUS: Uuid = Uuid::from_u128(1);
@@ -1009,7 +1009,7 @@ async fn timeline_properties_narrow_property_changes_in_storage(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn timeline_index_skips_exactly_the_unindexed_actions(pool: PgPool) {
     use crate::domain::timeline::UNINDEXED_TIMELINE_ACTIONS;
     let predicate: String = sqlx::query_scalar(
@@ -1031,7 +1031,7 @@ async fn timeline_index_skips_exactly_the_unindexed_actions(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn session_activity_preserves_invocations_and_paginates_without_entity_grants(pool: PgPool) {
     use crate::domain::ports::AgentActivityReads;
     let session = Uuid::now_v7();
@@ -1129,7 +1129,7 @@ async fn session_activity_preserves_invocations_and_paginates_without_entity_gra
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn session_activity_is_stamped_on_insert_and_leaves_out_reads(pool: PgPool) {
     use crate::domain::ports::AgentActivityReads;
     let session = Uuid::now_v7();

@@ -12,31 +12,31 @@ fn the_example_config_parses() {
 }
 
 #[test]
-fn macro_defaults_to_production() {
+fn rox_defaults_to_production() {
     let config: Config = toml::from_str(DEFAULT).expect("default config parses");
     assert_eq!(
-        config.macro_api.api_url,
+        config.rox_api.api_url,
         "https://gateway.rox.one/agent-harness"
     );
     assert_eq!(
-        config.macro_api.storage_url,
+        config.rox_api.storage_url,
         "https://gateway.rox.one/dss"
     );
-    assert_eq!(config.macro_api.web_url, "https://rox.one/app");
+    assert_eq!(config.rox_api.web_url, "https://rox.one/app");
     assert!(config.harness.args.contains(&"acp".to_owned()));
 }
 
 #[test]
-fn a_partial_macro_table_overrides_only_its_keys() {
+fn a_partial_rox_table_overrides_only_its_keys() {
     let config: Config = toml::from_str(&format!(
         "{DEFAULT}\n[macro]\nweb_url = \"http://localhost:3000/app\"\n"
     ))
     .expect("partial macro table parses");
     assert_eq!(
-        config.macro_api.api_url,
+        config.rox_api.api_url,
         "https://gateway.rox.one/agent-harness"
     );
-    assert_eq!(config.macro_api.web_url, "http://localhost:3000/app");
+    assert_eq!(config.rox_api.web_url, "http://localhost:3000/app");
 }
 
 #[test]
@@ -112,8 +112,8 @@ fn unknown_fields_are_rejected() {
     let with_typo = EXAMPLE.replace("repo_url", "repo_uri");
     assert!(toml::from_str::<Config>(&with_typo).is_err());
 
-    let macro_typo = format!("{DEFAULT}\n[macro]\napi_uri = \"http://localhost\"\n");
-    assert!(toml::from_str::<Config>(&macro_typo).is_err());
+    let rox_typo = format!("{DEFAULT}\n[macro]\napi_uri = \"http://localhost\"\n");
+    assert!(toml::from_str::<Config>(&rox_typo).is_err());
 }
 
 #[test]
@@ -152,7 +152,7 @@ fn harness_env_is_optional() {
 
 #[test]
 fn the_gateway_url_is_the_api_base_with_a_websocket_scheme() {
-    let local = MacroApi {
+    let local = RoxApi {
         egress_url: None,
         api_url: "http://localhost:50009/agent-harness".to_owned(),
         storage_url: "http://localhost:50009/dss".to_owned(),
@@ -163,7 +163,7 @@ fn the_gateway_url_is_the_api_base_with_a_websocket_scheme() {
         "ws://localhost:50009/agent-harness/runtime/ws",
     );
 
-    let secure = MacroApi {
+    let secure = RoxApi {
         egress_url: None,
         api_url: "https://gateway.rox.one/agent-harness/".to_owned(),
         storage_url: "https://gateway.rox.one/dss".to_owned(),

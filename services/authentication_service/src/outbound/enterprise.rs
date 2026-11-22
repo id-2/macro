@@ -12,10 +12,10 @@ use harnesses::{
     domain::{models::HarnessOwner, ports::HarnessRepo},
     outbound::pg_harness_repo::PgHarnessRepo,
 };
-use macro_auth::middleware::decode_jwt::{
-    JwtValidationArgs, decode_macro_access_token_allow_expired,
+use rox_auth::middleware::decode_jwt::{
+    JwtValidationArgs, decode_rox_access_token_allow_expired,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use std::sync::Arc;
 use teams::{domain::team_repo::TeamRepository, outbound::team_repo::TeamRepositoryImpl};
@@ -26,7 +26,7 @@ use uuid::Uuid;
 pub struct EnterpriseTeams(TeamRepositoryImpl);
 
 impl TeamDirectory for EnterpriseTeams {
-    async fn team_ids(&self, user: MacroUserIdStr<'static>) -> Result<Vec<Uuid>> {
+    async fn team_ids(&self, user: RoxUserIdStr<'static>) -> Result<Vec<Uuid>> {
         self.0
             .get_user_teams(&user)
             .await
@@ -60,9 +60,9 @@ impl UserLifecycle for FusionAuthLifecycle {
 pub struct PgMemberDirectory(PgPool);
 
 impl MemberDirectory for PgMemberDirectory {
-    async fn fusion_user_id(&self, user: &MacroUserIdStr<'_>) -> Result<String> {
+    async fn fusion_user_id(&self, user: &RoxUserIdStr<'_>) -> Result<String> {
         let fusion_user_id = sqlx::query_scalar!(
-            r#"SELECT u.id FROM "User" u JOIN macro_user m ON m.id = u.macro_user_id WHERE lower(m.email) = lower($1)"#,
+            r#"SELECT u.id FROM "User" u JOIN macro_user m ON m.id = u.rox_user_id WHERE lower(m.email) = lower($1)"#,
             user.email_str(),
         )
         .fetch_optional(&self.0)
@@ -77,7 +77,7 @@ impl MemberDirectory for PgMemberDirectory {
 pub struct ServerHarnessRevocation(PgHarnessRepo);
 
 impl HarnessRevoker for ServerHarnessRevocation {
-    async fn revoke_server_records(&self, member: &MacroUserIdStr<'_>) -> Result<usize> {
+    async fn revoke_server_records(&self, member: &RoxUserIdStr<'_>) -> Result<usize> {
         let harnesses = self
             .0
             .list_directory_harnesses(member.clone().into_owned())
@@ -145,9 +145,9 @@ impl fusionauth::LoginAudit for EnterpriseLoginAudit {
                     message: "login audit unavailable".into(),
                 })
             };
-            let decoded = decode_macro_access_token_allow_expired(access_token, &self.jwt_args)
+            let decoded = decode_rox_access_token_allow_expired(access_token, &self.jwt_args)
                 .map_err(|_| failure())?;
-            let actor = MacroUserIdStr::parse_from_str(decoded.as_ref()).map_err(|_| failure())?;
+            let actor = RoxUserIdStr::parse_from_str(decoded.as_ref()).map_err(|_| failure())?;
             self.enterprise
                 .record_login(&actor)
                 .await

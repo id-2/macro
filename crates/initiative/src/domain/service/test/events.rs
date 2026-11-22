@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::events::{InitiativeEventPublisher, InitiativeMacroEvent, InitiativeTopicEvent};
-use macro_event_broker::MacroEvent;
+use rox_event_broker::RoxEvent;
 use std::{
     future::Future,
     pin::Pin,
@@ -20,7 +20,7 @@ async fn attributed_creation_preserves_the_bot_and_delegating_owner() {
         .return_once(|_, _, _| Box::pin(async { Ok(detail(Vec::new())) }));
     let events = Arc::new(Events::default());
     let attribution = activity::Attribution::delegated(
-        activity::Actor::new_from_bot(bot_id::MACRO_AI_BOT_ID),
+        activity::Actor::new_from_bot(bot_id::ROX_AI_BOT_ID),
         user(OWNER),
     );
     service(repo)
@@ -48,7 +48,7 @@ async fn attributed_creation_rejects_mismatched_owner_before_creating_anything()
     for attribution in [
         activity::Attribution::direct(activity::Actor::new_from_user(user(OTHER))),
         activity::Attribution::delegated(
-            activity::Actor::new_from_bot(bot_id::MACRO_AI_BOT_ID),
+            activity::Actor::new_from_bot(bot_id::ROX_AI_BOT_ID),
             user(OTHER),
         ),
         activity::Attribution::delegated(activity::Actor::new_from_user(user(OWNER)), user(OWNER)),

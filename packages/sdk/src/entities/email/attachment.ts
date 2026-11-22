@@ -1,8 +1,8 @@
 import type { GetAttachmentResponses } from '../../../generated/email/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 
 /** The API's representation of an email attachment (`Attachment`). */
 export type EmailAttachmentData = GetAttachmentResponses[200]['attachment'];
@@ -11,7 +11,7 @@ export type EmailAttachmentData = GetAttachmentResponses[200]['attachment'];
  * A file attached to an email message. A thin handle keyed by attachment id;
  * the record loads lazily on first field access.
  */
-export class EmailAttachment extends MacroEntity<EmailAttachmentData> {
+export class EmailAttachment extends RoxEntity<EmailAttachmentData> {
   protected async fetch(): Promise<EmailAttachmentData> {
     const { attachment } = unwrap(
       await this.client.email.getAttachment({ path: { id: this.id } }),
@@ -20,12 +20,12 @@ export class EmailAttachment extends MacroEntity<EmailAttachmentData> {
   }
 
   /** A handle to an attachment by id. Fields load on first access. */
-  static byId(client: MacroClient, id: string): EmailAttachment {
+  static byId(client: RoxClient, id: string): EmailAttachment {
     return new EmailAttachment(client, id);
   }
 
   /** Build an attachment from an already-fetched record (pre-seeded, no fetch). */
-  static from(client: MacroClient, data: EmailAttachmentData): EmailAttachment {
+  static from(client: RoxClient, data: EmailAttachmentData): EmailAttachment {
     return new EmailAttachment(client, data.db_id, data);
   }
 

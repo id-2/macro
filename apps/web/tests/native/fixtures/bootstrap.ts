@@ -4,7 +4,7 @@ import { accounts, EMAIL, identity, USER_ID } from './mail';
 
 const link: Link = {
   id: accounts[0].id,
-  macro_id: USER_ID,
+  rox_id: USER_ID,
   email_address: EMAIL,
   fusionauth_user_id: 'fixture-user',
   is_primary: true,

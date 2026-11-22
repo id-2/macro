@@ -3,13 +3,13 @@
 //! overrides from the process environment.
 
 use database_env_vars::DatabaseUrl;
-use macro_env::Environment;
+use rox_env::Environment;
 
 #[cfg(test)]
 mod test;
 
 /// Settings supplied by the deployment.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// RoxDB URL. It must reach the database instance, not RDS Proxy: the

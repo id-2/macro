@@ -7,7 +7,7 @@
 import type { SoupCallRecordParticipantLeftAt } from './soupCallRecordParticipantLeftAt';
 
 /**
- * A Macro-account participant in a call record, as displayed in Soup.
+ * A Rox-account participant in a call record, as displayed in Soup.
  */
 export interface SoupCallRecordParticipant {
   /** When the user joined the call. */

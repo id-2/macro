@@ -5,8 +5,8 @@ use ai_usage::domain::financial::*;
 use ai_usage::domain::financial_service::validate_final_record;
 use ai_usage::domain::ports::FinancialFuture;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sqlx::{PgConnection, PgPool, types::Json};
@@ -127,9 +127,9 @@ async fn read_period(
     ).fetch_optional(conn).await?;
     row.map(|r| {
         Ok(FundingPeriod {
-            seat: MacroUserIdStr::try_from(r.user_id)
+            seat: RoxUserIdStr::try_from(r.user_id)
                 .map_err(|_| FinancialError::InvalidIdentifier)?,
-            payer: MacroUserIdStr::try_from(r.payer_id)
+            payer: RoxUserIdStr::try_from(r.payer_id)
                 .map_err(|_| FinancialError::InvalidIdentifier)?,
             subscription: FundingSubscription::new(r.subscription_id)?,
             period: BillingPeriod {
@@ -255,7 +255,7 @@ impl PgFundingRepo {
 impl FundingRepo for PgFundingRepo {
     fn period(
         &self,
-        seat: MacroUserIdStr<'static>,
+        seat: RoxUserIdStr<'static>,
         at: DateTime<Utc>,
     ) -> FinancialFuture<'_, Option<FundingPeriod>> {
         Box::pin(
@@ -471,7 +471,7 @@ impl FundingRepo for PgFundingRepo {
     fn allocation(&self, id: InvocationId) -> FinancialFuture<'_, Option<UsageAllocation>> {
         Box::pin(async move {
             let row = sqlx::query!(
-                "SELECT included_public, extra_public, prepaid, reclaimed_prepaid, postpaid, macro_absorbed
+                "SELECT included_public, extra_public, prepaid, reclaimed_prepaid, postpaid, rox_absorbed
                  FROM ai_funding_reservation WHERE invocation_id = $1 AND allocated", id.as_uuid(),
             ).fetch_optional(&self.pool).await?;
             row.map(|r| {
@@ -481,7 +481,7 @@ impl FundingRepo for PgFundingRepo {
                     prepaid: CustomerMoney::from_units(units(r.prepaid)?),
                     reclaimed_prepaid: CustomerMoney::from_units(units(r.reclaimed_prepaid)?),
                     postpaid: CustomerMoney::from_units(units(r.postpaid)?),
-                    macro_absorbed: CustomerMoney::from_units(units(r.macro_absorbed)?),
+                    rox_absorbed: CustomerMoney::from_units(units(r.rox_absorbed)?),
                 })
             })
             .transpose()
@@ -501,7 +501,7 @@ impl FundingRepo for PgFundingRepo {
         })
     }
 
-    fn reconcile(&self, payer: MacroUserIdStr<'static>) -> FinancialFuture<'_, ()> {
+    fn reconcile(&self, payer: RoxUserIdStr<'static>) -> FinancialFuture<'_, ()> {
         Box::pin(async move {
             let mut tx = self.pool.begin().await?;
             lock_payer(&mut tx, payer.as_ref()).await?;
@@ -619,7 +619,7 @@ async fn reconcile_locked(
             sqlx::query!(
                 "INSERT INTO ai_credit_ledger (id, user_id, kind, delta_cents, period_start, funding_invocation_id, note)
                  VALUES ($1, $2, 'consumption', $3, $4, $5, 'Authorized public-rate AI usage') ON CONFLICT (funding_invocation_id) DO NOTHING",
-                macro_uuid::generate_uuid_v7(), payer, -debit, row.period_start, row.invocation_id,
+                rox_uuid::generate_uuid_v7(), payer, -debit, row.period_start, row.invocation_id,
             ).execute(&mut *conn).await?;
         }
         let mut reclaim = db_units(allocation.reclaimed_prepaid.units())?;
@@ -648,10 +648,10 @@ async fn reconcile_locked(
         }
         sqlx::query!(
             "UPDATE ai_funding_reservation SET allocated = TRUE, included_public = $2, extra_public = $3,
-             prepaid = $4, reclaimed_prepaid = $5, postpaid = $6, macro_absorbed = $7 WHERE invocation_id = $1",
+             prepaid = $4, reclaimed_prepaid = $5, postpaid = $6, rox_absorbed = $7 WHERE invocation_id = $1",
             row.invocation_id, db_units(allocation.included_public.units())?, db_units(allocation.extra_public.units())?,
             db_units(allocation.prepaid.units())?, db_units(allocation.reclaimed_prepaid.units())?,
-            db_units(allocation.postpaid.units())?, db_units(allocation.macro_absorbed.units())?,
+            db_units(allocation.postpaid.units())?, db_units(allocation.rox_absorbed.units())?,
         ).execute(&mut *conn).await?;
         sqlx::query!("UPDATE ai_funding_state SET watermark = watermark + 1, prepaid_remainder = $2 WHERE user_id = $1", payer, db_units(remainder.units())?)
             .execute(&mut *conn).await?;
@@ -748,9 +748,9 @@ impl AdmissionData {
             AuthorizationSnapshot {
                 id: self.id.try_into()?,
                 invocation_id: self.invocation_id.try_into()?,
-                payer: MacroUserIdStr::try_from(self.payer.clone())
+                payer: RoxUserIdStr::try_from(self.payer.clone())
                     .map_err(|_| FinancialError::InvalidIdentifier)?,
-                seat: MacroUserIdStr::try_from(self.seat.clone())
+                seat: RoxUserIdStr::try_from(self.seat.clone())
                     .map_err(|_| FinancialError::InvalidIdentifier)?,
                 period: BillingPeriod {
                     start: self.start,

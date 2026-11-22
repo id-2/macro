@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 use super::{
@@ -27,7 +27,7 @@ async fn documents_with_sha(pool: &Pool<Postgres>, sha: &str) -> i64 {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn import_of_deleted_attachment_is_not_found_and_creates_nothing(pool: Pool<Postgres>) {
@@ -51,7 +51,7 @@ async fn import_of_deleted_attachment_is_not_found_and_creates_nothing(pool: Poo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn sha_reuse_of_deleted_attachment_is_not_found_and_keeps_existing_links(
@@ -95,7 +95,7 @@ async fn sha_reuse_of_deleted_attachment_is_not_found_and_keeps_existing_links(
 /// that reaches the attachment first waits on the delete's row lock, and one
 /// that reaches it later finds the row gone.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_test_data"))
 )]
 async fn message_deleted_during_import_is_not_found_and_rolls_back(pool: Pool<Postgres>) {

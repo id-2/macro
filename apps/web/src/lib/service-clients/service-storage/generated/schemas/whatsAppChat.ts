@@ -20,7 +20,7 @@ export interface WhatsAppChat {
   added?: WhatsAppChatAdded;
   /** Archived in WhatsApp. */
   archived: boolean;
-  /** "Add to Macro" works now. */
+  /** "Add to Rox" works now. */
   canAdd: boolean;
   cannotAddReason?: WhatsAppChatCannotAddReason;
   community?: WhatsAppChatCommunity;

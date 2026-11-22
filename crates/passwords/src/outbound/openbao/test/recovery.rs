@@ -3,7 +3,7 @@ use crate::{
     domain::{ports::Repository, service::PasswordService},
     outbound::postgres::PgRepository,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
@@ -147,7 +147,7 @@ async fn forward(
     client.write_all(&response).await
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 #[ignore = "requires explicit disposable local OpenBao and bootstrap signing key"]
 #[expect(
     clippy::disallowed_methods,
@@ -182,17 +182,17 @@ async fn accepted_create_survives_postwrite_lookup_interruption_and_same_operati
             .success()
     );
     let owner = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|enrollment@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|enrollment@example.test")
             .expect("synthetic identity")
             .into_owned(),
     };
-    let macro_user_id = uuid::Uuid::now_v7();
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,'enrollment@example.test','enrollment@example.test',$2)",macro_user_id,format!("fixture-{macro_user_id}"))
+    let rox_user_id = uuid::Uuid::now_v7();
+    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,'enrollment@example.test','enrollment@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}"))
         .execute(&pool).await.expect("fixture account");
     sqlx::query!(
-        r#"INSERT INTO "User"(id,email,macro_user_id) VALUES ($1,'enrollment@example.test',$2)"#,
+        r#"INSERT INTO "User"(id,email,rox_user_id) VALUES ($1,'enrollment@example.test',$2)"#,
         owner.user_id.as_ref(),
-        macro_user_id
+        rox_user_id
     )
     .execute(&pool)
     .await

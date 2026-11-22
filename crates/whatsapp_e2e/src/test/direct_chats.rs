@@ -1,5 +1,5 @@
 //! Direct chats end to end: added from the chat list, earlier messages
-//! imported from the phone, both sides live, sends from Macro, addressing by
+//! imported from the phone, both sides live, sends from Rox, addressing by
 //! phone number or LID landing in the same chat, and shared viewers reading
 //! without sending.
 
@@ -26,7 +26,7 @@ async fn listed_customer_chat(world: &World) -> whatsapp_linked::domain::models:
         .await
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_direct_chat_imports_its_history_and_works_both_ways(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;

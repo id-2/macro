@@ -12,7 +12,7 @@ use crate::domain::{
     models::{EmailErr, Link, ResolvedSendingInbox, SendingInboxRequest, UserProvider},
     ports::EmailRepo,
 };
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 
 use super::EmailServiceImpl;
 
@@ -26,12 +26,12 @@ where
 {
     pub(crate) async fn resolve_sending_inbox_impl(
         &self,
-        macro_id: MacroUserIdStr<'_>,
+        rox_id: RoxUserIdStr<'_>,
         request: SendingInboxRequest<'_>,
     ) -> Result<ResolvedSendingInbox, EmailErr> {
         let accessible_inboxes = self
             .email_repo
-            .inboxes_for_macro_id(macro_id.clone())
+            .inboxes_for_rox_id(rox_id.clone())
             .await
             .map_err(anyhow::Error::from)?;
 
@@ -39,11 +39,11 @@ where
             // An explicit choice is honoured or refused, never quietly
             // replaced: silently sending from a different address than the
             // one the caller named is the bug this whole module exists for.
-            Some(address) => match inbox_by_address(&accessible_inboxes, &macro_id, address) {
+            Some(address) => match inbox_by_address(&accessible_inboxes, &rox_id, address) {
                 Some(inbox) => (inbox, None),
                 None => {
                     let (inbox, alias) = self
-                        .inbox_with_alias(&accessible_inboxes, &macro_id, address)
+                        .inbox_with_alias(&accessible_inboxes, &rox_id, address)
                         .await?;
                     (inbox, Some(alias))
                 }
@@ -57,7 +57,7 @@ where
                     None => None,
                 };
                 let inbox = from_reply_target
-                    .or_else(|| default_inbox(&accessible_inboxes, &macro_id))
+                    .or_else(|| default_inbox(&accessible_inboxes, &rox_id))
                     .ok_or(EmailErr::InboxNotFound)?;
                 (inbox, None)
             }
@@ -89,7 +89,7 @@ where
     async fn inbox_with_alias(
         &self,
         inboxes: &[Link],
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         address: &str,
     ) -> Result<(usize, EmailStr<'static>), EmailErr> {
         let mut owned_first: Vec<(usize, &Link)> = inboxes
@@ -97,7 +97,7 @@ where
             .enumerate()
             .filter(|(_, inbox)| inbox.provider == UserProvider::Gmail)
             .collect();
-        owned_first.sort_by_key(|(_, inbox)| inbox.macro_id.as_ref() != caller.as_ref());
+        owned_first.sort_by_key(|(_, inbox)| inbox.rox_id.as_ref() != caller.as_ref());
 
         let mut unverified_in = None;
         let mut lookup_failures = 0_u32;
@@ -179,11 +179,11 @@ fn requested_address(requested: Option<&str>) -> Option<&str> {
 /// domains treat addresses. An inbox the caller owns wins over one delegated
 /// to them, so an address reachable through two accounts resolves to the
 /// same one every time instead of by row order.
-fn inbox_by_address(inboxes: &[Link], caller: &MacroUserIdStr<'_>, address: &str) -> Option<usize> {
+fn inbox_by_address(inboxes: &[Link], caller: &RoxUserIdStr<'_>, address: &str) -> Option<usize> {
     let at_address = |inbox: &&Link| inbox.email_address.0.as_ref().eq_ignore_ascii_case(address);
     inboxes
         .iter()
-        .position(|inbox| at_address(&inbox) && inbox.macro_id.as_ref() == caller.as_ref())
+        .position(|inbox| at_address(&inbox) && inbox.rox_id.as_ref() == caller.as_ref())
         .or_else(|| inboxes.iter().position(|inbox| at_address(&inbox)))
 }
 
@@ -192,8 +192,8 @@ fn inbox_by_address(inboxes: &[Link], caller: &MacroUserIdStr<'_>, address: &str
 /// reach. A delegated inbox is `is_primary` for *its* owner, so the macro-id
 /// guard is what keeps a teammate's mailbox from becoming the caller's
 /// default sender.
-fn default_inbox(inboxes: &[Link], caller: &MacroUserIdStr<'_>) -> Option<usize> {
-    let owned = |inbox: &Link| inbox.macro_id.as_ref() == caller.as_ref();
+fn default_inbox(inboxes: &[Link], caller: &RoxUserIdStr<'_>) -> Option<usize> {
+    let owned = |inbox: &Link| inbox.rox_id.as_ref() == caller.as_ref();
     inboxes
         .iter()
         .position(|inbox| inbox.is_primary && owned(inbox))

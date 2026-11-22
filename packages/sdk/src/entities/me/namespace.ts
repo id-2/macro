@@ -1,5 +1,5 @@
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { StaticImage } from '../images/image';
 import type { ProfilePicture } from '../users/profile-picture';
 import { User } from '../users/user';
@@ -31,7 +31,7 @@ export interface UpdateMeOptions {
  * @routing Use when changing the user's own name or profile picture; not looking up other people (`macro.users`).
  */
 export class MeNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Upload an image to use as your profile picture. This only stores it; pass
@@ -61,7 +61,7 @@ export class MeNamespace {
       body: data,
     });
     if (!response.ok) {
-      throw new MacroError(`image upload failed with ${response.status}`);
+      throw new RoxError(`image upload failed with ${response.status}`);
     }
     return StaticImage.byId(this.client, file_id);
   }

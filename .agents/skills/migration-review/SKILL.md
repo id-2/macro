@@ -120,7 +120,7 @@ schema back. With the migration applied and the old code still running:
 
   ```sql
   BEGIN;
-  \i crates/macro_db_client/migrations/<file>.sql
+  \i crates/rox_db_client/migrations/<file>.sql
   SELECT relation::regclass, mode FROM pg_locks
   WHERE pid = pg_backend_pid() AND locktype = 'relation'
     AND mode NOT IN ('AccessShareLock', 'RowShareLock', 'RowExclusiveLock');

@@ -4,7 +4,7 @@ import type { Output } from '@pulumi/pulumi';
 import {
   BASE_DOMAIN,
   CLOUD_TRAIL_SNS_TOPIC_ARN,
-  MACRO_SUBDOMAIN_CERT,
+  ROX_SUBDOMAIN_CERT,
   stack,
 } from '../../../shared';
 import {
@@ -12,7 +12,7 @@ import {
   DEFAULT_TARGET_GROUP_HEALTH_CHECK,
 } from './ecs_deployment_defaults';
 
-type MacroApplicationLoadBalancerArgs = {
+type RoxApplicationLoadBalancerArgs = {
   // The sub domain for the application load balancer
   // This will be `${subDomain}.${BASE_DOMAIN}`
   subDomain: string;
@@ -43,7 +43,7 @@ type MacroApplicationLoadBalancerArgs = {
 /**
  * @description creates an application load balancer component.
  */
-export class MacroApplicationLoadBalancer extends pulumi.ComponentResource {
+export class RoxApplicationLoadBalancer extends pulumi.ComponentResource {
   tags: { [key: string]: string };
   loadbalancer_security_group: aws.ec2.SecurityGroup;
   load_balancer: aws.lb.LoadBalancer;
@@ -53,10 +53,10 @@ export class MacroApplicationLoadBalancer extends pulumi.ComponentResource {
   rejected_connections_alarm: aws.cloudwatch.MetricAlarm;
   constructor(
     name: string,
-    args: MacroApplicationLoadBalancerArgs,
+    args: RoxApplicationLoadBalancerArgs,
     opts?: pulumi.ComponentResourceOptions
   ) {
-    super('my:components:MacroApplicationLoadBalancer', name, {}, opts);
+    super('my:components:RoxApplicationLoadBalancer', name, {}, opts);
     const { tags, isInternal, vpc, idleTimeout, subDomain } = args;
 
     this.tags = tags;
@@ -131,7 +131,7 @@ export class MacroApplicationLoadBalancer extends pulumi.ComponentResource {
         port: 443,
         protocol: 'HTTPS',
         sslPolicy: 'ELBSecurityPolicy-TLS13-1-2-2021-06',
-        certificateArn: MACRO_SUBDOMAIN_CERT,
+        certificateArn: ROX_SUBDOMAIN_CERT,
         tags,
         defaultActions: [
           {
@@ -332,7 +332,7 @@ export function serviceLoadBalancer(
       port: 443,
       protocol: 'HTTPS',
       sslPolicy: 'ELBSecurityPolicy-TLS13-1-2-2021-06',
-      certificateArn: MACRO_SUBDOMAIN_CERT,
+      certificateArn: ROX_SUBDOMAIN_CERT,
       tags,
       defaultActions: [
         {

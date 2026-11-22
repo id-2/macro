@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { Macro } from '../src/macro';
-import { MacroApiError, MacroForbiddenError } from '../src/utils';
+import { RoxApiError, RoxForbiddenError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
 
@@ -92,7 +92,7 @@ describe('EntityAccess.request', () => {
   });
 });
 
-describe('MacroForbiddenError', () => {
+describe('RoxForbiddenError', () => {
   test('a refused write throws the forbidden error', async () => {
     globalThis.fetch = (async (_input) =>
       Response.json(
@@ -109,9 +109,9 @@ describe('MacroForbiddenError', () => {
       .rename('Renamed')
       .catch((e: unknown) => e);
 
-    expect(error).toBeInstanceOf(MacroForbiddenError);
-    expect(error).toBeInstanceOf(MacroApiError);
-    expect((error as MacroForbiddenError).status).toBe(403);
+    expect(error).toBeInstanceOf(RoxForbiddenError);
+    expect(error).toBeInstanceOf(RoxApiError);
+    expect((error as RoxForbiddenError).status).toBe(403);
     expect((error as Error).message).toBe('Rox API error 403: Access denied');
   });
 
@@ -128,8 +128,8 @@ describe('MacroForbiddenError', () => {
       .rename('Renamed')
       .catch((e: unknown) => e);
 
-    expect(error).toBeInstanceOf(MacroApiError);
-    expect(error).not.toBeInstanceOf(MacroForbiddenError);
+    expect(error).toBeInstanceOf(RoxApiError);
+    expect(error).not.toBeInstanceOf(RoxForbiddenError);
   });
 });
 

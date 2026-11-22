@@ -10,7 +10,7 @@ use import_tracker::domain::model::{
     Comment, Group, GroupKind, Inventory, Issue, ObjectId, TrackerConnections, TrackerError, User,
 };
 use import_tracker::outbound::pipedream::{Connections, Session};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::ports::{ConnectedAppProxy, ConnectionStore};
 use serde::de::DeserializeOwned;
 use serde_json::{Value, json};
@@ -146,7 +146,7 @@ impl<Store: ConnectionStore, Proxy: ConnectedAppProxy> TrackerConnections
     #[tracing::instrument(skip_all, err)]
     async fn inventory(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         progress: &(dyn Fn(usize, usize) + Send + Sync),
     ) -> Result<Inventory, TrackerError> {
         let client = Client(self.0.open(user).await?);

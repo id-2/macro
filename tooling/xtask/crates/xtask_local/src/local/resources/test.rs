@@ -54,11 +54,11 @@ fn slack_import_queues_match_deployment_and_have_redrive() {
 
     let main = QUEUES
         .iter()
-        .find(|queue| queue.name == macro_queues::SlackImportQueue::LOCAL)
+        .find(|queue| queue.name == rox_queues::SlackImportQueue::LOCAL)
         .unwrap();
     let dlq = QUEUES
         .iter()
-        .find(|queue| queue.name == macro_queues::SlackImportDlq::LOCAL)
+        .find(|queue| queue.name == rox_queues::SlackImportDlq::LOCAL)
         .unwrap();
     assert_eq!(main.name, "slack-import-queue");
     assert_eq!(dlq.name, "slack-import-dlq");
@@ -93,14 +93,14 @@ fn slack_import_queues_match_deployment_and_have_redrive() {
 fn webhook_fifo_queue_uses_a_full_url_override() {
     let queue = QUEUES
         .iter()
-        .find(|queue| queue.name == macro_queues::WebhookEventQueue::LOCAL)
+        .find(|queue| queue.name == rox_queues::WebhookEventQueue::LOCAL)
         .expect("webhook event queue is cataloged");
 
     assert!(queue.name.ends_with(".fifo"));
     assert_eq!(queue.bindings.len(), 1);
     assert_eq!(
         queue.bindings[0].0,
-        macro_queues::WebhookEventQueue::OVERRIDE_ENV_VAR_NAME
+        rox_queues::WebhookEventQueue::OVERRIDE_ENV_VAR_NAME
     );
     assert!(matches!(queue.bindings[0].1, QueueForm::Url));
     assert_eq!(

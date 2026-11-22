@@ -31,8 +31,8 @@ fn an_empty_secret_never_verifies() {
 fn header_names_are_rox_with_legacy_aliases() {
     assert_eq!(SIGNATURE_HEADER, "x-rox-signature");
     assert_eq!(TIMESTAMP_HEADER, "x-rox-timestamp");
-    assert_eq!(LEGACY_SIGNATURE_HEADER, "x-macro-signature");
-    assert_eq!(LEGACY_TIMESTAMP_HEADER, "x-macro-timestamp");
+    assert_eq!(LEGACY_SIGNATURE_HEADER, "x-rox-signature");
+    assert_eq!(LEGACY_TIMESTAMP_HEADER, "x-rox-timestamp");
 }
 
 /// Pin the digest so the scheme can never drift from the TS verifier

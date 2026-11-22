@@ -38,8 +38,8 @@ import { attributes, line, type Value } from "./attributes.ts";
 import type {
 	Attribute,
 	Attributes,
-	MacroSpan,
-	MacroTelemetry,
+	RoxSpan,
+	RoxTelemetry,
 } from "./framework.ts";
 import type { Sink, Spans } from "./index.ts";
 import type { WakeRecord } from "./record.ts";
@@ -67,14 +67,14 @@ export const macroTelemetry = ({
 	telemetry,
 }: {
 	/** `Telemetry` from `@macro-inc/observability`, already initialised. */
-	readonly telemetry: MacroTelemetry;
+	readonly telemetry: RoxTelemetry;
 }): {
 	readonly spans: Spans;
 	readonly sink: Sink;
 	/** Resolves once what is waiting has been sent, or given up on. For a process about to exit. */
 	readonly flush: () => Promise<void>;
 } => {
-	const open = new Map<string, MacroSpan>();
+	const open = new Map<string, RoxSpan>();
 
 	const log = (record: WakeRecord): void => {
 		const message = line(record);
@@ -87,7 +87,7 @@ export const macroTelemetry = ({
 
 	return {
 		spans: ({ wake, name, startedAtMs, parent }) => {
-			const start = (): MacroSpan =>
+			const start = (): RoxSpan =>
 				telemetry.span(name, { startTime: startedAtMs });
 			const span =
 				parent?.traceId === undefined || parent.spanId === undefined

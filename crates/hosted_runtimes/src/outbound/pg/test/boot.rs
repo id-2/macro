@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::lifecycle::ROXD_GRACE;
 use crate::domain::ports::InstanceStatus;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn boot_timeout_uses_durable_timer_and_refreshes_grace_after_downtime(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());

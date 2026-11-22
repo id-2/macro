@@ -4,7 +4,7 @@ use crate::domain::models::{LabelListVisibility, LabelType, MessageListVisibilit
 // ── get_label_by_id ─────────────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_get_label_by_id_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -28,7 +28,7 @@ async fn test_get_label_by_id_found(pool: Pool<Postgres>) -> anyhow::Result<()> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_get_label_by_id_user_label(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -48,7 +48,7 @@ async fn test_get_label_by_id_user_label(pool: Pool<Postgres>) -> anyhow::Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_get_label_by_id_wrong_link(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -64,7 +64,7 @@ async fn test_get_label_by_id_wrong_link(pool: Pool<Postgres>) -> anyhow::Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_get_label_by_id_not_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -81,7 +81,7 @@ async fn test_get_label_by_id_not_found(pool: Pool<Postgres>) -> anyhow::Result<
 // ── get_thread_label_messages ───────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_get_thread_label_messages(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -106,7 +106,7 @@ async fn test_get_thread_label_messages(pool: Pool<Postgres>) -> anyhow::Result<
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_get_thread_label_messages_empty_thread(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -125,7 +125,7 @@ async fn test_get_thread_label_messages_empty_thread(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_get_thread_label_messages_wrong_link(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -147,7 +147,7 @@ async fn test_get_thread_label_messages_wrong_link(pool: Pool<Postgres>) -> anyh
 // ── insert_message_labels_batch ─────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -175,7 +175,7 @@ async fn test_insert_message_labels_batch(pool: Pool<Postgres>) -> anyhow::Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -204,7 +204,7 @@ async fn test_insert_message_labels_batch_idempotent(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_insert_message_labels_batch_empty(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -221,7 +221,7 @@ async fn test_insert_message_labels_batch_empty(pool: Pool<Postgres>) -> anyhow:
 // ── delete_message_labels_batch ─────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -249,7 +249,7 @@ async fn test_delete_message_labels_batch(pool: Pool<Postgres>) -> anyhow::Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_delete_message_labels_batch_nonexistent(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -265,7 +265,7 @@ async fn test_delete_message_labels_batch_nonexistent(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_delete_message_labels_batch_empty(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -281,7 +281,7 @@ async fn test_delete_message_labels_batch_empty(pool: Pool<Postgres>) -> anyhow:
 // ── update_message_read_status_batch ────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -311,7 +311,7 @@ async fn test_update_message_read_status_batch_mark_read(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -336,7 +336,7 @@ async fn test_update_message_read_status_batch_wrong_link(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_update_message_read_status_batch_empty(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -352,7 +352,7 @@ async fn test_update_message_read_status_batch_empty(pool: Pool<Postgres>) -> an
 // ── update_thread_read_status ───────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -384,7 +384,7 @@ async fn test_update_thread_read_status_mark_read(pool: Pool<Postgres>) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -409,7 +409,7 @@ async fn test_update_thread_read_status_wrong_link(pool: Pool<Postgres>) -> anyh
 // ── update_message_starred_status_batch ─────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -434,7 +434,7 @@ async fn test_update_message_starred_status_batch_star(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -462,7 +462,7 @@ async fn test_update_message_starred_status_batch_unstar(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -490,7 +490,7 @@ async fn test_update_message_starred_status_batch_wrong_link(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_update_message_starred_status_batch_empty(

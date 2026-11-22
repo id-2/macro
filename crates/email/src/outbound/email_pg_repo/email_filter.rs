@@ -234,7 +234,7 @@ pub async fn resync_signal_flags_for_sender(
         link_id,
         email_address,
         email_domain,
-        email_utils::MACRO_NOTIFICATION_SENDER_DOMAIN,
+        email_utils::ROX_NOTIFICATION_SENDER_DOMAIN,
     )
     .execute(conn)
     .await?;

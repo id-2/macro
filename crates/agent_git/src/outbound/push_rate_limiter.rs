@@ -1,7 +1,7 @@
 //! Each repo's push budget, a token bucket in its `agent_repos` row, so every
 //! replica of the service draws from the same one.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use crate::domain::ports::PushRateLimiter;
@@ -29,7 +29,7 @@ impl PushRateLimiter for PgPushRateLimiter {
     #[tracing::instrument(name = "agent_git.push_budget", skip_all, fields(repo_id = %agent_credentials::telemetry_id(agent_user_id.as_ref()), allowed), err)]
     async fn try_acquire_push(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, sqlx::Error> {
         // One statement: refill by the time since the last refill, then take a
         // token if there is a whole one. A missing row takes nothing.

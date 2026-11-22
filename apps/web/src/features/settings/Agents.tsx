@@ -12,11 +12,11 @@ import { modelLabel } from '@core/component/AI/constant/model-label';
 import { toast } from '@core/component/Toast/Toast';
 import { ENABLE_AGENT_DMS } from '@core/constant/featureFlags';
 import {
-  MACRO_AGENT_BOT_ID,
-  MACRO_AGENT_NAME,
-  MACRO_HARNESS_NAME,
+  ROX_AGENT_BOT_ID,
+  ROX_AGENT_NAME,
+  ROX_HARNESS_NAME,
 } from '@core/constant/macroAgent';
-import { MACRO_NEW_BOT_ID } from '@core/constant/macroNew';
+import { ROX_NEW_BOT_ID } from '@core/constant/macroNew';
 import { useChannelsContext } from '@core/context/channels';
 import { useUserId } from '@core/context/user';
 import { usePipedreamMcpFlag } from '@core/pipedream/flag';
@@ -141,18 +141,18 @@ type ChannelOption = ReturnType<typeof botAssignableChannelOptions>[number];
 
 const IN_MEMORY_HARNESS: ConnectedHarness = {
   id: 'in-memory',
-  name: MACRO_HARNESS_NAME,
+  name: ROX_HARNESS_NAME,
   kind: 'builtin',
   allowPermissionBypass: true,
   target: { harness: 'in-memory' },
 };
 
-const MACRO_AGENT: AgentSummary = {
-  id: MACRO_AGENT_BOT_ID,
-  name: MACRO_AGENT_NAME,
+const ROX_AGENT: AgentSummary = {
+  id: ROX_AGENT_BOT_ID,
+  name: ROX_AGENT_NAME,
   tag: 'macro',
   instructions: '',
-  whereItRuns: `In ${MACRO_AGENT_NAME}`,
+  whereItRuns: `In ${ROX_AGENT_NAME}`,
   defaultModel: MODEL_PRETTYNAME[Model.sonnet55],
   channelSummary: 'All channels',
   share: 'Team',
@@ -168,7 +168,7 @@ export function Agents(props: {
 }) {
   const agentDm = ENABLE_AGENT_DMS ? useOpenAgentDm() : undefined;
   const messageAgent = (id: string) =>
-    agentDm?.open(id === MACRO_AGENT_BOT_ID ? MACRO_NEW_BOT_ID : id);
+    agentDm?.open(id === ROX_AGENT_BOT_ID ? ROX_NEW_BOT_ID : id);
   const agentList = tourTarget(AGENTS_TOUR.agentList);
   // A create request already waiting opens the form on first render, so the
   // list never flashes before it.
@@ -289,7 +289,7 @@ export function Agents(props: {
       )
   );
   const teamAgents = createMemo(() => [
-    MACRO_AGENT,
+    ROX_AGENT,
     ...agents().filter((agent) => agent.share === 'Team'),
   ]);
   const privateAgents = createMemo(() =>
@@ -626,7 +626,7 @@ function AgentAvatar(props: { agent: AgentSummary }) {
         fallback={
           <Avatar.Fallback>
             <Show
-              when={props.agent.id === MACRO_AGENT_BOT_ID}
+              when={props.agent.id === ROX_AGENT_BOT_ID}
               fallback={<AgentIcon class="size-5" />}
             >
               <RoxMark class="size-5" />

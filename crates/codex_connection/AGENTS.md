@@ -24,7 +24,7 @@ sessions.
 
 ## Boundaries
 
-- Depends on: `codex_cloud_agents` (domain types), `macro_user_id`.
+- Depends on: `codex_cloud_agents` (domain types), `rox_user_id`.
 - Used by: `agent_harness`, `authentication_service`, `agent_harness_service`.
 
 ## Recipes
@@ -32,7 +32,7 @@ sessions.
 - Add a connection-lifecycle rule (e.g. a new error case or transition):
   `src/domain.rs` → `src/domain/service.rs` → its `test.rs`.
 - Change persisted connection state: `src/outbound/postgres.rs` →
-  `src/outbound/postgres/test.rs` (uses `macro_db_migrator` as a dev-dependency).
+  `src/outbound/postgres/test.rs` (uses `rox_db_migrator` as a dev-dependency).
 
 ## Checks
 

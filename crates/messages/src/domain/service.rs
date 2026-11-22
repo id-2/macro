@@ -895,7 +895,7 @@ impl<R: MessageRepository, E: MessageEventPublisher> MessageService<R, E> {
                         .map_err(|_| MessageError::Invalid("invalid mentioned user"))?;
                     if sender
                         .as_bot()
-                        .is_some_and(|bot| bot.bot_id() != bot_id::MACRO_AI_BOT_ID)
+                        .is_some_and(|bot| bot.bot_id() != bot_id::ROX_AI_BOT_ID)
                     {
                         return Err(MessageError::Invalid("bot mentions require the bot tag"));
                     }

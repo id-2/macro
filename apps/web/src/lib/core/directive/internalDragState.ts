@@ -20,7 +20,7 @@ declare module 'solid-js' {
 
 export function internalDrag(element: HTMLElement) {
   const onDragStart = (e: DragEvent) => {
-    e.dataTransfer?.setData('application/x-macro-internal', '1');
+    e.dataTransfer?.setData('application/x-rox-internal', '1');
     startX = e.clientX;
     startY = e.clientY;
     maxDistance = 0;

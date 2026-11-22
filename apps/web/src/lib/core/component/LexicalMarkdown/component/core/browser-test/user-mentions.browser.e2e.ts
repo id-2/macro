@@ -23,7 +23,7 @@ for (const resolveName of [true, false]) {
         });
       } else if (
         url.hostname === 'localhost' &&
-        !url.pathname.includes('/__macro_dev/')
+        !url.pathname.includes('/__rox_dev/')
       ) {
         await route.continue();
       } else {

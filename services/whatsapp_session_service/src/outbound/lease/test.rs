@@ -4,7 +4,7 @@
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use tokio::sync::mpsc;
@@ -31,7 +31,7 @@ async fn insert_account(pool: &PgPool, user_id: &str, state: &str) -> Uuid {
             VALUES (gen_random_uuid(), $2, $2, $3)
             RETURNING id
         )
-        INSERT INTO "User" ("id", "email", "macro_user_id")
+        INSERT INTO "User" ("id", "email", "rox_user_id")
         SELECT $1, $2, new_macro_user.id FROM new_macro_user
         "#,
         user_id,
@@ -54,7 +54,7 @@ async fn insert_account(pool: &PgPool, user_id: &str, state: &str) -> Uuid {
     account
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_one_replica_locks_an_account_and_discovery_skips_it(
     pool_options: PgPoolOptions,
     options: PgConnectOptions,
@@ -103,7 +103,7 @@ async fn only_one_replica_locks_an_account_and_discovery_skips_it(
     assert!(second.try_lock(connected).await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn killing_the_lock_connection_frees_its_locks_and_reports_the_loss(
     pool_options: PgPoolOptions,
     options: PgConnectOptions,
@@ -200,7 +200,7 @@ async fn start_replica(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_draining_replica_hands_its_account_over_without_waiting_for_a_rescan(
     pool_options: PgPoolOptions,
     options: PgConnectOptions,

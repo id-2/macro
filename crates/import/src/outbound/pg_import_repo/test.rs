@@ -3,10 +3,10 @@ use crate::domain::models::{
     ImportTargetKey, ImportTargetKind, SlackConversationId, SlackWorkspaceId,
 };
 use crate::domain::ports::{CanonicalImportRepo, NotionPlanRepo, PlanRow};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_members_returns_only_the_requested_roster(pool: PgPool) {
     let owner = ledger_actor(&pool, "roster-owner").await;
     let peer = ledger_actor(&pool, "roster-peer").await;
@@ -23,7 +23,7 @@ async fn team_members_returns_only_the_requested_roster(pool: PgPool) {
     assert!(repo.team_members(Uuid::now_v7()).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn run_inserts_running_without_an_error(pool: PgPool) {
     let actor = ledger_actor(&pool, "run-insert").await;
     let repo = PgImportRepo::new(pool);
@@ -41,7 +41,7 @@ async fn run_inserts_running_without_an_error(pool: PgPool) {
     assert!(runs[0].error.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn run_restarts_terminal_runs_and_clears_their_error(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let from = [
@@ -75,7 +75,7 @@ async fn run_restarts_terminal_runs_and_clears_their_error(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn run_does_not_take_over_a_running_run(pool: PgPool) {
     let actor = ledger_actor(&pool, "run-active").await;
     let repo = PgImportRepo::new(pool);
@@ -102,7 +102,7 @@ async fn run_does_not_take_over_a_running_run(pool: PgPool) {
     assert_eq!(after.updated_at, before.updated_at);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn runs_left_running_or_importing_are_reaped_once_stale(pool: PgPool) {
     let stale = ledger_actor(&pool, "stale-run").await;
     let legacy = ledger_actor(&pool, "legacy-run").await;
@@ -156,7 +156,7 @@ async fn runs_left_running_or_importing_are_reaped_once_stale(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn staged_manual_entity_round_trips(pool: PgPool) {
     let actor = ledger_actor(&pool, "manual-entity").await;
     let repo = PgImportRepo::new(pool);
@@ -180,7 +180,7 @@ async fn staged_manual_entity_round_trips(pool: PgPool) {
     assert_eq!(stored.metadata, metadata);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn read_only_targets_are_exact_scoped_and_never_reserve(pool: PgPool) {
     use crate::domain::{models::ImportTargetLookup, ports::ImportTargetReader};
     let admin = ledger_actor(&pool, "reader").await;
@@ -262,7 +262,7 @@ async fn read_only_targets_are_exact_scoped_and_never_reserve(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rows_record_their_kind_and_legacy_rows_read_as_the_source_default(pool: PgPool) {
     let actor = ledger_actor(&pool, "kinds").await;
     let repo = PgImportRepo::new(pool.clone());
@@ -300,7 +300,7 @@ async fn rows_record_their_kind_and_legacy_rows_read_as_the_source_default(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_kind_from_another_source_is_rejected(pool: PgPool) {
     let actor = ledger_actor(&pool, "wrong-kind").await;
     let repo = PgImportRepo::new(pool);
@@ -321,7 +321,7 @@ async fn a_kind_from_another_source_is_rejected(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_team_keeps_one_copy_of_each_notion_object(pool: PgPool) {
     let owner = ledger_actor(&pool, "notion-owner").await;
     let teammate = ledger_actor(&pool, "notion-teammate").await;
@@ -396,7 +396,7 @@ async fn a_team_keeps_one_copy_of_each_notion_object(pool: PgPool) {
     }
 }
 
-async fn ledger_actor(pool: &PgPool, label: &str) -> MacroUserIdStr<'static> {
+async fn ledger_actor(pool: &PgPool, label: &str) -> RoxUserIdStr<'static> {
     let id = Uuid::now_v7();
     let email = format!("{label}@example.com");
     let user_id = format!("macro|{email}");
@@ -410,7 +410,7 @@ async fn ledger_actor(pool: &PgPool, label: &str) -> MacroUserIdStr<'static> {
     .await
     .unwrap();
     sqlx::query!(
-        "INSERT INTO \"User\" (id, email, macro_user_id) VALUES ($1, $2, $3)",
+        "INSERT INTO \"User\" (id, email, rox_user_id) VALUES ($1, $2, $3)",
         user_id,
         email,
         id,
@@ -418,12 +418,12 @@ async fn ledger_actor(pool: &PgPool, label: &str) -> MacroUserIdStr<'static> {
     .execute(pool)
     .await
     .unwrap();
-    MacroUserIdStr::parse_from_str(&user_id)
+    RoxUserIdStr::parse_from_str(&user_id)
         .unwrap()
         .into_owned()
 }
 
-async fn ledger_team(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> Uuid {
+async fn ledger_team(pool: &PgPool, owner: &RoxUserIdStr<'static>) -> Uuid {
     let id = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Ledger test', $2)",
@@ -437,7 +437,7 @@ async fn ledger_team(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> Uuid {
     id
 }
 
-async fn join_ledger_team(pool: &PgPool, user: &MacroUserIdStr<'static>, team: Uuid) {
+async fn join_ledger_team(pool: &PgPool, user: &RoxUserIdStr<'static>, team: Uuid) {
     sqlx::query!(
         r#"INSERT INTO team_user (user_id, team_id, team_role) VALUES ($1, $2, 'admin')
            ON CONFLICT (user_id) DO UPDATE SET team_id = EXCLUDED.team_id"#,
@@ -472,7 +472,7 @@ async fn ledger_channel(pool: &PgPool, id: Uuid, team: Option<Uuid>, kind: Impor
 
 async fn legacy_mapping(
     repo: &PgImportRepo,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     key: &ImportTargetKey,
     channel_id: Uuid,
 ) {
@@ -491,7 +491,7 @@ async fn legacy_mapping(
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_admins_reserve_one_recoverable_uuid(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let peer = ledger_actor(&pool, "peer").await;
@@ -553,7 +553,7 @@ async fn two_admins_reserve_one_recoverable_uuid(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reservations_find_own_and_explicit_team_mappings(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let peer = ledger_actor(&pool, "peer").await;
@@ -608,7 +608,7 @@ async fn reservations_find_own_and_explicit_team_mappings(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn conflicting_historical_rows_fail_closed(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let peer = ledger_actor(&pool, "peer").await;
@@ -656,7 +656,7 @@ async fn conflicting_historical_rows_fail_closed(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn names_cannot_claim_slack_ids_and_pending_ids_cannot_be_replaced(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let team = ledger_team(&pool, &admin).await;
@@ -690,7 +690,7 @@ async fn names_cannot_claim_slack_ids_and_pending_ids_cannot_be_replaced(pool: P
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn private_and_dm_provenance_stays_out_of_legacy_listing(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let peer = ledger_actor(&pool, "peer").await;
@@ -729,7 +729,7 @@ async fn private_and_dm_provenance_stays_out_of_legacy_listing(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn authorized_existing_claims_cannot_cross_teams(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let peer = ledger_actor(&pool, "peer").await;
@@ -803,7 +803,7 @@ async fn authorized_existing_claims_cannot_cross_teams(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn private_legacy_mapping_requires_authorized_claim(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let team = ledger_team(&pool, &admin).await;
@@ -837,7 +837,7 @@ async fn private_legacy_mapping_requires_authorized_claim(pool: PgPool) {
     assert!(reserved.ready);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn source_binding_requires_confirmation_and_rejects_second_workspace(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let team = ledger_team(&pool, &admin).await;
@@ -877,7 +877,7 @@ async fn source_binding_requires_confirmation_and_rejects_second_workspace(pool:
     assert_eq!(repo.source_binding(team).await.unwrap().unwrap(), known);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_different_workspace_bindings_have_one_winner(pool: PgPool) {
     let admin = ledger_actor(&pool, "admin").await;
     let team = ledger_team(&pool, &admin).await;
@@ -913,7 +913,7 @@ fn plan_row(foreign_id: &str, parent: Option<&str>, title: &str) -> PlanRow {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_plan_replaces_the_staged_one_links_parents_and_keeps_imported_rows(pool: PgPool) {
     let actor = ledger_actor(&pool, "plan-replace").await;
     let repo = PgImportRepo::new(pool);
@@ -975,7 +975,7 @@ async fn a_new_plan_replaces_the_staged_one_links_parents_and_keeps_imported_row
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_review_ties_only_the_staged_plan_and_runs_move_only_from_the_given_states(pool: PgPool) {
     let actor = ledger_actor(&pool, "plan-review").await;
     let repo = PgImportRepo::new(pool.clone());
@@ -1069,7 +1069,7 @@ async fn a_review_ties_only_the_staged_plan_and_runs_move_only_from_the_given_st
     assert_eq!(runs[0].error.as_deref(), Some("Cancelled"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scan_counts_show_only_while_the_run_is_running_and_reset_on_restart(pool: PgPool) {
     let actor = ledger_actor(&pool, "run-scan").await;
     let repo = PgImportRepo::new(pool);

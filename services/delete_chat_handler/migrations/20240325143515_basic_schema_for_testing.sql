@@ -1,5 +1,5 @@
 -- NOTE: This is used purely to setup the testing DB
--- Changes from `crates/macro_db_client/migrations` need to be reflected here as raw SQL
+-- Changes from `crates/rox_db_client/migrations` need to be reflected here as raw SQL
 -- Changes here WILL NOT ever make it into the dev/production db.
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -657,7 +657,7 @@ CREATE TABLE public."JobToDocumentProcessResult" (
     "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TABLE public."MacroPrompt" (
+CREATE TABLE public."RoxPrompt" (
     id text DEFAULT gen_random_uuid() NOT NULL,
     title text NOT NULL,
     prompt text NOT NULL,
@@ -669,15 +669,15 @@ CREATE TABLE public."MacroPrompt" (
     updated_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TABLE public."MacroPromptAttachment" (
+CREATE TABLE public."RoxPromptAttachment" (
     id text DEFAULT gen_random_uuid() NOT NULL,
     attachment_type text NOT NULL,
     attachment_id text NOT NULL,
-    macro_prompt_id text NOT NULL
+    rox_prompt_id text NOT NULL
 );
 
-CREATE TABLE public."MacroPromptPermission" (
-    macro_prompt_id text NOT NULL,
+CREATE TABLE public."RoxPromptPermission" (
+    rox_prompt_id text NOT NULL,
     share_permission_id text NOT NULL
 );
 
@@ -969,7 +969,7 @@ CREATE TABLE public."User" (
     "lastName" character varying(100),
     "profilePicture" text,
     "profilePictureHash" character varying(40),
-    macro_user_id uuid NOT NULL,
+    rox_user_id uuid NOT NULL,
     "aiDataConsent" boolean DEFAULT false NOT NULL
 );
 
@@ -1064,9 +1064,9 @@ CREATE TABLE public._sqlx_migrations (
 CREATE TABLE public.account_merge_request (
     id uuid NOT NULL,
     code text NOT NULL,
-    macro_user_id uuid NOT NULL,
+    rox_user_id uuid NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    to_merge_macro_user_id uuid NOT NULL
+    to_merge_rox_user_id uuid NOT NULL
 );
 
 CREATE TABLE public.active_streams (
@@ -1340,7 +1340,7 @@ CREATE TABLE public.email_labels (
 
 CREATE TABLE public.email_links (
     id uuid NOT NULL,
-    macro_id text NOT NULL,
+    rox_id text NOT NULL,
     fusionauth_user_id text NOT NULL,
     email_address character varying(320) NOT NULL,
     provider public.email_user_provider_enum NOT NULL,
@@ -1382,7 +1382,7 @@ CREATE TABLE public.email_messages (
     is_draft boolean DEFAULT false NOT NULL,
     body_text text,
     body_html_sanitized text,
-    body_macro text,
+    body_rox text,
     headers_jsonb jsonb,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -1527,7 +1527,7 @@ CREATE TABLE public.github_app_installation_team (
 
 CREATE TABLE public.github_links (
     id uuid NOT NULL,
-    macro_id text NOT NULL,
+    rox_id text NOT NULL,
     fusionauth_user_id uuid NOT NULL,
     github_username character varying(255) NOT NULL,
     github_user_id text NOT NULL,
@@ -1552,17 +1552,17 @@ CREATE TABLE public.id_mapping (
 CREATE TABLE public.in_progress_email_link (
     id uuid NOT NULL,
     email text NOT NULL,
-    macro_user_id uuid NOT NULL,
+    rox_user_id uuid NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE TABLE public.in_progress_user_link (
     id uuid NOT NULL,
-    macro_user_id uuid NOT NULL,
+    rox_user_id uuid NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TABLE public.macro_user (
+CREATE TABLE public.rox_user (
     id uuid NOT NULL,
     username text NOT NULL,
     email text NOT NULL,
@@ -1570,14 +1570,14 @@ CREATE TABLE public.macro_user (
     has_trialed boolean DEFAULT true NOT NULL
 );
 
-CREATE TABLE public.macro_user_email_verification (
-    macro_user_id uuid NOT NULL,
+CREATE TABLE public.rox_user_email_verification (
+    rox_user_id uuid NOT NULL,
     email text NOT NULL,
     is_verified boolean DEFAULT false NOT NULL
 );
 
-CREATE TABLE public.macro_user_info (
-    macro_user_id uuid NOT NULL,
+CREATE TABLE public.rox_user_info (
+    rox_user_id uuid NOT NULL,
     industry text,
     title text,
     first_name text,
@@ -1882,14 +1882,14 @@ ALTER TABLE ONLY public."ItemLastAccessed"
 ALTER TABLE ONLY public."JobToDocumentProcessResult"
     ADD CONSTRAINT "JobToDocumentProcessResult_pkey" PRIMARY KEY ("jobId", "documentProcessResultId");
 
-ALTER TABLE ONLY public."MacroPromptAttachment"
-    ADD CONSTRAINT "MacroPromptAttachment_pkey" PRIMARY KEY (id);
+ALTER TABLE ONLY public."RoxPromptAttachment"
+    ADD CONSTRAINT "RoxPromptAttachment_pkey" PRIMARY KEY (id);
 
-ALTER TABLE ONLY public."MacroPromptPermission"
-    ADD CONSTRAINT "MacroPromptPermission_pkey" PRIMARY KEY (macro_prompt_id);
+ALTER TABLE ONLY public."RoxPromptPermission"
+    ADD CONSTRAINT "RoxPromptPermission_pkey" PRIMARY KEY (rox_prompt_id);
 
-ALTER TABLE ONLY public."MacroPrompt"
-    ADD CONSTRAINT "MacroPrompt_pkey" PRIMARY KEY (id);
+ALTER TABLE ONLY public."RoxPrompt"
+    ADD CONSTRAINT "RoxPrompt_pkey" PRIMARY KEY (id);
 
 ALTER TABLE ONLY public."OrganizationBilling"
     ADD CONSTRAINT "OrganizationBilling_pkey" PRIMARY KEY (id);
@@ -2161,14 +2161,14 @@ ALTER TABLE ONLY public.in_progress_email_link
 ALTER TABLE ONLY public.in_progress_user_link
     ADD CONSTRAINT in_progress_user_link_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY public.macro_user_email_verification
-    ADD CONSTRAINT macro_user_email_verification_pkey PRIMARY KEY (macro_user_id, email);
+ALTER TABLE ONLY public.rox_user_email_verification
+    ADD CONSTRAINT rox_user_email_verification_pkey PRIMARY KEY (rox_user_id, email);
 
-ALTER TABLE ONLY public.macro_user_info
-    ADD CONSTRAINT macro_user_info_pkey PRIMARY KEY (macro_user_id);
+ALTER TABLE ONLY public.rox_user_info
+    ADD CONSTRAINT rox_user_info_pkey PRIMARY KEY (rox_user_id);
 
-ALTER TABLE ONLY public.macro_user
-    ADD CONSTRAINT macro_user_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.rox_user
+    ADD CONSTRAINT rox_user_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.memory
     ADD CONSTRAINT memory_pkey PRIMARY KEY (id);
@@ -2361,15 +2361,15 @@ CREATE INDEX "JobToDocumentProcessResult_jobId_idx" ON public."JobToDocumentProc
 
 CREATE UNIQUE INDEX "JobToDocumentProcessResult_jobId_key" ON public."JobToDocumentProcessResult" USING btree ("jobId");
 
-CREATE INDEX "MacroPromptAttachment_attachment_type_attachment_id_idx" ON public."MacroPromptAttachment" USING btree (attachment_type, attachment_id);
+CREATE INDEX "RoxPromptAttachment_attachment_type_attachment_id_idx" ON public."RoxPromptAttachment" USING btree (attachment_type, attachment_id);
 
-CREATE INDEX "MacroPromptAttachment_macro_prompt_id_idx" ON public."MacroPromptAttachment" USING btree (macro_prompt_id);
+CREATE INDEX "RoxPromptAttachment_rox_prompt_id_idx" ON public."RoxPromptAttachment" USING btree (rox_prompt_id);
 
-CREATE UNIQUE INDEX "MacroPromptPermission_macro_prompt_id_key" ON public."MacroPromptPermission" USING btree (macro_prompt_id);
+CREATE UNIQUE INDEX "RoxPromptPermission_rox_prompt_id_key" ON public."RoxPromptPermission" USING btree (rox_prompt_id);
 
-CREATE UNIQUE INDEX "MacroPromptPermission_share_permission_id_key" ON public."MacroPromptPermission" USING btree (share_permission_id);
+CREATE UNIQUE INDEX "RoxPromptPermission_share_permission_id_key" ON public."RoxPromptPermission" USING btree (share_permission_id);
 
-CREATE INDEX "MacroPrompt_user_id_idx" ON public."MacroPrompt" USING btree (user_id);
+CREATE INDEX "RoxPrompt_user_id_idx" ON public."RoxPrompt" USING btree (user_id);
 
 CREATE UNIQUE INDEX "OrganizationBilling_email_key" ON public."OrganizationBilling" USING btree (email);
 
@@ -2491,11 +2491,11 @@ CREATE UNIQUE INDEX "WebsocketConnectionPermissions_connectionId_key" ON public.
 
 CREATE INDEX account_merge_request_code_idx ON public.account_merge_request USING btree (code);
 
-CREATE INDEX account_merge_request_macro_user_id_idx ON public.account_merge_request USING btree (macro_user_id);
+CREATE INDEX account_merge_request_rox_user_id_idx ON public.account_merge_request USING btree (rox_user_id);
 
-CREATE INDEX account_merge_request_to_merge_macro_user_id_idx ON public.account_merge_request USING btree (to_merge_macro_user_id);
+CREATE INDEX account_merge_request_to_merge_rox_user_id_idx ON public.account_merge_request USING btree (to_merge_rox_user_id);
 
-CREATE UNIQUE INDEX account_merge_request_to_merge_macro_user_id_key ON public.account_merge_request USING btree (to_merge_macro_user_id);
+CREATE UNIQUE INDEX account_merge_request_to_merge_rox_user_id_key ON public.account_merge_request USING btree (to_merge_rox_user_id);
 
 CREATE UNIQUE INDEX contacts_link_id_email_address_idx ON public.email_contacts USING btree (link_id, email_address);
 
@@ -2503,7 +2503,7 @@ CREATE UNIQUE INDEX email_filters_link_id_email_address_uq ON public.email_filte
 
 CREATE UNIQUE INDEX email_filters_link_id_email_domain_uq ON public.email_filters USING btree (link_id, lower((email_domain)::text)) WHERE (email_domain IS NOT NULL);
 
-CREATE UNIQUE INDEX email_links_macro_id_uq ON public.email_links USING btree (macro_id);
+CREATE UNIQUE INDEX email_links_rox_id_uq ON public.email_links USING btree (rox_id);
 
 CREATE INDEX entity_access_entity_id_entity_type_idx ON public.entity_access USING btree (entity_id, entity_type);
 
@@ -2635,7 +2635,7 @@ CREATE INDEX idx_email_links_email_provider ON public.email_links USING btree (l
 
 CREATE INDEX idx_email_links_fusionauth_user_active ON public.email_links USING btree (fusionauth_user_id, is_sync_active) WHERE (is_sync_active = true);
 
-CREATE INDEX idx_email_links_macro_id ON public.email_links USING btree (macro_id);
+CREATE INDEX idx_email_links_rox_id ON public.email_links USING btree (rox_id);
 
 CREATE INDEX idx_email_links_provider_active ON public.email_links USING btree (provider, is_sync_active) WHERE (is_sync_active = true);
 
@@ -2709,7 +2709,7 @@ CREATE INDEX idx_github_links_fusionauth_user_id ON public.github_links USING bt
 
 CREATE INDEX idx_github_links_github_username ON public.github_links USING btree (github_username);
 
-CREATE INDEX idx_github_links_macro_id ON public.github_links USING btree (macro_id);
+CREATE INDEX idx_github_links_rox_id ON public.github_links USING btree (rox_id);
 
 CREATE INDEX idx_github_pr_tasks_github_key ON public.github_pr_tasks USING btree (github_key);
 
@@ -2755,17 +2755,17 @@ CREATE INDEX idx_views_user_id ON public.saved_view USING btree (user_id);
 
 CREATE UNIQUE INDEX in_progress_email_link_email_key ON public.in_progress_email_link USING btree (email);
 
-CREATE INDEX in_progress_user_link_macro_user_id_idx ON public.in_progress_user_link USING btree (macro_user_id);
+CREATE INDEX in_progress_user_link_rox_user_id_idx ON public.in_progress_user_link USING btree (rox_user_id);
 
-CREATE UNIQUE INDEX macro_user_email_key ON public.macro_user USING btree (email);
+CREATE UNIQUE INDEX rox_user_email_key ON public.rox_user USING btree (email);
 
-CREATE UNIQUE INDEX macro_user_email_verification_email_key ON public.macro_user_email_verification USING btree (email);
+CREATE UNIQUE INDEX rox_user_email_verification_email_key ON public.rox_user_email_verification USING btree (email);
 
-CREATE INDEX macro_user_email_verification_macro_user_id_idx ON public.macro_user_email_verification USING btree (macro_user_id);
+CREATE INDEX rox_user_email_verification_rox_user_id_idx ON public.rox_user_email_verification USING btree (rox_user_id);
 
-CREATE UNIQUE INDEX macro_user_stripe_customer_id_key ON public.macro_user USING btree (stripe_customer_id);
+CREATE UNIQUE INDEX rox_user_stripe_customer_id_key ON public.rox_user USING btree (stripe_customer_id);
 
-CREATE UNIQUE INDEX macro_user_username_key ON public.macro_user USING btree (username);
+CREATE UNIQUE INDEX rox_user_username_key ON public.rox_user USING btree (username);
 
 CREATE UNIQUE INDEX notification_email_unsubscribe_code_code_idx ON public.notification_email_unsubscribe_code USING btree (code);
 
@@ -2928,17 +2928,17 @@ ALTER TABLE ONLY public."InstructionsDocuments"
 ALTER TABLE ONLY public."JobToDocumentProcessResult"
     ADD CONSTRAINT "JobToDocumentProcessResult_documentProcessResultId_fkey" FOREIGN KEY ("documentProcessResultId") REFERENCES public."DocumentProcessResult"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE ONLY public."MacroPromptAttachment"
-    ADD CONSTRAINT "MacroPromptAttachment_macro_prompt_id_fkey" FOREIGN KEY (macro_prompt_id) REFERENCES public."MacroPrompt"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public."RoxPromptAttachment"
+    ADD CONSTRAINT "RoxPromptAttachment_rox_prompt_id_fkey" FOREIGN KEY (rox_prompt_id) REFERENCES public."RoxPrompt"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE ONLY public."MacroPromptPermission"
-    ADD CONSTRAINT "MacroPromptPermission_macro_prompt_id_fkey" FOREIGN KEY (macro_prompt_id) REFERENCES public."MacroPrompt"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public."RoxPromptPermission"
+    ADD CONSTRAINT "RoxPromptPermission_rox_prompt_id_fkey" FOREIGN KEY (rox_prompt_id) REFERENCES public."RoxPrompt"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE ONLY public."MacroPromptPermission"
-    ADD CONSTRAINT "MacroPromptPermission_share_permission_id_fkey" FOREIGN KEY (share_permission_id) REFERENCES public."SharePermission"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public."RoxPromptPermission"
+    ADD CONSTRAINT "RoxPromptPermission_share_permission_id_fkey" FOREIGN KEY (share_permission_id) REFERENCES public."SharePermission"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE ONLY public."MacroPrompt"
-    ADD CONSTRAINT "MacroPrompt_user_id_fkey" FOREIGN KEY (user_id) REFERENCES public."User"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public."RoxPrompt"
+    ADD CONSTRAINT "RoxPrompt_user_id_fkey" FOREIGN KEY (user_id) REFERENCES public."User"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public."OrganizationBilling"
     ADD CONSTRAINT "OrganizationBilling_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES public."Organization"(id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -3046,7 +3046,7 @@ ALTER TABLE ONLY public."UserItemAccess"
     ADD CONSTRAINT "UserItemAccess_granted_from_team_id_fkey" FOREIGN KEY (granted_from_team_id) REFERENCES public.team(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public."User"
-    ADD CONSTRAINT "User_macro_user_id_fkey" FOREIGN KEY (macro_user_id) REFERENCES public.macro_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT "User_rox_user_id_fkey" FOREIGN KEY (rox_user_id) REFERENCES public.rox_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public."User"
     ADD CONSTRAINT "User_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES public."Organization"(id) ON UPDATE CASCADE ON DELETE SET NULL;
@@ -3061,7 +3061,7 @@ ALTER TABLE ONLY public."WebsocketConnectionPermissions"
     ADD CONSTRAINT "WebsocketConnectionPermissions_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.account_merge_request
-    ADD CONSTRAINT account_merge_request_macro_user_id_fkey FOREIGN KEY (macro_user_id) REFERENCES public.macro_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT account_merge_request_rox_user_id_fkey FOREIGN KEY (rox_user_id) REFERENCES public.rox_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.call_participants
     ADD CONSTRAINT call_participants_call_id_fkey FOREIGN KEY (call_id) REFERENCES public.calls(id) ON DELETE CASCADE;
@@ -3214,19 +3214,19 @@ ALTER TABLE ONLY public.github_app_installation_team
     ADD CONSTRAINT github_app_installation_team_team_id_fkey FOREIGN KEY (team_id) REFERENCES public.team(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.github_links
-    ADD CONSTRAINT github_links_macro_id_fkey FOREIGN KEY (macro_id) REFERENCES public."User"(id) ON DELETE CASCADE;
+    ADD CONSTRAINT github_links_rox_id_fkey FOREIGN KEY (rox_id) REFERENCES public."User"(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.in_progress_email_link
-    ADD CONSTRAINT in_progress_email_link_macro_user_id_fkey FOREIGN KEY (macro_user_id) REFERENCES public.macro_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT in_progress_email_link_rox_user_id_fkey FOREIGN KEY (rox_user_id) REFERENCES public.rox_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.in_progress_user_link
-    ADD CONSTRAINT in_progress_user_link_macro_user_id_fkey FOREIGN KEY (macro_user_id) REFERENCES public.macro_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT in_progress_user_link_rox_user_id_fkey FOREIGN KEY (rox_user_id) REFERENCES public.rox_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.macro_user_email_verification
-    ADD CONSTRAINT macro_user_email_verification_macro_user_id_fkey FOREIGN KEY (macro_user_id) REFERENCES public.macro_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public.rox_user_email_verification
+    ADD CONSTRAINT rox_user_email_verification_rox_user_id_fkey FOREIGN KEY (rox_user_id) REFERENCES public.rox_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.macro_user_info
-    ADD CONSTRAINT macro_user_info_macro_user_id_fkey FOREIGN KEY (macro_user_id) REFERENCES public.macro_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public.rox_user_info
+    ADD CONSTRAINT rox_user_info_rox_user_id_fkey FOREIGN KEY (rox_user_id) REFERENCES public.rox_user(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.property_definitions
     ADD CONSTRAINT property_definitions_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES public."Organization"(id) ON DELETE SET NULL;

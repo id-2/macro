@@ -254,7 +254,7 @@ type AddInboxOptions = {
  * shared-inbox conflict is surfaced through `requestShareInboxConfirmation`,
  * rendered by the globally mounted dialog.
  *
- * Desktop opens consent in the system browser and returns through a macro:///
+ * Desktop opens consent in the system browser and returns through a rox:///
  * deep link; web navigates the page. Both stash the current layout against the
  * new link id so the callback restores it. Native mobile needs no stash: its
  * layout never unmounts.
@@ -401,7 +401,7 @@ export function useAddInboxFlow() {
 
     const desktop = isPlatform('desktop');
     const callbackUrl = desktop
-      ? 'macro:///inbox-link-callback'
+      ? 'rox:///inbox-link-callback'
       : `${window.location.origin}${ROUTER_BASE_CONCAT}inbox-link-callback`;
     const result = await initialize(
       callbackUrl,

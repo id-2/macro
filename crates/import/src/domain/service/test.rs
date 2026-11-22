@@ -63,7 +63,7 @@ fn linear_task_content_degrades_without_optional_fields() {
 }
 
 #[test]
-fn linear_status_and_priority_map_onto_macro_labels() {
+fn linear_status_and_priority_map_onto_rox_labels() {
     assert_eq!(map_linear_status("Backlog"), Some("Not Started"));
     assert_eq!(map_linear_status("Todo"), Some("Not Started"));
     assert_eq!(map_linear_status("In Progress"), Some("In Progress"));

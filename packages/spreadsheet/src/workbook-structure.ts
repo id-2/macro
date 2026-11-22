@@ -350,7 +350,7 @@ export function changeWorkbookAxis(
     model.pauseEvaluation();
     sheets.forEach((_, index) => {
       if (index) model.newSheet();
-      model.renameSheet(index, `__macro_structure_${index}`);
+      model.renameSheet(index, `__rox_structure_${index}`);
     });
     sheets.forEach((sheet, index) => model.renameSheet(index, sheet.name));
     for (const [index, sheet] of sheets.entries()) {

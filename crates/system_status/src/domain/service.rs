@@ -4,7 +4,7 @@
 mod test;
 
 use chrono::Utc;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
 use crate::domain::{
     models::{CurrentSystemStatus, StatusUpdate, SystemStatus, SystemStatusError},
@@ -43,7 +43,7 @@ impl<R: SystemStatusRepo, B: StatusBroadcaster> SystemStatusService
     #[tracing::instrument(skip_all, err)]
     async fn history(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
     ) -> Result<Vec<StatusUpdate>, SystemStatusError> {
         require_staff(caller)?;
         Ok(self
@@ -64,13 +64,13 @@ impl<R: SystemStatusRepo, B: StatusBroadcaster> SystemStatusService
     )]
     async fn set_status(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         status: SystemStatus,
     ) -> Result<StatusUpdate, SystemStatusError> {
         require_staff(caller)?;
 
         let update = StatusUpdate {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             status,
             user_id: caller.clone().into_owned(),
             created_at: Utc::now(),
@@ -97,8 +97,8 @@ impl<R: SystemStatusRepo, B: StatusBroadcaster> SystemStatusService
     }
 }
 
-fn require_staff(user: &MacroUserIdStr<'_>) -> Result<(), SystemStatusError> {
-    if user.is_macro_staff() {
+fn require_staff(user: &RoxUserIdStr<'_>) -> Result<(), SystemStatusError> {
+    if user.is_rox_staff() {
         Ok(())
     } else {
         Err(SystemStatusError::Forbidden)

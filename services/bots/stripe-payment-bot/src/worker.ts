@@ -1,24 +1,24 @@
 import Stripe from 'stripe';
-import type { Env as MacroEnv } from '../../../../packages/sdk/src/config';
+import type { Env as RoxEnv } from '../../../../packages/sdk/src/config';
 import { createChannelBroadcaster } from './channel';
 import { formatNotification, notificationFromEvent } from './notification';
 
 type WorkerEnv = {
-  MACRO_BOT_TOKEN: string;
-  MACRO_ENV: string;
-  MACRO_STORAGE_URL?: string;
+  ROX_BOT_TOKEN: string;
+  ROX_ENV: string;
+  ROX_STORAGE_URL?: string;
   STRIPE_API_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
 };
 
 const REQUIRED_BINDINGS: readonly (keyof WorkerEnv)[] = [
-  'MACRO_BOT_TOKEN',
-  'MACRO_ENV',
+  'ROX_BOT_TOKEN',
+  'ROX_ENV',
   'STRIPE_API_KEY',
   'STRIPE_WEBHOOK_SECRET',
 ];
 
-const MACRO_ENVIRONMENTS: readonly MacroEnv[] = ['dev', 'prod', 'local'];
+const ROX_ENVIRONMENTS: readonly RoxEnv[] = ['dev', 'prod', 'local'];
 
 const cryptoProvider = Stripe.createSubtleCryptoProvider();
 
@@ -26,8 +26,8 @@ function missingBindings(env: WorkerEnv): string[] {
   return REQUIRED_BINDINGS.filter((key) => !env[key]);
 }
 
-function parseMacroEnv(value: string): MacroEnv | undefined {
-  return MACRO_ENVIRONMENTS.find((environment) => environment === value);
+function parseMacroEnv(value: string): RoxEnv | undefined {
+  return ROX_ENVIRONMENTS.find((environment) => environment === value);
 }
 
 export default {
@@ -48,11 +48,11 @@ export default {
       );
     }
 
-    const macroEnv = parseMacroEnv(env.MACRO_ENV);
+    const macroEnv = parseMacroEnv(env.ROX_ENV);
     if (!macroEnv) {
       return Response.json(
         {
-          error: `MACRO_ENV must be one of: ${MACRO_ENVIRONMENTS.join(', ')}`,
+          error: `ROX_ENV must be one of: ${ROX_ENVIRONMENTS.join(', ')}`,
         },
         { status: 500 }
       );
@@ -93,9 +93,9 @@ export default {
 
     try {
       await createChannelBroadcaster({
-        botToken: env.MACRO_BOT_TOKEN,
+        botToken: env.ROX_BOT_TOKEN,
         env: macroEnv,
-        storageUrl: env.MACRO_STORAGE_URL,
+        storageUrl: env.ROX_STORAGE_URL,
       })(formatNotification(notification));
     } catch (error) {
       console.error('Failed to post Stripe notification to Macro', error);

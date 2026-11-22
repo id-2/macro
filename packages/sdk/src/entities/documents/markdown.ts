@@ -2,8 +2,8 @@ import type {
   DocumentMarkdown,
   DocumentMarkdownWritten,
 } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
-import { MacroApiError, unwrap } from '../../utils/unwrap';
+import type { RoxClient } from '../../utils/client';
+import { RoxApiError, unwrap } from '../../utils/unwrap';
 import { EditOutcomeUnknownError } from './ai-edit';
 import type { Document } from './document';
 
@@ -23,7 +23,7 @@ export interface SetContentOptions {
  * so nothing was written. Read it again with `contentWithRevision()`, reapply
  * your change to what it now says, and write against the new revision.
  */
-export class DocumentChangedError extends MacroApiError {
+export class DocumentChangedError extends RoxApiError {
   constructor(data: unknown) {
     super(409, data);
     this.name = 'DocumentChangedError';
@@ -34,7 +34,7 @@ export class DocumentChangedError extends MacroApiError {
 
 /** Read the body and revision; `Document.contentWithRevision` calls this. */
 export async function readMarkdown(
-  client: MacroClient,
+  client: RoxClient,
   document: Document,
 ): Promise<DocumentMarkdown> {
   return unwrap(
@@ -46,7 +46,7 @@ export async function readMarkdown(
 
 /** Write the body at a revision; `Document.setContent` calls this. */
 export async function writeMarkdown(
-  client: MacroClient,
+  client: RoxClient,
   document: Document,
   markdown: string,
   options: SetContentOptions,

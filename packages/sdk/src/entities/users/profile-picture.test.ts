@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { StaticImage } from '../images/image';
 import { ImagesNamespace } from '../images/namespace';
 import { MeNamespace } from '../me/namespace';
@@ -40,7 +40,7 @@ function makeClient(rows: { id: string; url: string }[]) {
         return { data: {} };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, calls };
 }
 

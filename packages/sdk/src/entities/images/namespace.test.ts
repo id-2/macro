@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import type { GenerateImageRequest } from '../../../generated/cognition/types.gen';
 import type { EntityMessageCreateData } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
 import { Document } from '../documents/document';
 import { StaticImage } from './image';
@@ -29,7 +29,7 @@ describe('images.generate', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const image = await new ImagesNamespace(client).generate({
       prompt: 'a lighthouse at dusk',
@@ -79,7 +79,7 @@ describe('channel.send with images', () => {
           return { data: { id: 'message' } };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     await Channel.byId(client, 'channel').send('look', {
       images: [

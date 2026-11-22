@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT l.macro_id FROM email_threads t JOIN email_links l ON l.id = t.link_id WHERE t.id = $1 FOR SHARE OF t, l",
+  "query": "SELECT l.rox_id FROM email_threads t JOIN email_links l ON l.id = t.link_id WHERE t.id = $1 FOR SHARE OF t, l",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "macro_id",
+        "name": "rox_id",
         "type_info": "Text"
       }
     ],

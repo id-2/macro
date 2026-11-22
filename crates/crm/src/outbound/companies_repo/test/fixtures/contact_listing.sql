@@ -3,16 +3,16 @@
 -- restriction is relaxed, without coalescing the stored team contact records.
 ALTER TABLE team_user DROP CONSTRAINT team_user_user_id_unique;
 
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
     ('00000000-0000-0000-0000-000000000003', 'owner12@test.com', 'owner12@test.com', 'contacts_owner12'),
     ('00000000-0000-0000-0000-000000000004', 'owner13@test.com', 'owner13@test.com', 'contacts_owner13'),
     ('00000000-0000-0000-0000-000000000005', 'owner14@test.com', 'owner14@test.com', 'contacts_owner14');
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
     ('macro|owner12@test.com', 'owner12@test.com', '00000000-0000-0000-0000-000000000003'),
     ('macro|owner13@test.com', 'owner13@test.com', '00000000-0000-0000-0000-000000000004'),
     ('macro|owner14@test.com', 'owner14@test.com', '00000000-0000-0000-0000-000000000005');
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ('00000000-0000-0000-0000-000000000001', 'viewer@test.com', 'viewer@test.com', 'contacts_viewer'), ('00000000-0000-0000-0000-000000000002', 'owner@test.com', 'owner@test.com', 'contacts_owner');
-INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|viewer@test.com', 'viewer@test.com', '00000000-0000-0000-0000-000000000001'), ('macro|owner@test.com', 'owner@test.com', '00000000-0000-0000-0000-000000000002');
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ('00000000-0000-0000-0000-000000000001', 'viewer@test.com', 'viewer@test.com', 'contacts_viewer'), ('00000000-0000-0000-0000-000000000002', 'owner@test.com', 'owner@test.com', 'contacts_owner');
+INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|viewer@test.com', 'viewer@test.com', '00000000-0000-0000-0000-000000000001'), ('macro|owner@test.com', 'owner@test.com', '00000000-0000-0000-0000-000000000002');
 INSERT INTO team (id, name, owner_id) VALUES ('00000000-0000-0000-0000-00000000000b', 'Team 11', 'macro|owner@test.com');
 INSERT INTO team_crm_settings (team_id, crm_enabled) VALUES ('00000000-0000-0000-0000-00000000000b', TRUE);
 INSERT INTO team_user (team_id, user_id, team_role) VALUES ('00000000-0000-0000-0000-00000000000b', 'macro|viewer@test.com', 'admin');

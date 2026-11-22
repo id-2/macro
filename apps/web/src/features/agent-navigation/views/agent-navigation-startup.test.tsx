@@ -54,12 +54,12 @@ it('takes no tab id on a phone, and takes it once the page stops reading as one'
   render(() => <AgentNavigationProvider />);
 
   expect(opened).toEqual([]);
-  expect(sessionStorage.getItem('macro.ui-client-id')).toBeNull();
+  expect(sessionStorage.getItem('rox.ui-client-id')).toBeNull();
 
   pointer.setTouch(false);
 
-  expect(opened.map((channel) => channel.name)).toEqual(['macro.ui-client']);
-  expect(sessionStorage.getItem('macro.ui-client-id')).toMatch(
+  expect(opened.map((channel) => channel.name)).toEqual(['rox.ui-client']);
+  expect(sessionStorage.getItem('rox.ui-client-id')).toMatch(
     /^[0-9a-f-]{36}$/
   );
 });

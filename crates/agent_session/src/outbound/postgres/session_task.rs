@@ -7,7 +7,7 @@ impl<B: BotFacts + 'static> SessionTaskRepo for PgAgentSessionRepo<B> {
     async fn set_task(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> Result<SessionTaskWrite> {
         // The subquery locks the row before reading the previous task, and RETURNING reads

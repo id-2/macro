@@ -1,5 +1,5 @@
 pub use crate::domain::permissions::{AccessLevel, AuthToken, WriteAccess};
-use macro_sync_service_jwt::session::{
+use rox_sync_service_jwt::session::{
     SessionIdentity, SessionKind, SurfaceAccessLevel, decode_surface,
 };
 use serde::Deserialize;
@@ -24,7 +24,7 @@ pub struct WebsocketQueryParams {
 }
 
 pub(crate) fn decode_document_token(token: &str, secret: &str) -> worker::Result<AuthToken> {
-    let claims = macro_sync_service_jwt::decode::<DocumentClaims>(token, secret)
+    let claims = rox_sync_service_jwt::decode::<DocumentClaims>(token, secret)
         .context("failed to decode document grant")?;
     if claims
         .session_kind

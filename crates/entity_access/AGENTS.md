@@ -33,7 +33,7 @@ depended-on crates in the backend.
 ## Boundaries
 
 - Depends on: `model-entity`, `model_owner`, `models_entity_access_management`,
-  `models_permissions`, `macro_user_id`, `bot_id`.
+  `models_permissions`, `rox_user_id`, `bot_id`.
 - Used by: nearly every domain crate that authorizes a request (`documents`,
   `chat`, `projects`, `crm`, `forms`, `databases`, `channels`, `agent_session`,
   `graphql_*` crates, and most services) — a signature change here ripples
@@ -69,7 +69,7 @@ the entity-access domain service.
   (`queries/document_access/documents_access.sql`) and must answer each one as
   `get_document_access` does: change their sources together, and extend
   `test/documents_access.rs` and its fixture, which compare the two.
-- Spans here never record a user id (a `MacroUserId` is an email): skip it.
+- Spans here never record a user id (a `RoxUserId` is an email): skip it.
   Checks record how many source ids they bound as `source_id_count`, through
   `user_source_ids` in the Postgres adapter and `domain::telemetry`; a caller
   wraps its checks in `observe_source_ids` to record the count on its own span,

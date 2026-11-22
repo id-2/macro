@@ -33,7 +33,7 @@ impl<R: DraftObjectCleanupRepository, S: DraftObjectDeletion> DraftObjectCleanup
     pub async fn execute_once(&self) -> Result<bool, AttachmentError> {
         let Some(lease) = self
             .repository
-            .claim_object_cleanup(macro_uuid::generate_uuid_v7())
+            .claim_object_cleanup(rox_uuid::generate_uuid_v7())
             .await?
         else {
             return Ok(false);

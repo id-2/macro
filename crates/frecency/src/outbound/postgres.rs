@@ -8,7 +8,7 @@ use crate::domain::{
 };
 use chrono::{DateTime, Utc};
 use item_filters::ast::EntityFilterAst;
-use macro_user_id::{cowlike::CowLike, error::ParseErr, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, error::ParseErr, user_id::RoxUserIdStr};
 use model_entity::{Entity, EntityType};
 use sqlx::{PgPool, Postgres, QueryBuilder, Row, pool::PoolConnection, prelude::FromRow};
 use std::{borrow::Cow, collections::VecDeque, str::FromStr};
@@ -57,7 +57,7 @@ impl FrecencyPgStorage {
     #[tracing::instrument(err, skip(self))]
     async fn static_get_top_entities(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         from_score: Option<f64>,
         limit: u32,
     ) -> Result<Vec<AggregateFrecency>, FrecencyStorageErr> {
@@ -95,7 +95,7 @@ impl FrecencyPgStorage {
     #[tracing::instrument(err, skip(self, filter))]
     async fn dynamic_get_top_entities(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         from_score: Option<f64>,
         limit: u32,
         filter: EntityFilterAst,
@@ -234,7 +234,7 @@ impl AggregateRow {
         Ok(AggregateFrecency {
             id: AggregateId {
                 entity: entity_type.with_entity_string(entity_id.to_string()),
-                user_id: MacroUserIdStr::parse_from_str(&user_id).map(CowLike::into_owned)?,
+                user_id: RoxUserIdStr::parse_from_str(&user_id).map(CowLike::into_owned)?,
             },
             data: FrecencyData {
                 event_count,
@@ -323,7 +323,7 @@ impl AggregateFrecencyStorage for FrecencyPgStorage {
     #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
     async fn get_aggregate_for_user_entities<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         entities: &'a [Entity<'a>],
     ) -> Result<Vec<crate::domain::models::AggregateFrecency>, Self::Err> {
         // Build the WHERE conditions for each entity

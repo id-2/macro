@@ -64,7 +64,7 @@ fn dead_pid() -> u32 {
 /// registry, and reports on stdout. A no-op in a normal test run.
 #[test]
 fn child_process() {
-    let Some(role) = macro_env_var::maybe_read_env(CHILD_ROLE) else {
+    let Some(role) = rox_env_var::maybe_read_env(CHILD_ROLE) else {
         return;
     };
     match role.as_str() {
@@ -75,8 +75,8 @@ fn child_process() {
             std::io::stdin().read_to_end(&mut Vec::new()).unwrap();
         }
         "allocate" => {
-            let registry = Registry::at(macro_env_var::maybe_read_env(CHILD_DIR).unwrap());
-            let name = macro_env_var::maybe_read_env(CHILD_NAME).unwrap();
+            let registry = Registry::at(rox_env_var::maybe_read_env(CHILD_DIR).unwrap());
+            let name = rox_env_var::maybe_read_env(CHILD_NAME).unwrap();
             println!("\nREADY");
             let allocation = allocate(&registry, &name, &Machine::default());
             println!(

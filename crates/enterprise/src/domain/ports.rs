@@ -1,7 +1,7 @@
 use super::{DisableMemberReport, Result, RuntimePresetAllowlist, VerifiedRoxIdentity};
 use crate::audit::{AuditRecord, AuditResult};
 use entity_access::domain::models::{AdminTeamRole, EntityAccessReceipt};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Boxed enterprise use-case result used by object-erased admission ports.
@@ -18,15 +18,15 @@ pub trait EnterpriseRepository: Clone + Send + Sync + 'static {
     /// Insert or repeat the same verified binding.
     fn bind_verified(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        rox_user_id: &RoxUserIdStr<'_>,
         identity: VerifiedRoxIdentity,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Commit lifecycle state and its audit row atomically.
     fn commit_member_state(
         &self,
-        actor: &MacroUserIdStr<'_>,
-        member: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
         disabled: bool,
         result: AuditResult,
     ) -> impl Future<Output = Result<()>> + Send;
@@ -34,7 +34,7 @@ pub trait EnterpriseRepository: Clone + Send + Sync + 'static {
     /// Whether new email initialization and agent sessions are refused.
     fn member_disabled(
         &self,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool>> + Send;
 
     /// Replace or clear a team's exhaustive runtime allowlist.
@@ -59,7 +59,7 @@ pub trait TeamDirectory: Clone + Send + Sync + 'static {
     /// Teams the user belongs to, in the owning repository's order.
     fn team_ids(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Uuid>>> + Send;
 }
 
@@ -68,7 +68,7 @@ pub trait MemberDirectory: Clone + Send + Sync + 'static {
     /// Resolve a stored Rox user to FusionAuth's UUID.
     fn fusion_user_id(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<String>> + Send;
 }
 
@@ -85,7 +85,7 @@ pub trait HarnessRevoker: Clone + Send + Sync + 'static {
     /// Revoke every server record owned by this member and return the count.
     fn revoke_server_records(
         &self,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<usize>> + Send;
 }
 
@@ -94,7 +94,7 @@ pub trait AgentSessionAdmission: Send + Sync + 'static {
     /// Refuse disabled members and presets outside an exhaustive team list.
     fn ensure_allowed<'a>(
         &'a self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         preset_id: &'a str,
     ) -> EnterpriseFuture<'a, ()>;
 }
@@ -102,7 +102,7 @@ pub trait AgentSessionAdmission: Send + Sync + 'static {
 /// Email initialization's member-active gate.
 pub trait MemberAccess: Send + Sync + 'static {
     /// Fail with [`super::EnterpriseError::MemberDisabled`] after an admin disable.
-    fn ensure_active<'a>(&'a self, user: &'a MacroUserIdStr<'_>) -> EnterpriseFuture<'a, ()>;
+    fn ensure_active<'a>(&'a self, user: &'a RoxUserIdStr<'_>) -> EnterpriseFuture<'a, ()>;
 }
 
 /// Team-admin use cases consumed by the HTTP adapter.
@@ -111,14 +111,14 @@ pub trait EnterpriseAdminService: Send + Sync + 'static {
     fn disable_member(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        member: MacroUserIdStr<'static>,
+        member: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<DisableMemberReport>> + Send;
 
     /// Reactivate a team member without deleting or recreating any user data.
     fn enable_member(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        member: MacroUserIdStr<'static>,
+        member: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Write an exhaustive local-runtime allowlist.

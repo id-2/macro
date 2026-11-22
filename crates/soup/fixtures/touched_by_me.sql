@@ -19,11 +19,11 @@ INSERT INTO public."Organization" ("id", "name", "status")
 VALUES (1, 'Test Organization', 'PILOT')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO public."macro_user" ("id", "username", "email", "stripe_customer_id")
+INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id")
 VALUES ('a1111111-1111-1111-1111-111111111111', 'user@test.com', 'user@test.com', 'stripe_id_1'),
        ('a2222222-2222-2222-2222-222222222222', 'user2@test.com', 'user2@test.com', 'stripe_id_2');
 
-INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "macro_user_id")
+INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
 VALUES ('macro|user-1@test.com', 'user@test.com', 'stripe_id_1', 1, 'a1111111-1111-1111-1111-111111111111'),
        ('macro|user-2@test.com', 'user2@test.com', 'stripe_id_2', 1, 'a2222222-2222-2222-2222-222222222222')
 ON CONFLICT DO NOTHING;
@@ -71,7 +71,7 @@ VALUES ('33333333-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'member', 'macro|user-1@test.com
        -- Touched at T5 but user-1 has left: must never surface.
        ('33333333-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'member', 'macro|user-1@test.com', '2023-01-07 11:00:00', '2024-06-01 00:00:00');
 
-INSERT INTO public.email_links ("id", "macro_id", "fusionauth_user_id", "email_address", "provider")
+INSERT INTO public.email_links ("id", "rox_id", "fusionauth_user_id", "email_address", "provider")
 VALUES ('55555555-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'macro|user-1@test.com', 'fa-user-1', 'user@test.com', 'GMAIL'),
        ('55555555-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'macro|user-2@test.com', 'fa-user-2', 'user2@test.com', 'GMAIL');
 

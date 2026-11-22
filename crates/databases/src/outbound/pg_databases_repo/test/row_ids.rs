@@ -11,7 +11,7 @@ use super::*;
 use crate::domain::models::{CreateDatabase, DatabaseError, OpRefusal};
 use crate::domain::ports::{DatabasesRepo, DatabasesService};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inserted_rows_take_the_ids_the_client_minted(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -74,7 +74,7 @@ async fn inserted_rows_take_the_ids_the_client_minted(pool: PgPool) {
     assert_eq!(rows.iter().map(|row| row.id).collect::<Vec<_>>(), vec![sam]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_retried_insert_whose_first_attempt_committed_is_refused_as_taken(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -123,7 +123,7 @@ async fn a_retried_insert_whose_first_attempt_committed_is_refused_as_taken(pool
     assert_eq!(version(&pool, guests.table_id).await, committed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_row_id_another_database_already_has_is_refused_as_taken(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -210,7 +210,7 @@ async fn a_row_id_another_database_already_has_is_refused_as_taken(pool: PgPool)
     assert_eq!(version(&pool, guests.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_row_id_minted_twice_in_one_batch_is_refused_as_taken(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -271,7 +271,7 @@ async fn a_row_id_minted_twice_in_one_batch_is_refused_as_taken(pool: PgPool) {
     assert_eq!(version(&pool, guests.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_insert_naming_fewer_ids_than_rows_is_refused(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);

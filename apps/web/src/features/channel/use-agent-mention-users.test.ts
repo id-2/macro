@@ -1,14 +1,14 @@
 import { CODEX_BOT_PRINCIPAL_ID } from '@core/constant/codexAgent';
 import {
-  MACRO_AGENT_NAME,
-  MACRO_AGENT_PRINCIPAL_ID,
+  ROX_AGENT_NAME,
+  ROX_AGENT_PRINCIPAL_ID,
 } from '@core/constant/macroAgent';
 import {
-  MACRO_CODER_BOT_ID,
-  MACRO_CODER_NAME,
-  MACRO_CODER_PRINCIPAL_ID,
+  ROX_CODER_BOT_ID,
+  ROX_CODER_NAME,
+  ROX_CODER_PRINCIPAL_ID,
 } from '@core/constant/macroCoder';
-import { MACRO_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
 import type { IUser } from '@core/user/types';
 import { createRoot, createSignal } from 'solid-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -37,7 +37,7 @@ vi.mock('@app/lib/analytics/posthog', () => ({
 }));
 
 function macroEntries(users: IUser[]): IUser[] {
-  return users.filter((user) => user.name === MACRO_AGENT_NAME);
+  return users.filter((user) => user.name === ROX_AGENT_NAME);
 }
 
 describe('useAgentMentionUsers', () => {
@@ -71,9 +71,9 @@ describe('useAgentMentionUsers', () => {
       const users = useAgentMentionUsers(() => []);
       expect(macroEntries(users())).toEqual([
         {
-          id: MACRO_AGENT_PRINCIPAL_ID,
-          name: MACRO_AGENT_NAME,
-          email: MACRO_AGENT_NAME,
+          id: ROX_AGENT_PRINCIPAL_ID,
+          name: ROX_AGENT_NAME,
+          email: ROX_AGENT_NAME,
         },
       ]);
       dispose();
@@ -86,11 +86,11 @@ describe('useAgentMentionUsers', () => {
       flags.agents = enabled;
       const users = useAgentMentionUsers(() => []);
       expect(macroEntries(users()).map((user) => user.id)).toEqual([
-        MACRO_AGENT_PRINCIPAL_ID,
+        ROX_AGENT_PRINCIPAL_ID,
       ]);
       setEnabled(true);
       expect(macroEntries(users()).map((user) => user.id)).toEqual([
-        MACRO_NEW_PRINCIPAL_ID,
+        ROX_NEW_PRINCIPAL_ID,
       ]);
       dispose();
     });
@@ -101,18 +101,18 @@ describe('useAgentMentionUsers', () => {
       flags.agents = () => true;
       const users = useAgentMentionUsers(() => [
         {
-          id: MACRO_AGENT_PRINCIPAL_ID,
+          id: ROX_AGENT_PRINCIPAL_ID,
           name: 'Rox',
           email: 'Rox',
         },
         {
-          id: MACRO_NEW_PRINCIPAL_ID,
+          id: ROX_NEW_PRINCIPAL_ID,
           name: 'macro(new)',
           email: 'macro(new)',
         },
       ]);
       expect(macroEntries(users()).map((user) => user.id)).toEqual([
-        MACRO_NEW_PRINCIPAL_ID,
+        ROX_NEW_PRINCIPAL_ID,
       ]);
       dispose();
     });
@@ -125,7 +125,7 @@ describe('useAgentMentionUsers', () => {
         flags.agents = () => rollout;
         const users = useAgentMentionUsers(() => []);
         expect(users().map((user) => user.id)).not.toContain(
-          MACRO_CODER_PRINCIPAL_ID
+          ROX_CODER_PRINCIPAL_ID
         );
 
         const person = {
@@ -136,19 +136,19 @@ describe('useAgentMentionUsers', () => {
         const [enabled, setEnabled] = createSignal(true);
         const participants = [
           person,
-          ...[MACRO_CODER_BOT_ID, MACRO_CODER_PRINCIPAL_ID].map((id) => ({
+          ...[ROX_CODER_BOT_ID, ROX_CODER_PRINCIPAL_ID].map((id) => ({
             id,
-            name: MACRO_CODER_NAME,
-            email: MACRO_CODER_NAME,
+            name: ROX_CODER_NAME,
+            email: ROX_CODER_NAME,
           })),
         ];
         const mentions = useAgentMentionUsers(() => participants, enabled);
         expect(mentions()).toContainEqual(person);
         expect(mentions().map((user) => user.id)).not.toContain(
-          MACRO_CODER_BOT_ID
+          ROX_CODER_BOT_ID
         );
         expect(mentions().map((user) => user.id)).not.toContain(
-          MACRO_CODER_PRINCIPAL_ID
+          ROX_CODER_PRINCIPAL_ID
         );
         setEnabled(false);
         expect(mentions()).toEqual([person]);

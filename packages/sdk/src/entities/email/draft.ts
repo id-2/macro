@@ -2,7 +2,7 @@ import type {
   AddDraftAttachmentRequest,
   ApiDraftInput,
 } from '../../../generated/email/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { EmailAttachment } from './attachment';
 import { EmailMessage } from './message';
 import type { EmailThread } from './thread';
@@ -17,7 +17,7 @@ export type DraftOptions = Omit<
   | 'thread_db_id'
   | 'body_text'
   | 'body_html'
-  | 'body_macro'
+  | 'body_rox'
   | 'headers_json'
   | 'include_signature'
   | 'draft_generation'
@@ -65,7 +65,7 @@ export class EmailDraft extends EmailMessage {
   }
 
   /** Construct a lazy draft handle. */
-  static byId(client: MacroClient, id: string): EmailDraft {
+  static byId(client: RoxClient, id: string): EmailDraft {
     return new EmailDraft(client, id);
   }
 
@@ -295,7 +295,7 @@ export class DraftAttachment {
 
   /** Construct a draft scoped attachment handle. */
   static byId(
-    _client: MacroClient,
+    _client: RoxClient,
     draft: EmailDraft,
     id: string,
     forwarded = false,
@@ -362,7 +362,7 @@ export function draftBody(options: DraftOptions): ApiDraftInput {
             .replaceAll('+', '-')
             .replaceAll('/', '_')
             .replaceAll('=', ''),
-    body_macro: bodyMacro,
+    body_rox: bodyMacro,
     headers_json: headers,
     include_signature: includeSignature,
     draft_generation: draftGeneration,

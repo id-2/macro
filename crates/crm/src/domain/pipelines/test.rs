@@ -25,7 +25,7 @@ fn a_pipeline_without_a_record_type_starts_like_a_new_database() {
         "name": "Hiring"
     }))
     .unwrap();
-    let creator = MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap();
+    let creator = RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap();
     let blueprint = pipeline_blueprint(Uuid::nil(), creator, input, vec!["Lead".to_owned()]);
     assert_eq!(blueprint.record_type, None);
     let [name] = blueprint.database.columns.as_slice() else {

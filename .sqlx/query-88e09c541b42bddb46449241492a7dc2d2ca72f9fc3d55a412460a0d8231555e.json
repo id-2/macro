@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT voice_id FROM macro_user_voice WHERE macro_user_id = $1\n            ",
+  "query": "\n            SELECT voice_id FROM rox_user_voice WHERE rox_user_id = $1\n            ",
   "describe": {
     "columns": [
       {

@@ -296,7 +296,7 @@ struct DeploymentUrls {
 
 impl DeploymentUrls {
     fn from_deployment(deployment: &hosted_runtimes::domain::enrollment::Deployment) -> Self {
-        let trim = |url: &macro_service_urls::Url| url.as_str().trim_end_matches('/').to_owned();
+        let trim = |url: &rox_service_urls::Url| url.as_str().trim_end_matches('/').to_owned();
         Self {
             egress_url: trim(&deployment.egress_url),
             api_url: trim(&deployment.agent_harness_url),

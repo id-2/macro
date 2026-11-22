@@ -13,7 +13,7 @@ async fn insert_task(pool: &PgPool, id: &str) {
     .expect("insert task document");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stores_one_task_per_session_and_returns_the_pull_request(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;

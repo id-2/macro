@@ -8,8 +8,8 @@ use axum::extract::{Query, State};
 use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 use futures::StreamExt;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_middleware::tracking::ClientIp;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_middleware::tracking::ClientIp;
 use model::response::ErrorResponse;
 use reqwest::StatusCode;
 use serde::Deserialize;
@@ -41,7 +41,7 @@ const CONNECT_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
 /// a browser-like string clears those rules. Shaped like Gmail's image proxy —
 /// a real browser string plus a proxy identifier. A minority of hosts do the
 /// reverse, so [`proxy_request_handler`] retries once with no UA on failure.
-const UPSTREAM_USER_AGENT: &str = "Mozilla/5.0 (compatible; MacroImageProxy/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+const UPSTREAM_USER_AGENT: &str = "Mozilla/5.0 (compatible; RoxImageProxy/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 /// Build the HTTP client used to fetch upstream images.
 ///
@@ -177,7 +177,7 @@ pub struct ProxyParams {
     fields(actor = %user.acting_entity())
 )]
 pub async fn proxy_request_handler(
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Query(params): Query<ProxyParams>,
     State(http_client): State<reqwest::Client>,
     _ip: ClientIp,

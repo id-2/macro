@@ -42,7 +42,7 @@ trap 'exit 143' TERM
 unshare --user --map-root-user --net --pid --fork --mount-proc --kill-child=SIGKILL \
   bash -c 'set -euo pipefail
     ip link set lo up
-    export MACRO_E2E_NETNS=1
+    export ROX_E2E_NETNS=1
     exec dbus-run-session -- xvfb-run --auto-servernum --server-args="-screen 0 1440x1000x24 -nolisten tcp" \
       bun "$1/apps/web/tests/native/$2" "${@:3}"
   ' bash "$root" "$runner" "$@" &

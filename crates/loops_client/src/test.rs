@@ -33,7 +33,7 @@ fn normalize_email_only_strips_the_local_part() {
 
 #[test]
 fn idempotency_digest_fits_the_loops_header_limit() {
-    // A `MacroUserId` embeds an email, so an untruncated key can run well past
+    // A `RoxUserId` embeds an email, so an untruncated key can run well past
     // the 100 characters Loops accepts.
     let long_key = format!("user-registered-{}@rox.one", "a".repeat(300));
     assert_eq!(idempotency_digest(&long_key).len(), 64);

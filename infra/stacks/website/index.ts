@@ -497,7 +497,7 @@ if (stack === 'prod') {
         'google-site-verification=gXDuoHXWgx-OJbnAkfp01Y2zHpTOaai2aqnwWUARueA',
         '_h5l64nu1n1cgrijoyb1xpqs18feaulp',
         'MS=ms97745247',
-        // Macro Connect's Google OAuth app.
+        // Rox Connect's Google OAuth app.
         'google-site-verification=v0VjgBSJnZ-Xl6zjn4QFZibcfAsjWJejEOrmuM93a1Y',
       ],
     },

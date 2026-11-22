@@ -12,9 +12,9 @@ alwaysApply: false
 # Rust libraries
 
 Reach for these before writing a helper or adding a dependency. Infrastructure
-crates (`macro_config`, `macro_entrypoint`, `macro_service_urls`, `kafka_util`,
-`sqs_worker`, `macro_cors`, `macro_tower_layers`, `macro_auth`,
-`macro_authorization`) are covered by the config and observability rules; use
+crates (`rox_config`, `rox_entrypoint`, `rox_service_urls`, `kafka_util`,
+`sqs_worker`, `rox_cors`, `rox_tower_layers`, `rox_auth`,
+`rox_authorization`) are covered by the config and observability rules; use
 them instead of their generic equivalents.
 
 - **CS-56** Error types: `thiserror` enums for every public error (domain and
@@ -47,7 +47,7 @@ them instead of their generic equivalents.
   `CancellationToken` and is tracked by a `TaskTracker`.
 - **CS-62** Outbound HTTP: build one `reqwest::Client` with a timeout in the
   adapter's constructor and keep it; take the base URL from
-  `macro_service_urls`; call `macro_tower_layers::inject_trace_headers` on every
+  `rox_service_urls`; call `rox_tower_layers::inject_trace_headers` on every
   request. Never `Client::new()` per call or `.unwrap()` the builder.
 - **CS-63** Time is `chrono` (`DateTime<Utc>`); `time` only where a dependency's
   API requires it. New ids are `Uuid::now_v7()` or a newtype's `generate()`
@@ -57,7 +57,7 @@ them instead of their generic equivalents.
   `once_cell`, and never compile a regex per call.
 - **CS-65** Domain-service tests use hand-written fakes implementing the port;
   `mockall` only for narrow interaction assertions. DB tests use
-  `#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]`; HTTP doubles use
+  `#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]`; HTTP doubles use
   `wiremock`; transcript and replay output uses `insta`.
 - **CS-66** Never wait for a condition by polling: no `yield_now` or `sleep`
   loops. Signal with `oneshot`, `Notify`, `watch`, `Barrier`, or a channel, and

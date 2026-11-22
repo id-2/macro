@@ -5,14 +5,14 @@ use entity_access::domain::models::{
     AccessError, AccessLevel, BotAccessScope, CallChannelInfo, EntityAccessReceipt,
     EntityPermission, EntityType, RequiredPermission, TeamRole, UserTeamInfo,
 };
-use macro_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_ROX_USER_ID_HEADER};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use shared_entity_registry::OwnedPurgeOutcome;
 
 #[derive(Default)]
 struct Controls {
     deleted: Mutex<Vec<AgentSessionId>>,
-    controls: Mutex<Vec<(AgentSessionId, Option<MacroUserIdStr<'static>>)>>,
+    controls: Mutex<Vec<(AgentSessionId, Option<RoxUserIdStr<'static>>)>>,
 }
 impl AgentSessionNotificationRecipient for Controls {
     async fn purge_owned_session(
@@ -22,7 +22,7 @@ impl AgentSessionNotificationRecipient for Controls {
     ) -> SessionResult<OwnedPurgeOutcome> {
         unreachable!()
     }
-    async fn delete_user_sessions(&self, _: MacroUserIdStr<'static>) -> SessionResult<()> {
+    async fn delete_user_sessions(&self, _: RoxUserIdStr<'static>) -> SessionResult<()> {
         unreachable!()
     }
     async fn session_deleted(&self, id: AgentSessionId) -> SessionResult<()> {
@@ -48,7 +48,7 @@ impl AgentSessionNotificationRecipient for Controls {
         _: AgentSessionId,
         _: AgentActionId,
         _: String,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         unreachable!()
     }
@@ -56,7 +56,7 @@ impl AgentSessionNotificationRecipient for Controls {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         unreachable!()
     }
@@ -64,7 +64,7 @@ impl AgentSessionNotificationRecipient for Controls {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         unreachable!()
     }
@@ -86,7 +86,7 @@ struct FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -107,7 +107,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -119,7 +119,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -138,7 +138,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -152,7 +152,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -163,7 +163,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         panic!("unexpected get_users_by_entity call")
     }
 
@@ -183,7 +183,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         panic!("unexpected get_user_team call")
     }
@@ -198,7 +198,7 @@ async fn request(
     user: bool,
     body: serde_json::Value,
 ) -> StatusCode {
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-key".into(),
@@ -213,7 +213,7 @@ async fn request(
             Arc::new(FakeEntityAccessService {
                 access_level: Some(level),
             }),
-            MacroAuthorizationState::new(Arc::new(auth)),
+            RoxAuthorizationState::new(Arc::new(auth)),
         ),
     );
     let mut req = Request::builder()
@@ -227,7 +227,7 @@ async fn request(
         req = req.header(INTERNAL_API_KEY_HEADER, "test-key");
     }
     if user {
-        req = req.header(INTERNAL_MACRO_USER_ID_HEADER, OWNER);
+        req = req.header(INTERNAL_ROX_USER_ID_HEADER, OWNER);
     }
     router
         .oneshot(req.body(Body::from(body.to_string())).unwrap())
@@ -313,7 +313,7 @@ async fn internal_actions_require_user_identity_and_sufficient_entity_access() {
         *controls.controls.lock().unwrap(),
         [(
             AgentSessionId::TEST_A,
-            Some(MacroUserIdStr::try_from(OWNER.to_owned()).unwrap())
+            Some(RoxUserIdStr::try_from(OWNER.to_owned()).unwrap())
         )]
     );
 }
@@ -381,7 +381,7 @@ async fn session_activity_requires_view_access_and_valid_pagination_before_readi
             StatusCode::BAD_REQUEST,
         ),
     ] {
-        let auth = MacroAuthorizationServiceImpl::new(
+        let auth = RoxAuthorizationServiceImpl::new(
             FakeJwtValidator,
             InternalAuthConfig {
                 api_key: "test-key".into(),
@@ -398,7 +398,7 @@ async fn session_activity_requires_view_access_and_valid_pagination_before_readi
                 Arc::new(FakeEntityAccessService {
                     access_level: level,
                 }),
-                MacroAuthorizationState::new(Arc::new(auth)),
+                RoxAuthorizationState::new(Arc::new(auth)),
             )),
         );
         let request = Request::builder()
@@ -407,7 +407,7 @@ async fn session_activity_requires_view_access_and_valid_pagination_before_readi
                 AgentSessionId::TEST_A
             ))
             .header(INTERNAL_API_KEY_HEADER, "test-key")
-            .header(INTERNAL_MACRO_USER_ID_HEADER, OWNER)
+            .header(INTERNAL_ROX_USER_ID_HEADER, OWNER)
             .body(Body::empty())
             .unwrap();
         assert_eq!(router.oneshot(request).await.unwrap().status(), expected);

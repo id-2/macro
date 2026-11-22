@@ -3,13 +3,13 @@ use axum::Json;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::ErrorResponse;
 
 #[tracing::instrument(skip(ctx))]
 pub(crate) async fn handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path(fusionauth_user_id): Path<String>,
 ) -> Result<Response, Response> {
     ctx.user_inbox_deletion

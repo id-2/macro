@@ -6,7 +6,7 @@
 use std::sync::Arc;
 
 use connection_gateway_client::client::ConnectionGatewayClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use serde_json::json;
 
@@ -43,7 +43,7 @@ fn payload(action: &ClearAction) -> serde_json::Value {
 }
 
 impl ClearUpdates for GatewayClearUpdates {
-    async fn updated(&self, user: &MacroUserIdStr<'static>, action: &ClearAction) {
+    async fn updated(&self, user: &RoxUserIdStr<'static>, action: &ClearAction) {
         let sent = self
             .gateway
             .send_message(

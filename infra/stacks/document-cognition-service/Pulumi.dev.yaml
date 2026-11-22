@@ -7,7 +7,7 @@ config:
   document-cognition:internal_auth_key: document-storage-service-auth-key-dev
   document-cognition:jwt_secret_key: fusionauth-jwt-secret-dev
   document-cognition:legacy_jwt_secret_key: jwt-secret-dev
-  document-cognition:macro_db_secret_key: macro-db-dev
+  document-cognition:rox_db_secret_key: macro-db-dev
   document-cognition:openai_api_key: openai-key
   document-cognition:anthropic_api_key: anthropic-api-key-dev
   document-cognition:xai-api-key: xai-api-key
@@ -16,5 +16,5 @@ config:
   document-cognition:perplexity-api-key: perplexity-api-key
   document-cognition:tavily-api-key: tavily-api-key
   document-cognition:authentication_service_internal_api_key: authentication-service-internal-api-key-dev
-  document-cognition:macro_db_proxy_secret_key: macrodb-rds-proxy-dev
+  document-cognition:rox_db_proxy_secret_key: macrodb-rds-proxy-dev
   datadog:validate: "false"

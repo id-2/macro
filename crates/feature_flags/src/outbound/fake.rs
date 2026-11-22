@@ -1,7 +1,7 @@
 //! Deterministic, per-user feature flags for consumer tests.
 
 use crate::{FeatureFlags, FlagSnapshot, ServiceContext, ServiceFeatureFlags};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::collections::HashMap;
 
@@ -13,7 +13,7 @@ mod test;
 #[derive(Default)]
 pub struct FakeFeatureFlags {
     services: HashMap<ServiceContext, Result<FlagSnapshot, String>>,
-    users: HashMap<MacroUserIdStr<'static>, Result<FlagSnapshot, String>>,
+    users: HashMap<RoxUserIdStr<'static>, Result<FlagSnapshot, String>>,
 }
 
 impl FakeFeatureFlags {
@@ -22,13 +22,13 @@ impl FakeFeatureFlags {
         self.services.insert(context, result);
     }
     /// Configure a user's result. An error message simulates a load failure.
-    pub fn set(&mut self, user_id: MacroUserIdStr<'static>, result: Result<FlagSnapshot, String>) {
+    pub fn set(&mut self, user_id: RoxUserIdStr<'static>, result: Result<FlagSnapshot, String>) {
         self.users.insert(user_id, result);
     }
 }
 
 impl FeatureFlags for FakeFeatureFlags {
-    async fn load(&self, user_id: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
+    async fn load(&self, user_id: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
         match self.users.get(user_id) {
             Some(Ok(snapshot)) => Ok(snapshot.clone()),
             Some(Err(message)) => Err(rootcause::report!("{message}")),

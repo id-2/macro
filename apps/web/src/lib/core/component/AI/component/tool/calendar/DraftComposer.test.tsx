@@ -104,7 +104,7 @@ import {
 const link = (id: string, overrides: Partial<Link> = {}): Link =>
   ({
     id,
-    macro_id: 'macro|self',
+    rox_id: 'macro|self',
     email_address: `${id}@example.com`,
     is_primary: id === 'work',
     needs_reauth: false,

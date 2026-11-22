@@ -14,10 +14,10 @@ use axum::{
     routing::{any, delete, get, post},
 };
 use futures::TryStreamExt;
-use macro_authorization::{
-    InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 
 use crate::api::{
@@ -38,7 +38,7 @@ const LFS_MEDIA_TYPE: &str = "application/vnd.git-lfs+json";
 /// Router state.
 pub struct AgentGitRouterState<Service, Auth> {
     service: Arc<Service>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
     public_base_url: String,
 }
 
@@ -57,7 +57,7 @@ impl<Service, Auth> AgentGitRouterState<Service, Auth> {
     /// built from it), without a trailing slash.
     pub fn new(
         service: Arc<Service>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
         public_base_url: String,
     ) -> Self {
         Self {
@@ -68,7 +68,7 @@ impl<Service, Auth> AgentGitRouterState<Service, Auth> {
     }
 }
 
-impl<Service, Auth> FromRef<AgentGitRouterState<Service, Auth>> for MacroAuthorizationState<Auth> {
+impl<Service, Auth> FromRef<AgentGitRouterState<Service, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AgentGitRouterState<Service, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -89,7 +89,7 @@ pub fn agent_git_router<Service, Auth, Outer>(
 ) -> Router<Outer>
 where
     Service: AgentGitService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Outer: Send + Sync + 'static,
 {
     Router::new()
@@ -171,12 +171,12 @@ fn bad_request(message: &str) -> Response {
 }
 
 /// `<agent_user_id>.git` → the agent's user id.
-fn parse_repository(repository: &str) -> Result<MacroUserIdStr<'static>, AgentGitError> {
+fn parse_repository(repository: &str) -> Result<RoxUserIdStr<'static>, AgentGitError> {
     let agent_user_id = repository
         .strip_suffix(REPO_SUFFIX)
         .ok_or(AgentGitError::NotFound)?;
 
-    MacroUserIdStr::try_from(agent_user_id.to_owned()).map_err(|_| AgentGitError::NotFound)
+    RoxUserIdStr::try_from(agent_user_id.to_owned()).map_err(|_| AgentGitError::NotFound)
 }
 
 fn header_string(
@@ -265,7 +265,7 @@ struct InfoRefsQuery {
 }
 
 #[tracing::instrument(skip_all, fields(repo_id = %agent_credentials::telemetry_id(repository.trim_end_matches(REPO_SUFFIX)), git.rejected_reason, otel.status_code))]
-async fn info_refs<Service: AgentGitService, Auth: MacroAuthorizationService>(
+async fn info_refs<Service: AgentGitService, Auth: RoxAuthorizationService>(
     State(state): State<AgentGitRouterState<Service, Auth>>,
     Path(repository): Path<String>,
     Query(query): Query<InfoRefsQuery>,
@@ -291,7 +291,7 @@ async fn info_refs<Service: AgentGitService, Auth: MacroAuthorizationService>(
 }
 
 #[tracing::instrument(skip_all, fields(repo_id = %agent_credentials::telemetry_id(repository.trim_end_matches(REPO_SUFFIX)), git.rejected_reason, otel.status_code))]
-async fn upload_pack<Service: AgentGitService, Auth: MacroAuthorizationService>(
+async fn upload_pack<Service: AgentGitService, Auth: RoxAuthorizationService>(
     State(state): State<AgentGitRouterState<Service, Auth>>,
     Path(repository): Path<String>,
     caller: GitCredentialExtractor<Auth>,
@@ -310,7 +310,7 @@ async fn upload_pack<Service: AgentGitService, Auth: MacroAuthorizationService>(
 }
 
 #[tracing::instrument(skip_all, fields(repo_id = %agent_credentials::telemetry_id(repository.trim_end_matches(REPO_SUFFIX)), git.rejected_reason, otel.status_code))]
-async fn receive_pack<Service: AgentGitService, Auth: MacroAuthorizationService>(
+async fn receive_pack<Service: AgentGitService, Auth: RoxAuthorizationService>(
     State(state): State<AgentGitRouterState<Service, Auth>>,
     Path(repository): Path<String>,
     caller: GitCredentialExtractor<Auth>,
@@ -338,9 +338,9 @@ async fn lfs_unsupported() -> Response {
 }
 
 #[tracing::instrument(skip_all, err)]
-async fn create_repo<Service: AgentGitService, Auth: MacroAuthorizationService>(
+async fn create_repo<Service: AgentGitService, Auth: RoxAuthorizationService>(
     State(state): State<AgentGitRouterState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Json(request): Json<CreateRepoRequest>,
 ) -> Result<Json<CreatedRepoResponse>, AgentGitHttpError> {
     let created = state
@@ -362,9 +362,9 @@ async fn create_repo<Service: AgentGitService, Auth: MacroAuthorizationService>(
 }
 
 #[tracing::instrument(skip_all, err)]
-async fn ensure_repo<Service: AgentGitService, Auth: MacroAuthorizationService>(
+async fn ensure_repo<Service: AgentGitService, Auth: RoxAuthorizationService>(
     State(state): State<AgentGitRouterState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Json(request): Json<EnsureRepoRequest>,
 ) -> Result<Json<CreatedRepoResponse>, AgentGitHttpError> {
     let token = request.token;
@@ -390,12 +390,12 @@ async fn ensure_repo<Service: AgentGitService, Auth: MacroAuthorizationService>(
 }
 
 #[tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref())), err)]
-async fn delete_repo<Service: AgentGitService, Auth: MacroAuthorizationService>(
+async fn delete_repo<Service: AgentGitService, Auth: RoxAuthorizationService>(
     State(state): State<AgentGitRouterState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Path(agent_user_id): Path<String>,
 ) -> Result<StatusCode, AgentGitHttpError> {
-    let Ok(agent_user_id) = MacroUserIdStr::try_from(agent_user_id) else {
+    let Ok(agent_user_id) = RoxUserIdStr::try_from(agent_user_id) else {
         return Err(AgentGitHttpError(AgentGitError::NotFound));
     };
 
@@ -405,13 +405,13 @@ async fn delete_repo<Service: AgentGitService, Auth: MacroAuthorizationService>(
 }
 
 #[tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref())), err)]
-async fn read_voice<Service: AgentGitService, Auth: MacroAuthorizationService>(
+async fn read_voice<Service: AgentGitService, Auth: RoxAuthorizationService>(
     State(state): State<AgentGitRouterState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Path(agent_user_id): Path<String>,
     Query(query): Query<VoiceQuery>,
 ) -> Result<Json<VoiceConfig>, AgentGitHttpError> {
-    let Ok(agent_user_id) = MacroUserIdStr::try_from(agent_user_id) else {
+    let Ok(agent_user_id) = RoxUserIdStr::try_from(agent_user_id) else {
         return Err(AgentGitHttpError(AgentGitError::NotFound));
     };
 
@@ -421,13 +421,13 @@ async fn read_voice<Service: AgentGitService, Auth: MacroAuthorizationService>(
 }
 
 #[tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref())), err)]
-async fn set_voice<Service: AgentGitService, Auth: MacroAuthorizationService>(
+async fn set_voice<Service: AgentGitService, Auth: RoxAuthorizationService>(
     State(state): State<AgentGitRouterState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Path(agent_user_id): Path<String>,
     Json(request): Json<SetVoiceRequest>,
 ) -> Result<StatusCode, AgentGitHttpError> {
-    let Ok(agent_user_id) = MacroUserIdStr::try_from(agent_user_id) else {
+    let Ok(agent_user_id) = RoxUserIdStr::try_from(agent_user_id) else {
         return Err(AgentGitHttpError(AgentGitError::NotFound));
     };
 

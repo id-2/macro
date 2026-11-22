@@ -15,7 +15,7 @@ export type PushEvent =
 
 declare global {
   interface Window {
-    __MACRO_IOS_NOTIFICATION_LAUNCH__?: boolean;
+    __ROX_IOS_NOTIFICATION_LAUNCH__?: boolean;
   }
 }
 
@@ -26,7 +26,7 @@ export type PushPermissionStatus = ios.NotificationPermissionStatus & {
 };
 
 export function supportsNotificationLaunch(): boolean {
-  return window.__MACRO_IOS_NOTIFICATION_LAUNCH__ === true;
+  return window.__ROX_IOS_NOTIFICATION_LAUNCH__ === true;
 }
 
 /** Reveal auth/retry UI without discarding the durable tapped destination. */

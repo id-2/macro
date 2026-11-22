@@ -2,7 +2,7 @@
 
 use std::{future::Future, pin::Pin};
 
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 
 use super::models::{EmailErr, Link};
 

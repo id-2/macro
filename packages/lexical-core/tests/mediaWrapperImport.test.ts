@@ -55,7 +55,7 @@ describe('media wrapper div import', () => {
 
   it('does not steal an ancestor container with a nested image', () => {
     const editor = importHtml(
-      `<body><div data-classed-block="true" class="macro_quote gmail_quote"><div class="gmail_attr" data-classed-block="true">On ... wrote:</div><div>${IMG}</div><blockquote>quoted text</blockquote></div></body>`
+      `<body><div data-classed-block="true" class="rox_quote gmail_quote"><div class="gmail_attr" data-classed-block="true">On ... wrote:</div><div>${IMG}</div><blockquote>quoted text</blockquote></div></body>`
     );
     editor.read(() => {
       expect($collectImages()).toHaveLength(1);

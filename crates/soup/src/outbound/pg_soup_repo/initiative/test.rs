@@ -14,8 +14,8 @@ use item_filters::ast::{
     EntityFilterAst, calendar_event::CalendarEventLiteral, chat::ChatLiteral,
     document::DocumentLiteral, initiative::InitiativeLiteral, project::ProjectLiteral,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::{GroupByField, GroupingConfig};
 use models_pagination::Identify;
 use models_pagination::{CursorWithValAndFilter, Query, SimpleSortMethod, SortOn};
@@ -32,17 +32,17 @@ fn filters() -> EntityFilterAst {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
 }
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
     fixtures("test/initiatives.sql"),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn initiatives_access_cursor_and_hydration(pool: PgPool) -> anyhow::Result<()> {
     let mut without_initiatives = filters();
@@ -133,11 +133,11 @@ async fn initiatives_access_cursor_and_hydration(pool: PgPool) -> anyhow::Result
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
     fixtures("test/initiatives.sql"),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn initiative_listing_and_candidate_gate_share_access_rules(
     pool: PgPool,
@@ -208,11 +208,11 @@ async fn initiative_listing_and_candidate_gate_share_access_rules(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
     fixtures("test/initiatives.sql"),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn initiatives_grouping_and_property_enrichment(pool: PgPool) -> anyhow::Result<()> {
     let rows = expanded_dynamic_cursor_soup_grouped(
@@ -301,7 +301,7 @@ async fn initiatives_grouping_and_property_enrichment(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(fixtures("test/access_paths.sql"), migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(fixtures("test/access_paths.sql"), migrator = "ROX_DB_MIGRATIONS")]
 async fn listings_and_per_row_gates_agree_on_every_access_path(pool: PgPool) -> anyhow::Result<()> {
     // See the fixture for each initiative's path. In descending update order:
     // the viewer sees direct, owner, folder, joined-channel and team grants
@@ -352,7 +352,7 @@ async fn listings_and_per_row_gates_agree_on_every_access_path(pool: PgPool) -> 
     assert_eq!(all_ids.len(), 18);
 
     for (viewer, expected) in cases {
-        let user_id = MacroUserIdStr::parse_from_str(viewer)?;
+        let user_id = RoxUserIdStr::parse_from_str(viewer)?;
         let listed = expanded_dynamic_cursor_soup(
             &pool,
             ExpandedDynamicCursorArgs {

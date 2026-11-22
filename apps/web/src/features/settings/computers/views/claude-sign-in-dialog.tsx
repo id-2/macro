@@ -26,7 +26,7 @@ export function ClaudeSignInDialog(props: {
   const mode = useClaudeModeQuery(() => props.harnessId);
   const useCredits = async () => {
     // Already on credits: nothing to sign out of.
-    if (mode.data?.mode === 'macro_credits') {
+    if (mode.data?.mode === 'rox_credits') {
       props.onClose();
       return;
     }

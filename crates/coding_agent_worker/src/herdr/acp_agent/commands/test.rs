@@ -4,7 +4,7 @@ use agent_fold::domain::log::{AgentSessionId, AgentSessionLog};
 use agent_fold::domain::ports::FoldMachine as _;
 
 #[test]
-fn advertised_commands_reach_macro_metadata_for_each_provider() {
+fn advertised_commands_reach_rox_metadata_for_each_provider() {
     for (kind, expected) in [
         (TuiAgent::Claude, vec!["compact", "init", "fast", "effort"]),
         (

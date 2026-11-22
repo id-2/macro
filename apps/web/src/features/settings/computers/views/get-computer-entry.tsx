@@ -10,7 +10,7 @@ import { MachineRow } from '../../components/connected-runtimes-section';
 import { HarnessIcon } from '../../integration-ui';
 import { SettingsCard, SettingsSurface } from '../../primitives';
 import { useTeamComputers } from '../primitives/team-computers';
-import { fromPriceText, offersBlockedByPlan } from './MacroComputers';
+import { fromPriceText, offersBlockedByPlan } from './RoxComputers';
 
 /**
  * The top of Settings → Machines for a team admin who can buy a computer: a

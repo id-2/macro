@@ -136,7 +136,7 @@ impl<
     L: ProviderRateLimiter,
 > MailboxApiService<R, T, L>
 {
-    /// Read rules whose complete shape matches the Macro-owned rule contract.
+    /// Read rules whose complete shape matches the Rox-owned rule contract.
     pub async fn sender_rules(
         &self,
         mailbox: MailboxAccess,

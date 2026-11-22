@@ -14,9 +14,9 @@ use entity_access::domain::models::{
     BotReceiptScope, EntityAccessAuth, EntityAccessReceipt, EntityType as AccessEntityType,
     RequiredPermission,
 };
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{RoxEventBroker, NoopMacroEventBroker};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::DataType;
 use models_properties::api::requests::SetPropertyValue;
 use models_properties::api::{
@@ -70,8 +70,8 @@ fn require_generic_property_target(entity_type: AccessEntityType) -> Result<(), 
 
 struct PublishedEventActors {
     actor: Option<Actor<'static>>,
-    on_behalf_of: Option<MacroUserIdStr<'static>>,
-    actor_user_id: Option<MacroUserIdStr<'static>>,
+    on_behalf_of: Option<RoxUserIdStr<'static>>,
+    actor_user_id: Option<RoxUserIdStr<'static>>,
 }
 
 fn published_event_actors(access: &EditReceipt) -> PublishedEventActors {
@@ -123,7 +123,7 @@ where
     R: PropertiesRepo,
     P: PermissionService,
     N: NotificationService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     repository: R,
     permission_service: Option<P>,
@@ -159,10 +159,10 @@ where
     R: PropertiesRepo,
     P: PermissionService,
     N: NotificationService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// Replace the event broker while preserving every other service dependency.
-    pub fn with_event_broker<B2: MacroEventBroker>(
+    pub fn with_event_broker<B2: RoxEventBroker>(
         self,
         event_broker: B2,
     ) -> PropertiesServiceImpl<R, P, N, B2> {
@@ -195,7 +195,7 @@ where
     /// Build a creation event from the authoritative persisted definition.
     fn property_created_event(
         property: &PropertyDefinition,
-        actor_user_id: &MacroUserIdStr<'_>,
+        actor_user_id: &RoxUserIdStr<'_>,
     ) -> PropertyMacroEvent {
         PropertyMacroEvent::created(PropertyCreatedMetadata {
             property_definition_id: property.id,
@@ -212,7 +212,7 @@ where
     /// Build an option creation event from the authoritative persisted state.
     fn property_option_created_event(
         option: &PropertyOption,
-        actor_user_id: &MacroUserIdStr<'_>,
+        actor_user_id: &RoxUserIdStr<'_>,
     ) -> PropertyMacroEvent {
         PropertyMacroEvent::property_option_created(PropertyOptionCreatedMetadata {
             option_id: option.id,
@@ -227,7 +227,7 @@ where
     /// Build an option update event from the authoritative post-update state.
     fn property_option_updated_event(
         option: &PropertyOption,
-        actor_user_id: &MacroUserIdStr<'_>,
+        actor_user_id: &RoxUserIdStr<'_>,
     ) -> PropertyMacroEvent {
         PropertyMacroEvent::property_option_updated(PropertyOptionUpdatedMetadata {
             option_id: option.id,
@@ -242,7 +242,7 @@ where
     /// Build an option deletion event from the value captured before deletion.
     fn property_option_deleted_event(
         option: &PropertyOption,
-        actor_user_id: &MacroUserIdStr<'_>,
+        actor_user_id: &RoxUserIdStr<'_>,
     ) -> PropertyMacroEvent {
         PropertyMacroEvent::property_option_deleted(PropertyOptionDeletedMetadata {
             option_id: option.id,
@@ -386,7 +386,7 @@ where
     async fn owned_modifiable_definition(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_id: Option<Uuid>,
     ) -> Result<PropertyDefinition, PropertiesErr>
     where
@@ -415,7 +415,7 @@ where
     async fn owned_personal_tag_option(
         &self,
         option_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<(PropertyOption, PropertyDefinition), PropertiesErr>
     where
         anyhow::Error: From<R::Err>,
@@ -444,7 +444,7 @@ where
     /// Provision the team tag set the caller is sharing a label into.
     async fn target_team_tag_definition(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> Result<PropertyDefinition, PropertiesErr>
     where
@@ -470,7 +470,7 @@ where
     fn publish_option_change_events(
         &self,
         mutations: &[EntityPropertyMutationSnapshot],
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) {
         for mutation in mutations {
             self.publish_property_event(PropertyMacroEvent::entity_property_updated(
@@ -566,7 +566,7 @@ where
     R: PropertiesRepo,
     P: PermissionService,
     N: NotificationService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<R::Err> + From<P::Err> + From<N::Err>,
 {
     #[tracing::instrument(skip(self, access), fields(entity_id = %access.entity_id(), entity_type = ?access.entity_type()), err)]
@@ -1190,7 +1190,7 @@ where
     async fn get_property_definition(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> Result<PropertyDefinition, PropertiesErr> {
         let definition = self
@@ -1219,7 +1219,7 @@ where
     async fn list_property_definitions(
         &self,
         team: Option<&TeamReceipt>,
-        user_id: Option<&MacroUserIdStr<'_>>,
+        user_id: Option<&RoxUserIdStr<'_>>,
         include_system: bool,
         for_entity_type: Option<EntityType>,
     ) -> Result<Vec<PropertyDefinition>, PropertiesErr> {
@@ -1243,7 +1243,7 @@ where
     async fn list_property_definitions_with_options(
         &self,
         team: Option<&TeamReceipt>,
-        user_id: Option<&MacroUserIdStr<'_>>,
+        user_id: Option<&RoxUserIdStr<'_>>,
         include_system: bool,
         for_entity_type: Option<EntityType>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, PropertiesErr> {
@@ -1270,7 +1270,7 @@ where
     #[tracing::instrument(skip(self, team, request), fields(display_name = %request.display_name), err)]
     async fn create_property_definition(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         request: &CreatePropertyDefinitionRequest,
     ) -> Result<PropertyDefinition, PropertiesErr> {
@@ -1333,7 +1333,7 @@ where
     async fn delete_property_definition(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> Result<(), PropertiesErr> {
         // First check if the property exists and if it's a system property.
@@ -1381,7 +1381,7 @@ where
     async fn get_property_options(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> Result<Vec<PropertyOption>, PropertiesErr> {
         let definition = self
@@ -1414,7 +1414,7 @@ where
     async fn get_property_options_batch(
         &self,
         property_definition_ids: &[Uuid],
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> Result<HashMap<Uuid, Vec<PropertyOption>>, PropertiesErr> {
         Ok(self
@@ -1431,7 +1431,7 @@ where
     #[tracing::instrument(skip(self, team, request), fields(request = ?request), err)]
     async fn add_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         request: &AddPropertyOptionRequest,
@@ -1459,7 +1459,7 @@ where
 
     async fn get_or_create_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         request: &AddPropertyOptionRequest,
@@ -1489,7 +1489,7 @@ where
     #[tracing::instrument(skip(self, team, request), fields(request = ?request), err)]
     async fn update_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         option_id: Uuid,
@@ -1560,7 +1560,7 @@ where
     #[tracing::instrument(skip(self, team, plan), err)]
     async fn replace_property_options(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         plan: PropertyOptionReplacePlan,
@@ -1634,7 +1634,7 @@ where
     #[tracing::instrument(skip(self, team), err)]
     async fn delete_property_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         property_definition_id: Uuid,
         option_id: Uuid,
@@ -1677,7 +1677,7 @@ where
     #[tracing::instrument(skip(self, team), err)]
     async fn list_tag_sets(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> Result<Vec<TagSet>, PropertiesErr> {
         let mut sets = Vec::new();
@@ -1704,7 +1704,7 @@ where
     #[tracing::instrument(skip(self, team), err)]
     async fn ensure_tag_set(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         scope: TagScope,
     ) -> Result<TagSet, PropertiesErr> {
@@ -1731,7 +1731,7 @@ where
     #[tracing::instrument(skip(self, team), err)]
     async fn promote_tag_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         option_id: Uuid,
     ) -> Result<PropertyOption, PropertiesErr> {
@@ -1771,7 +1771,7 @@ where
     #[tracing::instrument(skip(self, team), err)]
     async fn merge_tag_option(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
         option_id: Uuid,
         target_option_id: Uuid,

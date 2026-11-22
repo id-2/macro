@@ -204,7 +204,7 @@ pub(super) fn build_return_redirect(
 
 /// Removes a pending account-link row after a callback failure.
 pub(super) async fn cleanup_pending_link(ctx: &ApiContext, link_id: &Uuid) {
-    macro_db_client::in_progress_user_link::delete_in_progress_user_link(&ctx.db, link_id)
+    rox_db_client::in_progress_user_link::delete_in_progress_user_link(&ctx.db, link_id)
         .await
         .inspect_err(|error| {
             tracing::warn!(

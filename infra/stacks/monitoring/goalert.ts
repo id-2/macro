@@ -3,7 +3,7 @@
 //
 // Each webhook posts to a GoAlert Generic API integration key: `goalert` and
 // `goalert-close` to the paging service, `goalert-notify` and
-// `goalert-notify-close` to the Notify service, which posts to the Macro Alerts
+// `goalert-notify-close` to the Notify service, which posts to the Rox Alerts
 // channel without phoning anyone. notify.ts picks between them. GoAlert keeps
 // one open alert per `dedup` value: repeat notifications (renotify) update it,
 // and `action: close` resolves it. `$ALERT_CYCLE_KEY` stays the same from a
@@ -53,7 +53,7 @@ export const goalertWebhooks = [
 ];
 
 // Watches the pager from outside. It is the only monitor that posts to the
-// Macro Alerts channel directly, through the webhook integration configured in
+// Rox Alerts channel directly, through the webhook integration configured in
 // the Datadog UI: if GoAlert is down, an alert routed through it never arrives.
 new datadog.SyntheticsTest('goalert-health', {
   name: 'GoAlert health check',

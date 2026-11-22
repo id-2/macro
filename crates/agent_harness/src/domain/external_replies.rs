@@ -2,8 +2,8 @@
 
 use agent_runtime_protocol::domain::action::AgentActionId;
 use agent_session::domain::{error::Result, model::AgentSessionId};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::model::{AnnounceOrigin, ReplyOutcome};
 
@@ -13,7 +13,7 @@ pub struct ExternalReplyTarget {
     /// The observed message's origin, never inferred from the current turn.
     pub origin: AnnounceOrigin,
     /// The user who caused the reply; current access is checked before posting.
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
     /// Reserved before posting so a retry addresses the same message.
     pub message_id: Uuid,
 }

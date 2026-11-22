@@ -95,7 +95,7 @@ async fn status_of(harness: &Harness, id: InitiativeId) -> anyhow::Result<Option
         .await?)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_persists_initial_values_in_the_same_request(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let harness = harness(&pool);
@@ -126,7 +126,7 @@ async fn create_persists_initial_values_in_the_same_request(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_rejected_value_leaves_no_initial_values_behind(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     let project = repo(pool.clone())

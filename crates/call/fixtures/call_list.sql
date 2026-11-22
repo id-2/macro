@@ -23,11 +23,11 @@
 --   W1  archived in OTHER, the viewer's grant is on a document with its id
 --   W2  archived standalone, a team-typed grant carries the viewer's id
 
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
   ('00000000-0000-0000-0000-0000000000f1', 'macro|viewer@example.com', 'viewer@example.com', 'cus_viewer'),
   ('00000000-0000-0000-0000-0000000000f2', 'macro|other@example.com', 'other@example.com', 'cus_other');
 
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
   ('macro|viewer@example.com', 'viewer@example.com', '00000000-0000-0000-0000-0000000000f1'),
   ('macro|other@example.com', 'other@example.com', '00000000-0000-0000-0000-0000000000f2');
 

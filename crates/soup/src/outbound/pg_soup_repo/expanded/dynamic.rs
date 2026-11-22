@@ -33,7 +33,7 @@ use item_filters::ast::{
     project::ProjectLiteral,
     properties::{PropertiesLiteral, PropertyEntityType, PropertyMatchValue},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use models_pagination::{Query, SimpleSortMethod};
 use models_soup::{
@@ -487,9 +487,9 @@ fn grouped_calendar_event_top_clause(sort_method: SimpleSortMethod, name_sort: b
                       event.owner_id = $1
                       OR EXISTS (
                           SELECT 1
-                          FROM macro_user_links link
+                          FROM rox_user_links link
                           WHERE link.link_id = event.source_link_id
-                            AND link.primary_macro_id = $1
+                            AND link.primary_rox_id = $1
                       )
                   )
 "#
@@ -2457,7 +2457,7 @@ impl SoupRow {
 #[derive(Debug)]
 pub(crate) struct ExpandedDynamicCursorArgs<'a> {
     /// the user for which we are performing the query
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// the limit of items we can return
     pub limit: u16,
     /// the Query that we are attempting to perform
@@ -2605,7 +2605,7 @@ pub(crate) async fn expanded_dynamic_cursor_soup(
 #[derive(Debug)]
 pub struct GroupedDynamicCursorArgs<'a> {
     /// The user for which we are performing the query
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// The limit of items we can return
     pub limit: u16,
     /// The Query that we are attempting to perform

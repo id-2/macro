@@ -60,7 +60,7 @@ impl ReadReceiptRepository for Fake {
             .push((token.as_str().to_owned(), at, debounce_after));
         Ok(true)
     }
-    async fn accessible_inboxes(&self, _: &MacroUserIdStr<'_>) -> Result<Vec<Uuid>, Report> {
+    async fn accessible_inboxes(&self, _: &RoxUserIdStr<'_>) -> Result<Vec<Uuid>, Report> {
         Ok(self.0.lock().unwrap().inboxes.clone())
     }
     async fn thread_receipts(
@@ -119,7 +119,7 @@ fn pixel_goes_before_closing_body_or_at_end() {
 }
 
 #[test]
-fn strip_removes_only_macro_pixels() {
+fn strip_removes_only_rox_pixels() {
     let prefix = PixelUrlPrefix::new(BASE);
     let html = format!(
         r#"<p>Hi</p><img src="https://cdn.example.com/logo.png"><blockquote><img src="{PREFIX}old" width="1"></blockquote>"#
@@ -222,7 +222,7 @@ async fn opens_are_debounced_from_now() {
 
 fn thread_receipt(entity_type: EntityType) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
         "0198f0aa-0000-7000-8000-000000000001",
         entity_type,
     )

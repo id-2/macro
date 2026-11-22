@@ -5,7 +5,7 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use email::domain::message_reads::ThreadMessagesRequest;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::ErrorResponse;
 use sqlx::types::Uuid;
 
@@ -25,7 +25,7 @@ pub struct PathParams {
 #[tracing::instrument(skip(ctx))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Path(PathParams { id }): extract::Path<PathParams>,
     extract::Query(query_params): extract::Query<ListThreadsParams>,
 ) -> Result<Response, Response> {

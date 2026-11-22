@@ -8,13 +8,13 @@
 ------------------------------------------------------------
 
 -- Link A: user email is user_a@example.com
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-00000000001a', 'macro|user_a@example.com', '00000000-0000-0000-0000-00000000001a',
         'user_a@example.com', 'GMAIL', true, '2025-11-11 17:48:26.664688 +00:00',
         '2025-11-11 17:48:26.664688 +00:00');
 
 -- Link B: different user for isolation tests
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-00000000001b', 'macro|user_b@example.com', '00000000-0000-0000-0000-00000000001b',
         'user_b@example.com', 'GMAIL', true, '2025-11-11 17:48:26.664688 +00:00',
         '2025-11-11 17:48:26.664688 +00:00');

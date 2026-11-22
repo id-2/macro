@@ -1,5 +1,5 @@
 import * as pulumi from '@pulumi/pulumi';
-import { MACRO_ORG_NAME, stack } from '.';
+import { ROX_ORG_NAME, stack } from '.';
 
 /**
  * Outputs exported by the gateway stack (`infra/stacks/gateway`).
@@ -36,7 +36,7 @@ export function getGatewayAlb(): GatewayAlb {
   }
 
   const gatewayStack = new pulumi.StackReference('gateway-stack', {
-    name: `${MACRO_ORG_NAME}/gateway/${stack}`,
+    name: `${ROX_ORG_NAME}/gateway/${stack}`,
   });
 
   const requireString = (output: string): pulumi.Output<string> =>

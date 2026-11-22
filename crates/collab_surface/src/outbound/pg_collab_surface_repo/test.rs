@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use model_entity::EntityType;
 use sqlx::PgPool;
 
@@ -10,7 +10,7 @@ const CHANNEL_2: &str = "22222222-2222-4222-8222-222222222222";
 fn new_surface(parent_type: EntityType, parent_id: &str) -> CollabSurface {
     let now = chrono::Utc::now();
     CollabSurface {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         parent: parent_type.with_entity_string(parent_id.to_string()),
         state: SurfaceState::Pending,
         created_at: now,
@@ -18,7 +18,7 @@ fn new_surface(parent_type: EntityType, parent_id: &str) -> CollabSurface {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn surface_round_trips(pool: PgPool) {
     let repo = PgCollabSurfaceRepo::new(pool);
     let surface = new_surface(EntityType::Channel, CHANNEL_1);
@@ -31,7 +31,7 @@ async fn surface_round_trips(pool: PgPool) {
     assert_eq!(read.state, SurfaceState::Pending);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mark_ready_flips_state(pool: PgPool) {
     let repo = PgCollabSurfaceRepo::new(pool);
     let surface = new_surface(EntityType::Document, CHANNEL_1);
@@ -42,7 +42,7 @@ async fn mark_ready_flips_state(pool: PgPool) {
     assert_eq!(read.state, SurfaceState::Ready);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn soft_deleted_surfaces_read_as_absent(pool: PgPool) {
     let repo = PgCollabSurfaceRepo::new(pool);
     let surface = new_surface(EntityType::Channel, CHANNEL_1);
@@ -54,7 +54,7 @@ async fn soft_deleted_surfaces_read_as_absent(pool: PgPool) {
     repo.soft_delete(surface.id).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_conflicts_read_as_not_inserted(pool: PgPool) {
     let repo = PgCollabSurfaceRepo::new(pool);
     let surface = new_surface(EntityType::Channel, CHANNEL_1);
@@ -76,7 +76,7 @@ async fn insert_conflicts_read_as_not_inserted(pool: PgPool) {
     assert!(repo.get(surface.id).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_by_parent_scopes_to_the_parent_and_skips_deleted(pool: PgPool) {
     let repo = PgCollabSurfaceRepo::new(pool);
     let a = new_surface(EntityType::Channel, CHANNEL_1);
@@ -96,7 +96,7 @@ async fn list_by_parent_scopes_to_the_parent_and_skips_deleted(pool: PgPool) {
     assert_eq!(ids, vec![a.id, b.id]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_by_parent_with_non_uuid_parent_reads_empty(pool: PgPool) {
     let repo = PgCollabSurfaceRepo::new(pool);
     let listed = repo
@@ -106,7 +106,7 @@ async fn list_by_parent_with_non_uuid_parent_reads_empty(pool: PgPool) {
     assert!(listed.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn is_deleted_reads_soft_deleted_rows_only(pool: PgPool) {
     let repo = PgCollabSurfaceRepo::new(pool);
     let live = new_surface(EntityType::Channel, CHANNEL_1);
@@ -119,7 +119,7 @@ async fn is_deleted_reads_soft_deleted_rows_only(pool: PgPool) {
     assert!(!repo.is_deleted(live.id).await.unwrap());
     assert!(
         !repo
-            .is_deleted(macro_uuid::generate_uuid_v7())
+            .is_deleted(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
     );

@@ -1,12 +1,12 @@
 use super::*;
 use chrono::Utc;
-use macro_user_id::cowlike::CowLike as _;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::cowlike::CowLike as _;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use std::sync::Mutex;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|image-caption-test@rox.one")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|image-caption-test@rox.one")
         .expect("valid user id")
         .into_owned()
 }

@@ -1,14 +1,14 @@
 //! RoxDB-backed adapter for
 //! [`crate::domain::join_announcement::JoinAnnouncementRepository`].
 //!
-//! Owns the `team_joined_macro_email` ledger.
+//! Owns the `team_joined_rox_email` ledger.
 
 #[cfg(test)]
 mod test;
 
 use std::collections::HashMap;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::prelude::*;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -35,10 +35,10 @@ impl JoinAnnouncementRepository for JoinAnnouncementRepositoryImpl {
     async fn claim(
         &self,
         team_id: Uuid,
-        candidates: &[MacroUserIdStr<'static>],
+        candidates: &[RoxUserIdStr<'static>],
         team_limit: u32,
     ) -> Result<Vec<ClaimedJoinEmail>, Report<JoinAnnouncementError>> {
-        let by_email: HashMap<&str, &MacroUserIdStr<'static>> = candidates
+        let by_email: HashMap<&str, &RoxUserIdStr<'static>> = candidates
             .iter()
             .map(|candidate| (candidate.email_str(), candidate))
             .collect();
@@ -64,7 +64,7 @@ impl JoinAnnouncementRepository for JoinAnnouncementRepositoryImpl {
         let rows = sqlx::query!(
             r#"
             WITH claimed AS (
-                INSERT INTO team_joined_macro_email (team_id, email)
+                INSERT INTO team_joined_rox_email (team_id, email)
                 SELECT t.id, c.email
                 FROM team t
                 CROSS JOIN UNNEST($2::text[], $3::text[]) AS c(email, user_id)
@@ -83,13 +83,13 @@ impl JoinAnnouncementRepository for JoinAnnouncementRepositoryImpl {
                       SELECT 1 FROM "User" u WHERE lower(u.email) = lower(c.email)
                   )
                   AND NOT EXISTS (
-                      SELECT 1 FROM team_joined_macro_email e
+                      SELECT 1 FROM team_joined_rox_email e
                       WHERE e.team_id = t.id AND e.email = c.email
                   )
                 ORDER BY c.email
                 LIMIT GREATEST(
                     $4::bigint
-                        - (SELECT count(*) FROM team_joined_macro_email e WHERE e.team_id = $1),
+                        - (SELECT count(*) FROM team_joined_rox_email e WHERE e.team_id = $1),
                     0
                 )
                 ON CONFLICT (team_id, email) DO NOTHING
@@ -128,10 +128,10 @@ impl JoinAnnouncementRepository for JoinAnnouncementRepositoryImpl {
     async fn release(
         &self,
         team_id: Uuid,
-        recipient: &MacroUserIdStr<'_>,
+        recipient: &RoxUserIdStr<'_>,
     ) -> Result<(), Report<JoinAnnouncementError>> {
         sqlx::query!(
-            "DELETE FROM team_joined_macro_email WHERE team_id = $1 AND email = $2",
+            "DELETE FROM team_joined_rox_email WHERE team_id = $1 AND email = $2",
             team_id,
             recipient.email_str(),
         )

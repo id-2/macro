@@ -1,14 +1,14 @@
 use super::*;
 use crate::ChannelMentionMetadata;
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use notification::domain::models::{Notification, NotificationState, UserNotificationRow};
 use std::sync::Arc;
 
 fn row_of<T: Notification>() -> UserNotificationRow<Arc<()>> {
     UserNotificationRow {
-        owner_id: MacroUserIdStr::try_from_email("bob@acme.com").unwrap(),
+        owner_id: RoxUserIdStr::try_from_email("bob@acme.com").unwrap(),
         notification_id: uuid::Uuid::nil(),
         notification_event_type: T::TYPE_NAME.to_string(),
         entity: EntityType::Team.with_entity_str("11111111-1111-1111-1111-111111111111"),
@@ -24,7 +24,7 @@ fn row_of<T: Notification>() -> UserNotificationRow<Arc<()>> {
 }
 
 #[test]
-fn colleague_joined_macro_never_lands_in_a_digest() {
+fn colleague_joined_rox_never_lands_in_a_digest() {
     let block_list = digest_email_block_list();
     assert!(
         block_list

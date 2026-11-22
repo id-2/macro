@@ -57,7 +57,7 @@ async fn discovery_uses_real_mcp_handshake_without_executing_tools() {
     .unwrap();
     let tools = client
         .tools(
-            &MacroUserIdStr::try_from_email("caller@example.com").unwrap(),
+            &RoxUserIdStr::try_from_email("caller@example.com").unwrap(),
             "linear",
         )
         .await

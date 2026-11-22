@@ -47,7 +47,7 @@ export function CalendarPermissionPrompt() {
             .filter(isExternalEmailLink)
             .filter(
               (link) =>
-                link.macro_id === userId() &&
+                link.rox_id === userId() &&
                 link.needs_calendar_permission &&
                 !link.needs_reauth &&
                 !link.calendar_disabled

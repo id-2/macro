@@ -9,7 +9,7 @@ fn main() {
 
     println!("cargo:rerun-if-changed=.macro-tauri-env");
     println!("cargo:rerun-if-changed=../../dist/bundle-manifest.json");
-    println!("cargo:rerun-if-env-changed=MACRO_BUNDLE_UPDATE_BASE_URL");
+    println!("cargo:rerun-if-env-changed=ROX_BUNDLE_UPDATE_BASE_URL");
 
     let contents = std::fs::read_to_string(".macro-tauri-env").unwrap_or_default();
     let raw_app_env = contents.trim();
@@ -23,7 +23,7 @@ fn main() {
 
     match app_env {
         "development" | "production" => {
-            println!("cargo:rustc-env=MACRO_TAURI_APP_ENV={app_env}");
+            println!("cargo:rustc-env=ROX_TAURI_APP_ENV={app_env}");
         }
         other => {
             panic!(".macro-tauri-env must contain `development` or `production`, found `{other}`");
@@ -40,18 +40,18 @@ fn main() {
             0
         }
     };
-    println!("cargo:rustc-env=MACRO_EMBEDDED_BUNDLE_BUILD={embedded_bundle_build}");
+    println!("cargo:rustc-env=ROX_EMBEDDED_BUNDLE_BUILD={embedded_bundle_build}");
     // Settings shows this as the app's build date. It stays fixed for the
     // binary; OTA bundles replace the JavaScript, not this value.
     let native_build_time_ms = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .expect("system clock is before the Unix epoch")
         .as_millis();
-    println!("cargo:rustc-env=MACRO_NATIVE_BUILD_TIME_MS={native_build_time_ms}");
-    if let Ok(bundle_update_base_url) = std::env::var("MACRO_BUNDLE_UPDATE_BASE_URL") {
+    println!("cargo:rustc-env=ROX_NATIVE_BUILD_TIME_MS={native_build_time_ms}");
+    if let Ok(bundle_update_base_url) = std::env::var("ROX_BUNDLE_UPDATE_BASE_URL") {
         let bundle_update_base_url = bundle_update_base_url.trim();
         if !bundle_update_base_url.is_empty() {
-            println!("cargo:rustc-env=MACRO_BUNDLE_UPDATE_BASE_URL={bundle_update_base_url}");
+            println!("cargo:rustc-env=ROX_BUNDLE_UPDATE_BASE_URL={bundle_update_base_url}");
         }
     }
 

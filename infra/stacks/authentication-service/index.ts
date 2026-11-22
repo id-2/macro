@@ -21,7 +21,7 @@ const tags = {
 
 const DATABASE_URL = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require(`macro_db_secret_key`),
+    secretId: config.require(`rox_db_secret_key`),
   })
   .apply((secret) => secret.secretString);
 
@@ -87,12 +87,12 @@ const googleClientSecretKeyArn: pulumi.Output<string> = aws.secretsmanager
   .getSecretVersionOutput({ secretId: GOOGLE_CLIENT_SECRET_KEY })
   .apply((secret) => secret.arn);
 
-const MACRO_API_TOKEN_PRIVATE_SECRET_KEY = config.require(
-  `macro_api_token_private_secret_key`
+const ROX_API_TOKEN_PRIVATE_SECRET_KEY = config.require(
+  `rox_api_token_private_secret_key`
 );
 const macroApiTokenSecretPrivateKeyArn: pulumi.Output<string> =
   aws.secretsmanager
-    .getSecretVersionOutput({ secretId: MACRO_API_TOKEN_PRIVATE_SECRET_KEY })
+    .getSecretVersionOutput({ secretId: ROX_API_TOKEN_PRIVATE_SECRET_KEY })
     .apply((secret) => secret.arn);
 
 const stripeWebhookSecretKey = config.require(`stripe_webhook_secret_key`);
@@ -100,7 +100,7 @@ const stripeWebhookSecretKeyArn: pulumi.Output<string> = aws.secretsmanager
   .getSecretVersionOutput({ secretId: stripeWebhookSecretKey })
   .apply((secret) => secret.arn);
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
 const secretKeyArns = [
   pulumi.interpolate`${jwtSecretKeyArn}`,
@@ -109,7 +109,7 @@ const secretKeyArns = [
   pulumi.interpolate`${fusionauthClientSecretKeyArn}`,
   pulumi.interpolate`${stripeSecretKeyArn}`,
   pulumi.interpolate`${googleClientSecretKeyArn}`,
-  pulumi.interpolate`${MACRO_API_TOKENS.macroApiTokenPublicKeyArn}`,
+  pulumi.interpolate`${ROX_API_TOKENS.macroApiTokenPublicKeyArn}`,
   pulumi.interpolate`${macroApiTokenSecretPrivateKeyArn}`,
   pulumi.interpolate`${stripeWebhookSecretKeyArn}`,
 ];
@@ -194,7 +194,7 @@ new UserLinkCleanupHandler('user-link-cleanup-handler', {
   envVars: {
     DATABASE_URL: pulumi.interpolate`${DATABASE_URL}`,
     ENVIRONMENT: stack,
-    RUST_LOG: 'user_link_cleanup_handler=info,macro_http_request=info',
+    RUST_LOG: 'user_link_cleanup_handler=info,rox_http_request=info',
   },
   vpc,
   tags,

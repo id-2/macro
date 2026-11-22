@@ -2,7 +2,7 @@ use super::*;
 use email::domain::attachment_access::{AttachmentReadRecord, AttachmentReadRepository};
 use email::domain::mailbox::MailboxError;
 use futures::future::BoxFuture;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::service::message;
 use std::sync::{Arc, Mutex};
 
@@ -29,7 +29,7 @@ impl AuthorizedAttachmentBytes for Reader {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn imported_gmail_draft_preserves_native_inline_files_and_honors_removal_and_upload_deduplication(
     db: PgPool,
 ) {
@@ -37,7 +37,7 @@ async fn imported_gmail_draft_preserves_native_inline_files_and_honors_removal_a
     let thread = Uuid::now_v7();
     let draft = Uuid::now_v7();
     let upload = Uuid::now_v7();
-    sqlx::query!("INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider) VALUES($1,'macro|gmail-native@example.com','gmail-native','gmail-native@example.com','GMAIL')",link).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES($1,'macro|gmail-native@example.com','gmail-native','gmail-native@example.com','GMAIL')",link).execute(&db).await.unwrap();
     sqlx::query!(
         "INSERT INTO email_threads(id,link_id) VALUES($1,$2)",
         thread,
@@ -134,7 +134,7 @@ impl AuthorizedAttachmentBytes for SourceInboxReader {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn forwarding_reads_bytes_with_the_source_inbox_identity(db: PgPool) {
     let sending = Uuid::now_v7();
     let source = Uuid::now_v7();
@@ -142,7 +142,7 @@ async fn forwarding_reads_bytes_with_the_source_inbox_identity(db: PgPool) {
     let original = Uuid::now_v7();
     let attachment = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO email_links(id,macro_id,fusionauth_user_id,email_address,provider) VALUES
+        "INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider) VALUES
         ($1,'macro|forwarder@example.com','forwarder','sender@example.com','GMAIL'),
         ($2,'macro|forwarder@example.com','forwarder','source@example.com','OUTLOOK')",
         sending,

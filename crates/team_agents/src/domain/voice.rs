@@ -5,7 +5,7 @@ use std::future::Future;
 
 use entity_access::domain::models::{AdminTeamRole, EntityAccessReceipt};
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -49,7 +49,7 @@ pub trait VoiceProvider: Send + Sync + 'static {
     /// on `team`.
     fn sample(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         team: Uuid,
         model: &VoiceModel,
     ) -> impl Future<Output = Result<Vec<u8>, TeamAgentError>> + Send;

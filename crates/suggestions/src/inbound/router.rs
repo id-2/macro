@@ -10,11 +10,11 @@ use axum::response::IntoResponse;
 use axum::routing::{get, post, put};
 use axum::{Json, Router};
 use entity_registry::{CreationPrincipalExtractor, NonUserOwners};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
-    MacroUserAuthentication, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
+    RoxUserAuthentication, UserOnly,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::Deserialize;
 use utoipa::IntoParams;
 
@@ -32,7 +32,7 @@ pub struct SuggestionRouterState<S, Auth> {
     /// The suggestions service.
     pub service: Arc<S>,
     /// Who is calling.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for SuggestionRouterState<S, Auth> {
@@ -44,7 +44,7 @@ impl<S, Auth> Clone for SuggestionRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<SuggestionRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<SuggestionRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &SuggestionRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -62,7 +62,7 @@ impl<S, Auth> FromRef<SuggestionRouterState<S, Auth>> for NonUserOwners {
 pub fn suggestion_router<S, Auth, St>(state: SuggestionRouterState<S, Auth>) -> Router<St>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Send + Sync,
 {
     Router::new()
@@ -181,12 +181,12 @@ pub struct AcceptSuggestionRequest {
 /// program's marks (a code-mode invocation, the code-execution header), is
 /// the person; any other credential (an agent's, an API token, a program)
 /// acts for them. When it can't be told, it is someone acting for them.
-fn caller(user: &MacroUserAuthentication, headers: &HeaderMap) -> SuggestionCaller {
+fn caller(user: &RoxUserAuthentication, headers: &HeaderMap) -> SuggestionCaller {
     // Validated against its session at the router's boundary.
     let correlation = agent_correlation::context::current();
     if correlation.is_none()
         && user.is_human_session()
-        && !headers.contains_key(macro_authorization::CODE_EXECUTION_HEADER)
+        && !headers.contains_key(rox_authorization::CODE_EXECUTION_HEADER)
     {
         SuggestionCaller::User
     } else {
@@ -227,20 +227,20 @@ pub struct FeedQuery {
 /// The caller's feed, for them or their own agent.
 pub async fn list_suggestions<S, Auth>(
     State(state): State<SuggestionRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     headers: HeaderMap,
     Query(query): Query<FeedQuery>,
 ) -> Result<Json<SuggestionFeed>, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let caller = caller(&user.authorization, &headers);
     Ok(Json(
         state
             .service
             .feed(
-                &user.authorization.macro_user_id,
+                &user.authorization.rox_user_id,
                 caller,
                 query.timezone,
                 query.limit.map(|limit| usize::from(limit.get())),
@@ -266,17 +266,17 @@ where
 /// sends it once the feed is on screen.
 pub async fn record_suggestions_viewed<S, Auth>(
     State(state): State<SuggestionRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     headers: HeaderMap,
 ) -> Result<StatusCode, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let caller = caller(&user.authorization, &headers);
     state
         .service
-        .viewed(&user.authorization.macro_user_id, caller)
+        .viewed(&user.authorization.rox_user_id, caller)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -305,14 +305,14 @@ where
 /// refused: the person saves its routine in the app, which makes it done.
 pub async fn accept_suggestion<S, Auth>(
     State(state): State<SuggestionRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     headers: HeaderMap,
     Path(id): Path<Uuid>,
     body: Result<Json<AcceptSuggestionRequest>, JsonRejection>,
 ) -> Result<StatusCode, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = body.map_err(SuggestionApiError::InvalidRequest)?;
     let caller = caller(&user.authorization, &headers);
@@ -322,7 +322,7 @@ where
     };
     state
         .service
-        .accept(&user.authorization.macro_user_id, caller, id, accept)
+        .accept(&user.authorization.rox_user_id, caller, id, accept)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -344,18 +344,18 @@ where
 /// The caller, or their own agent, isn't interested in an open suggestion.
 pub async fn dismiss_suggestion<S, Auth>(
     State(state): State<SuggestionRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     headers: HeaderMap,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let caller = caller(&user.authorization, &headers);
     state
         .service
-        .dismiss(&user.authorization.macro_user_id, caller, id)
+        .dismiss(&user.authorization.rox_user_id, caller, id)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -379,18 +379,18 @@ where
 /// five minutes of it.
 pub async fn restore_suggestion<S, Auth>(
     State(state): State<SuggestionRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     headers: HeaderMap,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let caller = caller(&user.authorization, &headers);
     state
         .service
-        .restore(&user.authorization.macro_user_id, caller, id)
+        .restore(&user.authorization.rox_user_id, caller, id)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -415,7 +415,7 @@ pub async fn review_suggestions<S, Auth>(
 ) -> Result<Json<SuggestionsReview>, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     // The code-mode invocation the credential names, already validated
     // against its session at the router's boundary.
@@ -447,7 +447,7 @@ pub async fn add_suggestion<S, Auth>(
 ) -> Result<Json<SuggestionWriteOutcome>, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = body.map_err(SuggestionApiError::InvalidRequest)?;
     let correlation = agent_correlation::context::current();
@@ -484,7 +484,7 @@ pub async fn rewrite_suggestion<S, Auth>(
 ) -> Result<Json<SuggestionWriteOutcome>, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = body.map_err(SuggestionApiError::InvalidRequest)?;
     let correlation = agent_correlation::context::current();
@@ -521,7 +521,7 @@ pub async fn retire_suggestion<S, Auth>(
 ) -> Result<Json<SuggestionWriteOutcome>, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = body.map_err(SuggestionApiError::InvalidRequest)?;
     let correlation = agent_correlation::context::current();
@@ -559,7 +559,7 @@ pub async fn attach_suggestion_draft<S, Auth>(
 ) -> Result<Json<SuggestionWriteOutcome>, SuggestionApiError>
 where
     S: SuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = body.map_err(SuggestionApiError::InvalidRequest)?;
     let correlation = agent_correlation::context::current();

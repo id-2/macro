@@ -71,7 +71,7 @@ impl ActivitySource for ChatTopicEvent {
                     Owner::User(user) => Actor::new_from_user(user.clone()),
                     Owner::Bot(bot_id) => Actor::new_from_bot(*bot_id),
                     // A team is not an actor; display unattributed creation as system activity.
-                    Owner::Team(_) => Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID),
+                    Owner::Team(_) => Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
                 },
                 CommonAction::Created,
                 &m.chat_id,

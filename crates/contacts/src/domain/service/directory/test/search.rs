@@ -4,9 +4,9 @@ struct ScanPages(Vec<ContactIdEntry>);
 impl ContactsPageService for ScanPages {
     async fn lookup_contact_ids(
         &self,
-        _viewer: MacroUserIdStr<'_>,
+        _viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         Ok(lookup
             .ids()
             .iter()
@@ -16,7 +16,7 @@ impl ContactsPageService for ScanPages {
     }
     async fn contact_id_page(
         &self,
-        _viewer: MacroUserIdStr<'_>,
+        _viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> Result<ContactIdPage, Report> {
@@ -47,7 +47,7 @@ async fn search_matches_names_and_resumes_using_original_storage_positions() {
         ])),
         names,
     );
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     let named = service
         .search_contacts(
             viewer.clone(),
@@ -95,7 +95,7 @@ async fn scan_budget_returns_progress_instead_of_false_exhaustion() {
     rows.push(ContactIdEntry::parse("macro|winner@example.com".into()).unwrap());
     let names = Arc::new(Names::default());
     let service = ContactsDirectoryService::new(Arc::new(ScanPages(rows)), names.clone());
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     let query = ContactSearch::new("winner").unwrap();
     let first = service
         .search_contacts(viewer.clone(), &query, None, ContactPageSize::DEFAULT)
@@ -129,7 +129,7 @@ async fn exact_reference_matching_keeps_the_scan_budget_and_filters_before_limit
     rows.push(ContactIdEntry::parse("macro|known@example.com".into()).unwrap());
     let names = Arc::new(Names::default());
     let service = ContactsDirectoryService::new(Arc::new(ScanPages(rows)), names.clone());
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     let query = ContactSearch::exact("SECOND").unwrap();
     let page = service
         .search_contacts(
@@ -189,7 +189,7 @@ async fn lookup_never_enriches_unknown_members_and_keeps_requested_order() {
         )),
         names.clone(),
     );
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     let lookup = ContactLookup::new(
         [
             "outside@example.com",
@@ -197,7 +197,7 @@ async fn lookup_never_enriches_unknown_members_and_keeps_requested_order() {
             "known@example.com",
             "known@example.com",
         ]
-        .map(|email| MacroUserIdStr::try_from_email(email).unwrap())
+        .map(|email| RoxUserIdStr::try_from_email(email).unwrap())
         .to_vec(),
     )
     .unwrap();
@@ -217,7 +217,7 @@ async fn lookup_never_enriches_unknown_members_and_keeps_requested_order() {
         ["macro|unknown@example.com", "macro|known@example.com"]
     );
     let missing = ContactLookup::new(vec![
-        MacroUserIdStr::try_from_email("outside@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("outside@example.com").unwrap(),
     ])
     .unwrap();
     assert!(

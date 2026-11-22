@@ -47,7 +47,7 @@ async fn event_with_uid(
     repo.upsert_event_fixture(upsert).await.unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invitation_accounts_are_authorized_and_ambiguity_never_guesses(pool: PgPool) {
     let viewer = "macro|invite-reader@example.com";
     insert_user(&pool, viewer).await;
@@ -106,7 +106,7 @@ async fn invitation_accounts_are_authorized_and_ambiguity_never_guesses(pool: Pg
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_outlook_inbox_answers_through_its_own_copy_of_a_google_meeting(pool: PgPool) {
     let viewer = "macro|invite-outlook@example.com";
     insert_user(&pool, viewer).await;
@@ -155,7 +155,7 @@ async fn an_outlook_inbox_answers_through_its_own_copy_of_a_google_meeting(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_receiving_inbox_keeps_its_copy_past_the_candidate_limit(pool: PgPool) {
     let viewer = "macro|invite-many@example.com";
     insert_user(&pool, viewer).await;
@@ -177,7 +177,7 @@ async fn the_receiving_inbox_keeps_its_copy_past_the_candidate_limit(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn copies_without_the_requested_occurrence_leave_room_for_one_with_it(pool: PgPool) {
     let viewer = "macro|invite-instance@example.com";
     insert_user(&pool, viewer).await;
@@ -210,7 +210,7 @@ async fn copies_without_the_requested_occurrence_leave_room_for_one_with_it(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invitation_delegation_is_scoped_to_the_granted_inbox(pool: PgPool) {
     let viewer = "macro|invite-delegate@example.com";
     let owner = "macro|invite-owner@example.com";
@@ -224,7 +224,7 @@ async fn invitation_delegation_is_scoped_to_the_granted_inbox(pool: PgPool) {
     event(&pool, &repo, owner, private_link).await;
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
         VALUES ($1, $2, $3)
         "#,
         viewer,
@@ -263,7 +263,7 @@ async fn invitation_delegation_is_scoped_to_the_granted_inbox(pool: PgPool) {
     ));
 
     sqlx::query!(
-        "DELETE FROM macro_user_links WHERE primary_macro_id = $1 AND link_id = $2",
+        "DELETE FROM rox_user_links WHERE primary_rox_id = $1 AND link_id = $2",
         viewer,
         delegated_link,
     )
@@ -290,7 +290,7 @@ async fn invitation_delegation_is_scoped_to_the_granted_inbox(pool: PgPool) {
     assert!(candidates[0].is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invitation_delegation_preserves_connection_and_sync_states(pool: PgPool) {
     let viewer = "macro|invite-sync-delegate@example.com";
     let owner = "macro|invite-sync-owner@example.com";
@@ -302,7 +302,7 @@ async fn invitation_delegation_preserves_connection_and_sync_states(pool: PgPool
     provider_ids(&repo, link).await;
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
         VALUES ($1, $2, $3)
         "#,
         viewer,
@@ -333,7 +333,7 @@ async fn invitation_delegation_preserves_connection_and_sync_states(pool: PgPool
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invitation_moved_instance_uses_original_key_and_instance_revision(pool: PgPool) {
     let viewer = "macro|instance-reader@example.com";
     insert_user(&pool, viewer).await;
@@ -400,7 +400,7 @@ async fn invitation_moved_instance_uses_original_key_and_instance_revision(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn master_invitation_does_not_compare_revisions_with_first_exception(pool: PgPool) {
     let viewer = "macro|master-reader@example.com";
     insert_user(&pool, viewer).await;
@@ -454,7 +454,7 @@ async fn master_invitation_does_not_compare_revisions_with_first_exception(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn master_invitation_resolves_the_current_or_next_live_occurrence(pool: PgPool) {
     use chrono::SubsecRound;
     let viewer = "macro|series-reader@example.com";

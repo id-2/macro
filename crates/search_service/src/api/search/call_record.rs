@@ -1,7 +1,7 @@
 use channels::outbound::channel_name::batch_resolve_channel_names;
 use indexmap::IndexMap;
 use item_filters::CallStatus;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::{EntityReference, EntityType};
 use models_search::call_record::{
     CallRecordMetadata, CallRecordSearchResponseItem, CallRecordSearchResponseItemWithMetadata,
@@ -38,11 +38,11 @@ pub(in crate::api::search) async fn enrich_call_records(
         .collect();
 
     let metadata_rows =
-        macro_db_client::call_record::get::get_call_records_metadata(&ctx.db, user_id, &call_ids)
+        rox_db_client::call_record::get::get_call_records_metadata(&ctx.db, user_id, &call_ids)
             .await
             .map_err(SearchError::InternalError)?;
 
-    let viewer_user_id = MacroUserIdStr::parse_from_str(user_id)
+    let viewer_user_id = RoxUserIdStr::parse_from_str(user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?;
     let unique_channel_ids: Vec<Uuid> = {
         let mut seen: std::collections::HashSet<Uuid> = std::collections::HashSet::new();

@@ -10,7 +10,7 @@ use lambda_runtime::{Error, LambdaEvent, run, service_fn, tracing};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypointExt::init();
+    RoxEntrypointExt::init();
 
     let context = Arc::new(AppContext::from_env().await?);
 
@@ -37,11 +37,11 @@ async fn handler(
     Ok(())
 }
 
-struct MacroEntrypointExt;
+struct RoxEntrypointExt;
 
-impl MacroEntrypointExt {
+impl RoxEntrypointExt {
     fn init() {
-        macro_entrypoint::MacroEntrypoint::default().init();
+        rox_entrypoint::RoxEntrypoint::default().init();
         tracing::trace!("initiating document upload finalizer lambda");
     }
 }

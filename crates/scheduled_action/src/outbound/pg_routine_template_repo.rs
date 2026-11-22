@@ -1,6 +1,6 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use model_entity::EntityAppearance;
 use model_owner::Owner;
 use serde_json::Value;

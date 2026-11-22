@@ -1,15 +1,15 @@
 import type { Message as MessageRecord } from '../../../generated/storage/types.gen';
 import { type RichMessage, toBody } from '../../mentions';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 import { CallRecord } from './call-record';
 
 /** A message in a call's single persistent chat thread. */
-export class CallMessage extends MacroEntity<MessageRecord> {
+export class CallMessage extends RoxEntity<MessageRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     readonly callId: string,
     id: string,
     seed?: MessageRecord,
@@ -28,13 +28,13 @@ export class CallMessage extends MacroEntity<MessageRecord> {
   }
 
   /** A handle to a message by id. Fields load on first access. */
-  static byId(client: MacroClient, callId: string, id: string): CallMessage {
+  static byId(client: RoxClient, callId: string, id: string): CallMessage {
     return new CallMessage(client, callId, id);
   }
 
   /** Build a message from its record without another fetch. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     callId: string,
     record: MessageRecord,
   ): CallMessage {

@@ -4,8 +4,8 @@ use crate::domain::events::{
     MessageAttachmentCreatedMetadata, MessageAttachmentRemovedMetadata, MessageDeletedMetadata,
     MessageMentionedMetadata, MessagePatchedMetadata, MessagePostedMetadata,
 };
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroMessagesTopic;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxMessagesTopic;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -39,7 +39,7 @@ pub enum MessageTopicEvent {
 }
 
 impl TopicEvent for MessageTopicEvent {
-    type Topic = MacroMessagesTopic;
+    type Topic = RoxMessagesTopic;
     const SCHEMA_VERSION: u8 = 1;
 }
 
@@ -95,7 +95,7 @@ impl MessageMacroEvent {
     }
 }
 
-impl MacroEvent for MessageMacroEvent {
+impl RoxEvent for MessageMacroEvent {
     type EventPayload = MessageTopicEvent;
     fn key(&self) -> &str {
         &self.key
@@ -122,7 +122,7 @@ impl<Broker> BrokerMessagePublisher<Broker> {
 }
 
 #[cfg(feature = "ports")]
-impl<Broker: macro_event_broker::MacroEventBroker> crate::domain::ports::MessageEventPublisher
+impl<Broker: rox_event_broker::RoxEventBroker> crate::domain::ports::MessageEventPublisher
     for BrokerMessagePublisher<Broker>
 {
     async fn publish(

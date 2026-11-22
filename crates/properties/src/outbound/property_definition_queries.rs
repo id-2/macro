@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::property_definition::PropertyDefinition;
 use models_properties::service::property_definition_with_options::PropertyDefinitionWithOptions;
 use models_properties::service::property_option::{PropertyOption, PropertyOptionValue};
@@ -69,7 +69,7 @@ pub async fn get_property_definition(
 pub async fn get_property_definition_with_owner(
     pool: &Pool<Postgres>,
     property_id: Uuid,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     team_id: Option<Uuid>,
 ) -> anyhow::Result<Option<PropertyDefinition>> {
     let user_id: &str = user_id.as_ref();
@@ -125,7 +125,7 @@ pub async fn get_property_definition_with_owner(
 pub async fn list_property_definitions(
     pool: &Pool<Postgres>,
     team_id: Option<Uuid>,
-    user_id: Option<&MacroUserIdStr<'_>>,
+    user_id: Option<&RoxUserIdStr<'_>>,
     include_system: bool,
 ) -> anyhow::Result<Vec<PropertyDefinition>> {
     let user_id: Option<&str> = user_id.map(|u| u.as_ref());
@@ -187,7 +187,7 @@ pub async fn list_property_definitions(
 pub async fn list_property_definitions_with_options(
     pool: &Pool<Postgres>,
     team_id: Option<Uuid>,
-    user_id: Option<&MacroUserIdStr<'_>>,
+    user_id: Option<&RoxUserIdStr<'_>>,
     include_system: bool,
 ) -> anyhow::Result<Vec<PropertyDefinitionWithOptions>> {
     read_property_definitions_with_options(pool, team_id, user_id, include_system, None).await
@@ -197,7 +197,7 @@ pub async fn list_property_definitions_with_options(
 pub async fn get_visible_property_options_batch(
     pool: &Pool<Postgres>,
     property_definition_ids: &[Uuid],
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     team_id: Option<Uuid>,
 ) -> anyhow::Result<HashMap<Uuid, Vec<PropertyOption>>> {
     if property_definition_ids.is_empty() {
@@ -219,7 +219,7 @@ pub async fn get_visible_property_options_batch(
 async fn read_property_definitions_with_options(
     pool: &Pool<Postgres>,
     team_id: Option<Uuid>,
-    user_id: Option<&MacroUserIdStr<'_>>,
+    user_id: Option<&RoxUserIdStr<'_>>,
     include_system: bool,
     property_definition_ids: Option<&[Uuid]>,
 ) -> anyhow::Result<Vec<PropertyDefinitionWithOptions>> {
@@ -361,7 +361,7 @@ pub async fn create_property_definition(
     let (team_id, user_id) = owner.into_ids();
     let user_id: Option<&str> = user_id.map(|u| u.as_ref());
 
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
 
     let mut tx = pool.begin().await?;
 
@@ -579,7 +579,7 @@ pub(super) async fn create_property_option_tx(
     value: PropertyOptionValue,
     color: Option<String>,
 ) -> anyhow::Result<()> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let (number_value, string_value) = value.to_db_values();
 
     sqlx::query!(

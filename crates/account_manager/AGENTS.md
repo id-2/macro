@@ -18,13 +18,13 @@ claims a credential once. The managed account revokes it from settings.
 ## Scope
 
 - Owns: the `account_manager_grants` table's lifecycle.
-- Not here: authenticating with a manager credential → `macro_authorization`
+- Not here: authenticating with a manager credential → `rox_authorization`
   (`CredentialOrigin::AccountManager`, `AccountHolderOrInternal`). Rendering the
   card → `apps/web/src/features/account-manager`.
 
 ## Boundaries
 
-- Depends on: `channels`, `messages`, `entity_access`, `macro_authorization`,
+- Depends on: `channels`, `messages`, `entity_access`, `rox_authorization`,
   `user_api_key` (credential format and hashing).
 - Used by: `services/document_storage_service`.
 

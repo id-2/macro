@@ -532,7 +532,7 @@ function presentViewPart(id: string): MessagePart {
   return {
     kind: 'tool_use',
     id,
-    name: { kind: 'mcp', server: 'macro_internal', tool: 'PresentView' },
+    name: { kind: 'mcp', server: 'rox_internal', tool: 'PresentView' },
     status: 'completed',
     detail: { kind: 'view', view: PRESENTED_VIEW, error: null },
   };

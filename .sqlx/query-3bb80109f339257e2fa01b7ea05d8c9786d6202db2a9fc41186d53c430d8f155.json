@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT t.id as thread_id\n        FROM email_threads t\n        JOIN email_links l ON t.link_id = l.id\n        WHERE l.macro_id = $1\n          AND t.latest_outbound_message_ts IS NOT NULL\n        ORDER BY t.latest_outbound_message_ts DESC\n        LIMIT $2 OFFSET $3\n        ",
+  "query": "\n        SELECT t.id as thread_id\n        FROM email_threads t\n        JOIN email_links l ON t.link_id = l.id\n        WHERE l.rox_id = $1\n          AND t.latest_outbound_message_ts IS NOT NULL\n        ORDER BY t.latest_outbound_message_ts DESC\n        LIMIT $2 OFFSET $3\n        ",
   "describe": {
     "columns": [
       {

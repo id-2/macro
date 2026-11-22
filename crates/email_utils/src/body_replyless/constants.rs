@@ -7,7 +7,7 @@ lazy_static! {
     // --- Regexes ---
 
     /// "On [Date] [Sender] wrote:" attribution lines (Gmail, Superhuman, Apple
-    /// Mail, Macro). `\s` is Unicode-aware, so it also covers the narrow
+    /// Mail, Rox). `\s` is Unicode-aware, so it also covers the narrow
     /// no-break space Gmail puts before AM/PM and `&nbsp;`. The sender part may
     /// span lines (and the `<a>` around the address) but is bounded so a
     /// stray "wrote:" far below cannot pull in reply text.

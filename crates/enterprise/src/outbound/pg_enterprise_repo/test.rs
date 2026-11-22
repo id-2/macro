@@ -3,7 +3,7 @@ use crate::audit::AuditResult;
 use crate::domain::RuntimePresetAllowlist;
 use sqlx::{PgPool, Row};
 
-static TEST_MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../macro_db_client/migrations");
+static TEST_MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../rox_db_client/migrations");
 
 async fn migrate_for_test(pool: &PgPool) {
     // The integrated source currently has two migrations at 20261110150956.
@@ -29,30 +29,30 @@ async fn migrate_for_test(pool: &PgPool) {
     .unwrap();
 }
 
-async fn create_user(pool: &PgPool, email: &str) -> MacroUserIdStr<'static> {
-    let macro_uuid = Uuid::new_v4();
+async fn create_user(pool: &PgPool, email: &str) -> RoxUserIdStr<'static> {
+    let rox_uuid = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
     )
-    .bind(macro_uuid)
+    .bind(rox_uuid)
     .bind(email)
     .bind(email)
-    .bind(format!("cus_{macro_uuid}"))
+    .bind(format!("cus_{rox_uuid}"))
     .execute(pool)
     .await
     .unwrap();
-    sqlx::query("INSERT INTO \"User\" (id, email, name, macro_user_id) VALUES ($1, $2, $3, $4)")
+    sqlx::query("INSERT INTO \"User\" (id, email, name, rox_user_id) VALUES ($1, $2, $3, $4)")
         .bind(format!("macro|{email}"))
         .bind(email)
         .bind(email)
-        .bind(macro_uuid)
+        .bind(rox_uuid)
         .execute(pool)
         .await
         .unwrap();
-    MacroUserIdStr::try_from_email(email).unwrap()
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
-async fn create_team(pool: &PgPool, owner: &MacroUserIdStr<'_>) -> Uuid {
+async fn create_team(pool: &PgPool, owner: &RoxUserIdStr<'_>) -> Uuid {
     let team_id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO team (id, name, owner_id, enterprise) VALUES ($1, 'enterprise', $2, true)",
@@ -104,13 +104,13 @@ async fn identity_binding_enforces_all_three_unique_keys(pool: PgPool) {
     );
 
     let bindings =
-        sqlx::query("SELECT macro_user_id, rox_account_id, handle FROM rox_identity_binding")
+        sqlx::query("SELECT rox_user_id, rox_account_id, handle FROM rox_identity_binding")
             .fetch_all(&pool)
             .await
             .unwrap();
     assert_eq!(bindings.len(), 1);
     assert_eq!(
-        bindings[0].get::<String, _>("macro_user_id"),
+        bindings[0].get::<String, _>("rox_user_id"),
         member.as_ref()
     );
     assert_eq!(

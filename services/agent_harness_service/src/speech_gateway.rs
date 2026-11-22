@@ -195,7 +195,7 @@ impl SpeechGateway {
         request
             .headers_mut()
             .insert(header::AUTHORIZATION, self.provider_authorization()?);
-        macro_tower_layers::inject_trace_headers(request.headers_mut());
+        rox_tower_layers::inject_trace_headers(request.headers_mut());
 
         let config = WebSocketConfig::default()
             .max_message_size(Some(MAX_MESSAGE_BYTES))
@@ -235,7 +235,7 @@ pub(crate) fn router(gateway: Arc<SpeechGateway>) -> Router {
         .route("/brain/inference/tts", get(tts))
         .with_state(gateway)
         .layer(
-            macro_tower_layers::MacroRequestIdAndTracingLayer::new(Duration::from_millis(200))
+            rox_tower_layers::RoxRequestIdAndTracingLayer::new(Duration::from_millis(200))
                 .into_inner(),
         )
 }

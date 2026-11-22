@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_permissions::share_permission::team_share::{TeamShareRequest, authorize_team_share};
 use sqlx::PgPool;
 
@@ -122,7 +122,7 @@ async fn apply_comment_view_and_clear(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn apply_inserts_updates_and_deletes_direct_team_entity_access(
@@ -133,7 +133,7 @@ async fn apply_inserts_updates_and_deletes_direct_team_entity_access(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn apply_inserts_updates_and_deletes_direct_team_entity_access_for_initiative(
@@ -144,7 +144,7 @@ async fn apply_inserts_updates_and_deletes_direct_team_entity_access_for_initiat
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn apply_inserts_updates_and_deletes_direct_team_entity_access_for_chat(
@@ -155,7 +155,7 @@ async fn apply_inserts_updates_and_deletes_direct_team_entity_access_for_chat(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn apply_inserts_updates_and_deletes_direct_team_entity_access_for_agent_sessions(
@@ -166,7 +166,7 @@ async fn apply_inserts_updates_and_deletes_direct_team_entity_access_for_agent_s
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn legacy_session_facts_stay_valid_after_permission_initialization(
@@ -195,7 +195,7 @@ async fn legacy_session_facts_stay_valid_after_permission_initialization(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn database_without_permissions_is_shared_once_its_permission_exists(
@@ -234,7 +234,7 @@ async fn database_without_permissions_is_shared_once_its_permission_exists(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn apply_inserts_updates_and_deletes_direct_team_entity_access_for_calls(
@@ -246,7 +246,7 @@ async fn apply_inserts_updates_and_deletes_direct_team_entity_access_for_calls(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn load_facts_prefers_active_call_over_archived_record_with_same_id(
@@ -272,7 +272,7 @@ async fn load_facts_prefers_active_call_over_archived_record_with_same_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn initialize_call_grants_view_to_creator_team_or_nothing(
@@ -315,7 +315,7 @@ async fn initialize_call_grants_view_to_creator_team_or_nothing(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn initialize_explicit_task_grants_edit_to_owner_team(pool: PgPool) -> rootcause::Result<()> {
@@ -349,7 +349,7 @@ async fn initialize_explicit_task_grants_edit_to_owner_team(pool: PgPool) -> roo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn apply_project_team_share_copies_and_clears_nested_contents(
@@ -454,17 +454,17 @@ async fn apply_project_team_share_copies_and_clears_nested_contents(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../entity_access/fixtures", scripts("typed_owner_team"))
 )]
 async fn typed_owner_facts_match_sql_audiences_without_owner_escalation(
     pool: PgPool,
 ) -> rootcause::Result<()> {
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_user_id::user_id::RoxUserIdStr;
     use models_permissions::share_permission::team_share::TeamSharePolicyError;
 
     let team = Uuid::parse_str("90000000-0000-0000-0000-000000000011")?;
-    let actor = MacroUserIdStr::parse_from_str("macro|typed-owner@example.com")?;
+    let actor = RoxUserIdStr::parse_from_str("macro|typed-owner@example.com")?;
     let mut tx = pool.begin().await?;
     for (suffix, has_team) in [
         (31, true),
@@ -516,7 +516,7 @@ async fn typed_owner_facts_match_sql_audiences_without_owner_escalation(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn load_facts_rejects_unsupported_entity_type(pool: PgPool) -> rootcause::Result<()> {
     let entity =
         EntityType::User.with_entity_string("20000000-0000-0000-0000-000000000001".to_string());

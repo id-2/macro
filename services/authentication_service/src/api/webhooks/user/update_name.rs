@@ -4,11 +4,11 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 
 use crate::api::context::{ApiContext, AuthorizationService};
 
-use macro_db_client::user::update_user_name::update_user_name;
+use rox_db_client::user::update_user_name::update_user_name;
 
 use model::{authentication::webhooks::update_name::UpdateNameWebhook, response::EmptyResponse};
 
@@ -36,7 +36,7 @@ async fn process(
 #[tracing::instrument(skip(ctx, req, _internal_authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<UpdateNameWebhook>,
 ) -> Result<Response, Response> {
     let user_id = "macro|".to_string() + &req.email;

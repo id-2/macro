@@ -6,8 +6,8 @@ use jev::domain::Probability;
 use serde_json::Value;
 use std::sync::Mutex;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|person@example.com".to_owned()).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|person@example.com".to_owned()).unwrap()
 }
 
 struct Admission(Result<(), AiAdmissionError>);
@@ -15,7 +15,7 @@ struct Admission(Result<(), AiAdmissionError>);
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         assert_eq!(user, &owner());

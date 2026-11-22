@@ -10,7 +10,7 @@ pub use ports::*;
 use super::{LinkDeletion, purge::PurgePacing};
 use crate::domain::events::{EmailMacroEvent, LinkDisconnectReason, LinkDisconnectedMetadata};
 use anyhow::Context;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_email::service::{link::Link, pubsub::DeletionReason};
 
 /// Coordinates physical deletion after the lifecycle service permits it.
@@ -39,7 +39,7 @@ where
     C: LinkDeletionCrm,
     P: LinkPurger,
     N: LinkDeletionRefresh,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     async fn delete(&self, link: &Link, reason: &DeletionReason) -> anyhow::Result<()> {
         self.handle_delete(link, reason).await
@@ -54,7 +54,7 @@ where
     C: LinkDeletionCrm,
     P: LinkPurger,
     N: LinkDeletionRefresh,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// notifies downstream dependencies of link deletion, and deletes link (and all data) from database
     #[tracing::instrument(skip(self), fields(link = ?link), err)]
@@ -87,8 +87,8 @@ where
         // (the `crm_contact_sources` FK to `email_links` cascades when the
         // upcoming `purge_link` deletes the link row, so the link-scoped source rows go
         // away regardless), so we log and continue rather than bailing.
-        let macro_id_str = link.macro_id.to_string();
-        match self.crm.get_team_id_for_user(&macro_id_str).await {
+        let rox_id_str = link.rox_id.to_string();
+        match self.crm.get_team_id_for_user(&rox_id_str).await {
             Ok(Some(team_id)) => {
                 if let Err(e) = self.crm.depopulate_link_in_team(&team_id, &link.id).await {
                     tracing::error!(error=?e, team_id=%team_id, link_id=%link.id, "Failed to depopulate CRM rows before link delete; orphan crm_contacts/crm_companies may remain");
@@ -112,7 +112,7 @@ where
         // The teardown is async relative to the delete request, so signal completion
         // now that the rows are gone — a client showing this inbox can drop its data.
         self.refresh
-            .link_removed(link.macro_id.as_ref(), link.id)
+            .link_removed(link.rox_id.as_ref(), link.id)
             .await;
 
         let _ = self
@@ -120,7 +120,7 @@ where
             .send_event(&EmailMacroEvent::link_disconnected(
                 LinkDisconnectedMetadata {
                     link_id: link.id,
-                    owner: link.macro_id.clone(),
+                    owner: link.rox_id.clone(),
                     email_address: link.email_address.0.as_ref().to_string(),
                     reason: match deletion_reason {
                         DeletionReason::Unused => LinkDisconnectReason::Unused,
@@ -151,7 +151,7 @@ where
         match self.repository.acquire().await {
             Ok(mut conn) => {
                 match conn
-                    .delete_promoted_mailbox_user(link.macro_id.as_ref())
+                    .delete_promoted_mailbox_user(link.rox_id.as_ref())
                     .await
                 {
                     Ok(Some(minted_id)) => {

@@ -59,7 +59,7 @@ type InternalAppLink = {
  * Returns null for anything that is not a Rox `/app` URL.
  *
  * The `/app` prefix is stripped because the Tauri router uses `/` as its
- * base (mirrors `MacroScheme::from_url` on the Rust side).
+ * base (mirrors `RoxScheme::from_url` on the Rust side).
  */
 export function parseInternalAppLink(url: string): InternalAppLink | null {
   let parsed: URL;

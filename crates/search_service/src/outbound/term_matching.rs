@@ -7,7 +7,7 @@ use std::{
 };
 
 use feature_flags::FeatureFlags;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use tokio::time::Instant;
 use tracing::Instrument;
 
@@ -108,7 +108,7 @@ impl<F> Shared<F> {
 }
 
 impl<F: FeatureFlags + 'static> Shared<F> {
-    async fn refresh(&self, caller: MacroUserIdStr<'static>) {
+    async fn refresh(&self, caller: RoxUserIdStr<'static>) {
         let enabled = match self.flags.load(&caller).await {
             Ok(flags) => flags.is_enabled(ENABLE_DYNAMIC_SEARCH_TERM_MATCHING),
             Err(error) => {
@@ -123,7 +123,7 @@ impl<F: FeatureFlags + 'static> Shared<F> {
 
 #[async_trait::async_trait]
 impl<F: FeatureFlags + 'static> TermMatchingRollout for FlaggedTermMatching<F> {
-    async fn dynamic_enabled_for(&self, caller: MacroUserIdStr<'_>) -> bool {
+    async fn dynamic_enabled_for(&self, caller: RoxUserIdStr<'_>) -> bool {
         let (enabled, starts_refresh) = self.shared.remembered(caller.as_ref());
         if starts_refresh {
             // Parented on the search's span so the read stays in its trace.
@@ -144,7 +144,7 @@ pub struct LocalTermMatching;
 
 #[async_trait::async_trait]
 impl TermMatchingRollout for LocalTermMatching {
-    async fn dynamic_enabled_for(&self, _caller: MacroUserIdStr<'_>) -> bool {
+    async fn dynamic_enabled_for(&self, _caller: RoxUserIdStr<'_>) -> bool {
         true
     }
 }

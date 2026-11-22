@@ -20,7 +20,7 @@ fn reconciler(pool: &PgPool) -> WorkerReferenceReconciler {
     WorkerReferenceReconciler::new(pool.clone(), ImportLimits::default())
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn patches_intents_and_search_rollback_at_every_boundary(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::PublicChannel, 1).await;
@@ -120,7 +120,7 @@ async fn patches_intents_and_search_rollback_at_every_boundary(pool: PgPool) {
     assert_eq!(counts(&pool).await.2, 1);
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn cancelled_partial_import_rechecks_access_and_never_reopens_fallbacks(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::PrivateChannel, 2).await;
@@ -189,12 +189,12 @@ async fn cancelled_partial_import_rechecks_access_and_never_reopens_fallbacks(po
     );
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn forward_conversation_order_and_split_parts(pool: PgPool) {
     linked_conversations(pool, ["C1", "C2"]).await;
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn reverse_conversation_order_and_split_parts(pool: PgPool) {
     linked_conversations(pool, ["C2", "C1"]).await;
 }
@@ -349,7 +349,7 @@ async fn linked_conversations(pool: PgPool, order: [&str; 2]) {
     );
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn later_duplicate_job_cannot_patch_first_committed_body(pool: PgPool) {
     let team = team(&pool).await;
     let first = claim(&pool, team, ConversationKind::PublicChannel, 1).await;

@@ -11,7 +11,7 @@ use serde_json::json;
 
 use std::sync::{Arc, Mutex};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use self::fake_clears::FakeClears;
 use super::*;
@@ -41,7 +41,7 @@ struct FakeClearUpdates {
 }
 
 impl ClearUpdates for FakeClearUpdates {
-    async fn updated(&self, _user: &MacroUserIdStr<'static>, action: &ClearAction) {
+    async fn updated(&self, _user: &RoxUserIdStr<'static>, action: &ClearAction) {
         self.sent.lock().unwrap().push(action.clone());
     }
 }

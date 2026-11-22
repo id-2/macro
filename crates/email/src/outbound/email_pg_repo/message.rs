@@ -351,7 +351,7 @@ pub(crate) async fn get_simple_message(
 }
 
 /// Find an existing draft that replies to the given message, identified by
-/// the "Macro-In-Reply-To" header value.
+/// the "Rox-In-Reply-To" header value.
 #[tracing::instrument(skip(pool), err)]
 pub(crate) async fn get_draft_replying_to(
     pool: &PgPool,
@@ -379,8 +379,8 @@ pub(crate) async fn get_draft_replying_to(
           AND NOT EXISTS(SELECT 1 FROM email_draft_transfers t WHERE t.source_id=m.id AND t.state<>'preparing')
           AND (m.replying_to_id=$2::uuid OR jsonb_path_exists(
               m.headers_jsonb,
-              '$[*] ? (@."Macro-In-Reply-To" == $macro_uuid)'::jsonpath,
-              jsonb_build_object('macro_uuid', $2::uuid::text)
+              '$[*] ? (@."Macro-In-Reply-To" == $rox_uuid)'::jsonpath,
+              jsonb_build_object('rox_uuid', $2::uuid::text)
           ))
         ORDER BY m.created_at DESC
         LIMIT 1
@@ -415,7 +415,7 @@ pub(crate) async fn delete_draft_message(
     let outlook = sqlx::query!(r#"
         SELECT l.id,l.sync_generation FROM email_links l JOIN email_messages m ON m.link_id = l.id
         WHERE m.id = $1 AND m.thread_id = $2 AND l.id = ANY($3) AND l.provider = 'OUTLOOK'
-            AND ($4::text = l.macro_id OR EXISTS (SELECT 1 FROM macro_user_links u WHERE u.link_id = l.id AND u.primary_macro_id = $4))
+            AND ($4::text = l.rox_id OR EXISTS (SELECT 1 FROM rox_user_links u WHERE u.link_id = l.id AND u.primary_rox_id = $4))
         FOR UPDATE OF l
     "#,message_id,thread_db_id,link_ids,actor).fetch_optional(&mut *tx).await?;
 
@@ -498,7 +498,7 @@ pub(crate) async fn delete_draft_message(
         sqlx::query!("UPDATE email_messages SET mailbox_state = COALESCE(mailbox_state,'{}'::jsonb) || '{\"provider_missing\":true}'::jsonb WHERE id = $1",message_id).execute(&mut *tx).await?;
         super::thread::update_thread_metadata(&mut tx, thread_db_id, link.id).await?;
         let payload = serde_json::json!({"kind":"organization","thread_id":thread_db_id});
-        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),link.id,link.sync_generation,payload).execute(&mut *tx).await?;
+        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),link.id,link.sync_generation,payload).execute(&mut *tx).await?;
         tx.commit().await?;
         return Ok(Some(DraftDeletion {
             thread_deleted: false,

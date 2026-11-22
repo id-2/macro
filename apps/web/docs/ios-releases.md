@@ -14,7 +14,7 @@ release; see [file exports](../tauri/file_export_plugin/AGENTS.md).
 Play as the source of truth — is described in `docs/development/android.md`.)
 
 Web bundles ship to installed apps over the air (see
-`tauri/macro_bundle_updater_plugin`). On iOS they persist in a backup-excluded
+`tauri/rox_bundle_updater_plugin`). On iOS they persist in a backup-excluded
 Application Support directory so storage pressure cannot purge them; the
 updater ignores legacy cache contents (see
 `tauri/src-tauri/README.md#ota-bundle-storage`). Native code — anything under
@@ -159,7 +159,7 @@ raising the floor.
 ### Notification launch handoff compatibility
 
 The local `tauri/ios_push_plugin` exposes
-`window.__MACRO_IOS_NOTIFICATION_LAUNCH__` at document start. Web bundles use
+`window.__ROX_IOS_NOTIFICATION_LAUNCH__` at document start. Web bundles use
 the durable pending-intent, acknowledgment and native-cover commands only
 when that capability exists; older iOS binaries keep their legacy push path.
 New watchers pass `launchAware: true`. Older web bundles omit it, so the native

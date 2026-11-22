@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use super::*;
 use crate::outbound::pg_access_repo::queries::get_entity_users;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const OWNER: &str = "macro|owner@corp.test";
 const TEAM_MEMBER: &str = "macro|member@corp.test";
@@ -11,19 +11,19 @@ const DEPARTED: &str = "macro|departed@corp.test";
 const GUEST: &str = "macro|guest@corp.test";
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
-    let macro_uuid = Uuid::now_v7();
+    let rox_uuid = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
-        macro_uuid,
+        rox_uuid,
         user_id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         user_id,
-        macro_uuid,
+        rox_uuid,
     )
     .execute(pool)
     .await
@@ -48,7 +48,7 @@ async fn grant(pool: &PgPool, entity_id: Uuid, source_type: &str, source_id: &st
 /// A folder's documents share the folder's grants, one also has its own share, and
 /// one has nothing but its owner: each must reach exactly the users a per-entity
 /// lookup finds, with documents of equal grants sharing one audience.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grouped_audiences_match_each_entitys_own_users(pool: PgPool) {
     for user_id in [OWNER, TEAM_MEMBER, PARTICIPANT, DEPARTED, GUEST] {
         insert_user(&pool, user_id).await;
@@ -179,7 +179,7 @@ const MAILBOX_OWNER: &str = "macro|mailbox@corp.test";
 /// per-entity `get_users_by_entity` returns. Every entity also has an email
 /// thread row in a mailbox owned by someone without a grant, so a kind that adds
 /// users beyond its grants (as email threads do) fails here if it is listed.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grouped_audiences_equal_per_entity_users_for_every_grouped_kind(pool: PgPool) {
     use crate::domain::{
         ports::{EntityAccessService, EntityAudienceLookup},
@@ -247,7 +247,7 @@ async fn grouped_audiences_equal_per_entity_users_for_every_grouped_kind(pool: P
     .unwrap();
     let mailbox_id = Uuid::now_v7();
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, 'mailbox@corp.test', 'GMAIL')"#,
         mailbox_id,
         MAILBOX_OWNER,

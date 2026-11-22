@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::{Value, json};
 use system_properties::SystemPropertyKey;
 
@@ -161,7 +161,7 @@ fn literal_property_ids_are_the_system_properties() {
     assert!(sql.contains(&SystemPropertyKey::CONTACTS_UUID.to_string()));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn matches_companies_and_contacts_once(pool: PgPool) {
     let companies = SystemPropertyKey::COMPANIES_UUID;
     let contacts = SystemPropertyKey::CONTACTS_UUID;
@@ -207,7 +207,7 @@ async fn matches_companies_and_contacts_once(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn matches_database_rows_whose_entity_cells_reference_a_record(pool: PgPool) {
     let (database, deals) = table(&pool).await;
     let account = column(&pool, database, deals, "ENTITY").await;
@@ -345,7 +345,7 @@ async fn full_scan_edges(
     edges
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn database_row_edges_equal_the_full_scan(pool: PgPool) {
     let companies: Vec<Uuid> = (0..6).map(|n| Uuid::from_u128(0xc0_0000 + n)).collect();
     let contacts: Vec<Uuid> = (0..6).map(|n| Uuid::from_u128(0xc1_0000 + n)).collect();

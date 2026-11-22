@@ -34,7 +34,7 @@ function makeEditor() {
 
 function $collectMacroQuotes() {
   return $nodesOfType(ClassedBlockNode).filter((node) =>
-    node.exportJSON().classes.includes('macro_quote')
+    node.exportJSON().classes.includes('rox_quote')
   );
 }
 

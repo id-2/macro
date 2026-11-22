@@ -1,5 +1,5 @@
 use super::*;
-use crate::domain::meeting_links::attach_macro_call;
+use crate::domain::meeting_links::attach_rox_call;
 
 const CALL_URL: &str = "https://rox.one/app/meet/join/abcdefghijklmnop";
 
@@ -26,8 +26,8 @@ async fn preview(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn a_channel_share_previews_the_meeting_without_its_macro_call(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn a_channel_share_previews_the_meeting_without_its_rox_call(pool: PgPool) {
     let organizer_id = "macro|call-organizer@example.com";
     let guest_id = "macro|call-guest@example.com";
     let member_id = "macro|call-member@example.com";
@@ -37,7 +37,7 @@ async fn a_channel_share_previews_the_meeting_without_its_macro_call(pool: PgPoo
     let organizer_provider = provider_ids(&repo, organizer_link).await;
     let guest_provider = provider_ids(&repo, guest_link).await;
     let (description, location) =
-        attach_macro_call(Some("<p>Bring the budget draft</p>"), None, CALL_URL);
+        attach_rox_call(Some("<p>Bring the budget draft</p>"), None, CALL_URL);
 
     let mut organizer_copy = timed_upsert(
         organizer_id,
@@ -88,14 +88,14 @@ async fn a_channel_share_previews_the_meeting_without_its_macro_call(pool: PgPoo
     assert_eq!(guest.location, Some(location));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn a_channel_share_keeps_a_room_beside_the_macro_call(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn a_channel_share_keeps_a_room_beside_the_rox_call(pool: PgPool) {
     let organizer_id = "macro|room-organizer@example.com";
     let member_id = "macro|room-member@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
     let repo = PgCalendarRepository::new(pool.clone());
     let provider = provider_ids(&repo, organizer_link).await;
-    let (description, location) = attach_macro_call(None, Some("Room 4"), CALL_URL);
+    let (description, location) = attach_rox_call(None, Some("Room 4"), CALL_URL);
     let mut upsert = timed_upsert(
         organizer_id,
         organizer_link,
@@ -116,8 +116,8 @@ async fn a_channel_share_keeps_a_room_beside_the_macro_call(pool: PgPool) {
     assert_eq!(shared.location.as_deref(), Some("Room 4"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn a_channel_share_previews_an_occurrence_without_its_macro_call(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn a_channel_share_previews_an_occurrence_without_its_rox_call(pool: PgPool) {
     let organizer_id = "macro|exception-organizer@example.com";
     let member_id = "macro|exception-member@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
@@ -132,7 +132,7 @@ async fn a_channel_share_previews_an_occurrence_without_its_macro_call(pool: PgP
         1,
     );
     upsert.event.description = Some("Series agenda".to_string());
-    let (description, location) = attach_macro_call(Some("<p>Only this one</p>"), None, CALL_URL);
+    let (description, location) = attach_rox_call(Some("<p>Only this one</p>"), None, CALL_URL);
     let edited_start = Utc.with_ymd_and_hms(2026, 7, 25, 14, 0, 0).unwrap();
     let recurrence_id = edited_start.to_rfc3339();
     upsert.occurrences[1].recurrence_id = Some(recurrence_id.clone());
@@ -172,8 +172,8 @@ async fn a_channel_share_previews_an_occurrence_without_its_macro_call(pool: PgP
 
 /// The join line closes the description, so a long body puts the preview's
 /// cut inside it: past its link, inside its link, and before it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn the_macro_call_leaves_a_shared_description_whole_before_the_cap(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn the_rox_call_leaves_a_shared_description_whole_before_the_cap(pool: PgPool) {
     let organizer_id = "macro|cap-organizer@example.com";
     let member_id = "macro|cap-member@example.com";
     let organizer_link = insert_link(&pool, organizer_id).await;
@@ -183,7 +183,7 @@ async fn the_macro_call_leaves_a_shared_description_whole_before_the_cap(pool: P
 
     for (body_chars, previewed_chars) in [(3_900, 3_900), (3_925, 3_925), (4_100, 4_000)] {
         let body = "a".repeat(body_chars);
-        let (description, location) = attach_macro_call(Some(&body), Some("Room 4"), CALL_URL);
+        let (description, location) = attach_rox_call(Some(&body), Some("Room 4"), CALL_URL);
         let mut upsert = timed_upsert(
             organizer_id,
             organizer_link,

@@ -1,6 +1,6 @@
 //! Ports (trait contracts) for the user API key domain.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::{
     CreatedUserApiKey, UserApiKey, UserApiKeyError, UserApiKeyId, UserApiKeyInfo,
@@ -17,7 +17,7 @@ pub trait UserApiKeysRepo: Send + Sync + 'static {
     /// Persist a newly minted key for the user. `hash` is SHA-256 of the secret.
     fn insert_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
         name: &str,
         hash: &[u8; 32],
@@ -26,19 +26,19 @@ pub trait UserApiKeysRepo: Send + Sync + 'static {
     /// Count the keys currently in the user's collection.
     fn count_keys(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<i64, Self::Err>> + Send;
 
     /// List the user's keys as id, name, and created_at, newest first.
     fn list_keys(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<UserApiKeyInfo>, Self::Err>> + Send;
 
     /// Remove one of the user's keys by id. Returns `true` when a row was removed.
     fn delete_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -47,21 +47,21 @@ pub trait UserApiKeysRepo: Send + Sync + 'static {
     /// the keys they return stays live.
     fn replace_keys_named(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
         name: &str,
         hash: &[u8; 32],
     ) -> impl Future<Output = Result<UserApiKeyInfo, Self::Err>> + Send;
 
     /// Owner of a key. Authenticate-by-key is implemented by
-    /// `macro_authorization`'s `PgUserApiKeyAuthorizationRepo`.
+    /// `rox_authorization`'s `PgUserApiKeyAuthorizationRepo`.
     ///
     /// Looks up by SHA-256 of the presented secret. Not exposed through
     /// [UserApiKeyService] in this slice.
     fn find_user_id_by_key(
         &self,
         key: &UserApiKey,
-    ) -> impl Future<Output = Result<Option<MacroUserIdStr<'static>>, Self::Err>> + Send;
+    ) -> impl Future<Output = Result<Option<RoxUserIdStr<'static>>, Self::Err>> + Send;
 }
 
 /// Inbound service port: the user API key API used by drivers (HTTP).
@@ -70,7 +70,7 @@ pub trait UserApiKeyService: Send + Sync + 'static {
     /// nowhere else.
     fn create_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         name: &str,
     ) -> impl Future<Output = Result<CreatedUserApiKey, UserApiKeyError>> + Send;
 
@@ -78,21 +78,21 @@ pub trait UserApiKeyService: Send + Sync + 'static {
     /// atomically, so repeating or racing this always leaves one live key.
     fn replace_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         name: &str,
     ) -> impl Future<Output = Result<CreatedUserApiKey, UserApiKeyError>> + Send;
 
     /// List the user's keys as id, name, and created_at.
     fn list_keys(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<UserApiKeyInfo>, UserApiKeyError>> + Send;
 
     /// Delete one of the user's keys by opaque id. [UserApiKeyError::NotFound]
     /// when the key does not exist in the caller's collection.
     fn delete_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
     ) -> impl Future<Output = Result<(), UserApiKeyError>> + Send;
 }

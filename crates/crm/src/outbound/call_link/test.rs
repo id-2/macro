@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use system_properties::{
     PgSystemPropertiesRepository, SystemPropertiesServiceImpl, SystemPropertyKey,
@@ -14,19 +14,19 @@ const TEAMMATE: &str = "macro|teammate@acme.example.com";
 async fn seed_team(pool: &PgPool, crm_enabled: bool) -> Uuid {
     let team_id = Uuid::now_v7();
     for user_id in [MEMBER, TEAMMATE] {
-        let macro_user_id = Uuid::now_v7();
+        let rox_user_id = Uuid::now_v7();
         sqlx::query(
             "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
         )
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .bind(user_id)
-        .bind(format!("stripe_{macro_user_id}"))
+        .bind(format!("stripe_{rox_user_id}"))
         .execute(pool)
         .await
         .unwrap();
-        sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#)
+        sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#)
             .bind(user_id)
-            .bind(macro_user_id)
+            .bind(rox_user_id)
             .execute(pool)
             .await
             .unwrap();
@@ -109,7 +109,7 @@ fn people(user_ids: &[&str], invitee_emails: &[&str]) -> CallPeople {
     CallPeople {
         user_ids: user_ids
             .iter()
-            .map(|id| MacroUserIdStr::parse_from_str(id).unwrap().into_owned())
+            .map(|id| RoxUserIdStr::parse_from_str(id).unwrap().into_owned())
             .collect(),
         invitee_emails: invitee_emails.iter().map(ToString::to_string).collect(),
     }
@@ -140,7 +140,7 @@ async fn linked_ids(
     ids
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn links_companies_by_domain_and_contacts_by_address(pool: PgPool) {
     let team_id = seed_team(&pool, true).await;
     let acme = insert_company(&pool, team_id, "acme.example.com", false).await;
@@ -179,7 +179,7 @@ async fn links_companies_by_domain_and_contacts_by_address(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn links_records_without_email_contribution_consent(pool: PgPool) {
     let team_id = seed_team(&pool, false).await;
     let acme = insert_company(&pool, team_id, "acme.example.com", false).await;
@@ -204,7 +204,7 @@ async fn links_records_without_email_contribution_consent(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn never_matches_the_teams_own_members(pool: PgPool) {
     let team_id = seed_team(&pool, true).await;
     insert_company(&pool, team_id, "acme.example.com", false).await;
@@ -222,7 +222,7 @@ async fn never_matches_the_teams_own_members(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn keeps_associations_a_user_already_edited(pool: PgPool) {
     let team_id = seed_team(&pool, true).await;
     insert_company(&pool, team_id, "acme.example.com", false).await;
@@ -257,7 +257,7 @@ async fn keeps_associations_a_user_already_edited(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn matches_accounts_and_contacts_regardless_of_case(pool: PgPool) {
     let team_id = seed_team(&pool, true).await;
     let acme = insert_company(&pool, team_id, "acme.example.com", false).await;
@@ -308,7 +308,7 @@ async fn add_address(pool: &PgPool, contact_id: Uuid, email: &str) {
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn links_a_company_contact_by_its_second_address(pool: PgPool) {
     let team_id = seed_team(&pool, true).await;
     let acme = insert_company(&pool, team_id, "acme.example.com", false).await;
@@ -336,7 +336,7 @@ async fn links_a_company_contact_by_its_second_address(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn links_a_contact_without_a_company_by_any_address(pool: PgPool) {
     let team_id = seed_team(&pool, true).await;
     let lin = insert_unfiled_contact(&pool, team_id, "lin@personal.example.com", false).await;
@@ -357,7 +357,7 @@ async fn links_a_contact_without_a_company_by_any_address(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn links_every_visible_contact_holding_an_address(pool: PgPool) {
     let team_id = seed_team(&pool, true).await;
     let acme = insert_company(&pool, team_id, "acme.example.com", false).await;
@@ -391,7 +391,7 @@ async fn links_every_visible_contact_holding_an_address(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn second_addresses_skip_hidden_records_and_team_members(pool: PgPool) {
     let team_id = seed_team(&pool, true).await;
     let hidden_company = insert_company(&pool, team_id, "hidden.example.com", true).await;

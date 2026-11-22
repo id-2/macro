@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::enrollment::DeviceSecret;
 use crate::domain::models::ComputerName;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::{
     Arc, Mutex,
     atomic::{AtomicU32, Ordering},
@@ -119,7 +119,7 @@ async fn docker_create_replays_refresh_unclaimed_enrollment_without_rebooting() 
                 start: true,
             }),
             harness_id: None,
-            created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+            created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
             created_at: Utc::now(),
             enrolled_at: None,
             setup_completed_at: None,
@@ -289,7 +289,7 @@ async fn an_agent_computer_is_created_and_recreated_from_the_agent_image() {
                 start: true,
             }),
             harness_id: None,
-            created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+            created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
             created_at: Utc::now(),
             enrolled_at: None,
             setup_completed_at: None,

@@ -160,7 +160,7 @@ rows, initiatives, ...) and get back a single unified, paginated result.
   for trees the stripper rejects; on the calendar leg it seq-scanned every
   event in the table.
 - Calendar access is `owner_id = $1 OR source_link_id = ANY(ARRAY(...))`, not
-  an `EXISTS` over `macro_user_links`, so the planner can index both sides of
+  an `EXISTS` over `rox_user_links`, so the planner can index both sides of
   the OR.
 - Queries over a known id list (`*/by_ids.rs`, hydration, candidate gates
   such as `initiative_gate`) check access per row with `EXISTS` on

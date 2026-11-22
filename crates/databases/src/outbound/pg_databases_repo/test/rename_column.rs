@@ -10,7 +10,7 @@ use super::*;
 use crate::domain::models::{DatabaseError, OpBatch, OpRefusal, SchemaError};
 use crate::domain::ports::{DatabasesRepo, DatabasesService};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_column_rename_relabels_that_placement_alone_and_checks_what_the_caller_saw(
     pool: PgPool,
 ) {
@@ -181,7 +181,7 @@ async fn a_column_rename_relabels_that_placement_alone_and_checks_what_the_calle
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_column_renames_have_exactly_one_winner(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);

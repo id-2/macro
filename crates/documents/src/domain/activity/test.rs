@@ -1,11 +1,11 @@
 use ::activity::{Action, activity_id};
 use chrono::{TimeZone as _, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use model_entity::EntityType;
 use uuid::Uuid;
 
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 
 use super::*;
 use crate::domain::events::{
@@ -17,8 +17,8 @@ use model_owner::Owner;
 
 const DOCUMENT_ID: &str = "11111111-1111-1111-1111-111111111111";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn envelope(event: DocumentTopicEvent) -> Event<DocumentTopicEvent> {
@@ -65,7 +65,7 @@ fn created_with_system_actor_is_not_the_owner_subject() {
     let event = envelope(DocumentTopicEvent::Created(DocumentCreatedMetadata {
         document_id: DOCUMENT_ID.to_string(),
         owner: Owner::from_principal_str("macro|owner@example.com").unwrap(),
-        actor: Some(Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID)),
+        actor: Some(Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID)),
         on_behalf_of: None,
         document_name: "invoice".to_string(),
         file_type: None,
@@ -78,11 +78,11 @@ fn created_with_system_actor_is_not_the_owner_subject() {
     assert_eq!(activity.action, Action::Created);
     assert_eq!(
         activity.actor.as_ref(),
-        bot_id::MACRO_SYSTEM_BOT_ID.into_storage_id().as_ref()
+        bot_id::ROX_SYSTEM_BOT_ID.into_storage_id().as_ref()
     );
     assert_eq!(
         activity.subject_id,
-        bot_id::MACRO_SYSTEM_BOT_ID.into_storage_id().as_ref()
+        bot_id::ROX_SYSTEM_BOT_ID.into_storage_id().as_ref()
     );
 }
 
@@ -91,7 +91,7 @@ fn created_on_behalf_of_the_owner_stays_on_their_feed() {
     let event = envelope(DocumentTopicEvent::Created(DocumentCreatedMetadata {
         document_id: DOCUMENT_ID.to_string(),
         owner: Owner::from_principal_str("macro|owner@example.com").unwrap(),
-        actor: Some(Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID)),
+        actor: Some(Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID)),
         on_behalf_of: Some(user("macro|owner@example.com")),
         document_name: "welcome".to_string(),
         file_type: None,
@@ -103,7 +103,7 @@ fn created_on_behalf_of_the_owner_stays_on_their_feed() {
     let activity = single_activity(event.event.ingest(event.event_id));
     assert_eq!(
         activity.actor.as_ref(),
-        bot_id::MACRO_SYSTEM_BOT_ID.into_storage_id().as_ref()
+        bot_id::ROX_SYSTEM_BOT_ID.into_storage_id().as_ref()
     );
     assert_eq!(activity.subject_id, "macro|owner@example.com");
 }
@@ -170,7 +170,7 @@ fn delegated_update_stays_on_the_user_feed() {
         document_id: DOCUMENT_ID.to_string(),
         owner: Owner::from_principal_str("macro|owner@example.com").unwrap(),
         actor_user_id: None,
-        actor: Some(Actor::new_from_bot(bot_id::MACRO_AI_BOT_ID)),
+        actor: Some(Actor::new_from_bot(bot_id::ROX_AI_BOT_ID)),
         on_behalf_of: Some(user("macro|owner@example.com")),
         document_name: Some("renamed".to_string()),
         previous_project_id: None,
@@ -182,7 +182,7 @@ fn delegated_update_stays_on_the_user_feed() {
     assert_eq!(activity.action, Action::Edited);
     assert_eq!(
         activity.actor.as_ref(),
-        bot_id::MACRO_AI_BOT_ID.into_storage_id().as_ref()
+        bot_id::ROX_AI_BOT_ID.into_storage_id().as_ref()
     );
     assert_eq!(activity.subject_id, "macro|owner@example.com");
 }
@@ -218,7 +218,7 @@ fn unattributable_mutations_are_dropped() {
 #[test]
 fn copied_maps_to_a_created_activity_for_the_new_document() {
     let copier = user("macro|copier@example.com");
-    let bot = Actor::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+    let bot = Actor::new_from_bot(bot_id::ROX_AI_BOT_ID);
     let event = envelope(DocumentTopicEvent::Copied(DocumentCopiedMetadata {
         document_id: "22222222-2222-2222-2222-222222222222".to_string(),
         source_document_id: DOCUMENT_ID.to_string(),
@@ -242,8 +242,8 @@ fn copied_maps_to_a_created_activity_for_the_new_document() {
 #[test]
 fn creation_and_copy_derive_user_bot_and_team_actors() {
     let user = user("macro|creator@example.com");
-    let bot = bot_id::MACRO_AI_BOT_ID;
-    let system = Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID);
+    let bot = bot_id::ROX_AI_BOT_ID;
+    let system = Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID);
     for (owner, expected_actor) in [
         (Owner::User(user.clone()), Actor::new_from_user(user)),
         (Owner::Bot(bot), Actor::new_from_bot(bot)),
@@ -290,8 +290,8 @@ fn creation_and_copy_derive_user_bot_and_team_actors() {
 fn team_creation_prefers_explicit_actor_then_on_behalf_of_then_system() {
     let initiating_user = user("macro|creator@example.com");
     let user_actor = Actor::new_from_user(initiating_user.clone());
-    let bot_actor = Actor::new_from_bot(bot_id::MACRO_AI_BOT_ID);
-    let system_actor = Actor::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID);
+    let bot_actor = Actor::new_from_bot(bot_id::ROX_AI_BOT_ID);
+    let system_actor = Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID);
     for (actor, on_behalf_of, expected_actor, expected_subject) in [
         (
             Some(bot_actor.clone()),
@@ -388,7 +388,7 @@ fn attributed_sync_content_is_an_edited_activity() {
             document_id: DOCUMENT_ID.to_string(),
             file_type: FileType::Md,
             document_version_id: None,
-            actor: Some(Actor::new_from_bot(bot_id::MACRO_AI_BOT_ID)),
+            actor: Some(Actor::new_from_bot(bot_id::ROX_AI_BOT_ID)),
             on_behalf_of: Some(user("macro|owner@example.com")),
         },
     ));
@@ -396,7 +396,7 @@ fn attributed_sync_content_is_an_edited_activity() {
     assert_eq!(activity.action, Action::Edited);
     assert_eq!(
         activity.actor.as_ref(),
-        bot_id::MACRO_AI_BOT_ID.into_storage_id().as_ref()
+        bot_id::ROX_AI_BOT_ID.into_storage_id().as_ref()
     );
     assert_eq!(activity.subject_id, "macro|owner@example.com");
 }

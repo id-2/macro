@@ -416,7 +416,7 @@ export function calculateSpreadsheetForAi(
       workbook.some((item) => item.name.toLowerCase() === name.toLowerCase())
     )
       name += '_';
-    const scratchId = `__macro_scratch_${crypto.randomUUID()}`;
+    const scratchId = `__rox_scratch_${crypto.randomUUID()}`;
     const scratch: SpreadsheetWorkbookSheet = {
       id: scratchId,
       name,

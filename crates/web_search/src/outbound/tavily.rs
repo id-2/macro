@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use anyhow::Context;
 use async_trait::async_trait;
-use macro_env_var::maybe_env_var;
+use rox_env_var::maybe_env_var;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 

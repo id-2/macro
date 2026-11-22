@@ -1,6 +1,6 @@
 //! Building lifecycle-event identity from the session's own rows.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::events::{SessionIdentity, ThreadOrigin};
 
@@ -22,7 +22,7 @@ use super::model::{AgentSession, SessionBot};
 pub fn session_identity(
     session: &AgentSession,
     bot: &SessionBot,
-    participants: Vec<MacroUserIdStr<'static>>,
+    participants: Vec<RoxUserIdStr<'static>>,
 ) -> Result<SessionIdentity> {
     let owner = session.owner_user()?;
     let mut audience = participants;

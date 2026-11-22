@@ -178,7 +178,7 @@ after checking that no existing index already leads with those columns
 - Create it in its own migration, generated with the
   [`sqlx-migration`](../sqlx-migration/SKILL.md) skill: a single
   `CREATE INDEX CONCURRENTLY` in a `-- no-transaction` file, like
-  `crates/macro_db_client/migrations/20261006151520_email_threads_non_spam_link_sort.sql`.
+  `crates/rox_db_client/migrations/20261006151520_email_threads_non_spam_link_sort.sql`.
 - Match the query: equality columns first, then the sort columns in the
   query's direction; make it partial when the query always filters on a
   constant.

@@ -12,15 +12,15 @@ use agent_session::domain::ports::MockAgentSessionRepo;
 use bots::domain::models::{Agent, AgentChannelScope, AgentMcpServers, Bot, BotKind, BotOwner};
 use channel_sender::ChannelSender;
 use chrono::Utc;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::models::SimpleMention;
 
 use crate::domain::broker_events::TriggerDecision;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|trigger-service-test@rox.one")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|trigger-service-test@rox.one")
         .expect("valid user id")
         .into_owned()
 }
@@ -117,7 +117,7 @@ fn session(id: AgentSessionId, bot_id: BotId) -> AgentSession {
         name: agent_session::domain::model::DEFAULT_AGENT_SESSION_NAME.to_owned(),
         archived: None,
         owner_id: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@example.com").expect("valid macro user id"),
+            RoxUserIdStr::try_from_email("owner@example.com").expect("valid macro user id"),
         ),
         thread_id: Some(Uuid::from_u128(3)),
         thread_parent: Some(MessageParent::Channel(Uuid::from_u128(1))),
@@ -209,7 +209,7 @@ fn service_reading(
 }
 
 fn allow_invocation(
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     parent: &MessageParent,
     root_id: Uuid,
 ) -> std::pin::Pin<Box<dyn Future<Output = Result<Option<AuthorizedInvocation>>> + Send>> {
@@ -308,7 +308,7 @@ async fn mention_yields_event(posted: &MessagePostedMetadata, facts: impl Into<F
 async fn a_private_global_agent_is_unavailable_to_another_user() {
     let mut posted = message(vec![mention_of(BotId::TEST_A)]);
     posted.sender = ChannelSender::new_from_user(
-        MacroUserIdStr::try_from_email("outsider@example.com").expect("valid user id"),
+        RoxUserIdStr::try_from_email("outsider@example.com").expect("valid user id"),
     );
     let mut bots = MockAgentBotLookup::new();
     bots.expect_get_agent()
@@ -1218,7 +1218,7 @@ async fn a_discussion_cannot_invoke_another_users_private_agent() {
         let mut posted = message(vec![mention_of(BotId::TEST_A)]);
         posted.parent = parent.clone();
         posted.sender = ChannelSender::new_from_user(
-            MacroUserIdStr::try_from_email("other@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("other@example.com").unwrap(),
         );
         let mut bots = MockAgentBotLookup::new();
         bots.expect_get_agent()
@@ -1379,7 +1379,7 @@ async fn a_crm_discussion_cannot_invoke_another_users_private_agent() {
         let mut posted = message(vec![mention_of(BotId::TEST_A)]);
         posted.parent = parent;
         posted.sender = ChannelSender::new_from_user(
-            MacroUserIdStr::try_from_email("other@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("other@example.com").unwrap(),
         );
         let mut bots = MockAgentBotLookup::new();
         bots.expect_get_agent()
@@ -1392,9 +1392,9 @@ async fn a_crm_discussion_cannot_invoke_another_users_private_agent() {
 #[tokio::test]
 async fn attributed_bot_mentions_open_or_resume_the_target_session() {
     for (source, target) in [
-        (bot_id::MACRO_NEW_BOT_ID, bot_id::CURSOR_BOT_ID),
-        (bot_id::CURSOR_BOT_ID, bot_id::MACRO_NEW_BOT_ID),
-        (BotId::TEST_A, bot_id::MACRO_NEW_BOT_ID),
+        (bot_id::ROX_NEW_BOT_ID, bot_id::CURSOR_BOT_ID),
+        (bot_id::CURSOR_BOT_ID, bot_id::ROX_NEW_BOT_ID),
+        (BotId::TEST_A, bot_id::ROX_NEW_BOT_ID),
     ] {
         for existing in [false, true] {
             let mut posted = message(vec![mention_of(target)]);
@@ -1526,14 +1526,14 @@ async fn unattributed_bot_messages_do_not_trigger() {
 
 #[tokio::test]
 async fn agents_mentioning_each_other_stop_at_the_hop_limit_without_a_person() {
-    let macro_ai = ChannelSender::new_from_bot(bot_id::MACRO_NEW_BOT_ID);
+    let rox_ai = ChannelSender::new_from_bot(bot_id::ROX_NEW_BOT_ID);
     let cursor = ChannelSender::new_from_bot(bot_id::CURSOR_BOT_ID);
     // The agent posting hop `n`, alternating from Rox's first handoff.
     let agent = |n: usize| {
         if n % 2 == 1 {
-            (macro_ai.clone(), bot_id::CURSOR_BOT_ID)
+            (rox_ai.clone(), bot_id::CURSOR_BOT_ID)
         } else {
-            (cursor.clone(), bot_id::MACRO_NEW_BOT_ID)
+            (cursor.clone(), bot_id::ROX_NEW_BOT_ID)
         }
     };
     let thread: Vec<ThreadMessage> = std::iter::once(thread_message(

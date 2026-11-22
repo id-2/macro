@@ -18,7 +18,7 @@ export const definition = defineBlock({
   description: 'edit canvas',
   component: lazy(() => import('./component/Block')),
   accepted: {
-    canvas: 'application/x-macro-canvas',
+    canvas: 'application/x-rox-canvas',
   },
   liveTrackingEnabled: true,
   async load(source, intent, parentSpan) {

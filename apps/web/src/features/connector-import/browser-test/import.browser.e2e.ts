@@ -5,7 +5,7 @@ const fixture = '/src/features/connector-import/browser-test/import.html';
 test.beforeEach(async ({ page }) => {
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.goto(fixture, { waitUntil: 'domcontentloaded' });
 });
 

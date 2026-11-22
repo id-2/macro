@@ -1,5 +1,5 @@
 use email_formatting::EmailDigestNotification;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::models::apple::APNSPushNotification;
 use notification::domain::models::mobile::NotifCollapseKey;
 use notification::domain::models::queue_message::EmailContent;
@@ -27,7 +27,7 @@ impl NotificationExtIos for SandboxNotification {
 
     fn as_apns<'a>(
         &self,
-        _sender_id: Option<MacroUserIdStr<'a>>,
+        _sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &model_entity::Entity<'_>,
         _notification_id: uuid::Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {

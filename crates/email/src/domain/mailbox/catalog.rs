@@ -2,7 +2,7 @@
 
 use super::*;
 use crate::domain::models::{EmailBackfillStatus, EmailSyncStatus};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{
     link::{Link, UserProvider},
     settings::Settings,
@@ -25,7 +25,7 @@ pub struct InboxCatalogEntry {
 pub trait InboxCatalogRepository: Send + Sync + 'static {
     fn accessible_details(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<InboxCatalogFacts>, MailboxError>> + Send;
 }
 
@@ -51,7 +51,7 @@ pub struct InboxCatalogService<R>(pub R);
 impl<R: InboxCatalogRepository> InboxCatalogService<R> {
     pub async fn list(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> Result<Vec<InboxCatalogEntry>, MailboxError> {
         Ok(self
             .0
@@ -145,12 +145,12 @@ impl<R: InboxAccessRepository> InboxCatalogService<R> {
             .await
             .map_err(InboxAccessError::Query)?
             .ok_or(InboxAccessError::NotFound)?;
-        if link.macro_id.as_ref() == caller {
+        if link.rox_id.as_ref() == caller {
             return Ok((link, InboxAccess::Own));
         }
         if self
             .0
-            .delegated(caller, link.macro_id.as_ref(), link.id)
+            .delegated(caller, link.rox_id.as_ref(), link.id)
             .await
             .map_err(InboxAccessError::Query)?
         {

@@ -125,7 +125,7 @@ export function EmailCard(props: { class?: string } = {}) {
     const links = emailLinksQuery.isSuccess ? emailLinksQuery.data.links : [];
     const uid = userId();
     const primary = links.find(
-      (link) => link.is_primary && link.macro_id === uid
+      (link) => link.is_primary && link.rox_id === uid
     );
     const others = links.filter((link) => link !== primary);
     return { primary, others };
@@ -173,7 +173,7 @@ export function EmailCard(props: { class?: string } = {}) {
               <InboxRow
                 link={primary()}
                 isPrimary
-                isOwn={primary().macro_id === userId()}
+                isOwn={primary().rox_id === userId()}
                 resyncing={resyncingIds().has(primary().id)}
                 onResync={() => handleResyncInbox(primary().id)}
                 onReconnect={() =>
@@ -202,7 +202,7 @@ export function EmailCard(props: { class?: string } = {}) {
                   setRemoveTarget({
                     id: primary().id,
                     email: primary().email_address,
-                    isOwn: primary().macro_id === userId(),
+                    isOwn: primary().rox_id === userId(),
                   })
                 }
                 onTurnOffCalendar={() =>
@@ -225,7 +225,7 @@ export function EmailCard(props: { class?: string } = {}) {
               <InboxRow
                 link={link}
                 isPrimary={false}
-                isOwn={link.macro_id === userId()}
+                isOwn={link.rox_id === userId()}
                 resyncing={resyncingIds().has(link.id)}
                 onResync={() => handleResyncInbox(link.id)}
                 onReconnect={() =>
@@ -254,7 +254,7 @@ export function EmailCard(props: { class?: string } = {}) {
                   setRemoveTarget({
                     id: link.id,
                     email: link.email_address,
-                    isOwn: link.macro_id === userId(),
+                    isOwn: link.rox_id === userId(),
                   })
                 }
                 onTurnOffCalendar={() =>

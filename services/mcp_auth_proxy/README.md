@@ -125,7 +125,7 @@ removed and its length capped. Nothing is stored until the user answers.
 becomes a redirector to a host the user just refused.
 
 Two checks keep a flow tied to the person approving it, using one random secret
-in the `__Host-macro_mcp_oauth` cookie (`Secure`, `HttpOnly`, `SameSite=Lax`),
+in the `__Host-rox_mcp_oauth` cookie (`Secure`, `HttpOnly`, `SameSite=Lax`),
 which `/authorize` sets on every flow past the chooser
 (`domain/browser_binding.rs`). The email sign-in form is held to the same checks:
 
@@ -207,7 +207,7 @@ RFC 8707 `resource` parameter (`domain/resource.rs`):
   Worker). It passes its bearer unchanged to Rox's APIs, which accept a
   FusionAuth token but cannot look up its client, so writes would show as the
   user's own. This resource gets a Rox API token instead, minted at `/token`
-  for the same user through the `MacroApiTokenMinter` port: the Rox bot via
+  for the same user through the `RoxApiTokenMinter` port: the Rox bot via
   the client's registered name, the attribution public MCP's `ExecuteCode`
   signs. It expires with the FusionAuth token it was minted from, and the
   refresh token stays FusionAuth's, so a refresh naming this resource mints a
@@ -274,7 +274,7 @@ them for one hour (`ttlSeconds` in `infra/stacks/fusionauth-instance`).
 ## User API keys
 
 The harness also wires the existing revocable `UserApiKeyAuthorizer` into the
-mounted MCP router. Clients can send `x-macro-user-api-key` instead of a JWT
+mounted MCP router. Clients can send `x-rox-user-api-key` instead of a JWT
 bearer. Valid keys resolve only their account owner using the same validity and
 scope checks as other user-key routes; revoked or expired keys cannot authenticate.
 A valid bearer still works when no valid key is present. Account/agent claims

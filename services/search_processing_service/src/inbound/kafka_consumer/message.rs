@@ -3,7 +3,7 @@
 //! Channel messages are indexed; document discussions are not, so facts with
 //! a document parent are ignored here.
 
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 use messages::domain::models::MessageParent;
 use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
 use opensearch_client::OpensearchClient;

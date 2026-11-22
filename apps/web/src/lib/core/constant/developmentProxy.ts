@@ -10,7 +10,7 @@ export const DEVELOPMENT_PROXY_TARGETS = {
   otlp: 'http://localhost:4318',
 } as const;
 
-export const DEVELOPMENT_PROXY_PREFIX = '/__macro_dev';
+export const DEVELOPMENT_PROXY_PREFIX = '/__rox_dev';
 
 /** Keep hosted development APIs on the page origin, including workers and WS. */
 export function developmentProxyUrl(url: string): string {

@@ -1,6 +1,6 @@
 import { match, P } from 'ts-pattern';
 import type { Macro } from '../../sdk/src/macro';
-import { MacroApiError, MacroError } from '../../sdk/src/utils/unwrap';
+import { RoxApiError, RoxError } from '../../sdk/src/utils/unwrap';
 import type { Catalog, Operation, PathStep } from './catalog';
 import { DEFAULT_MAX_ITEMS, MAX_ITEMS_INPUT } from './tools';
 import { HandleInput, type InputValidators } from './validate';
@@ -184,7 +184,7 @@ export function describeError(error: unknown): {
 } {
   if (error instanceof OperationError)
     return { code: error.code, message: error.message };
-  if (error instanceof MacroApiError) {
+  if (error instanceof RoxApiError) {
     const code = match(error.status)
       .returnType<ErrorCode>()
       .with(400, 422, () => 'invalid')
@@ -198,9 +198,9 @@ export function describeError(error: unknown): {
       error.status >= 500 ? `Rox API error ${error.status}` : error.message;
     return { code, message };
   }
-  if (error instanceof MacroError)
+  if (error instanceof RoxError)
     return {
-      code: error.name === 'MacroNotFoundError' ? 'not_found' : 'invalid',
+      code: error.name === 'RoxNotFoundError' ? 'not_found' : 'invalid',
       message: error.message,
     };
   return { code: 'internal', message: 'The operation failed unexpectedly.' };

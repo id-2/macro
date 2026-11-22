@@ -26,9 +26,9 @@ impl CalendarChangeRepository for PgCalendarRepository {
         let rows = sqlx::query!(
             r#"
             WITH visible AS (
-                SELECT id AS link_id FROM email_links WHERE macro_id = $1
+                SELECT id AS link_id FROM email_links WHERE rox_id = $1
                 UNION
-                SELECT link_id FROM macro_user_links WHERE primary_macro_id = $1
+                SELECT link_id FROM rox_user_links WHERE primary_rox_id = $1
             )
             SELECT visible.link_id AS "link_id!", COALESCE(counter.seq, 0) AS "seq!"
             FROM visible
@@ -63,9 +63,9 @@ impl CalendarChangeRepository for PgCalendarRepository {
         let rows = sqlx::query!(
             r#"
             WITH visible AS (
-                SELECT id AS link_id FROM email_links WHERE macro_id = $1
+                SELECT id AS link_id FROM email_links WHERE rox_id = $1
                 UNION
-                SELECT link_id FROM macro_user_links WHERE primary_macro_id = $1
+                SELECT link_id FROM rox_user_links WHERE primary_rox_id = $1
             ),
             since AS (
                 SELECT position.link_id, position.seq
@@ -226,9 +226,9 @@ impl CalendarChangeRepository for PgCalendarRepository {
               AND occurrence.owner_id IN (
                     SELECT $1::text
                     UNION
-                    SELECT link.child_macro_id
-                    FROM macro_user_links link
-                    WHERE link.primary_macro_id = $1
+                    SELECT link.child_rox_id
+                    FROM rox_user_links link
+                    WHERE link.primary_rox_id = $1
               )
               AND event.status <> 'cancelled'
               AND NOT occurrence.is_cancelled
@@ -236,9 +236,9 @@ impl CalendarChangeRepository for PgCalendarRepository {
                     event.owner_id = $1
                     OR EXISTS (
                         SELECT 1
-                        FROM macro_user_links link
+                        FROM rox_user_links link
                         WHERE link.link_id = event.source_link_id
-                          AND link.primary_macro_id = $1
+                          AND link.primary_rox_id = $1
                     )
               )
             ORDER BY
@@ -341,12 +341,12 @@ impl CalendarChangeRepository for PgCalendarRepository {
               AND NOT calendar.is_deleted
               AND account.sync_status <> 'disabled'
               AND (
-                    link.macro_id = $1
+                    link.rox_id = $1
                     OR EXISTS (
                         SELECT 1
-                        FROM macro_user_links delegation
+                        FROM rox_user_links delegation
                         WHERE delegation.link_id = link.id
-                          AND delegation.primary_macro_id = $1
+                          AND delegation.primary_rox_id = $1
                     )
               )
             "#,

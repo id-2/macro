@@ -1,6 +1,6 @@
 //! Installation claims read from RoxDB.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use crate::domain::{models::GithubError, ports::GithubInstallationClaims};
@@ -23,9 +23,9 @@ impl PgGithubInstallationClaims {
 
 impl GithubInstallationClaims for PgGithubInstallationClaims {
     #[tracing::instrument(skip(self), err)]
-    async fn is_linked(&self, user: &MacroUserIdStr<'_>) -> Result<bool, GithubError> {
+    async fn is_linked(&self, user: &RoxUserIdStr<'_>) -> Result<bool, GithubError> {
         sqlx::query_scalar!(
-            r#"SELECT EXISTS (SELECT 1 FROM github_links WHERE macro_id = $1) AS "linked!""#,
+            r#"SELECT EXISTS (SELECT 1 FROM github_links WHERE rox_id = $1) AS "linked!""#,
             user.as_ref(),
         )
         .fetch_one(&self.pool)
@@ -39,7 +39,7 @@ impl GithubInstallationClaims for PgGithubInstallationClaims {
     #[tracing::instrument(skip(self), err)]
     async fn has_claim(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         installation_id: u64,
     ) -> Result<bool, GithubError> {
         sqlx::query_scalar!(
@@ -47,13 +47,13 @@ impl GithubInstallationClaims for PgGithubInstallationClaims {
             SELECT EXISTS (
                 SELECT 1 FROM github_app_installation i
                 WHERE i.id = $1
-                  AND EXISTS (SELECT 1 FROM github_links l WHERE l.macro_id = $2)
+                  AND EXISTS (SELECT 1 FROM github_links l WHERE l.rox_id = $2)
                   AND (
                     (i.source_type = 'user' AND i.source_id = $2 AND NOT EXISTS (
                         SELECT 1 FROM github_app_installation_installer installer
                         WHERE installer.installation_id = i.id
                           AND installer.github_user_id NOT IN (
-                              SELECT l.github_user_id FROM github_links l WHERE l.macro_id = $2
+                              SELECT l.github_user_id FROM github_links l WHERE l.rox_id = $2
                           )
                     ))
                     OR (i.source_type = 'team' AND EXISTS (

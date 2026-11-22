@@ -3,8 +3,8 @@ use crate::{
     domain::models::{Notification, SendNotificationRequestBuilder, TaggedContent},
     outbound::repository::NotificationDbOps,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -15,7 +15,7 @@ impl Notification for PendingAccess {
     const TYPE_NAME: &'static str = "entity_access_requested";
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn withdrawal_prevents_delayed_notification_creation(pool: PgPool) {
     let id = Uuid::new_v4();
     let withdrawal = PgNotificationWithdrawal(pool.clone());
@@ -25,7 +25,7 @@ async fn withdrawal_prevents_delayed_notification_creation(pool: PgPool) {
         notification_entity: EntityType::Document.with_entity_str("document"),
         secondary_notification_entity: None,
         sender_id: None,
-        recipient_ids: HashSet::from([MacroUserIdStr::try_from("macro|owner@test.com").unwrap()]),
+        recipient_ids: HashSet::from([RoxUserIdStr::try_from("macro|owner@test.com").unwrap()]),
         notification: TaggedContent::new(PendingAccess),
     };
     assert!(

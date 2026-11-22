@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::timeline::TimelineRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::Row;
 
 const OWNER: &str = "macro|external-chat-owner@example.com";
@@ -8,7 +8,7 @@ const OWNER: &str = "macro|external-chat-owner@example.com";
 async fn migrate_for_test(pool: &PgPool) {
     // Keep both colliding migration bodies in the isolated test database,
     // remapping only the mailbox migration's in-memory version.
-    let migrations = MACRO_DB_MIGRATIONS
+    let migrations = ROX_DB_MIGRATIONS
         .iter()
         .map(|migration| {
             let mut migration = migration.clone();
@@ -31,10 +31,10 @@ async fn migrate_for_test(pool: &PgPool) {
 #[sqlx::test(migrations = false)]
 async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplicate(pool: PgPool) {
     migrate_for_test(&pool).await;
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)"#,
-        macro_user_id,
+        rox_user_id,
         OWNER,
         "external-chat-owner@example.com",
     )
@@ -42,10 +42,10 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         OWNER,
         "external-chat-owner@example.com",
-        macro_user_id,
+        rox_user_id,
     )
     .execute(&pool)
     .await
@@ -71,7 +71,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
     .await
     .unwrap();
     let repo = PgExternalChatRepository::new(pool.clone());
-    let actor = MacroUserIdStr::try_from(OWNER.to_owned()).unwrap();
+    let actor = RoxUserIdStr::try_from(OWNER.to_owned()).unwrap();
     let update = UpdateSharePermissionRequestV2 {
         link_share: Some(Some(LinkShare::Public)),
         link_share_access_level: Some(Some(AccessLevel::View)),

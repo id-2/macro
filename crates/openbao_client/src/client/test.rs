@@ -10,7 +10,7 @@ async fn login_and_versioned_cas_wire_contract() {
     Mock::given(method("POST"))
         .and(path("/v1/auth/macro/login"))
         .and(header("X-Vault-Namespace", "team-fixture"))
-        .and(header("x-macro-audit-id", "audit-fixture"))
+        .and(header("x-rox-audit-id", "audit-fixture"))
         .and(body_json(
             serde_json::json!({"jwt":"synthetic-jwt","role":"passwords-service"}),
         ))

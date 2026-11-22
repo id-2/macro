@@ -7,7 +7,7 @@
 //! session), it rebuilds the window from the startup config; otherwise the
 //! user sees nothing and every relaunch silently exits.
 
-use navigation_plugin::MacroNavigationPlugin;
+use navigation_plugin::RoxNavigationPlugin;
 use tauri::utils::config::WindowConfig;
 use tauri::{AppHandle, Manager};
 
@@ -16,14 +16,14 @@ use crate::{AppRuntime, ConfigureWindow};
 /// What [`build`] needs to recreate a startup window after setup.
 pub(crate) struct StartupWindows {
     configs: Vec<WindowConfig>,
-    navigation: MacroNavigationPlugin,
+    navigation: RoxNavigationPlugin,
     configure: ConfigureWindow,
 }
 
 impl StartupWindows {
     pub(crate) fn new(
         configs: Vec<WindowConfig>,
-        navigation: MacroNavigationPlugin,
+        navigation: RoxNavigationPlugin,
         configure: ConfigureWindow,
     ) -> Self {
         Self {

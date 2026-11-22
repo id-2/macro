@@ -14,7 +14,7 @@ use crate::stream::{ChatCompletionStream, StreamPart, ToolCall, ToolResponse};
 use ai_toolset::{AsyncTool, AsyncToolCollection, ToolAnnotated, ToolSet as AiToolSet};
 use ai_usage::{AiFeature, UsageContext, UsageEvent, UsageRecorder};
 use futures::StreamExt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rig_core::completion::{CompletionModel, GetTokenUsage};
 use rig_core::message::Message;
 use schemars::JsonSchema;
@@ -37,8 +37,8 @@ pub(crate) fn test_loop() -> AgentLoop {
 }
 
 /// A stable test user id.
-pub(crate) fn test_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("test@rox.one").expect("valid user id")
+pub(crate) fn test_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("test@rox.one").expect("valid user id")
 }
 
 /// The usage context every test session runs under.

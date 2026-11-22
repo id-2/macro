@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'outlook-tester', 'outlook-owner@example.com', 'cus_outlook_test')",
+  "query": "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'outlook-tester', 'outlook-owner@example.com', 'cus_outlook_test')",
   "describe": {
     "columns": [],
     "parameters": {

@@ -431,7 +431,7 @@ pub async fn insert_or_update_labels<Q: LabelCatalogQueries>(
     }
     for label in &mut service_labels {
         if label.id.is_none() {
-            label.id = Some(macro_uuid::generate_uuid_v7());
+            label.id = Some(rox_uuid::generate_uuid_v7());
         }
     }
     pool.upsert(service_labels).await

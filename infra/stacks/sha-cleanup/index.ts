@@ -12,7 +12,7 @@ const tags = {
 
 const DATABASE_URL = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require(`macro_db_secret_key`),
+    secretId: config.require(`rox_db_secret_key`),
   })
   .apply((secret) => secret.secretString);
 
@@ -28,9 +28,9 @@ const documentStorageBucketId: pulumi.Output<string> = cloudStorageStack
   .getOutput('documentStorageBucketId')
   .apply((id) => id as string);
 
-const MACRO_CACHE = aws.secretsmanager
+const ROX_CACHE = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require(`macro_cache_secret_key`),
+    secretId: config.require(`rox_cache_secret_key`),
   })
   .apply((secret) => secret.secretString);
 
@@ -42,7 +42,7 @@ const shaCleanupWorker = new ShaWorker('sha-cleanup-worker', {
   containerEnvVars: [
     {
       name: 'REDIS_URI',
-      value: pulumi.interpolate`redis://${MACRO_CACHE}`,
+      value: pulumi.interpolate`redis://${ROX_CACHE}`,
     },
     {
       name: 'DATABASE_URL',
@@ -54,7 +54,7 @@ const shaCleanupWorker = new ShaWorker('sha-cleanup-worker', {
     },
     {
       name: 'RUST_LOG',
-      value: 'sha_cleanup_worker=info,macro_http_request=info',
+      value: 'sha_cleanup_worker=info,rox_http_request=info',
     },
     {
       name: 'DOCUMENT_STORAGE_BUCKET',

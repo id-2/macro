@@ -20,7 +20,7 @@ async fn updates_send_acting_user_only_in_authenticated_header() {
     .await;
     let client = CodingAgentsClient::new(&server.url, KEY).unwrap();
     let updates = client
-        .list_updates(MacroUserIdStr::try_from(USER).unwrap())
+        .list_updates(RoxUserIdStr::try_from(USER).unwrap())
         .await
         .unwrap();
     assert!(updates.items.is_empty());
@@ -35,7 +35,7 @@ async fn updates_send_acting_user_only_in_authenticated_header() {
         requests[0]
             .head
             .to_lowercase()
-            .contains(&format!("{}: {USER}", INTERNAL_MACRO_USER_ID_HEADER))
+            .contains(&format!("{}: {USER}", INTERNAL_ROX_USER_ID_HEADER))
     );
     assert_eq!(requests[0].body, Value::Null);
 }
@@ -141,7 +141,7 @@ async fn server(replies: Vec<Reply>) -> Server {
 
 fn command() -> DispatchCodingAgentRequest {
     DispatchCodingAgentRequest {
-        user_id: MacroUserIdStr::try_from(USER).unwrap(),
+        user_id: RoxUserIdStr::try_from(USER).unwrap(),
         agent_id: Uuid::now_v7(),
         prompt: "Fix the regression in the user's repository".into(),
     }
@@ -369,7 +369,7 @@ async fn session_actions_send_the_verified_user_once_and_keep_uncertain_failures
     let client = CodingAgentsClient::new(&format!("{}/agent-harness", server.url), KEY).unwrap();
     let result = client
         .execute(
-            MacroUserIdStr::try_from(USER).unwrap(),
+            RoxUserIdStr::try_from(USER).unwrap(),
             id,
             SessionAction::Prompt {
                 prompt: "Continue".into(),
@@ -385,7 +385,7 @@ async fn session_actions_send_the_verified_user_once_and_keep_uncertain_failures
     assert!(matches!(
         client
             .execute(
-                MacroUserIdStr::try_from(USER).unwrap(),
+                RoxUserIdStr::try_from(USER).unwrap(),
                 id,
                 SessionAction::Stop
             )
@@ -399,7 +399,7 @@ async fn session_actions_send_the_verified_user_once_and_keep_uncertain_failures
     )));
     assert!(requests[0].head.to_lowercase().contains(&format!(
         "{}: {USER}",
-        macro_authorization::INTERNAL_MACRO_USER_ID_HEADER
+        rox_authorization::INTERNAL_ROX_USER_ID_HEADER
     )));
     assert_eq!(
         requests[0].body,

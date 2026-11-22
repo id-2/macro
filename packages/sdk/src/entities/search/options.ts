@@ -10,7 +10,7 @@ import type {
   UnifiedSearchResponseItem,
 } from '../../../generated/search/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 type Hit = UnifiedSearchResponseItem;
 
@@ -31,11 +31,11 @@ export interface SearchOpts {
 export function entitySearch<T, K extends Hit['type']>(opts: {
   filters?: EntityFilters;
   type: K;
-  make: (client: MacroClient, hit: Extract<Hit, { type: K }>) => T;
+  make: (client: RoxClient, hit: Extract<Hit, { type: K }>) => T;
   /** Opt in to CRM results (off by default server-side; required for company hits). */
   includeCrm?: boolean;
 }): (
-  client: MacroClient,
+  client: RoxClient,
   query: string,
   searchOpts?: SearchOpts,
 ) => AsyncGenerator<T> {

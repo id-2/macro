@@ -5,7 +5,7 @@
 -- Link 1: Primary test link with multiple scheduled messages
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000001', 'macro|scheduled_user@example.com', '00000000-0000-0000-0000-0000000a0001',
         'scheduled_user@example.com', 'GMAIL', true, NOW(), NOW());
 
@@ -124,7 +124,7 @@ VALUES ('00000000-0000-0000-0000-0000000d0005',
 -- Link 2: Different user (for isolation test)
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000002', 'macro|other_user@example.com', '00000000-0000-0000-0000-0000000a0002',
         'other_user@example.com', 'GMAIL', true, NOW(), NOW());
 

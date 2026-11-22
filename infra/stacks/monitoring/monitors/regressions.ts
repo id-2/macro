@@ -10,7 +10,7 @@ import { graphGroup, prodMonitor, thresholdGraph } from '../prod-monitor';
 // monitor reads this log-based metric instead. Counts every prod error log
 // line, tagged by service.
 new datadog.LogsMetric('macro-logs-errors', {
-  name: 'macro.logs.errors',
+  name: 'rox.logs.errors',
   compute: { aggregationType: 'count' },
   filter: { query: 'env:prod status:error' },
   groupBies: [{ path: 'service', tagName: 'service' }],

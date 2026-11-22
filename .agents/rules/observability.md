@@ -17,7 +17,7 @@ through them and the per-runtime APIs.
 ## Correlate across hops
 
 - Propagate W3C trace context on every hop. Inbound HTTP adopts `traceparent`
-  through `macro_tower_layers`; outbound Rust HTTP calls `inject_trace_headers`;
+  through `rox_tower_layers`; outbound Rust HTTP calls `inject_trace_headers`;
   Kafka publishes carry trace headers via `kafka_util`; agent and ACP messages
   use `genai_telemetry::propagation`. A new transport (queue message, websocket
   frame, worker call) needs inject on send and extract on receive. If a hop
@@ -40,13 +40,13 @@ through them and the per-runtime APIs.
 - Span the places a trace would otherwise go dark: queue and Kafka consumers,
   cross-service client calls, background jobs, and multi-step business
   operations. Don't span trivial helpers; HTTP handlers already get spans from
-  `macro_tower_layers`.
+  `rox_tower_layers`.
 - Name spans for the operation (`calendar.sync_account`), not the function.
 - Record the IDs you will search by (entity, user, team, session, document) and
   sizes/counts as fields. Skip bulky or sensitive arguments; never record
   prompts, message content, tokens, secrets, or personal data (email, username,
   IP); use opaque ids. `#[tracing::instrument]` records every argument it
-  doesn't skip, by `Debug`, and a `MacroUserId` is an email: skip user ids (and
+  doesn't skip, by `Debug`, and a `RoxUserId` is an email: skip user ids (and
   structs holding one) or use `skip_all` with explicit `fields`.
 - A background loop opens one span per round, never one around the whole loop:
   `#[tracing::instrument]` on a function that loops forever opens a span that

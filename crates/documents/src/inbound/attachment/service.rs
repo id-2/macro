@@ -14,7 +14,7 @@ use entity_access::domain::{
 };
 use futures::future::join_all;
 use lexical_client::LexicalClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::DocumentBasic;
 use model_entity::{Entity, EntityType};
 use model_file_type::{FileAssociation, FileType};
@@ -54,7 +54,7 @@ impl<DSvc: DocumentService, ESvc: EntityAccessService> AttachmentService
     #[tracing::instrument(skip_all)]
     async fn resolve_attachments<'a>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&'a Entity<'a>]>,
     ) -> Attachments<'a> {
         let user_id = &user_id;
@@ -90,7 +90,7 @@ impl<DSvc: DocumentService, ESvc: EntityAccessService> DocumentAttachmentService
     #[tracing::instrument(skip(self), err)]
     async fn resolve_project(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: &str,
     ) -> Result<AttachmentContent<'static>, AttachmentError> {
         self.entity_access_service
@@ -136,7 +136,7 @@ impl<DSvc: DocumentService, ESvc: EntityAccessService> DocumentAttachmentService
     #[tracing::instrument(skip(self), err)]
     async fn resolve_skill(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: &str,
     ) -> Result<AttachmentContent<'static>, AttachmentError> {
         if let Some(skill) = uuid::Uuid::from_str(id)
@@ -178,7 +178,7 @@ impl<DSvc: DocumentService, ESvc: EntityAccessService> DocumentAttachmentService
     #[tracing::instrument(skip(self), err)]
     async fn resolve_document(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: &str,
     ) -> Result<AttachmentContent<'static>, AttachmentError> {
         let receipt = self
@@ -214,7 +214,7 @@ impl<DSvc: DocumentService, ESvc: EntityAccessService> DocumentAttachmentService
             });
         }
 
-        let content = match file_type.macro_app_path() {
+        let content = match file_type.rox_app_path() {
             FileAssociation::Pdf(_) | FileAssociation::Write(_) => {
                 let text = self
                     .document_service
@@ -313,7 +313,7 @@ pub(super) async fn fetch_url_bytes(url: &str) -> Result<Vec<u8>, AttachmentErro
     // Presigned/distribution URLs are minted with the browser-facing `localhost`
     // host; rewrite to the in-network LocalStack host so this server-side fetch
     // works inside Docker. No-op outside local AWS.
-    let url = macro_aws_config::transform_aws_url_for_internal_fetch(url);
+    let url = rox_aws_config::transform_aws_url_for_internal_fetch(url);
     let url = url.as_str();
     let response = reqwest::get(url)
         .await

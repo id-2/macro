@@ -10,7 +10,7 @@ use std::time::Duration;
 // ── get_simple_message ────────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_get_simple_message_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -38,7 +38,7 @@ async fn test_get_simple_message_found(pool: Pool<Postgres>) -> anyhow::Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_get_simple_message_wrong_link_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -54,7 +54,7 @@ async fn test_get_simple_message_wrong_link_id(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_get_simple_message_across_inboxes(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -77,7 +77,7 @@ async fn test_get_simple_message_across_inboxes(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_get_simple_message_not_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -93,7 +93,7 @@ async fn test_get_simple_message_not_found(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_get_simple_message_draft_with_headers(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -114,7 +114,7 @@ async fn test_get_simple_message_draft_with_headers(pool: Pool<Postgres>) -> any
 // ── get_draft_replying_to ─────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_get_draft_replying_to_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -135,7 +135,7 @@ async fn test_get_draft_replying_to_found(pool: Pool<Postgres>) -> anyhow::Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_get_draft_replying_to_not_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -151,7 +151,7 @@ async fn test_get_draft_replying_to_not_found(pool: Pool<Postgres>) -> anyhow::R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_get_draft_replying_to_wrong_link(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -169,7 +169,7 @@ async fn test_get_draft_replying_to_wrong_link(pool: Pool<Postgres>) -> anyhow::
 // ── delete_draft_message ──────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_delete_draft_message_keeps_nonempty_thread(
@@ -205,7 +205,7 @@ async fn test_delete_draft_message_keeps_nonempty_thread(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_delete_draft_message_removes_empty_thread(
@@ -235,7 +235,7 @@ async fn test_delete_draft_message_removes_empty_thread(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_delete_draft_message_rejects_sent_message(
@@ -269,7 +269,7 @@ async fn test_delete_draft_message_rejects_sent_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_delete_draft_message_rejects_foreign_link_scope(
@@ -304,7 +304,7 @@ async fn test_delete_draft_message_rejects_foreign_link_scope(
 // ── cross_inbox_reply_drafts ──────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_cross_inbox_reply_drafts(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -344,7 +344,7 @@ async fn test_cross_inbox_reply_drafts(pool: Pool<Postgres>) -> anyhow::Result<(
 // ── upsert_contacts ───────────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_upsert_contacts_existing_contacts(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -384,7 +384,7 @@ async fn test_upsert_contacts_existing_contacts(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_upsert_contacts_new_contact(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -418,7 +418,7 @@ async fn test_upsert_contacts_new_contact(pool: Pool<Postgres>) -> anyhow::Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -451,7 +451,7 @@ async fn test_upsert_contacts_fills_missing_name(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_upsert_contacts_mixed_to_cc_bcc(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -489,7 +489,7 @@ async fn test_upsert_contacts_mixed_to_cc_bcc(pool: Pool<Postgres>) -> anyhow::R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_upsert_contacts_case_insensitive(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -526,7 +526,7 @@ async fn test_upsert_contacts_case_insensitive(pool: Pool<Postgres>) -> anyhow::
 // ── insert_draft_message ──────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -559,7 +559,7 @@ async fn test_insert_draft_message_into_existing_thread(
         bcc: vec![],
         body_text: Some("Hello".to_string()),
         body_html: Some("<p>Hello</p>".to_string()),
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -622,7 +622,7 @@ async fn test_insert_draft_message_into_existing_thread(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -648,7 +648,7 @@ async fn test_insert_draft_message_with_new_thread(pool: Pool<Postgres>) -> anyh
         bcc: vec![],
         body_text: Some("New thread body".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -699,7 +699,7 @@ async fn test_insert_draft_message_with_new_thread(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_autosave_ignores_send_time_but_immediate_send_preserves_undo_schedule(
@@ -727,7 +727,7 @@ async fn test_autosave_ignores_send_time_but_immediate_send_preserves_undo_sched
         bcc: vec![],
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: Some(send_time),
         actor_id: None,
@@ -769,7 +769,7 @@ async fn test_autosave_ignores_send_time_but_immediate_send_preserves_undo_sched
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_insert_draft_message_upsert_existing(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -817,7 +817,7 @@ async fn test_insert_draft_message_upsert_existing(pool: Pool<Postgres>) -> anyh
         bcc: vec![],
         body_text: Some("Updated body".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -869,7 +869,7 @@ async fn test_insert_draft_message_upsert_existing(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -897,7 +897,7 @@ async fn test_insert_draft_message_updates_thread_metadata(
         bcc: vec![],
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -928,7 +928,7 @@ async fn test_insert_draft_message_updates_thread_metadata(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
@@ -954,7 +954,7 @@ async fn test_insert_message_with_is_draft_false(pool: Pool<Postgres>) -> anyhow
         bcc: vec![],
         body_text: Some("This is a sent message".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -987,7 +987,7 @@ async fn test_insert_message_with_is_draft_false(pool: Pool<Postgres>) -> anyhow
 // ── client-handle mappings / owner-guarded upsert ───────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_client_handle_bindings_resolve_scoped_and_cascade(
@@ -1062,8 +1062,8 @@ fn first_save_of(
     link_id: Uuid,
     subject: &str,
 ) -> (ResolvedDraftInput, ThreadRow, Uuid) {
-    let message_db_id = macro_uuid::generate_uuid_v7();
-    let thread_db_id = macro_uuid::generate_uuid_v7();
+    let message_db_id = rox_uuid::generate_uuid_v7();
+    let thread_db_id = rox_uuid::generate_uuid_v7();
     let mut input = resolved_input(message_db_id, thread_db_id);
     input.subject = subject.to_string();
     input.draft_client_id = Some(handle);
@@ -1103,7 +1103,7 @@ async fn thread_exists(pool: &Pool<Postgres>, id: Uuid) -> anyhow::Result<bool> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_concurrent_first_saves_of_one_handle_settle_on_one_row(
@@ -1168,7 +1168,7 @@ async fn test_concurrent_first_saves_of_one_handle_settle_on_one_row(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_save_racing_a_committed_binding_adopts_it(
@@ -1216,7 +1216,7 @@ async fn test_save_racing_a_committed_binding_adopts_it(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_client_handle_replay_cannot_replace_a_scheduled_or_sent_winner(
@@ -1226,8 +1226,8 @@ async fn test_client_handle_replay_cannot_replace_a_scheduled_or_sent_winner(
 
     let repo = EmailPgRepo::new(pool.clone());
     let link = Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")?;
-    let handle = macro_uuid::generate_uuid_v7();
-    let actor = MacroUserIdStr::parse_from_str("macro|user1@test.com")?;
+    let handle = rox_uuid::generate_uuid_v7();
+    let actor = RoxUserIdStr::parse_from_str("macro|user1@test.com")?;
     let contacts = UpsertedContacts {
         from_contact_id: None,
         recipients: vec![],
@@ -1288,7 +1288,7 @@ async fn test_client_handle_replay_cannot_replace_a_scheduled_or_sent_winner(
 // rebind has to count as the newest binding, or the handle keeps resolving to
 // the inbox the draft was moved away from.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_rebinding_a_handle_wins_the_cross_inbox_recency_tie(
@@ -1366,7 +1366,7 @@ fn resolved_input(db_id: Uuid, thread_db_id: Uuid) -> ResolvedDraftInput {
         bcc: vec![],
         body_text: Some("attacker content".to_string()),
         body_html: Some("<p>attacker content</p>".to_string()),
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -1395,7 +1395,7 @@ async fn message_snapshot(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_upsert_guard_rejects_cross_inbox_overwrite(
@@ -1437,7 +1437,7 @@ async fn test_upsert_guard_rejects_cross_inbox_overwrite(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_upsert_guard_rejects_sent_message_overwrite(
@@ -1471,7 +1471,7 @@ async fn test_upsert_guard_rejects_sent_message_overwrite(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn test_insert_message_reports_applied_on_create(pool: Pool<Postgres>) -> anyhow::Result<()> {

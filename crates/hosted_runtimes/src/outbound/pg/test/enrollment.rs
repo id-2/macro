@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::enrollment::EnrollmentGeneration;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn generations_and_create_outbox_never_persist_issuance_material(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
@@ -59,7 +59,7 @@ async fn generations_and_create_outbox_never_persist_issuance_material(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enrollment_guard_uses_the_claim_transaction_namespace(pool: PgPool) {
     let repo = PgComputerRepo::new(pool.clone(), policy());
     let id = ComputerId::new_from_uuid(Uuid::from_u128(1));

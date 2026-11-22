@@ -33,7 +33,7 @@ export function agentClaudeMode(
   return match(harnessMode)
     .returnType<ClaudeModeResponse | undefined>()
     .with(undefined, () => undefined)
-    .with('macro_credits', () => ({ mode: 'macro_credits' }))
+    .with('rox_credits', () => ({ mode: 'rox_credits' }))
     .with('own_account', () =>
       login?.mode === 'own_account' ? login : { mode: 'own_account' }
     )
@@ -52,7 +52,7 @@ export function agentClaudeState(
 
   return match(mode.mode)
     .returnType<AgentClaudeState>()
-    .with('macro_credits', () => 'credits')
+    .with('rox_credits', () => 'credits')
     .with('own_account', () => {
       const expiresAt = mode.account?.expiresAt;
       const expired = !!expiresAt && Date.parse(expiresAt) <= now;

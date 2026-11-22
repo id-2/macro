@@ -1,15 +1,15 @@
 use super::*;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_all_non_drafts_with_sent_at(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000301")?;
@@ -33,13 +33,13 @@ async fn get_thread_summary_info_all_non_drafts_with_sent_at(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_all_drafts_fallback_to_updated_at(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000302")?;
@@ -63,13 +63,13 @@ async fn get_thread_summary_info_all_drafts_fallback_to_updated_at(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_mixed_drafts_ignores_draft_timestamps(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000303")?;
@@ -97,13 +97,13 @@ async fn get_thread_summary_info_mixed_drafts_ignores_draft_timestamps(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_single_message_same_first_and_last(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000305")?;
@@ -125,13 +125,13 @@ async fn get_thread_summary_info_single_message_same_first_and_last(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_partial_sent_at_prefers_sent_at_over_updated_at(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000306")?;
@@ -160,11 +160,11 @@ async fn get_thread_summary_info_partial_sent_at_prefers_sent_at_over_updated_at
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_multiple_threads(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_ids = vec![
@@ -185,13 +185,13 @@ async fn get_thread_summary_info_multiple_threads(pool: Pool<Postgres>) -> Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_empty_thread_ids_returns_empty(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_ids: Vec<Uuid> = vec![];
@@ -204,11 +204,11 @@ async fn get_thread_summary_info_empty_thread_ids_returns_empty(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_viewed_at_logic(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000301")?;
@@ -227,13 +227,13 @@ async fn get_thread_summary_info_viewed_at_logic(pool: Pool<Postgres>) -> Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_subject_is_from_earliest_message(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000307")?;
@@ -256,11 +256,11 @@ async fn get_thread_summary_info_subject_is_from_earliest_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_filter_out_trash(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000308")?;
@@ -273,11 +273,11 @@ async fn get_thread_summary_info_filter_out_trash(pool: Pool<Postgres>) -> Resul
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_skips_discarded_drafts(pool: Pool<Postgres>) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let replied_thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000301")?;
@@ -332,13 +332,13 @@ async fn get_thread_summary_info_skips_discarded_drafts(pool: Pool<Postgres>) ->
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("get_thread_summary_info"))
 )]
 async fn get_thread_summary_info_latest_message_without_sender_contact(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001c")?;
     let healthy_thread_id = Uuid::parse_str("00000000-0000-0000-0000-000000000301")?;

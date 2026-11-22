@@ -19,7 +19,7 @@ ai_tools = [
 ]
 axum = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:utoipa",
   "entity_access/axum",
@@ -29,7 +29,7 @@ axum = [
 backfill_binary = [
   "channels/outbound",
   "dep:database_env_vars",
-  "dep:macro_entrypoint",
+  "dep:rox_entrypoint",
   "outbound",
   "ports",
 ]
@@ -70,14 +70,14 @@ chrono = { workspace = true }
 channels = { path = "../channels", default-features = false, features = ["ports"] }
 contacts = { path = "../contacts", default-features = false, optional = true }
 database_env_vars = { path = "../database_env_vars", optional = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = [
   "axum",
 ] }
-macro_entrypoint = { path = "../macro_entrypoint", optional = true }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid" }
+rox_entrypoint = { path = "../rox_entrypoint", optional = true }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid" }
 model_owner = { path = "../model_owner" }
 models_permissions = { path = "../models_permissions" }
 non_empty = { path = "../non_empty" }
@@ -124,7 +124,7 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 wiremock = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 models_pagination = { path = "../models_pagination" }
 tokio = { workspace = true }
 tower = { workspace = true }

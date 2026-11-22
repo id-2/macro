@@ -16,7 +16,7 @@ model.
 
 - Change how a key is encrypted/decrypted: `src/cipher.rs` → its `test.rs`.
 - Change how the ciphertext row is read or written: `src/store.rs` → its
-  `test.rs` (uses `macro_db_migrator` as a dev-dependency).
+  `test.rs` (uses `rox_db_migrator` as a dev-dependency).
 
 ## Checks
 

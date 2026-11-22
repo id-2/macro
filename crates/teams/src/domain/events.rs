@@ -7,9 +7,9 @@
 mod test;
 
 use bot_id::BotId;
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroTeamsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxTeamsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use serde::{Deserialize, Serialize};
 use shared_entity_registry::RegisteredEntityType;
@@ -27,7 +27,7 @@ pub struct TeamCreatedMetadata {
     /// Stable team slug.
     pub slug: String,
     /// User who owns the team.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Whether the team has enterprise features.
     pub enterprise: bool,
     /// Whether the team has a paid subscription, without exposing billing identifiers.
@@ -42,7 +42,7 @@ pub struct TeamUpdatedMetadata {
     /// Identifier of the updated team.
     pub team_id: Uuid,
     /// Authenticated user who updated the team.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
     /// Requested display name, or `None` when the PATCH omitted it.
     pub name: Option<String>,
     /// Requested slug, or `None` when the PATCH omitted it.
@@ -55,9 +55,9 @@ pub struct TeamDeletedMetadata {
     /// Identifier of the deleted team.
     pub team_id: Uuid,
     /// Authenticated owner who deleted the team.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
     /// Users who belonged to the team when it was deleted.
-    pub member_user_ids: Vec<MacroUserIdStr<'static>>,
+    pub member_user_ids: Vec<RoxUserIdStr<'static>>,
     /// Every bot the team had, soft-deleted ones included, in id order.
     /// Missing on events published before this field existed.
     #[serde(default)]
@@ -100,7 +100,7 @@ pub struct TeamInviteCreatedMetadata {
     /// Lowercase email address invited to the team.
     pub email: String,
     /// User who created the invite.
-    pub invited_by: MacroUserIdStr<'static>,
+    pub invited_by: RoxUserIdStr<'static>,
     /// Team display name when it could be retrieved.
     pub team_name: Option<String>,
 }
@@ -115,7 +115,7 @@ pub struct TeamInviteRejectedMetadata {
     /// Lowercase email address that rejected the invite.
     pub email: String,
     /// Invited user who rejected the invite.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
 }
 
 /// Metadata for [`TeamTopicEvent::InviteRevoked`].
@@ -128,7 +128,7 @@ pub struct TeamInviteRevokedMetadata {
     /// Lowercase email address whose invite was revoked.
     pub email: String,
     /// Authenticated administrator who revoked the invite.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
 }
 
 /// How a user joined a team.
@@ -140,7 +140,7 @@ pub enum TeamJoinMethod {
         /// Identifier of the accepted invite.
         invite_id: Uuid,
         /// User who originally sent the invite.
-        invited_by: MacroUserIdStr<'static>,
+        invited_by: RoxUserIdStr<'static>,
     },
     /// The user joined because their email matched the team's automatic-join domain.
     DomainAutoJoin,
@@ -149,7 +149,7 @@ pub enum TeamJoinMethod {
     /// A team admin added this account as a team agent, on an included seat.
     TeamAgent {
         /// Admin who added the agent.
-        added_by: MacroUserIdStr<'static>,
+        added_by: RoxUserIdStr<'static>,
     },
 }
 
@@ -159,14 +159,14 @@ pub struct TeamMemberJoinedMetadata {
     /// Identifier of the joined team.
     pub team_id: Uuid,
     /// User who joined the team.
-    pub member_id: MacroUserIdStr<'static>,
+    pub member_id: RoxUserIdStr<'static>,
     /// Other current teammates the joining member should have a DM with.
     ///
     /// Sorted and de-duplicated. Empty when the roster could not be loaded or
     /// the team has no other members. Missing on events published before this
     /// field existed.
     #[serde(default)]
-    pub teammate_ids: Vec<MacroUserIdStr<'static>>,
+    pub teammate_ids: Vec<RoxUserIdStr<'static>>,
     /// Role assigned to the new member.
     pub role: TeamRole,
     /// Mechanism by which the member joined.
@@ -179,9 +179,9 @@ pub struct TeamMemberRemovedMetadata {
     /// Identifier of the team the member left.
     pub team_id: Uuid,
     /// User removed from the team.
-    pub member_id: MacroUserIdStr<'static>,
+    pub member_id: RoxUserIdStr<'static>,
     /// User who performed the removal.
-    pub removed_by: MacroUserIdStr<'static>,
+    pub removed_by: RoxUserIdStr<'static>,
     /// Member's role before removal.
     pub role: TeamRole,
 }
@@ -192,9 +192,9 @@ pub struct TeamMemberRoleChangedMetadata {
     /// Identifier of the team whose member changed role.
     pub team_id: Uuid,
     /// Authenticated user who changed the role.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
     /// User whose role changed.
-    pub member_id: MacroUserIdStr<'static>,
+    pub member_id: RoxUserIdStr<'static>,
     /// Newly assigned role.
     pub role: TeamRole,
     /// Role held before the change, when known.
@@ -207,12 +207,12 @@ pub struct TeamAutoJoinDomainToggledMetadata {
     /// Identifier of the team whose setting changed.
     pub team_id: Uuid,
     /// Authenticated user who changed the setting.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
     /// Newly enabled automatic-join domain, or `None` when disabled.
     pub auto_join_domain: Option<String>,
 }
 
-/// Lifecycle, invite, and membership events published to [`MacroTeamsTopic`].
+/// Lifecycle, invite, and membership events published to [`RoxTeamsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum TeamTopicEvent {
@@ -249,12 +249,12 @@ pub enum TeamTopicEvent {
 }
 
 impl TopicEvent for TeamTopicEvent {
-    type Topic = MacroTeamsTopic;
+    type Topic = RoxTeamsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroTeamsTopic`], keyed by the team's bare UUID.
+/// Publishable event for [`RoxTeamsTopic`], keyed by the team's bare UUID.
 pub struct TeamMacroEvent {
     key: String,
     event: Event<TeamTopicEvent>,
@@ -326,7 +326,7 @@ impl TeamMacroEvent {
     }
 }
 
-impl MacroEvent for TeamMacroEvent {
+impl RoxEvent for TeamMacroEvent {
     type EventPayload = TeamTopicEvent;
 
     fn key(&self) -> &str {

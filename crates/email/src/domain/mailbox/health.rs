@@ -2,7 +2,7 @@
 
 use super::*;
 use email_api_client::domain::models::{AccessToken, TokenFreshness};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::link::{Link, UserProvider};
 
 #[cfg(test)]
@@ -16,7 +16,7 @@ pub struct InboxHealthBinding {
 pub trait InboxHealthRepository: Send + Sync + 'static {
     fn accessible(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Link>, MailboxError>> + Send;
     fn binding(
         &self,
@@ -58,7 +58,7 @@ impl<R, G> InboxHealthService<R, G> {
     }
 }
 impl<R: InboxHealthRepository, G: InboxHealthGateway> InboxHealthService<R, G> {
-    pub async fn request(&self, actor: &MacroUserIdStr<'_>) -> Result<(), MailboxError> {
+    pub async fn request(&self, actor: &RoxUserIdStr<'_>) -> Result<(), MailboxError> {
         for link in self.repository.accessible(actor).await? {
             if link.is_sync_active && self.repository.begin_probe(link.id).await {
                 self.repository.enqueue_probe(link.id).await?;

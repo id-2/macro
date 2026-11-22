@@ -5,7 +5,7 @@ use crate::{
     },
     inbound::axum_extractors::test_support::{BotAccessCall, FakeEntityAccessService},
 };
-use macro_authorization::MacroUserAuthentication;
+use rox_authorization::RoxUserAuthentication;
 use model_user::UserContext;
 
 #[tokio::test]
@@ -14,13 +14,13 @@ async fn signed_agent_uses_owner_scope_and_preserves_both_identities() {
         FakeEntityAccessService::new(None).with_bot_permission(EntityPermission::ChannelRole {
             role: ParticipantRole::Member,
         });
-    let agent_id = bot_id::MACRO_NEW_BOT_ID;
+    let agent_id = bot_id::ROX_NEW_BOT_ID;
     let owner = "macro|owner@example.com".to_string().try_into().unwrap();
-    let principal = MacroAuthorization::User(MacroUserAuthentication {
-        origin: macro_authorization::CredentialOrigin::MacroApiJwt,
+    let principal = RoxAuthorization::User(RoxUserAuthentication {
+        origin: rox_authorization::CredentialOrigin::RoxApiJwt,
         agent_id: Some(agent_id),
         agent_via: None,
-        macro_user_id: owner,
+        rox_user_id: owner,
         user_context: UserContext {
             user_id: "macro|owner@example.com".into(),
             fusion_user_id: "fusion-owner".into(),
@@ -59,11 +59,11 @@ async fn signed_agent_uses_owner_scope_and_preserves_both_identities() {
 #[tokio::test]
 async fn signed_agent_cannot_send_without_owner_access() {
     let service = FakeEntityAccessService::new(None);
-    let principal = MacroAuthorization::User(MacroUserAuthentication {
-        origin: macro_authorization::CredentialOrigin::MacroApiJwt,
-        agent_id: Some(bot_id::MACRO_NEW_BOT_ID),
+    let principal = RoxAuthorization::User(RoxUserAuthentication {
+        origin: rox_authorization::CredentialOrigin::RoxApiJwt,
+        agent_id: Some(bot_id::ROX_NEW_BOT_ID),
         agent_via: None,
-        macro_user_id: "macro|owner@example.com".to_string().try_into().unwrap(),
+        rox_user_id: "macro|owner@example.com".to_string().try_into().unwrap(),
         user_context: UserContext {
             user_id: "macro|owner@example.com".into(),
             fusion_user_id: "fusion-owner".into(),
@@ -86,11 +86,11 @@ async fn signed_agent_cannot_send_without_owner_access() {
 #[tokio::test]
 async fn signed_agent_does_not_change_caller_identity_for_existing_messages() {
     let service = FakeEntityAccessService::new(Some(AccessLevel::Edit));
-    let principal = MacroAuthorization::User(MacroUserAuthentication {
-        origin: macro_authorization::CredentialOrigin::MacroApiJwt,
-        agent_id: Some(bot_id::MACRO_NEW_BOT_ID),
+    let principal = RoxAuthorization::User(RoxUserAuthentication {
+        origin: rox_authorization::CredentialOrigin::RoxApiJwt,
+        agent_id: Some(bot_id::ROX_NEW_BOT_ID),
         agent_via: None,
-        macro_user_id: "macro|owner@example.com".to_string().try_into().unwrap(),
+        rox_user_id: "macro|owner@example.com".to_string().try_into().unwrap(),
         user_context: UserContext {
             user_id: "macro|owner@example.com".into(),
             fusion_user_id: "fusion-owner".into(),

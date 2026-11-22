@@ -1,10 +1,10 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 use super::*;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("team_link_share"))
 )]
 async fn get_team_default_link_share_returns_the_team_preference(
@@ -29,7 +29,7 @@ async fn get_team_default_link_share_returns_the_team_preference(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("team_link_share"))
 )]
 async fn get_team_default_link_share_returns_none_without_a_team(
@@ -48,7 +48,7 @@ async fn get_team_default_link_share_returns_none_without_a_team(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../fixtures", scripts("team_share"))
 )]
 async fn get_share_permission_id_returns_initiative_share_permission(
@@ -62,7 +62,7 @@ async fn get_share_permission_id_returns_initiative_share_permission(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_share_permission_id_rejects_unsupported_item_type(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {

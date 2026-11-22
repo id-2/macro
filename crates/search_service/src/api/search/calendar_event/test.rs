@@ -1,6 +1,6 @@
 use super::*;
 use calendar_events::domain::labels::{EventLabels, EventRole};
-use calendar_events::domain::meeting_links::attach_macro_call;
+use calendar_events::domain::meeting_links::attach_rox_call;
 use chrono::{NaiveDate, TimeZone, Utc};
 use opensearch_client::search::model::{Highlight, SearchHit};
 
@@ -165,8 +165,8 @@ fn labels_serialize_under_the_occurrence_names() {
 }
 
 #[test]
-fn a_channel_member_reads_the_description_without_the_macro_call() {
-    let (stored, _) = attach_macro_call(Some("Quarterly planning"), None, CALL_URL);
+fn a_channel_member_reads_the_description_without_the_rox_call() {
+    let (stored, _) = attach_rox_call(Some("Quarterly planning"), None, CALL_URL);
     assert_eq!(
         returned_description(&stored, false).as_deref(),
         Some("Quarterly planning")
@@ -175,7 +175,7 @@ fn a_channel_member_reads_the_description_without_the_macro_call() {
 
 #[test]
 fn a_description_holding_only_the_join_line_comes_back_empty() {
-    let (stored, _) = attach_macro_call(None, None, CALL_URL);
+    let (stored, _) = attach_rox_call(None, None, CALL_URL);
     assert_eq!(returned_description(&stored, false), None);
 }
 
@@ -184,15 +184,15 @@ fn a_join_line_closing_a_long_description_still_comes_out() {
     // The mention preview's trap: a cap ahead of the strip would cut the join
     // line short of what the rule recognizes. Search caps nothing.
     let text = "Agenda ".repeat(1_000);
-    let (stored, _) = attach_macro_call(Some(&text), None, CALL_URL);
+    let (stored, _) = attach_rox_call(Some(&text), None, CALL_URL);
     let returned = returned_description(&stored, false).expect("the text stays");
     assert!(!returned.contains("/meet/join/"), "{returned}");
     assert!(returned.starts_with("Agenda"), "{returned}");
 }
 
 #[test]
-fn a_holder_keeps_the_macro_call() {
-    let (stored, _) = attach_macro_call(Some("Quarterly planning"), None, CALL_URL);
+fn a_holder_keeps_the_rox_call() {
+    let (stored, _) = attach_rox_call(Some("Quarterly planning"), None, CALL_URL);
     assert_eq!(
         returned_description(&stored, true).as_deref(),
         Some(stored.as_str())
@@ -200,7 +200,7 @@ fn a_holder_keeps_the_macro_call() {
 }
 
 #[test]
-fn a_share_without_a_macro_call_keeps_its_markup() {
+fn a_share_without_a_rox_call_keeps_its_markup() {
     let stored = "<p>See <a href=\"https://example.com/notes\">the notes</a></p>";
     assert_eq!(returned_description(stored, false).as_deref(), Some(stored));
 }

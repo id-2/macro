@@ -20,7 +20,7 @@ working mailbox.
 - `ensure_rox_mailbox` in
   `services/email_service/src/outbound/mailbox_init.rs` creates the account's
   `provider = ROX` row in `email_links` from the claimed handle, as the single
-  primary link for that `macro_id`. It is reached from `POST /email/init`
+  primary link for that `rox_id`. It is reached from `POST /email/init`
   without a `link_id` and involves no provider client.
 
 ## What is missing

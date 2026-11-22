@@ -69,8 +69,8 @@ import type {
   InviteToTeamRequest,
   JoinTeamByInviteLinkResponse,
   ListGtmInviteLinksParams,
-  MacroApiTokenParams,
-  MacroApiTokenResponse,
+  RoxApiTokenParams,
+  RoxApiTokenResponse,
   MergeGithubPullRequestRequest,
   MergeGithubPullRequestResponse,
   PasswordlessCallbackParams,
@@ -2476,7 +2476,7 @@ Authorization: Bearer <access_token>
 This returns a new macro-api-token
  */
 export type macroApiTokenResponse200 = {
-  data: MacroApiTokenResponse;
+  data: RoxApiTokenResponse;
   status: 200;
 };
 
@@ -2504,7 +2504,7 @@ export type macroApiTokenResponse =
   | macroApiTokenResponseSuccess
   | macroApiTokenResponseError;
 
-export const getMacroApiTokenUrl = (params: MacroApiTokenParams) => {
+export const getMacroApiTokenUrl = (params: RoxApiTokenParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -2516,12 +2516,12 @@ export const getMacroApiTokenUrl = (params: MacroApiTokenParams) => {
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `/jwt/macro_api_token?${stringifiedParams}`
-    : `/jwt/macro_api_token`;
+    ? `/jwt/rox_api_token?${stringifiedParams}`
+    : `/jwt/rox_api_token`;
 };
 
 export const macroApiToken = async (
-  params: MacroApiTokenParams,
+  params: RoxApiTokenParams,
   options?: RequestInit
 ): Promise<macroApiTokenResponse> => {
   const res = await fetch(getMacroApiTokenUrl(params), {
@@ -2544,7 +2544,7 @@ export const macroApiToken = async (
 You can either have your access token and refresh token in the cookies or in the request
 headers
 Authorization: Bearer <access_token>
-x-macro-refresh-token: <refresh_token>
+x-rox-refresh-token: <refresh_token>
 This returns the cookies with the new access and refresh token
  */
 export type refreshResponse200 = {
@@ -4323,7 +4323,7 @@ export const getSystemStatus = async (
 
 /**
  * Authenticate with a Rox session, or from a script with a personal API
-key (Settings → API keys) in the `x-macro-user-api-key` header. The body
+key (Settings → API keys) in the `x-rox-user-api-key` header. The body
 is the new status:
 
 - `{"status": "operational"}` clears the banner. It takes no message.
@@ -4332,7 +4332,7 @@ is the new status:
 
 Messages are trimmed and must be 1–500 characters. Every call is kept in
 the history, even when it repeats the current status.
- * @summary Sets the status every user sees and pushes it to every open app. Macro
+ * @summary Sets the status every user sees and pushes it to every open app. Rox
 staff only.
  */
 export type setSystemStatusResponse200 = {

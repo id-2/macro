@@ -20,7 +20,7 @@ const computerHarness: Harness = {
   connected: true,
   last_connected_at: '2026-11-11T09:05:00Z',
   computer_id: 'computer-ada',
-  claude_mode: 'macro_credits',
+  claude_mode: 'rox_credits',
 };
 
 const pairedHarness: Harness = {
@@ -56,7 +56,7 @@ describe('agentClaudeState', () => {
   });
 
   it('runs on Rox credits without a sign-in', () => {
-    expect(agentClaudeState({ mode: 'macro_credits' }, now)).toBe('credits');
+    expect(agentClaudeState({ mode: 'rox_credits' }, now)).toBe('credits');
   });
 
   it("uses the team's Claude plan while its sign-in has not expired", () => {
@@ -112,8 +112,8 @@ describe('agentClaudeMode', () => {
 
   it('follows the harness list, which polls, over a cached sign-in', () => {
     // Signed out elsewhere: the cached login no longer applies.
-    expect(agentClaudeMode('macro_credits', login)).toEqual({
-      mode: 'macro_credits',
+    expect(agentClaudeMode('rox_credits', login)).toEqual({
+      mode: 'rox_credits',
     });
     expect(agentClaudeMode(undefined, login)).toBeUndefined();
   });
@@ -124,7 +124,7 @@ describe('agentClaudeMode', () => {
     expect(agentClaudeMode('own_account', undefined)).toEqual({
       mode: 'own_account',
     });
-    expect(agentClaudeMode('own_account', { mode: 'macro_credits' })).toEqual({
+    expect(agentClaudeMode('own_account', { mode: 'rox_credits' })).toEqual({
       mode: 'own_account',
     });
   });

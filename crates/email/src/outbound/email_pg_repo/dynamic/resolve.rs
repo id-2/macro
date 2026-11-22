@@ -257,12 +257,12 @@ pub(super) async fn resolve_filters(
                    (el.deleting_at IS NULL AND EXISTS (
                        SELECT 1 FROM crm_email_consent consent
                        WHERE consent.team_id = $1
-                         AND consent.user_id = el.macro_id
+                         AND consent.user_id = el.rox_id
                          AND consent.link_id = el.id
                          AND consent.enabled
                    )) AS "contributing!"
             FROM email_links el
-            JOIN team_user tu ON tu.user_id = el.macro_id
+            JOIN team_user tu ON tu.user_id = el.rox_id
             WHERE tu.team_id = $1 AND el.is_primary
             "#,
                 team_id,

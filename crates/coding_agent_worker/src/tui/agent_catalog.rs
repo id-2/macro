@@ -21,12 +21,12 @@ pub use npm_adapter::AdapterInstall;
 mod test;
 
 mod environment {
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Home;
     }
     // Windows sets no `HOME`; this is its home directory.
     #[cfg(windows)]
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Userprofile;
     }
 }

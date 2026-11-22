@@ -23,7 +23,7 @@ fn fallback_attribution_uses_the_canonical_bot_not_a_fabricated_user() {
     let stored = convert(message, Uuid::now_v7().try_into().unwrap()).unwrap();
     assert_eq!(
         stored.sender,
-        ChannelSender::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID)
+        ChannelSender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID)
     );
     assert_eq!(stored.imported_author.as_deref(), Some("Archive author"));
 }

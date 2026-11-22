@@ -109,7 +109,7 @@ export type CellValue =
    */
   | { type: 'options'; value: OptionRef[] }
   /**
-   *  References to Macro entities of the kind the column points at; at
+   *  References to Rox entities of the kind the column points at; at
    *  most one for a single-valued column.
    */
   | { type: 'entities'; value: EntityRef[] }
@@ -274,7 +274,7 @@ export type ColumnKind =
       /**  The options, in display order. */
       options: SelectOption[];
     }
-  /**  One or more references to Macro entities. */
+  /**  One or more references to Rox entities. */
   | {
       kind: 'entity';
       /**  Whether a cell holds several references. */
@@ -359,7 +359,7 @@ export type DataType =
   | 'ENTITY';
 
 /**
- *  Identifier of reusable database storage. Its optional Macro entity uses
+ *  Identifier of reusable database storage. Its optional Rox entity uses
  *  the same identity, so existing routes and grants keep their IDs.
  */
 export type DatabaseId = string;
@@ -513,7 +513,7 @@ export type EngineError = {
 };
 
 /**
- *  What an entity column's references point at: a kind of Macro entity, or
+ *  What an entity column's references point at: a kind of Rox entity, or
  *  the rows of another table for a relation.
  *
  *  Spelled as the properties system spells entity types (`USER`,
@@ -548,7 +548,7 @@ export type EntityKind =
   /**  Rows of another table: the column is a relation. */
   | 'DATABASE_ROW';
 
-/**  A reference to one Macro entity. */
+/**  A reference to one Rox entity. */
 export type EntityRef = {
   /**  What kind of entity it is; it must be the kind the column points at. */
   entityType: OpEntityKind;
@@ -930,7 +930,7 @@ export type OpColumnKind =
     }
   /**  Colored labels; always several per cell. */
   | { type: 'tag' }
-  /**  References to Macro entities. */
+  /**  References to Rox entities. */
   | {
       type: 'entity';
       /**  What the references point at. */
@@ -947,7 +947,7 @@ export type OpColumnKind =
       table: TableId;
     };
 
-/**  A kind of Macro entity a reference column can point at. */
+/**  A kind of Rox entity a reference column can point at. */
 export type OpEntityKind =
   /**  People. */
   | 'USER'
@@ -2265,7 +2265,7 @@ export type TableSchema = {
  *  serving its fetch requests decides how.
  */
 export type TableSource =
-  /**  A Macro database table, read through Soup. */
+  /**  A Rox database table, read through Soup. */
   | 'database'
   /**  The people the viewer can see: `id`, `name`, `email`. */
   | 'people';

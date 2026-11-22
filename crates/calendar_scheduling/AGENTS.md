@@ -2,7 +2,7 @@
 
 ## What it is
 
-Part of Calendar: personal and Macro-team booking pages — event types,
+Part of Calendar: personal and Rox-team booking pages — event types,
 availability, collective/round-robin hosts, booking limits, and the booking
 lifecycle. See `README.md` for the full product model and the required
 RoxDB migrations.
@@ -17,8 +17,8 @@ RoxDB migrations.
 - `src/domain/availability.rs`: weekly schedules, date overrides, and conflict
   resolution across connected calendars.
 - `src/outbound/postgres.rs`: storage (feature `postgres`).
-- `src/outbound/macro_services.rs`, `src/outbound/meeting_links.rs`: calendar/team
-  domain ports and Macro-call meeting links (feature `calendar`).
+- `src/outbound/rox_services.rs`, `src/outbound/meeting_links.rs`: calendar/team
+  domain ports and Rox-call meeting links (feature `calendar`).
 
 ## Scope
 
@@ -62,7 +62,7 @@ RoxDB migrations.
 - Reschedule counts only increase after a successful move; old records default
   to zero rather than reconstructing unknown history.
 - Availability, reschedule slots, the agent's booking tools, forms bookings and
-  form attachment all gate on `macro_services/sync_health.rs`: only calendars
+  form attachment all gate on `rox_services/sync_health.rs`: only calendars
   with Busy on count, a transient failure serves stored events for
   `STALE_AVAILABILITY_WINDOW` after the next sync was due (the last good sync,
   or a day after it for a daily-synced Google system calendar), and the creation

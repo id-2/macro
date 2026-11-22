@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::gmail::gmail_ops::ModifyMessageLabelsPayload;
 use models_email::gmail::gmail_ops::{GmailMessageRef, ModifyMessageLabelsBatchPayload};
 use std::io::Write;
@@ -167,7 +167,7 @@ fn message_ids(payload: &ModifyMessageLabelsBatchPayload) -> Vec<Uuid> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("gmail_ops_label_revert"))
 )]
 async fn an_older_write_waits_for_a_newer_one_and_sends_once_gmail_rejects_it(pool: PgPool) {
@@ -202,7 +202,7 @@ async fn an_older_write_waits_for_a_newer_one_and_sends_once_gmail_rejects_it(po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("gmail_ops_label_revert"))
 )]
 async fn a_confirmed_newer_write_supersedes_the_older_one(pool: PgPool) {
@@ -222,7 +222,7 @@ async fn a_confirmed_newer_write_supersedes_the_older_one(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("gmail_ops_label_revert"))
 )]
 async fn rejected_batch_reverts_only_the_messages_its_write_was_newest_on(pool: PgPool) {
@@ -253,7 +253,7 @@ async fn rejected_batch_reverts_only_the_messages_its_write_was_newest_on(pool: 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("gmail_ops_label_revert"))
 )]
 async fn rejected_mark_read_restores_the_unread_message_and_thread(pool: PgPool) {
@@ -311,7 +311,7 @@ async fn rejected_mark_read_restores_the_unread_message_and_thread(pool: PgPool)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("gmail_ops_label_revert"))
 )]
 async fn rejected_single_message_operation_reverts_its_message(pool: PgPool) {

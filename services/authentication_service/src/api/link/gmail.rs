@@ -6,8 +6,8 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use calendar_events::domain::models::google_calendar_scope_parameter;
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
-use macro_middleware::tracking::ClientIp;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
+use rox_middleware::tracking::ClientIp;
 use model::response::ErrorResponse;
 use roles_and_permissions::domain::model::PermissionId;
 use serde_utils::urlencode::UrlEncoded;
@@ -152,12 +152,12 @@ pub async fn init_gmail_link_handler(
     let authorization = &db_permissions.authorization;
     let fusion_user_id = &authorization.authorization.user.user_context.fusion_user_id;
     let initiator =
-        macro_uuid::string_to_uuid(fusion_user_id).context("fusion user id must be a uuid")?;
+        rox_uuid::string_to_uuid(fusion_user_id).context("fusion user id must be a uuid")?;
 
     if !ctx
         .inbox_connections
         .permits_connection(
-            authorization.authorization.user.macro_user_id.clone(),
+            authorization.authorization.user.rox_user_id.clone(),
             db_permissions
                 .permissions
                 .contains(&PermissionId::ReadProfessionalFeatures.to_string()),
@@ -171,7 +171,7 @@ pub async fn init_gmail_link_handler(
     }
 
     let count =
-        macro_db_client::in_progress_user_link::count_existing_in_progress_user_links_for_user(
+        rox_db_client::in_progress_user_link::count_existing_in_progress_user_links_for_user(
             &ctx.db,
             fusion_user_id,
         )
@@ -186,7 +186,7 @@ pub async fn init_gmail_link_handler(
         .split_ascii_whitespace()
         .map(ToOwned::to_owned)
         .collect();
-    let link_id = macro_db_client::in_progress_user_link::create_in_progress_google_link(
+    let link_id = rox_db_client::in_progress_user_link::create_in_progress_google_link(
         &ctx.db,
         fusion_user_id,
         &requested_google_scopes,
@@ -315,16 +315,16 @@ impl IntoResponse for GmailLinkStatusError {
             (status = 500, body=ErrorResponse),
         )
     )]
-#[tracing::instrument(skip(ctx, ip_context, authorization), fields(client_ip=%ip_context, user_id=%authorization.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(ctx, ip_context, authorization), fields(client_ip=%ip_context, user_id=%authorization.authorization.user.rox_user_id), err)]
 pub async fn check_gmail_link_status_handler(
     State(ctx): State<ApiContext>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<GmailLinkStatusResponse>, GmailLinkStatusError> {
     // Check if the user has an email link in db
-    if macro_db_client::email::check_user_email_link(
+    if rox_db_client::email::check_user_email_link(
         &ctx.db,
-        &authorization.authorization.user.macro_user_id,
+        &authorization.authorization.user.rox_user_id,
     )
     .await
     .map_err(GmailLinkStatusError::Internal)?

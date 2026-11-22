@@ -8,12 +8,12 @@ use bot_id::BotId;
 use http::header::{AUTHORIZATION, HeaderMap, HeaderName, HeaderValue};
 use http::{Method, StatusCode};
 use http_body_util::{BodyExt, Empty, Full};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 use url::Url;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id")
 }
 
 fn empty_body() -> ProxyBody {
@@ -184,7 +184,7 @@ const WIKI: &str = "https://wiki.example.com/mcp";
 impl McpCredentials for SpyCredentials {
     async fn resolve(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: BotId,
         _session: uuid::Uuid,
         destination: &McpDestination,
@@ -256,7 +256,7 @@ impl SpyGithubTokens {
 impl GithubTokens for SpyGithubTokens {
     async fn resolve(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         repo: &RepoSlug,
     ) -> Result<UpstreamCall, EgressError> {
         self.asked
@@ -897,8 +897,8 @@ async fn strips_hop_by_hop_headers_from_the_response() {
 /// Egress is open to every session owner, not only Rox staff: an outside
 /// owner's call resolves against their own connections and goes through.
 #[tokio::test]
-async fn a_session_owned_outside_macro_is_proxied_with_its_owners_credentials() {
-    let visitor = MacroUserIdStr::try_from_email("visitor@example.com").expect("a valid user id");
+async fn a_session_owned_outside_rox_is_proxied_with_its_owners_credentials() {
+    let visitor = RoxUserIdStr::try_from_email("visitor@example.com").expect("a valid user id");
     let service = EgressServiceImpl::new(
         StubSessions(Ok(SessionGrant {
             session: AgentSessionId::new(),
@@ -1286,12 +1286,12 @@ async fn preview_uses_only_the_authenticated_session_token_at_a_fixed_destinatio
     assert!(service.credentials.asked.lock().unwrap().is_empty());
 }
 
-fn asker() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("asker@rox.one").expect("a valid user id")
+fn asker() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("asker@rox.one").expect("a valid user id")
 }
 
 /// A grant whose running turn `prompter` prompted.
-fn prompted_by(prompter: Option<MacroUserIdStr<'static>>) -> StubSessions {
+fn prompted_by(prompter: Option<RoxUserIdStr<'static>>) -> StubSessions {
     let StubSessions(Ok(mut grant)) =
         StubSessions::granting_with(selected(&[("datadog", "Datadog")]))
     else {

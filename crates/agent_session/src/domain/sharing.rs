@@ -3,7 +3,7 @@
 use entity_access::domain::models::{
     EntityAccessReceipt, EntityType, OwnerAccessLevel, RequiredPermission, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::{
     SharePermissionV2, UpdateSharePermissionRequestV2,
     access_level::AccessLevel,
@@ -67,7 +67,7 @@ pub trait SessionSharingRepo: Send + Sync + 'static {
     fn update_permissions(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         request: UpdateSharePermissionRequestV2,
         team_share: Option<AuthorizedTeamShareCommand>,
     ) -> impl Future<Output = Result<SharePermissionV2>> + Send;
@@ -105,7 +105,7 @@ fn session_id<T: RequiredPermission>(access: &EntityAccessReceipt<T>) -> Result<
     if access.entity().entity_type != EntityType::AgentSession {
         return Err(AgentSessionError::Forbidden);
     }
-    let id = macro_uuid::Uuid::parse_str(&access.entity().entity_id)
+    let id = rox_uuid::Uuid::parse_str(&access.entity().entity_id)
         .map_err(|_| AgentSessionError::InvalidSharing("invalid agent session id"))?;
     Ok(AgentSessionId::new_from_uuid(id))
 }
@@ -117,7 +117,7 @@ fn validate(request: &UpdateSharePermissionRequestV2) -> Result<()> {
         ));
     }
     for grant in request.channel_share_permissions.iter().flatten() {
-        if macro_uuid::Uuid::parse_str(&grant.channel_id).is_err() {
+        if rox_uuid::Uuid::parse_str(&grant.channel_id).is_err() {
             return Err(AgentSessionError::InvalidSharing("invalid channel id"));
         }
         if grant.access_level == Some(AccessLevel::Owner) {

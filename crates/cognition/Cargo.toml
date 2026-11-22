@@ -8,9 +8,9 @@ publish = false
 ai_toolset = { path = "../ai_toolset" }
 async-trait = { workspace = true }
 jev = { path = "../jev", features = ["batches"] }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = ["axum"] }
-macro_tower_layers = { path = "../macro_tower_layers" }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", default-features = false, features = ["axum"] }
+rox_tower_layers = { path = "../rox_tower_layers" }
+rox_user_id = { path = "../rox_user_id" }
 reqwest = { workspace = true }
 rootcause = { workspace = true }
 schemars = { workspace = true }

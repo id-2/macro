@@ -8,7 +8,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use fusionauth::identity_provider::{IdentityProviderLink, LinkUserRequest};
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::ErrorResponse;
 
 use crate::api::context::{ApiContext, AuthorizationService};
@@ -50,7 +50,7 @@ pub struct RelocateInboxGrantResponse {
 #[tracing::instrument(skip(ctx, _internal_authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(RelocateInboxGrantRequest {
         email,
         owner_fusionauth_user_id,

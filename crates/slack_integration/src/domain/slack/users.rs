@@ -2,7 +2,7 @@
 
 use std::{collections::BTreeMap, str::FromStr};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::models::{SlackUserId, ValidationError};
@@ -49,9 +49,9 @@ impl UserProfile {
         nonempty(self.display_name.as_deref()).or_else(|| nonempty(self.real_name.as_deref()))
     }
 
-    fn macro_user(&self) -> Option<MacroUserIdStr<'static>> {
+    fn macro_user(&self) -> Option<RoxUserIdStr<'static>> {
         // This constructor validates and lowercases without stripping dots/plus aliases.
-        MacroUserIdStr::try_from_email(self.email.as_deref()?).ok()
+        RoxUserIdStr::try_from_email(self.email.as_deref()?).ok()
     }
 }
 
@@ -86,11 +86,11 @@ impl ExportUser {
 }
 
 /// Attribution decision. The worker materializes `SystemBot` with
-/// `bot_id::MACRO_SYSTEM_BOT_ID`; the parser neither hardcodes nor configures a bot ID.
+/// `bot_id::ROX_SYSTEM_BOT_ID`; the parser neither hardcodes nor configures a bot ID.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResolvedAuthor {
     /// Lowercase raw-email Rox identity, without imported_author.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
     /// System-bot sender with the source name retained for imported_author.
     SystemBot {
         /// Slack display/username or source ID when no name is available.
@@ -131,7 +131,7 @@ impl UserDirectory {
     }
 
     /// Resolve a member/reactor without inventing an email or consulting a roster.
-    pub fn participant(&self, id: &SlackUserId) -> Option<MacroUserIdStr<'static>> {
+    pub fn participant(&self, id: &SlackUserId) -> Option<RoxUserIdStr<'static>> {
         let user = self.users.get(id)?;
         if user.is_system_author() {
             return None;
@@ -145,7 +145,7 @@ impl UserDirectory {
     pub fn direct_message_members(
         &self,
         members: &[SlackUserId],
-    ) -> Option<[MacroUserIdStr<'static>; 2]> {
+    ) -> Option<[RoxUserIdStr<'static>; 2]> {
         let [first, second] = members else {
             return None;
         };

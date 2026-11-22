@@ -10,8 +10,8 @@ use crate::domain::{
     InvoiceVoid, OverageChargeRequest, PaymentGateway, Result, SubscriptionScope,
 };
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -26,7 +26,7 @@ use stripe::{
 };
 
 /// Metadata key stamped on every Stripe object this crate creates.
-pub const PURPOSE_METADATA_KEY: &str = "macro_purpose";
+pub const PURPOSE_METADATA_KEY: &str = "rox_purpose";
 /// [`PURPOSE_METADATA_KEY`] value for a credit-pack Checkout Session.
 pub const PURPOSE_AI_CREDITS: &str = "ai_credits";
 /// [`PURPOSE_METADATA_KEY`] value for an overage invoice.
@@ -34,13 +34,13 @@ pub const PURPOSE_AI_OVERAGE: &str = "ai_overage";
 /// [`PURPOSE_METADATA_KEY`] value for an automatic credit-reload invoice.
 pub const PURPOSE_AI_CREDIT_RELOAD: &str = "ai_credit_reload";
 /// Metadata key carrying the payer's Rox user id.
-pub const PAYER_METADATA_KEY: &str = "macro_user_id";
+pub const PAYER_METADATA_KEY: &str = "rox_user_id";
 /// Metadata key carrying the `ai_overage_charge` id on overage invoices.
-pub const CHARGE_METADATA_KEY: &str = "macro_charge_id";
+pub const CHARGE_METADATA_KEY: &str = "rox_charge_id";
 /// Metadata key carrying the `ai_credit_reload` id on reload invoices.
-pub const RELOAD_METADATA_KEY: &str = "macro_reload_id";
+pub const RELOAD_METADATA_KEY: &str = "rox_reload_id";
 const CREDIT_RELOAD_INVOICE_DESCRIPTION: &str = "Rox AI credits (automatic reload)";
-const BILLING_SCOPE_METADATA_KEY: &str = "macro_billing_scope";
+const BILLING_SCOPE_METADATA_KEY: &str = "rox_billing_scope";
 const PERSONAL_SCOPE_STAMP: &str = "personal";
 const TEAM_ID_METADATA_KEY: &str = "team_id";
 
@@ -225,7 +225,7 @@ struct OneOffInvoice<'a> {
     line_description: &'a str,
 }
 
-fn credit_reload_metadata(reload_id: Uuid, payer: &MacroUserIdStr<'_>) -> HashMap<String, String> {
+fn credit_reload_metadata(reload_id: Uuid, payer: &RoxUserIdStr<'_>) -> HashMap<String, String> {
     HashMap::from([
         (
             PURPOSE_METADATA_KEY.to_string(),
@@ -294,7 +294,7 @@ fn in_scope(subscription: &Subscription, scope: SubscriptionScope) -> bool {
     match scope {
         SubscriptionScope::Personal => team_id.is_none(),
         SubscriptionScope::Team { team_id: expected } => team_id
-            .and_then(|raw| macro_uuid::string_to_uuid(raw).ok())
+            .and_then(|raw| rox_uuid::string_to_uuid(raw).ok())
             .is_some_and(|parsed| parsed == expected),
     }
 }
@@ -385,7 +385,7 @@ fn stamped_scope(invoice: &Invoice) -> Result<Option<SubscriptionScope>> {
     if raw == PERSONAL_SCOPE_STAMP {
         return Ok(Some(SubscriptionScope::Personal));
     }
-    match macro_uuid::string_to_uuid(raw) {
+    match rox_uuid::string_to_uuid(raw) {
         Ok(team_id) => Ok(Some(SubscriptionScope::Team { team_id })),
         Err(_) => Err(BillingError::Payment(anyhow::anyhow!(
             "overage invoice has a malformed billing scope"

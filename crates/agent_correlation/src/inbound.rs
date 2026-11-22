@@ -12,9 +12,9 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use macro_auth::{
+use rox_auth::{
     headers::AccessTokenExtractor,
-    macro_api_token::MacroApiToken,
+    rox_api_token::RoxApiToken,
     middleware::decode_jwt::{JwtToken, JwtValidationArgs},
 };
 use serde::{Deserialize, Serialize};
@@ -74,7 +74,7 @@ where
 }
 
 /// The request's Rox API token, only if its signature verifies.
-async fn verified_api_token(parts: &mut Parts, jwt: &JwtValidationArgs) -> Option<MacroApiToken> {
+async fn verified_api_token(parts: &mut Parts, jwt: &JwtValidationArgs) -> Option<RoxApiToken> {
     let query = parts
         .uri
         .query()
@@ -91,8 +91,8 @@ async fn verified_api_token(parts: &mut Parts, jwt: &JwtValidationArgs) -> Optio
     // Authentication remains the route's responsibility. Public webhooks and
     // non-Rox credentials may share the listener; only a verified Rox
     // JWT can introduce attribution, never an unsigned header or claim.
-    match macro_auth::middleware::decode_jwt::handler(jwt, &token) {
-        Ok(JwtToken::MacroApiToken(token)) => Some(token),
+    match rox_auth::middleware::decode_jwt::handler(jwt, &token) {
+        Ok(JwtToken::RoxApiToken(token)) => Some(token),
         _ => None,
     }
 }
@@ -100,7 +100,7 @@ async fn verified_api_token(parts: &mut Parts, jwt: &JwtValidationArgs) -> Optio
 /// The scope `token` signs, or a refusal when the request is outside it. The
 /// signature is the claim's authority, so this needs no lookup.
 fn checked_signed_scope(
-    token: Option<&MacroApiToken>,
+    token: Option<&RoxApiToken>,
     parts: &Parts,
 ) -> Result<SignedScope, CorrelationRejection> {
     let scope = SignedScope::from_claim(token.and_then(|token| token.agent_scope.as_deref()));
@@ -122,7 +122,7 @@ fn checked_signed_scope(
 fn sdk_verb(parts: &Parts) -> Option<crate::AgentVerb> {
     parts
         .headers
-        .get("x-macro-sdk-verb")
+        .get("x-rox-sdk-verb")
         .and_then(|value| value.to_str().ok())
         .and_then(|value| value.parse().ok())
 }
@@ -130,7 +130,7 @@ fn sdk_verb(parts: &Parts) -> Option<crate::AgentVerb> {
 /// Validate the token's correlation claim against its agent session.
 async fn accept_correlation(
     state: &CorrelationState,
-    token: Option<&MacroApiToken>,
+    token: Option<&RoxApiToken>,
 ) -> Result<Option<(Uuid, Correlation)>, CorrelationRejection> {
     let Some((id, agent)) =
         token.and_then(|token| Some((token.agent_correlation_id?, token.agent_id)))

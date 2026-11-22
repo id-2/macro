@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use doppleganger::Mirror;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::db;
 use models_email::email::service::link;
 use models_email::service;
@@ -26,7 +26,7 @@ pub async fn fetch_link_by_email(
     let db_link = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id, macro_id, fusionauth_user_id, email_address, provider as "provider: _",
+        SELECT id, rox_id, fusionauth_user_id, email_address, provider as "provider: _",
                is_sync_active, is_primary, needs_reauth, last_sync_error_at, created_at, updated_at
         FROM email_links
         WHERE email_address = $1 AND provider = $2
@@ -41,27 +41,27 @@ pub async fn fetch_link_by_email(
     Ok(db_link.map(service::link::Link::try_from).transpose()?)
 }
 
-/// fetches email_links given a macro_id.
-#[tracing::instrument(skip(pool, macro_id), err)]
-pub async fn fetch_link_by_macro_id(
+/// fetches email_links given a rox_id.
+#[tracing::instrument(skip(pool, rox_id), err)]
+pub async fn fetch_link_by_rox_id(
     pool: &PgPool,
-    macro_id: &str,
+    rox_id: &str,
 ) -> anyhow::Result<Option<link::Link>> {
-    if macro_id.is_empty() {
+    if rox_id.is_empty() {
         anyhow::bail!("Rox ID cannot be empty");
     }
 
     let db_link = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id, macro_id, fusionauth_user_id, email_address, provider as "provider: _",
+        SELECT id, rox_id, fusionauth_user_id, email_address, provider as "provider: _",
                is_sync_active, is_primary, needs_reauth, last_sync_error_at, created_at, updated_at
         FROM email_links
-        WHERE macro_id = $1
+        WHERE rox_id = $1
         ORDER BY created_at DESC
         LIMIT 1
         "#,
-        macro_id
+        rox_id
     )
     .fetch_optional(pool)
     .await?;
@@ -70,20 +70,20 @@ pub async fn fetch_link_by_macro_id(
     Ok(db_link.map(service::link::Link::try_from).transpose()?)
 }
 
-/// Fetches the link for a `macro_id` whose `email_address` matches the given
+/// Fetches the link for a `rox_id` whose `email_address` matches the given
 /// address. Used by the CRM backfill/teardown path, where the address is
-/// derived from the macro_id itself (`macro|<email>`) — this resolves the
+/// derived from the rox_id itself (`macro|<email>`) — this resolves the
 /// inbox that *is* the user rather than the most-recently-connected one that
-/// [`fetch_link_by_macro_id`] would return. The comparison is
-/// case-insensitive: the macro_id email part is always lowercased, but
+/// [`fetch_link_by_rox_id`] would return. The comparison is
+/// case-insensitive: the rox_id email part is always lowercased, but
 /// `email_address` preserves its original casing.
-#[tracing::instrument(skip(pool, email_address, macro_id), err)]
-pub async fn fetch_link_by_macro_id_and_email_address(
+#[tracing::instrument(skip(pool, email_address, rox_id), err)]
+pub async fn fetch_link_by_rox_id_and_email_address(
     pool: &PgPool,
-    macro_id: &str,
+    rox_id: &str,
     email_address: &str,
 ) -> anyhow::Result<Option<link::Link>> {
-    if macro_id.is_empty() {
+    if rox_id.is_empty() {
         anyhow::bail!("Rox ID cannot be empty");
     }
     if email_address.is_empty() {
@@ -96,15 +96,15 @@ pub async fn fetch_link_by_macro_id_and_email_address(
     // workspace's online metadata, which this environment cannot produce.
     let db_link = sqlx::query_as::<_, DbLink>(
         r#"
-        SELECT id, macro_id, fusionauth_user_id, email_address, provider,
+        SELECT id, rox_id, fusionauth_user_id, email_address, provider,
                is_sync_active, is_primary, needs_reauth, last_sync_error_at, created_at, updated_at
         FROM email_links
-        WHERE macro_id = $1 AND LOWER(email_address) = $2
+        WHERE rox_id = $1 AND LOWER(email_address) = $2
         ORDER BY created_at DESC
         LIMIT 1
         "#,
     )
-    .bind(macro_id)
+    .bind(rox_id)
     .bind(email_address)
     .fetch_optional(pool)
     .await?;
@@ -115,26 +115,26 @@ pub async fn fetch_link_by_macro_id_and_email_address(
 /// Fetches the mailbox the user owns as their primary workspace identity.
 /// CRM population and teardown both use this explicit fact rather than
 /// deriving ownership from the legacy `macro|{email}` user id.
-#[tracing::instrument(skip(pool, macro_id), err)]
-pub async fn fetch_primary_link_by_macro_id(
+#[tracing::instrument(skip(pool, rox_id), err)]
+pub async fn fetch_primary_link_by_rox_id(
     pool: &PgPool,
-    macro_id: &str,
+    rox_id: &str,
 ) -> anyhow::Result<Option<link::Link>> {
-    if macro_id.is_empty() {
+    if rox_id.is_empty() {
         anyhow::bail!("Rox ID cannot be empty");
     }
 
     let db_link = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id, macro_id, fusionauth_user_id, email_address, provider as "provider: _",
+        SELECT id, rox_id, fusionauth_user_id, email_address, provider as "provider: _",
                is_sync_active, is_primary, needs_reauth, last_sync_error_at, created_at, updated_at
         FROM email_links
-        WHERE macro_id = $1 AND is_primary
+        WHERE rox_id = $1 AND is_primary
         ORDER BY created_at DESC
         LIMIT 1
         "#,
-        macro_id
+        rox_id
     )
     .fetch_optional(pool)
     .await?;
@@ -142,22 +142,22 @@ pub async fn fetch_primary_link_by_macro_id(
     Ok(db_link.map(service::link::Link::try_from).transpose()?)
 }
 
-/// Fetches all email_links the user can access via their macro_id, including any
-/// inboxes delegated via macro_user_links. The union is the read-side half of the
+/// Fetches all email_links the user can access via their rox_id, including any
+/// inboxes delegated via rox_user_links. The union is the read-side half of the
 /// multi-inbox narrow-graph design — it surfaces both the user's own inboxes
-/// (same macro_id) and inboxes belonging to other macro users they've been delegated.
-pub async fn fetch_inboxes_for_macro_id(
+/// (same rox_id) and inboxes belonging to other macro users they've been delegated.
+pub async fn fetch_inboxes_for_rox_id(
     pool: &PgPool,
-    macro_id: &str,
+    rox_id: &str,
 ) -> anyhow::Result<Vec<link::Link>> {
-    if macro_id.is_empty() {
-        anyhow::bail!("macro_id cannot be empty");
+    if rox_id.is_empty() {
+        anyhow::bail!("rox_id cannot be empty");
     }
 
     let db_links = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id as "id!", macro_id as "macro_id!",
+        SELECT id as "id!", rox_id as "rox_id!",
                fusionauth_user_id as "fusionauth_user_id!",
                email_address as "email_address!",
                provider as "provider!: _",
@@ -168,22 +168,22 @@ pub async fn fetch_inboxes_for_macro_id(
                created_at as "created_at!",
                updated_at as "updated_at!"
         FROM (
-            SELECT el.id, el.macro_id, el.fusionauth_user_id, el.email_address,
+            SELECT el.id, el.rox_id, el.fusionauth_user_id, el.email_address,
                    el.provider, el.is_sync_active, el.is_primary, el.needs_reauth,
                    el.last_sync_error_at, el.created_at, el.updated_at,el.sync_generation,el.grant_generation
             FROM email_links el
-            WHERE el.macro_id = $1
+            WHERE el.rox_id = $1
             UNION
-            SELECT el.id, el.macro_id, el.fusionauth_user_id, el.email_address,
+            SELECT el.id, el.rox_id, el.fusionauth_user_id, el.email_address,
                    el.provider, el.is_sync_active, el.is_primary, el.needs_reauth,
                    el.last_sync_error_at, el.created_at, el.updated_at,el.sync_generation,el.grant_generation
             FROM email_links el
-            JOIN macro_user_links mul ON el.id = mul.link_id
-            WHERE mul.primary_macro_id = $1
+            JOIN rox_user_links mul ON el.id = mul.link_id
+            WHERE mul.primary_rox_id = $1
         ) AS combined
         ORDER BY created_at DESC
         "#,
-        macro_id
+        rox_id
     )
     .fetch_all(pool)
     .await?;
@@ -211,7 +211,7 @@ pub struct InboxDetails {
     /// Distinguishes a deliberate opt-out from a grant that never carried the
     /// calendar scopes, which read identically from the scopes alone.
     pub calendar_disabled: bool,
-    /// Whether the inbox has a calendar account in Macro, i.e. whether there
+    /// Whether the inbox has a calendar account in Rox, i.e. whether there
     /// is calendar data to remove. Independent of the recorded scopes, which
     /// stop satisfying the capability check whenever Rox changes the scope
     /// set it requests.
@@ -220,7 +220,7 @@ pub struct InboxDetails {
 
 struct DbInboxDetailsRow {
     id: Uuid,
-    macro_id: String,
+    rox_id: String,
     fusionauth_user_id: String,
     email_address: String,
     provider: DbUserProvider,
@@ -240,21 +240,21 @@ struct DbInboxDetailsRow {
     photo_url: Option<String>,
 }
 
-/// Single-query variant of [`fetch_inboxes_for_macro_id`] that also joins each
+/// Single-query variant of [`fetch_inboxes_for_rox_id`] that also joins each
 /// inbox's settings, its most recent backfill job status, and its own photo
 /// (the self-contact's SFS photo, synced from people/me). Inboxes without an
 /// `email_settings` row get default settings.
-#[tracing::instrument(skip(pool, macro_id), err)]
-pub async fn fetch_inbox_details_for_macro_id(
+#[tracing::instrument(skip(pool, rox_id), err)]
+pub async fn fetch_inbox_details_for_rox_id(
     pool: &PgPool,
-    macro_id: &MacroUserIdStr<'_>,
+    rox_id: &RoxUserIdStr<'_>,
 ) -> anyhow::Result<Vec<InboxDetails>> {
-    let macro_id: &str = macro_id.as_ref();
+    let rox_id: &str = rox_id.as_ref();
 
     let rows = sqlx::query_as!(
         DbInboxDetailsRow,
         r#"
-        SELECT l.id as "id!", l.macro_id as "macro_id!",
+        SELECT l.id as "id!", l.rox_id as "rox_id!",
                l.fusionauth_user_id as "fusionauth_user_id!",
                l.email_address as "email_address!",
                l.provider as "provider!: _",
@@ -282,18 +282,18 @@ pub async fn fetch_inbox_details_for_macro_id(
                    SELECT 1 FROM calendar_accounts ca WHERE ca.email_link_id = l.id
                ) AS "has_calendar_data!"
         FROM (
-            SELECT el.id, el.macro_id, el.fusionauth_user_id, el.email_address,
+            SELECT el.id, el.rox_id, el.fusionauth_user_id, el.email_address,
                    el.provider, el.is_sync_active, el.is_primary, el.needs_reauth,
                    el.last_sync_error_at, el.created_at, el.updated_at,el.sync_generation,el.grant_generation
             FROM email_links el
-            WHERE el.macro_id = $1
+            WHERE el.rox_id = $1
             UNION
-            SELECT el.id, el.macro_id, el.fusionauth_user_id, el.email_address,
+            SELECT el.id, el.rox_id, el.fusionauth_user_id, el.email_address,
                    el.provider, el.is_sync_active, el.is_primary, el.needs_reauth,
                    el.last_sync_error_at, el.created_at, el.updated_at,el.sync_generation,el.grant_generation
             FROM email_links el
-            JOIN macro_user_links mul ON el.id = mul.link_id
-            WHERE mul.primary_macro_id = $1
+            JOIN rox_user_links mul ON el.id = mul.link_id
+            WHERE mul.primary_rox_id = $1
         ) l
         LEFT JOIN email_link_google_scopes g ON g.link_id = l.id
         LEFT JOIN email_link_microsoft_scopes ms ON ms.link_id = l.id AND ms.grant_generation = l.grant_generation
@@ -308,7 +308,7 @@ pub async fn fetch_inbox_details_for_macro_id(
             ON c.link_id = l.id AND LOWER(c.email_address) = LOWER(l.email_address)
         ORDER BY l.created_at DESC
         "#,
-        macro_id
+        rox_id
     )
     .fetch_all(pool)
     .await?;
@@ -325,7 +325,7 @@ pub async fn fetch_inbox_details_for_macro_id(
             };
             let link = link::Link::try_from(DbLink {
                 id: row.id,
-                macro_id: row.macro_id,
+                rox_id: row.rox_id,
                 fusionauth_user_id: row.fusionauth_user_id,
                 email_address: row.email_address,
                 provider: row.provider,
@@ -349,7 +349,7 @@ pub async fn fetch_inbox_details_for_macro_id(
         .collect()
 }
 
-/// fetches email_links given a fusionauth_user_id. a fusionauth_user_id can have multiple email_links, each with a unique macro_id
+/// fetches email_links given a fusionauth_user_id. a fusionauth_user_id can have multiple email_links, each with a unique rox_id
 #[tracing::instrument(skip(pool), err)]
 pub async fn fetch_links_by_fusionauth_user_id(
     pool: &PgPool,
@@ -362,7 +362,7 @@ pub async fn fetch_links_by_fusionauth_user_id(
     let db_links = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id, fusionauth_user_id, macro_id, email_address, provider as "provider: _",
+        SELECT id, fusionauth_user_id, rox_id, email_address, provider as "provider: _",
                is_sync_active, is_primary, needs_reauth, last_sync_error_at, created_at, updated_at
         FROM email_links
         WHERE fusionauth_user_id = $1
@@ -383,36 +383,36 @@ pub async fn fetch_links_by_fusionauth_user_id(
 }
 
 /// Resolves the inbox (email_link) that owns a thread, but only when that inbox
-/// belongs to the given macro user or is delegated to them via macro_user_links.
+/// belongs to the given macro user or is delegated to them via rox_user_links.
 /// Returns `None` when the thread doesn't exist or its inbox isn't one the caller
 /// owns or has delegated access to — callers map that to a not-found/unauthorized
 /// response. Lets mutating thread routes derive the inbox from the thread instead
 /// of an `X-Email-Link-Id` header.
-#[tracing::instrument(skip(pool, macro_id), err)]
+#[tracing::instrument(skip(pool, rox_id), err)]
 pub async fn fetch_owned_link_for_thread(
     pool: &PgPool,
-    macro_id: &str,
+    rox_id: &str,
     thread_id: Uuid,
 ) -> anyhow::Result<Option<link::Link>> {
     let db_link = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT l.id, l.macro_id, l.fusionauth_user_id, l.email_address, l.provider as "provider: _",
+        SELECT l.id, l.rox_id, l.fusionauth_user_id, l.email_address, l.provider as "provider: _",
                l.is_sync_active, l.is_primary, l.needs_reauth, l.last_sync_error_at,
                l.created_at, l.updated_at
         FROM email_threads t
         JOIN email_links l ON l.id = t.link_id
         WHERE t.id = $1
           AND (
-              l.macro_id = $2
+              l.rox_id = $2
               OR EXISTS (
-                  SELECT 1 FROM macro_user_links mul
-                  WHERE mul.link_id = l.id AND mul.primary_macro_id = $2
+                  SELECT 1 FROM rox_user_links mul
+                  WHERE mul.link_id = l.id AND mul.primary_rox_id = $2
               )
           )
         "#,
         thread_id,
-        macro_id
+        rox_id
     )
     .fetch_optional(pool)
     .await?;
@@ -422,31 +422,31 @@ pub async fn fetch_owned_link_for_thread(
 
 /// Resolves the inbox (email_link) that owns a message, scoped to the caller's
 /// own and delegated inboxes. See [`fetch_owned_link_for_thread`].
-#[tracing::instrument(skip(pool, macro_id), err)]
+#[tracing::instrument(skip(pool, rox_id), err)]
 pub async fn fetch_owned_link_for_message(
     pool: &PgPool,
-    macro_id: &str,
+    rox_id: &str,
     message_id: Uuid,
 ) -> anyhow::Result<Option<link::Link>> {
     let db_link = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT l.id, l.macro_id, l.fusionauth_user_id, l.email_address, l.provider as "provider: _",
+        SELECT l.id, l.rox_id, l.fusionauth_user_id, l.email_address, l.provider as "provider: _",
                l.is_sync_active, l.is_primary, l.needs_reauth, l.last_sync_error_at,
                l.created_at, l.updated_at
         FROM email_messages m
         JOIN email_links l ON l.id = m.link_id
         WHERE m.id = $1
           AND (
-              l.macro_id = $2
+              l.rox_id = $2
               OR EXISTS (
-                  SELECT 1 FROM macro_user_links mul
-                  WHERE mul.link_id = l.id AND mul.primary_macro_id = $2
+                  SELECT 1 FROM rox_user_links mul
+                  WHERE mul.link_id = l.id AND mul.primary_rox_id = $2
               )
           )
         "#,
         message_id,
-        macro_id
+        rox_id
     )
     .fetch_optional(pool)
     .await?;
@@ -461,7 +461,7 @@ pub async fn fetch_link_by_id(pool: &PgPool, link_id: Uuid) -> anyhow::Result<Op
     let db_link = sqlx::query_as!(
         DbLink,
         r#"
-        SELECT id, macro_id, fusionauth_user_id, email_address, provider as "provider: _",
+        SELECT id, rox_id, fusionauth_user_id, email_address, provider as "provider: _",
                is_sync_active, is_primary, needs_reauth, last_sync_error_at, created_at, updated_at
         FROM email_links
         WHERE id = $1
@@ -490,23 +490,23 @@ pub struct ReadableInbox {
     pub grant_generation: i64,
 }
 
-/// The inboxes `macro_id` owns (not delegated ones) that are syncing and whose
+/// The inboxes `rox_id` owns (not delegated ones) that are syncing and whose
 /// credentials still work, newest first, for reading straight from the
 /// provider.
 #[tracing::instrument(skip_all, err)]
 pub async fn fetch_readable_owned_inboxes(
     pool: &PgPool,
-    macro_id: &MacroUserIdStr<'_>,
+    rox_id: &RoxUserIdStr<'_>,
 ) -> anyhow::Result<Vec<ReadableInbox>> {
     let rows = sqlx::query!(
         r#"
         SELECT id, email_address, provider as "provider: DbUserProvider",
                sync_generation, grant_generation
         FROM email_links
-        WHERE macro_id = $1 AND is_sync_active AND NOT needs_reauth
+        WHERE rox_id = $1 AND is_sync_active AND NOT needs_reauth
         ORDER BY created_at DESC
         "#,
-        macro_id.as_ref()
+        rox_id.as_ref()
     )
     .fetch_all(pool)
     .await?;

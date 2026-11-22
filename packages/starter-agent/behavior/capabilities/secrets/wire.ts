@@ -196,7 +196,7 @@ export const agentBase = (teamId: string): string =>
 
 /** The request headers of the contract. */
 export const headers = {
-  key: 'x-macro-user-api-key',
-  wake: 'x-macro-agent-session-id',
-  mutation: 'x-macro-passwords',
+  key: 'x-rox-user-api-key',
+  wake: 'x-rox-agent-session-id',
+  mutation: 'x-rox-passwords',
 } as const;

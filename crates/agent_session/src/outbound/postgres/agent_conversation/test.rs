@@ -1,8 +1,8 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 async fn channel(pool: &PgPool) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'direct_message', 'macro|dm@example.com')", id)
         .execute(pool).await.unwrap();
     id
@@ -12,9 +12,9 @@ fn with(channel_id: Uuid, bot_id: BotId) -> AgentConversation {
     AgentConversation { channel_id, bot_id }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn simultaneous_first_posts_reserve_the_same_session_before_it_exists(pool: PgPool) {
-    let conversation = with(channel(&pool).await, bot_id::MACRO_NEW_BOT_ID);
+    let conversation = with(channel(&pool).await, bot_id::ROX_NEW_BOT_ID);
     let repo = super::super::test::test_repo(&pool);
     assert_eq!(repo.current(conversation).await.unwrap(), None);
     let (a, b) = tokio::join!(
@@ -34,10 +34,10 @@ async fn simultaneous_first_posts_reserve_the_same_session_before_it_exists(pool
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn start_fresh_preserves_earlier_sessions_and_isolates_other_conversations(pool: PgPool) {
-    let first_conversation = with(channel(&pool).await, bot_id::MACRO_NEW_BOT_ID);
-    let second_conversation = with(channel(&pool).await, bot_id::MACRO_NEW_BOT_ID);
+    let first_conversation = with(channel(&pool).await, bot_id::ROX_NEW_BOT_ID);
+    let second_conversation = with(channel(&pool).await, bot_id::ROX_NEW_BOT_ID);
     let repo = super::super::test::test_repo(&pool);
     let first = repo.current_or_create(first_conversation).await.unwrap();
     let second = repo.current_or_create(second_conversation).await.unwrap();
@@ -69,11 +69,11 @@ async fn start_fresh_preserves_earlier_sessions_and_isolates_other_conversations
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_agents_in_one_channel_run_on_separate_sessions(pool: PgPool) {
     let channel = channel(&pool).await;
-    let first = with(channel, bot_id::MACRO_NEW_BOT_ID);
-    let second = with(channel, bot_id::MACRO_CODER_BOT_ID);
+    let first = with(channel, bot_id::ROX_NEW_BOT_ID);
+    let second = with(channel, bot_id::ROX_CODER_BOT_ID);
     let repo = super::super::test::test_repo(&pool);
     let first_session = repo.current_or_create(first).await.unwrap();
     let second_session = repo.current_or_create(second).await.unwrap();
@@ -83,9 +83,9 @@ async fn two_agents_in_one_channel_run_on_separate_sessions(pool: PgPool) {
     assert_eq!(repo.current(first).await.unwrap(), Some(fresh));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_current_session_answers_its_conversation(pool: PgPool) {
-    let conversation = with(channel(&pool).await, bot_id::MACRO_NEW_BOT_ID);
+    let conversation = with(channel(&pool).await, bot_id::ROX_NEW_BOT_ID);
     let repo = super::super::test::test_repo(&pool);
     let first = repo.current_or_create(conversation).await.unwrap();
     assert!(repo.is_current_conversation_session(first).await.unwrap());

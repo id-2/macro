@@ -14,8 +14,8 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, post, put},
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -24,7 +24,7 @@ use uuid::Uuid;
 /// Scheduling service and authentication state.
 pub struct RouterState<R, C, D, A> {
     service: Arc<Service<R, C, D>>,
-    auth: MacroAuthorizationState<A>,
+    auth: RoxAuthorizationState<A>,
 }
 impl<R, C, D, A> Clone for RouterState<R, C, D, A> {
     fn clone(&self) -> Self {
@@ -34,14 +34,14 @@ impl<R, C, D, A> Clone for RouterState<R, C, D, A> {
         }
     }
 }
-impl<R, C, D, A> FromRef<RouterState<R, C, D, A>> for MacroAuthorizationState<A> {
+impl<R, C, D, A> FromRef<RouterState<R, C, D, A>> for RoxAuthorizationState<A> {
     fn from_ref(s: &RouterState<R, C, D, A>) -> Self {
         s.auth.clone()
     }
 }
 impl<R, C, D, A> RouterState<R, C, D, A> {
     /// Bind the domain service to the host's authentication.
-    pub fn new(service: Arc<Service<R, C, D>>, auth: MacroAuthorizationState<A>) -> Self {
+    pub fn new(service: Arc<Service<R, C, D>>, auth: RoxAuthorizationState<A>) -> Self {
         Self { service, auth }
     }
 }
@@ -50,7 +50,7 @@ pub fn router<
     R: Repository,
     C: Calendars,
     D: Directory,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
     T: Send + Sync + 'static,
 >(
     state: RouterState<R, C, D, A>,
@@ -243,23 +243,23 @@ impl IntoResponse for ApiError {
 }
 /// Read personal or team booking settings without creating them.
 #[utoipa::path(get, path = "/scheduling/settings", operation_id = "get_booking_settings", params(Scope), responses((status = 200, body = ProfileResponse), (status = 403), (status = 404)), tag = "scheduling")]
-pub async fn settings<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn settings<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Query(q): Query<Scope>,
 ) -> Result<Json<ProfileResponse>, ApiError> {
     Ok(Json(ProfileResponse {
         profile: s
             .service
-            .settings(user.authorization.user.macro_user_id.as_ref(), q.team_id)
+            .settings(user.authorization.user.rox_user_id.as_ref(), q.team_id)
             .await?,
     }))
 }
 /// Save booking settings at the revision they were read with.
 #[utoipa::path(put, path = "/scheduling/settings", operation_id = "save_booking_settings", params(Scope), request_body = Profile, responses((status = 200, body = ProfileResponse), (status = 400), (status = 403), (status = 409)), tag = "scheduling")]
-pub async fn save<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn save<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Query(q): Query<Scope>,
     Json(profile): Json<Profile>,
 ) -> Result<Json<ProfileResponse>, ApiError> {
@@ -267,7 +267,7 @@ pub async fn save<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizati
         profile: s
             .service
             .save(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 q.team_id,
                 profile,
             )
@@ -276,12 +276,12 @@ pub async fn save<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizati
 }
 /// List the profile's bookings, optionally those starting in a half-open range.
 #[utoipa::path(get, path = "/scheduling/bookings", operation_id = "list_bookings", params(BookingRange), responses((status = 200, body = BookingsResponse), (status = 400), (status = 403)), tag = "scheduling")]
-pub async fn bookings<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn bookings<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Query(q): Query<BookingRange>,
 ) -> Result<Json<BookingsResponse>, ApiError> {
-    let user = user.authorization.user.macro_user_id.as_ref();
+    let user = user.authorization.user.rox_user_id.as_ref();
     let bookings = match (q.from, q.to) {
         (Some(start), Some(end)) => {
             s.service
@@ -293,9 +293,9 @@ pub async fn bookings<R: Repository, C: Calendars, D: Directory, A: MacroAuthori
     };
     Ok(Json(BookingsResponse { bookings }))
 }
-async fn attendance<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn attendance<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Path(id): Path<Uuid>,
     Json(request): Json<AttendanceRequest>,
 ) -> Result<Json<BookingResponse>, ApiError> {
@@ -303,28 +303,28 @@ async fn attendance<R: Repository, C: Calendars, D: Directory, A: MacroAuthoriza
         booking: s
             .service
             .set_attendance(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 id,
                 request.attendance,
             )
             .await?,
     }))
 }
-async fn approve<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn approve<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<BookingResponse>, ApiError> {
     Ok(Json(BookingResponse {
         booking: s
             .service
-            .approve(user.authorization.user.macro_user_id.as_ref(), id)
+            .approve(user.authorization.user.rox_user_id.as_ref(), id)
             .await?,
     }))
 }
-async fn cancel<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn cancel<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<BookingResponse>, ApiError> {
     Ok(Json(BookingResponse {
@@ -333,12 +333,12 @@ async fn cancel<R: Repository, C: Calendars, D: Directory, A: MacroAuthorization
             .cancel(
                 id,
                 None,
-                Some(user.authorization.user.macro_user_id.as_ref()),
+                Some(user.authorization.user.rox_user_id.as_ref()),
             )
             .await?,
     }))
 }
-async fn public_profile<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn public_profile<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<PublicResponse>, ApiError> {
@@ -346,7 +346,7 @@ async fn public_profile<R: Repository, C: Calendars, D: Directory, A: MacroAutho
         profile: s.service.public_profile(id).await?,
     }))
 }
-async fn slots<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn slots<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
     Path((profile, event)): Path<(Uuid, Uuid)>,
     Query(q): Query<SlotQuery>,
@@ -363,7 +363,7 @@ async fn slots<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationS
             .await?,
     }))
 }
-async fn book<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn book<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
     Path((profile, event)): Path<(Uuid, Uuid)>,
     Json(request): Json<BookingRequest>,
@@ -375,7 +375,7 @@ async fn book<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationSe
         schedule_time_zone: r.schedule.time_zone,
     }))
 }
-async fn receipt<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn receipt<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
     Path(id): Path<Uuid>,
     headers: HeaderMap,
@@ -387,7 +387,7 @@ async fn receipt<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizatio
         schedule_time_zone: r.schedule.time_zone,
     }))
 }
-async fn cancel_public<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn cancel_public<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
     Path(id): Path<Uuid>,
     Json(q): Json<Token>,
@@ -401,7 +401,7 @@ async fn replacement_slots<
     R: Repository,
     C: Calendars,
     D: Directory,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 >(
     State(s): State<RouterState<R, C, D, A>>,
     Path(id): Path<Uuid>,
@@ -415,7 +415,7 @@ async fn replacement_slots<
             .await?,
     }))
 }
-async fn reschedule<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+async fn reschedule<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
     Path(id): Path<Uuid>,
     Json(q): Json<RescheduleRequest>,
@@ -430,14 +430,14 @@ async fn reschedule<R: Repository, C: Calendars, D: Directory, A: MacroAuthoriza
 
 /// Read one booking as its personal owner, a host, or a team administrator.
 #[utoipa::path(get, path = "/scheduling/bookings/{id}/manage", operation_id = "get_managed_booking", params(("id" = Uuid, Path, description = "Booking identity")), responses((status = 200, body = ReceiptResponse), (status = 403), (status = 404)), tag = "scheduling")]
-pub async fn manage<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn manage<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<ReceiptResponse>, ApiError> {
     let r = s
         .service
-        .manage(user.authorization.user.macro_user_id.as_ref(), id)
+        .manage(user.authorization.user.rox_user_id.as_ref(), id)
         .await?;
     Ok(Json(ReceiptResponse {
         booking: r.booking,
@@ -448,16 +448,16 @@ pub async fn manage<R: Repository, C: Calendars, D: Directory, A: MacroAuthoriza
 
 /// Booking statistics for a local date range and the equally long period before it.
 #[utoipa::path(post, path = "/scheduling/insights", operation_id = "get_booking_insights", params(Scope), request_body = InsightQuery, responses((status = 200, body = BookingInsights), (status = 400), (status = 403)), tag = "scheduling")]
-pub async fn insights<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn insights<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Query(scope): Query<Scope>,
     Json(query): Json<InsightQuery>,
 ) -> Result<Json<BookingInsights>, ApiError> {
     Ok(Json(
         s.service
             .booking_insights(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 scope.team_id,
                 query,
             )
@@ -466,24 +466,24 @@ pub async fn insights<R: Repository, C: Calendars, D: Directory, A: MacroAuthori
 }
 /// Approve, cancel, record attendance for, or reschedule one booking.
 #[utoipa::path(post, path = "/scheduling/bookings/{id}/change", operation_id = "change_booking", params(("id" = Uuid, Path, description = "Booking identity")), request_body = BookingChange, responses((status = 200, body = BookingResponse), (status = 400), (status = 403), (status = 404), (status = 409)), tag = "scheduling")]
-pub async fn change<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn change<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Path(id): Path<Uuid>,
     Json(change): Json<BookingChange>,
 ) -> Result<Json<BookingResponse>, ApiError> {
     Ok(Json(BookingResponse {
         booking: s
             .service
-            .change_booking(user.authorization.user.macro_user_id.as_ref(), id, change)
+            .change_booking(user.authorization.user.rox_user_id.as_ref(), id, change)
             .await?,
     }))
 }
 /// Replacement start times for one booking on a schedule-local date.
 #[utoipa::path(get, path = "/scheduling/bookings/{id}/slots", operation_id = "list_booking_reschedule_slots", params(("id" = Uuid, Path, description = "Booking identity"), ReplacementQuery), responses((status = 200, body = SlotsResponse), (status = 403), (status = 404)), tag = "scheduling")]
-pub async fn host_slots<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn host_slots<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Path(id): Path<Uuid>,
     Query(query): Query<ReplacementQuery>,
 ) -> Result<Json<SlotsResponse>, ApiError> {
@@ -491,7 +491,7 @@ pub async fn host_slots<R: Repository, C: Calendars, D: Directory, A: MacroAutho
         slots: s
             .service
             .host_replacement_slots(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 id,
                 query.date,
             )
@@ -501,15 +501,15 @@ pub async fn host_slots<R: Repository, C: Calendars, D: Directory, A: MacroAutho
 
 /// List and search booking links with their full drafts and reusable schedules.
 #[utoipa::path(get, path = "/scheduling/links", operation_id = "list_booking_links", params(LinkSearch), responses((status = 200, body = BookingLinkListing), (status = 403)), tag = "scheduling")]
-pub async fn list_links<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn list_links<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Query(q): Query<LinkSearch>,
 ) -> Result<Json<BookingLinkListing>, ApiError> {
     Ok(Json(
         s.service
             .list_links(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 q.team_id,
                 q.query.as_deref(),
             )
@@ -523,10 +523,10 @@ pub async fn create_link<
     R: Repository,
     C: Calendars,
     D: Directory,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 >(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Query(q): Query<Scope>,
     Json(request): Json<CreateBookingLinkRequest>,
 ) -> Result<Json<BookingLink>, ApiError> {
@@ -534,7 +534,7 @@ pub async fn create_link<
     Ok(Json(
         s.service
             .create_link(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 q.team_id,
                 request.draft,
             )
@@ -544,9 +544,9 @@ pub async fn create_link<
 
 /// Replace one booking link's configuration at the profile revision it was read with.
 #[utoipa::path(put, path = "/scheduling/links/{id}", operation_id = "edit_booking_link", params(("id" = Uuid, Path, description = "Booking link (event type) identity"), Scope), request_body = EditBookingLinkRequest, responses((status = 200, body = BookingLink), (status = 400), (status = 403), (status = 404), (status = 409)), tag = "scheduling")]
-pub async fn edit_link<R: Repository, C: Calendars, D: Directory, A: MacroAuthorizationService>(
+pub async fn edit_link<R: Repository, C: Calendars, D: Directory, A: RoxAuthorizationService>(
     State(s): State<RouterState<R, C, D, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Path(id): Path<Uuid>,
     Query(q): Query<Scope>,
     Json(request): Json<EditBookingLinkRequest>,
@@ -555,7 +555,7 @@ pub async fn edit_link<R: Repository, C: Calendars, D: Directory, A: MacroAuthor
     Ok(Json(
         s.service
             .edit_link(
-                user.authorization.user.macro_user_id.as_ref(),
+                user.authorization.user.rox_user_id.as_ref(),
                 q.team_id,
                 id,
                 request.expected_revision,

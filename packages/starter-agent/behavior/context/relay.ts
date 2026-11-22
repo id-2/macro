@@ -12,7 +12,7 @@ import type { Hosts } from './addresses.ts';
 import { anthropicRoute } from './children.ts';
 
 /** The header a user API key travels in, both from the script and on to Rox. */
-export const keyHeader = 'x-macro-user-api-key';
+export const keyHeader = 'x-rox-user-api-key';
 
 /** Headers that say who is calling: the script's are dropped, and only the agent's key goes on. */
 const dropped = new Set([
@@ -27,7 +27,7 @@ const dropped = new Set([
   'transfer-encoding',
   'content-length',
 ]);
-const botHeaders = 'x-macro-bot-';
+const botHeaders = 'x-rox-bot-';
 
 /** Compares two secrets in time that doesn't depend on where they differ. */
 export const constantTimeEqual = (given: string, expected: string): boolean =>

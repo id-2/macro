@@ -1,5 +1,5 @@
-use macro_event_broker::{Event, MacroEvent};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -24,8 +24,8 @@ fn bot_id() -> BotId {
     BotId::parse_uuid_str(BOT_ID).expect("valid bot id")
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
@@ -253,7 +253,7 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
     ]
 }
 
-fn macro_events() -> Vec<TeamMacroEvent> {
+fn rox_events() -> Vec<TeamMacroEvent> {
     topic_events()
         .into_iter()
         .map(|(event, _)| match event {
@@ -295,22 +295,22 @@ fn every_variant_has_exact_json_envelope() {
 
 #[test]
 fn every_variant_round_trips() {
-    for original in macro_events() {
+    for original in rox_events() {
         let payload = serde_json::to_vec(original.event()).expect("serializable event");
         let decoded = TeamMacroEvent::decode(original.key(), &payload).expect("decodable event");
 
         assert_eq!(decoded.key(), TEAM_ID);
         assert_eq!(decoded.event(), original.event());
-        assert_eq!(decoded.topic(), "macro.teams");
+        assert_eq!(decoded.topic(), "rox.teams");
     }
 }
 
 #[test]
 fn constructors_use_teams_topic_bare_uuid_key_and_schema_version_one() {
-    for event in macro_events() {
+    for event in rox_events() {
         assert_eq!(event.key(), TEAM_ID);
         assert!(!event.key().starts_with("team|"));
-        assert_eq!(event.topic(), "macro.teams");
+        assert_eq!(event.topic(), "rox.teams");
         assert_eq!(event.event().schema_version, 1);
     }
 }
@@ -387,7 +387,7 @@ fn roles_and_join_methods_serialize_lowercase() {
 fn payloads_recursively_exclude_billing_fields() {
     let forbidden_terms = ["subscription", "customer", "stripe", "payment"];
 
-    for event in macro_events() {
+    for event in rox_events() {
         let payload = serde_json::to_value(event.event()).expect("serializable event");
         assert_no_forbidden_fields(&payload, &forbidden_terms);
     }

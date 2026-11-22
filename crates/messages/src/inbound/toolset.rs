@@ -67,7 +67,7 @@ impl<ESvc: EntityAccessService> MessageToolContext<ESvc> {
         Self {
             messages,
             entity_access_service,
-            actor: bot_id::MACRO_AI_BOT_ID,
+            actor: bot_id::ROX_AI_BOT_ID,
             via: None,
         }
     }

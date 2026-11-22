@@ -200,7 +200,7 @@ impl CrmService for FakeCrm {
         unimplemented!("FakeCrm.depopulate_link_in_team")
     }
 
-    async fn get_team_id_for_user(&self, _macro_id: &str) -> Result<Option<uuid::Uuid>, CrmError> {
+    async fn get_team_id_for_user(&self, _rox_id: &str) -> Result<Option<uuid::Uuid>, CrmError> {
         unimplemented!("FakeCrm.get_team_id_for_user")
     }
 
@@ -449,7 +449,7 @@ impl ChannelListService for ReferencingComms {
 
     async fn get_activities(
         &self,
-        _user: MacroUserIdStr<'_>,
+        _user: RoxUserIdStr<'_>,
     ) -> Result<Vec<channels::domain::models::Activity>, Report> {
         Ok(Vec::new())
     }
@@ -495,7 +495,7 @@ impl ChannelListService for ReferencingComms {
 
     async fn get_names(
         &self,
-        _names: std::collections::HashSet<MacroUserIdStr<'_>>,
+        _names: std::collections::HashSet<RoxUserIdStr<'_>>,
     ) -> Result<Vec<channels::domain::models::UserName>, Report> {
         Ok(Vec::new())
     }
@@ -507,7 +507,7 @@ fn request(filters: EntityFilterAst) -> SoupRequest<EntityFilterAst> {
         limit: 1,
         cursor: SoupQuery::new_sort_simple(SimpleSortMethod::UpdatedAt, filters),
         sort_direction: SoupSortDirection::Desc,
-        user: MacroUserIdStr::parse_from_str(USER).unwrap(),
+        user: RoxUserIdStr::parse_from_str(USER).unwrap(),
         email_preview_view: PreviewView::default(),
         link_ids: vec![],
     }
@@ -890,7 +890,7 @@ async fn sales_tasks_grouped_reads_only_document_and_task_edges() {
         .get_user_soup_grouped(GroupedSortRequest {
             limit: 100,
             cursor: Query::Sort(SimpleSortMethod::UpdatedAt.into(), sales_view("tasks")),
-            user_id: MacroUserIdStr::parse_from_str(USER).unwrap(),
+            user_id: RoxUserIdStr::parse_from_str(USER).unwrap(),
             grouping: GroupingConfig {
                 field: GroupByField::Date,
                 group_key: None,
@@ -931,7 +931,7 @@ async fn sales_tasks_grouped_without_properties_resolve_the_activity_scope() {
         .get_user_soup_grouped_without_properties(GroupedSortRequest {
             limit: 100,
             cursor: Query::Sort(SimpleSortMethod::UpdatedAt.into(), sales_view("tasks")),
-            user_id: MacroUserIdStr::parse_from_str(USER).unwrap(),
+            user_id: RoxUserIdStr::parse_from_str(USER).unwrap(),
             grouping: GroupingConfig {
                 field: GroupByField::Date,
                 group_key: None,

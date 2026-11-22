@@ -27,7 +27,7 @@ LLM.
 ## Boundaries
 
 - Depends on: `agent`, `embedding`, `lexical_client`; `backfill`-feature-gated
-  `macro_entrypoint`, `macro_aws_config`, `secretsmanager_client`.
+  `rox_entrypoint`, `rox_aws_config`, `secretsmanager_client`.
 - Used by: `services/document_storage_service`, `crates/documents`.
 
 ## Recipes

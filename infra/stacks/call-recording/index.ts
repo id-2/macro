@@ -269,7 +269,7 @@ export const bucketPolicyId = bucketPolicy.id;
 
 const DATABASE_URL = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require('macro_db_proxy_secret_key'),
+    secretId: config.require('rox_db_proxy_secret_key'),
   })
   .apply((secret) => secret.secretString);
 
@@ -279,7 +279,7 @@ const previewLambdaEnvVars: CallRecordingPreviewLambdaEnvVars = {
   FFMPEG_PATH: '/opt/bin/ffmpeg',
   FFPROBE_PATH: '/opt/bin/ffprobe',
   ENVIRONMENT: stack,
-  RUST_LOG: 'call_recording_preview_handler=trace,macro_http_request=info',
+  RUST_LOG: 'call_recording_preview_handler=trace,rox_http_request=info',
 };
 
 const callRecordingPreviewLambda = new CallRecordingPreviewLambda(

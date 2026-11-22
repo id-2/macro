@@ -192,7 +192,7 @@ async function primaryCalendar(db: SQL, timezone: string) {
     insert into calendar_accounts (id, owner_id, email_link_id, provider, provider_account_id, sync_status, last_synced_at)
     select ${account}::uuid, ${owner}, link.id, 'google', ${email(OWNER)}, 'ready', now()
     from email_links link
-    where link.macro_id = ${owner} and link.id::text like ${`${seedId(SCENARIO_NAME, '', '').slice(0, 8)}%`}
+    where link.rox_id = ${owner} and link.id::text like ${`${seedId(SCENARIO_NAME, '', '').slice(0, 8)}%`}
     on conflict (email_link_id) do nothing
     returning id`;
   await db`

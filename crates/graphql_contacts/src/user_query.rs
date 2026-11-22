@@ -4,7 +4,7 @@ use contacts::domain::models::{
     page::{ContactCursor, ContactPageSize, MAX_CONTACT_PAGE_SIZE},
     query::{ContactLookup, ContactSearch},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::Base64Str;
 
 use crate::ContactsGraphqlContext;
@@ -66,12 +66,12 @@ impl GraphqlContactMatching {
 
 /// Flattenable directory fields of an already-authenticated GraphQL viewer.
 pub struct GraphqlContactsQuery {
-    viewer: MacroUserIdStr<'static>,
+    viewer: RoxUserIdStr<'static>,
 }
 
 impl GraphqlContactsQuery {
     /// Construct from the authenticated root's viewer, never a client-provided ID.
-    pub fn new(viewer: MacroUserIdStr<'static>) -> Self {
+    pub fn new(viewer: RoxUserIdStr<'static>) -> Self {
         Self { viewer }
     }
 
@@ -118,7 +118,7 @@ impl GraphqlContactsQuery {
         }
         let ids = user_ids
             .into_iter()
-            .map(|id| MacroUserIdStr::try_from(id.to_string()).map_err(|_| bad_input()))
+            .map(|id| RoxUserIdStr::try_from(id.to_string()).map_err(|_| bad_input()))
             .collect::<Result<Vec<_>, _>>()?;
         self.lookup(ctx, ContactLookup::new(ids).ok_or_else(bad_input)?)
             .await
@@ -139,7 +139,7 @@ impl GraphqlContactsQuery {
         }
         let ids = emails
             .into_iter()
-            .map(|email| MacroUserIdStr::try_from_email(&email).map_err(|_| bad_input()))
+            .map(|email| RoxUserIdStr::try_from_email(&email).map_err(|_| bad_input()))
             .collect::<Result<Vec<_>, _>>()?;
         self.lookup(ctx, ContactLookup::new(ids).ok_or_else(bad_input)?)
             .await

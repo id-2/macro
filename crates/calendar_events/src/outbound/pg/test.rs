@@ -15,7 +15,7 @@ use crate::domain::service::{CalendarService, GoogleCalendarBackfillFailureServi
 use crate::domain::team::{CalendarTeamRepository, TeamCalendarSharing};
 use crate::outbound::pg_team::PgCalendarTeamRepository;
 use chrono::{Duration, SubsecRound, TimeZone};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 fn complete_grant() -> GoogleScopeSet {
     GoogleScopeSet::parse(&GOOGLE_CALENDAR_SCOPES.join(" "))
@@ -47,7 +47,7 @@ async fn insert_link(pool: &PgPool, owner_id: &str) -> Uuid {
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
@@ -62,14 +62,14 @@ async fn insert_link(pool: &PgPool, owner_id: &str) -> Uuid {
 }
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = Uuid::now_v7();
-    let stripe_customer_id = format!("cus_{macro_user_id}");
+    let rox_user_id = Uuid::now_v7();
+    let stripe_customer_id = format!("cus_{rox_user_id}");
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         "#,
-        macro_user_id,
+        rox_user_id,
         id,
         id,
         stripe_customer_id,
@@ -80,12 +80,12 @@ async fn insert_user(pool: &PgPool, id: &str) {
     let email = id.rsplit_once('|').map(|(_, email)| email).unwrap_or(id);
     sqlx::query!(
         r#"
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ($1, $2, $3)
         "#,
         id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -212,7 +212,7 @@ fn timed_upsert(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn applying_grant_recreates_missing_side_table_state_from_version_zero(pool: PgPool) {
     let link_id = insert_link(&pool, "macro|calendar-missing-grant@example.com").await;
     let sentinel_updated_at = Utc.with_ymd_and_hms(2020, 1, 2, 3, 4, 5).unwrap();
@@ -266,7 +266,7 @@ async fn applying_grant_recreates_missing_side_table_state_from_version_zero(poo
     assert_eq!(persisted.side_version, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_capability_transition_schedules_once_and_failed_jobs_can_retry(pool: PgPool) {
     let owner_id = "macro|calendar@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -351,7 +351,7 @@ async fn calendar_capability_transition_schedules_once_and_failed_jobs_can_retry
     assert!(published_at.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reaper_rearms_a_dead_lettered_pending_job(pool: PgPool) {
     let owner_id = "macro|calendar-wedged-pending@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -423,7 +423,7 @@ async fn reaper_rearms_a_dead_lettered_pending_job(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reaper_leaves_a_never_delivered_queued_job_alone(pool: PgPool) {
     let owner_id = "macro|calendar-queued@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -477,7 +477,7 @@ async fn reaper_leaves_a_never_delivered_queued_job_alone(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reaper_rearms_a_running_job_behind_a_dead_lease(pool: PgPool) {
     let owner_id = "macro|calendar-wedged-running@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -548,7 +548,7 @@ async fn reaper_rearms_a_running_job_behind_a_dead_lease(pool: PgPool) {
     assert!(row.published_at.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_calendar_scope_disables_sources_and_fences_the_running_job(pool: PgPool) {
     let owner_id = "macro|calendar-downgrade@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -690,7 +690,7 @@ async fn removing_calendar_scope_disables_sources_and_fences_the_running_job(poo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn completed_google_job_is_rearmed_and_reuses_calendar_sync_state(pool: PgPool) {
     let owner_id = "macro|calendar-periodic@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -807,7 +807,7 @@ async fn completed_google_job_is_rearmed_and_reuses_calendar_sync_state(pool: Pg
     assert_eq!(stored.materialized_range, Some(range));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn google_claim_rejects_a_job_without_its_grant_provisioned_account(pool: PgPool) {
     let link_id = insert_link(&pool, "macro|calendar-invalid-job@example.com").await;
     let job_id = Uuid::now_v7();
@@ -848,7 +848,7 @@ async fn google_claim_rejects_a_job_without_its_grant_provisioned_account(pool: 
     assert!(state.lease_token.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn canonical_precedence_uses_the_selected_source_clock(pool: PgPool) {
     let owner_id = "macro|calendar-source-clock@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -906,7 +906,7 @@ async fn canonical_precedence_uses_the_selected_source_clock(pool: PgPool) {
     assert_eq!(canonical.updated_at, later_clock);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn fenced_google_snapshot_removes_deleted_events_and_calendars(pool: PgPool) {
     let owner_id = "macro|calendar-snapshot@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1040,7 +1040,7 @@ async fn fenced_google_snapshot_removes_deleted_events_and_calendars(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn expired_google_worker_cannot_resurrect_reconciled_provider_data(pool: PgPool) {
     let owner_id = "macro|calendar-stale-worker@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1194,7 +1194,7 @@ async fn expired_google_worker_cannot_resurrect_reconciled_provider_data(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn google_snapshot_deletion_removes_an_event_without_a_surviving_source(pool: PgPool) {
     let owner_id = "macro|calendar-source-fallback@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1277,7 +1277,7 @@ async fn google_snapshot_deletion_removes_an_event_without_a_surviving_source(po
     assert_eq!((remaining.event_count, remaining.source_count), (0, 0));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn incremental_cancellation_tombstones_retire_sources_without_a_snapshot(pool: PgPool) {
     let owner_id = "macro|calendar-tombstone@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1404,7 +1404,7 @@ async fn incremental_cancellation_tombstones_retire_sources_without_a_snapshot(p
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn occurrence_range_uses_overlap_indexes_and_preserves_attendees(pool: PgPool) {
     let owner_id = "macro|calendar@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1448,7 +1448,7 @@ async fn occurrence_range_uses_overlap_indexes_and_preserves_attendees(pool: PgP
     }));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn guest_policy_follows_the_canonical_copy(pool: PgPool) {
     let owner_id = "macro|calendar-guests@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1510,7 +1510,7 @@ async fn guest_policy_follows_the_canonical_copy(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_recorded_guest_policy_reaches_the_entity_and_every_copy(pool: PgPool) {
     let owner_id = "macro|calendar-refused@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1563,7 +1563,7 @@ async fn a_recorded_guest_policy_reaches_the_entity_and_every_copy(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn source_projections_store_neither_viewer_capabilities_nor_a_default_policy(pool: PgPool) {
     let owner_id = "macro|calendar-projection@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1598,7 +1598,7 @@ async fn source_projections_store_neither_viewer_capabilities_nor_a_default_poli
     assert!(stored["event"].get("isSnapshot").is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_snapshot_stays_marked_on_reads_and_mutation_targets(pool: PgPool) {
     let owner_id = "macro|calendar-snapshot@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1651,7 +1651,7 @@ async fn a_snapshot_stays_marked_on_reads_and_mutation_targets(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_snapshot_an_invitation_reached_stays_its_owners_seat(pool: PgPool) {
     let owner_id = "macro|calendar-seat@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1700,7 +1700,7 @@ async fn a_snapshot_an_invitation_reached_stays_its_owners_seat(pool: PgPool) {
     assert!(!entity_is_snapshot);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_snapshot_beside_the_real_meeting_stays_a_snapshot_when_addressed(pool: PgPool) {
     let owner_id = "macro|calendar-snapshot-beside@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1789,7 +1789,7 @@ async fn a_snapshot_beside_the_real_meeting_stays_a_snapshot_when_addressed(pool
 /// instance and never on the series master, so the occurrence carrying that
 /// exception must project the exception's attendees while its siblings keep
 /// the series answer.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn listing_keeps_the_series_event_beside_the_exception_and_its_link(pool: PgPool) {
     let owner_id = "macro|calendar-listing@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1891,7 +1891,7 @@ async fn listing_keeps_the_series_event_beside_the_exception_and_its_link(pool: 
     assert_eq!(*sibling, OccurrenceException::default());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn occurrence_attendee_override_shadows_the_series_response(pool: PgPool) {
     let owner_id = "macro|calendar-rsvp@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -1989,7 +1989,7 @@ async fn occurrence_attendee_override_shadows_the_series_response(pool: PgPool) 
 /// the occurrence carrying it must read the exception's content — on the
 /// entity and on the calendar copy a client shows — while its siblings keep
 /// the series content.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn occurrence_content_override_shadows_the_series_content(pool: PgPool) {
     let owner_id = "macro|calendar-exception@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2101,7 +2101,7 @@ async fn occurrence_content_override_shadows_the_series_content(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mention_preview_shows_the_previewed_occurrences_content(pool: PgPool) {
     let owner_id = "macro|mention-exception@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2192,7 +2192,7 @@ async fn mention_preview_shows_the_previewed_occurrences_content(pool: PgPool) {
 /// An exception that explicitly replaces the attendee list with an empty one
 /// must project no attendees for that occurrence — not fall back to the
 /// series list, which only an exception without an attendee list inherits.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explicitly_empty_override_attendees_do_not_inherit_the_series_list(pool: PgPool) {
     let owner_id = "macro|calendar-empty-override@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2264,7 +2264,7 @@ async fn explicitly_empty_override_attendees_do_not_inherit_the_series_list(pool
     assert_eq!(attendees_at(&recurrence_id), Some(0));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn occurrence_cursor_is_stable_when_occurrences_share_a_start(pool: PgPool) {
     let owner_id = "macro|calendar-pagination@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2319,7 +2319,7 @@ async fn occurrence_cursor_is_stable_when_occurrences_share_a_start(pool: PgPool
     assert_eq!(event_ids.len(), 3);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn watch_channels_round_trip_from_recording_to_targeted_rearm(pool: PgPool) {
     let owner_id = "macro|calendar-watch@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2471,7 +2471,7 @@ async fn watch_channels_round_trip_from_recording_to_targeted_rearm(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sync_status_reflects_visible_account_ingestion_state(pool: PgPool) {
     let owner_id = "macro|calendar-sync-status@example.com";
     let repo = PgCalendarRepository::new(pool.clone());
@@ -2507,7 +2507,7 @@ async fn sync_status_reflects_visible_account_ingestion_state(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_a_first_google_import_reports_syncing(pool: PgPool) {
     let owner_id = "macro|calendar-routine-sync@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2565,7 +2565,7 @@ async fn only_a_first_google_import_reports_syncing(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retiring_sources_raises_the_team_hint_only_for_out_of_office_ones(pool: PgPool) {
     let owner_id = "macro|calendar-retired-hint@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2647,7 +2647,7 @@ async fn retiring_sources_raises_the_team_hint_only_for_out_of_office_ones(pool:
     assert_eq!(hint_of(meeting), Some(false));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unchanged_google_projection_skips_the_write_path(pool: PgPool) {
     let owner_id = "macro|calendar-idempotent@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2739,7 +2739,7 @@ async fn unchanged_google_projection_skips_the_write_path(pool: PgPool) {
     assert_eq!(title, "New title");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delegated_inbox_source_grants_calendar_visibility(pool: PgPool) {
     let child_id = "macro|child@example.com";
     let primary_id = "macro|primary@example.com";
@@ -2760,7 +2760,7 @@ async fn delegated_inbox_source_grants_calendar_visibility(pool: PgPool) {
     .unwrap();
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
         VALUES ($1, $2, $3)
         "#,
         primary_id,
@@ -2800,7 +2800,7 @@ async fn delegated_inbox_source_grants_calendar_visibility(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn identical_uids_from_distinct_inboxes_remain_distinct_and_link_scoped(pool: PgPool) {
     let child_id = "macro|child-two-inboxes@example.com";
     let primary_id = "macro|primary-two-inboxes@example.com";
@@ -2834,7 +2834,7 @@ async fn identical_uids_from_distinct_inboxes_remain_distinct_and_link_scoped(po
     .unwrap();
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
         VALUES ($1, $2, $3)
         "#,
         primary_id,
@@ -2881,7 +2881,7 @@ async fn identical_uids_from_distinct_inboxes_remain_distinct_and_link_scoped(po
     assert_eq!(event_count, 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn equal_sequence_cannot_replace_a_newer_projection(pool: PgPool) {
     let owner_id = "macro|stale-calendar@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -2916,7 +2916,7 @@ async fn equal_sequence_cannot_replace_a_newer_projection(pool: PgPool) {
     assert_eq!(title, "Latest");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stale_google_source_projection_cannot_resurface_during_reconciliation(pool: PgPool) {
     let owner_id = "macro|stale-google-source@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3102,7 +3102,7 @@ async fn stale_google_source_projection_cannot_resurface_during_reconciliation(p
     assert_eq!(restored.source_count, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unclaimed_google_reauth_failure_is_atomic_and_edge_triggered(pool: PgPool) {
     let owner_id = "macro|calendar-reauth@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3190,7 +3190,7 @@ async fn unclaimed_google_reauth_failure_is_atomic_and_edge_triggered(pool: PgPo
     assert!(!duplicate.link_reauth_transitioned);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_permission_failure_does_not_mark_the_gmail_link_for_reauth(pool: PgPool) {
     let owner_id = "macro|calendar-permission-only@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3238,7 +3238,7 @@ async fn calendar_permission_failure_does_not_mark_the_gmail_link_for_reauth(poo
     assert!(!state.needs_reauth);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unclaimed_permanent_google_failure_marks_account_error(pool: PgPool) {
     let owner_id = "macro|calendar-permanent@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3315,7 +3315,7 @@ async fn grant_and_provider_ids(repo: &PgCalendarRepository, link_id: Uuid) -> (
     provider_ids(repo, link_id).await
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn user_mutation_write_persists_a_google_echo_without_a_lease(pool: PgPool) {
     let owner_id = "macro|calendar-user-mutation@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3354,7 +3354,7 @@ async fn user_mutation_write_persists_a_google_echo_without_a_lease(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mutation_target_resolves_only_for_visible_requesters(pool: PgPool) {
     let owner_id = "macro|calendar-target-owner@example.com";
     let delegate_id = "macro|calendar-target-delegate@example.com";
@@ -3378,7 +3378,7 @@ async fn mutation_target_resolves_only_for_visible_requesters(pool: PgPool) {
         .event_id;
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
         VALUES ($1, $2, $3)
         "#,
         delegate_id,
@@ -3431,7 +3431,7 @@ async fn mutation_target_resolves_only_for_visible_requesters(pool: PgPool) {
     assert!(hidden.is_none(), "stranger cannot see the mutation target");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn primary_time_zone_is_the_primary_calendars(pool: PgPool) {
     let owner_id = "macro|calendar-time-zone@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3464,7 +3464,7 @@ async fn primary_time_zone_is_the_primary_calendars(pool: PgPool) {
     assert!(stranger.is_none(), "a stranger has no primary calendar");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn creation_target_actor_is_owned_inboxes_not_the_calendar_inbox(pool: PgPool) {
     let owner_id = "macro|calendar-create-actor@example.com";
     let delegate_id = "macro|calendar-create-delegate@example.com";
@@ -3475,7 +3475,7 @@ async fn creation_target_actor_is_owned_inboxes_not_the_calendar_inbox(pool: PgP
     grant_and_provider_ids(&repo, link_id).await;
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
         VALUES ($1, $2, $3)
         "#,
         delegate_id,
@@ -3512,7 +3512,7 @@ async fn creation_target_actor_is_owned_inboxes_not_the_calendar_inbox(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn creation_target_prefers_the_requesters_own_primary_inbox(pool: PgPool) {
     let owner_id = "macro|calendar-create@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3610,7 +3610,7 @@ async fn creation_target_prefers_the_requesters_own_primary_inbox(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_persistently_failing_calendar_badges_then_clears_on_recovery(pool: PgPool) {
     let owner_id = "macro|calendar-sync-error@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3768,7 +3768,7 @@ async fn a_persistently_failing_calendar_badges_then_clears_on_recovery(pool: Pg
     assert_eq!(sync_error().await, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_a_google_source_restores_the_surviving_calendar_copy(pool: PgPool) {
     let owner_id = "macro|calendar-remove-source@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -3988,7 +3988,7 @@ async fn scheduled_firings(pool: &PgPool, event_id: Uuid) -> Vec<(String, i32, D
     .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn upsert_materializes_popup_reminder_firings(pool: PgPool) {
     let owner_id = "macro|reminder-owner@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4022,7 +4022,7 @@ async fn upsert_materializes_popup_reminder_firings(pool: PgPool) {
     assert_eq!(scheduled_firings(&pool, event_id).await, Vec::new());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_default_reminders_fan_out_to_use_default_events(pool: PgPool) {
     let owner_id = "macro|reminder-defaults@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4104,7 +4104,7 @@ async fn calendar_default_reminders_fan_out_to_use_default_events(pool: PgPool) 
 /// birthdays) never resolve the calendar's default reminders — Google's
 /// clients offer no notification setting on them — while explicit overrides
 /// still schedule firings.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn status_events_ignore_calendar_default_reminders(pool: PgPool) {
     let owner_id = "macro|working-location@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4210,7 +4210,7 @@ async fn status_events_ignore_calendar_default_reminders(pool: PgPool) {
 /// firing schedule: a defaults change on a secondary calendar must not
 /// delete the canonical schedule and rebuild it from the secondary's
 /// defaults.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn secondary_calendar_changes_leave_the_canonical_schedule_alone(pool: PgPool) {
     let owner_id = "macro|reminder-canonical@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4280,7 +4280,7 @@ async fn secondary_calendar_changes_leave_the_canonical_schedule_alone(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cancelled_events_and_occurrences_schedule_no_firings(pool: PgPool) {
     let owner_id = "macro|reminder-cancelled@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4316,7 +4316,7 @@ async fn cancelled_events_and_occurrences_schedule_no_firings(pool: PgPool) {
     assert_eq!(scheduled_firings(&pool, event_id).await, Vec::new());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn dispatch_repo_sweeps_claims_and_completes(pool: PgPool) {
     let owner_id = "macro|reminder-dispatch@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4384,7 +4384,7 @@ async fn dispatch_repo_sweeps_claims_and_completes(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stale_and_declined_firings_resolve_safely(pool: PgPool) {
     let owner_id = "macro|reminder-stale@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4434,7 +4434,7 @@ async fn stale_and_declined_firings_resolve_safely(pool: PgPool) {
     assert_eq!(past, Vec::new());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reminder_decline_follows_owner_inbox_not_calendar_self(pool: PgPool) {
     let owner_id = "macro|reminder-owner-inbox@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4507,7 +4507,7 @@ async fn reminder_decline_follows_owner_inbox_not_calendar_self(pool: PgPool) {
 /// read path: it is what tells the product a conference is one Rox may
 /// detach, so losing it in persistence would put a third-party conference at
 /// risk of being destroyed by an edit.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn conference_provider_round_trips_through_persistence(pool: PgPool) {
     let owner_id = "macro|calendar-conference@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4665,7 +4665,7 @@ async fn connected_calendar(
     (account_id, calendar_id, event_id, channel_id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn disconnecting_calendar_removes_the_data_and_records_the_opt_out(pool: PgPool) {
     let owner_id = "macro|calendar-disconnect@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4752,7 +4752,7 @@ async fn disconnecting_calendar_removes_the_data_and_records_the_opt_out(pool: P
 /// Consent requests carry `include_granted_scopes=true`, so a later Gmail-only
 /// connect reports the calendar scopes Google still holds. That must not
 /// resurrect calendar; only a flow that asked for calendar turns it back on.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reissued_grant_keeps_calendar_off_until_it_is_requested_again(pool: PgPool) {
     let owner_id = "macro|calendar-reissued@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4823,7 +4823,7 @@ async fn a_reissued_grant_keeps_calendar_off_until_it_is_requested_again(pool: P
     assert!(!restored.opted_out);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_owner_can_disconnect_an_inbox_calendar(pool: PgPool) {
     let owner_id = "macro|calendar-owner@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -4848,7 +4848,7 @@ async fn only_the_owner_can_disconnect_an_inbox_calendar(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mention_previews_resolve_through_the_shared_uid(pool: PgPool) {
     let author_id = "macro|mention-author@example.com";
     let attendee_id = "macro|mention-attendee@example.com";
@@ -4982,7 +4982,7 @@ async fn insert_channel(pool: &PgPool, owner_id: &str, members: &[&str]) -> Uuid
     channel_id
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mention_previews_fall_back_to_a_channel_shared_projection(pool: PgPool) {
     let author_id = "macro|shared-author@example.com";
     let attendee_id = "macro|shared-attendee@example.com";
@@ -5130,7 +5130,7 @@ async fn mention_previews_fall_back_to_a_channel_shared_projection(pool: PgPool)
     assert_eq!(previews[0], CalendarMentionPreview::DoesNotExist);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mention_preview_picks_the_requested_or_nearest_occurrence(pool: PgPool) {
     let owner_id = "macro|mention-occurrence@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -5297,7 +5297,7 @@ async fn mark_team_sources_verified(repo: &PgCalendarRepository, users: &[&str])
     ).execute(&repo.pool).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_out_of_office_returns_teammates_status_only(pool: PgPool) {
     let requester = "macro|gab@example.com";
     let teammate = "macro|teammate@example.com";
@@ -5378,7 +5378,7 @@ async fn team_out_of_office_returns_teammates_status_only(pool: PgPool) {
     assert!(empty.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_out_of_office_requires_an_active_primary_calendar_source(pool: PgPool) {
     let requester = "macro|viewer@example.com";
     let subscribed = "macro|subscribed@example.com";
@@ -5446,7 +5446,7 @@ async fn team_out_of_office_requires_an_active_primary_calendar_source(pool: PgP
     assert!(rows.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_out_of_office_hides_private_status_even_with_detail_sharing(pool: PgPool) {
     let requester = "macro|asker@example.com";
     let teammate = "macro|double@example.com";
@@ -5488,7 +5488,7 @@ async fn team_out_of_office_hides_private_status_even_with_detail_sharing(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_out_of_office_shows_busy_only_status_without_its_title(pool: PgPool) {
     let viewer = "macro|ooo-viewer@example.com";
     let unset = "macro|ooo-unset@example.com";
@@ -5533,7 +5533,7 @@ async fn team_out_of_office_shows_busy_only_status_without_its_title(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_out_of_office_reads_each_sources_own_event_type(pool: PgPool) {
     let viewer = "macro|type-viewer@example.com";
     let teammate = "macro|type-teammate@example.com";
@@ -5595,7 +5595,7 @@ fn shift_upsert_days(upsert: &mut CalendarEventUpsert, days: i64) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_out_of_office_deduplicates_before_the_limit(pool: PgPool) {
     let requester = "macro|limit-viewer@example.com";
     let teammate = "macro|limit-double@example.com";
@@ -5824,7 +5824,7 @@ fn range_around(starts_at: DateTime<Utc>) -> OccurrenceRange {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn shared_calendar_copy_records_its_content_without_touching_the_primary_entity(
     pool: PgPool,
 ) {
@@ -5945,7 +5945,7 @@ async fn shared_calendar_copy_records_its_content_without_touching_the_primary_e
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_late_primary_sync_reclaims_the_entity_from_a_shared_copy(pool: PgPool) {
     let member = "macro|teo@example.com";
     let viewer = "macro|watcher@example.com";
@@ -6040,7 +6040,7 @@ async fn a_late_primary_sync_reclaims_the_entity_from_a_shared_copy(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_hourly_shared_copy_reimport_never_reclaims_the_entity(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6089,7 +6089,7 @@ async fn an_hourly_shared_copy_reimport_never_reclaims_the_entity(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_primary_edit_propagates_over_a_fresher_shared_copy(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6147,7 +6147,7 @@ async fn a_primary_edit_propagates_over_a_fresher_shared_copy(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mutation_target_addresses_the_primary_by_default_and_the_named_calendar_copy(
     pool: PgPool,
 ) {
@@ -6219,7 +6219,7 @@ async fn mutation_target_addresses_the_primary_by_default_and_the_named_calendar
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_default_reminder_changes_follow_the_primary_calendar(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6293,7 +6293,7 @@ async fn calendar_default_reminder_changes_follow_the_primary_calendar(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retiring_the_primary_copy_promotes_the_shared_copy(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6353,7 +6353,7 @@ async fn retiring_the_primary_copy_promotes_the_shared_copy(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_user_edit_through_the_shared_copy_moves_the_schedule_but_keeps_primary_content(
     pool: PgPool,
 ) {
@@ -6452,7 +6452,7 @@ async fn a_user_edit_through_the_shared_copy_moves_the_schedule_but_keeps_primar
     assert_primary_content(&entity_content(&pool, event_id).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn canonical_selection_skips_copies_on_deleted_calendars(pool: PgPool) {
     let member = "macro|teo@example.com";
     insert_user(&pool, member).await;
@@ -6553,7 +6553,7 @@ async fn canonical_selection_skips_copies_on_deleted_calendars(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_older_canonical_resync_cannot_undo_a_user_edit_made_through_another_copy(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6712,7 +6712,7 @@ fn timed(starts_at: DateTime<Utc>) -> EventTime {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_primary_copy_arriving_after_a_shared_copy_takes_the_schedule(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6757,7 +6757,7 @@ async fn a_primary_copy_arriving_after_a_shared_copy_takes_the_schedule(pool: Pg
     assert_eq!(event.calendar_id, Some(primary_calendar_id));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_user_edit_through_the_shared_copy_keeps_the_primary_guests_and_conference(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6814,7 +6814,7 @@ async fn a_user_edit_through_the_shared_copy_keeps_the_primary_guests_and_confer
     assert_eq!(event.title, "OOO");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn echoes_landing_out_of_order_keep_the_newer_schedule(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6880,7 +6880,7 @@ async fn echoes_landing_out_of_order_keep_the_newer_schedule(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_copy_that_wrote_the_schedule_keeps_writing_it(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -6943,7 +6943,7 @@ async fn the_copy_that_wrote_the_schedule_keeps_writing_it(pool: PgPool) {
     assert_primary_content(&entity_content(&pool, event_id).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_writable_copy_outranks_a_fresher_reader_copy_without_a_primary(pool: PgPool) {
     let member = "macro|teo@example.com";
     insert_user(&pool, member).await;
@@ -7006,7 +7006,7 @@ async fn a_writable_copy_outranks_a_fresher_reader_copy_without_a_primary(pool: 
     assert_eq!(event.calendar_id, Some(secondary_calendar_id));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_writable_copy_outranks_a_fresher_copy_whose_calendar_role_is_unknown(pool: PgPool) {
     let member = "macro|teo@example.com";
     insert_user(&pool, member).await;
@@ -7092,7 +7092,7 @@ async fn a_writable_copy_outranks_a_fresher_copy_whose_calendar_role_is_unknown(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_calendar_role_change_moves_the_entity_to_the_new_canonical_copy_on_reconcile(
     pool: PgPool,
 ) {
@@ -7261,7 +7261,7 @@ async fn a_calendar_role_change_moves_the_entity_to_the_new_canonical_copy_on_re
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_calendar_role_change_refreshes_the_read_only_flag_of_its_only_copy(pool: PgPool) {
     let member = "macro|teo@example.com";
     insert_user(&pool, member).await;
@@ -7339,7 +7339,7 @@ async fn a_calendar_role_change_refreshes_the_read_only_flag_of_its_only_copy(po
     assert!(!target.is_read_only);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retiring_an_unrelated_copy_keeps_a_fresher_schedule_written_through_another(pool: PgPool) {
     let member = "macro|teo@example.com";
     let link_id = insert_link(&pool, member).await;
@@ -7471,7 +7471,7 @@ fn attendee(email: &str, is_organizer: bool) -> CalendarAttendee {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mention_previews_say_how_the_viewer_holds_the_meeting(pool: PgPool) {
     let organizer_id = "macro|copy-organizer@example.com";
     let guest_id = "macro|copy-guest@example.com";

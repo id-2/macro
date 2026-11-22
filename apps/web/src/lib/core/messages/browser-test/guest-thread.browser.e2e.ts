@@ -31,7 +31,7 @@ test('guest can use the shared thread and text composer without app providers', 
 }, testInfo) => {
   const pageErrors: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.goto('/src/lib/core/messages/browser-test/guest-thread.html', {
     waitUntil: 'domcontentloaded',
   });
@@ -93,7 +93,7 @@ test('guest edits and deletes only their own message', async ({
 }, testInfo) => {
   const pageErrors: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.goto('/src/lib/core/messages/browser-test/guest-thread.html', {
     waitUntil: 'domcontentloaded',
   });

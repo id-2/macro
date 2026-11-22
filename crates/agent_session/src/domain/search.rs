@@ -5,8 +5,8 @@ pub mod indexing;
 use std::{future::Future, pin::Pin};
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use crate::domain::error::Result;
 
@@ -18,7 +18,7 @@ pub struct AgentSessionSearchMetadata {
     /// User-facing name.
     pub name: String,
     /// Session owner.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// Agent persona identity.
     pub bot_id: Uuid,
     /// Creation time.

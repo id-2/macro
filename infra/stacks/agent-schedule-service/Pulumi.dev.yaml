@@ -1,7 +1,7 @@
 config:
   aws-native:region: us-east-1
   aws:region: us-east-1
-  agent-schedule-service:macro_db_secret_key: macro-db-dev
+  agent-schedule-service:rox_db_secret_key: macro-db-dev
   agent-schedule-service:jwt_secret_key: fusionauth-jwt-secret-dev
   agent-schedule-service:fusionauth_client_id: fusionauth-client-id-key-dev
   agent-schedule-service:fusionauth_issuer: fusionauth-dev.rox.one

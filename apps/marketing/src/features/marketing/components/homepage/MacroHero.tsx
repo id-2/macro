@@ -5,7 +5,7 @@ const homepageDescription =
   'Rox replaces 27+ apps with one connected system designed for humans and agents.';
 
 /** Centered homepage introduction. */
-export function MacroHero() {
+export function RoxHero() {
   return (
     <div class="macro-text-hero">
       <div class="macro-text-hero-copy">

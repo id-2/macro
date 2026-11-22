@@ -16,7 +16,7 @@ use channels::{
 use chrono::{DateTime, Utc};
 use entity_access::domain::ports::EntityAccessService;
 use import::outbound::pg_import_repo::targets as ledger;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::{
     domain::historical as messages_model, outbound::pg_message_repo::PgMessageRepository,
 };
@@ -214,7 +214,7 @@ impl<A: EntityAccessService> HistoricalSink for ChannelImportSink<A> {
 impl<A: EntityAccessService> ImportTargets for ChannelImportSink<A> {
     async fn find_dm(
         &self,
-        pair: &[MacroUserIdStr<'static>; 2],
+        pair: &[RoxUserIdStr<'static>; 2],
     ) -> PortResult<Option<TargetFacts>> {
         let pair =
             DmPair::new(pair[0].clone(), pair[1].clone()).map_err(|_| ImportError::InvalidInput)?;
@@ -437,7 +437,7 @@ fn convert(
         thread_id: message.parent_id,
         sender: match message.sender {
             HistoricalSender::User(user) => ChannelSender::new_from_user(user),
-            HistoricalSender::SystemBot => ChannelSender::new_from_bot(bot_id::MACRO_SYSTEM_BOT_ID),
+            HistoricalSender::SystemBot => ChannelSender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
         },
         imported_author: message.imported_author,
         content: message.content,

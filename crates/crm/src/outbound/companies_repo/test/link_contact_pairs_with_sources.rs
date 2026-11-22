@@ -1,7 +1,7 @@
 use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -11,7 +11,7 @@ fn as_set(pairs: Vec<(Uuid, String)>) -> HashSet<(Uuid, String)> {
     pairs.into_iter().collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn keeps_only_pairs_backed_by_a_source_row(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@test.com";
@@ -41,7 +41,7 @@ async fn keeps_only_pairs_backed_by_a_source_row(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn does_not_match_a_source_owned_by_a_different_link(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@test.com";
@@ -68,7 +68,7 @@ async fn does_not_match_a_source_owned_by_a_different_link(pool: PgPool) -> anyh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn matches_case_insensitively_and_returns_lowercased(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@test.com";
@@ -90,7 +90,7 @@ async fn matches_case_insensitively_and_returns_lowercased(pool: PgPool) -> anyh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn empty_input_is_a_no_op(pool: PgPool) -> anyhow::Result<()> {
     let repo = CompaniesRepositoryImpl::new(pool.clone());
     assert!(repo.link_contact_pairs_with_sources(&[]).await?.is_empty());

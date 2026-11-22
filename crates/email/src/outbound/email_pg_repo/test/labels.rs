@@ -4,7 +4,7 @@ use crate::domain::models::{LabelListVisibility, LabelType, MessageListVisibilit
 // ── list_labels_by_link_id ──────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_list_labels_by_link_id_returns_all_labels(
@@ -26,7 +26,7 @@ async fn test_list_labels_by_link_id_returns_all_labels(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_list_labels_by_link_id_field_mapping(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -54,7 +54,7 @@ async fn test_list_labels_by_link_id_field_mapping(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_list_labels_by_link_id_isolates_by_link(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -72,7 +72,7 @@ async fn test_list_labels_by_link_id_isolates_by_link(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_thread_labels"))
 )]
 async fn test_list_labels_by_link_id_nonexistent_link(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -89,11 +89,11 @@ async fn test_list_labels_by_link_id_nonexistent_link(pool: Pool<Postgres>) -> a
 // ── labels_by_thread_ids ────────────────────────────────────────────
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_labels"))
 )]
 async fn test_labels_by_thread_ids_single_thread(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS; // Dummy reference for IDE
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS; // Dummy reference for IDE
     let repo = EmailPgRepo::new(pool);
 
     let thread_ids = vec![Uuid::parse_str("11111111-1111-1111-1111-111111111111")?];
@@ -111,7 +111,7 @@ async fn test_labels_by_thread_ids_single_thread(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_labels"))
 )]
 async fn test_labels_by_thread_ids_multiple_threads(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -136,7 +136,7 @@ async fn test_labels_by_thread_ids_multiple_threads(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_labels"))
 )]
 async fn test_labels_by_thread_ids_no_duplicate_labels_same_thread(
@@ -159,7 +159,7 @@ async fn test_labels_by_thread_ids_no_duplicate_labels_same_thread(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_labels"))
 )]
 async fn test_labels_by_thread_ids_thread_with_no_labels(
@@ -180,7 +180,7 @@ async fn test_labels_by_thread_ids_thread_with_no_labels(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_labels"))
 )]
 async fn test_labels_by_thread_ids_empty_input(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -195,7 +195,7 @@ async fn test_labels_by_thread_ids_empty_input(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_labels"))
 )]
 async fn test_labels_by_thread_ids_different_label_types(
@@ -220,7 +220,7 @@ async fn test_labels_by_thread_ids_different_label_types(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_labels", "email_labels_pending_tags")
@@ -255,7 +255,7 @@ async fn test_labels_by_thread_ids_overlays_pending_tags(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_labels", "email_labels_pending_tags")
@@ -303,7 +303,7 @@ async fn user_label_thread_ids(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_labels", "email_labels_pending_tags")
@@ -322,7 +322,7 @@ async fn test_user_label_preview_includes_pending_tags(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_labels", "email_labels_queued_deletes")
@@ -359,7 +359,7 @@ async fn test_labels_by_thread_ids_hides_queued_label_deletes(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_labels", "email_labels_queued_deletes")
@@ -389,7 +389,7 @@ async fn test_labels_by_message_ids_hides_queued_label_deletes(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_labels", "email_labels_queued_deletes")
@@ -421,7 +421,7 @@ fn relation_scans<'a>(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_labels", "email_labels_bulk")

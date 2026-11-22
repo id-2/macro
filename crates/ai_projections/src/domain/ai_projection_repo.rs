@@ -1,6 +1,6 @@
 //! Outbound port for ai projection persistence.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::model::{
     AiProjection, AiProjectionError, Expiry, RefreshCadence, TargetType, UserAiProjection,
@@ -120,13 +120,13 @@ pub trait AiProjectionRepository: Clone + Send + Sync + 'static {
     /// (e.g. `read:professional_features`).
     fn user_has_permission(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         permission: &str,
     ) -> impl Future<Output = Result<bool, AiProjectionError>> + Send;
 
     /// Returns the ids of the teams the user belongs to.
     fn get_user_team_ids(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<uuid::Uuid>, AiProjectionError>> + Send;
 }

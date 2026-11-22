@@ -1,5 +1,5 @@
 //! Transactional facts and direct user grants for the shared access workflow.
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_owner::Owner;
 use models_permissions::{
@@ -15,7 +15,7 @@ mod test;
 /// Unknown kinds fail closed. This is a facts reader; reviewer policy is a domain concern.
 pub async fn facts(
     tx: &mut Transaction<'_, Postgres>,
-    id: &macro_uuid::Uuid,
+    id: &rox_uuid::Uuid,
     kind: EntityType,
 ) -> anyhow::Result<Option<SharingFacts>> {
     let id_text = id.to_string();
@@ -37,8 +37,8 @@ pub async fn facts(
             .fetch_optional(tx.as_mut()).await?.map(|r| (r.owner_user_id, r.name, None)),
         EntityType::Database => sqlx::query!("SELECT user_id AS owner_id, name FROM database_entities WHERE database_id = $1 AND trashed_at IS NULL FOR SHARE", id)
             .fetch_optional(tx.as_mut()).await?.map(|r| (r.owner_id, r.name, None)),
-        EntityType::EmailThread => sqlx::query!("SELECT l.macro_id FROM email_threads t JOIN email_links l ON l.id = t.link_id WHERE t.id = $1 FOR SHARE OF t, l", id)
-            .fetch_optional(tx.as_mut()).await?.map(|r| (r.macro_id, "Email thread".into(), None)),
+        EntityType::EmailThread => sqlx::query!("SELECT l.rox_id FROM email_threads t JOIN email_links l ON l.id = t.link_id WHERE t.id = $1 FOR SHARE OF t, l", id)
+            .fetch_optional(tx.as_mut()).await?.map(|r| (r.rox_id, "Email thread".into(), None)),
         EntityType::Call => {
             let live = sqlx::query!("SELECT created_by FROM calls WHERE id = $1 FOR SHARE", id).fetch_optional(tx.as_mut()).await?;
             if let Some(r) = live { Some((r.created_by, "Call".into(), None)) }
@@ -55,7 +55,7 @@ pub async fn facts(
         sqlx::query!("SELECT owner_user_id, team_id FROM bots WHERE id = $1 AND deleted_at IS NULL FOR SHARE", bot.as_uuid())
             .fetch_optional(tx.as_mut()).await?.map(|row| -> anyhow::Result<Option<Owner>> {
                 match (row.owner_user_id, row.team_id) {
-                    (Some(user), None) => Ok(Some(Owner::User(MacroUserIdStr::try_from(user)?))),
+                    (Some(user), None) => Ok(Some(Owner::User(RoxUserIdStr::try_from(user)?))),
                     (None, Some(team)) => Ok(Some(Owner::Team(team))),
                     _ => Ok(None),
                 }
@@ -65,7 +65,7 @@ pub async fn facts(
     };
     let team_members = if let Owner::Team(team) = sponsor.as_ref().unwrap_or(&owner) {
         sqlx::query!("SELECT user_id, team_role AS \"team_role: SharingTeamRole\" FROM team_user WHERE team_id = $1 FOR SHARE", team)
-            .fetch_all(tx.as_mut()).await?.into_iter().map(|r| Ok((MacroUserIdStr::try_from(r.user_id)?, r.team_role))).collect::<anyhow::Result<Vec<_>>>()?
+            .fetch_all(tx.as_mut()).await?.into_iter().map(|r| Ok((RoxUserIdStr::try_from(r.user_id)?, r.team_role))).collect::<anyhow::Result<Vec<_>>>()?
     } else {
         Vec::new()
     };
@@ -81,7 +81,7 @@ pub async fn facts(
 /// List direct non-owner user grants. Inherited, channel and team grants are excluded.
 pub async fn list(
     tx: &mut Transaction<'_, Postgres>,
-    id: &macro_uuid::Uuid,
+    id: &rox_uuid::Uuid,
     kind: EntityType,
 ) -> anyhow::Result<Vec<(String, AccessLevel)>> {
     Ok(sqlx::query!(r#"SELECT source_id, access_level AS "access_level: AccessLevel" FROM entity_access WHERE entity_id = $1 AND entity_type = $2 AND source_type = 'user' AND granted_from_project_id IS NULL AND access_level <> 'owner' ORDER BY source_id"#, id, kind.as_ref())
@@ -92,9 +92,9 @@ pub async fn list(
 /// Owner grants are never changed; removal affects only this grant's inheritance path.
 pub async fn set(
     tx: &mut Transaction<'_, Postgres>,
-    id: &macro_uuid::Uuid,
+    id: &rox_uuid::Uuid,
     kind: EntityType,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     level: Option<AccessLevel>,
     upgrade_only: bool,
 ) -> anyhow::Result<()> {
@@ -127,7 +127,7 @@ pub async fn set(
                 continue;
             }
             // Legacy documents inherit through their project at read time.
-            let Ok(child_id) = child.entity_id.parse::<macro_uuid::Uuid>() else {
+            let Ok(child_id) = child.entity_id.parse::<rox_uuid::Uuid>() else {
                 continue;
             };
             sqlx::query!(r#"INSERT INTO entity_access(entity_id, entity_type, source_id, source_type, access_level, granted_from_project_id)

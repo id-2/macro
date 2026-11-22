@@ -1,7 +1,7 @@
 import { AgentMessage } from './DemoAgentMessage';
 import { AgentRosterRow, ViewShell } from './DemoWorkspaceChrome';
 import './demo-agents-view.css';
-import MacroLogo from '@icon/macro-logo.svg';
+import RoxLogo from '@icon/macro-logo.svg';
 import ShareIcon from '@icon/share.svg';
 import BuildingsIcon from '@icon/system/regular/buildings.svg';
 import CalendarIcon from '@icon/system/regular/calendar-blank.svg';
@@ -357,7 +357,7 @@ function AgentSessionDemo(props: {
           />
         </div>
         <div class="mb-3 flex items-center gap-2 text-sm font-medium">
-          <Show when={coding()} fallback={<MacroLogo class="size-5" />}>
+          <Show when={coding()} fallback={<RoxLogo class="size-5" />}>
             <CursorIcon class="size-5" />
           </Show>
           {coding() ? 'Cursor' : 'Rox'}

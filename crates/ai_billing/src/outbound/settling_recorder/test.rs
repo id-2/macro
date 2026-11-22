@@ -9,7 +9,7 @@ use ai_usage::{
     UsageContext,
 };
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use tokio::sync::Notify;
 
@@ -55,28 +55,28 @@ struct FakeBilling {
 impl BillingService for FakeBilling {
     async fn change_plan(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: crate::domain::plan_change::PlanChange,
     ) -> Result<()> {
         panic!("this use case must not change plans")
     }
 
-    async fn snapshot(&self, _user: &MacroUserIdStr<'_>) -> Result<UsageSnapshot> {
+    async fn snapshot(&self, _user: &RoxUserIdStr<'_>) -> Result<UsageSnapshot> {
         self.snapshots.fetch_add(1, Ordering::SeqCst);
         Ok(self.snapshot.clone())
     }
 
-    async fn check_allowance(&self, _user: &MacroUserIdStr<'_>) -> Result<AllowanceDecision> {
+    async fn check_allowance(&self, _user: &RoxUserIdStr<'_>) -> Result<AllowanceDecision> {
         unreachable!()
     }
 
-    async fn settle(&self, _user: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn settle(&self, _user: &RoxUserIdStr<'_>) -> Result<()> {
         unreachable!("the recorder must use the settlement trigger")
     }
 
     async fn update_overage(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _enabled: bool,
         _limit_cents: i64,
     ) -> Result<UsageSnapshot> {
@@ -85,7 +85,7 @@ impl BillingService for FakeBilling {
 
     async fn update_auto_reload(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _enabled: bool,
         _thresholds: AutoReloadThresholds,
     ) -> Result<UsageSnapshot> {
@@ -94,7 +94,7 @@ impl BillingService for FakeBilling {
 
     async fn purchase_credits(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _amount_cents: i64,
     ) -> Result<crate::domain::CreditPurchase> {
         unreachable!()
@@ -102,7 +102,7 @@ impl BillingService for FakeBilling {
 
     async fn create_credit_checkout(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _amount_cents: i64,
         _success_url: String,
         _cancel_url: String,
@@ -112,7 +112,7 @@ impl BillingService for FakeBilling {
 
     async fn apply_credit_purchase(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         _amount_cents: i64,
         _stripe_reference: &str,
     ) -> Result<()> {
@@ -121,7 +121,7 @@ impl BillingService for FakeBilling {
 
     async fn sync_period(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         _start: DateTime<Utc>,
         _end: DateTime<Utc>,
         _verified: Option<crate::domain::period::SubscriptionPeriod>,
@@ -136,7 +136,7 @@ impl BillingService for FakeBilling {
     async fn mark_credit_reload_invoice(
         &self,
         _stripe_invoice_id: &str,
-        _reload_id: Option<macro_uuid::Uuid>,
+        _reload_id: Option<rox_uuid::Uuid>,
         _paid: bool,
     ) -> Result<()> {
         unreachable!()
@@ -147,14 +147,14 @@ impl BillingService for FakeBilling {
 struct FakeTrigger(Arc<AtomicUsize>);
 
 impl SettlementTrigger for FakeTrigger {
-    fn request_settlement(&self, _payer: MacroUserIdStr<'static>) {
+    fn request_settlement(&self, _payer: RoxUserIdStr<'static>) {
         self.0.fetch_add(1, Ordering::SeqCst);
     }
 }
 
 async fn record(
     settlement: AiUsageBilling,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     tier: PlanTier,
     unlimited: bool,
     chargeable_cents: i64,
@@ -174,7 +174,7 @@ async fn record(
 
 async fn record_with_policy(
     settlement: AiUsageBilling,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     tier: PlanTier,
     unlimited: bool,
     chargeable_cents: i64,
@@ -232,8 +232,8 @@ async fn record_with_policy(
     )
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
 }
 
 #[tokio::test]

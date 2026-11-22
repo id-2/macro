@@ -31,7 +31,7 @@ pub(super) fn direct_text(
     event
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_direct_chat_is_added_kept_and_sent_to_only_by_its_owner(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);

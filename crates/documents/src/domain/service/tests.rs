@@ -3,8 +3,8 @@ use foreign_entity::domain::models::{
     CreateForeignEntity, ForeignEntity, ForeignEntityError, PatchForeignEntity, SourceId,
 };
 use foreign_entity::domain::ports::{ForeignEntityListQuery, ForeignEntityService};
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::cowlike::CowLike;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::cowlike::CowLike;
 use model::document::{DocumentMetadata, FileType};
 use std::sync::{Arc, Mutex};
 
@@ -71,7 +71,7 @@ fn task_document_context(document_id: &str) -> DocumentBasic {
 }
 
 fn authenticated_receipt(document_id: &str) -> EntityAccessReceipt<ViewAccessLevel> {
-    let user_id = macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -87,7 +87,7 @@ fn internal_receipt(document_id: &str) -> EntityAccessReceipt<ViewAccessLevel> {
 }
 
 fn member_team_receipt(team_id: &str, user_id: &str) -> EntityAccessReceipt<MemberTeamRole> {
-    let user_id = macro_user_id::user_id::MacroUserIdStr::parse_from_str(user_id)
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str(user_id)
         .unwrap()
         .into_owned();
 
@@ -162,7 +162,7 @@ impl TaskPropertiesPort for TestTaskPropertiesPort {
     async fn update_task_status(
         &self,
         _access: &EntityAccessReceipt<EditAccessLevel>,
-        _credited_user: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _credited_user: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
         _source: Option<&models_properties::service::property_change_source::PropertyChangeSource>,
         _status: &str,
     ) -> anyhow::Result<()> {
@@ -204,7 +204,7 @@ impl ConnectionService for TestConnectionService {
 
     async fn send_channel_message<'a>(
         &self,
-        _users: &[macro_user_id::user_id::MacroUserIdStr<'a>],
+        _users: &[rox_user_id::user_id::RoxUserIdStr<'a>],
         _message_type: &str,
         _message: serde_json::Value,
     ) -> Result<(), connection::domain::models::ConnectionError> {
@@ -374,8 +374,8 @@ impl TestEventBroker {
     }
 }
 
-impl MacroEventBroker for TestEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for TestEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -692,7 +692,7 @@ async fn get_document_by_team_slug_rejects_wrong_receipt_entity_type() {
     repo.expect_get_document_id_by_team_task_number().times(0);
     repo.expect_get_basic_document().times(0);
     let receipt = EntityAccessReceipt::<MemberTeamRole>::dangerously_assert_authenticated_user(
-        macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
             .unwrap()
             .into_owned(),
         "00000000-0000-0000-0000-000000000701",
@@ -877,7 +877,7 @@ async fn bot_lifecycle_event_has_no_actor_user_id() {
 }
 
 #[tokio::test]
-async fn bot_task_branch_uses_macro_fallback() {
+async fn bot_task_branch_uses_rox_fallback() {
     let document_id = "00000000-0000-0000-0000-000000000124";
     let service = make_test_service(make_mock_repo());
 
@@ -1509,7 +1509,7 @@ async fn test_get_task_github_pull_requests_skips_malformed_keys_before_lookup()
 }
 
 fn owner_receipt(document_id: &str) -> EntityAccessReceipt<OwnerAccessLevel> {
-    let user_id = macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -1782,7 +1782,7 @@ async fn team_edit_rejects_owner_level_and_enable_without_team_before_writes() {
 }
 
 fn edit_receipt(document_id: &str) -> EntityAccessReceipt<EditAccessLevel> {
-    let user_id = macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -1811,7 +1811,7 @@ async fn content_uploaded_publishes_document_event_with_owner_and_version() {
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.documents");
+    assert_eq!(event.topic, "rox.documents");
     assert_eq!(event.key, "doc-1");
     assert_eq!(event.payload["event_type"], "document.content_uploaded");
     assert_eq!(event.payload["metadata"]["document_id"], "doc-1");
@@ -1905,7 +1905,7 @@ async fn test_delete_document_publishes_document_deleted_event() {
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.documents");
+    assert_eq!(event.topic, "rox.documents");
     assert_eq!(event.key, "doc-1");
     assert_eq!(event.payload["event_type"], "document.deleted");
     assert_eq!(event.payload["schema_version"], 1);
@@ -2023,7 +2023,7 @@ async fn test_edit_document_publishes_document_updated_event() {
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.documents");
+    assert_eq!(event.topic, "rox.documents");
     assert_eq!(event.key, "doc-1");
     assert_eq!(event.payload["event_type"], "document.updated");
     assert_eq!(event.payload["metadata"]["document_name"], "New name");
@@ -2135,7 +2135,7 @@ async fn copy_document_best_effort_bumps_inherited_project_and_publishes_event()
         .withf(|id| id == "project-1")
         .returning(|_| {
             Box::pin(std::future::ready(Ok(
-                macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+                rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
                     .unwrap()
                     .into_owned(),
             )))
@@ -2182,7 +2182,7 @@ async fn copy_document_best_effort_bumps_inherited_project_and_publishes_event()
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
     let event = &published[0];
-    assert_eq!(event.topic, "macro.documents");
+    assert_eq!(event.topic, "rox.documents");
     assert_eq!(event.key, "doc-2");
     assert_eq!(event.payload["event_type"], "document.copied");
     assert_eq!(event.payload["metadata"]["document_id"], "doc-2");
@@ -2362,7 +2362,7 @@ impl crate::domain::ports::mentions::DocumentMentionTrackingPort for RejectUnexp
     async fn track_document_mentions(
         &self,
         _: &str,
-        _: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
         _: &str,
     ) -> anyhow::Result<()> {
         panic!("failed repository creation must not track mentions");
@@ -2427,8 +2427,8 @@ async fn creator_forwards_explicit_consent_and_stops_after_repository_failure() 
     }
 }
 
-fn test_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user@user.com")
+fn test_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned()
 }
@@ -2682,7 +2682,7 @@ async fn create_document_publishes_the_principal_as_owner_and_actor() {
         ),
         (
             CreationPrincipal::BotForUser {
-                bot: bot_id::MACRO_AI_BOT_ID,
+                bot: bot_id::ROX_AI_BOT_ID,
                 user: test_user(),
             },
             "macro|user@user.com",
@@ -2768,7 +2768,7 @@ async fn email_import_is_attributed_to_the_system_bot() {
     );
     assert_eq!(
         published[0].payload["metadata"]["actor"],
-        bot_id::MACRO_SYSTEM_BOT_ID.into_storage_id().as_ref()
+        bot_id::ROX_SYSTEM_BOT_ID.into_storage_id().as_ref()
     );
     assert!(
         published[0].payload["metadata"]
@@ -2792,7 +2792,7 @@ impl TaskPropertiesPort for RecordingTaskPropertiesPort {
     async fn update_task_status(
         &self,
         _access: &EntityAccessReceipt<EditAccessLevel>,
-        _credited_user: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _credited_user: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
         _source: Option<&models_properties::service::property_change_source::PropertyChangeSource>,
         _status: &str,
     ) -> anyhow::Result<()> {
@@ -2837,7 +2837,7 @@ async fn default_task_properties_assign_the_acting_user_and_never_a_team_bot() {
         }],
     };
     let bot_for_user = CreationPrincipal::BotForUser {
-        bot: bot_id::MACRO_SYSTEM_BOT_ID,
+        bot: bot_id::ROX_SYSTEM_BOT_ID,
         user: test_user(),
     };
     let team_bot = CreationPrincipal::TeamBot {
@@ -3064,7 +3064,7 @@ async fn edited_interaction_bumps_document_before_publishing() {
     let published = event_broker.published();
     let published = published.lock().unwrap();
     assert_eq!(published.len(), 1);
-    assert_eq!(published[0].topic, "macro.documents");
+    assert_eq!(published[0].topic, "rox.documents");
     assert_eq!(published[0].key, "doc-1");
     assert_eq!(published[0].payload["event_type"], "document.interaction");
     assert_eq!(published[0].payload["metadata"]["document_id"], "doc-1");

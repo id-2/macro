@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use ai_usage::{AiFeature, UsageAmount, UsageEvent};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 
 use super::*;
@@ -66,7 +66,7 @@ impl UsageRecorder for FakeRecorder {
 fn usage() -> UsageContext {
     UsageContext::new(
         AiFeature::Automation,
-        MacroUserIdStr::try_from("macro|jev-test@example.com".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|jev-test@example.com".to_owned()).unwrap(),
     )
 }
 

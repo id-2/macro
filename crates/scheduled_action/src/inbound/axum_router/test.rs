@@ -13,13 +13,13 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_authorization::{
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims, BotAuthentication, BotScope,
-    InternalIdentityClaims, MacroAuthorizationError, MacroUserAuthentication,
+    InternalIdentityClaims, RoxAuthorizationError, RoxUserAuthentication,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model::user::UserContext;
 use model_owner::Owner;
@@ -105,13 +105,13 @@ fn manual_execution_documents_quota_and_retryable_validation_failures() {
 const OTHER: &str = "macro|other@rox.one";
 const VIEWER: &str = "macro|viewer@rox.one";
 const BOT_TOKEN: &str = "team-bot-token";
-const TEAM_ID: macro_uuid::Uuid = macro_uuid::Uuid::from_u128(0x7EA4);
+const TEAM_ID: rox_uuid::Uuid = rox_uuid::Uuid::from_u128(0x7EA4);
 
 #[derive(Clone)]
 pub(crate) struct FakeAuth;
 
-impl MacroAuthorizationService for FakeAuth {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuth {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             "owner" => Ok(UserContext {
                 user_id: USER.into(),
@@ -129,17 +129,17 @@ impl MacroAuthorizationService for FakeAuth {
                 user_id: "macro|stranger@rox.one".into(),
                 ..Default::default()
             }),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_bot(
@@ -147,28 +147,28 @@ impl MacroAuthorizationService for FakeAuth {
         bot_token: &str,
         bot_scope: BotScope,
         acting_user: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         if bot_token != BOT_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(BotAuthentication {
             bot_id: bot_id::BotId::TEST_A,
-            token_id: macro_uuid::Uuid::nil(),
+            token_id: rox_uuid::Uuid::nil(),
             bot_scope,
             team_id: Some(TEAM_ID),
             acting_user: acting_user
                 .and_then(|claims| claims.user_id)
                 .map(|user_id| {
-                    let macro_user_id = MacroUserIdStr::try_from(user_id).expect("acting user id");
-                    MacroUserAuthentication {
+                    let rox_user_id = RoxUserIdStr::try_from(user_id).expect("acting user id");
+                    RoxUserAuthentication {
                         agent_id: None,
                         agent_via: None,
-                        origin: macro_authorization::CredentialOrigin::Bot,
+                        origin: rox_authorization::CredentialOrigin::Bot,
                         user_context: UserContext {
-                            user_id: macro_user_id.to_string(),
+                            user_id: rox_user_id.to_string(),
                             ..Default::default()
                         },
-                        macro_user_id,
+                        rox_user_id,
                     }
                 }),
         })
@@ -178,9 +178,9 @@ impl MacroAuthorizationService for FakeAuth {
         &self,
         key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if key != "test-internal-key" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(claims.user_id.map(|user_id| UserContext {
             user_id,
@@ -214,7 +214,7 @@ impl FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -254,7 +254,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -263,7 +263,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -282,7 +282,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -303,13 +303,13 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<
         (
             EntityPermission,
-            macro_uuid::Uuid,
+            rox_uuid::Uuid,
             entity_access::domain::models::TeamRole,
         ),
         AccessError,
@@ -321,27 +321,27 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<macro_user_id::user_id::MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<rox_user_id::user_id::RoxUserIdStr<'static>>, AccessError> {
         unimplemented!()
     }
 
     async fn get_call_channel(
         &self,
-        _call_id: &macro_uuid::Uuid,
+        _call_id: &rox_uuid::Uuid,
     ) -> Result<Option<CallChannelInfo>, AccessError> {
         unimplemented!()
     }
 
     async fn get_call_channel_by_channel_id(
         &self,
-        _channel_id: &macro_uuid::Uuid,
+        _channel_id: &rox_uuid::Uuid,
     ) -> Result<Option<CallChannelInfo>, AccessError> {
         unimplemented!()
     }
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!()
     }
@@ -358,7 +358,7 @@ fn router_with<S: ScheduledActionService>(
     scheduled_action_router(ScheduledActionRouterState {
         service,
         access_service: Arc::new(access),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuth)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuth)),
     })
 }
 
@@ -527,7 +527,7 @@ async fn owner_can_read_cron_and_event_routines_but_missing_ids_return_not_found
             StatusCode::UNAUTHORIZED
         );
     }
-    let missing = format!("/scheduled-actions/{}", macro_uuid::generate_uuid_v7());
+    let missing = format!("/scheduled-actions/{}", rox_uuid::generate_uuid_v7());
     assert_eq!(
         request(&app, "GET", &missing, "owner", Value::Null).await.0,
         StatusCode::NOT_FOUND
@@ -645,10 +645,10 @@ async fn authenticates_user_and_internal_requests_and_rejects_missing_credential
     let internal = Request::builder()
         .uri("/scheduled-actions")
         .header(
-            macro_authorization::INTERNAL_API_KEY_HEADER,
+            rox_authorization::INTERNAL_API_KEY_HEADER,
             "test-internal-key",
         )
-        .header(macro_authorization::INTERNAL_MACRO_USER_ID_HEADER, USER)
+        .header(rox_authorization::INTERNAL_ROX_USER_ID_HEADER, USER)
         .body(Body::empty())
         .unwrap();
     assert_eq!(
@@ -676,7 +676,7 @@ async fn maps_typed_errors_and_sanitizes_internal_failures() {
         ),
         (
             anyhow::Error::from(AlreadyRunningError {
-                action_id: macro_uuid::generate_uuid_v7(),
+                action_id: rox_uuid::generate_uuid_v7(),
             }),
             StatusCode::CONFLICT,
         ),
@@ -960,7 +960,7 @@ async fn executing_a_nonuser_owned_row_returns_not_found() {
     let svc = service(true);
     let app = router_with(svc.clone(), FakeEntityAccessService::owner_only());
     let (_, created) = request(&app, "POST", "/scheduled-actions", "owner", cron_action()).await;
-    let id = macro_uuid::Uuid::parse_str(created["id"].as_str().unwrap()).unwrap();
+    let id = rox_uuid::Uuid::parse_str(created["id"].as_str().unwrap()).unwrap();
     set_stored_owner(svc.as_ref(), id, Owner::Bot(bot_id::BotId::TEST_A));
     let (status, _) = request(
         &app,
@@ -982,10 +982,10 @@ async fn bare_internal_key_on_an_id_route_is_unauthorized() {
                 .method("POST")
                 .uri(format!(
                     "/scheduled-actions/{}/execute",
-                    macro_uuid::generate_uuid_v7()
+                    rox_uuid::generate_uuid_v7()
                 ))
                 .header(
-                    macro_authorization::INTERNAL_API_KEY_HEADER,
+                    rox_authorization::INTERNAL_API_KEY_HEADER,
                     "test-internal-key",
                 )
                 .body(Body::empty())
@@ -1034,7 +1034,7 @@ async fn list_as_grantee_excludes_another_owners_routine() {
         serde_json::to_value(configuration(true)).unwrap(),
     )
     .await;
-    let id = macro_uuid::Uuid::parse_str(created["id"].as_str().unwrap()).unwrap();
+    let id = rox_uuid::Uuid::parse_str(created["id"].as_str().unwrap()).unwrap();
     grant_to(svc.as_ref(), OTHER, id);
     let (_, list) = request(
         &app,
@@ -1123,11 +1123,11 @@ async fn the_catalog_is_served_in_the_zone_asked_for() {
 
 async fn internal_get(app: &Router, uri: &str, acting_user: Option<&str>) -> StatusCode {
     let mut request = Request::builder().uri(uri).header(
-        macro_authorization::INTERNAL_API_KEY_HEADER,
+        rox_authorization::INTERNAL_API_KEY_HEADER,
         "test-internal-key",
     );
     if let Some(user) = acting_user {
-        request = request.header(macro_authorization::INTERNAL_MACRO_USER_ID_HEADER, user);
+        request = request.header(rox_authorization::INTERNAL_ROX_USER_ID_HEADER, user);
     }
     app.clone()
         .oneshot(request.body(Body::empty()).unwrap())

@@ -7,7 +7,7 @@ use crate::domain::{
         GithubAppInstallationSource, GithubAuthenticatedUser, GithubError,
         GithubInstallationAccessToken, GithubKey, GithubPullRequestCheckRun,
         GithubPullRequestComment, GithubPullRequestDetails, GithubPullRequestStatus,
-        GithubSetupAccessToken, GithubUserInstallation, MacroTaskId, ResolvedTeamTaskReference,
+        GithubSetupAccessToken, GithubUserInstallation, RoxTaskId, ResolvedTeamTaskReference,
         TeamTaskReference, ValidatedGithubWebhookEvent,
     },
     ports::{GithubSyncClient, GithubSyncRepo, GithubSyncService},
@@ -38,7 +38,7 @@ use github_pull_requests::domain::{
     ports::GithubPullRequestRepository,
     service::GithubPullRequestServiceImpl,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::{DocumentBasic, DocumentMetadata};
 use model_entity::Entity;
 use model_owner::CreationPrincipal;
@@ -92,7 +92,7 @@ sNRx7TF4iOEBkdJgBUoY4X/rZ+51FQOrdZGqeWo+8TjBhMQN7b4=
 #[derive(Debug, Clone)]
 struct TaskStatusCall {
     entity_id: String,
-    credited_user: Option<MacroUserIdStr<'static>>,
+    credited_user: Option<RoxUserIdStr<'static>>,
     source: Option<PropertyChangeSource>,
     status: String,
 }
@@ -274,7 +274,7 @@ impl DocumentService for StubDocumentService {
     async fn update_task_status(
         &self,
         receipt: EntityAccessReceipt<EditAccessLevel>,
-        credited_user: Option<MacroUserIdStr<'static>>,
+        credited_user: Option<RoxUserIdStr<'static>>,
         source: Option<PropertyChangeSource>,
         status: &str,
     ) -> Result<(), DocumentError> {
@@ -384,18 +384,18 @@ struct StubSyncRepo {
     /// (team_id, task ID) pairs. Multiple entries model a slug shared by
     /// several of the installation's teams.
     #[allow(clippy::type_complexity)]
-    team_task_references: Mutex<HashMap<(String, String, i32), Vec<(uuid::Uuid, MacroTaskId)>>>,
-    /// Maps github_user_id -> macro_ids for installation event lookups.
+    team_task_references: Mutex<HashMap<(String, String, i32), Vec<(uuid::Uuid, RoxTaskId)>>>,
+    /// Maps github_user_id -> rox_ids for installation event lookups.
     ///
     /// A github_user_id may map to multiple Rox users because multiple Rox
     /// users can share one GitHub account.
     github_links: Mutex<HashMap<String, Vec<String>>>,
-    /// Maps lowercase github login -> macro_ids for mention lookups.
+    /// Maps lowercase github login -> rox_ids for mention lookups.
     github_login_links: Mutex<HashMap<String, Vec<String>>>,
-    /// Maps macro_id -> team_ids for installation event lookups.
+    /// Maps rox_id -> team_ids for installation event lookups.
     user_teams: Mutex<HashMap<String, Vec<uuid::Uuid>>>,
     /// Maps team_id -> Rox user IDs for notification recipient lookups.
-    team_members: Mutex<HashMap<uuid::Uuid, Vec<MacroUserIdStr<'static>>>>,
+    team_members: Mutex<HashMap<uuid::Uuid, Vec<RoxUserIdStr<'static>>>>,
     /// Current github_app_installation source rows keyed by installation id.
     installation_source_rows: Mutex<HashMap<String, HashSet<GithubAppInstallationSource>>>,
     /// Recorded installation source upserts: (installation_id, sources).
@@ -419,38 +419,38 @@ impl StubSyncRepo {
         }
     }
 
-    fn with_github_link(self, github_user_id: &str, macro_id: &str) -> Self {
+    fn with_github_link(self, github_user_id: &str, rox_id: &str) -> Self {
         self.github_links
             .lock()
             .unwrap()
             .entry(github_user_id.to_string())
             .or_default()
-            .push(macro_id.to_string());
+            .push(rox_id.to_string());
         self
     }
 
-    fn with_github_login_link(self, github_login: &str, macro_id: &str) -> Self {
+    fn with_github_login_link(self, github_login: &str, rox_id: &str) -> Self {
         self.github_login_links
             .lock()
             .unwrap()
             .entry(github_login.to_lowercase())
             .or_default()
-            .push(macro_id.to_string());
+            .push(rox_id.to_string());
         self
     }
 
-    fn with_user_teams(self, macro_id: &str, team_ids: Vec<uuid::Uuid>) -> Self {
+    fn with_user_teams(self, rox_id: &str, team_ids: Vec<uuid::Uuid>) -> Self {
         self.user_teams
             .lock()
             .unwrap()
-            .insert(macro_id.to_string(), team_ids);
+            .insert(rox_id.to_string(), team_ids);
         self
     }
 
     fn with_team_members(self, team_id: uuid::Uuid, member_ids: Vec<&str>) -> Self {
         let member_ids = member_ids
             .into_iter()
-            .map(|member_id| MacroUserIdStr::try_from(member_id.to_string()).unwrap())
+            .map(|member_id| RoxUserIdStr::try_from(member_id.to_string()).unwrap())
             .collect();
         self.team_members
             .lock()
@@ -465,7 +465,7 @@ impl StubSyncRepo {
         team_slug: &str,
         team_task_id: i32,
         team_id: uuid::Uuid,
-        task_id: MacroTaskId,
+        task_id: RoxTaskId,
     ) -> Self {
         self.team_task_references
             .lock()
@@ -517,13 +517,13 @@ impl StubSyncRepo {
 impl GithubSyncRepo for StubSyncRepo {
     type Err = anyhow::Error;
 
-    async fn get_task_ids(&self, github_key: GithubKey) -> Result<Vec<MacroTaskId>, Self::Err> {
+    async fn get_task_ids(&self, github_key: GithubKey) -> Result<Vec<RoxTaskId>, Self::Err> {
         let tasks = self.tasks.lock().unwrap();
         let ids = tasks
             .get(github_key.as_ref())
             .map(|set| {
                 set.iter()
-                    .filter_map(|s| MacroTaskId::from_short_uuid(s))
+                    .filter_map(|s| RoxTaskId::from_short_uuid(s))
                     .collect()
             })
             .unwrap_or_default();
@@ -533,7 +533,7 @@ impl GithubSyncRepo for StubSyncRepo {
     async fn upsert_task_ids(
         &self,
         github_key: GithubKey,
-        task_ids: &[MacroTaskId],
+        task_ids: &[RoxTaskId],
     ) -> Result<(), Self::Err> {
         let mut tasks = self.tasks.lock().unwrap();
         let set = tasks.entry(github_key.as_ref().to_string()).or_default();
@@ -546,8 +546,8 @@ impl GithubSyncRepo for StubSyncRepo {
     async fn filter_duplicate_tasks(
         &self,
         github_key: GithubKey,
-        task_ids: &[MacroTaskId],
-    ) -> Result<Vec<MacroTaskId>, Self::Err> {
+        task_ids: &[RoxTaskId],
+    ) -> Result<Vec<RoxTaskId>, Self::Err> {
         let tasks = self.tasks.lock().unwrap();
         let existing = tasks.get(github_key.as_ref());
         Ok(task_ids
@@ -590,7 +590,7 @@ impl GithubSyncRepo for StubSyncRepo {
         Ok(resolved)
     }
 
-    async fn get_macro_ids_by_github_user_ids(
+    async fn get_rox_ids_by_github_user_ids(
         &self,
         github_user_ids: &[String],
     ) -> Result<HashMap<String, Vec<String>>, Self::Err> {
@@ -598,13 +598,13 @@ impl GithubSyncRepo for StubSyncRepo {
         Ok(github_user_ids
             .iter()
             .filter_map(|github_user_id| {
-                let macro_ids = links.get(github_user_id)?.clone();
-                Some((github_user_id.clone(), macro_ids))
+                let rox_ids = links.get(github_user_id)?.clone();
+                Some((github_user_id.clone(), rox_ids))
             })
             .collect())
     }
 
-    async fn get_macro_ids_by_github_logins(
+    async fn get_rox_ids_by_github_logins(
         &self,
         github_logins: &[String],
     ) -> Result<HashMap<String, Vec<String>>, Self::Err> {
@@ -613,18 +613,18 @@ impl GithubSyncRepo for StubSyncRepo {
             .iter()
             .filter_map(|login| {
                 let login = login.to_lowercase();
-                let macro_ids = links.get(&login)?.clone();
-                Some((login, macro_ids))
+                let rox_ids = links.get(&login)?.clone();
+                Some((login, rox_ids))
             })
             .collect())
     }
 
-    async fn get_user_team_ids(&self, macro_id: &str) -> Result<Vec<uuid::Uuid>, Self::Err> {
+    async fn get_user_team_ids(&self, rox_id: &str) -> Result<Vec<uuid::Uuid>, Self::Err> {
         Ok(self
             .user_teams
             .lock()
             .unwrap()
-            .get(macro_id)
+            .get(rox_id)
             .cloned()
             .unwrap_or_default())
     }
@@ -632,7 +632,7 @@ impl GithubSyncRepo for StubSyncRepo {
     async fn get_team_member_ids(
         &self,
         team_id: uuid::Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         let mut member_ids = self
             .team_members
             .lock()
@@ -646,7 +646,7 @@ impl GithubSyncRepo for StubSyncRepo {
 
     async fn get_installation_ids_for_sources(
         &self,
-        macro_id: &str,
+        rox_id: &str,
         team_ids: &[uuid::Uuid],
     ) -> Result<Vec<String>, Self::Err> {
         let rows = self.installation_source_rows.lock().unwrap();
@@ -654,7 +654,7 @@ impl GithubSyncRepo for StubSyncRepo {
             .iter()
             .filter(|(_, sources)| {
                 sources.iter().any(|source| match source {
-                    GithubAppInstallationSource::User(user) => user == macro_id,
+                    GithubAppInstallationSource::User(user) => user == rox_id,
                     GithubAppInstallationSource::Team(team) => team_ids.contains(team),
                 })
             })
@@ -1854,7 +1854,7 @@ async fn pr_with_task_id_in_branch_name() {
 
 #[tokio::test]
 async fn pr_with_team_task_id_in_branch_name() {
-    let task_id = MacroTaskId::from_uuid(&uuid::Uuid::parse_str(KNOWN_TASK_UUID).unwrap());
+    let task_id = RoxTaskId::from_uuid(&uuid::Uuid::parse_str(KNOWN_TASK_UUID).unwrap());
     let team_id = uuid::Uuid::parse_str("dddddddd-dddd-dddd-dddd-dddddddddddd").unwrap();
     let repo = StubSyncRepo::new().with_team_task_reference("12345", "eng", 123, team_id, task_id);
     let service = make_sync_service_with_repo(repo);
@@ -1891,7 +1891,7 @@ async fn pr_with_team_task_id_in_branch_name() {
 
 #[tokio::test]
 async fn team_task_id_requires_installation_team_match() {
-    let task_id = MacroTaskId::from_uuid(&uuid::Uuid::parse_str(KNOWN_TASK_UUID).unwrap());
+    let task_id = RoxTaskId::from_uuid(&uuid::Uuid::parse_str(KNOWN_TASK_UUID).unwrap());
     let team_id = uuid::Uuid::parse_str("dddddddd-dddd-dddd-dddd-dddddddddddd").unwrap();
     let repo = StubSyncRepo::new().with_team_task_reference("99999", "eng", 123, team_id, task_id);
     let service = make_sync_service_with_repo(repo);
@@ -1923,7 +1923,7 @@ async fn team_task_id_requires_installation_team_match() {
 // markdown code must not link team PY's task 6.
 #[tokio::test]
 async fn team_task_reference_inside_markdown_code_links_nothing() {
-    let task_id = MacroTaskId::from_uuid(&uuid::Uuid::parse_str(KNOWN_TASK_UUID).unwrap());
+    let task_id = RoxTaskId::from_uuid(&uuid::Uuid::parse_str(KNOWN_TASK_UUID).unwrap());
     let team_id = uuid::Uuid::parse_str("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee").unwrap();
     let repo = StubSyncRepo::new().with_team_task_reference("12345", "py", 6, team_id, task_id);
     let service = make_sync_service_with_repo(repo);
@@ -1964,8 +1964,8 @@ async fn ambiguous_team_task_reference_links_nothing() {
     // unique), so "eng-123" matches a different task in each team. Linking
     // either would risk attributing the PR to the wrong team's task, so the
     // reference must be skipped entirely.
-    let task_a = MacroTaskId::from_uuid(&uuid::Uuid::parse_str(KNOWN_TASK_UUID).unwrap());
-    let task_b = MacroTaskId::from_uuid(
+    let task_a = RoxTaskId::from_uuid(&uuid::Uuid::parse_str(KNOWN_TASK_UUID).unwrap());
+    let task_b = RoxTaskId::from_uuid(
         &uuid::Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap(),
     );
     let team_a = uuid::Uuid::parse_str("dddddddd-dddd-dddd-dddd-dddddddddddd").unwrap();
@@ -3718,7 +3718,7 @@ async fn pr_event_extracts_participants_from_webhook_payload() {
 #[tokio::test]
 async fn pr_event_without_valid_tasks_still_upserts_foreign_entity() {
     let (service, foreign_entity_service) = make_sync_service_with_foreign_entity_service();
-    let unknown_task_id = MacroTaskId::from_uuid(
+    let unknown_task_id = RoxTaskId::from_uuid(
         &uuid::Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap(),
     )
     .to_task_id_string();
@@ -4350,7 +4350,7 @@ async fn comment_deduplicates_against_repo() {
 }
 
 #[tokio::test]
-async fn false_positive_macro_prefix_ignored() {
+async fn false_positive_rox_prefix_ignored() {
     // "macro-inc" matches the regex but does not correspond to a real task document.
     let (service, doc_service) = make_sync_service_with_doc_service();
     let event = ValidatedGithubWebhookEvent::new(
@@ -5585,8 +5585,8 @@ async fn bot_opened_pr_body_mention_does_not_notify_mention() {
     assert!(requests_with_tag(&requests, "github_pr_mention").is_empty());
 }
 
-fn installation_setup_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|setup@example.com".to_string()).unwrap()
+fn installation_setup_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|setup@example.com".to_string()).unwrap()
 }
 
 /// Repo where the setup user has linked the stub client's GitHub account,
@@ -5605,7 +5605,7 @@ fn make_setup_sync_service() -> TestGithubSyncService {
 fn installation_setup_state(team_id: Option<uuid::Uuid>, exp: i64) -> String {
     sign_installation_state(
         &InstallationState {
-            macro_user_id: installation_setup_user(),
+            rox_user_id: installation_setup_user(),
             team_id,
             exp,
         },
@@ -5637,7 +5637,7 @@ async fn begin_team_installation_setup_preserves_query_and_signs_team() {
 
     assert_eq!(url.path(), "/apps/test/installations/new");
     assert_eq!(query.get("existing").map(String::as_str), Some("1"));
-    assert_eq!(state.macro_user_id, user);
+    assert_eq!(state.rox_user_id, user);
     assert_eq!(state.team_id, Some(team_id));
     assert!(state.exp <= chrono::Utc::now().timestamp() + 60 * 60);
 }
@@ -6113,13 +6113,13 @@ async fn repeated_installation_association_is_idempotent() {
 #[derive(Default)]
 struct StubRealtime {
     fail_sends: bool,
-    events: std::sync::Mutex<Vec<(Vec<MacroUserIdStr<'static>>, ForeignEntity)>>,
+    events: std::sync::Mutex<Vec<(Vec<RoxUserIdStr<'static>>, ForeignEntity)>>,
 }
 
 impl crate::domain::ports::GithubSyncRealtime for StubRealtime {
     async fn publish_pull_request(
         &self,
-        recipients: &[MacroUserIdStr<'static>],
+        recipients: &[RoxUserIdStr<'static>],
         entity: &ForeignEntity,
     ) -> Result<(), GithubError> {
         if self.fail_sends {
@@ -6137,7 +6137,7 @@ impl crate::domain::ports::GithubSyncRealtime for StubRealtime {
 
 #[tokio::test]
 async fn realtime_publishes_saved_entities_only_to_their_source_members() {
-    let team = macro_uuid::generate_uuid_v7();
+    let team = rox_uuid::generate_uuid_v7();
     let repo = StubSyncRepo::new()
         .with_team_members(team, vec!["macro|actor@user.com", "macro|reader@user.com"]);
     let service = make_sync_service_with_repo(repo);
@@ -6190,7 +6190,7 @@ async fn realtime_does_not_publish_to_an_empty_or_invalid_source() {
         .upsert_enriched_pull_request_foreign_entities(
             pull_request,
             &[
-                GithubAppInstallationSource::Team(macro_uuid::generate_uuid_v7()),
+                GithubAppInstallationSource::Team(rox_uuid::generate_uuid_v7()),
                 GithubAppInstallationSource::User("invalid".to_string()),
             ],
         )

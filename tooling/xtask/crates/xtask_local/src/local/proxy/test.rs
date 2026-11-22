@@ -326,7 +326,7 @@ fn a_stack_signed_out_of_its_own_session_sends_no_foreign_token() {
         "login=true; local-macro-refresh-token=old",
         // A longer instance name that starts with this one is still foreign.
         "macro-agent-a-2--local-macro-access-token=other",
-        "__Host-macro-agent-a-2--macro_mcp_oauth=other",
+        "__Host-macro-agent-a-2--rox_mcp_oauth=other",
     ] {
         assert_eq!(apply(&a.cookie, jar), "", "jar: {jar}");
     }
@@ -340,8 +340,8 @@ fn prefixed_cookie_names_keep_their_browser_prefix() {
 
     for (from_service, in_jar) in [
         (
-            "__Host-macro_mcp_oauth=bind; Path=/; Secure",
-            "__Host-macro-agent-a--macro_mcp_oauth=bind; Path=/; Secure",
+            "__Host-rox_mcp_oauth=bind; Path=/; Secure",
+            "__Host-macro-agent-a--rox_mcp_oauth=bind; Path=/; Secure",
         ),
         (
             "__Secure-session=s; Path=/; Secure",
@@ -370,8 +370,8 @@ fn a_bare_copy_never_shadows_the_stacks_own_cookie() {
 
     for (jar, reaches_service) in [
         (
-            "__Host-macro-agent-a--macro_mcp_oauth=mine; __Host-macro_mcp_oauth=bare",
-            "__Host-macro_mcp_oauth=mine",
+            "__Host-macro-agent-a--rox_mcp_oauth=mine; __Host-rox_mcp_oauth=bare",
+            "__Host-rox_mcp_oauth=mine",
         ),
         (
             "__Host-macro-preview=bare; __Host-macro-agent-a--macro-preview=mine",
@@ -500,7 +500,7 @@ fn real_caddy_applies_the_generated_cookie_rules() {
         "{{\n    admin off\n    auto_https off\n}}\n\n\
          http://127.0.0.1:{service} {{\n    header {{\n\
          +Set-Cookie \"local-macro-access-token=tok; Path=/; Secure; HttpOnly\"\n\
-         +Set-Cookie \"__Host-macro_mcp_oauth=bind; Path=/; Secure\"\n\
+         +Set-Cookie \"__Host-rox_mcp_oauth=bind; Path=/; Secure\"\n\
          +Set-Cookie \"__Secure-s=1; Path=/; Secure\"\n\
          +Set-Cookie \"_ga=1; Path=/\"\n\
          +Set-Cookie \"local-macro-refresh-token=; Path=/; Max-Age=0\"\n\
@@ -559,7 +559,7 @@ fn real_caddy_applies_the_generated_cookie_rules() {
         set_cookies,
         [
             "macro-agent-a--local-macro-access-token=tok; Path=/; Secure; HttpOnly",
-            "__Host-macro-agent-a--macro_mcp_oauth=bind; Path=/; Secure",
+            "__Host-macro-agent-a--rox_mcp_oauth=bind; Path=/; Secure",
             "__Secure-macro-agent-a--s=1; Path=/; Secure",
             "macro-agent-a--_ga=1; Path=/",
             "macro-agent-a--local-macro-refresh-token=; Path=/; Max-Age=0",
@@ -572,8 +572,8 @@ fn real_caddy_applies_the_generated_cookie_rules() {
             "local-macro-access-token=mine",
         ),
         (
-            "__Host-macro-agent-a--macro_mcp_oauth=mine; __Host-macro_mcp_oauth=bare",
-            "__Host-macro_mcp_oauth=mine",
+            "__Host-macro-agent-a--rox_mcp_oauth=mine; __Host-rox_mcp_oauth=bare",
+            "__Host-rox_mcp_oauth=mine",
         ),
         (
             "local-macro-flag; macro-agent-a--x=__Host-macro-agent-a--y;macro-agent-a--z=1",

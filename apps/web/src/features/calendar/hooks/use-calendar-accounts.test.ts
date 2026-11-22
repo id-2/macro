@@ -6,7 +6,7 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
   ({
     id,
     provider: 'GMAIL',
-    macro_id: 'macro|self',
+    rox_id: 'macro|self',
     email_address: `${id}@example.com`,
     needs_calendar_permission: false,
     calendar_disabled: false,
@@ -93,7 +93,7 @@ describe('toCalendarAccounts', () => {
   });
 
   it('drops delegated inboxes the viewer does not own', () => {
-    const links = [link('own'), link('shared', { macro_id: 'macro|other' })];
+    const links = [link('own'), link('shared', { rox_id: 'macro|other' })];
     expect(toCalendarAccounts(links, 'macro|self')).toEqual([
       {
         provider: 'GMAIL',

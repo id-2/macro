@@ -59,7 +59,7 @@ before acting"); paired machines keep it off until their owner turns it on.
   something runs. A direct grant counts only while its holder shares a team with
   the owner. Never authorize from `Harness.owner` for a computer harness.
 - Opening a machine takes the owner's own session
-  (`MacroUserAuthentication::is_human_session`): agents can ask, never grant.
+  (`RoxUserAuthentication::is_human_session`): agents can ask, never grant.
 - A resident is a bound agent with `is_coding` false. There is no move-in or
   eviction flow yet; the binding is all there is.
 - Direct grants and access requests go through `crates/access_requests`
@@ -69,7 +69,7 @@ before acting"); paired machines keep it off until their owner turns it on.
 
 ## Boundaries
 
-- Depends on: `harness_id`, `harness_token`, `bot_id`, `macro_authorization`,
+- Depends on: `harness_id`, `harness_token`, `bot_id`, `rox_authorization`,
   `entity_access_db_utils`, `models_permissions`.
 - Used by: `coding_agent_worker`, `bots` (`HarnessTeamAgents`).
 

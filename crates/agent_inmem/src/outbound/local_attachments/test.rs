@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use agent::types::{ChatMessage, ChatMessageContent, Role};
 use attachment::{AttachmentError, ResolutionError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use tokio::sync::Notify;
 use tokio_util::sync::CancellationToken;
@@ -52,7 +52,7 @@ impl Drop for ReadGuard {
 impl AttachmentService for Service {
     async fn resolve_attachments<'a>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&'a Entity<'a>]>,
     ) -> Attachments<'a> {
         let entity = ids[0];

@@ -38,7 +38,7 @@ this is separate from the WebView's browser storage.
 
 Rox passes `$APPLOCALDATA` to the plugin fork's `init_with_cookie_store_dir`;
 the plugin owns the `.cookies` filename within that directory. Its default
-`init()` still uses the cache directory. Macro deliberately does not migrate
+`init()` still uses the cache directory. Rox deliberately does not migrate
 the old cache file, so the first launch after this native update requires
 sign-in again. Cookie expiry, refresh, and write behavior are unchanged. This
 requires a native app release; an OTA frontend bundle cannot relocate the jar.
@@ -263,7 +263,7 @@ editing the contract, run from the repository root with the development native
 environment configured:
 
 ```sh
-UPDATE_NATIVE_DIAGNOSTIC_TYPES=1 cargo test --manifest-path apps/web/tauri/Cargo.toml --locked -p app -p macro_bundle_updater_plugin --lib --no-default-features diagnostic_wire_types
+UPDATE_NATIVE_DIAGNOSTIC_TYPES=1 cargo test --manifest-path apps/web/tauri/Cargo.toml --locked -p app -p rox_bundle_updater_plugin --lib --no-default-features diagnostic_wire_types
 ```
 
 The same tests without that environment variable check for drift.
@@ -356,7 +356,7 @@ The Tao patch in `../Cargo.toml` pins `macro-inc/tao` at `6cbc7628`. It backport
 [tao#1257](https://github.com/tauri-apps/tao/pull/1257), including the review's
 nullable-accessor fix: cold-start URL contexts and browsing-web activities
 are forwarded through the same `Opened` event path as warm links. Nil launch
-options are treated as an ordinary launch, not a panic. Macro's existing
+options are treated as an ordinary launch, not a panic. Rox's existing
 frontend-ready buffer handles early delivery; no extra navigation path is needed.
 
 Normal startup and cold/warm custom-scheme links were exercised on iOS 27;

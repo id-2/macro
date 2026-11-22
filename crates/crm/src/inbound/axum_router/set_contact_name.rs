@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
 };
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
 use utoipa::ToSchema;
@@ -52,7 +52,7 @@ pub async fn handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: CrmContactAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,

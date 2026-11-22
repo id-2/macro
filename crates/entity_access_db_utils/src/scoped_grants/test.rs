@@ -4,9 +4,9 @@
 
 use agent_correlation::context::{Attribution, scope_attribution};
 use agent_correlation::scope::SessionScope;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::Owner;
 use models_permissions::share_permission::channel_share_permission::{
     UpdateChannelSharePermission, UpdateOperation,
@@ -91,8 +91,8 @@ async fn grant(
     .unwrap();
 }
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 /// The owner of the fixture's folders.
@@ -106,7 +106,7 @@ async fn fixture_owner(pool: &PgPool) -> String {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_row_is_only_its_owners_grant(pool: PgPool) {
     let entity = Uuid::now_v7();
     let owner = user("owner@example.com");
@@ -161,7 +161,7 @@ async fn a_new_row_is_only_its_owners_grant(pool: PgPool) {
     assert_eq!(grants(&pool, &entity).await.len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_team_owner_shares_with_its_members(pool: PgPool) {
     let entity = Uuid::now_v7();
     assert_refused(
@@ -181,7 +181,7 @@ async fn a_team_owner_shares_with_its_members(pool: PgPool) {
     assert_eq!(grants(&pool, &entity).await.len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn user_grants_are_refused_only_when_they_add_access(pool: PgPool) {
     let entity = Uuid::now_v7();
     let owner = user("owner@example.com");
@@ -245,7 +245,7 @@ async fn user_grants_are_refused_only_when_they_add_access(pool: PgPool) {
     assert_eq!(grants(&pool, &entity).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn channel_and_team_grants_are_refused(pool: PgPool) {
     let entity = Uuid::now_v7();
     let channel = CHANNEL_ID.to_string();
@@ -338,7 +338,7 @@ async fn channel_and_team_grants_are_refused(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_someones_access_is_refused(pool: PgPool) {
     let entity = Uuid::now_v7();
     let owner = user("owner@example.com");
@@ -419,7 +419,7 @@ async fn removing_someones_access_is_refused(pool: PgPool) {
     assert_eq!(grants(&pool, &entity).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn direct_and_participant_grants_are_refused(pool: PgPool) -> anyhow::Result<()> {
     let call = Uuid::now_v7();
     let participant = user("participant@example.com");
@@ -471,7 +471,7 @@ async fn direct_and_participant_grants_are_refused(pool: PgPool) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("upsert_test_data"))
 )]
 async fn filing_in_a_shared_folder_is_refused(pool: PgPool) {
@@ -556,7 +556,7 @@ async fn filing_in_a_shared_folder_is_refused(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("upsert_test_data"))
 )]
 async fn a_move_within_a_shared_folder_keeps_what_it_inherits(pool: PgPool) {
@@ -624,7 +624,7 @@ async fn a_move_within_a_shared_folder_keeps_what_it_inherits(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("upsert_test_data"))
 )]
 async fn a_folder_brings_its_contents_into_a_shared_folder(pool: PgPool) {

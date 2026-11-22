@@ -62,7 +62,7 @@ pub async fn run_worker(
     crm_service: CrmServiceType,
     connection_gateway_client: ConnectionGatewayClient,
     notification_ingress_service: Arc<NotificationIngressType>,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     contacts_ingress: Arc<SqsContactsIngress<SqsContactsQueue>>,
 ) {
     run_worker_with_cancellation(
@@ -75,7 +75,7 @@ pub async fn run_worker(
         crm_service,
         connection_gateway_client,
         notification_ingress_service,
-        macro_event_broker,
+        rox_event_broker,
         contacts_ingress,
         CancellationToken::new(),
     )
@@ -97,7 +97,7 @@ pub(crate) async fn context(
     crm_service: CrmServiceType,
     connection_gateway_client: ConnectionGatewayClient,
     notification_ingress_service: Arc<NotificationIngressType>,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     contacts_ingress: Arc<SqsContactsIngress<SqsContactsQueue>>,
     cancellation_token: CancellationToken,
 ) -> Option<LinkManagerContext> {
@@ -148,7 +148,7 @@ pub(crate) async fn context(
         auth_service_client.clone(),
         redis_client.clone(),
         sqs_client.clone(),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
         contacts_ingress,
     ));
     let ctx = LinkManagerContext {
@@ -160,7 +160,7 @@ pub(crate) async fn context(
             notifications: crate::outbound::link_manager::ReauthNotifier(
                 notification_ingress_service,
             ),
-            broker: macro_event_broker.clone(),
+            broker: rox_event_broker.clone(),
             deletion: email::domain::mailbox::link_manager::deletion::LinkDeletionService {
                 purge: email::domain::mailbox::link_manager::purge::LinkPurgeService {
                     repository: email::outbound::mailbox_pg::PgMailboxSync::new(db.clone()),
@@ -173,7 +173,7 @@ pub(crate) async fn context(
                 auth: crate::outbound::link_manager::DeletionAuth(auth_service_client),
                 crm: crm_service,
                 refresh: crate::outbound::link_manager::DeletionRefresh(connection_gateway_client),
-                broker: macro_event_broker,
+                broker: rox_event_broker,
             },
         }),
     };
@@ -197,7 +197,7 @@ pub async fn run_worker_with_cancellation(
     crm_service: CrmServiceType,
     connection_gateway_client: ConnectionGatewayClient,
     notification_ingress_service: Arc<NotificationIngressType>,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     contacts_ingress: Arc<SqsContactsIngress<SqsContactsQueue>>,
     cancellation_token: CancellationToken,
 ) {
@@ -211,7 +211,7 @@ pub async fn run_worker_with_cancellation(
         crm_service,
         connection_gateway_client,
         notification_ingress_service,
-        macro_event_broker,
+        rox_event_broker,
         contacts_ingress,
         cancellation_token.clone(),
     )

@@ -23,7 +23,7 @@ mod test;
 pub const HANDOFF_ENV: &str = "ROXD_HANDOFF_FD";
 
 mod environment {
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         /// Set only by roxd when it `execve`s into an update.
         pub struct RoxdHandoffFd;
     }

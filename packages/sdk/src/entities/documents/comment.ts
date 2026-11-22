@@ -1,8 +1,8 @@
 import type { Message as MessageRecord } from '../../../generated/storage/types.gen';
 import { type RichMessage, toBody } from '../../mentions';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 import { Document } from './document';
 
@@ -11,9 +11,9 @@ import { Document } from './document';
  * document and message UUID. Its record and mutations are the ones channel
  * messages use.
  */
-export class Comment extends MacroEntity<MessageRecord> {
+export class Comment extends RoxEntity<MessageRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** The document this comment belongs to. */
     readonly documentId: string,
     id: string,
@@ -33,13 +33,13 @@ export class Comment extends MacroEntity<MessageRecord> {
   }
 
   /** A handle to a comment by id. Fields load on first access. */
-  static byId(client: MacroClient, documentId: string, id: string): Comment {
+  static byId(client: RoxClient, documentId: string, id: string): Comment {
     return new Comment(client, documentId, id);
   }
 
   /** Build a comment from a message record (pre-seeded, no fetch). */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     documentId: string,
     record: MessageRecord,
   ): Comment {

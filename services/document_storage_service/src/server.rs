@@ -3,7 +3,7 @@
 
 use crate::{
     api::{
-        self, MACRO_INTERNAL_USER_ID,
+        self, ROX_INTERNAL_USER_ID,
         context::{
             ApiContext, AuthorizationService, DocumentStorageServiceAuthKey, DssOwnedPurgeState,
             TaskPropertiesAdapter,
@@ -130,19 +130,19 @@ use initiative::{
     outbound::PgInitiativeRepo,
 };
 use lexical_client::LexicalClient;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, PgBotAuthorizationRepo, PgBotAuthorizer, PgHarnessAuthorizationRepo,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, PgBotAuthorizationRepo, PgBotAuthorizer, PgHarnessAuthorizationRepo,
     PgHarnessAuthorizer, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_env_var::maybe_env_vars;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
-use macro_service_urls::{
+use rox_env_var::maybe_env_vars;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
+use rox_service_urls::{
     AiEditingWorkerUrl, ConnectionGatewayUrl, LexicalServiceUrl, StaticFileServiceUrl,
     SyncServiceUrl,
 };
-use macro_sha_count_client::Redis;
+use rox_sha_count_client::Redis;
 use notification::domain::service::{
     NotificationReaderService, PlatformArnConfig, SqsNotificationIngress,
     WebSocketNotificationConsumerService,
@@ -220,9 +220,9 @@ maybe_env_vars! {
 /// Published warehouse address for LiveKit Cloud, when one can be opened
 /// from outside this machine. The in-network name `localstack` is not used.
 fn recording_warehouse_endpoint() -> Option<String> {
-    let candidate = macro_aws_config::LocalAwsPublicUrl::new()
+    let candidate = rox_aws_config::LocalAwsPublicUrl::new()
         .map(|url| url.as_ref().to_owned())
-        .or_else(|| macro_aws_config::LocalAwsUrl::new().map(|url| url.as_ref().to_owned()))?;
+        .or_else(|| rox_aws_config::LocalAwsUrl::new().map(|url| url.as_ref().to_owned()))?;
     call::domain::models::cloud_reachable_warehouse_endpoint(&candidate).map(str::to_owned)
 }
 
@@ -235,7 +235,7 @@ pub fn run() -> impl Future<Output = anyhow::Result<()>> {
 async fn run_server() -> anyhow::Result<()> {
     let env = Environment::new_or_prod();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
@@ -303,18 +303,18 @@ async fn run_server() -> anyhow::Result<()> {
     );
     tracing::trace!("initialized dynamodb client");
 
-    let s3_client = macro_aws_config::s3_client().await;
+    let s3_client = rox_aws_config::s3_client().await;
 
     tracing::trace!("initialized s3 client");
 
-    let search_event_queue = macro_queues::SearchEventQueue::new();
-    let document_delete_queue = macro_queues::DocumentDeleteQueue::new();
-    let contacts_queue = macro_queues::ContactsQueue::new();
-    let notification_queue = macro_queues::NotificationIngressQueue::new();
-    let gmail_ops_queue = macro_queues::GmailOpsQueue::new();
-    let email_scheduled_queue = macro_queues::EmailScheduledQueue::new();
-    let reminder_dispatch_queue = macro_queues::ReminderDispatchQueue::new();
-    let calendar_reminder_dispatch_queue = macro_queues::CalendarReminderDispatchQueue::new();
+    let search_event_queue = rox_queues::SearchEventQueue::new();
+    let document_delete_queue = rox_queues::DocumentDeleteQueue::new();
+    let contacts_queue = rox_queues::ContactsQueue::new();
+    let notification_queue = rox_queues::NotificationIngressQueue::new();
+    let gmail_ops_queue = rox_queues::GmailOpsQueue::new();
+    let email_scheduled_queue = rox_queues::EmailScheduledQueue::new();
+    let reminder_dispatch_queue = rox_queues::ReminderDispatchQueue::new();
+    let calendar_reminder_dispatch_queue = rox_queues::CalendarReminderDispatchQueue::new();
     let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(&aws_config))
         .search_event_queue(&search_event_queue)
         .document_delete_queue(&document_delete_queue)
@@ -323,7 +323,7 @@ async fn run_server() -> anyhow::Result<()> {
         .email_scheduled_queue(&email_scheduled_queue);
     let webhook_event_queue = webhook::outbound::SqsWebhookQueue::new(
         Arc::new(sqs_client.clone()),
-        macro_queues::WebhookEventQueue::new().to_string(),
+        rox_queues::WebhookEventQueue::new().to_string(),
         config.webhook_queue_max_messages,
         config.webhook_queue_wait_time_seconds,
     );
@@ -388,7 +388,7 @@ async fn run_server() -> anyhow::Result<()> {
         ));
     }
     let import_jobs = ai_tools::ImportJobs::new();
-    let macro_event_broker = MacroEventBrokerService::new(
+    let rox_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
@@ -398,7 +398,7 @@ async fn run_server() -> anyhow::Result<()> {
     // directory, the same check the ConfigureAgent tool makes.
     let bots_service = BotServiceImpl::new(
         bots_repo,
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
         harnesses::domain::service::HarnessServiceImpl::new(
             PgHarnessRepo::new(db.clone()),
             hosted_runtimes::outbound::pg::PgComputerAgents::new(db.clone()),
@@ -408,11 +408,11 @@ async fn run_server() -> anyhow::Result<()> {
         ai_tools::pipedream_client_from_env()?,
     ));
 
-    let authorization_service: AuthorizationService = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(jwt_validation_args.clone()),
+    let authorization_service: AuthorizationService = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(jwt_validation_args.clone()),
         InternalAuthConfig {
             api_key: dss_auth_key.as_ref().to_string(),
-            default_user_id: Some(MACRO_INTERNAL_USER_ID.to_string()),
+            default_user_id: Some(ROX_INTERNAL_USER_ID.to_string()),
         },
         PgBotAuthorizer::new(PgBotAuthorizationRepo::new(db.clone())),
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
@@ -420,7 +420,7 @@ async fn run_server() -> anyhow::Result<()> {
     .with_harness_authorizer(PgHarnessAuthorizer::new(PgHarnessAuthorizationRepo::new(
         db.clone(),
     )));
-    let authorization_state = MacroAuthorizationState::new(Arc::new(authorization_service));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(authorization_service));
     let harnesses_service = harnesses::domain::service::HarnessServiceImpl::new(
         PgHarnessRepo::new(db.clone()),
         hosted_runtimes::outbound::pg::PgComputerAgents::new(db.clone()),
@@ -460,7 +460,7 @@ async fn run_server() -> anyhow::Result<()> {
             .authentication_service_secret_key
             .as_ref()
             .to_string(),
-        macro_service_urls::AuthServiceUrl::new()?.to_string(),
+        rox_service_urls::AuthServiceUrl::new()?.to_string(),
     ));
     let email_service = EmailServiceImpl::new(
         EmailPgRepo::new(db.clone()),
@@ -483,7 +483,7 @@ async fn run_server() -> anyhow::Result<()> {
         db.clone(),
         (*entity_access_service).clone(),
     ))
-    .with_macro_event_broker(macro_event_broker.clone());
+    .with_rox_event_broker(rox_event_broker.clone());
     let readonly_email_service = ReadonlyEmailPreviewAdapter(
         EmailServiceImpl::new(
             EmailPgRepo::new(readonly_db.clone()),
@@ -495,7 +495,7 @@ async fn run_server() -> anyhow::Result<()> {
             ),
             0,
         )
-        .with_macro_event_broker(macro_event_broker.clone()),
+        .with_rox_event_broker(rox_event_broker.clone()),
     );
     let system_properties_service =
         SystemPropertiesServiceImpl::new(PgSystemPropertiesRepository::new(db.clone()));
@@ -535,7 +535,7 @@ async fn run_server() -> anyhow::Result<()> {
             Some(permission_checker),
             Some(notification_service),
         )
-        .with_event_broker(macro_event_broker.clone())
+        .with_event_broker(rox_event_broker.clone())
         .with_initiative_assignees(Arc::new(
             initiative::domain::assignees::InitiativeAssignees::new(PgInitiativeRepo::new(
                 db.clone(),
@@ -588,7 +588,7 @@ async fn run_server() -> anyhow::Result<()> {
             .document_storage_service_presigned_url_browser_cache_expiry_seconds,
     };
     let s3_upload_adapter = S3UploadUrlAdapter::new(
-        macro_aws_config::s3_client().await,
+        rox_aws_config::s3_client().await,
         config.document_storage_bucket.as_ref(),
         config.docx_document_upload_bucket.as_ref(),
     );
@@ -638,7 +638,7 @@ async fn run_server() -> anyhow::Result<()> {
     let project_service = Arc::new(ProjectServiceImpl::new(
         PgProjectRepo::new(db.clone(), owned_entity_registrar.clone()),
         S3ProjectUploadAdapter::new(
-            macro_aws_config::s3_client().await,
+            rox_aws_config::s3_client().await,
             config.document_storage_bucket.as_ref(),
             config.docx_document_upload_bucket.as_ref(),
             config.upload_staging_bucket.as_ref(),
@@ -646,14 +646,14 @@ async fn run_server() -> anyhow::Result<()> {
         DynamoBulkUploadAdapter::new(dynamodb_client.clone()),
         ShaCountAdapter::new(Redis::new(redis_client.clone())),
         entity_access_management_service.clone(),
-        SqsProjectSearchIndexer::new(Arc::new(sqs_client.clone()), macro_event_broker.clone()),
+        SqsProjectSearchIndexer::new(Arc::new(sqs_client.clone()), rox_event_broker.clone()),
         crate::outbound::filed_items::FiledItemsUnfilerAdapter::new(db.clone()),
         if cfg!(feature = "local") {
             Some(uuid::uuid!("d50676e2-0a12-4c62-bc07-4b1cb6d8e9bc"))
         } else {
             None
         },
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     ));
 
     let document_service = Arc::new(DocumentServiceImpl::new(
@@ -669,7 +669,7 @@ async fn run_server() -> anyhow::Result<()> {
         connection_service,
         entity_access_management_service.clone(),
         ForeignEntityServiceImpl::new(PgForeignEntityRepo::new(db.clone())),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     ));
 
     let foreign_entity_service = Arc::new(ForeignEntityServiceImpl::new(PgForeignEntityRepo::new(
@@ -693,7 +693,7 @@ async fn run_server() -> anyhow::Result<()> {
             )
             .with_event_publisher(
                 github_pull_requests::broker::BrokerGithubPullRequestPublisher(
-                    macro_event_broker.clone(),
+                    rox_event_broker.clone(),
                 ),
             ),
         ),
@@ -703,7 +703,7 @@ async fn run_server() -> anyhow::Result<()> {
         ConnectionGatewayGithubRealtime::new(conn_gateway_client.clone()),
     )
     .with_webhook_publisher(github::broker::BrokerGithubWebhookPublisher(
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     ));
 
     let github_pull_request_index_state = PullRequestIndexRouterState {
@@ -748,7 +748,7 @@ async fn run_server() -> anyhow::Result<()> {
                 )),
                 PgGithubPullRequestRepo::new(db.clone()),
                 S3GithubPullRequestPatchStore::new(
-                    macro_aws_config::s3_client().await,
+                    rox_aws_config::s3_client().await,
                     config.github_pull_request_patch_bucket.to_string(),
                 ),
             ),
@@ -922,7 +922,7 @@ async fn run_server() -> anyhow::Result<()> {
     let call_root_poster = call::outbound::channel_threads::LateCallRootPoster::default();
     let call_service_builder = call_service_builder
         .with_voice_repo(PgVoiceRepo::new(db.clone()))
-        .with_event_broker(macro_event_broker.clone());
+        .with_event_broker(rox_event_broker.clone());
     let flags = feature_flags::outbound::posthog::PostHogFeatureFlags::new(
         config.posthog_host.value().unwrap_or(DEFAULT_POSTHOG_HOST),
         config.posthog_api_key.as_ref().to_owned(),
@@ -1035,7 +1035,7 @@ async fn run_server() -> anyhow::Result<()> {
             webhook_repository.clone(),
             webhook_http_client.clone(),
             webhook_endpoint_scheme_policy,
-            macro_event_broker.clone(),
+            rox_event_broker.clone(),
         );
     let webhook_rate_limiter = RateLimitServiceImpl {
         repo: RedisRateLimitAdapter {
@@ -1191,7 +1191,7 @@ async fn run_server() -> anyhow::Result<()> {
         let cancellation_token = consumer_cancellation_token.clone();
         let activity_repo = activity::outbound::pg_activity_repo::PgActivityRepo::new(db.clone());
         let activity_realtime = activity::domain::announcements::ActivityAnnouncements::new(
-            activity::KafkaActivityRealtimePublisher::new(macro_event_broker.clone()),
+            activity::KafkaActivityRealtimePublisher::new(rox_event_broker.clone()),
             crate::service::activity::EntityAccessActivityAudience::new(
                 entity_access_service.clone(),
             ),
@@ -1302,7 +1302,7 @@ async fn run_server() -> anyhow::Result<()> {
     let sqs_client = Arc::new(sqs_client);
     let conn_gateway_client = Arc::new(conn_gateway_client);
 
-    // MacroConfig reads the shared OPENAI_API_KEY from Doppler's APP_SECRETS_JSON
+    // RoxConfig reads the shared OPENAI_API_KEY from Doppler's APP_SECRETS_JSON
     // or the local environment. Validate once before constructing consumers.
     let openai_api_key = config.openai_api_key.as_ref().to_owned();
     anyhow::ensure!(
@@ -1356,7 +1356,7 @@ async fn run_server() -> anyhow::Result<()> {
         ),
         ContactsChannelDispatcher::new(contacts_ingress.clone()),
     )
-    .with_macro_event_broker(macro_event_broker.clone());
+    .with_rox_event_broker(rox_event_broker.clone());
 
     let channels_service = Arc::new(
         ChannelServiceImpl::with_dependencies(
@@ -1411,7 +1411,7 @@ async fn run_server() -> anyhow::Result<()> {
     )
     .with_sharing(messages::outbound::pg_discussion_context::PgDiscussionContext(db.clone()));
     let annotation_service = Arc::new(messages::domain::annotations::AnnotationService::new(
-        macro_db_client::annotations::repository::PgAnnotationRepository(db.clone()),
+        rox_db_client::annotations::repository::PgAnnotationRepository(db.clone()),
         (*entity_access_service).clone(),
         discussion_delivery.clone(),
     ));
@@ -1430,7 +1430,7 @@ async fn run_server() -> anyhow::Result<()> {
                 ))
                 .with_crm(crm::outbound::lookup::PgCrmParentReader::new(db.clone())),
             messages::domain::effects::MessageEffects::new(
-                messages::outbound::broker::BrokerMessagePublisher::new(macro_event_broker.clone()),
+                messages::outbound::broker::BrokerMessagePublisher::new(rox_event_broker.clone()),
                 channel_bots::outbound::conversation::LocalBotPublisher::new(bot_trigger_sender),
                 messages::domain::delivery::ParentMessagePublisher::new(
                     channel_delivery,
@@ -1565,12 +1565,12 @@ async fn run_server() -> anyhow::Result<()> {
     // a channel has no composer to finish a chat-deferred user tool in, so
     // calendar event creation executes directly and SendEmail is unavailable.
     // Agent sessions belong to a different bot entirely
-    // (`bot_id::MACRO_NEW_BOT_ID`, served by the harness), so the two paths
+    // (`bot_id::ROX_NEW_BOT_ID`, served by the harness), so the two paths
     // can never answer the same mention.
     // This host holds no authentication-service key, so its counted usage is
     // settled by that service's reconciliation sweep rather than requested
     // after each completion.
-    let mut macro_agent_tool_context = ai_tools::build_tool_service_context_from_env(
+    let mut rox_agent_tool_context = ai_tools::build_tool_service_context_from_env(
         db.clone(),
         event_broker_tracker.clone(),
         import_jobs.clone(),
@@ -1584,7 +1584,7 @@ async fn run_server() -> anyhow::Result<()> {
                         .authentication_service_secret_key
                         .as_ref()
                         .to_string(),
-                    macro_service_urls::AuthServiceUrl::new()?.to_string(),
+                    rox_service_urls::AuthServiceUrl::new()?.to_string(),
                 ),
             ),
         )),
@@ -1602,7 +1602,7 @@ async fn run_server() -> anyhow::Result<()> {
     // side-effect pipeline so agent-posted messages share the exact instance
     // used by the HTTP API, including the in-process bot trigger sender (the
     // env builder wires an equivalent pipeline, but without bot triggers).
-    macro_agent_tool_context.channel_tool_context =
+    rox_agent_tool_context.channel_tool_context =
         ai_tools::build_channel_tool_context_with_dispatcher(
             db.clone(),
             std::sync::Arc::new(SpawnedChannelEventDispatcher::new(
@@ -1610,20 +1610,20 @@ async fn run_server() -> anyhow::Result<()> {
             )),
             message_service.clone(),
         );
-    let macro_agent_tools = ai_tools::tools_for(ai_tools::AiHost::ChannelBot);
+    let rox_agent_tools = ai_tools::tools_for(ai_tools::AiHost::ChannelBot);
     let conversation_access = Arc::new(
         channel_bots::outbound::conversation::EntityAccessConversation(
             entity_access_service.clone(),
         ),
     );
-    let admission = macro_agent_tool_context.admission.clone();
+    let admission = rox_agent_tool_context.admission.clone();
     // The pipeline entry and CSV routes run through the same workflows the
     // agent's pipeline tools use.
-    let pipeline_workflows = macro_agent_tool_context
+    let pipeline_workflows = rox_agent_tool_context
         .pipeline_tool_context
         .service
         .clone();
-    let crm_transfer = macro_agent_tool_context
+    let crm_transfer = rox_agent_tool_context
         .crm_transfer_tool_context
         .service
         .clone();
@@ -1674,7 +1674,7 @@ async fn run_server() -> anyhow::Result<()> {
     let document_files = Arc::new(
         documents_hex::outbound::s3_document_files::S3DocumentFiles::new(
             db.clone(),
-            macro_aws_config::s3_client().await,
+            rox_aws_config::s3_client().await,
             config.document_storage_bucket.to_string(),
         ),
     );
@@ -1691,8 +1691,8 @@ async fn run_server() -> anyhow::Result<()> {
         message_service.clone(),
         conversation_access.clone(),
         Arc::new(channel_bots::outbound::AgentLoopResponder::new(
-            macro_agent_tool_context,
-            macro_agent_tools,
+            rox_agent_tool_context,
+            rox_agent_tools,
         )),
         Arc::new(
             channel_bots::domain::trigger_detector::MentionOrInferredDetector::new(
@@ -1735,7 +1735,7 @@ async fn run_server() -> anyhow::Result<()> {
             slack_limits,
         ),
         slack_integration::outbound::s3_storage::S3ImportStorage::new(
-            macro_aws_config::s3_client().await,
+            rox_aws_config::s3_client().await,
             config.upload_staging_bucket.as_ref().to_owned(),
             slack_limits,
         )
@@ -1831,7 +1831,7 @@ async fn run_server() -> anyhow::Result<()> {
         )
         .with_event_publisher(Arc::new(
             initiative::outbound::event_publisher::BrokerInitiativeEventPublisher::new(
-                macro_event_broker.clone(),
+                rox_event_broker.clone(),
             ),
         )),
     );
@@ -1843,7 +1843,7 @@ async fn run_server() -> anyhow::Result<()> {
         databases::outbound::gateway_event_publisher::GatewayTableEventPublisher::new(
             conn_gateway_client.as_ref().clone(),
         ),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     ));
     let pipeline_service = Arc::new(crm::domain::pipelines::PipelineServiceImpl::new(
         crm::outbound::pipelines::PgPipelineRepo::new(
@@ -1873,7 +1873,7 @@ async fn run_server() -> anyhow::Result<()> {
         forms::outbound::gateway_event_publisher::GatewayFormEventPublisher::new(
             conn_gateway_client.as_ref().clone(),
         ),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
         collab_surface_service.clone(),
         static_file_service_client::StaticFileServiceClient::new(
             config.internal_api_key.to_string(),
@@ -2146,7 +2146,7 @@ async fn run_server() -> anyhow::Result<()> {
         );
         let brokers = config.kafka_brokers.as_ref().to_string();
         let entity_access_service = entity_access_service.as_ref().clone();
-        let macro_event_broker = macro_event_broker.clone();
+        let rox_event_broker = rox_event_broker.clone();
         let cancellation_token = consumer_cancellation_token.clone();
         async move {
             let mut consecutive_failures = 0_u32;
@@ -2157,7 +2157,7 @@ async fn run_server() -> anyhow::Result<()> {
 
                 let fanout_service = SoupRealtimeServiceImpl::new(
                     EntityAccessExpander::new(entity_access_service.clone()),
-                    KafkaSoupRealtimePublisher::new(macro_event_broker.clone()),
+                    KafkaSoupRealtimePublisher::new(rox_event_broker.clone()),
                 );
                 tracing::info!("starting realtime Soup entity consumer");
                 let result = fanout_service
@@ -2221,7 +2221,7 @@ async fn run_server() -> anyhow::Result<()> {
             channels_service.clone(),
             message_commands.clone(),
             entity_access_service.clone(),
-            macro_service_urls::AppServiceUrl::new()?,
+            rox_service_urls::AppServiceUrl::new()?,
         ),
     ));
     let user_api_key_service = Arc::new(UserApiKeyServiceImpl::new(PgUserApiKeysRepo::new(
@@ -2277,7 +2277,7 @@ async fn run_server() -> anyhow::Result<()> {
     let graphql_calendar_mutation_context = graphql_calendar::CalendarGraphqlMutationContext::new(
         Arc::new(
             calendar_events::outbound::calendar_service_mutations::CalendarServiceMutations::new(
-                macro_service_urls::CalendarServiceUrl::new()
+                rox_service_urls::CalendarServiceUrl::new()
                     .context("calendar service url")?
                     .to_string(),
                 config.internal_api_key.to_string(),
@@ -2364,7 +2364,7 @@ async fn run_server() -> anyhow::Result<()> {
         documents_hex::outbound::document_purge::RedisDocxPartReferences::new(
             redis_sha_client.clone(),
         ),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     ));
 
     let owned_purge_state = DssOwnedPurgeState::new(
@@ -2377,7 +2377,7 @@ async fn run_server() -> anyhow::Result<()> {
                 ),
                 entity_access_management_service.clone(),
             )
-            .with_event_broker(macro_event_broker.clone()),
+            .with_event_broker(rox_event_broker.clone()),
         ),
         project_service.clone(),
     );
@@ -2397,7 +2397,7 @@ async fn run_server() -> anyhow::Result<()> {
                 db.clone(),
                 redis_sha_client.clone(),
                 sqs_client.clone(),
-                macro_event_broker.clone(),
+                rox_event_broker.clone(),
             )),
         ));
 
@@ -2456,7 +2456,7 @@ async fn run_server() -> anyhow::Result<()> {
             ),
             attention_feed::outbound::mail::EmailFeedMail::new(Arc::new(email_service.clone())),
             attention_feed::outbound::signals::SoupRealtimeFeedSignals::new(
-                KafkaSoupRealtimePublisher::new(macro_event_broker.clone()),
+                KafkaSoupRealtimePublisher::new(rox_event_broker.clone()),
             ),
         ),
         feed_triggers.clone(),
@@ -2473,7 +2473,7 @@ async fn run_server() -> anyhow::Result<()> {
             ),
             attention_feed::outbound::mail::EmailFeedMail::new(Arc::new(email_service.clone())),
             attention_feed::outbound::signals::SoupRealtimeFeedSignals::new(
-                KafkaSoupRealtimePublisher::new(macro_event_broker.clone()),
+                KafkaSoupRealtimePublisher::new(rox_event_broker.clone()),
             ),
             // Clears are stored on the primary, with the notification state
             // they change.
@@ -2653,7 +2653,7 @@ async fn run_server() -> anyhow::Result<()> {
                     db.clone(),
                     properties::outbound::properties_pg_repo::PropertiesPgRepo::new(db.clone()),
                 ),
-                macro_event_broker.clone(),
+                rox_event_broker.clone(),
             )),
             authorization_state.clone(),
         ),
@@ -2696,7 +2696,7 @@ async fn run_server() -> anyhow::Result<()> {
         s3_client: s3,
         dynamodb_client: Arc::new(dynamodb_client),
         dynamo_db,
-        macro_event_broker: macro_event_broker.clone(),
+        rox_event_broker: rox_event_broker.clone(),
         sqs_client: sqs_client.clone(),
         document_purger,
         notification_ingress_service: notification_ingress_service.clone(),

@@ -139,7 +139,7 @@ fn runtime_lines(app: &App, width: u16) -> Vec<Line<'static>> {
     }
     lines.push(Line::from(vec![
         Span::styled("  Change these on the web: ", Style::new().fg(DIM)),
-        Span::styled(app.config.macro_api.settings_url(), Style::new().fg(ACCENT)),
+        Span::styled(app.config.rox_api.settings_url(), Style::new().fg(ACCENT)),
     ]));
     lines
 }

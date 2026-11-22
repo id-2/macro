@@ -12,7 +12,7 @@
 -- User Link
 ------------------------------------------------------------
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-00000000001a', 'macro|user_a@example.com', '00000000-0000-0000-0000-00000000001a',
         'user_a@example.com', 'GMAIL', true, NOW(), NOW());
 
@@ -301,7 +301,7 @@ VALUES ('00000000-0000-0000-0000-0000000e0801', '00000000-0000-0000-0000-0000000
         false, false, false, false, NOW(), NOW());
 
 -- Link B intentionally has no self-contact row.
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-00000000002a', 'macro|missing-self@example.com',
         '00000000-0000-0000-0000-00000000002a', 'missing-self@example.com', 'GMAIL', true, NOW(), NOW());
 INSERT INTO email_contacts (id, link_id, email_address, created_at, updated_at)
@@ -326,7 +326,7 @@ VALUES ('00000000-0000-0000-0000-0000002a2002', '00000000-0000-0000-0000-0000000
         'provider-att-2002', 'missing_self_contact.pdf', 'application/pdf', NOW());
 
 -- Link C has an independently eligible contacted thread that must not leak into Link A.
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-00000000003a', 'macro|other@example.com',
         '00000000-0000-0000-0000-00000000003a', 'other@example.com', 'GMAIL', true, NOW(), NOW());
 INSERT INTO email_contacts (id, link_id, email_address, created_at, updated_at)

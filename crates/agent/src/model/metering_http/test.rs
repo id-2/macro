@@ -941,7 +941,7 @@ async fn provider_excess_is_not_clipped_to_the_authorized_budget() {
     })
     .await;
     assert_eq!(journal.begins.lock().unwrap()[0].token_budget.output(), 20);
-    // The funding domain needs the full excess to classify Macro-absorbed usage;
+    // The funding domain needs the full excess to classify Rox-absorbed usage;
     // the producer must neither truncate it nor invent customer liability.
     assert_eq!(
         journal.finals.lock().unwrap()[0].usage,
@@ -981,7 +981,7 @@ async fn a_reshaped_anthropic_request_is_metered_with_its_cache_usage() {
             {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_load", "content": "loaded"}]},
         ],
         "cache_control": {"type": "ephemeral"},
-        "macro_prompt_layout": {
+        "rox_prompt_layout": {
             "cache_shared_system": true,
             "tool_references": [{"tool_use_id": "toolu_load", "tool_names": ["EditPresentation"]}],
         },
@@ -1003,7 +1003,7 @@ async fn a_reshaped_anthropic_request_is_metered_with_its_cache_usage() {
     .await;
 
     let sent = transport.bodies.lock().unwrap()[0].clone();
-    assert_eq!(sent.get("macro_prompt_layout"), None);
+    assert_eq!(sent.get("rox_prompt_layout"), None);
     assert_eq!(
         sent["messages"][2]["content"][0]["content"],
         json!([{"type": "tool_reference", "tool_name": "EditPresentation"}])

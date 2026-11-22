@@ -575,9 +575,9 @@ async function connectPipedreamAccount(
 
 type ConsentResult = Exclude<PipedreamConnectEvent, { type: 'error' }>;
 
-const MACRO_CONNECT_POLL_MS = 2000;
+const ROX_CONNECT_POLL_MS = 2000;
 // Matches Connect's session lifetime.
-const MACRO_CONNECT_TIMEOUT_MS = 10 * 60 * 1000;
+const ROX_CONNECT_TIMEOUT_MS = 10 * 60 * 1000;
 
 /**
  * Run Rox Connect's consent page in `popup` (or the system browser), then
@@ -593,8 +593,8 @@ async function connectThroughMacroConnect(
 ): Promise<PipedreamConnectOutcome> {
   const userId = currentUserId();
   assignOauthUrl(popup, connectUrl);
-  return span.span('macro_connect.consent', async () => {
-    const deadline = Date.now() + MACRO_CONNECT_TIMEOUT_MS;
+  return span.span('rox_connect.consent', async () => {
+    const deadline = Date.now() + ROX_CONNECT_TIMEOUT_MS;
     while (Date.now() < deadline && currentUserId() === userId) {
       const closed = popup?.closed ?? false;
       const result = await cognitionApiServiceClient.completeMacroConnect({
@@ -612,7 +612,7 @@ async function connectThroughMacroConnect(
       }
       if (closed) return 'closed';
       await new Promise((resolve) =>
-        setTimeout(resolve, MACRO_CONNECT_POLL_MS)
+        setTimeout(resolve, ROX_CONNECT_POLL_MS)
       );
     }
     return 'closed';

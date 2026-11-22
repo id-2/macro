@@ -28,7 +28,7 @@ use axum::{
 use entity_access::domain::models::MemberTeamRole;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::OptionalMacroUserTeamExtractorV2;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 
 use crate::domain::error::PropertiesErr;
 use crate::domain::service::PropertiesService;
@@ -37,7 +37,7 @@ use crate::domain::service::PropertiesService;
 pub struct PropertiesRouterState<S, A, Auth> {
     properties_service: Arc<S>,
     entity_access_service: Arc<A>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
     managed_team_definitions: Arc<[String]>,
 }
 
@@ -57,7 +57,7 @@ impl<S: PropertiesService, A: EntityAccessService, Auth> PropertiesRouterState<S
     pub fn new(
         properties_service: Arc<S>,
         entity_access_service: Arc<A>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             properties_service,
@@ -91,7 +91,7 @@ impl<S, A, Auth> FromRef<PropertiesRouterState<S, A, Auth>> for Arc<A> {
 }
 
 /// Lets request extractors pull the authorization service out of the state.
-impl<S, A, Auth> FromRef<PropertiesRouterState<S, A, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, A, Auth> FromRef<PropertiesRouterState<S, A, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &PropertiesRouterState<S, A, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -128,7 +128,7 @@ pub fn router<S, A, Auth>() -> Router<PropertiesRouterState<S, A, Auth>>
 where
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         // Property Definition Management - requires authentication

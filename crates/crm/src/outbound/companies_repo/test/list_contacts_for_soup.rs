@@ -5,7 +5,7 @@ use crate::domain::{
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use filter_ast::Expr;
 use item_filters::ast::crm_contact::CrmContactLiteral as Contact;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -36,7 +36,7 @@ async fn list(repo: &CompaniesRepositoryImpl, filter: Expr<Contact>) -> Vec<CrmC
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn combines_authorized_teams_before_collapsing_email(pool: PgPool) {
@@ -60,7 +60,7 @@ async fn combines_authorized_teams_before_collapsing_email(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn filters_team_records_before_deduplication_and_preserves_exact_ids(pool: PgPool) {
@@ -110,7 +110,7 @@ async fn filters_team_records_before_deduplication_and_preserves_exact_ids(pool:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn hidden_access_uses_each_owning_teams_role(pool: PgPool) {
@@ -147,7 +147,7 @@ async fn hidden_access_uses_each_owning_teams_role(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn keyset_pages_never_repeat_or_skip_deduplicated_contacts(pool: PgPool) {
@@ -193,7 +193,7 @@ async fn keyset_pages_never_repeat_or_skip_deduplicated_contacts(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn email_less_contacts_never_collapse(pool: PgPool) {
@@ -215,7 +215,7 @@ async fn email_less_contacts_never_collapse(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures("fixtures/contact_listing.sql")
 )]
 async fn negated_email_filters_keep_email_less_contacts(pool: PgPool) {

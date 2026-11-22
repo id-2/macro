@@ -1,7 +1,7 @@
 //! Pairing consent, identity ownership and lease fencing.
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pairing_is_owner_bound_and_a_verified_identity_cannot_change_hands(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -170,7 +170,7 @@ async fn pairing_is_owner_bound_and_a_verified_identity_cannot_change_hands(pool
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cancelling_pairing_ends_consent_and_signals_the_replica(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -212,7 +212,7 @@ async fn cancelling_pairing_ends_consent_and_signals_the_replica(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_expired_qr_session_reads_as_expired_and_a_new_connect_starts_fresh(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -264,7 +264,7 @@ async fn an_expired_qr_session_reads_as_expired_and_a_new_connect_starts_fresh(p
     assert_eq!(next.state, PairingState::Waiting);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_newer_lease_fences_the_previous_replica(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);

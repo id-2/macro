@@ -448,7 +448,7 @@ const MICROSOFT_TEAMS_OPTION: EventComposerConferenceOption = {
   value: 'microsoft_teams',
   label: 'Microsoft Teams',
 };
-const MACRO_CALL_OPTION: EventComposerConferenceOption = {
+const ROX_CALL_OPTION: EventComposerConferenceOption = {
   value: 'macro',
   label: 'Rox call',
 };
@@ -485,7 +485,7 @@ export function EventComposerConferencePill(
   const provider = createMemo(() => props.provider);
   const canKeepExisting = createMemo(() => props.canKeepExisting);
   const options = createMemo(() => [
-    ...(includesMacroCall() ? [MACRO_CALL_OPTION] : []),
+    ...(includesMacroCall() ? [ROX_CALL_OPTION] : []),
     ...(provider() === 'microsoft_teams'
       ? [MICROSOFT_TEAMS_OPTION]
       : provider() === null || provider() === 'other'

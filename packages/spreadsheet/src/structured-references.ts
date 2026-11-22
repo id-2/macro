@@ -456,7 +456,7 @@ export function protectStructuredReferences(formula: string): {
 } {
   if (!formula.includes('['))
     return { formula, restore: (text: string) => text };
-  let prefix = '__macro_table_reference_';
+  let prefix = '__rox_table_reference_';
   while (formula.includes(prefix)) prefix += '_';
   const originals: string[] = [];
   const pieces = formulaPieces(formula);

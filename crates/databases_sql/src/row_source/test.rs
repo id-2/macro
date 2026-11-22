@@ -96,7 +96,7 @@ fn soup_row(row: &Row) -> SoupItem<SoupPropertiesField> {
             .map(ToString::to_string)
             .unwrap_or_default(),
         owner_id: model_owner::Owner::User(
-            MacroUserIdStr::parse_from_str("macro|owner@rox.one").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|owner@rox.one").unwrap(),
         ),
         created_by: None,
         created_at: Utc::now(),
@@ -276,7 +276,7 @@ impl SoupService for ReplaySoup {
     }
     async fn group_labels<'a>(
         &'a self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
         _group_by: &'a soup::domain::models::grouping::GroupByField,
         _keys: &'a [String],
     ) -> Result<soup::domain::models::grouping::GroupLabels, SoupErr> {
@@ -285,7 +285,7 @@ impl SoupService for ReplaySoup {
 
     async fn caller_tag_sets<'a>(
         &self,
-        _: MacroUserIdStr<'a>,
+        _: RoxUserIdStr<'a>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, SoupErr> {
         unimplemented!("rows never read tag sets")
     }
@@ -297,8 +297,8 @@ struct NoContacts;
 impl ContactsService for NoContacts {
     async fn query_contacts(
         &self,
-        _: MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, rootcause::Report> {
+        _: RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, rootcause::Report> {
         unimplemented!("no transcript reads people")
     }
     async fn add_contact_nodes(&self, _: ContactsNodes) -> Result<(), rootcause::Report> {
@@ -352,7 +352,7 @@ impl OpsSink for ReplaySink {
 async fn replay(name: &str) -> Vec<EntityFilterAst> {
     let transcript = transcript(name);
     let soup = ReplaySoup::new(&transcript);
-    let viewer = MacroUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
+    let viewer = RoxUserIdStr::parse_from_str("macro|owner@rox.one").unwrap();
     let source = SoupRowSource {
         soup: &soup,
         contacts: &NoContacts,

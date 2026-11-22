@@ -39,7 +39,7 @@ function reconcile(user, registration, jwt, id_token, tokens) {
   }
 
   /* Only fill what's missing: this runs on every login, and the user may have
-     since changed their name in Macro. */
+     since changed their name in Rox. */
   if (!user.firstName) {
     user.firstName = claim('given_name');
   }

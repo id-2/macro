@@ -6,7 +6,7 @@
 use std::collections::HashSet;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::dm::DmPair;
@@ -30,9 +30,9 @@ pub struct HistoricalChannel {
     /// Target type and optional team identity.
     pub kind: HistoricalChannelKind,
     /// Importing administrator, used as owner only on initial creation.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Explicit source memberships, in addition to the new channel's owner.
-    pub participants: HashSet<MacroUserIdStr<'static>>,
+    pub participants: HashSet<RoxUserIdStr<'static>>,
     /// Resolved source creation time, used only on initial creation.
     pub created_at: DateTime<Utc>,
 }
@@ -50,7 +50,7 @@ pub struct EnsuredChannel {
 #[derive(Debug, Clone)]
 pub enum DmCreation {
     /// Present-day creation with ordinary activity, owned by one member of the pair.
-    Live(MacroUserIdStr<'static>),
+    Live(RoxUserIdStr<'static>),
     /// Silent historical creation. The normalized pair's first member owns the DM.
     Historical {
         /// Caller-reserved UUIDv7, used only when no exact pair already exists.
@@ -62,7 +62,7 @@ pub enum DmCreation {
 
 impl DmCreation {
     /// Resolve ownership without ever introducing a third participant.
-    pub fn owner<'a>(&'a self, pair: &'a DmPair) -> anyhow::Result<&'a MacroUserIdStr<'static>> {
+    pub fn owner<'a>(&'a self, pair: &'a DmPair) -> anyhow::Result<&'a RoxUserIdStr<'static>> {
         match self {
             Self::Live(owner) if owner == pair.lo() || owner == pair.hi() => Ok(owner),
             Self::Live(_) => anyhow::bail!("DM owner must belong to the pair"),

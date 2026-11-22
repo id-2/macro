@@ -6,7 +6,7 @@ import { type Accessor, createEffect, createSignal, onCleanup } from 'solid-js';
 export function $writtenText(): string {
   const lines: string[] = [];
   for (const node of $getRoot().getChildren()) {
-    if ($isClassedBlockNode(node) && node.__classes.includes('macro_quote'))
+    if ($isClassedBlockNode(node) && node.__classes.includes('rox_quote'))
       break;
     lines.push(node.getTextContent());
   }

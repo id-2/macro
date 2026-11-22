@@ -10,7 +10,7 @@ them for permanent deletion.
 
 - `src/handler.rs`: runs `handle_chats`, `handle_documents`, `handle_projects`
   concurrently via `tokio::try_join!`; each publishes purge events through
-  `MacroEventBroker` (chats/documents) or queues deletion directly (projects).
+  `RoxEventBroker` (chats/documents) or queues deletion directly (projects).
 - `src/context.rs`: DB pool + event broker + queue clients.
 
 ## Scope

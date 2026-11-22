@@ -4,7 +4,7 @@ use std::num::NonZeroUsize;
 
 use agent_fold::domain::lifecycle::LifecycleFold;
 use agent_fold::domain::model::TurnState;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use super::error::Result;
 use super::model::AgentSessionId;

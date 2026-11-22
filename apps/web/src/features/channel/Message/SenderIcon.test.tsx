@@ -1,6 +1,6 @@
 import { CURSOR_BOT_PRINCIPAL_ID } from '@core/constant/cursorAgent';
-import { MACRO_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
-import { MACRO_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
 import type { MessageData } from '@core/messages/types';
 import ClaudeIcon from '@icon/wide-claude.svg';
 import { cleanup, render } from '@solidjs/testing-library';
@@ -59,8 +59,8 @@ const renderSender = (data: MessageData, interactive = true) =>
 describe('SenderIcon', () => {
   it('draws first-party bots through UserIcon so they keep their brand mark', () => {
     for (const id of [
-      MACRO_AGENT_PRINCIPAL_ID,
-      MACRO_NEW_PRINCIPAL_ID,
+      ROX_AGENT_PRINCIPAL_ID,
+      ROX_NEW_PRINCIPAL_ID,
       CURSOR_BOT_PRINCIPAL_ID,
     ]) {
       const { getByTestId, queryByTestId } = renderSender(message(id));
@@ -73,7 +73,7 @@ describe('SenderIcon', () => {
   it('draws a post made through a known MCP client with its mark', () => {
     for (const client of ['Claude', 'Claude Code']) {
       const { container, getByTestId, queryByTestId } = renderSender(
-        message(MACRO_AGENT_PRINCIPAL_ID, {
+        message(ROX_AGENT_PRINCIPAL_ID, {
           type: 'bot',
           id: '00000000-0000-0000-0000-00000000a1a1',
           name: 'Rox',
@@ -94,7 +94,7 @@ describe('SenderIcon', () => {
 
   it('draws a post made through an unknown MCP client with its initial', () => {
     const { getByTestId, queryByTestId } = renderSender(
-      message(MACRO_AGENT_PRINCIPAL_ID, {
+      message(ROX_AGENT_PRINCIPAL_ID, {
         type: 'bot',
         id: '00000000-0000-0000-0000-00000000a1a1',
         name: 'Rox',
@@ -138,8 +138,8 @@ describe('SenderIcon', () => {
   });
 
   it('gives a first-party agent the user card', () => {
-    const { getByTestId } = renderSender(message(MACRO_AGENT_PRINCIPAL_ID));
-    expect(getByTestId('user-card').dataset.id).toBe(MACRO_AGENT_PRINCIPAL_ID);
+    const { getByTestId } = renderSender(message(ROX_AGENT_PRINCIPAL_ID));
+    expect(getByTestId('user-card').dataset.id).toBe(ROX_AGENT_PRINCIPAL_ID);
   });
 
   it('leaves people to the card UserIcon already draws', () => {

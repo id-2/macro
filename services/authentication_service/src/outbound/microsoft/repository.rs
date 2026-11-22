@@ -69,9 +69,9 @@ impl MicrosoftGrantRepository for PgMicrosoftGrants {
     ) -> Result<email::domain::inbox_entitlement::InboxConnectionFacts, MicrosoftAuthError> {
         let facts=sqlx::query!(r#"SELECT
             EXISTS(SELECT 1 FROM "RolesOnUsers" ru JOIN "RolesOnPermissions" rp ON rp."roleId"=ru."roleId" WHERE ru."userId"=u.id AND rp."permissionId"='read:professional_features') AS "professional!",
-            (SELECT count(*) FROM email_links l WHERE l.macro_id=u.id OR EXISTS(SELECT 1 FROM macro_user_links a WHERE a.link_id=l.id AND a.primary_macro_id=u.id)) AS "inboxes!",
-            EXISTS(SELECT 1 FROM email_links l WHERE l.id=$2 AND l.provider='OUTLOOK' AND (l.macro_id=u.id OR EXISTS(SELECT 1 FROM macro_user_links a WHERE a.link_id=l.id AND a.primary_macro_id=u.id))) AS "reconnecting!"
-            FROM "User" u WHERE u.macro_user_id=$1 LIMIT 1"#,owner,reconnect)
+            (SELECT count(*) FROM email_links l WHERE l.rox_id=u.id OR EXISTS(SELECT 1 FROM rox_user_links a WHERE a.link_id=l.id AND a.primary_rox_id=u.id)) AS "inboxes!",
+            EXISTS(SELECT 1 FROM email_links l WHERE l.id=$2 AND l.provider='OUTLOOK' AND (l.rox_id=u.id OR EXISTS(SELECT 1 FROM rox_user_links a WHERE a.link_id=l.id AND a.primary_rox_id=u.id))) AS "reconnecting!"
+            FROM "User" u WHERE u.rox_user_id=$1 LIMIT 1"#,owner,reconnect)
             .fetch_optional(&self.db).await.map_err(|_|MicrosoftAuthError::Unavailable)?.ok_or(MicrosoftAuthError::InvalidIdentity)?;
         Ok(email::domain::inbox_entitlement::InboxConnectionFacts {
             professional: facts.professional,
@@ -104,10 +104,10 @@ impl MicrosoftGrantRepository for PgMicrosoftGrants {
         .map_err(database_error)?;
         let result = sqlx::query!(
             r#"
-            INSERT INTO in_progress_user_link (id, macro_user_id, email_provider)
+            INSERT INTO in_progress_user_link (id, rox_user_id, email_provider)
             SELECT $1, $2, 'OUTLOOK'
             WHERE (SELECT count(*) FROM in_progress_user_link
-                WHERE macro_user_id = $2 AND created_at > now() - interval '24 hours') < 5
+                WHERE rox_user_id = $2 AND created_at > now() - interval '24 hours') < 5
         "#,
             attempt.id,
             attempt.owner
@@ -135,7 +135,7 @@ impl MicrosoftGrantRepository for PgMicrosoftGrants {
             FROM in_progress_user_link p
             WHERE a.id = $1 AND a.id = p.id AND p.email_provider = 'OUTLOOK'
                 AND a.claimed_at IS NULL AND a.completed_at IS NULL AND a.expires_at > now()
-            RETURNING a.id, p.macro_user_id, a.identity_provider_id, a.redirect_uri,
+            RETURNING a.id, p.rox_user_id, a.identity_provider_id, a.redirect_uri,
                 a.return_uri, a.pkce_verifier, a.oidc_nonce, a.expires_at, a.calendar_requested
         "#,
             id
@@ -146,7 +146,7 @@ impl MicrosoftGrantRepository for PgMicrosoftGrants {
         .ok_or(MicrosoftAuthError::InvalidAttempt)?;
         Ok(LinkAttempt {
             id: row.id,
-            owner: row.macro_user_id,
+            owner: row.rox_user_id,
             identity_provider_id: row.identity_provider_id,
             redirect_uri: row.redirect_uri,
             return_uri: row.return_uri,
@@ -206,7 +206,7 @@ impl MicrosoftGrantRepository for PgMicrosoftGrants {
         let marked = sqlx::query!(r#"
             UPDATE microsoft_link_attempts a SET completed_at=now(),pkce_verifier='',oidc_nonce='',grant_id=$3
             FROM in_progress_user_link p
-            WHERE a.id=$1 AND p.id=a.id AND p.macro_user_id=$2
+            WHERE a.id=$1 AND p.id=a.id AND p.rox_user_id=$2
                 AND p.email_provider='OUTLOOK' AND a.claimed_at IS NOT NULL
                 AND a.completed_at IS NULL AND a.expires_at > now()
         "#,attempt.id,attempt.owner,grant_id).execute(&mut *tx).await.map_err(database_error)?;
@@ -235,9 +235,9 @@ impl MicrosoftGrantRepository for PgMicrosoftGrants {
                 g.tenant_id AS "tenant_id!",g.mailbox_id AS "mailbox_id!",g.scopes,a.calendar_requested
             FROM in_progress_user_link p
             JOIN microsoft_link_attempts a ON a.id = p.id AND a.completed_at IS NOT NULL
-            JOIN microsoft_oauth_grant_versions g ON g.grant_id=a.grant_id AND g.fusionauth_user_id = p.macro_user_id::text
+            JOIN microsoft_oauth_grant_versions g ON g.grant_id=a.grant_id AND g.fusionauth_user_id = p.rox_user_id::text
                 AND g.email_address = p.linked_email
-            WHERE p.id = $1 AND p.macro_user_id = $2 AND p.email_provider = 'OUTLOOK'
+            WHERE p.id = $1 AND p.rox_user_id = $2 AND p.email_provider = 'OUTLOOK'
                 AND p.created_at > now() - interval '24 hours' AND g.revoked_at IS NULL
                 AND g.grant_id IS NOT NULL AND g.tenant_id IS NOT NULL AND g.mailbox_id IS NOT NULL
         "#,

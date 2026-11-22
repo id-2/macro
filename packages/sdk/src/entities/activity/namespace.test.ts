@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
 import { User } from '../users/user';
 import { ActivityNamespace } from './namespace';
@@ -34,7 +34,7 @@ describe('activity', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const range = await new ActivityNamespace(client).mine({
       from: new Date('2026-11-01T00:00:00Z'),

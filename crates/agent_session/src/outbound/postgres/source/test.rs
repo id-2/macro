@@ -1,10 +1,10 @@
 use super::super::test::{create_test_bot, new_session, test_repo};
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use trigger_context::origin::Caller;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("user@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("user@example.com").unwrap()
 }
 
 async fn stored_kind(pool: &PgPool, session: AgentSessionId) -> Option<String> {
@@ -22,11 +22,11 @@ async fn stored_kind(pool: &PgPool, session: AgentSessionId) -> Option<String> {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_is_created_with_its_source_and_deleted_with_it(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
-    let message_id = macro_uuid::generate_uuid_v7();
+    let message_id = rox_uuid::generate_uuid_v7();
     let session = AgentSessionRepo::create(
         &repo,
         CreateAgentSessionParams {
@@ -75,7 +75,7 @@ async fn a_session_is_created_with_its_source_and_deleted_with_it(pool: PgPool) 
     assert_eq!(remaining, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_session_create_leaves_no_source(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -101,7 +101,7 @@ async fn a_failed_session_create_leaves_no_source(pool: PgPool) {
     assert_eq!(sources, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unknown_origin_stores_nothing(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -113,15 +113,15 @@ async fn an_unknown_origin_stores_nothing(pool: PgPool) {
     assert_eq!(stored_kind(&pool, session.id).await, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_table_refuses_an_origin_the_enum_cannot_express(pool: PgPool) {
     let routine_with_a_person = sqlx::query!(
         r#"
         INSERT INTO agent_session_source (id, kind, routine_id, routine_firing, actor_user_id)
         VALUES ($1, 'routine', $2, 'manual', 'macro|user@example.com')
         "#,
-        macro_uuid::generate_uuid_v7(),
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
     )
     .execute(&pool)
     .await;
@@ -132,16 +132,16 @@ async fn the_table_refuses_an_origin_the_enum_cannot_express(pool: PgPool) {
         INSERT INTO agent_session_source (id, kind, routine_id, routine_firing, event_id)
         VALUES ($1, 'routine', $2, 'scheduled', $3)
         "#,
-        macro_uuid::generate_uuid_v7(),
-        macro_uuid::generate_uuid_v7(),
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
     )
     .execute(&pool)
     .await;
     assert!(scheduled_with_an_event.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_agent_and_its_lineage_read_back_as_stored(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -150,9 +150,9 @@ async fn an_agent_and_its_lineage_read_back_as_stored(pool: PgPool) {
             bot,
             on_behalf_of: user(),
             lineage: Lineage::Session {
-                session: macro_uuid::generate_uuid_v7(),
+                session: rox_uuid::generate_uuid_v7(),
                 root: Root::Routine {
-                    routine: macro_uuid::generate_uuid_v7(),
+                    routine: rox_uuid::generate_uuid_v7(),
                 },
             },
         }),

@@ -27,7 +27,7 @@ fn message(team: TeamId, channel: Uuid, seconds: u32) -> HistoricalMessage {
         parent_id: None,
         orphaned_thread_ts: None,
         sender: HistoricalSender::User(
-            MacroUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|lifecycle@example.com").unwrap(),
         ),
         imported_author: None,
         content: "historical".into(),
@@ -56,7 +56,7 @@ async fn insert_message(batch: &mut FencedBatch<'_, '_>, message: &HistoricalMes
     .unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn shape_only_target_binding_is_fenced_and_immutable(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, None).await;
     let running = claim(&repo, &event).await;
@@ -77,7 +77,7 @@ async fn shape_only_target_binding_is_fenced_and_immutable(pool: PgPool) {
     assert!(bind_target(&mut tx, &running.lease, channel).await.is_err());
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn concurrent_jobs_share_first_committed_message_mapping(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(1)).await;
     let first = claim(&repo, &event).await;
@@ -194,7 +194,7 @@ async fn concurrent_jobs_share_first_committed_message_mapping(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn checkpoints_cross_part_boundaries_without_counting_twice(pool: PgPool) {
     let (repo, team, event) = fixture_parts(&pool, Some(2), 2).await;
     let running = claim(&repo, &event).await;
@@ -255,7 +255,7 @@ async fn checkpoints_cross_part_boundaries_without_counting_twice(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn skipped_records_checkpoint_replay_and_reclaim(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(3)).await;
     let running = claim(&repo, &event).await;
@@ -327,7 +327,7 @@ async fn skipped_records_checkpoint_replay_and_reclaim(pool: PgPool) {
     assert!(repo.pending_search(50).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn mappings_messages_counters_and_search_rollback_together(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(1)).await;
     let running = claim(&repo, &event).await;
@@ -400,7 +400,7 @@ async fn mappings_messages_counters_and_search_rollback_together(pool: PgPool) {
     assert_eq!(repo.pending_search(50).await.unwrap().len(), 1);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn duplicates_keep_first_mapping_and_partial_failure_keeps_search(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(3)).await;
     let running = claim(&repo, &event).await;
@@ -460,7 +460,7 @@ async fn duplicates_keep_first_mapping_and_partial_failure_keeps_search(pool: Pg
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn stale_search_ack_cannot_clear_new_dirty_generation(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(3)).await;
     let running = claim(&repo, &event).await;
@@ -529,7 +529,7 @@ async fn stale_search_ack_cannot_clear_new_dirty_generation(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn invalid_checkpoints_and_late_fence_roll_back(pool: PgPool) {
     let (repo, team, event) = fixture(&pool, Some(3)).await;
     let running = claim(&repo, &event).await;

@@ -15,7 +15,7 @@ fn proxy_preserves_app_cookies_but_never_forwards_gateway_credentials() {
     );
     headers.append(header::COOKIE, "another=two".parse().unwrap());
     headers.insert("x-forwarded-host", "attacker.test".parse().unwrap());
-    headers.insert("x-macro-internal-key", "secret".parse().unwrap());
+    headers.insert("x-rox-internal-key", "secret".parse().unwrap());
     headers.insert(header::ORIGIN, "https://public.test".parse().unwrap());
     clean_request(
         &mut headers,
@@ -29,7 +29,7 @@ fn proxy_preserves_app_cookies_but_never_forwards_gateway_credentials() {
     assert_eq!(headers[header::HOST], "localhost:3000");
     assert_eq!(headers["x-forwarded-host"], "public.test");
     assert_eq!(headers[header::ORIGIN], "http://localhost:3000");
-    assert!(!headers.contains_key("x-macro-internal-key"));
+    assert!(!headers.contains_key("x-rox-internal-key"));
 }
 #[test]
 fn response_cannot_replace_gateway_cookie_or_poison_sibling_hosts() {

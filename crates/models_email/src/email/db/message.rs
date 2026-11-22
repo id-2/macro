@@ -38,7 +38,7 @@ pub struct Message {
     pub is_draft: bool,
     pub body_text: Option<String>,
     pub body_html_sanitized: Option<String>,
-    pub body_macro: Option<String>,
+    pub body_rox: Option<String>,
     pub headers_jsonb: Option<JsonValue>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -58,7 +58,7 @@ pub struct MessageToSend {
     pub bcc: Option<Vec<ContactInfo>>,
     pub body_text: Option<String>,
     pub body_html: Option<String>,
-    pub body_macro: Option<String>,
+    pub body_rox: Option<String>,
     pub headers_json: Option<JsonValue>,
 }
 

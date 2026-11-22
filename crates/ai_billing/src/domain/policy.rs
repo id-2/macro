@@ -13,13 +13,13 @@
 //! seat usage. Earlier released credits can replace provisional postpaid holds, but
 //! only within the credits and total funding budget captured at admission. Later
 //! purchases or opt-in changes cannot re-fund history. Unavoidable unfunded excess is
-//! Macro-absorbed, not debt. This module does not activate policy or change subscriptions.
+//! Rox-absorbed, not debt. This module does not activate policy or change subscriptions.
 
 use ai_usage::AiFeature;
 use ai_usage::domain::financial::{
     CentParts, CustomerMoney, FinancialError, FundingAuthorizationId, InvocationId, PublicUsage,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use thiserror::Error;
 
 use super::models::{
@@ -105,7 +105,7 @@ pub enum FundingSource {
     /// Explicitly authorized customer liability, regardless of invoice state.
     Postpaid,
     /// Unfunded in-flight excess; never collectible from the customer.
-    MacroAbsorbed,
+    RoxAbsorbed,
 }
 
 /// An exact money split. A source boundary can fall inside one public picodollar,
@@ -115,7 +115,7 @@ pub struct FundingPortion {
     /// Who funded this portion.
     pub source: FundingSource,
     /// Extra-price customer money; included portions always have zero money.
-    /// For Macro-absorbed portions this is a valuation, not customer liability.
+    /// For Rox-absorbed portions this is a valuation, not customer liability.
     pub amount: CustomerMoney,
 }
 
@@ -124,7 +124,7 @@ impl FundingPortion {
     pub fn category(self) -> PricingCategory {
         match self.source {
             FundingSource::Included => PricingCategory::Included,
-            FundingSource::Prepaid | FundingSource::Postpaid | FundingSource::MacroAbsorbed => {
+            FundingSource::Prepaid | FundingSource::Postpaid | FundingSource::RoxAbsorbed => {
                 PricingCategory::Extra
             }
         }
@@ -177,9 +177,9 @@ pub struct AuthorizationSnapshot {
     /// Exactly one actual provider attempt, not a logical multi-attempt run.
     pub invocation_id: InvocationId,
     /// Account owning shared credits and postpaid cap.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// Seat whose own included allowance is consumed.
-    pub seat: MacroUserIdStr<'static>,
+    pub seat: RoxUserIdStr<'static>,
     /// Frozen verified period; do not derive from current time at finalization.
     pub period: BillingPeriod,
     /// Policy selected prospectively for this seat/period.
@@ -310,16 +310,16 @@ pub struct UsageAllocation {
     /// Authorized incurred liability, irrespective of whether it has been collected.
     pub postpaid: CustomerMoney,
     /// Extra-price valuation of unfunded overshoot, not provider expense or customer debt.
-    pub macro_absorbed: CustomerMoney,
+    pub rox_absorbed: CustomerMoney,
 }
 
 impl UsageAllocation {
-    /// Exact extra valuation, including Macro-absorbed usage.
+    /// Exact extra valuation, including Rox-absorbed usage.
     pub fn extra_money(&self) -> Result<CustomerMoney, PolicyError> {
         Ok(self
             .prepaid
             .checked_add(self.postpaid)?
-            .checked_add(self.macro_absorbed)?)
+            .checked_add(self.rox_absorbed)?)
     }
 
     /// Only postpaid creates new customer liability; credit purchases were paid separately.
@@ -343,8 +343,8 @@ impl UsageAllocation {
                 amount: self.postpaid,
             },
             FundingPortion {
-                source: FundingSource::MacroAbsorbed,
-                amount: self.macro_absorbed,
+                source: FundingSource::RoxAbsorbed,
+                amount: self.rox_absorbed,
             },
         ]
     }
@@ -537,7 +537,7 @@ impl Reservation {
             prepaid: prepaid.checked_add(reclaimed_prepaid)?,
             reclaimed_prepaid,
             postpaid: postpaid_budget.checked_sub(reclaimed_prepaid)?,
-            macro_absorbed: remainder.checked_sub(postpaid_budget)?,
+            rox_absorbed: remainder.checked_sub(postpaid_budget)?,
         };
         self.allocation = AllocationState::Allocated(allocation.clone());
         Ok(allocation)

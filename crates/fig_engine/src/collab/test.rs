@@ -347,7 +347,7 @@ fn entries_round_trip_every_property() {
                 local: 4,
             }),
         }));
-        props.macro_data = Some(Arc::from([(Arc::from("libraries"), Arc::from("[]"))]));
+        props.rox_data = Some(Arc::from([(Arc::from("libraries"), Arc::from("[]"))]));
         props.arc_data = Some([0.25, 4.5, 0.75]);
         let state = NodeState {
             props,

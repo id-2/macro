@@ -1003,7 +1003,7 @@ pub(crate) fn props_with_assets(m: MsgRef, assets: &assets::AssetIds) -> Props {
         .or_else(|| m.str("componentKey").filter(|k| !k.is_empty()))
         .map(Into::into);
     p.library = library_link(&m).map(Arc::new);
-    p.macro_data = macro_data(&m);
+    p.rox_data = rox_data(&m);
     p.style_type = m
         .enum_name("styleType")
         .filter(|t| *t != "NONE")
@@ -1098,13 +1098,13 @@ fn library_link(m: &MsgRef) -> Option<LibraryLink> {
 }
 
 /// Rox's `pluginData` entries (other plugins' are left in the record).
-fn macro_data(m: &MsgRef) -> Option<library::RoxData> {
+fn rox_data(m: &MsgRef) -> Option<library::RoxData> {
     if !m.has("pluginData") {
         return None;
     }
     let entries: library::RoxData = m
         .msgs("pluginData")
-        .filter(|d| d.str("pluginID") == Some(library::MACRO_PLUGIN))
+        .filter(|d| d.str("pluginID") == Some(library::ROX_PLUGIN))
         .filter_map(|d| Some((d.str("key")?.into(), d.str("value").unwrap_or("").into())))
         .collect();
     (!entries.is_empty()).then_some(entries)

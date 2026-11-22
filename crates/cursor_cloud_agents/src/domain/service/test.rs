@@ -2995,7 +2995,7 @@ async fn admission_refusal_is_typed_aborted_and_never_sent_to_cursor() {
 
 #[cfg(feature = "postgres")]
 #[tokio::test]
-async fn existing_cursor_agent_runs_even_when_macro_helper_admission_would_fail() {
+async fn existing_cursor_agent_runs_even_when_rox_helper_admission_would_fail() {
     let cursor = FakeCursor::new();
     let service = CursorSessionService::new(
         cursor.clone(),

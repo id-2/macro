@@ -4,9 +4,9 @@ use std::{future::Future, pin::Pin};
 
 use activity::{Actor, Attribution};
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroInitiativesTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxInitiativesTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use super::models::{InitiativeError, InitiativeId};
@@ -17,7 +17,7 @@ pub struct InitiativeEventActor {
     /// Principal mechanically responsible for the mutation.
     pub actor: Actor<'static>,
     /// User who delegated the mutation to the actor, when any.
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
 }
 
 impl From<Attribution> for InitiativeEventActor {
@@ -67,7 +67,7 @@ pub enum InitiativeTopicEvent {
 }
 
 impl TopicEvent for InitiativeTopicEvent {
-    type Topic = MacroInitiativesTopic;
+    type Topic = RoxInitiativesTopic;
     const SCHEMA_VERSION: u8 = 1;
 }
 
@@ -87,7 +87,7 @@ impl InitiativeMacroEvent {
     }
 }
 
-impl MacroEvent for InitiativeMacroEvent {
+impl RoxEvent for InitiativeMacroEvent {
     type EventPayload = InitiativeTopicEvent;
     fn key(&self) -> &str {
         &self.key

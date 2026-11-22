@@ -7,10 +7,10 @@
 --   - A second team scoped to a different user (isolation case)
 
 ------------------------------------------------------------
--- macro_user (referenced by "User".macro_user_id)
+-- rox_user (referenced by "User".rox_user_id)
 ------------------------------------------------------------
 
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
     ('00000000-0000-0000-0000-000000000a01', 'alpha_owner', 'alpha_owner@team.com', 'cus_alpha_owner'),
     ('00000000-0000-0000-0000-000000000a02', 'beta_owner',  'beta_owner@team.com',  'cus_beta_owner'),
     ('00000000-0000-0000-0000-000000000a03', 'member',      'member@team.com',      'cus_member'),
@@ -23,7 +23,7 @@ INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
 -- Users
 ------------------------------------------------------------
 
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
     ('macro|alpha_owner@team.com', 'alpha_owner@team.com', '00000000-0000-0000-0000-000000000a01'),
     ('macro|beta_owner@team.com',  'beta_owner@team.com',  '00000000-0000-0000-0000-000000000a02'),
     ('macro|member@team.com',      'member@team.com',      '00000000-0000-0000-0000-000000000a03'),

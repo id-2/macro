@@ -8,7 +8,7 @@ use crate::domain::service::{CrmService, CrmServiceImpl};
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use crate::outbound::no_op_resolver::NoOpCompanyMetadataResolver;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -22,7 +22,7 @@ fn personal(local: &str) -> String {
     format!("{local}@{PERSONAL_DOMAIN}")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn blocking_preserves_records_and_stops_consented_sync(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, OWNER).await?;
@@ -98,7 +98,7 @@ async fn blocking_preserves_records_and_stops_consented_sync(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn blocklists_are_per_team(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -114,7 +114,7 @@ async fn blocklists_are_per_team(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn multiple_domain_blocks_do_not_hide_records(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, OWNER).await?;
@@ -137,7 +137,7 @@ async fn multiple_domain_blocks_do_not_hide_records(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_domain_changes_keep_company_and_contacts_consistent(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -221,7 +221,7 @@ async fn change_domains_while_privacy_locked(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unblocking_a_domain_that_was_never_blocked_keeps_hand_hidden_records(
     pool: PgPool,
 ) -> anyhow::Result<()> {

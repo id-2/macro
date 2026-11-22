@@ -6,7 +6,7 @@ import type {
   UsageRequest,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { User } from '../users/user';
 
 export type {
@@ -38,7 +38,7 @@ export class AiNamespace {
     );
   }
 
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Generate an answer matching a JSON Schema. Set toolset to { type: 'none' }

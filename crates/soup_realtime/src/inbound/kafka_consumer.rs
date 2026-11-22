@@ -28,8 +28,8 @@ use email::domain::events::{EmailMacroEvent, EmailTopicEvent};
 use github_pull_requests::broker::{GithubPullRequestMacroEvent, GithubPullRequestTopicEvent};
 use initiative::domain::events::{InitiativeMacroEvent, InitiativeTopicEvent};
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
 use messages::domain::models::MessageParent;
 use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
@@ -57,9 +57,9 @@ impl GroupName for SoupRealtimeConsumerGroup {
 
 type SoupRealtimeKafkaAdapter = KafkaConsumerAdapter<SoupRealtimeConsumerGroup, DeclaredMacroEvent>;
 type SoupRealtimeKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, SoupRealtimeKafkaAdapter>;
+    RoxEventConsumerService<DeclaredMacroEvent, SoupRealtimeKafkaAdapter>;
 
-macro_event_broker::declare_topics!(
+rox_event_broker::declare_topics!(
     DeclaredMacroEvent:
         GithubPullRequestMacroEvent,
         DocumentMacroEvent,

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            l.macro_id AS \"mailbox_owner!\",\n            (l.macro_id = $2) AS \"is_owner!\"\n        FROM public.email_threads t\n        JOIN public.email_links l ON l.id = t.link_id\n        WHERE t.id = $1::uuid\n          AND (\n              l.macro_id = $2\n              OR EXISTS (\n                  SELECT 1\n                  FROM public.macro_user_links mul\n                  WHERE mul.link_id = l.id\n                    AND mul.primary_macro_id = $2\n              )\n          )\n        ",
+  "query": "\n        SELECT\n            l.rox_id AS \"mailbox_owner!\",\n            (l.rox_id = $2) AS \"is_owner!\"\n        FROM public.email_threads t\n        JOIN public.email_links l ON l.id = t.link_id\n        WHERE t.id = $1::uuid\n          AND (\n              l.rox_id = $2\n              OR EXISTS (\n                  SELECT 1\n                  FROM public.rox_user_links mul\n                  WHERE mul.link_id = l.id\n                    AND mul.primary_rox_id = $2\n              )\n          )\n        ",
   "describe": {
     "columns": [
       {

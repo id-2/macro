@@ -13,7 +13,7 @@ use std::time::Duration;
 
 use futures::FutureExt;
 use import_notion::domain::ports::NotionConnections;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::ConnectorSelect;
 use tokio_util::sync::CancellationToken;
 use tracing::Instrument;
@@ -132,7 +132,7 @@ where
     /// Hold the user's run for this process, recording `job` on it.
     pub(in crate::domain::service) async fn take_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         job: &NotionJob,
     ) -> Result<bool> {
         self.repo
@@ -144,7 +144,7 @@ where
     /// lease, notice a cancel within seconds, and stop on shutdown.
     pub(in crate::domain::service) fn hold_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> (Arc<JobControl>, AbortOnDrop) {
         let control = Arc::new(JobControl::new(self.jobs.shutdown.clone()));
         let service = self.clone();
@@ -196,7 +196,7 @@ where
     }
 
     /// Give the run up so another process adopts it straight away.
-    pub(in crate::domain::service) async fn release_run(&self, user: &MacroUserIdStr<'static>) {
+    pub(in crate::domain::service) async fn release_run(&self, user: &RoxUserIdStr<'static>) {
         match self.repo.release_lease(user, self.jobs.instance).await {
             Ok(released) => tracing::info!(released, "workspace import handed over"),
             Err(error) => tracing::warn!(error = ?error, "workspace import lease was not released"),
@@ -208,7 +208,7 @@ where
     /// runs were adopted.
     pub(in crate::domain::service) async fn adopt_stalled(
         &self,
-        user: Option<&MacroUserIdStr<'static>>,
+        user: Option<&RoxUserIdStr<'static>>,
     ) -> usize {
         let limit = if user.is_some() { 1 } else { ADOPT_PER_SWEEP };
         let adopted = match self
@@ -312,7 +312,7 @@ where
 
     /// Fail a run that cannot be resumed and send its rows back to staged.
     /// A write given up on ends like any other, so its session hears of it.
-    async fn give_up(&self, user: &MacroUserIdStr<'static>, status: RunStatus) {
+    async fn give_up(&self, user: &RoxUserIdStr<'static>, status: RunStatus) {
         tracing::warn!("giving up on a stalled workspace import");
         let failed = match status {
             RunStatus::Importing => {
@@ -342,7 +342,7 @@ where
     /// objects, and those still `importing`.
     pub(in crate::domain::service) async fn resumable_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review_id: Uuid,
     ) -> Result<WriteSet> {
         if self.workspace_source != ImportSource::Notion {

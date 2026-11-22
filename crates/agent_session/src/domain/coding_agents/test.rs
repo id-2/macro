@@ -8,13 +8,13 @@ use crate::domain::routines::{
 #[derive(Clone, Default)]
 struct Directory {
     candidates: Arc<Mutex<Vec<CodingAgentCandidate>>>,
-    callers: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    callers: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
 }
 
 impl CodingAgentDirectory for Directory {
     async fn candidates(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<CodingAgentCandidate>, CodingAgentError> {
         self.callers.lock().unwrap().push(user_id);
         Ok(self.candidates.lock().unwrap().clone())
@@ -88,14 +88,14 @@ impl RoutineSessions for Sessions {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|coder@example.com".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|coder@example.com".to_owned()).unwrap()
 }
 
 fn candidate(is_coding: bool, available: bool) -> CodingAgentCandidate {
     CodingAgentCandidate {
         agent: CodingAgent {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             name: "Repository maintainer".into(),
             description: Some("Maintains the web app".into()),
             instructions: "Work in the product repository".into(),

@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -11,29 +11,29 @@ use crate::domain::ports::UserApiKeysRepo;
 const USER_A: &str = "macro|user-a@rox.one";
 const USER_B: &str = "macro|user-b@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(id)
     .execute(pool)
     .await
     .expect("macro_user should insert");
-    sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#)
+    sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#)
         .bind(id)
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .execute(pool)
         .await
         .expect("user should insert");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_and_list_return_id_name_and_created_at_scoped_per_user(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -81,7 +81,7 @@ async fn insert_and_list_return_id_name_and_created_at_scoped_per_user(pool: PgP
     assert!(!key_column_exists);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn user_scoped_reads_use_composite_created_at_index(pool: PgPool) {
     let indexes: Vec<(String, String)> = sqlx::query_as(
         r#"
@@ -112,7 +112,7 @@ async fn user_scoped_reads_use_composite_created_at_index(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn count_keys_counts_only_caller_rows(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -157,7 +157,7 @@ async fn count_keys_counts_only_caller_rows(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_key_is_scoped_to_owner(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -194,7 +194,7 @@ async fn delete_key_is_scoped_to_owner(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn find_user_id_by_key_looks_up_hash(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = PgUserApiKeysRepo::new(pool);
@@ -224,7 +224,7 @@ async fn find_user_id_by_key_looks_up_hash(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_same_hash_for_second_user_is_rejected(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -242,7 +242,7 @@ async fn insert_same_hash_for_second_user_is_rejected(pool: PgPool) {
     assert!(matches!(err, super::UserApiKeysRepoErr::Db(_)));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn racing_replacements_leave_exactly_one_live_key(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = PgUserApiKeysRepo::new(pool.clone());

@@ -1,8 +1,8 @@
 use crate::outbound::pg_soup_repo::unexpanded::{
     by_cursor::unexpanded_generic_cursor_soup, by_ids::unexpanded_soup_by_ids,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use models_pagination::Identify;
 use models_pagination::{PaginateOn, Query, SimpleSortMethod};
@@ -13,14 +13,14 @@ use uuid::Uuid;
 
 // testing the sorting methods work as expected
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("simple_items")
     )
 )]
 async fn test_unexpanded_generic_sorting_methods(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
 
     let get_item_ids =
         |items: &[SoupItem]| -> Vec<Uuid> { items.iter().map(|item| item.id()).collect() };
@@ -96,14 +96,14 @@ async fn test_unexpanded_generic_sorting_methods(pool: Pool<Postgres>) -> anyhow
 
 // testing the sorting with mixed item types works as expected
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_unexpanded")
     )
 )]
 async fn test_unexpanded_generic_mixed_types_sorting(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
 
     // --- Helper to extract IDs for easy comparison ---
     let get_item_ids =
@@ -214,14 +214,14 @@ async fn test_unexpanded_generic_mixed_types_sorting(pool: Pool<Postgres>) -> an
 
 // testing the cursor based pagination works as expected
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_unexpanded_history")
     )
 )]
 async fn test_get_user_items_unexpanded_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
     let result = unexpanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -284,14 +284,14 @@ async fn test_get_user_items_unexpanded_cursor(pool: Pool<Postgres>) -> anyhow::
 
 // Test that unexpanded_soup_by_ids only includes explicit access
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_unexpanded")
     )
 )]
 async fn test_unexpanded_soup_by_ids(pool: Pool<Postgres>) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
 
     // Request specific items in a specific order
     let entities = [
@@ -332,14 +332,14 @@ async fn test_unexpanded_soup_by_ids(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_unexpanded")
     )
 )]
 async fn it_should_be_empty(pool: Pool<Postgres>) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
     // Test with empty entity list
     let empty_result = unexpanded_soup_by_ids(&pool, user_id.copied(), [])
         .await
@@ -365,14 +365,14 @@ async fn it_should_be_empty(pool: Pool<Postgres>) {
 
 // Test that unexpanded_soup_by_ids correctly handles mixed entity types
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("simple_items")
     )
 )]
 async fn test_unexpanded_soup_by_ids_simple(pool: Pool<Postgres>) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
 
     // Request documents in a specific order
     let entities = [
@@ -408,14 +408,14 @@ async fn test_unexpanded_soup_by_ids_simple(pool: Pool<Postgres>) {
 
 // Test that unexpanded_soup_by_ids respects access control
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("mixed_items_unexpanded_history")
     )
 )]
 async fn test_unexpanded_soup_by_ids_access_control(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
 
     // Request all items, but only those with explicit access should be returned
     let entities = [
@@ -430,7 +430,7 @@ async fn test_unexpanded_soup_by_ids_access_control(pool: Pool<Postgres>) -> any
     assert_eq!(items.len(), 3, "Should have access to all three items");
 
     // Test with a different user who might not have access
-    let other_user_id = MacroUserIdStr::parse_from_str("macro|other@user.com").unwrap();
+    let other_user_id = RoxUserIdStr::parse_from_str("macro|other@user.com").unwrap();
     let other_items = unexpanded_soup_by_ids(&pool, other_user_id, &entities).await?;
 
     // Other user shouldn't have access to any items (based on typical fixture setup)
@@ -445,14 +445,14 @@ async fn test_unexpanded_soup_by_ids_access_control(pool: Pool<Postgres>) -> any
 
 // Test that is_completed field is correctly set based on task status
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
-        path = "../../../../../macro_db_client/fixtures",
+        path = "../../../../../rox_db_client/fixtures",
         scripts("tasks_with_is_completed")
     )
 )]
 async fn test_is_completed_field(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap();
 
     let result = unexpanded_generic_cursor_soup(
         &pool,

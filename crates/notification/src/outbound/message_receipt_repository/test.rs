@@ -1,14 +1,14 @@
 use super::*;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
-fn test_user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn test_user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("message_receipts"))
 )]
 async fn test_record_message_id(pool: Pool<Postgres>) {
@@ -34,7 +34,7 @@ async fn test_record_message_id(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("message_receipts"))
 )]
 async fn test_record_message_id_idempotent(pool: Pool<Postgres>) {
@@ -64,7 +64,7 @@ async fn test_record_message_id_idempotent(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("message_receipts"))
 )]
 async fn test_mark_message_failed(pool: Pool<Postgres>) {
@@ -94,7 +94,7 @@ async fn test_mark_message_failed(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("message_receipts"))
 )]
 async fn test_did_all_messages_fail_returns_false_when_some_not_failed(pool: Pool<Postgres>) {
@@ -112,7 +112,7 @@ async fn test_did_all_messages_fail_returns_false_when_some_not_failed(pool: Poo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("message_receipts"))
 )]
 async fn test_did_all_messages_fail_returns_true_when_all_failed(pool: Pool<Postgres>) {
@@ -133,7 +133,7 @@ async fn test_did_all_messages_fail_returns_true_when_all_failed(pool: Pool<Post
     assert!(result);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn test_did_all_messages_fail_returns_true_when_no_messages(pool: Pool<Postgres>) {
     let repo = DbMessageReceiptRepository::new(pool);
     let user = test_user("nonexistent@test.com");

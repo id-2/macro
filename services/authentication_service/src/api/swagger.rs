@@ -40,7 +40,7 @@ use crate::api::agent_api_keys::{
 use crate::api::cursor_api_key::{CursorApiKeyStatus, put_cursor_api_key::PutCursorApiKeyRequest};
 use crate::api::email::generate_email_link::GenerateEmailLinkRequest;
 use crate::api::email::resend_fusionauth_verify_user_email::ResendFusionauthVerifyUserEmailRequest;
-use crate::api::jwt::macro_api_token::MacroApiTokenResponse;
+use crate::api::jwt::rox_api_token::RoxApiTokenResponse;
 use crate::api::link::create_in_progress_link::CreateInProgressLinkResponse;
 use crate::api::link::github::{GithubLinkStatusResponse, InitGithubLinkResponse};
 use crate::api::link::gmail::{GmailLinkStatusResponse, InitGmailLinkResponse};
@@ -144,7 +144,7 @@ use model::user::{
 
                 /// /jwt
                 jwt::refresh::handler,
-                jwt::macro_api_token::handler,
+                jwt::rox_api_token::handler,
 
                 /// /user
                 user::get_user_info::handler,
@@ -288,7 +288,7 @@ use model::user::{
                         PostGetNamesRequestBody,
                         UserTokensResponse,
                         UserLinkResponse,
-                        MacroApiTokenResponse,
+                        RoxApiTokenResponse,
                         ResendFusionauthVerifyUserEmailRequest,
                         GenerateEmailLinkRequest,
                         CreateInProgressLinkResponse,

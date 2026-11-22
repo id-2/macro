@@ -1,5 +1,5 @@
 //! A running program showing the person who prompted its turn something in
-//! the Macro app tab they typed in (`macro.ui.open`).
+//! the Rox app tab they typed in (`macro.ui.open`).
 //!
 //! Only a turn a person prompted from a tab can do this, and only that
 //! person's tab: the command is addressed to the tab the prompt came from and
@@ -19,8 +19,8 @@ use agent_session::domain::model::{AgentSessionId, TurnPrompter, UiClientId};
 use ai_toolset::actor::ToolActor;
 use async_trait::async_trait;
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::Duration;
@@ -113,7 +113,7 @@ pub struct UiCommandFrame {
     /// Identifies this command.
     pub command_id: Uuid,
     /// The person it is for; a tab signed in as anybody else ignores it.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The tab it is for; every other tab ignores it.
     pub client_id: UiClientId,
     /// The session whose agent sent it.
@@ -148,7 +148,7 @@ impl UiCommandKind {
 #[derive(Clone, Debug)]
 pub struct UiTurn {
     /// The session owner, which an execution acting as the owner resolves to.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Who prompted the turn the session runs or last ran.
     pub prompter: Option<TurnPrompter>,
     /// The session agent's display name.
@@ -174,7 +174,7 @@ pub enum UiBudgetScope {
     /// New panes in one turn.
     TurnNewPanes(AgentActionId),
     /// Commands to one person.
-    Person(MacroUserIdStr<'static>),
+    Person(RoxUserIdStr<'static>),
 }
 
 /// The session's turn, as the command channel needs it.
@@ -188,7 +188,7 @@ pub trait UiTurns: Send + Sync + 'static {
 #[async_trait]
 pub trait UiNavigationFlag: Send + Sync + 'static {
     /// On for `user`. A flag that cannot be read counts as off.
-    async fn enabled(&self, user: &MacroUserIdStr<'static>) -> bool;
+    async fn enabled(&self, user: &RoxUserIdStr<'static>) -> bool;
 }
 
 /// Shared command budgets, the same on every replica.
@@ -204,7 +204,7 @@ pub trait UiCommandDelivery: Send + Sync + 'static {
     /// Send `frame` to every connection `user` has open; how many took it.
     async fn send(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         frame: &UiCommandFrame,
     ) -> Result<u64, CodeModeError>;
 }
@@ -264,7 +264,7 @@ impl UiCommandService {
     async fn admit(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         execution: ExecutionId,
     ) -> Result<Admitted, CodeModeError> {
         let session =
@@ -317,7 +317,7 @@ impl UiCommandService {
     pub async fn open(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         input: OpenInApp,
     ) -> Result<UiCommandOutcome, CodeModeError> {
         let span = tracing::Span::current();
@@ -373,7 +373,7 @@ impl UiCommandService {
         }
 
         let frame = UiCommandFrame {
-            command_id: macro_uuid::generate_uuid_v7(),
+            command_id: rox_uuid::generate_uuid_v7(),
             user_id: user.clone(),
             client_id: client,
             session_id: admitted.session,
@@ -401,7 +401,7 @@ impl UiCommandService {
 
 /// The person and tab a turn may show things to: a person's own turn, typed
 /// in a tab. A system turn never has one, whatever its row holds.
-fn prompting_tab(admitted: &Admitted) -> Option<(&MacroUserIdStr<'static>, UiClientId)> {
+fn prompting_tab(admitted: &Admitted) -> Option<(&RoxUserIdStr<'static>, UiClientId)> {
     let prompter = admitted.turn_facts.prompter.as_ref()?;
     if prompter.action_id != admitted.turn {
         return None;
@@ -414,9 +414,9 @@ fn prompting_tab(admitted: &Admitted) -> Option<(&MacroUserIdStr<'static>, UiCli
 
 fn resolve<'a>(
     acting_as: &ToolActor,
-    owner: &'a MacroUserIdStr<'static>,
-    requester: Option<&'a MacroUserIdStr<'static>>,
-) -> Result<&'a MacroUserIdStr<'static>, CodeModeError> {
+    owner: &'a RoxUserIdStr<'static>,
+    requester: Option<&'a RoxUserIdStr<'static>>,
+) -> Result<&'a RoxUserIdStr<'static>, CodeModeError> {
     acting_as
         .resolve(owner, requester)
         .map_err(|_| CodeModeError::Forbidden)

@@ -11,7 +11,7 @@ use entity_access::domain::ports::EntityAccessService;
 use entity_mutation::{
     DuplicateEntity, EntityMutationErrorCode, MoveEntity, capability::MoveEntityRequest,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -102,7 +102,7 @@ impl MovePrincipal {
     async fn receipt<T, ESvc>(
         self,
         entity_access_service: &ESvc,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<EntityAccessReceipt<T>, AccessError>
@@ -136,7 +136,7 @@ async fn move_with<S, ESvc>(
     service: &S,
     entity_access_service: &ESvc,
     actor: BotId,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     entity: Entity<'static>,
     project_id: Option<String>,
 ) -> Result<(), ToolCallError>

@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use email::domain::backfill_jobs::BackfillJobAccess;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use sqlx::types::Uuid;
 use utoipa::ToSchema;
 
@@ -19,7 +19,7 @@ pub struct BackfillCancelParams {
 #[tracing::instrument(skip(ctx))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Json(req_body): Json<BackfillCancelParams>,
 ) -> Result<Response, Response> {
     ctx.backfill_jobs

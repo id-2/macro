@@ -55,7 +55,7 @@ async fn registered_session(
 ) -> (
     PgAgentSessionRepo<PgBotsRepo>,
     AgentSessionId,
-    MacroUserIdStr<'static>,
+    RoxUserIdStr<'static>,
 ) {
     let repo = test_repo(pool);
     let bot = create_test_bot(pool).await;
@@ -76,7 +76,7 @@ async fn sweep(repo: &PgAgentSessionRepo<PgBotsRepo>) -> Vec<WorkEndReason> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn registering_twice_returns_the_active_registration(pool: PgPool) {
     let (repo, session, account) = registered_session(&pool).await;
     let active = repo
@@ -91,7 +91,7 @@ async fn registering_twice_returns_the_active_registration(pool: PgPool) {
     assert_eq!(end_state(&pool, session).await, vec![None]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unregistering_twice_ends_once_and_keeps_the_row(pool: PgPool) {
     let (repo, session, account) = registered_session(&pool).await;
 
@@ -109,7 +109,7 @@ async fn unregistering_twice_ends_once_and_keeps_the_row(pool: PgPool) {
     assert!(active.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_later_registration_is_a_new_one(pool: PgPool) {
     let (repo, session, account) = registered_session(&pool).await;
     repo.unregister(&account, session).await.unwrap();
@@ -123,7 +123,7 @@ async fn a_later_registration_is_a_new_one(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_archived_or_missing_session_refuses_registration(pool: PgPool) {
     let (repo, session, account) = registered_session(&pool).await;
     AgentSessionRepo::set_archived(&repo, session, true)
@@ -140,7 +140,7 @@ async fn an_archived_or_missing_session_refuses_registration(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn archiving_ends_registrations_at_once_and_restoring_does_not_bring_them_back(pool: PgPool) {
     let (repo, session, account) = registered_session(&pool).await;
 
@@ -165,7 +165,7 @@ async fn archiving_ends_registrations_at_once_and_restoring_does_not_bring_them_
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_auto_archive_ends_registrations_whatever_triggered_it(pool: PgPool) {
     let (repo, session, _account) = registered_session(&pool).await;
     repo.set_session_auto_archive_overrides(
@@ -190,7 +190,7 @@ async fn an_auto_archive_ends_registrations_whatever_triggered_it(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn finished_pull_requests_end_registrations_regardless_of_auto_archive_preference(
     pool: PgPool,
 ) {
@@ -245,7 +245,7 @@ async fn finished_pull_requests_end_registrations_regardless_of_auto_archive_pre
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_link_with_no_stored_pull_request_is_not_finished(pool: PgPool) {
     let (repo, session, account) = registered_session(&pool).await;
     let unknown = "example/repo/pull/404";
@@ -263,7 +263,7 @@ async fn a_link_with_no_stored_pull_request_is_not_finished(pool: PgPool) {
     assert!(sweep(&repo).await.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sweep_ends_an_idle_session_after_a_day_unless_blocked(pool: PgPool) {
     let (repo, session, _account) = registered_session(&pool).await;
 
@@ -282,7 +282,7 @@ async fn a_sweep_ends_an_idle_session_after_a_day_unless_blocked(pool: PgPool) {
     assert!(sweep(&repo).await.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sweep_counts_a_failed_turn_as_idle(pool: PgPool) {
     let (repo, session, _account) = registered_session(&pool).await;
 
@@ -291,7 +291,7 @@ async fn a_sweep_counts_a_failed_turn_as_idle(pool: PgPool) {
     assert_eq!(sweep(&repo).await, vec![WorkEndReason::Idle]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sweep_ends_a_blocked_session_after_a_week(pool: PgPool) {
     let (repo, session, _account) = registered_session(&pool).await;
 
@@ -306,7 +306,7 @@ async fn a_sweep_ends_a_blocked_session_after_a_week(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sweep_catches_up_on_finished_pull_requests_first(pool: PgPool) {
     let (repo, session, account) = registered_session(&pool).await;
     let closed = add_pull_request(&pool, 1, "closed").await;
@@ -319,7 +319,7 @@ async fn a_sweep_catches_up_on_finished_pull_requests_first(pool: PgPool) {
     assert_eq!(sweep(&repo).await, vec![WorkEndReason::PullRequestFinished]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sweep_prefers_an_archived_session_over_the_time_rules(pool: PgPool) {
     let (repo, session, _account) = registered_session(&pool).await;
     set_activity(&pool, session, "idle", Duration::hours(25)).await;
@@ -334,7 +334,7 @@ async fn a_sweep_prefers_an_archived_session_over_the_time_rules(pool: PgPool) {
     assert_eq!(sweep(&repo).await, vec![WorkEndReason::SessionArchived]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_sweeps_end_each_registration_once(pool: PgPool) {
     let (repo, session, _account) = registered_session(&pool).await;
     set_activity(&pool, session, "idle", Duration::hours(25)).await;
@@ -344,7 +344,7 @@ async fn concurrent_sweeps_end_each_registration_once(pool: PgPool) {
     assert_eq!(first.len() + second.len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn archived_sessions_are_never_read_and_states_report_recent_ends(pool: PgPool) {
     let (repo, session, account) = registered_session(&pool).await;
     let accounts = [account.clone()];

@@ -9,7 +9,7 @@ use std::sync::{
 
 use entity_access::outbound::get_user_source_ids;
 use futures::future::join_all;
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::user_id::RoxUserId;
 use sqlx::{
     PgPool,
     postgres::{PgConnectOptions, PgPoolOptions},
@@ -47,7 +47,7 @@ async fn counting_pool(
     Ok((pool, checkouts))
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 async fn concurrent_identical_source_id_lookups_run_the_query_once(
     options: PgPoolOptions,
     connect: PgConnectOptions,
@@ -65,7 +65,7 @@ async fn concurrent_identical_source_id_lookups_run_the_query_once(
     .execute(&pool)
     .await?;
     let before = checkouts.load(Ordering::SeqCst);
-    let user = MacroUserId::parse_from_str("macro|sources-once@example.test")?.lowercase();
+    let user = RoxUserId::parse_from_str("macro|sources-once@example.test")?.lowercase();
     let expected = vec![
         "7e000000-0000-0000-0000-000000000001".to_string(),
         "macro|sources-once@example.test".to_string(),
@@ -85,15 +85,15 @@ async fn concurrent_identical_source_id_lookups_run_the_query_once(
     Ok(())
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 async fn source_id_lookups_for_other_users_stay_separate(
     options: PgPoolOptions,
     connect: PgConnectOptions,
 ) -> anyhow::Result<()> {
     let (pool, checkouts) = counting_pool(options, connect).await?;
     let before = checkouts.load(Ordering::SeqCst);
-    let user_a = MacroUserId::parse_from_str("macro|sources-separate-a@example.test")?.lowercase();
-    let user_b = MacroUserId::parse_from_str("macro|sources-separate-b@example.test")?.lowercase();
+    let user_a = RoxUserId::parse_from_str("macro|sources-separate-a@example.test")?.lowercase();
+    let user_b = RoxUserId::parse_from_str("macro|sources-separate-b@example.test")?.lowercase();
 
     let (a_sources, b_sources) = tokio::join!(
         get_user_source_ids(&pool, Some(&user_a)),
@@ -107,7 +107,7 @@ async fn source_id_lookups_for_other_users_stay_separate(
     Ok(())
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 async fn a_failed_source_id_lookup_fails_every_waiting_caller_and_the_next_one_runs_again(
     options: PgPoolOptions,
     connect: PgConnectOptions,
@@ -117,7 +117,7 @@ async fn a_failed_source_id_lookup_fails_every_waiting_caller_and_the_next_one_r
         .execute(&pool)
         .await?;
     let before = checkouts.load(Ordering::SeqCst);
-    let user = MacroUserId::parse_from_str("macro|sources-failed@example.test")?.lowercase();
+    let user = RoxUserId::parse_from_str("macro|sources-failed@example.test")?.lowercase();
 
     let lookups = (0..5).map(|_| get_user_source_ids(&pool, Some(&user)));
     for source_ids in join_all(lookups).await {

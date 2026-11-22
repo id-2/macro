@@ -46,7 +46,7 @@ describe('the HTML a reopened draft seeds the composer with', () => {
 
   it('keeps the composer’s own quoted thread', () => {
     const html =
-      '<div>Sounds good</div><div class="macro_quote gmail_quote"><div class="gmail_attr">On Mon, Sam wrote:</div><blockquote>Can we talk?</blockquote></div>';
+      '<div>Sounds good</div><div class="rox_quote gmail_quote"><div class="gmail_attr">On Mon, Sam wrote:</div><blockquote>Can we talk?</blockquote></div>';
 
     expect(draftEditorHtml(draft(html))).toBe(html);
   });

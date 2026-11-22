@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id,provider::text AS \"provider!\",email_address,sync_generation,grant_generation,is_sync_active,\n        (macro_id=$2 OR EXISTS(SELECT 1 FROM macro_user_links u WHERE u.link_id=l.id AND u.primary_macro_id=$2)) AS \"authorized!\"\n        FROM email_links l WHERE id=ANY($1) ORDER BY id FOR UPDATE",
+  "query": "SELECT id,provider::text AS \"provider!\",email_address,sync_generation,grant_generation,is_sync_active,\n        (rox_id=$2 OR EXISTS(SELECT 1 FROM rox_user_links u WHERE u.link_id=l.id AND u.primary_rox_id=$2)) AS \"authorized!\"\n        FROM email_links l WHERE id=ANY($1) ORDER BY id FOR UPDATE",
   "describe": {
     "columns": [
       {

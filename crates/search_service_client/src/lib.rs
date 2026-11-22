@@ -28,7 +28,7 @@ impl SearchServiceClient {
         request: reqwest::RequestBuilder,
     ) -> reqwest::RequestBuilder {
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         request.headers(headers)
     }
 }

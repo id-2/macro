@@ -43,7 +43,7 @@ event contract (schema, sanitization, delivery semantics).
   change set, under the team billing lock, invoiced now with
   `error_if_incomplete` (a decline is `CustomerError::PaymentFailed`) and
   idempotent by key (`subscription_item_change` durable requests/receipts plus
-  an atomic `macro_item_change` provider marker and Stripe's `Idempotency-Key`).
+  an atomic `rox_item_change` provider marker and Stripe's `Idempotency-Key`).
   Replay the receipt before resolving current subscription/prices. A change
   left pending is settled by the next holder of the subscription guard (applied
   iff its provider marker landed, else `abandoned`), so it never wedges seat,

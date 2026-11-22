@@ -54,7 +54,7 @@ pub async fn row_history_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let changes = state
         .service
@@ -110,13 +110,13 @@ pub struct ChangePath {
 pub async fn undo_change_handler<Service, EntityAccess, Authorization>(
     access: DatabaseAccessLevelExtractor<EditAccessLevel, EntityAccess, Authorization>,
     State(state): State<DatabasesRouterState<Service, EntityAccess, Authorization>>,
-    user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     Path(path): Path<ChangePath>,
 ) -> Result<Json<UndoChangeResponse>, DatabaseError>
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let outcome = state
         .service
@@ -178,7 +178,7 @@ pub async fn table_changes_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let changes = state
         .service

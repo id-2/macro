@@ -44,7 +44,7 @@ fn copy_of(
     copy
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owned_inboxes_carry_the_calendars_each_can_write(pool: PgPool) {
     let owner_id = "macro|organizer-calendar-owned@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -82,7 +82,7 @@ async fn owned_inboxes_carry_the_calendars_each_can_write(pool: PgPool) {
     assert_eq!(writable, [SECONDARY, "primary"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_invitation_from_a_secondary_calendar_names_the_organizers_copy(pool: PgPool) {
     let owner_id = "macro|organizer-calendar-target@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -160,7 +160,7 @@ async fn an_invitation_from_a_secondary_calendar_names_the_organizers_copy(pool:
     assert_eq!(preview.viewer_calendar_ids, [primary_id, secondary_id]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_calendar_the_inbox_only_reads_lends_its_copy_nothing(pool: PgPool) {
     let owner_id = "macro|organizer-calendar-reader@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -335,7 +335,7 @@ async fn copy_titles(repo: &PgCalendarRepository, meeting: &SecondaryMeeting) ->
     event.sources.into_iter().map(|copy| copy.title).collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_edit_through_the_organizers_copy_shows_until_the_invitation_catches_up(pool: PgPool) {
     let repo = PgCalendarRepository::new(pool.clone());
     let meeting =
@@ -405,7 +405,7 @@ async fn an_edit_through_the_organizers_copy_shows_until_the_invitation_catches_
     assert_eq!(copy_titles(&repo, &meeting).await, ["Renamed", "Renamed"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_invitation_retakes_content_a_later_change_reached_first(pool: PgPool) {
     let repo = PgCalendarRepository::new(pool.clone());
     let meeting =
@@ -426,7 +426,7 @@ async fn the_invitation_retakes_content_a_later_change_reached_first(pool: PgPoo
     assert_eq!(content.content_updated_at, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sync_of_the_organizers_copy_leaves_content_to_the_invitation(pool: PgPool) {
     let repo = PgCalendarRepository::new(pool.clone());
     let meeting =
@@ -449,7 +449,7 @@ async fn a_sync_of_the_organizers_copy_leaves_content_to_the_invitation(pool: Pg
 /// The migration that logs events organized by a calendar their inbox
 /// writes, so caches holding their pre-October-2026 capabilities refetch them.
 const LOG_ORGANIZED_EVENTS: &str = include_str!(
-    "../../../../../macro_db_client/migrations/20261026184741_log_events_organized_by_a_writable_calendar.sql"
+    "../../../../../rox_db_client/migrations/20261026184741_log_events_organized_by_a_writable_calendar.sql"
 );
 
 /// A copy of another meeting on `calendar_id`, organized by `organizer`.
@@ -467,7 +467,7 @@ fn other_meeting(
     copy
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_capability_backfill_logs_only_events_a_writable_calendar_organizes(pool: PgPool) {
     let owner_id = "macro|organizer-calendar-backfill@example.com";
     let link_id = insert_link(&pool, owner_id).await;

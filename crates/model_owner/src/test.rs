@@ -107,8 +107,8 @@ fn owner_type_lowercase_round_trips() {
 #[test]
 fn is_user_matches_only_that_user() {
     let owner = Owner::from_principal_str("macro|hutch@rox.one").unwrap();
-    let same = MacroUserIdStr::parse_from_str("macro|hutch@rox.one").unwrap();
-    let other = MacroUserIdStr::parse_from_str("macro|other@rox.one").unwrap();
+    let same = RoxUserIdStr::parse_from_str("macro|hutch@rox.one").unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@rox.one").unwrap();
 
     assert!(owner.is_user(&same));
     assert!(!owner.is_user(&other));
@@ -121,7 +121,7 @@ fn is_user_matches_only_that_user() {
 
 #[test]
 fn as_user_is_only_the_user_kind() {
-    let user = MacroUserIdStr::parse_from_str("macro|hutch@rox.one").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|hutch@rox.one").unwrap();
 
     assert_eq!(Owner::User(user.clone()).as_user(), Some(&user));
     assert_eq!(

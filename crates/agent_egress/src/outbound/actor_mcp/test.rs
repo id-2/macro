@@ -50,8 +50,8 @@ async fn state_is_preserved_within_one_actor_and_isolated_across_actors() {
     });
     let transport = HttpActorMcpTransport::new(AddressPolicy::AnyAddress).unwrap();
     let session = AgentSessionId::new();
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
-    let requester = MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
+    let requester = RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     for (actor, expected) in [
         (requester.clone(), "1"),
         (requester.clone(), "2"),

@@ -3,7 +3,7 @@ import type {
   ChannelType,
 } from '../../../generated/storage/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { SearchOpts } from '../search/options';
 import type { Team } from '../teams/team';
 import type { User } from '../users/user';
@@ -46,7 +46,7 @@ export class ChannelNamespace {
   /** Team-shared labels that group channels in the Chat sidebar. */
   readonly labels: ChannelLabelsNamespace;
 
-  constructor(private readonly client: MacroClient) {
+  constructor(private readonly client: RoxClient) {
     this.labels = new ChannelLabelsNamespace(client);
   }
 

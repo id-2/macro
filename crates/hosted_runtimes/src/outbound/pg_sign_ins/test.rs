@@ -1,5 +1,5 @@
 use chrono::{TimeZone, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 use crate::domain::ids::ComputerId;
@@ -7,22 +7,22 @@ use harness_id::HarnessId;
 
 const TEAM: Uuid = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_7ea4);
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgPool) {
-    let macro_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0011);
+    let rox_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0011);
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'owner@example.com', 'owner@example.com', 'stripe_owner')
         "#,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(&pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|owner@example.com', 'owner@example.com', $1)"#,
-        macro_user_id,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|owner@example.com', 'owner@example.com', $1)"#,
+        rox_user_id,
     )
     .execute(&pool)
     .await
@@ -113,7 +113,7 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
         harness_id,
         team_id: TEAM,
         computer_name: "Build box".to_owned(),
-        signed_in_by: Some(MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()),
+        signed_in_by: Some(RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()),
         signed_in_at: at(1, 12),
         expires_at: Some(at(20, 12)),
         last_notice: None,

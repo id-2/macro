@@ -114,7 +114,7 @@ function CalendarDraftComposerContent(props: CalendarDraftComposerProps) {
       fireAndForget(linksQuery.refetch(), 'ai-calendar-compose');
   };
   const primaryInbox = () =>
-    links().find((link) => link.macro_id === userId() && link.is_primary);
+    links().find((link) => link.rox_id === userId() && link.is_primary);
   const primaryNeedsAccess = () =>
     primaryInbox()?.needs_reauth || primaryInbox()?.needs_calendar_permission;
   const requestedInbox = () => {

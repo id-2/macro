@@ -121,7 +121,7 @@ async fn an_external_open_provisions_nothing_and_prompts_nobody() {
     let agent_client_protocol::schema::v1::McpServer::Http(server) = &open.mcp_servers[1] else {
         panic!("expected HTTP MCP")
     };
-    assert_eq!(server.name, "macro_internal");
+    assert_eq!(server.name, "rox_internal");
     assert!(server.url.ends_with("/mcp/internal"));
     assert!(
         server

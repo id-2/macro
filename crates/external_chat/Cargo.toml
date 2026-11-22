@@ -11,7 +11,7 @@ ports = [
   "dep:async-trait",
   "dep:entity_access",
   "dep:image",
-  "dep:macro_user_id",
+  "dep:rox_user_id",
   "dep:nom",
   "dep:rootcause",
   "dep:sha2",
@@ -35,7 +35,7 @@ outbound = [
 inbound = [
   "dep:axum",
   "dep:entity_access",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "entity_access/inbound",
   "ports",
   "schema",
@@ -50,8 +50,8 @@ entity_access = { path = "../entity_access", default-features = false, optional 
 entity_access_db_utils = { path = "../entity_access_db_utils", optional = true }
 enterprise = { path = "../enterprise", default-features = false, optional = true }
 image = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = ["axum"], optional = true }
-macro_user_id = { path = "../macro_user_id", optional = true }
+rox_authorization = { path = "../rox_authorization", default-features = false, features = ["axum"], optional = true }
+rox_user_id = { path = "../rox_user_id", optional = true }
 model-entity = { path = "../model-entity" }
 models_permissions = { path = "../models_permissions" }
 nom = { workspace = true, optional = true }
@@ -71,5 +71,5 @@ uuid = { workspace = true }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

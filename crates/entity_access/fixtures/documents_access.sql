@@ -40,13 +40,13 @@
 --   legacy-public  public view link                               view
 --   legacy-missing no document row                                none
 
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
     ('a0000000-0000-0000-0000-000000000001', 'viewer',   'viewer@batch.test',   'cus_batch_viewer'),
     ('a0000000-0000-0000-0000-000000000002', 'teammate', 'teammate@batch.test', 'cus_batch_teammate'),
     ('a0000000-0000-0000-0000-000000000003', 'stranger', 'stranger@batch.test', 'cus_batch_stranger'),
     ('a0000000-0000-0000-0000-000000000004', 'outsider', 'outsider@batch.test', 'cus_batch_outsider');
 
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
     ('macro|viewer@batch.test',   'viewer@batch.test',   'a0000000-0000-0000-0000-000000000001'),
     ('macro|teammate@batch.test', 'teammate@batch.test', 'a0000000-0000-0000-0000-000000000002'),
     ('macro|stranger@batch.test', 'stranger@batch.test', 'a0000000-0000-0000-0000-000000000003'),
@@ -126,12 +126,12 @@ INSERT INTO "DocumentPermission" ("documentId", "sharePermissionId") VALUES
 
 -- Inboxes: e1...01 the viewer's, e1...02 the stranger's (delegated to the
 -- viewer), e1...03 the outsider's.
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider) VALUES
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider) VALUES
     ('e1000000-0000-0000-0000-000000000001', 'macro|viewer@batch.test',   'macro|viewer@batch.test',   'viewer@mail.test',   'GMAIL'),
     ('e1000000-0000-0000-0000-000000000002', 'macro|stranger@batch.test', 'macro|stranger@batch.test', 'stranger@mail.test', 'GMAIL'),
     ('e1000000-0000-0000-0000-000000000003', 'macro|outsider@batch.test', 'macro|outsider@batch.test', 'outsider@mail.test', 'GMAIL');
 
-INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id) VALUES
+INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id) VALUES
     ('macro|viewer@batch.test', 'macro|stranger@batch.test', 'e1000000-0000-0000-0000-000000000002');
 
 INSERT INTO email_threads (id, link_id) VALUES

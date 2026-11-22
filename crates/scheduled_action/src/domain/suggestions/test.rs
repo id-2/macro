@@ -52,7 +52,7 @@ impl FakeRepo {
 }
 
 impl SuggestionRepo for FakeRepo {
-    async fn kept_by(&self, _: &MacroUserIdStr<'_>, session: Uuid) -> Result<u32> {
+    async fn kept_by(&self, _: &RoxUserIdStr<'_>, session: Uuid) -> Result<u32> {
         Ok(self
             .kept
             .lock()
@@ -64,7 +64,7 @@ impl SuggestionRepo for FakeRepo {
 
     async fn add(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         session: Uuid,
         generation: Uuid,
         suggestion: &CheckedSuggestion,
@@ -116,7 +116,7 @@ impl SuggestionRepo for FakeRepo {
 
     async fn retire(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         id: Uuid,
         _: Uuid,
         generation: Uuid,
@@ -136,30 +136,30 @@ impl SuggestionRepo for FakeRepo {
         Ok(moved)
     }
 
-    async fn suggestions(&self, _: &MacroUserIdStr<'_>) -> Result<Vec<StoredSuggestion>> {
+    async fn suggestions(&self, _: &RoxUserIdStr<'_>) -> Result<Vec<StoredSuggestion>> {
         Ok(self.suggestions.lock().unwrap().clone())
     }
 
-    async fn dismissed_templates(&self, _: &MacroUserIdStr<'_>) -> Result<Vec<String>> {
+    async fn dismissed_templates(&self, _: &RoxUserIdStr<'_>) -> Result<Vec<String>> {
         Ok(self.templates.lock().unwrap().clone())
     }
 
-    async fn dismiss(&self, _: &MacroUserIdStr<'_>, id: Uuid) -> Result<Option<Transition>> {
+    async fn dismiss(&self, _: &RoxUserIdStr<'_>, id: Uuid) -> Result<Option<Transition>> {
         Ok(self.apply(id, RoutineSuggestionEvent::Dismiss))
     }
 
-    async fn dismiss_template(&self, _: &MacroUserIdStr<'_>, key: &str) -> Result<()> {
+    async fn dismiss_template(&self, _: &RoxUserIdStr<'_>, key: &str) -> Result<()> {
         self.templates.lock().unwrap().push(key.to_owned());
         Ok(())
     }
 
-    async fn saved_from(&self, _: &MacroUserIdStr<'_>) -> Result<Vec<Uuid>> {
+    async fn saved_from(&self, _: &RoxUserIdStr<'_>) -> Result<Vec<Uuid>> {
         Ok(self.saved.lock().unwrap().clone())
     }
 
     async fn drafted(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         ids: &[Uuid],
     ) -> Result<Vec<(Uuid, crate::domain::models::ActionConfiguration)>> {
         Ok(self
@@ -180,7 +180,7 @@ impl SuggestionRepo for FakeRepo {
 struct FakeSources;
 
 impl SuggestionSources for FakeSources {
-    async fn inbox(&self, _: &MacroUserIdStr<'static>, limit: u16) -> Result<Vec<InboxMessage>> {
+    async fn inbox(&self, _: &RoxUserIdStr<'static>, limit: u16) -> Result<Vec<InboxMessage>> {
         assert_eq!(limit, INBOX_MESSAGES);
         Ok(vec![InboxMessage {
             from: Some("Supplier <orders@supplier.example>".to_owned()),
@@ -192,7 +192,7 @@ impl SuggestionSources for FakeSources {
         }])
     }
 
-    async fn apps(&self, _: &MacroUserIdStr<'static>) -> Result<Vec<String>> {
+    async fn apps(&self, _: &RoxUserIdStr<'static>) -> Result<Vec<String>> {
         Ok(vec!["slack".to_owned()])
     }
 }
@@ -220,7 +220,7 @@ impl GenerationSessions for FakeGenerations {
 
 #[async_trait::async_trait]
 impl GenerationStatuses for FakeGenerations {
-    async fn latest(&self, _: &MacroUserIdStr<'_>) -> Result<Option<GenerationStatus>> {
+    async fn latest(&self, _: &RoxUserIdStr<'_>) -> Result<Option<GenerationStatus>> {
         Ok(*self.status.lock().unwrap())
     }
 }
@@ -284,7 +284,7 @@ impl Harness {
     /// An open session of `kind` for `owner`, in a new generation.
     fn session_of(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         kind: SessionKind,
         surfaces: &[Surface],
     ) -> Uuid {
@@ -344,7 +344,7 @@ async fn only_the_persons_open_routines_sessions_may_suggest() {
             .await,
     );
     // Someone else's routines session.
-    let other = MacroUserIdStr::try_from("macro|someone-else@example.com".to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("macro|someone-else@example.com".to_owned()).unwrap();
     let theirs = h.session_of(other, SessionKind::Routines, &[Surface::Email]);
     assert_not_suggesting(h.service.suggest(&principal, Some(theirs), request()).await);
     // The person's own suggestions session.

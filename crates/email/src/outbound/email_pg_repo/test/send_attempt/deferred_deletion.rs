@@ -4,15 +4,15 @@ use crate::domain::scheduled_delivery::state as delivery;
 use email_db_client::messages::delete::delete_db_message;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn deletion_retains_delivery_and_reconciliation_after_submission(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
-    let file = macro_uuid::generate_uuid_v7();
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
+    let file = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO email_attachments(id,message_id,provider_attachment_id,filename,mime_type,size_bytes) VALUES($1,$2,'approved-file','file.txt','text/plain',4)", file, message()).execute(&pool).await?;
     let mut approved = prepared();
     approved.snapshot.forwarded_attachment_ids = vec![file];
@@ -48,14 +48,14 @@ async fn deletion_retains_delivery_and_reconciliation_after_submission(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn failed_send_keeps_recoverable_content_until_cancel(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(
@@ -98,14 +98,14 @@ async fn failed_send_keeps_recoverable_content_until_cancel(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn deferred_deletion_cannot_delete_a_resend_with_the_same_provider_identity(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let first = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let first = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), first, prepared()).await?;
     sqlx::query!(
         "UPDATE email_messages SET provider_id='unchanged-provider-id' WHERE id=$1",
@@ -115,7 +115,7 @@ async fn deferred_deletion_cannot_delete_a_resend_with_the_same_provider_identit
     .await?;
     assert!(!delete_db_message(&pool, message()).await?);
     repo.cancel_send(&actor(), link(), first).await?;
-    let second = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let second = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), second, prepared_generation(2))
         .await?;
     assert!(
@@ -141,14 +141,14 @@ async fn deferred_deletion_cannot_delete_a_resend_with_the_same_provider_identit
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn terminal_deletion_applies_only_to_the_captured_provider_identity(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(
@@ -185,14 +185,14 @@ async fn terminal_deletion_applies_only_to_the_captured_provider_identity(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn confirmed_delivery_with_unchanged_provider_identity_finishes_deferred_deletion(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(
@@ -232,7 +232,7 @@ async fn confirmed_delivery_with_unchanged_provider_identity_finishes_deferred_d
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn explicit_inbox_removal_revokes_authority_without_blocking_the_parent_cascade(
@@ -242,7 +242,7 @@ async fn explicit_inbox_removal_revokes_authority_without_blocking_the_parent_ca
     repo.admit_send(
         &actor(),
         link(),
-        SendAttemptId(macro_uuid::generate_uuid_v7()),
+        SendAttemptId(rox_uuid::generate_uuid_v7()),
         prepared(),
     )
     .await?;
@@ -270,7 +270,7 @@ async fn explicit_inbox_removal_revokes_authority_without_blocking_the_parent_ca
 
 #[cfg(feature = "mailbox")]
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn explicit_inbox_purge_removes_an_accepted_send_and_its_retained_deletion(
@@ -280,7 +280,7 @@ async fn explicit_inbox_purge_removes_an_accepted_send_and_its_retained_deletion
     repo.admit_send(
         &actor(),
         link(),
-        SendAttemptId(macro_uuid::generate_uuid_v7()),
+        SendAttemptId(rox_uuid::generate_uuid_v7()),
         prepared(),
     )
     .await?;

@@ -28,7 +28,7 @@ fn a_reporting_agent_shows_its_own_status() {
 #[test]
 fn an_agent_without_status_is_unknown_while_it_runs() {
     let info = info(
-        r#"{"address":"t4","state":"live","cwd":"/work","labels":{"macro.agent":"codex"},"status":null,"foreground":{"pid":1,"name":"codex","argv":[],"cwd":"/work"}}"#,
+        r#"{"address":"t4","state":"live","cwd":"/work","labels":{"rox.agent":"codex"},"status":null,"foreground":{"pid":1,"name":"codex","argv":[],"cwd":"/work"}}"#,
     )
     .unwrap();
     assert_eq!(info.status, "unknown");
@@ -40,7 +40,7 @@ fn a_finished_or_replaced_agent_is_missing() {
     assert!(finished.missing_agent());
     // A kept terminal whose agent was lost runs a fresh shell in its place.
     let replaced = info(
-        r#"{"address":"t4","state":"live","cwd":"/work","labels":{"macro.agent":"claude"},"status":null,"foreground":{"pid":1,"name":"bash","argv":[],"cwd":"/work"}}"#,
+        r#"{"address":"t4","state":"live","cwd":"/work","labels":{"rox.agent":"claude"},"status":null,"foreground":{"pid":1,"name":"bash","argv":[],"cwd":"/work"}}"#,
     )
     .unwrap_err();
     assert!(replaced.missing_agent());
@@ -69,7 +69,7 @@ fn fake_hc(root: &Path) -> std::path::PathBuf {
 printf '%s\n' "$*" >> {calls}
 case "$1 $2" in
   "get t1") echo '{{"address":"t1","state":"live","cwd":"/","labels":{{"herdr.space":"space-1"}}}}' ;;
-  "get macro-abc") echo '{{"address":"t9","state":"live","cwd":"/work","labels":{{"macro.agent":"codex"}},"status":{{"state":"idle"}}}}' ;;
+  "get macro-abc") echo '{{"address":"t9","state":"live","cwd":"/work","labels":{{"rox.agent":"codex"}},"status":{{"state":"idle"}}}}' ;;
   run*) echo '{{"address":"t9","state":"live","cwd":"/work"}}' ;;
   *) echo '{{}}' ;;
 esac

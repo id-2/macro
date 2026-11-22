@@ -21,7 +21,7 @@ pub(super) fn is_tool_lookup(name: &ToolName) -> bool {
     match name {
         ToolName::Native { name } => LOOKUP_TOOLS.contains(&name.as_str()),
         ToolName::Mcp { server, tool } => {
-            matches!(server.as_str(), "macro" | "macro_internal")
+            matches!(server.as_str(), "macro" | "rox_internal")
                 && LOOKUP_TOOLS.contains(&tool.as_str())
         }
     }
@@ -60,7 +60,7 @@ pub(super) fn rows(
     }
     // Rox's own agent runs code on the internal server; other agents reach
     // the same tool through Rox's public MCP server.
-    if !matches!(name, ToolName::Mcp { server, tool } if matches!(server.as_str(), "macro" | "macro_internal") && tool == "ExecuteCode")
+    if !matches!(name, ToolName::Mcp { server, tool } if matches!(server.as_str(), "macro" | "rox_internal") && tool == "ExecuteCode")
     {
         return None;
     }

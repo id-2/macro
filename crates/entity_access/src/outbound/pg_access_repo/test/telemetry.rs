@@ -57,7 +57,7 @@ impl<S: Subscriber + for<'a> LookupSpan<'a>> Layer<S> for SpanValues {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("user_team"))
 )]
 async fn document_check_records_its_source_id_count_and_no_user_id(
@@ -102,7 +102,7 @@ async fn document_check_records_its_source_id_count_and_no_user_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("user_team"))
 )]
 async fn pipelines_check_records_counts_and_no_ids(pool: PgPool) -> anyhow::Result<()> {

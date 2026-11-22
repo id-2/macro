@@ -1,6 +1,6 @@
 //! Integration tests for sharing a personal label with a team.
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::service::property_value::PropertyValue;
 use models_properties::{DataType, EntityType};
@@ -65,7 +65,7 @@ async fn tag_document(
         ON CONFLICT (entity_id, entity_type, property_definition_id)
         DO UPDATE SET values = $4
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         entity_id,
         definition_id,
         value,
@@ -76,7 +76,7 @@ async fn tag_document(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn promote_moves_label_and_retags_entities(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -119,7 +119,7 @@ async fn promote_moves_label_and_retags_entities(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn promote_attaches_the_team_property_when_absent(
@@ -154,7 +154,7 @@ async fn promote_attaches_the_team_property_when_absent(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn promote_reports_a_case_insensitive_name_collision(
@@ -189,7 +189,7 @@ async fn promote_reports_a_case_insensitive_name_collision(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn concurrent_promotions_of_one_name_produce_a_single_team_label(
@@ -260,7 +260,7 @@ async fn concurrent_promotions_of_one_name_produce_a_single_team_label(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn merge_retags_entities_onto_the_team_label(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -311,7 +311,7 @@ async fn merge_retags_entities_onto_the_team_label(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn merge_rejects_a_target_outside_the_team_tag_set(
@@ -341,7 +341,7 @@ async fn merge_rejects_a_target_outside_the_team_tag_set(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn promoted_label_reads_back_from_the_team_tag_set(
@@ -359,7 +359,7 @@ async fn promoted_label_reads_back_from_the_team_tag_set(
 
     // user3 is on Team 1 but never had the personal label, so this asserts the
     // whole point of promotion: the label is now theirs to see and use.
-    let user3 = macro_user_id::user_id::MacroUserIdStr::try_from("macro|user3@test.com")?;
+    let user3 = rox_user_id::user_id::RoxUserIdStr::try_from("macro|user3@test.com")?;
     let visible = repo.get_caller_tag_definitions(user3.as_ref()).await?;
     let team_labels = visible
         .iter()
@@ -391,7 +391,7 @@ async fn promoted_label_reads_back_from_the_team_tag_set(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties", "tags"))
 )]
 async fn promote_provisions_a_team_tag_set_on_demand(pool: Pool<Postgres>) -> anyhow::Result<()> {

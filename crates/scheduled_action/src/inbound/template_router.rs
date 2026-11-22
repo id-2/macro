@@ -9,10 +9,10 @@ use entity_access::domain::models::OwnerAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::ScheduledActionAccessExtractor;
 use entity_registry::{CreationPrincipalExtractor, NonUserOwners};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use crate::domain::models::ActionConfiguration;
 use crate::domain::ports::RoutineTemplateService;
@@ -22,7 +22,7 @@ use crate::inbound::axum_router::{ScheduledActionApiError, ScheduledActionRespon
 pub struct RoutineTemplateRouterState<T, Svc, Auth> {
     pub service: Arc<T>,
     pub access_service: Arc<Svc>,
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, Svc, Auth> Clone for RoutineTemplateRouterState<T, Svc, Auth> {
@@ -42,7 +42,7 @@ impl<T, Svc, Auth> FromRef<RoutineTemplateRouterState<T, Svc, Auth>> for Arc<Svc
 }
 
 impl<T, Svc, Auth> FromRef<RoutineTemplateRouterState<T, Svc, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &RoutineTemplateRouterState<T, Svc, Auth>) -> Self {
         state.authorization_state.clone()
@@ -63,7 +63,7 @@ pub fn routine_template_router<T, Svc, Auth, St>(
 where
     T: RoutineTemplateService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Send + Sync,
 {
     Router::new()
@@ -106,7 +106,7 @@ pub async fn share_template<T, Svc, Auth>(
 where
     T: RoutineTemplateService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(req) = body.map_err(ScheduledActionApiError::InvalidRequest)?;
     let template = state
@@ -139,7 +139,7 @@ pub async fn unshare_template<T, Svc, Auth>(
 where
     T: RoutineTemplateService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service
@@ -163,17 +163,17 @@ where
 )]
 pub async fn get_template<T, Svc, Auth>(
     State(state): State<RoutineTemplateRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<RoutineTemplate>, ScheduledActionApiError>
 where
     T: RoutineTemplateService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
             .service
-            .get_template(&user.authorization.user.macro_user_id, id)
+            .get_template(&user.authorization.user.rox_user_id, id)
             .await?,
     ))
 }
@@ -203,7 +203,7 @@ pub async fn activate_template<T, Svc, Auth>(
 where
     T: RoutineTemplateService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(req) = body.map_err(ScheduledActionApiError::InvalidRequest)?;
     let created = state.service.activate_template(&principal, id, req).await?;

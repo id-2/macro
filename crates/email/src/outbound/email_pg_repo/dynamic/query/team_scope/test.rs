@@ -2,8 +2,8 @@ use super::*;
 use crate::outbound::email_pg_repo::dynamic::resolve::{ResolvedFilters, resolve_filters};
 use chrono::{TimeZone, Utc};
 use item_filters::ast::email::Email;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::email::EmailStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::email::EmailStr;
 use models_pagination::SimpleSortMethod;
 use sqlx::Execute;
 
@@ -313,7 +313,7 @@ async fn resolved_inboxes(
 /// deleted; u7's (link 9) has consent off; and u3's (link 3) is named only by
 /// u8's consent. Delta's u9 consents on link 10, which only Delta reads.
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn contributing_inboxes_restate_the_privacy_function(
@@ -353,7 +353,7 @@ async fn contributing_inboxes_restate_the_privacy_function(
 /// Delta and consents there, and u1, who contributes to Gamma, joins Delta
 /// and blocks dense.test there.
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn another_teams_consent_and_lists_never_apply(pool: sqlx::PgPool) -> anyhow::Result<()> {
@@ -412,7 +412,7 @@ async fn another_teams_consent_and_lists_never_apply(pool: sqlx::PgPool) -> anyh
 /// test. The fixture's hand-made threads are where only a draft or a spam
 /// message carries a participant.
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn allowed_restates_the_privacy_function(pool: sqlx::PgPool) -> anyhow::Result<()> {

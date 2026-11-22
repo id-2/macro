@@ -1,6 +1,6 @@
 //! Bounded reads of the viewer's contact graph, including the viewer themselves.
 
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
 /// Maximum number of contact IDs in one page.
 pub const MAX_CONTACT_PAGE_SIZE: u16 = 500;
@@ -55,7 +55,7 @@ impl ContactCursor {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContactIdEntry {
     /// Canonical user identifier.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Exclusive position immediately after this source row.
     pub cursor: ContactCursor,
 }
@@ -63,7 +63,7 @@ pub struct ContactIdEntry {
 impl ContactIdEntry {
     /// Parse a stored ID without losing its original continuation position.
     pub fn parse(position: String) -> Option<Self> {
-        let user_id = MacroUserIdStr::try_from(position.as_str())
+        let user_id = RoxUserIdStr::try_from(position.as_str())
             .ok()?
             .into_owned();
         let cursor = ContactCursor::from_position(position)?;

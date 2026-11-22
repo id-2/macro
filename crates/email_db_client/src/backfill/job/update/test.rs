@@ -4,10 +4,10 @@ use super::{
     finalize_initialization, mark_completion_effects_complete, release_completion_effects,
     release_init_lease, renew_completion_effects, renew_init_lease,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{PgPool, types::Uuid};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn initialization_lease_is_fenced_reclaimable_and_publishes_once(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -15,7 +15,7 @@ async fn initialization_lease_is_fenced_reclaimable_and_publishes_once(
     let email_job_id = Uuid::new_v4();
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
@@ -80,13 +80,13 @@ async fn initialization_lease_is_fenced_reclaimable_and_publishes_once(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failing_an_active_scan_marks_it_terminal(pool: PgPool) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     let email_job_id = Uuid::new_v4();
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
@@ -124,7 +124,7 @@ async fn failing_an_active_scan_marks_it_terminal(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn completing_an_active_scan_runs_completion_effects_once(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -132,7 +132,7 @@ async fn completing_an_active_scan_runs_completion_effects_once(
     let email_job_id = Uuid::new_v4();
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
@@ -194,14 +194,14 @@ async fn completing_an_active_scan_runs_completion_effects_once(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn zero_thread_completion_is_fenced_by_init_lease(pool: PgPool) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     let email_job_id = Uuid::new_v4();
     let current_lease = Uuid::new_v4();
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,
@@ -281,13 +281,13 @@ async fn zero_thread_completion_is_fenced_by_init_lease(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failing_a_terminal_scan_is_an_idempotent_noop(pool: PgPool) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     let email_job_id = Uuid::new_v4();
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
         link_id,

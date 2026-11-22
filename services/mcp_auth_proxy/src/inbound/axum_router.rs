@@ -15,7 +15,7 @@ use axum::{
     routing,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
 use serde::Deserialize;
 use tower_http::cors::{AllowOrigin, CorsLayer};
 
@@ -105,7 +105,7 @@ const EMAIL_SIGN_IN_PATH: &str = "email-sign-in";
 /// Cookie carrying the browser's `BrowserBinding`. The `__Host-` prefix makes
 /// browsers refuse it unless it is `Secure`, host-only and on `/`, so no
 /// sibling domain can plant one.
-const BROWSER_BINDING_COOKIE: &str = "__Host-macro_mcp_oauth";
+const BROWSER_BINDING_COOKIE: &str = "__Host-rox_mcp_oauth";
 
 /// The consent screen loads nothing, runs nothing, and cannot be framed, so a
 /// page that overlays it cannot trick a click onto Allow.
@@ -1014,7 +1014,7 @@ fn mcp_cors_layer() -> CorsLayer {
         .allow_headers([
             header::CONTENT_TYPE,
             header::AUTHORIZATION,
-            HeaderName::from_static("x-macro-user-api-key"),
+            HeaderName::from_static("x-rox-user-api-key"),
             HeaderName::from_static("mcp-protocol-version"),
             HeaderName::from_static("mcp-session-id"),
         ])

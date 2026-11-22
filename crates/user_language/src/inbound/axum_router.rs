@@ -9,8 +9,8 @@ use axum::{
     response::IntoResponse,
     routing::get,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use model_user::UserLanguage;
@@ -20,7 +20,7 @@ use crate::domain::{models::UserLanguageError, ports::UserLanguageService};
 /// Router state for the user language endpoints.
 pub struct UserLanguageRouterState<S, Auth> {
     service: Arc<S>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for UserLanguageRouterState<S, Auth> {
@@ -34,7 +34,7 @@ impl<S, Auth> Clone for UserLanguageRouterState<S, Auth> {
 
 impl<S: UserLanguageService, Auth> UserLanguageRouterState<S, Auth> {
     /// Create router state from a shared service and authorization state.
-    pub fn new(service: Arc<S>, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<S>, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization_state,
@@ -42,7 +42,7 @@ impl<S: UserLanguageService, Auth> UserLanguageRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<UserLanguageRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<UserLanguageRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &UserLanguageRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -56,7 +56,7 @@ impl<S, Auth> FromRef<UserLanguageRouterState<S, Auth>> for MacroAuthorizationSt
 pub fn user_language_router<S, Auth, T>(state: UserLanguageRouterState<S, Auth>) -> Router<T>
 where
     S: UserLanguageService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -83,15 +83,15 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn get_user_language_handler<S, Auth>(
     State(state): State<UserLanguageRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<UserLanguage>, UserLanguageError>
 where
     S: UserLanguageService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let language = state
         .service
-        .get_language(&user.authorization.user.macro_user_id)
+        .get_language(&user.authorization.user.rox_user_id)
         .await?;
     Ok(Json(UserLanguage { language }))
 }
@@ -115,16 +115,16 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn put_user_language_handler<S, Auth>(
     State(state): State<UserLanguageRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<UserLanguage>,
 ) -> Result<StatusCode, UserLanguageError>
 where
     S: UserLanguageService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service
-        .set_language(&user.authorization.user.macro_user_id, body.language)
+        .set_language(&user.authorization.user.rox_user_id, body.language)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }

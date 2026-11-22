@@ -13,7 +13,7 @@ ports = ["entity_access/ports"]
 # Core
 anyhow = { workspace = true }
 entity_access = { path = "../entity_access", default-features = false }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

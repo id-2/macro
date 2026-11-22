@@ -1,5 +1,5 @@
 INSERT INTO email_links (id,
-                         macro_id,
+                         rox_id,
                          fusionauth_user_id,
                          email_address,
                          provider)

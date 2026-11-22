@@ -377,7 +377,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
         id,
         name: {
           kind: 'mcp',
-          server: 'macro_internal',
+          server: 'rox_internal',
           tool: 'SearchTools',
         },
         status: 'running',
@@ -459,7 +459,7 @@ export async function playTurn(options: { speed: number; summarize: boolean }) {
       model.parts.push({
         kind: 'tool_use',
         id,
-        name: { kind: 'mcp', server: 'macro_internal', tool: 'ExecuteCode' },
+        name: { kind: 'mcp', server: 'rox_internal', tool: 'ExecuteCode' },
         status: 'pending',
         detail: { kind: 'macro', input: {}, output: null, error: null },
       }) - 1;

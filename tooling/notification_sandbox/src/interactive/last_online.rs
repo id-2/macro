@@ -1,4 +1,4 @@
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::models::email_notification_digest::ports::LastOnlineChecker;
 use rootcause::Report;
 use std::time::Duration;
@@ -7,7 +7,7 @@ use std::time::Duration;
 pub struct InteractiveLastOnlineChecker;
 
 impl LastOnlineChecker for InteractiveLastOnlineChecker {
-    async fn last_online_checker<'a>(&self, user: MacroUserIdStr<'a>) -> Result<Duration, Report> {
+    async fn last_online_checker<'a>(&self, user: RoxUserIdStr<'a>) -> Result<Duration, Report> {
         let minutes: u64 =
             inquire::CustomType::new(&format!("Minutes since user \"{user}\" was last online?"))
                 .with_default(60)

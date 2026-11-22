@@ -4,7 +4,7 @@
 mod options;
 mod structure;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_databases::views::{
     Conjunction, FilterCondition, FilterGroup, FilterNode, FilterTest, NewView, NumberOperator,
     RequestedLayout, ViewId, ViewQuery,
@@ -49,7 +49,7 @@ fn set_cells(wedding: &Wedding, row: RowId, cells: Vec<CellWrite>) -> Vec<Databa
     }]
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn wolf_undoes_his_edit_and_julias_later_plus_ones_stays(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, _) = insert_guests(&pool, &wedding).await;
@@ -128,7 +128,7 @@ async fn wolf_undoes_his_edit_and_julias_later_plus_ones_stays(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undoing_an_insert_julia_since_edited_is_refused_and_writes_nothing(pool: PgPool) {
     let wedding = wedding(&pool).await;
     insert_guests(&pool, &wedding).await;
@@ -164,7 +164,7 @@ async fn undoing_an_insert_julia_since_edited_is_refused_and_writes_nothing(pool
     assert_eq!(table_state(&pool, wedding.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undoing_a_row_delete_brings_omar_back_exactly_after_julia_edits_maria(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, omar) = insert_guests(&pool, &wedding).await;
@@ -206,7 +206,7 @@ async fn undoing_a_row_delete_brings_omar_back_exactly_after_julia_edits_maria(p
     assert_ne!(after.rows[0], before.rows[0]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undoing_a_column_delete_restores_the_column_its_cells_and_the_view_filter(pool: PgPool) {
     let wedding = wedding(&pool).await;
     insert_guests(&pool, &wedding).await;
@@ -273,7 +273,7 @@ async fn undoing_a_column_delete_restores_the_column_its_cells_and_the_view_filt
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undo_then_redo_round_trips(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, _) = insert_guests(&pool, &wedding).await;
@@ -307,7 +307,7 @@ async fn undo_then_redo_round_trips(pool: PgPool) {
     assert_eq!(after_redo, edited);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn wolf_cannot_undo_julias_change(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, _) = insert_guests(&pool, &wedding).await;

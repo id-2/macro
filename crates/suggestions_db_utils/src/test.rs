@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -6,19 +6,19 @@ use super::*;
 const OWNER: &str = "macro|suggestions-db-utils@rox.one";
 
 async fn setup(pool: &PgPool) -> (Uuid, Uuid) {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         OWNER,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         OWNER,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -64,7 +64,7 @@ fn card(suggestion: Uuid, generation: Uuid) -> NewRoutineSuggestionCard<'static>
 
 /// A card moves only from the state its routine suggestion's transition
 /// read it in, so a card that moved meanwhile is left alone.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_routine_card_moves_only_from_the_state_it_is_in(pool: PgPool) {
     let (generation, suggestion) = setup(&pool).await;
     let mut tx = pool.begin().await.unwrap();
@@ -105,7 +105,7 @@ async fn a_routine_card_moves_only_from_the_state_it_is_in(pool: PgPool) {
     assert_eq!(state, "done");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_routine_card_waits_for_room(pool: PgPool) {
     let (generation, suggestion) = setup(&pool).await;
     let mut tx = pool.begin().await.unwrap();
@@ -124,7 +124,7 @@ async fn a_routine_card_waits_for_room(pool: PgPool) {
 }
 
 /// Each routine saved from a suggestion is one more thing its card produced.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_saved_routine_is_what_its_card_produced(pool: PgPool) {
     let (generation, suggestion) = setup(&pool).await;
     let mut tx = pool.begin().await.unwrap();

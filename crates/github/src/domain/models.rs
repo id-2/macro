@@ -41,7 +41,7 @@ pub use repository::{GithubRepository, PullRequestIndexPage, PullRequestIndexReq
 pub use sync::{
     GithubAppInstallationSource, GithubAuthenticatedUser, GithubInstallationAccessToken,
     GithubInstallationSetupAction, GithubSetupAccessToken, GithubUserInstallation,
-    GithubUserInstallationsPage, GithubWebhookEventType, MacroTaskId, ResolvedTeamTaskReference,
+    GithubUserInstallationsPage, GithubWebhookEventType, RoxTaskId, ResolvedTeamTaskReference,
     TeamTaskReference, ValidatedGithubWebhookEvent, extract_github_mentions,
     pull_request_task_reference, strip_markdown_code,
 };

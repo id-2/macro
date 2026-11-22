@@ -7,7 +7,7 @@ use std::{future::Future, pin::Pin};
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{AdminTeamRole, EntityAccessReceipt};
 use futures::Stream;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::models::*;
@@ -115,7 +115,7 @@ pub trait ImportRepo: Send + Sync + 'static {
     fn create(
         &self,
         team: TeamId,
-        admin: &MacroUserIdStr<'_>,
+        admin: &RoxUserIdStr<'_>,
         command: &CreateImport,
         limits: &ImportLimits,
     ) -> impl Future<Output = PortResult<ImportProgress>> + Send;
@@ -179,7 +179,7 @@ pub trait ImportRepo: Send + Sync + 'static {
         &self,
         team: TeamId,
         job: JobId,
-    ) -> impl Future<Output = PortResult<Option<MacroUserIdStr<'static>>>> + Send;
+    ) -> impl Future<Output = PortResult<Option<RoxUserIdStr<'static>>>> + Send;
 
     /// At most 50 team-owned receipts, descending job ID, exclusively before the cursor.
     fn list(
@@ -196,7 +196,7 @@ pub trait ExecutionRepo: Send + Sync + 'static {
     fn requester(
         &self,
         event: &ImportEvent,
-    ) -> impl Future<Output = PortResult<Option<(TeamId, MacroUserIdStr<'static>)>>> + Send;
+    ) -> impl Future<Output = PortResult<Option<(TeamId, RoxUserIdStr<'static>)>>> + Send;
 
     /// Claim Queued work or reclaim expired Importing work using database time and a
     /// fresh token/generation. Reject cancellation and stale event generations. The
@@ -312,7 +312,7 @@ pub trait ImportAuthorizer: Send + Sync + 'static {
     fn require_admin(
         &self,
         team: TeamId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = PortResult<()>> + Send;
 
     /// Authorize target type, team provenance and requester access independently of
@@ -321,7 +321,7 @@ pub trait ImportAuthorizer: Send + Sync + 'static {
     fn require_target(
         &self,
         team: TeamId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         metadata: &ConversationMetadata,
         target: Uuid,
     ) -> impl Future<Output = PortResult<()>> + Send;
@@ -334,7 +334,7 @@ pub trait ImportProgressAccess: Send + Sync + 'static {
     /// Inputs are deduplicated and bounded to 500 IDs per call.
     fn participating_targets(
         &self,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         targets: &[Uuid],
     ) -> impl Future<Output = PortResult<Vec<Uuid>>> + Send;
 }
@@ -346,7 +346,7 @@ pub trait ImportNotifier: Send + Sync + 'static {
     /// or detailed progress in the payload. Caller revalidates admin access first.
     fn invalidate(
         &self,
-        requester: &MacroUserIdStr<'_>,
+        requester: &RoxUserIdStr<'_>,
         team: TeamId,
         job: JobId,
         revision: u64,
@@ -370,7 +370,7 @@ pub trait ImportLedger: Send + Sync + 'static {
     fn reserve(
         &self,
         team: TeamId,
-        requester: &MacroUserIdStr<'static>,
+        requester: &RoxUserIdStr<'static>,
         metadata: &ConversationMetadata,
         authorized_existing_target: Option<Uuid>,
     ) -> impl Future<Output = PortResult<TargetReservation>> + Send;

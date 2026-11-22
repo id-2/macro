@@ -6,7 +6,7 @@ version = "0.1.0"
 
 [features]
 schema = ["dep:utoipa"]
-axum = ["reads", "schema", "dep:axum", "dep:macro_authorization", "dep:tracing"]
+axum = ["reads", "schema", "dep:axum", "dep:rox_authorization", "dep:tracing"]
 # The read service: ranges and feeds with display metadata resolved.
 reads = ["dep:async-trait"]
 # JSON schemas of the range types, for saved transcripts of the removed
@@ -20,7 +20,7 @@ consumer = [
   "dep:rootcause",
   "dep:tokio",
   "dep:tracing",
-  "macro_event_broker/outbound",
+  "rox_event_broker/outbound",
 ]
 default = ["consumer", "outbound", "realtime"]
 outbound = ["dep:sqlx", "dep:tracing"]
@@ -36,7 +36,7 @@ realtime = [
 agent_correlation = { path = "../agent_correlation" }
 utoipa = { workspace = true, optional = true }
 axum = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", default-features = false, features = [
   "axum",
 ], optional = true }
 async-trait = { workspace = true, optional = true }
@@ -46,9 +46,9 @@ chrono = { workspace = true }
 chrono-tz = { workspace = true }
 futures = { workspace = true, optional = true }
 kafka_util = { path = "../kafka_util", optional = true }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
-macro_user_id = { path = "../macro_user_id" }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 model_owner = { path = "../model_owner" }
 rdkafka = { workspace = true, optional = true }
@@ -69,5 +69,5 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 bot_id = { path = "../bot_id" }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "test-util"] }

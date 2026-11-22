@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 
@@ -195,7 +195,7 @@ fn invoice(id: &str, subscription: Option<&str>, purpose: Option<&str>) -> Value
     json!({
         "id": id, "object": "invoice", "customer": "cus_Ordered", "subscription": subscription,
         "status": "paid", "billing_reason": "subscription_cycle",
-        "metadata": purpose.map(|purpose| json!({"macro_purpose": purpose})).unwrap_or(json!({})),
+        "metadata": purpose.map(|purpose| json!({"rox_purpose": purpose})).unwrap_or(json!({})),
         "lines": {"has_more": false, "data": []}
     })
 }
@@ -231,7 +231,7 @@ async fn cursor_state(
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_redelivered_event_is_stored_and_applied_once(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     let payload = event(
@@ -258,7 +258,7 @@ async fn a_redelivered_event_is_stored_and_applied_once(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn events_apply_in_created_order_whatever_order_they_arrive_in(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     inbox
@@ -296,7 +296,7 @@ async fn events_apply_in_created_order_whatever_order_they_arrive_in(pool: PgPoo
     assert_eq!(snapshot["status"], "canceled");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_event_arriving_after_a_later_one_applied_reapplies_from_it_in_order(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     inbox
@@ -338,7 +338,7 @@ async fn an_event_arriving_after_a_later_one_applied_reapplies_from_it_in_order(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_late_event_during_a_lease_stops_the_holder_from_moving_past_it(pool: PgPool) {
     let (inbox, _, _) = inbox(&pool);
     inbox
@@ -407,7 +407,7 @@ async fn a_late_event_during_a_lease_stops_the_holder_from_moving_past_it(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_superseded_snapshot_is_skipped_only_by_consumers_of_the_latest(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     for (id, created, status) in [
@@ -439,7 +439,7 @@ async fn a_superseded_snapshot_is_skipped_only_by_consumers_of_the_latest(pool: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_invoice_paid_twice_applies_once_and_a_later_failure_changes_nothing(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     let overage = invoice("in_Overage", None, Some("ai_overage"));
@@ -481,7 +481,7 @@ async fn an_invoice_paid_twice_applies_once_and_a_later_failure_changes_nothing(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_invoice_before_any_subscription_event_reads_the_subscription_once(pool: PgPool) {
     let (inbox, stripe, recorder) = inbox(&pool);
     stripe.subscriptions.lock().unwrap().insert(
@@ -543,7 +543,7 @@ async fn an_invoice_before_any_subscription_event_reads_the_subscription_once(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failing_consumer_backs_off_without_holding_back_the_others(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     recorder
@@ -596,7 +596,7 @@ async fn a_failing_consumer_backs_off_without_holding_back_the_others(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retries_dead_letter_after_the_attempt_cap(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     recorder
@@ -625,7 +625,7 @@ async fn retries_dead_letter_after_the_attempt_cap(pool: PgPool) {
     assert_eq!(dead_event.as_deref(), Some("evt_Created"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_event_rearms_a_cursor_whose_retries_ran_out(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     recorder
@@ -689,7 +689,7 @@ async fn a_new_event_rearms_a_cursor_whose_retries_ran_out(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_payload_cleared_by_retention_is_skipped_and_the_cursor_moves_past_it(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     for (id, created) in [("evt_Cleared", 1_800_000_000), ("evt_Kept", 1_800_000_100)] {
@@ -720,7 +720,7 @@ async fn a_payload_cleared_by_retention_is_skipped_and_the_cursor_moves_past_it(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_resent_event_older_than_retention_does_not_rewind_the_cursor(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     inbox
@@ -764,7 +764,7 @@ async fn a_resent_event_older_than_retention_does_not_rewind_the_cursor(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_rejected_event_dead_letters_at_once_and_replay_can_skip_it(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     recorder
@@ -828,7 +828,7 @@ async fn a_rejected_event_dead_letters_at_once_and_replay_can_skip_it(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn dead_cursors_replay_in_bulk_by_consumer(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     for consumer in [Consumer::PersonalPlan, Consumer::TeamSubscription] {
@@ -886,7 +886,7 @@ async fn dead_cursors_replay_in_bulk_by_consumer(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stalled_apply_does_not_hold_back_other_customers(pool: PgPool) {
     let (inbox, _, recorder) = inbox(&pool);
     let inbox = Arc::new(inbox);
@@ -947,7 +947,7 @@ async fn a_stalled_apply_does_not_hold_back_other_customers(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_lease_hides_a_cursor_from_other_replicas_until_it_expires(pool: PgPool) {
     let (inbox, _, _) = inbox(&pool);
     inbox
@@ -992,7 +992,7 @@ async fn a_lease_hides_a_cursor_from_other_replicas_until_it_expires(pool: PgPoo
     assert_eq!(repo.claim(second, 100, LEASE).await.unwrap().len(), 5);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_event_received_during_a_lease_keeps_the_cursor_due(pool: PgPool) {
     let (inbox, _, _) = inbox(&pool);
     inbox
@@ -1027,7 +1027,7 @@ async fn an_event_received_during_a_lease_keeps_the_cursor_due(pool: PgPool) {
     assert_eq!(cursor_state(&pool, Consumer::Gtm).await.0, "dirty");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_live_mode_event_is_refused_by_a_test_deployment(pool: PgPool) {
     let (inbox, _, _) = inbox(&pool);
     let payload = json!({

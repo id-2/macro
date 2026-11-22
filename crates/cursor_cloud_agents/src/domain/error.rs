@@ -8,7 +8,7 @@ use thiserror::Error;
 /// Why a session operation failed.
 #[derive(Debug, Error)]
 pub enum SessionError {
-    /// A Macro-funded hosted helper was refused; the owner's Cursor budget is unrelated.
+    /// A Rox-funded hosted helper was refused; the owner's Cursor budget is unrelated.
     #[cfg(feature = "postgres")]
     #[error(transparent)]
     Admission(#[from] agent_session::domain::error::AiAdmissionError),
@@ -51,7 +51,7 @@ impl From<rootcause::Report> for SessionError {
 /// `message` is the `session/prompt` error's message and is always present.
 /// `notice` is the same refusal in the shape a reader renders as an
 /// instruction with somewhere to go; it exists only for the refusals a
-/// person can resolve outside Macro, and travels as the error's `data`.
+/// person can resolve outside Rox, and travels as the error's `data`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PromptRefusal {
     /// One plain sentence or two, no report decorations.

@@ -1,5 +1,5 @@
 import type { DocumentOp } from '@ai-ops/editor';
-import { MACRO_AGENT_NAME } from '@core/constant/macroAgent';
+import { ROX_AGENT_NAME } from '@core/constant/macroAgent';
 import { type Span, Telemetry } from '@macro-inc/observability';
 import { getDocumentPermissionToken } from '@service-storage/client';
 import { createSignal } from 'solid-js';
@@ -141,7 +141,7 @@ export async function requestAiEdit(args: {
         mode: args.mode,
         // Inline edits are Rox's own; its name labels the cursors readers
         // watch, the same way an agent's edits carry the agent's name.
-        editor: { name: MACRO_AGENT_NAME },
+        editor: { name: ROX_AGENT_NAME },
         interpret: false,
         propagate: args.onOps === undefined ? undefined : false,
       }),

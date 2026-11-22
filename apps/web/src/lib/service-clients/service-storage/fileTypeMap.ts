@@ -12,12 +12,12 @@ export const FileTypeMap = {
   md: { extension: 'md', mime: 'text/markdown', app: 'md' },
   spreadsheet: {
     extension: 'spreadsheet',
-    mime: 'application/x-macro-spreadsheet',
+    mime: 'application/x-rox-spreadsheet',
     app: 'document',
   },
   canvas: {
     extension: 'canvas',
-    mime: 'application/x-macro-canvas',
+    mime: 'application/x-rox-canvas',
     app: 'canvas',
   },
   coffee: { extension: 'coffee', mime: 'text/plain', app: 'code' },

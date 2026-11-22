@@ -10,8 +10,8 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, post},
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use serde::Deserialize;
 use std::sync::Arc;
@@ -32,7 +32,7 @@ pub struct OnboardingRouterState<T, Auth> {
     /// The onboarding service implementation.
     pub service: Arc<T>,
     /// The authorization state used by the request extractors.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 // Manual Clone impl so T doesn't need to be Clone (it's behind Arc).
@@ -51,7 +51,7 @@ impl<T, Auth> FromRef<OnboardingRouterState<T, Auth>> for Arc<T> {
     }
 }
 
-impl<T, Auth> FromRef<OnboardingRouterState<T, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Auth> FromRef<OnboardingRouterState<T, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &OnboardingRouterState<T, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -61,7 +61,7 @@ impl<T, Auth> FromRef<OnboardingRouterState<T, Auth>> for MacroAuthorizationStat
 pub fn onboarding_router<T, Auth, S>(state: OnboardingRouterState<T, Auth>) -> Router<S>
 where
     T: OnboardingService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -93,13 +93,13 @@ fn error_response(e: OnboardingError) -> Response {
     ),
     tag = "onboarding"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn get_state_handler<T: OnboardingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn get_state_handler<T: OnboardingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Response {
     match service
-        .get_state(user.authorization.user.macro_user_id)
+        .get_state(user.authorization.user.rox_user_id)
         .await
     {
         Ok(state) => Json(state).into_response(),
@@ -119,14 +119,14 @@ pub async fn get_state_handler<T: OnboardingService, Auth: MacroAuthorizationSer
     ),
     tag = "onboarding"
 )]
-#[tracing::instrument(skip(service, user, body), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn complete_handler<T: OnboardingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user, body), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn complete_handler<T: OnboardingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<CompleteOnboardingRequest>,
 ) -> Response {
     match service
-        .complete(user.authorization.user.macro_user_id, body.skipped)
+        .complete(user.authorization.user.rox_user_id, body.skipped)
         .await
     {
         Ok(row) => Json(row).into_response(),
@@ -144,13 +144,13 @@ pub async fn complete_handler<T: OnboardingService, Auth: MacroAuthorizationServ
     ),
     tag = "onboarding"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn dismissed_prompts_handler<T: OnboardingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn dismissed_prompts_handler<T: OnboardingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Response {
     match service
-        .dismissed_prompts(user.authorization.user.macro_user_id)
+        .dismissed_prompts(user.authorization.user.rox_user_id)
         .await
     {
         Ok(prompts) => Json(prompts).into_response(),
@@ -171,17 +171,17 @@ pub async fn dismissed_prompts_handler<T: OnboardingService, Auth: MacroAuthoriz
     ),
     tag = "onboarding"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id))]
-pub async fn dismiss_prompt_handler<T: OnboardingService, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id))]
+pub async fn dismiss_prompt_handler<T: OnboardingService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(prompt_id): Path<String>,
 ) -> Response {
     let Some(prompt) = PromptId::parse(&prompt_id) else {
         return (StatusCode::BAD_REQUEST, "malformed prompt id").into_response();
     };
     match service
-        .dismiss_prompt(user.authorization.user.macro_user_id, prompt)
+        .dismiss_prompt(user.authorization.user.rox_user_id, prompt)
         .await
     {
         Ok(()) => StatusCode::NO_CONTENT.into_response(),

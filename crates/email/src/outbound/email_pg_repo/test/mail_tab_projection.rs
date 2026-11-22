@@ -1,8 +1,8 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_signal_flag", "mail_draft_policy")
@@ -12,7 +12,7 @@ async fn draft_aggregate_signal_matches_canonical_policy(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = MacroUserIdStr::parse_from_str("macro|sigflag_email@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|sigflag_email@example.com")?;
     let link_id = uuid::uuid!("00000000-0000-0000-0000-000000000e01");
     let notification_thread = uuid::uuid!("00000000-0000-0000-0000-00000000e207");
 
@@ -51,7 +51,7 @@ async fn draft_aggregate_signal_matches_canonical_policy(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_signal_flag", "mail_draft_policy")
@@ -60,7 +60,7 @@ async fn draft_aggregate_signal_matches_canonical_policy(
 async fn draft_aggregate_calendar_matches_inline_invitation_policy(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let viewer = MacroUserIdStr::parse_from_str("macro|sigflag_email@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|sigflag_email@example.com")?;
     let ids = [
         uuid::uuid!("00000000-0000-0000-0000-00000000e201"),
         uuid::uuid!("00000000-0000-0000-0000-00000000e204"),
@@ -102,14 +102,14 @@ async fn draft_aggregate_calendar_matches_inline_invitation_policy(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_shared_threads", "mail_tab_projection")
     )
 )]
 async fn canonical_tab_previews_and_share_facts(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let viewer = MacroUserIdStr::parse_from_str("macro|user1@test.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|user1@test.com")?;
     let thread = uuid::uuid!("20000001-0000-0000-0000-000000000001");
     let direct = uuid::uuid!("20000101-0000-0000-0000-000000000101");
     let team = uuid::uuid!("20000103-0000-0000-0000-000000000103");
@@ -181,7 +181,7 @@ async fn canonical_tab_previews_and_share_facts(pool: Pool<Postgres>) -> anyhow:
     );
     let other = repo
         .thread_mail_projections_by_ids(
-            MacroUserIdStr::parse_from_str("macro|user2@test.com")?,
+            RoxUserIdStr::parse_from_str("macro|user2@test.com")?,
             &[direct],
         )
         .await?;

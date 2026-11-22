@@ -13,7 +13,7 @@ async fn insert_cell(
     sqlx::query!(
         "INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values)
          VALUES ($1, $2, 'DATABASE_ROW', $3, jsonb_build_object('type', 'String', 'value', $4::text))",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         row,
         definition,
         value,
@@ -52,7 +52,7 @@ fn refusal(error: sqlx::Error) -> (String, String) {
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_cell_of_a_column_of_its_rows_table_is_accepted(pool: PgPool) {
     let (repo, table, name) = fixture(&pool).await;
     let rows = repo.insert_rows(table.id, USER, 1).await.unwrap().unwrap();
@@ -66,7 +66,7 @@ async fn a_cell_of_a_column_of_its_rows_table_is_accepted(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_cell_of_a_column_of_another_table_is_refused(pool: PgPool) {
     let (repo, guests, name) = fixture(&pool).await;
     let hosts = TableId::new();
@@ -120,10 +120,10 @@ async fn a_cell_of_a_column_of_another_table_is_refused(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_cell_of_a_missing_row_is_refused(pool: PgPool) {
     let (_, _, name) = fixture(&pool).await;
-    let missing = macro_uuid::generate_uuid_v7().to_string();
+    let missing = rox_uuid::generate_uuid_v7().to_string();
 
     let inserted = insert_cell(&pool, &missing, name, "Sam").await;
     assert_eq!(
@@ -145,7 +145,7 @@ async fn a_cell_of_a_missing_row_is_refused(pool: PgPool) {
     assert_eq!(stored_cells(&pool).await, vec![]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_row_deletes_its_cells(pool: PgPool) {
     let (repo, table, name) = fixture(&pool).await;
     let rows = repo.insert_rows(table.id, USER, 2).await.unwrap().unwrap();
@@ -161,7 +161,7 @@ async fn deleting_a_row_deletes_its_cells(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_table_or_its_database_deletes_its_cells(pool: PgPool) {
     let (repo, table, name) = fixture(&pool).await;
     let rows = repo.insert_rows(table.id, USER, 1).await.unwrap().unwrap();
@@ -174,7 +174,7 @@ async fn deleting_a_table_or_its_database_deletes_its_cells(pool: PgPool) {
     assert_eq!(stored_cells(&pool).await, vec![]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_column_deletes_its_cells_in_that_table_only(pool: PgPool) {
     let (repo, guests, name) = fixture(&pool).await;
     let email = insert_definition(&pool, "Email").await;
@@ -222,7 +222,7 @@ async fn deleting_a_column_deletes_its_cells_in_that_table_only(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rebinding_a_column_deletes_the_old_definitions_cells(pool: PgPool) {
     let (repo, table, name) = fixture(&pool).await;
     let title = insert_definition(&pool, "Title").await;

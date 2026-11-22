@@ -2,9 +2,9 @@ use std::sync::{Arc, Mutex};
 
 use crate::domain::events::{AgentSessionLifecycleEvent, SessionDeletedMetadata, SessionIdentity};
 use bots::domain::models::BotId;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::cowlike::CowLike as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::cowlike::CowLike as _;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::BrokerLifecyclePublisher;
 use crate::domain::model::AgentSessionId;
@@ -24,8 +24,8 @@ struct FakeBroker {
     refuses: bool,
 }
 
-impl MacroEventBroker for FakeBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for FakeBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -55,7 +55,7 @@ fn deleted() -> AgentSessionLifecycleEvent {
             session_name: "Agent Session".to_owned(),
             bot_id: BotId::TEST_A,
             bot_name: "Test Agent".to_owned(),
-            owner_id: MacroUserIdStr::parse_from_str("macro|owner@example.com")
+            owner_id: RoxUserIdStr::parse_from_str("macro|owner@example.com")
                 .expect("valid user id")
                 .into_owned(),
             origin: None,
@@ -77,7 +77,7 @@ async fn publishes_on_the_lifecycle_topic_keyed_by_session_id() {
         .lock()
         .expect("fake broker is not poisoned");
     assert_eq!(published.len(), 1);
-    assert_eq!(published[0].topic, "macro.agent_session_lifecycle");
+    assert_eq!(published[0].topic, "rox.agent_session_lifecycle");
     assert_eq!(published[0].key, AgentSessionId::TEST_A.to_string());
     assert_eq!(published[0].envelope["event_type"], "agent_session.deleted");
     assert_eq!(published[0].envelope["schema_version"], 1);

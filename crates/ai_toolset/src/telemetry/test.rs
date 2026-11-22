@@ -4,7 +4,7 @@ use crate::{
     ToolCallError, ToolSet as _,
 };
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use opentelemetry::Value;
 use opentelemetry::trace::{Status, TracerProvider as _};
 use opentelemetry_sdk::trace::{InMemorySpanExporter, SdkTracerProvider, SpanData};
@@ -75,7 +75,7 @@ fn user_toolset() -> AsyncToolCollection<()> {
 }
 
 fn request_context() -> RequestContext {
-    RequestContext::new(MacroUserIdStr::try_from_email("test@rox.one").expect("valid user id"))
+    RequestContext::new(RoxUserIdStr::try_from_email("test@rox.one").expect("valid user id"))
 }
 
 /// An OpenTelemetry pipeline that keeps finished spans in memory, installed as
@@ -340,7 +340,7 @@ async fn oversized_content_is_bounded_and_flagged() {
     assert_eq!(
         span.attributes
             .iter()
-            .find(|kv| kv.key.as_str() == attr::MACRO_CONTENT_TRUNCATED)
+            .find(|kv| kv.key.as_str() == attr::ROX_CONTENT_TRUNCATED)
             .map(|kv| kv.value.clone()),
         Some(Value::Bool(true))
     );

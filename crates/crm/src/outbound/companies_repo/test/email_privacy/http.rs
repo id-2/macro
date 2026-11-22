@@ -12,9 +12,9 @@ use axum::{
     routing::get,
 };
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_authorization::{
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
+use rox_authorization::{
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
     ValidatedIdentity,
 };
 use serde_json::{Value, json};
@@ -28,18 +28,18 @@ impl JwtValidator for FixtureCredential {
     fn validate_credential(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, rootcause::Report<RoxAuthorizationError>> {
         let user = match token {
             "owner" => OWNER,
             "member" => MEMBER,
             _ => {
                 return Err(rootcause::Report::new(
-                    MacroAuthorizationError::InvalidCredentials,
+                    RoxAuthorizationError::InvalidCredentials,
                 ));
             }
         };
         Ok(ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -77,7 +77,7 @@ async fn request(app: &Router, user: &str, body: Option<Value>) -> (StatusCode, 
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn privacy_http_preserves_records_and_enforces_mailbox_and_role_boundaries(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -91,7 +91,7 @@ async fn privacy_http_preserves_records_and_enforces_mailbox_and_role_boundaries
     .execute(&pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         MEMBER,
         user
     )
@@ -116,8 +116,8 @@ async fn privacy_http_preserves_records_and_enforces_mailbox_and_role_boundaries
         entity_access_service: Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
             pool.clone(),
         ))),
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
                 FixtureCredential,
                 InternalAuthConfig {
                     api_key: "fixture-only".into(),

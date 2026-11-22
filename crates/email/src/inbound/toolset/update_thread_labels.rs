@@ -6,7 +6,7 @@ use ai_toolset::{AsyncTool, RequestContext, ServiceContext, ToolCallError, ToolR
 use ai_toolset::{ToolAnnotated, ToolAnnotations};
 use async_trait::async_trait;
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -163,7 +163,7 @@ where
         let link = service_context
             .service
             .get_owned_link_for_thread(
-                MacroUserIdStr((*request_context.user_id).clone()),
+                RoxUserIdStr((*request_context.user_id).clone()),
                 self.thread_id,
             )
             .await
@@ -186,7 +186,7 @@ where
             let changed = service_context
                 .service
                 .change_thread_mailbox_state(
-                    MacroUserIdStr((*request_context.user_id).clone()),
+                    RoxUserIdStr((*request_context.user_id).clone()),
                     self.thread_id,
                     action,
                 )

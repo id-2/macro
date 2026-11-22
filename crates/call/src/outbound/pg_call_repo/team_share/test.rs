@@ -4,8 +4,8 @@
 use std::ops::Deref;
 
 use entity_access_db_utils::team_share::direct_level;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use model_entity::EntityType;
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::team_share::{
@@ -209,7 +209,7 @@ async fn insert_legacy_team_row(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_team_share_facts_reads_creator_team_and_null_state(
     pool: Pool<Postgres>,
@@ -238,7 +238,7 @@ async fn get_team_share_facts_reads_creator_team_and_null_state(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_team_share_facts_adopts_legacy_view_grant_but_not_other_levels(
     pool: Pool<Postgres>,
@@ -274,7 +274,7 @@ async fn get_team_share_facts_adopts_legacy_view_grant_but_not_other_levels(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn get_team_share_facts_adopts_legacy_view_grant_after_canonical_clear(
     pool: Pool<Postgres>,
@@ -331,7 +331,7 @@ async fn get_team_share_facts_adopts_legacy_view_grant_after_canonical_clear(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn create_call_starts_with_toggle_on_and_no_canonical_state(
     pool: Pool<Postgres>,
@@ -356,7 +356,7 @@ async fn create_call_starts_with_toggle_on_and_no_canonical_state(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn create_call_lost_race_leaves_no_permission_or_grant_rows(
     pool: Pool<Postgres>,
@@ -386,7 +386,7 @@ async fn create_call_lost_race_leaves_no_permission_or_grant_rows(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn toggle_share_with_team_flips_live_call_and_conflicts_once_archived(
     pool: Pool<Postgres>,
@@ -424,7 +424,7 @@ async fn toggle_share_with_team_flips_live_call_and_conflicts_once_archived(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_live_share_with_team_sets_toggle_and_conflicts_once_archived(
     pool: Pool<Postgres>,
@@ -455,7 +455,7 @@ async fn patch_live_share_with_team_sets_toggle_and_conflicts_once_archived(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_translates_toggle_on_into_canonical_view(
     pool: Pool<Postgres>,
@@ -483,7 +483,7 @@ async fn archive_translates_toggle_on_into_canonical_view(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_translates_toggle_off_into_unshared(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -503,7 +503,7 @@ async fn archive_translates_toggle_off_into_unshared(pool: Pool<Postgres>) -> an
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_with_toggle_on_but_no_team_shares_nothing(
     pool: Pool<Postgres>,
@@ -528,7 +528,7 @@ async fn archive_with_toggle_on_but_no_team_shares_nothing(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn archive_adopts_legacy_view_grant_and_leaves_other_levels(
     pool: Pool<Postgres>,
@@ -558,7 +558,7 @@ async fn archive_adopts_legacy_view_grant_and_leaves_other_levels(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_applies_view_command_on_archived_call(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -593,7 +593,7 @@ async fn patch_applies_view_command_on_archived_call(pool: Pool<Postgres>) -> an
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_clear_removes_team_row_and_bumps_revision(
     pool: Pool<Postgres>,
@@ -624,7 +624,7 @@ async fn patch_clear_removes_team_row_and_bumps_revision(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_legacy_alias_command_enables_view_and_clears(
     pool: Pool<Postgres>,
@@ -661,7 +661,7 @@ async fn patch_legacy_alias_command_enables_view_and_clears(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_with_team_level_but_no_command_is_forbidden_and_rolls_back(
     pool: Pool<Postgres>,
@@ -692,7 +692,7 @@ async fn patch_with_team_level_but_no_command_is_forbidden_and_rolls_back(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_rejects_command_for_other_call_or_mismatched_level(
     pool: Pool<Postgres>,
@@ -732,7 +732,7 @@ async fn patch_rejects_command_for_other_call_or_mismatched_level(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_stale_command_returns_conflict(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
@@ -759,7 +759,7 @@ async fn patch_stale_command_returns_conflict(pool: Pool<Postgres>) -> anyhow::R
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_untracked_legacy_grant_returns_conflict_without_partial_writes(
     pool: Pool<Postgres>,
@@ -792,7 +792,7 @@ async fn patch_untracked_legacy_grant_returns_conflict_without_partial_writes(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn patch_team_share_link_share_and_name_in_one_call_persist_together(
     pool: Pool<Postgres>,
@@ -845,7 +845,7 @@ async fn patch_team_share_link_share_and_name_in_one_call_persist_together(
 
 #[sqlx::test(
     fixtures(path = "../../../../fixtures", scripts("call_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn list_read_reports_live_toggle_and_canonical_state(
     pool: Pool<Postgres>,

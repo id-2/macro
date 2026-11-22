@@ -6,7 +6,7 @@ use crate::domain::coding_preferences::CodingPreferences;
 use crate::domain::model::ArchiveCause;
 use crate::domain::pull_request_links::SessionPullRequestLinkRepo;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn preferences_default_off_and_round_trip(pool: PgPool) {
     let repo = test_repo(&pool);
     create_test_bot(&pool).await;
@@ -50,7 +50,7 @@ async fn preferences_default_off_and_round_trip(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn archives_only_when_the_trigger_is_on_for_the_session(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -133,7 +133,7 @@ async fn archives_only_when_the_trigger_is_on_for_the_session(pool: PgPool) {
     assert_eq!(settings.auto_archived_at, Some(archive.at));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_restored_session_is_never_archived_again(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -184,7 +184,7 @@ async fn a_restored_session_is_never_archived_again(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_with_work_in_flight_stays_visible(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -233,7 +233,7 @@ async fn a_session_with_work_in_flight_stays_visible(pool: PgPool) {
     );
 
     let answering = create_session(&repo, new_session(bot, None, None)).await;
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'direct_message', $2)",
         channel,
@@ -273,7 +273,7 @@ async fn a_session_with_work_in_flight_stays_visible(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sessions_archive_for_pull_requests_once_all_are_closed_and_one_merged(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
@@ -343,7 +343,7 @@ async fn sessions_archive_for_pull_requests_once_all_are_closed_and_one_merged(p
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_person_archives_as_user_and_restoring_clears_who_archived(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;

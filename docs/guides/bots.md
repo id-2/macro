@@ -33,7 +33,7 @@ A bot you create is personal, so it posts as itself on your behalf:
 import { Macro } from '@macro-inc/sdk';
 
 const bot = new Macro({
-  auth: { type: 'bot', token: process.env.MACRO_BOT_TOKEN! },
+  auth: { type: 'bot', token: process.env.ROX_BOT_TOKEN! },
 });
 const macro = bot.requestedAs(bot.users.byId('macro|you@example.com'));
 
@@ -53,7 +53,7 @@ Bots can't search: search rejects bot tokens. Search with an API key from
 ```ts
 import { Macro } from '@macro-inc/sdk';
 
-const macro = new Macro({ token: process.env.MACRO_API_KEY! });
+const macro = new Macro({ token: process.env.ROX_API_KEY! });
 
 for await (const doc of macro.documents.search('roadmap', { pageSize: 5 })) {
   console.log(doc.id, await doc.name());
@@ -66,7 +66,7 @@ An API key can do everything the settings page does: create and configure bots,
 grant channels, read webhook URLs and mint or revoke tokens.
 
 ```ts
-const macro = new Macro({ token: process.env.MACRO_API_KEY! });
+const macro = new Macro({ token: process.env.ROX_API_KEY! });
 
 const bot = await macro.bots.create({ name: 'Release bot', handle: 'release-bot' });
 await bot.grantChannel(macro.channels.byId('<channel-id>'));
@@ -75,7 +75,7 @@ const [webhook] = await bot.webhooks();
 ```
 
 `secret` is shown only once. POST `{ "content": "..." }` to `webhook.url` with
-the token in `x-macro-bot-token` and `x-macro-bot-scope: user`.
+the token in `x-rox-bot-token` and `x-rox-bot-scope: user`.
 
 ## What a bot can do
 
@@ -99,4 +99,4 @@ the token in `x-macro-bot-token` and `x-macro-bot-scope: user`.
   [`goalert-bot`](../../services/bots/goalert-bot/README.md) (threads, edits,
   acting as a user).
 - Server code: [`crates/bots`](../../crates/bots/AGENTS.md). Who a bot may act
-  as is decided in `crates/macro_authorization/src/domain/bot_authorizer.rs`.
+  as is decided in `crates/rox_authorization/src/domain/bot_authorizer.rs`.

@@ -1,12 +1,12 @@
 use super::create_backfill_job;
 use crate::backfill::job::get::get_active_backfill_job;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 
 async fn insert_link(pool: &Pool<Postgres>, link_id: Uuid) {
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
         link_id,
         "macro|conflict@corp.test",
@@ -17,7 +17,7 @@ async fn insert_link(pool: &Pool<Postgres>, link_id: Uuid) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_backfill_job_dedupes_active_job(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let link_id = Uuid::new_v4();
     insert_link(&pool, link_id).await;

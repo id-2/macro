@@ -25,10 +25,10 @@ mod package;
 
 pub use package::package;
 
-/// The `macro_data` key of the libraries a file uses (on its document
+/// The `rox_data` key of the libraries a file uses (on its document
 /// node): a [`LibraryRef`] list as JSON.
 pub const LIBRARIES_KEY: &str = "libraries";
-/// The `macro_data` key of what a library last published (on its document
+/// The `rox_data` key of what a library last published (on its document
 /// node): a [`Manifest`] as JSON.
 pub const PUBLISHED_KEY: &str = "library";
 
@@ -161,14 +161,14 @@ pub(crate) fn is_published_name(doc: &Document, i: NodeIdx) -> bool {
 
 /// The library's last publish, from its document node.
 pub fn manifest(doc: &Document) -> Option<Manifest> {
-    let text = doc.props(doc.root).macro_value(PUBLISHED_KEY)?;
+    let text = doc.props(doc.root).rox_value(PUBLISHED_KEY)?;
     serde_json::from_str(text).ok()
 }
 
 /// The libraries a file uses, from its document node.
 pub fn enabled(doc: &Document) -> Vec<LibraryRef> {
     doc.props(doc.root)
-        .macro_value(LIBRARIES_KEY)
+        .rox_value(LIBRARIES_KEY)
         .and_then(|t| serde_json::from_str(t).ok())
         .unwrap_or_default()
 }

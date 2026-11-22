@@ -15,8 +15,8 @@ GoAlert webhook ──POST──> /goalert/{WEBHOOK_SECRET}
                               │ KV ALERT_MESSAGES: alert:<AlertID> → message
                               ▼
          @macro-inc/sdk → channel.send / message.reply / react / edit
-         headers: x-macro-bot-token: BOT_TOKEN, x-macro-bot-scope: user,
-                  x-macro-bot-for-macro-user-id: ACTING_USER_ID
+         headers: x-rox-bot-token: BOT_TOKEN, x-rox-bot-scope: user,
+                  x-rox-bot-for-macro-user-id: ACTING_USER_ID
 ```
 
 | GoAlert payload | Channel effect |
@@ -96,7 +96,7 @@ notification) at
 
 | Variable         | Required | Default | Description                                               |
 | ---------------- | -------- | ------- | --------------------------------------------------------- |
-| `BOT_TOKEN`      | yes      |         | Bot API key (`mbot_...`, sent as `x-macro-bot-token`)      |
+| `BOT_TOKEN`      | yes      |         | Bot API key (`mbot_...`, sent as `x-rox-bot-token`)      |
 | `CHANNEL_ID`     | yes      |         | Channel UUID to post to (Rox Alerts)                    |
 | `ACTING_USER_ID` | yes      |         | Secret: the bot owner's user id (`macro\|<email>`)         |
 | `WEBHOOK_SECRET` | yes      |         | Secret path segment for the webhook URL                   |
@@ -104,7 +104,7 @@ notification) at
 | `ENVIRONMENT`    | no       | `local` | `deployment.environment` on exported spans                |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | no |    | OTLP/HTTP traces endpoint; unset disables export          |
 | `DD_API_KEY`     | no       |         | Secret: Datadog key sent with trace exports               |
-| `MACRO_ENV`      | no       | `prod`  | SDK environment (`prod`/`dev`/`local`), local server only |
+| `ROX_ENV`      | no       | `prod`  | SDK environment (`prod`/`dev`/`local`), local server only |
 | `PORT`           | no       | `8089`  | Listen port (local Bun server only)                       |
 
 ## Development

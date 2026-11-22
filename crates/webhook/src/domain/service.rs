@@ -17,8 +17,8 @@ use super::{
     ports::{WebhookError, WebhookRepo, WebhookService, WebhookValidationClient},
 };
 use chrono::Utc;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use url::Url;
 
 const MAX_NAME_LEN: usize = 128;
@@ -217,7 +217,7 @@ fn webhook_is_missing(webhook: &Webhook) -> bool {
     webhook.deleted_at.is_some()
 }
 
-fn generate_signing_secret(caller: &MacroUserIdStr<'_>) -> String {
+fn generate_signing_secret(caller: &RoxUserIdStr<'_>) -> String {
     format!(
         "whsec_{}_{}",
         caller.as_ref(),
@@ -241,7 +241,7 @@ impl<R, V, B> WebhookServiceImpl<R, V, B>
 where
     R: WebhookRepo,
     V: WebhookValidationClient,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     fn publish_webhook_event(&self, event: &WebhookMacroEvent) {
         drop(self.event_broker.send_event(event).inspect_err(|error| {
@@ -251,7 +251,7 @@ where
 
     async fn workspace_id_for_scope(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         scope: WebhookScope,
     ) -> Result<String, WebhookError> {
         match scope {
@@ -271,7 +271,7 @@ where
 
     async fn caller_owns_workspace(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         workspace_id: &str,
     ) -> Result<bool, WebhookError> {
         if workspace_id == caller.as_ref() {
@@ -290,7 +290,7 @@ where
     /// The workspaces the caller owns: their personal workspace, plus their team's if any.
     async fn caller_workspace_ids(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<String>, WebhookError> {
         let mut workspace_ids = vec![caller.as_ref().to_string()];
         if let Some(team_workspace_id) = self
@@ -306,7 +306,7 @@ where
 
     async fn load_authorized_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> Result<Webhook, WebhookError> {
         let webhook = self
@@ -332,11 +332,11 @@ impl<R, V, B> WebhookService for WebhookServiceImpl<R, V, B>
 where
     R: WebhookRepo,
     V: WebhookValidationClient,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 {
     async fn create_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         request: CreateWebhookRequest,
     ) -> Result<Webhook, WebhookError> {
         validate_create_request(&request, self.endpoint_scheme_policy)?;
@@ -390,7 +390,7 @@ where
 
     async fn get_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> Result<Webhook, WebhookError> {
         self.load_authorized_webhook(caller, webhook_id).await
@@ -399,7 +399,7 @@ where
     /// All webhooks they can access.
     async fn list_webhooks(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<ListWebhooksResponse, WebhookError> {
         let workspace_ids = self.caller_workspace_ids(caller).await?;
         let webhooks = self
@@ -412,7 +412,7 @@ where
 
     async fn patch_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
         request: PatchWebhookRequest,
     ) -> Result<Webhook, WebhookError> {
@@ -468,7 +468,7 @@ where
 
     async fn validate_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> Result<ValidateWebhookResponse, WebhookError> {
         let webhook = self
@@ -504,7 +504,7 @@ where
 
     async fn delete_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> Result<(), WebhookError> {
         let webhook = self

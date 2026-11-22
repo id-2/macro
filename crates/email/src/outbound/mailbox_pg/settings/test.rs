@@ -1,8 +1,8 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|outlook-test@example.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|outlook-test@example.com").unwrap()
 }
 async fn category(db: &PgPool, link: Uuid) -> Uuid {
     let id = Uuid::now_v7();
@@ -10,11 +10,11 @@ async fn category(db: &PgPool, link: Uuid) -> Uuid {
         .execute(db).await.unwrap();
     id
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_category_is_durable_and_foreign_inbox_cannot_queue_cleanup(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     let label = category(&db, link).await;
-    let outsider = MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let outsider = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
     assert!(repo.delete_label(&outsider, link, label).await.is_err());
     assert!(
         repo.claim_settings(Uuid::now_v7(), true, true)
@@ -56,7 +56,7 @@ async fn removing_category_is_durable_and_foreign_inbox_cannot_queue_cleanup(db:
             .is_none()
     );
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sender_changes_keep_rule_ownership_and_old_revision_cannot_ack_a_new_intent(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     repo.sender_block(&actor(), link, "blocked@example.com", true)
@@ -97,7 +97,7 @@ async fn sender_changes_keep_rule_ownership_and_old_revision_cannot_ack_a_new_in
             .is_none()
     );
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconnect_fences_old_settings_work_without_losing_accepted_intent(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     repo.sender_block(&actor(), link, "blocked@example.com", true)
@@ -138,7 +138,7 @@ async fn reconnect_fences_old_settings_work_without_losing_accepted_intent(db: P
     );
     repo.finish_settings(&second, true, 0, None).await.unwrap();
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn catalog_refresh_cannot_restore_a_category_while_cleanup_is_pending(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     let label = category(&db, link).await;
@@ -160,7 +160,7 @@ async fn catalog_refresh_cannot_restore_a_category_while_cleanup_is_pending(db: 
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn paused_outlook_settings_do_not_run_until_writes_resume(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     repo.sender_block(&actor(), link, "blocked@example.com", true)
@@ -188,11 +188,11 @@ async fn paused_outlook_settings_do_not_run_until_writes_resume(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn category_creation_is_durable_paused_and_fenced_by_deletion(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     let mailbox = repo.accessible(&actor(), link).await.unwrap();
-    let outsider = MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let outsider = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
     assert!(
         repo.queue_label_creation(&outsider, mailbox, "New category")
             .await
@@ -271,7 +271,7 @@ async fn category_creation_is_durable_paused_and_fenced_by_deletion(db: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn catalog_refresh_keeps_optimistic_category_until_creation_finishes(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     let mailbox = repo.accessible(&actor(), link).await.unwrap();
@@ -305,7 +305,7 @@ async fn catalog_refresh_keeps_optimistic_category_until_creation_finishes(db: P
     repo.commit_created_label(&create, label).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pending_settings_status_tracks_confirmation_and_current_grant(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     let mailbox = repo.accessible(&actor(), link).await.unwrap();
@@ -347,7 +347,7 @@ async fn pending_settings_status_tracks_confirmation_and_current_grant(db: PgPoo
     assert_eq!(repo.pending_operations(current).await.unwrap().len(), 1);
     assert!(
         repo.accessible(
-            &MacroUserIdStr::parse_from_str("macro|stranger@example.com").unwrap(),
+            &RoxUserIdStr::parse_from_str("macro|stranger@example.com").unwrap(),
             link
         )
         .await

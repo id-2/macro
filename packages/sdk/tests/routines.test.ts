@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from 'bun:test';
 import type { ScheduledActionResponse } from '../generated/scheduled-action/types.gen';
 import { Macro } from '../src/macro';
-import { MacroApiError } from '../src/utils';
+import { RoxApiError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -58,8 +58,8 @@ test('routine creation maps agent handles, seeds detail and uses shared auth and
       agent: { bot_id: 'agent-1' },
     },
   });
-  expect(requests[0].headers.get('x-macro-bot-token')).toBe('mbot_test');
-  expect(requests[0].headers.get('x-macro-bot-for-macro-user-id')).toBe(
+  expect(requests[0].headers.get('x-rox-bot-token')).toBe('mbot_test');
+  expect(requests[0].headers.get('x-rox-bot-for-macro-user-id')).toBe(
     record.owner,
   );
   expect(events).toEqual([
@@ -179,7 +179,7 @@ test('routine writes invalidate detail only after success', async () => {
   expect(await routine.enabled()).toBe(false);
   expect(reads).toBe(2);
   reject = true;
-  await expect(routine.setEnabled(true)).rejects.toBeInstanceOf(MacroApiError);
+  await expect(routine.setEnabled(true)).rejects.toBeInstanceOf(RoxApiError);
   expect(await routine.enabled()).toBe(false);
   expect(reads).toBe(2);
 });
@@ -277,22 +277,22 @@ test('a rejected routine create carries the server validation message', async ()
       model: 'model',
     }),
   ).rejects.toMatchObject({
-    name: 'MacroApiError',
+    name: 'RoxApiError',
     status: 400,
     message: `Rox API error 400: ${rejection}`,
     data: rejection,
   });
 });
 
-test('MacroApiError messages carry the message or error of a JSON body', () => {
-  expect(new MacroApiError(403, { message: 'Forbidden' }).message).toBe(
+test('RoxApiError messages carry the message or error of a JSON body', () => {
+  expect(new RoxApiError(403, { message: 'Forbidden' }).message).toBe(
     'Rox API error 403: Forbidden',
   );
-  expect(new MacroApiError(409, { error: 'already running' }).message).toBe(
+  expect(new RoxApiError(409, { error: 'already running' }).message).toBe(
     'Rox API error 409: already running',
   );
-  expect(new MacroApiError(500, {}).message).toBe('Rox API error 500');
-  expect(new MacroApiError(502, 'x'.repeat(600)).message).toBe(
+  expect(new RoxApiError(500, {}).message).toBe('Rox API error 500');
+  expect(new RoxApiError(502, 'x'.repeat(600)).message).toBe(
     `Rox API error 502: ${'x'.repeat(500)}…`,
   );
 });

@@ -13,7 +13,7 @@ use axum::{
     routing::get,
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{OptionalMacroAuthorizationExtractor, UserOrInternalService};
+use rox_authorization::{OptionalMacroAuthorizationExtractor, UserOrInternalService};
 use opentelemetry::trace::TraceContextExt;
 use std::time::Duration;
 use sync_router::session::{

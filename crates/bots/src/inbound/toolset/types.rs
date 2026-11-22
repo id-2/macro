@@ -8,9 +8,9 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// Preferred header used to authenticate bot webhook requests.
-pub const BOT_WEBHOOK_TOKEN_HEADER: &str = "x-macro-bot-token";
+pub const BOT_WEBHOOK_TOKEN_HEADER: &str = "x-rox-bot-token";
 /// Header selecting the authorization scope for bot webhook requests.
-pub const BOT_WEBHOOK_SCOPE_HEADER: &str = "x-macro-bot-scope";
+pub const BOT_WEBHOOK_SCOPE_HEADER: &str = "x-rox-bot-scope";
 /// User scope works for both user- and team-owned bots on channel webhooks.
 pub const BOT_WEBHOOK_SCOPE: &str = "user";
 

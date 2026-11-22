@@ -9,8 +9,8 @@ use axum::{
     Json, RequestExt,
     extract::{FromRef, FromRequest, Request},
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
     OptionalMacroAuthorizationExtractor,
 };
 use serde::{Deserialize, de::DeserializeOwned};
@@ -48,8 +48,8 @@ where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     V: DeserializeOwned + Send,
     S: Send + Sync + 'static,
 {
@@ -66,7 +66,7 @@ where
             .authorization
             .ok_or(ExtractorError::Unauthorized)?;
 
-        if matches!(authorization, MacroAuthorization::Internal(None)) {
+        if matches!(authorization, RoxAuthorization::Internal(None)) {
             return Err(ExtractorError::Unauthorized);
         }
 
@@ -81,7 +81,7 @@ where
             .map_err(|_| ExtractorError::BadRequest("Invalid entity body"))?;
 
         let service = Arc::<Svc>::from_ref(state);
-        if let MacroAuthorization::Bot(authentication) = &authorization {
+        if let RoxAuthorization::Bot(authentication) = &authorization {
             let inner = deserialize_body(json)?;
             let entity_access_receipt = generate_bot_entity_access_receipt::<T>(
                 service.as_ref(),
@@ -99,12 +99,12 @@ where
         }
 
         let (user, user_org_id) = match authorization {
-            MacroAuthorization::User(user) | MacroAuthorization::Internal(Some(user)) => {
+            RoxAuthorization::User(user) | RoxAuthorization::Internal(Some(user)) => {
                 let org_id = user.user_context.organization_id.map(i64::from);
-                (user.macro_user_id, org_id)
+                (user.rox_user_id, org_id)
             }
-            MacroAuthorization::Harness(_) => return Err(ExtractorError::Unauthorized),
-            MacroAuthorization::Bot(_) | MacroAuthorization::Internal(None) => {
+            RoxAuthorization::Harness(_) => return Err(ExtractorError::Unauthorized),
+            RoxAuthorization::Bot(_) | RoxAuthorization::Internal(None) => {
                 unreachable!("bot and identity-less internal access returned above")
             }
         };

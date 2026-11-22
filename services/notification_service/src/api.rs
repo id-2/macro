@@ -2,7 +2,7 @@ use crate::api::context::{ApiContext, AuthorizationService};
 use ::notification::inbound::http::NotificationRouterState;
 use anyhow::Context;
 use axum::Router;
-use macro_tower_layers::MacroRequestIdAndTracingLayer;
+use rox_tower_layers::RoxRequestIdAndTracingLayer;
 use model::version::{ServiceNameState, VersionedApiServiceName, validate_api_version};
 use std::time::Duration;
 use tower::ServiceBuilder;
@@ -36,14 +36,14 @@ pub async fn setup_and_serve<S: ::notification::domain::service::NotificationRea
         .merge(health::router())
         .layer(
             ServiceBuilder::new()
-                .layer(MacroRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
+                .layer(RoxRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
                 .layer(axum::middleware::from_fn_with_state(
                     ServiceNameState {
                         service_name: VersionedApiServiceName::NotificationService,
                     },
                     validate_api_version,
                 ))
-                .layer(macro_cors::cors_layer())
+                .layer(rox_cors::cors_layer())
                 .layer(CompressionLayer::new().gzip(true)),
         );
     let app = Router::new()
@@ -79,7 +79,7 @@ fn api_router<S: ::notification::domain::service::NotificationReader>(
 ) -> Router<ApiContext> {
     let middleware = {
         ServiceBuilder::new().layer(axum::middleware::from_fn(
-            macro_middleware::connection_drop_prevention_handler,
+            rox_middleware::connection_drop_prevention_handler,
         ))
     };
 

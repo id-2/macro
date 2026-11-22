@@ -127,8 +127,8 @@ fn lock_build_in(dir: &Path, on_wait: impl FnOnce()) -> Result<File> {
 fn prepare_dependencies(stage: &Stage) -> Result<()> {
     let mut prepare = Command::new("bun");
     prepare.current_dir(app_dir()).args(["run", "dev:prepare"]);
-    if macro_env_var::maybe_read_env("WASM_PKG_CACHE_DIR").is_none() {
-        let home = macro_env_var::maybe_read_env("HOME").context("HOME is not set")?;
+    if rox_env_var::maybe_read_env("WASM_PKG_CACHE_DIR").is_none() {
+        let home = rox_env_var::maybe_read_env("HOME").context("HOME is not set")?;
         prepare.env(
             "WASM_PKG_CACHE_DIR",
             Path::new(&home).join(".cache/macro-local/wasm-pkgs"),
@@ -301,7 +301,7 @@ fn dev_env(instance: &Instance, mode: Mode, traces_enabled: bool) -> Result<Vec<
             instance.port(Port::Frontend).to_string(),
         ),
         ("VITE_LOCAL_SERVERS".to_string(), "ALL".to_string()),
-        ("MACRO_LOCAL_HOSTNAME".to_string(), super::tls::hostname()?),
+        ("ROX_LOCAL_HOSTNAME".to_string(), super::tls::hostname()?),
         (
             "NODE_EXTRA_CA_CERTS".to_string(),
             proxy::ca_pem().display().to_string(),
@@ -311,11 +311,11 @@ fn dev_env(instance: &Instance, mode: Mode, traces_enabled: bool) -> Result<Vec<
             "same-origin".to_string(),
         ),
         (
-            "MACRO_LOCAL_BACKEND_PROXY".to_string(),
+            "ROX_LOCAL_BACKEND_PROXY".to_string(),
             proxy::url(instance),
         ),
         (
-            "MACRO_LOCAL_BACKEND_ROUTES".to_string(),
+            "ROX_LOCAL_BACKEND_ROUTES".to_string(),
             proxy::frontend_path_prefixes().join(","),
         ),
     ];
@@ -338,7 +338,7 @@ fn dev_env(instance: &Instance, mode: Mode, traces_enabled: bool) -> Result<Vec<
         // filtered by that env — actually match the emitted spans/records.
         env.push((
             "VITE_OTEL_ENV".to_string(),
-            macro_env_var::maybe_read_env("DD_ENV").unwrap_or_else(|| "local".into()),
+            rox_env_var::maybe_read_env("DD_ENV").unwrap_or_else(|| "local".into()),
         ));
     }
     env.push((

@@ -1,9 +1,9 @@
 /**
  * Verify a Rox webhook signature.
  *
- * Macro signs deliveries as `X-Macro-Signature: v1=<hex>` where the digest is
+ * Rox signs deliveries as `X-Rox-Signature: v1=<hex>` where the digest is
  * HMAC-SHA256 over `"{timestamp}.{rawBody}"` keyed by the webhook's signing
- * secret (see the `X-Macro-Timestamp` header).
+ * secret (see the `X-Rox-Timestamp` header).
  */
 export async function verifySignature(opts: {
   secret: string;

@@ -10,7 +10,7 @@ use ::activity::{
     Action, Activity, ActivitySource, Actor, CommonAction, DomainActivity, EntityType, Ingest,
     event_time,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::events::{EmailEventOrigin, EmailTopicEvent};
@@ -54,7 +54,7 @@ impl ActivitySource for EmailTopicEvent {
     fn ingest(&self, event_id: Uuid) -> Ingest {
         let now = || event_time(event_id);
         // A thread mutation counts only when a user did it directly.
-        let user_edit = |actor: &Option<MacroUserIdStr<'static>>,
+        let user_edit = |actor: &Option<RoxUserIdStr<'static>>,
                          origin: &EmailEventOrigin,
                          thread_id: Uuid| {
             match (actor, origin) {

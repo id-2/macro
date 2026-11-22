@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::{dm::EnsureDmsSummary, ports::ChannelMutationErr};
-use macro_event_broker::{Event, MacroEvent as _, MacroEventCollection as _, MessageParts};
+use rox_event_broker::{Event, RoxEvent as _, RoxEventCollection as _, MessageParts};
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Default)]
@@ -43,8 +43,8 @@ impl MessageParts for TestMessage<'_> {
     }
 }
 
-fn user(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn member_joined() -> TeamsTopicForDms {
@@ -58,15 +58,15 @@ fn member_joined() -> TeamsTopicForDms {
 }
 
 #[test]
-fn subscribes_to_macro_teams() {
-    assert_eq!(DeclaredMacroEvent::topics(), ["macro.teams"]);
+fn subscribes_to_rox_teams() {
+    assert_eq!(DeclaredMacroEvent::topics(), ["rox.teams"]);
 }
 
 #[test]
 fn decodes_member_joined_events() {
     let payload = serde_json::to_vec(&Event::new(member_joined())).expect("serializable");
     let decoded = DeclaredMacroEvent::decode(&TestMessage {
-        topic: "macro.teams",
+        topic: "rox.teams",
         payload: &payload,
     })
     .expect("decodable");
@@ -93,7 +93,7 @@ fn decodes_other_team_events_as_ignored() {
     }))
     .expect("serializable");
     let decoded = DeclaredMacroEvent::decode(&TestMessage {
-        topic: "macro.teams",
+        topic: "rox.teams",
         payload: &payload,
     })
     .expect("decodable");
@@ -121,7 +121,7 @@ fn decodes_canonical_member_joined_json() {
     }))
     .expect("serializable");
     let decoded = DeclaredMacroEvent::decode(&TestMessage {
-        topic: "macro.teams",
+        topic: "rox.teams",
         payload: &payload,
     })
     .expect("decodable");
@@ -148,7 +148,7 @@ fn missing_teammate_ids_defaults_to_empty() {
     }))
     .expect("serializable");
     let decoded = DeclaredMacroEvent::decode(&TestMessage {
-        topic: "macro.teams",
+        topic: "rox.teams",
         payload: &payload,
     })
     .expect("decodable");

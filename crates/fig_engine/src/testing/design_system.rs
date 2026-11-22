@@ -232,7 +232,7 @@ pub fn variables_file() -> Vec<u8> {
 pub(crate) fn variables_file_with_remote(remote: bool) -> Vec<u8> {
     use crate::kiwi::{Schema, schema_from_text};
     use crate::testing::{V, color, encode, guid, node, size, translate};
-    let text = crate::save::MACRO_SCHEMA
+    let text = crate::save::ROX_SCHEMA
         .replace("WASHI_TAPE VARIABLE", "WASHI_TAPE VARIABLE VARIABLE_SET")
         .replace(
             "message Paint type:PaintType",

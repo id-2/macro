@@ -386,9 +386,9 @@ impl GenAiProjector {
             SessionUpdate::UsageUpdate(usage) => {
                 if let Some(turn) = &self.turn {
                     turn.span
-                        .set_u64(attr::MACRO_CONTEXT_USED_TOKENS, usage.used);
+                        .set_u64(attr::ROX_CONTEXT_USED_TOKENS, usage.used);
                     turn.span
-                        .set_u64(attr::MACRO_CONTEXT_SIZE_TOKENS, usage.size);
+                        .set_u64(attr::ROX_CONTEXT_SIZE_TOKENS, usage.size);
                 }
             }
             // Plans, modes, commands, titles and the user's own echoed
@@ -409,7 +409,7 @@ impl GenAiProjector {
         turn.first_output_recorded = true;
         let elapsed_ms = u64::try_from(turn.started.elapsed().as_millis()).unwrap_or(u64::MAX);
         turn.span
-            .set_u64(attr::MACRO_TIME_TO_FIRST_OUTPUT_MS, elapsed_ms);
+            .set_u64(attr::ROX_TIME_TO_FIRST_OUTPUT_MS, elapsed_ms);
     }
 
     fn note_output_kind(&mut self, kind: OutputKind) {
@@ -419,17 +419,17 @@ impl GenAiProjector {
         let (recorded, attribute, kind) = match kind {
             OutputKind::Text => (
                 &mut turn.first_text_recorded,
-                attr::MACRO_TIME_TO_FIRST_TEXT_MS,
+                attr::ROX_TIME_TO_FIRST_TEXT_MS,
                 "text",
             ),
             OutputKind::Reasoning => (
                 &mut turn.first_reasoning_recorded,
-                attr::MACRO_TIME_TO_FIRST_REASONING_MS,
+                attr::ROX_TIME_TO_FIRST_REASONING_MS,
                 "reasoning",
             ),
             OutputKind::ToolCall => (
                 &mut turn.first_tool_call_recorded,
-                attr::MACRO_TIME_TO_FIRST_TOOL_CALL_MS,
+                attr::ROX_TIME_TO_FIRST_TOOL_CALL_MS,
                 "tool_call",
             ),
         };
@@ -506,7 +506,7 @@ impl GenAiProjector {
             );
             turn.span.set_str(attr::INPUT_MESSAGES, bounded.json);
             if bounded.truncated {
-                turn.span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                turn.span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
             }
         }
         self.turn = Some(turn);
@@ -544,7 +544,7 @@ impl GenAiProjector {
                 let (json, truncated) = bound_tool_definitions(definitions, &self.policy.limits);
                 turn.span.set_str(attr::TOOL_DEFINITIONS, json);
                 if truncated {
-                    turn.span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                    turn.span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
                 }
             }
         }
@@ -552,13 +552,13 @@ impl GenAiProjector {
 
     /// A listed tool's name as this harness calls it. Rox's in-process agent
     /// calls Rox's tools natively, by their bare names, while the listing
-    /// sees them through Rox's MCP server as `mcp__macro__<tool>`; every
+    /// sees them through Rox's MCP server as `mcp__rox__<tool>`; every
     /// other harness calls them by the listed name.
     fn definition_name(&self, listed: &str) -> String {
         let name: ToolName = listed.parse().unwrap_or_else(|never| match never {});
         if self.harness == Harness::Macro
             && let ToolName::Mcp { .. } = &name
-            && let Some(tool) = self.harness.reader().macro_tool(&name)
+            && let Some(tool) = self.harness.reader().rox_tool(&name)
         {
             return tool.to_owned();
         }
@@ -647,7 +647,7 @@ impl GenAiProjector {
             );
             turn.span.set_str(attr::OUTPUT_MESSAGES, bounded.json);
             if bounded.truncated {
-                turn.span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                turn.span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
             }
         }
         // Dropping the last handle closes the span.
@@ -728,12 +728,12 @@ impl GenAiProjector {
                 agent.session.id = %self.session,
             ),
         };
-        span.set_str(attr::MACRO_TOOL_KIND, tool_kind_name(call.kind));
+        span.set_str(attr::ROX_TOOL_KIND, tool_kind_name(call.kind));
         if !call.title.is_empty() {
-            span.set_str(attr::MACRO_TOOL_TITLE, call.title.clone());
+            span.set_str(attr::ROX_TOOL_TITLE, call.title.clone());
         }
         if let ToolName::Mcp { server, .. } = &name {
-            span.set_str(attr::MACRO_MCP_SERVER, server.clone());
+            span.set_str(attr::ROX_MCP_SERVER, server.clone());
         }
         if let Some(description) = self.tool_description(&name) {
             span.set_str(attr::TOOL_DESCRIPTION, description);
@@ -837,7 +837,7 @@ impl GenAiProjector {
                 other => other.to_string().len(),
             };
             tool.span.set_u64(
-                attr::MACRO_TOOL_RESULT_BYTES,
+                attr::ROX_TOOL_RESULT_BYTES,
                 u64::try_from(bytes).unwrap_or(u64::MAX),
             );
         }
@@ -846,14 +846,14 @@ impl GenAiProjector {
                 let (json, truncated) = bounded_json_string(arguments, &self.policy.limits);
                 tool.span.set_str(attr::TOOL_CALL_ARGUMENTS, json);
                 if truncated {
-                    tool.span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                    tool.span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
                 }
             }
             if let Some(result) = &result {
                 let (json, truncated) = bounded_json_string(result, &self.policy.limits);
                 tool.span.set_str(attr::TOOL_CALL_RESULT, json);
                 if truncated {
-                    tool.span.set_bool(attr::MACRO_CONTENT_TRUNCATED, true);
+                    tool.span.set_bool(attr::ROX_CONTENT_TRUNCATED, true);
                 }
             }
         }

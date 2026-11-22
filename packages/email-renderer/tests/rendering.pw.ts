@@ -296,7 +296,7 @@ test('shadow isolation, link safety, literal plaintext and quote expansion use p
       normalizeFonts: false,
     };
     const input = {
-      html: '<style>body{color:red}</style><p>Hello <a href="https://example.com">Link</a></p><div class="macro_quote">Quoted</div>',
+      html: '<style>body{color:red}</style><p>Hello <a href="https://example.com">Link</a></p><div class="rox_quote">Quoted</div>',
     };
     const prepared = prepareEmailBody(input);
     const renderer = mountEmailBody(host, prepared, options);

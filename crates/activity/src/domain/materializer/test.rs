@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -66,7 +66,7 @@ fn activity() -> Activity {
         Uuid::from_u128(7),
         0,
         Actor::new_from_user(
-            MacroUserIdStr::try_from("macro|teo@example.com".to_string()).expect("valid user"),
+            RoxUserIdStr::try_from("macro|teo@example.com".to_string()).expect("valid user"),
         ),
         None,
         EntityType::Document,

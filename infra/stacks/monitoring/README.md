@@ -16,7 +16,7 @@ nothing else. GoAlert runs on the observability host (`infra/stacks/observabilit
 and has two services, each with its pair of webhooks declared in `goalert.ts`:
 
 - **Notify** (`@webhook-goalert-notify`, `@webhook-goalert-notify-close`):
-  posts the alert to the Macro Alerts channel. Every warning, alert and no-data
+  posts the alert to the Rox Alerts channel. Every warning, alert and no-data
   notification opens or updates an alert here, except a paging monitor's
   critical alert.
 - **Paging** (`@webhook-goalert`, `@webhook-goalert-close`): also phones the
@@ -295,11 +295,11 @@ limitations and the post-deploy verification gates.
 ## AI provider coverage
 
 `monitors/ai-providers.ts` adds **four monitors, one dashboard, two log-based
-metrics and one span-based metric** for Macro's AI provider accounts. Its
+metrics and one span-based metric** for Rox's AI provider accounts. Its
 header lists every log and span field it reads; [the
 runbook](../../../docs/runbooks/ai-providers.md) covers each alert.
 
-- A provider refusing Macro's key as suspended or out of credit pages from the
+- A provider refusing Rox's key as suspended or out of credit pages from the
   Rust services' `ai provider account unavailable` log, and notifies from the
   AI editing worker's `ai.provider_account_unavailable` span.
 - Month-to-date priced spend, from the `ai usage priced` log, warns at 50% and
@@ -340,7 +340,7 @@ header lists every log field it reads;
 and where each generation's trace is.
 
 The dashboard shows generations by outcome, the fallback rate (generations
-that left Macro's templates only), time to first suggestion, per-surface fill,
+that left Rox's templates only), time to first suggestion, per-surface fill,
 rejected suggestions, and saves and dismissals by surface, origin and kind.
 The monitor notifies when more than 10% of an hour's finished generations,
 plus two, fail; it does not page while suggestions are behind

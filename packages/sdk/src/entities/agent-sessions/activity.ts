@@ -3,7 +3,7 @@ import type {
   AgentActivityCursor,
 } from '../../../generated/agent-harness/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { AgentSession } from './agent-session';
 
 /** Page options for recorded session activity, newest first. */
@@ -17,13 +17,13 @@ export type AgentActivityOptions = {
 /** A code-mode invocation, identified independently of its runtime or retries. */
 export class AgentInvocation {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     private readonly parent: AgentSession,
     readonly id: string,
   ) {}
 
   /** Construct a handle without making a request. */
-  static byId(client: MacroClient, session: AgentSession, id: string) {
+  static byId(client: RoxClient, session: AgentSession, id: string) {
     return new AgentInvocation(client, session, id);
   }
 
@@ -64,7 +64,7 @@ export type AgentActivity = {
 
 /** Iterate recorded mutations; reads and failed requests do not create history. */
 export function sessionActivity(
-  client: MacroClient,
+  client: RoxClient,
   session: AgentSession,
   options: AgentActivityOptions = {},
 ): AsyncGenerator<AgentActivity> {

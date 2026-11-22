@@ -1,7 +1,7 @@
 //! Typed review drafts and outcomes. Decoding a draft is its validation.
 use super::{ReviewItemStatus, ReviewKind};
 use crate::domain::CodeModeError;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
@@ -131,7 +131,7 @@ impl<Draft, Outcome> ReviewItem<Draft, Outcome> {
     pub fn pending(draft: Draft) -> Self {
         Self {
             state: ReviewItemState {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 edited: false,
                 status: ReviewItemStatus::Pending,
                 error: None,
@@ -339,7 +339,7 @@ fn calendar_problem(draft: &CalendarDraft) -> Option<&'static str> {
     if !ends_after_start {
         return Some("The event must end after it starts.");
     }
-    if draft.add_macro_call && draft.add_conference {
+    if draft.add_rox_call && draft.add_conference {
         return Some("Choose either a Rox call or a video meeting.");
     }
     None

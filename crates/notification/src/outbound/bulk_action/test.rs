@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use notification_state::NotificationState;
 use serde_json::json;
 use sqlx::{Pool, Postgres};
@@ -6,8 +6,8 @@ use sqlx::{Pool, Postgres};
 use super::*;
 use crate::{domain::bulk_action::BulkActionItem, outbound::repository::NotificationDbOps};
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("user@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("user@example.com").unwrap()
 }
 
 /// A notification for the test user in `state`, created `age_seconds` ago.
@@ -94,7 +94,7 @@ async fn undo(store: &PgBulkActions, id: Uuid) -> BulkAction {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undo_restores_each_notification_to_its_earlier_state(pool: Pool<Postgres>) {
     let store = PgBulkActions::new(pool.clone());
     let unseen = notification(&pool, NotificationState::Unseen, 60.0).await;
@@ -123,7 +123,7 @@ async fn undo_restores_each_notification_to_its_earlier_state(pool: Pool<Postgre
     assert_eq!(state(&pool, already_done).await, NotificationState::Done);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_notification_newer_than_the_action_is_left_alone(pool: Pool<Postgres>) {
     let store = PgBulkActions::new(pool.clone());
     let before = notification(&pool, NotificationState::Unseen, 60.0).await;
@@ -141,7 +141,7 @@ async fn a_notification_newer_than_the_action_is_left_alone(pool: Pool<Postgres>
     assert_eq!(state(&pool, after).await, NotificationState::Unseen);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undo_skips_what_the_user_changed_after_the_action(pool: Pool<Postgres>) {
     let store = PgBulkActions::new(pool.clone());
     let untouched = notification(&pool, NotificationState::Unseen, 60.0).await;
@@ -174,7 +174,7 @@ async fn undo_skips_what_the_user_changed_after_the_action(pool: Pool<Postgres>)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_undo_stops_the_worker_still_applying(pool: Pool<Postgres>) {
     let store = PgBulkActions::new(pool.clone());
     let first = notification(&pool, NotificationState::Unseen, 60.0).await;
@@ -215,7 +215,7 @@ async fn an_undo_stops_the_worker_still_applying(pool: Pool<Postgres>) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stalled_action_is_claimed_and_resumes_from_its_cursor(pool: Pool<Postgres>) {
     let store = PgBulkActions::new(pool.clone());
     let first = notification(&pool, NotificationState::Unseen, 60.0).await;
@@ -268,7 +268,7 @@ async fn a_stalled_action_is_claimed_and_resumes_from_its_cursor(pool: Pool<Post
     assert!(store.running(&user()).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_action_that_keeps_stalling_is_marked_failed(pool: Pool<Postgres>) {
     let store = PgBulkActions::new(pool.clone());
     let (_, lease) = create(&store, json!({})).await;
@@ -292,7 +292,7 @@ async fn an_action_that_keeps_stalling_is_marked_failed(pool: Pool<Postgres>) {
     assert_eq!(action.status, BulkActionStatus::Failed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn creating_the_same_action_twice_creates_it_once(pool: Pool<Postgres>) {
     let store = PgBulkActions::new(pool.clone());
     let new = NewBulkAction {
@@ -317,7 +317,7 @@ async fn creating_the_same_action_twice_creates_it_once(pool: Pool<Postgres>) {
         CreatedBulkAction::Conflict
     ));
     let other_user = NewBulkAction {
-        user_id: MacroUserIdStr::try_from_email("other@example.com").unwrap(),
+        user_id: RoxUserIdStr::try_from_email("other@example.com").unwrap(),
         ..new
     };
     assert!(matches!(
@@ -326,7 +326,7 @@ async fn creating_the_same_action_twice_creates_it_once(pool: Pool<Postgres>) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn finished_actions_are_purged_with_their_ledgers(pool: Pool<Postgres>) {
     let store = PgBulkActions::new(pool.clone());
     let id = notification(&pool, NotificationState::Unseen, 60.0).await;

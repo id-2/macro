@@ -21,7 +21,7 @@ use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
 use chrono::{DateTime, Utc};
-use macro_env::Environment;
+use rox_env::Environment;
 
 use crate::domain::enrollment::{Enrollment, EnrollmentGeneration, EnrollmentIssueError};
 use crate::domain::ids::{ComputerId, PairingId};
@@ -36,14 +36,14 @@ use crate::outbound::stderr_tail::{STDERR_TAIL_BYTES, log_failure, read_tail};
 mod test;
 
 /// Label carrying the control-plane owner.
-pub const CONTROL_PLANE_LABEL: &str = "macro.control_plane";
-const CREATED_AT_LABEL: &str = "macro.created_at";
-const GENERATION_LABEL: &str = "macro.enrollment_generation";
-const PAIRING_LABEL: &str = "macro.pairing_id";
-const IMAGE_LABEL: &str = "macro.image";
+pub const CONTROL_PLANE_LABEL: &str = "rox.control_plane";
+const CREATED_AT_LABEL: &str = "rox.created_at";
+const GENERATION_LABEL: &str = "rox.enrollment_generation";
+const PAIRING_LABEL: &str = "rox.pairing_id";
+const IMAGE_LABEL: &str = "rox.image";
 
 /// Label every computer container carries, valued with its computer id.
-pub const COMPUTER_ID_LABEL: &str = "macro.computer_id";
+pub const COMPUTER_ID_LABEL: &str = "rox.computer_id";
 
 /// Where the enrollment directory is mounted inside the container; the image's
 /// `/etc/macro/enroll.env` reads `file:/run/macro/enrollment.json`.

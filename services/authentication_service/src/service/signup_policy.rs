@@ -3,10 +3,10 @@ mod test;
 
 use std::{collections::HashSet, fmt};
 
-use macro_user_id::email::Email;
+use rox_user_id::email::Email;
 use serde_json::Value;
 
-const MACRO_EMAIL_DOMAIN: &str = "rox.one";
+const ROX_EMAIL_DOMAIN: &str = "rox.one";
 
 /// The configured signup admission policy.
 #[derive(Clone, Eq, PartialEq)]
@@ -52,7 +52,7 @@ impl SignupPolicy {
             Self::AllowAll => Ok(()),
             Self::EmailAllowlist { allowed_emails } => {
                 let normalized_email = normalize_public_email(email)?;
-                if is_macro_email(&normalized_email) || allowed_emails.contains(&normalized_email) {
+                if is_rox_email(&normalized_email) || allowed_emails.contains(&normalized_email) {
                     Ok(())
                 } else {
                     Err(SignupPolicyDenial::PublicEmailNotAllowed)
@@ -161,8 +161,8 @@ fn normalize_email(email: &str) -> Result<String, ()> {
     Ok(lowercased_email)
 }
 
-fn is_macro_email(normalized_email: &str) -> bool {
+fn is_rox_email(normalized_email: &str) -> bool {
     normalized_email
         .rsplit_once('@')
-        .is_some_and(|(_, domain)| domain == MACRO_EMAIL_DOMAIN)
+        .is_some_and(|(_, domain)| domain == ROX_EMAIL_DOMAIN)
 }

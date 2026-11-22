@@ -41,7 +41,7 @@ pub async fn run_worker(
     dss_client: DocumentStorageServiceClient,
     system_properties_service: Arc<SystemPropertiesServiceImpl<PgSystemPropertiesRepository>>,
     crm_service: CrmServiceType,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     notifications_enabled: bool,
     retry_worker: bool,
 ) {
@@ -58,7 +58,7 @@ pub async fn run_worker(
         dss_client,
         system_properties_service,
         crm_service,
-        macro_event_broker,
+        rox_event_broker,
         notifications_enabled,
         retry_worker,
         CancellationToken::new(),
@@ -84,7 +84,7 @@ pub(crate) fn context(
     dss_client: DocumentStorageServiceClient,
     system_properties_service: Arc<SystemPropertiesServiceImpl<PgSystemPropertiesRepository>>,
     _crm_service: CrmServiceType,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     notifications_enabled: bool,
     retry_worker: bool,
 ) -> InboxSyncContext {
@@ -104,7 +104,7 @@ pub(crate) fn context(
         connection_gateway_client,
         dss_client,
         system_properties_service,
-        macro_event_broker,
+        rox_event_broker,
     };
     let service = Arc::new(InboxSyncService {
         links: PgGmailOps(db.clone()),
@@ -142,7 +142,7 @@ pub async fn run_worker_with_cancellation(
     dss_client: DocumentStorageServiceClient,
     system_properties_service: Arc<SystemPropertiesServiceImpl<PgSystemPropertiesRepository>>,
     crm_service: CrmServiceType,
-    macro_event_broker: PubSubEventBroker,
+    rox_event_broker: PubSubEventBroker,
     notifications_enabled: bool,
     retry_worker: bool,
     cancellation_token: CancellationToken,
@@ -160,7 +160,7 @@ pub async fn run_worker_with_cancellation(
         dss_client,
         system_properties_service,
         crm_service,
-        macro_event_broker,
+        rox_event_broker,
         notifications_enabled,
         retry_worker,
     );

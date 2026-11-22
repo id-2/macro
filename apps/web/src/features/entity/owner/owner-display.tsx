@@ -1,7 +1,7 @@
 import { UserIcon } from '@core/component/UserIcon';
 import { useUserId } from '@core/context/user';
 import { getDisplayName } from '@core/user';
-import type { MacroId } from '@core/user/macroId';
+import type { RoxId } from '@core/user/macroId';
 import UsersThreeIcon from '@icon/system/regular/users-three.svg';
 import { firstPartyBotName } from '@queries/bots/first-party-bot-name';
 import { useBotProfile } from '@queries/bots/profiles';
@@ -62,7 +62,7 @@ function asKind<K extends Owner['kind']>(
 }
 
 function UserOwner(props: {
-  id: MacroId;
+  id: RoxId;
   viewerLabel?: string;
   suppressClick?: boolean;
   showTooltip?: boolean;

@@ -1,6 +1,6 @@
 use super::*;
 use crate::threads::get::get_thread_by_id_and_link_id;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use std::time::Duration;
 
@@ -17,7 +17,7 @@ async fn fetch_flag(pool: &Pool<Postgres>, thread_id: &str) -> anyhow::Result<bo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_calendar_flag"))
 )]
 async fn sync_sets_flag_when_thread_has_calendar_attachment(
@@ -33,7 +33,7 @@ async fn sync_sets_flag_when_thread_has_calendar_attachment(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_calendar_flag"))
 )]
 async fn sync_clears_stale_flag_when_no_calendar_attachment(
@@ -50,7 +50,7 @@ async fn sync_clears_stale_flag_when_no_calendar_attachment(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_calendar_flag"))
 )]
 async fn sync_is_stable_when_flag_already_matches(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -91,7 +91,7 @@ async fn fetch_kind_flags(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("sync_thread_attachment_kind_flags")
@@ -112,7 +112,7 @@ async fn sync_sets_kind_flags_from_attachment_mime_types(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("sync_thread_attachment_kind_flags")
@@ -134,7 +134,7 @@ async fn sync_clears_stale_kind_flags(pool: Pool<Postgres>) -> anyhow::Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("sync_thread_attachment_kind_flags")
@@ -174,7 +174,7 @@ const SIG_THREAD_TRASH_ONLY: &str = "00000000-0000-0000-0000-00000000d204";
 const SIG_THREAD_VIP_ADDRESS: &str = "00000000-0000-0000-0000-00000000d205";
 const SIG_THREAD_DOMAIN_MUTED: &str = "00000000-0000-0000-0000-00000000d206";
 const SIG_THREAD_DRAFT: &str = "00000000-0000-0000-0000-00000000d207";
-const SIG_THREAD_MACRO_DIGEST: &str = "00000000-0000-0000-0000-00000000d209";
+const SIG_THREAD_ROX_DIGEST: &str = "00000000-0000-0000-0000-00000000d209";
 
 async fn fetch_signal(pool: &Pool<Postgres>, thread_id: &str) -> anyhow::Result<bool> {
     Ok(sqlx::query_scalar!(
@@ -192,7 +192,7 @@ async fn sync_signal(pool: &Pool<Postgres>, thread_id: &str) -> anyhow::Result<(
 
 // A message with no category labels counts as signal by default.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn signal_set_for_unlabeled_message(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -205,7 +205,7 @@ async fn signal_set_for_unlabeled_message(pool: Pool<Postgres>) -> anyhow::Resul
 // A stale true flag is cleared when the thread's only message carries a
 // depriority category label.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn signal_cleared_for_category_labeled_thread(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -219,7 +219,7 @@ async fn signal_cleared_for_category_labeled_thread(pool: Pool<Postgres>) -> any
 
 // Any-message semantics: one signal message outweighs noise siblings.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn signal_set_when_any_message_matches(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -231,7 +231,7 @@ async fn signal_set_when_any_message_matches(pool: Pool<Postgres>) -> anyhow::Re
 
 // TRASH messages are excluded: they can't make a thread signal.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn signal_ignores_trashed_messages(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -244,7 +244,7 @@ async fn signal_ignores_trashed_messages(pool: Pool<Postgres>) -> anyhow::Result
 // An important-address filter outranks both a muted-domain filter and a
 // depriority category label.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn signal_address_override_beats_domain_and_labels(
@@ -260,7 +260,7 @@ async fn signal_address_override_beats_domain_and_labels(
 // A muted-domain filter forces noise when the sender has no address-level
 // exception, even for an otherwise-signal message.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn signal_domain_override_mutes_unlabeled_message(
@@ -276,19 +276,19 @@ async fn signal_domain_override_mutes_unlabeled_message(
 // case-insensitive on the sender domain and beats both the unlabeled
 // default and an explicit address-important override.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
-async fn signal_cleared_for_macro_notification_sender(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    assert!(fetch_signal(&pool, SIG_THREAD_MACRO_DIGEST).await?);
-    sync_signal(&pool, SIG_THREAD_MACRO_DIGEST).await?;
-    assert!(!fetch_signal(&pool, SIG_THREAD_MACRO_DIGEST).await?);
+async fn signal_cleared_for_rox_notification_sender(pool: Pool<Postgres>) -> anyhow::Result<()> {
+    assert!(fetch_signal(&pool, SIG_THREAD_ROX_DIGEST).await?);
+    sync_signal(&pool, SIG_THREAD_ROX_DIGEST).await?;
+    assert!(!fetch_signal(&pool, SIG_THREAD_ROX_DIGEST).await?);
     Ok(())
 }
 
 // Drafts are always signal, even when labeled with a depriority category.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn signal_set_for_draft_despite_category_label(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -318,7 +318,7 @@ async fn fetch_inbox_state(
 // update_thread_metadata piggybacks the is_signal sync, so every existing
 // metadata-recompute call site keeps the flag fresh.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn update_thread_metadata_syncs_signal_flag(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -348,7 +348,7 @@ async fn update_thread_metadata_syncs_signal_flag(pool: Pool<Postgres>) -> anyho
 
 // A recomputation that produces the same values must not rewrite the row.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("sync_thread_signal_flag"))
 )]
 async fn repeated_metadata_recompute_is_noop(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -424,7 +424,7 @@ async fn reply_draft_to_sent_mail_inbox_state(
 // Mail the user sent to themselves is mail they received, so a reply draft
 // brings it back to the inbox. Mail sent only to others stays archived.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../email/fixtures", scripts("email_thread_labels"))
 )]
 async fn a_message_sent_to_its_own_sender_counts_as_received_mail(
@@ -441,7 +441,7 @@ async fn a_message_sent_to_its_own_sender_counts_as_received_mail(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../email/fixtures", scripts("email_thread_labels"))
 )]
 async fn returned_sent_only_metadata_preserves_visibility_without_rewriting(

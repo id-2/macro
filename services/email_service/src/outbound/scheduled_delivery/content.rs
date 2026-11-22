@@ -41,7 +41,7 @@ pub(super) async fn load_delivery_content(
             bcc: Some(message.bcc.into_iter().map(contact).collect()),
             body_text: message.body_text,
             body_html: message.body_html,
-            body_macro: message.body_macro,
+            body_rox: message.body_rox,
             attachments: None,
             headers_json: message.headers_json,
             send_time: message.send_time,

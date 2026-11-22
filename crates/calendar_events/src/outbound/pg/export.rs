@@ -87,9 +87,9 @@ pub(super) async fn event_export(
                     candidate.owner_id = $1
                     OR EXISTS (
                         SELECT 1
-                        FROM macro_user_links link
+                        FROM rox_user_links link
                         WHERE link.link_id = candidate.source_link_id
-                          AND link.primary_macro_id = $1
+                          AND link.primary_rox_id = $1
                     )
               )
             UNION ALL

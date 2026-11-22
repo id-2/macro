@@ -168,7 +168,7 @@ function EmailSignatures() {
             >
               <SignatureSection
                 link={link}
-                shared={link.macro_id !== userId()}
+                shared={link.rox_id !== userId()}
               />
             </Suspense>
           )}
@@ -182,7 +182,7 @@ function EmailReadReceipts() {
   const userId = useUserId();
   const { query } = useEmailLinks();
   const links = () =>
-    (query.data?.links ?? []).filter((link) => link.macro_id === userId());
+    (query.data?.links ?? []).filter((link) => link.rox_id === userId());
   return (
     <Show
       when={!query.isPending}

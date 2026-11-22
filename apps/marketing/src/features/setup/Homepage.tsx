@@ -4,7 +4,7 @@ import { FeatureUiStyles } from '../marketing/components/FeaturePage';
 import { HomepageFeatureLinks } from '../marketing/components/HomepageFeatureLinks';
 import { HomepageResources } from '../marketing/components/HomepageResources';
 import { HomepageTrustBadges } from '../marketing/components/HomepageTrustBadges';
-import { MacroHero } from '../marketing/components/homepage/MacroHero';
+import { RoxHero } from '../marketing/components/homepage/RoxHero';
 import { SiteHeader } from '../marketing/components/SiteHeader';
 import { wallpapers } from '../marketing/components/TutorialWallpaper';
 import '../marketing/components/homepage/macro-homepage.css';
@@ -44,7 +44,7 @@ export function Homepage(props: { embedded?: boolean } = {}) {
         >
           <section class="macro-home-hero" aria-labelledby="macro-home-title">
             <HomepageFeatureLinks />
-            <MacroHero />
+            <RoxHero />
             <HomepageTrustBadges revealOnScroll />
           </section>
           <Suspense>

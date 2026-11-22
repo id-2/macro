@@ -21,7 +21,7 @@ struct FakeRepo(Arc<Mutex<State>>);
 impl EnterpriseRepository for FakeRepo {
     async fn bind_verified(
         &self,
-        _macro_user_id: &MacroUserIdStr<'_>,
+        _macro_user_id: &RoxUserIdStr<'_>,
         identity: VerifiedRoxIdentity,
     ) -> Result<()> {
         self.0.lock().unwrap().bindings.push(identity);
@@ -30,8 +30,8 @@ impl EnterpriseRepository for FakeRepo {
 
     async fn commit_member_state(
         &self,
-        _actor: &MacroUserIdStr<'_>,
-        _member: &MacroUserIdStr<'_>,
+        _actor: &RoxUserIdStr<'_>,
+        _member: &RoxUserIdStr<'_>,
         disabled: bool,
         result: AuditResult,
     ) -> Result<()> {
@@ -41,7 +41,7 @@ impl EnterpriseRepository for FakeRepo {
         Ok(())
     }
 
-    async fn member_disabled(&self, _member: &MacroUserIdStr<'_>) -> Result<bool> {
+    async fn member_disabled(&self, _member: &RoxUserIdStr<'_>) -> Result<bool> {
         Ok(self.0.lock().unwrap().disabled)
     }
 
@@ -73,7 +73,7 @@ impl EnterpriseRepository for FakeRepo {
 struct FakeTeams(Vec<Uuid>);
 
 impl TeamDirectory for FakeTeams {
-    async fn team_ids(&self, _user: MacroUserIdStr<'static>) -> Result<Vec<Uuid>> {
+    async fn team_ids(&self, _user: RoxUserIdStr<'static>) -> Result<Vec<Uuid>> {
         Ok(self.0.clone())
     }
 }
@@ -103,7 +103,7 @@ impl UserLifecycle for FakeLifecycle {
 struct FakeMembers;
 
 impl MemberDirectory for FakeMembers {
-    async fn fusion_user_id(&self, _user: &MacroUserIdStr<'_>) -> Result<String> {
+    async fn fusion_user_id(&self, _user: &RoxUserIdStr<'_>) -> Result<String> {
         Ok("fusion-member".to_owned())
     }
 }
@@ -112,13 +112,13 @@ impl MemberDirectory for FakeMembers {
 struct FakeHarnesses;
 
 impl HarnessRevoker for FakeHarnesses {
-    async fn revoke_server_records(&self, _member: &MacroUserIdStr<'_>) -> Result<usize> {
+    async fn revoke_server_records(&self, _member: &RoxUserIdStr<'_>) -> Result<usize> {
         Ok(2)
     }
 }
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 fn receipt() -> EntityAccessReceipt<AdminTeamRole> {
@@ -244,7 +244,7 @@ async fn non_member_is_refused_before_lifecycle_or_audit_writes() {
 struct FailingHarnesses;
 
 impl HarnessRevoker for FailingHarnesses {
-    async fn revoke_server_records(&self, _member: &MacroUserIdStr<'_>) -> Result<usize> {
+    async fn revoke_server_records(&self, _member: &RoxUserIdStr<'_>) -> Result<usize> {
         Err(EnterpriseError::Storage(anyhow::anyhow!(
             "injected harness revocation failure"
         )))

@@ -2,13 +2,13 @@
 
 use std::collections::BTreeSet;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 use super::*;
 
 const MACRO: &str = "11111111-1111-1111-1111-111111111111";
-const MACRO_PLANNING: &str = "22222222-2222-2222-2222-222222222222";
+const ROX_PLANNING: &str = "22222222-2222-2222-2222-222222222222";
 const MACARONI: &str = "33333333-3333-3333-3333-333333333333";
 const GABRIEL_DM: &str = "66666666-6666-6666-6666-666666666666";
 const PETER_TEO_GROUP: &str = "77777777-7777-7777-7777-777777777777";
@@ -22,8 +22,8 @@ const UNKNOWN_BOT_DM: &str = "dddddddd-dddd-dddd-dddd-dddddddddddd";
 const MEMBER: &str = "macro|member@test.com";
 const GABRIEL: &str = "macro|gabriel@test.com";
 
-fn user(id: &str) -> MacroUserId<Lowercase<'_>> {
-    MacroUserId::parse_from_str(id).unwrap().lowercase()
+fn user(id: &str) -> RoxUserId<Lowercase<'_>> {
+    RoxUserId::parse_from_str(id).unwrap().lowercase()
 }
 
 fn ids(results: &PaginatedResult<NameSearchResult>) -> Vec<String> {
@@ -35,7 +35,7 @@ fn ids(results: &PaginatedResult<NameSearchResult>) -> Vec<String> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn member_sees_matching_channels_but_non_member_does_not(
@@ -52,10 +52,10 @@ async fn member_sees_matching_channels_but_non_member_does_not(
     )
     .await?;
 
-    assert_eq!(ids(&member_results), [MACRO_PLANNING, MACRO]);
+    assert_eq!(ids(&member_results), [ROX_PLANNING, MACRO]);
     assert!(member_results.items.iter().all(|hit| {
         hit.entity_type == SearchEntityType::Channels
-            && hit.name.contains("<macro_em>Macro</macro_em>")
+            && hit.name.contains("<rox_em>Macro</rox_em>")
     }));
 
     let non_member_results = search_channel_names(
@@ -74,7 +74,7 @@ async fn member_sees_matching_channels_but_non_member_does_not(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn partial_matches_substrings_while_exact_requires_a_complete_token(
@@ -90,7 +90,7 @@ async fn partial_matches_substrings_while_exact_requires_a_complete_token(
         None,
     )
     .await?;
-    assert_eq!(ids(&prefix), [MACARONI, MACRO_PLANNING, MACRO]);
+    assert_eq!(ids(&prefix), [MACARONI, ROX_PLANNING, MACRO]);
 
     let infix = search_channel_names(
         &pool,
@@ -102,7 +102,7 @@ async fn partial_matches_substrings_while_exact_requires_a_complete_token(
         None,
     )
     .await?;
-    assert_eq!(ids(&infix), [MACRO_PLANNING, MACRO]);
+    assert_eq!(ids(&infix), [ROX_PLANNING, MACRO]);
 
     let exact_prefix = search_channel_names(
         &pool,
@@ -126,12 +126,12 @@ async fn partial_matches_substrings_while_exact_requires_a_complete_token(
         None,
     )
     .await?;
-    assert_eq!(ids(&exact_token), [MACRO_PLANNING, MACRO]);
+    assert_eq!(ids(&exact_token), [ROX_PLANNING, MACRO]);
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn former_participant_cannot_find_channel(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -151,7 +151,7 @@ async fn former_participant_cannot_find_channel(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn direct_message_is_found_by_the_other_participants_name(
@@ -170,7 +170,7 @@ async fn direct_message_is_found_by_the_other_participants_name(
     assert_eq!(ids(&by_first_name), [GABRIEL_DM]);
     assert_eq!(
         by_first_name.items[0].name,
-        "<macro_em>Gab</macro_em>riel Birman"
+        "<rox_em>Gab</rox_em>riel Birman"
     );
 
     let by_last_name = search_channel_names(
@@ -186,13 +186,13 @@ async fn direct_message_is_found_by_the_other_participants_name(
     assert_eq!(ids(&by_last_name), [GABRIEL_DM]);
     assert_eq!(
         by_last_name.items[0].name,
-        "Gabriel <macro_em>Birman</macro_em>"
+        "Gabriel <rox_em>Birman</rox_em>"
     );
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn direct_message_falls_back_to_the_email_local_part(
@@ -209,7 +209,7 @@ async fn direct_message_falls_back_to_the_email_local_part(
     )
     .await?;
     assert_eq!(ids(&no_user_row), [NAMELESS_DM]);
-    assert_eq!(no_user_row.items[0].name, "<macro_em>nameless</macro_em>");
+    assert_eq!(no_user_row.items[0].name, "<rox_em>nameless</rox_em>");
 
     let no_profile = search_channel_names(
         &pool,
@@ -222,12 +222,12 @@ async fn direct_message_falls_back_to_the_email_local_part(
     )
     .await?;
     assert_eq!(ids(&no_profile), [GABRIEL_DM]);
-    assert_eq!(no_profile.items[0].name, "<macro_em>member</macro_em>");
+    assert_eq!(no_profile.items[0].name, "<rox_em>member</rox_em>");
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn viewer_is_never_part_of_their_own_direct_message_name(
@@ -260,7 +260,7 @@ async fn viewer_is_never_part_of_their_own_direct_message_name(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn display_name_skips_not_available_parts(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -276,12 +276,12 @@ async fn display_name_skips_not_available_parts(pool: Pool<Postgres>) -> anyhow:
     .await?;
 
     assert_eq!(ids(&results), [HOLLIS_DM]);
-    assert_eq!(results.items[0].name, "<macro_em>Hollis</macro_em>");
+    assert_eq!(results.items[0].name, "<rox_em>Hollis</rox_em>");
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn unnamed_private_channel_is_found_by_any_other_participant(
@@ -300,7 +300,7 @@ async fn unnamed_private_channel_is_found_by_any_other_participant(
     assert_eq!(ids(&by_first_participant), [PETER_TEO_GROUP]);
     assert_eq!(
         by_first_participant.items[0].name,
-        "<macro_em>Peter</macro_em> Chinman, Teo Nys"
+        "<rox_em>Peter</rox_em> Chinman, Teo Nys"
     );
 
     let by_second_participant = search_channel_names(
@@ -316,13 +316,13 @@ async fn unnamed_private_channel_is_found_by_any_other_participant(
     assert_eq!(ids(&by_second_participant), [PETER_TEO_GROUP]);
     assert_eq!(
         by_second_participant.items[0].name,
-        "Peter Chinman, Teo <macro_em>Nys</macro_em>"
+        "Peter Chinman, Teo <rox_em>Nys</rox_em>"
     );
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn every_term_must_match_the_stored_name_or_some_other_participant(
@@ -341,7 +341,7 @@ async fn every_term_must_match_the_stored_name_or_some_other_participant(
     assert_eq!(ids(&two_participants), [PETER_TEO_GROUP]);
     assert_eq!(
         two_participants.items[0].name,
-        "<macro_em>Peter</macro_em> Chinman, <macro_em>Teo</macro_em> Nys"
+        "<rox_em>Peter</rox_em> Chinman, <rox_em>Teo</rox_em> Nys"
     );
 
     let comma_separated = search_channel_names(
@@ -378,16 +378,16 @@ async fn every_term_must_match_the_stored_name_or_some_other_participant(
         None,
     )
     .await?;
-    assert_eq!(ids(&two_words_of_a_stored_name), [MACRO_PLANNING]);
+    assert_eq!(ids(&two_words_of_a_stored_name), [ROX_PLANNING]);
     assert_eq!(
         two_words_of_a_stored_name.items[0].name,
-        "<macro_em>Macro</macro_em> <macro_em>Plan</macro_em>ning"
+        "<rox_em>Macro</rox_em> <rox_em>Plan</rox_em>ning"
     );
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn persona_direct_messages_are_found_by_bot_name(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -402,7 +402,7 @@ async fn persona_direct_messages_are_found_by_bot_name(pool: Pool<Postgres>) -> 
     )
     .await?;
     assert_eq!(ids(&system_bot), [CODEX_DM]);
-    assert_eq!(system_bot.items[0].name, "<macro_em>Codex</macro_em>");
+    assert_eq!(system_bot.items[0].name, "<rox_em>Codex</rox_em>");
 
     let owned_bot = search_channel_names(
         &pool,
@@ -415,7 +415,7 @@ async fn persona_direct_messages_are_found_by_bot_name(pool: Pool<Postgres>) -> 
     )
     .await?;
     assert_eq!(ids(&owned_bot), [DEAL_DESK_DM]);
-    assert_eq!(owned_bot.items[0].name, "<macro_em>Deal</macro_em> Desk");
+    assert_eq!(owned_bot.items[0].name, "<rox_em>Deal</rox_em> Desk");
 
     let bot_without_row = search_channel_names(
         &pool,
@@ -428,12 +428,12 @@ async fn persona_direct_messages_are_found_by_bot_name(pool: Pool<Postgres>) -> 
     )
     .await?;
     assert_eq!(ids(&bot_without_row), [UNKNOWN_BOT_DM]);
-    assert_eq!(bot_without_row.items[0].name, "<macro_em>Bot</macro_em>");
+    assert_eq!(bot_without_row.items[0].name, "<rox_em>Bot</rox_em>");
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn channel_types_narrow_the_search(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -482,7 +482,7 @@ async fn channel_types_narrow_the_search(pool: Pool<Postgres>) -> anyhow::Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn channel_ids_narrow_the_search(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -505,7 +505,7 @@ async fn channel_ids_narrow_the_search(pool: Pool<Postgres>) -> anyhow::Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn pages_through_mixed_named_and_direct_message_results(
@@ -542,7 +542,7 @@ async fn pages_through_mixed_named_and_direct_message_results(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn blank_terms_and_thread_cursors_are_rejected(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -581,7 +581,7 @@ async fn blank_terms_and_thread_cursors_are_rejected(pool: Pool<Postgres>) -> an
 /// The SQL match and the Rust name resolution implement one rule: a channel is
 /// returned exactly when the name the viewer sees contains every term.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("channel"))
 )]
 async fn results_match_the_names_the_viewer_sees(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -593,7 +593,7 @@ async fn results_match_the_names_the_viewer_sees(pool: Pool<Postgres>) -> anyhow
     .fetch_all(&pool)
     .await?;
     let resolved_names =
-        batch_resolve_channel_names(&pool, &channel_ids, MacroUserIdStr(viewer.clone())).await?;
+        batch_resolve_channel_names(&pool, &channel_ids, RoxUserIdStr(viewer.clone())).await?;
     assert_eq!(resolved_names.len(), 11);
 
     for term in [
@@ -643,7 +643,7 @@ async fn results_match_the_names_the_viewer_sees(pool: Pool<Postgres>) -> anyhow
             results
                 .items
                 .iter()
-                .all(|hit| hit.name.contains("<macro_em>")),
+                .all(|hit| hit.name.contains("<rox_em>")),
             "every hit for {term:?} is highlighted"
         );
     }

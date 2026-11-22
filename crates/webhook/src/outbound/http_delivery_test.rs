@@ -119,7 +119,7 @@ fn rejects_reserved_headers_case_insensitively() {
         "X-ROX-TIMESTAMP",
         "x-Rox-Signature",
         "X-Macro-Event",
-        "x-macro-event-id",
+        "x-rox-event-id",
         "X-MACRO-TIMESTAMP",
         "x-Macro-Signature",
     ] {

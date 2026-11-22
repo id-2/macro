@@ -106,7 +106,7 @@ export function mapGraphqlEmailMessage(
     })),
     bcc: message.bcc.map(mapContact),
     body_html_sanitized: message.bodyHtmlSanitized,
-    body_macro: message.bodyMacro,
+    body_rox: message.bodyMacro,
     body_replyless: message.bodyReplyless,
     calendar_invitations:
       decodeCalendarInvitations(message.calendarInvitations) ?? [],

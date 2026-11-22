@@ -1,6 +1,6 @@
 //! Direct-message identity and batch commands.
 
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::collections::HashSet;
 
 #[cfg(test)]
@@ -14,13 +14,13 @@ pub struct SelfDm;
 /// Two distinct users that identify one direct message. `(a, b)` equals `(b, a)`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DmPair {
-    lo: MacroUserIdStr<'static>,
-    hi: MacroUserIdStr<'static>,
+    lo: RoxUserIdStr<'static>,
+    hi: RoxUserIdStr<'static>,
 }
 
 impl DmPair {
     /// Construct a pair of distinct users. Argument order does not matter.
-    pub fn new(a: MacroUserIdStr<'_>, b: MacroUserIdStr<'_>) -> Result<Self, SelfDm> {
+    pub fn new(a: RoxUserIdStr<'_>, b: RoxUserIdStr<'_>) -> Result<Self, SelfDm> {
         match a.as_ref().cmp(b.as_ref()) {
             std::cmp::Ordering::Less => Ok(Self {
                 lo: a.into_owned(),
@@ -35,12 +35,12 @@ impl DmPair {
     }
 
     /// Return one side of the pair.
-    pub fn lo(&self) -> &MacroUserIdStr<'static> {
+    pub fn lo(&self) -> &RoxUserIdStr<'static> {
         &self.lo
     }
 
     /// Return the other side of the pair.
-    pub fn hi(&self) -> &MacroUserIdStr<'static> {
+    pub fn hi(&self) -> &RoxUserIdStr<'static> {
         &self.hi
     }
 }
@@ -48,7 +48,7 @@ impl DmPair {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct EnsureDm {
     pub(crate) pair: DmPair,
-    pub(crate) owner: MacroUserIdStr<'static>,
+    pub(crate) owner: RoxUserIdStr<'static>,
 }
 
 /// An opaque batch of direct messages to ensure.
@@ -67,8 +67,8 @@ impl EnsureDms {
 
 /// Build the direct-message star for one joining member and a team roster.
 pub fn ensure_dms_for_joining_member(
-    joiner: MacroUserIdStr<'static>,
-    roster: impl IntoIterator<Item = MacroUserIdStr<'static>>,
+    joiner: RoxUserIdStr<'static>,
+    roster: impl IntoIterator<Item = RoxUserIdStr<'static>>,
 ) -> EnsureDms {
     let teammates = roster
         .into_iter()
@@ -88,7 +88,7 @@ pub fn ensure_dms_for_joining_member(
 
 /// Build the complete direct-message clique for a team roster.
 pub fn ensure_dms_for_roster(
-    roster: impl IntoIterator<Item = MacroUserIdStr<'static>>,
+    roster: impl IntoIterator<Item = RoxUserIdStr<'static>>,
 ) -> EnsureDms {
     let mut roster = roster
         .into_iter()

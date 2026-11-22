@@ -8,7 +8,7 @@ use entity_access::domain::{
     models::{EntityAccessAuth, EntityAccessReceipt, EntityType, OwnerAccessLevel},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::annotations::{
     delete::{DeleteUnthreadedAnchorRequest, DeleteUnthreadedAnchorResponse},
     edit::{EditAnchorRequest, EditAnchorResponse},
@@ -91,7 +91,7 @@ impl<R: AnnotationRepository, A: EntityAccessService, P: MessageEventPublisher>
 
     async fn capability(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         org: Option<i64>,
         id: Uuid,
         highlight: bool,
@@ -119,7 +119,7 @@ impl<R: AnnotationRepository, A: EntityAccessService, P: MessageEventPublisher>
     /// Change geometry after checking ownership and current comment permission.
     pub async fn edit(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         org: Option<i64>,
         input: EditAnchorRequest,
     ) -> Result<EditAnchorResponse, MessageError> {
@@ -166,7 +166,7 @@ impl<R: AnnotationRepository, A: EntityAccessService, P: MessageEventPublisher>
     /// Explicitly delete an annotation, including any attached discussion.
     pub async fn delete(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         org: Option<i64>,
         input: DeleteUnthreadedAnchorRequest,
     ) -> Result<DeleteUnthreadedAnchorResponse, MessageError> {

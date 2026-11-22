@@ -1,5 +1,5 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { WhatsAppAccount } from './account';
 import { WhatsAppChat } from './chat';
 
@@ -8,11 +8,11 @@ import { WhatsAppChat } from './chat';
  * chat list. Added chats are external chats: read and send in them through
  * `macro.externalChats`.
  *
- * @routing Use when checking the user's paired WhatsApp account or listing its chats to add to Macro; not reading or sending in an added chat (`macro.externalChats`).
+ * @routing Use when checking the user's paired WhatsApp account or listing its chats to add to Rox; not reading or sending in an added chat (`macro.externalChats`).
  */
 export class WhatsAppNamespace {
   /** Bind existing-account operations to this authenticated client. */
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Current owner's account, or undefined when no account has been connected.

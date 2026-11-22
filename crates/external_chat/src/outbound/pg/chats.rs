@@ -2,7 +2,7 @@
 use super::*;
 use crate::domain::ports::{ChatRepository, StagedUpload};
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// A shape value as an integer column.
 fn column(value: Option<u32>) -> Option<i32> {
@@ -95,7 +95,7 @@ impl ChatRepository for PgExternalChatRepository {
 
     async fn staged_upload_mime(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         chat_id: Uuid,
         upload: Uuid,
     ) -> ExternalChatResult<Option<String>> {

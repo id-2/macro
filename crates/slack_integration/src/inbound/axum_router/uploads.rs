@@ -7,9 +7,9 @@ use axum::{
 };
 use entity_access::{
     domain::{models::AdminTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
@@ -58,14 +58,14 @@ impl TryFrom<CompleteUploads> for CompleteRequest {
         (status = 413, description = "Body limit exceeded"), (status = 503, description = "Slack imports disabled")))]
 pub async fn register<T, Eas, Auth>(
     State(state): State<SlackRouterState<T, Eas, Auth>>,
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     Path(job): Path<JobId>,
     Json(request): Json<RegisterRequest>,
 ) -> Result<impl axum::response::IntoResponse, ApiError>
 where
     T: ImportService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let grants = state
         .service
@@ -85,14 +85,14 @@ where
         (status = 422, description = "Object verification failed"), (status = 503, description = "Slack imports disabled")))]
 pub async fn complete<T, Eas, Auth>(
     State(state): State<SlackRouterState<T, Eas, Auth>>,
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     Path(job): Path<JobId>,
     Json(request): Json<CompleteRequest>,
 ) -> Result<Json<ImportProgress>, ApiError>
 where
     T: ImportService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state

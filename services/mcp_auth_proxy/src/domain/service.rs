@@ -23,7 +23,7 @@ use super::{
         TokenRequest, TokenResponse, UpstreamLogin, UpstreamTokens, UserConsent,
     },
     ports::{
-        ClientRegistrationStore, EmailCodeError, EmailCodeProvider, MacroApiTokenMinter,
+        ClientRegistrationStore, EmailCodeError, EmailCodeProvider, RoxApiTokenMinter,
         OAuthProvider, RefreshTokenBindingStore, UpstreamGrantError,
     },
     redirect_uri::{RedirectTrust, RedirectUriPolicy},
@@ -180,7 +180,7 @@ pub struct McpAuthProxyServiceDeps<I> {
     /// The MCP servers tokens may be issued for.
     pub resources: McpResources,
     /// Mints the tokens of the resources that call Rox's APIs directly.
-    pub macro_api_tokens: Arc<dyn MacroApiTokenMinter>,
+    pub rox_api_tokens: Arc<dyn RoxApiTokenMinter>,
 }
 
 /// Domain service backing the MCP OAuth broker.
@@ -194,7 +194,7 @@ pub struct McpAuthProxyServiceImpl<I> {
     redirect_uri_policy: RedirectUriPolicy,
     public_url: String,
     resources: McpResources,
-    macro_api_tokens: Arc<dyn MacroApiTokenMinter>,
+    rox_api_tokens: Arc<dyn RoxApiTokenMinter>,
 }
 
 impl<I> Clone for McpAuthProxyServiceImpl<I> {
@@ -209,7 +209,7 @@ impl<I> Clone for McpAuthProxyServiceImpl<I> {
             redirect_uri_policy: self.redirect_uri_policy.clone(),
             public_url: self.public_url.clone(),
             resources: self.resources.clone(),
-            macro_api_tokens: Arc::clone(&self.macro_api_tokens),
+            rox_api_tokens: Arc::clone(&self.rox_api_tokens),
         }
     }
 }
@@ -229,7 +229,7 @@ where
             oauth_provider,
             email_codes,
             resources,
-            macro_api_tokens,
+            rox_api_tokens,
         } = deps;
 
         Self {
@@ -245,7 +245,7 @@ where
             redirect_uri_policy,
             public_url,
             resources,
-            macro_api_tokens,
+            rox_api_tokens,
         }
     }
 
@@ -363,7 +363,7 @@ where
                     .and_then(|client| client_label(&client.client_name));
 
                 let minted = self
-                    .macro_api_tokens
+                    .rox_api_tokens
                     .mint(
                         &upstream,
                         client_name.as_deref(),

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use chrono::{TimeZone, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use whatsmeow::store::{
     ChatSettingsStore, ContactEntry, ContactStore, MUTED_FOREVER, RedactedPhoneEntry,
@@ -12,7 +12,7 @@ use whatsmeow::types::{
 
 use crate::store::test::open_new_store;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn names_report_whether_they_changed(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let alice = new_jid("111", DEFAULT_USER_SERVER);
@@ -59,7 +59,7 @@ async fn names_report_whether_they_changed(pool: Pool<Postgres>) {
     assert_eq!(store.get_contact(&unknown).await.unwrap(), None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn batches_merge_into_existing_contacts(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let alice = new_jid("111", DEFAULT_USER_SERVER);
@@ -128,7 +128,7 @@ async fn batches_merge_into_existing_contacts(pool: Pool<Postgres>) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn chat_settings_are_kept_per_chat(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let group = new_jid("123-456", GROUP_SERVER);

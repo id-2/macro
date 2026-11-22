@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sha2::{Digest, Sha256};
 use tokio::process::Command;
 
@@ -25,7 +25,7 @@ impl RepoDirectories {
 
     /// `<sha256(agent_user_id)>.git`: fixed-length and path-safe, since user
     /// ids contain `|` and `@`.
-    pub fn repo_directory_name(&self, agent_user_id: &MacroUserIdStr<'_>) -> String {
+    pub fn repo_directory_name(&self, agent_user_id: &RoxUserIdStr<'_>) -> String {
         format!(
             "{}.git",
             hex::encode(Sha256::digest(agent_user_id.as_ref().as_bytes()))
@@ -33,7 +33,7 @@ impl RepoDirectories {
     }
 
     /// Absolute path of the agent's bare repo.
-    pub fn repo_path(&self, agent_user_id: &MacroUserIdStr<'_>) -> PathBuf {
+    pub fn repo_path(&self, agent_user_id: &RoxUserIdStr<'_>) -> PathBuf {
         self.root.join(self.repo_directory_name(agent_user_id))
     }
 }

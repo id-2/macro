@@ -1,4 +1,4 @@
-//! Signals published to [`MacroAgentSessionsTopic`].
+//! Signals published to [`RoxAgentSessionsTopic`].
 //!
 //! The topic stays at its first schema version. Channel parents keep the
 //! shapes every consumer already decodes - [`NewAgentSessionEvent::TopLevelMentioned`]
@@ -12,9 +12,9 @@ use agent_session::domain::model::AgentSessionId;
 use bot_id::BotId;
 use channels::domain::broker_events::{ChannelEventAttachment, ChannelMessagePostedMetadata};
 use channels::domain::models::ChannelType;
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroAgentSessionsTopic;
-use macro_uuid::Uuid;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxAgentSessionsTopic;
+use rox_uuid::Uuid;
 use messages::domain::events::{MessageEventAttachment, MessagePostedMetadata};
 use messages::domain::models::MessageParent;
 use serde::{Deserialize, Serialize};
@@ -80,7 +80,7 @@ pub struct AgentAssignedToTaskEvent {
     /// The single bot-authored root to update with the session response.
     pub discussion_id: Uuid,
     /// User who assigned the task and owns the resulting session.
-    pub actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub actor: rox_user_id::user_id::RoxUserIdStr<'static>,
     /// Private startup prompt, never posted as a discussion message.
     pub prompt: String,
     /// Who assigned it, and whether a project's agents were inherited.
@@ -338,7 +338,7 @@ impl ExistingAgentSessionEvent {
     }
 }
 
-/// Events publishable to [`MacroAgentSessionsTopic`].
+/// Events publishable to [`RoxAgentSessionsTopic`].
 ///
 /// The serde tag and [`AgentTriggerEventName`] spell the same wire names:
 /// subscribers filter on them, so they are API. `event_names_match_the_wire`
@@ -378,7 +378,7 @@ impl AgentTriggerTopicEvent {
 }
 
 impl TopicEvent for AgentTriggerTopicEvent {
-    type Topic = MacroAgentSessionsTopic;
+    type Topic = RoxAgentSessionsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
@@ -455,7 +455,7 @@ pub struct MissingChannelType {
     pub channel_id: Uuid,
 }
 
-/// Publishable event for [`MacroAgentSessionsTopic`].
+/// Publishable event for [`RoxAgentSessionsTopic`].
 ///
 /// Keyed by bot id: a session belongs to one bot, so one bot's partition
 /// carries every event of every one of its sessions, in order -- which is what
@@ -586,7 +586,7 @@ impl AgentSessionMacroEvent {
     }
 }
 
-impl MacroEvent for AgentSessionMacroEvent {
+impl RoxEvent for AgentSessionMacroEvent {
     type EventPayload = AgentTriggerTopicEvent;
 
     fn key(&self) -> &str {

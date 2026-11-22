@@ -14,7 +14,7 @@ use entity_access::domain::models::{EditAccessLevel, EntityType};
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::principal_entity_access_receipt;
 use entity_registry::CreationPrincipalExtractor;
-use macro_authorization::{AnyPrincipal, MacroAuthorizationExtractor, MacroAuthorizationService};
+use rox_authorization::{AnyPrincipal, RoxAuthorizationExtractor, RoxAuthorizationService};
 
 use super::DocumentRouterState;
 use crate::domain::create::upload::NewFileUpload;
@@ -84,11 +84,11 @@ pub struct UploadFileResponse {
 pub async fn upload_file_handler<
     T: DocumentService + DocumentCreationService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
     CreationPrincipalExtractor { principal, .. }: CreationPrincipalExtractor<Auth>,
-    caller: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    caller: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     Query(query): Query<UploadFileQuery>,
     body: Bytes,
 ) -> Result<Json<UploadFileResponse>, DocumentError> {

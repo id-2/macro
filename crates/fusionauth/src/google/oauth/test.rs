@@ -85,7 +85,7 @@ async fn an_enforced_admin_policy_is_a_blocked_grant() {
 }
 
 #[tokio::test]
-async fn a_broken_macro_client_is_not_a_blocked_grant() {
+async fn a_broken_rox_client_is_not_a_blocked_grant() {
     let error = refresh_answering(
         ResponseTemplate::new(401).set_body_json(json!({ "error": "invalid_client" })),
     )

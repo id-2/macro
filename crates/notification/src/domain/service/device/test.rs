@@ -3,14 +3,14 @@ use crate::domain::models::queue_message::QueueMessage;
 use crate::domain::ports::{NotificationQueue, NotificationRepository, SnsEndpointManager};
 use crate::domain::service::NotificationReader;
 use crate::domain::service::ingress::{NotificationReaderService, PlatformArnConfig};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde::Serialize;
 use std::collections::{HashMap, HashSet};
 use std::sync::Mutex;
 
-fn test_user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("test@example.com").unwrap()
+fn test_user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("test@example.com").unwrap()
 }
 
 // ─── Mocks ───────────────────────────────────────────────────────────────
@@ -84,7 +84,7 @@ impl NotificationRepository for MockNotifRepo {
 
     async fn upsert_device(
         &self,
-        user_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        user_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         device_token: &str,
         device_endpoint: &str,
         device_type: &DeviceType,
@@ -102,7 +102,7 @@ impl NotificationRepository for MockNotifRepo {
 
     async fn delete_user_devices_by_token(
         &self,
-        user_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        user_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         device_token: &str,
         _device_type: &DeviceType,
     ) -> Result<Vec<String>, Report> {
@@ -135,16 +135,16 @@ impl NotificationRepository for MockNotifRepo {
     }
     async fn get_muted_users<'a>(
         &self,
-        _: &[macro_user_id::user_id::MacroUserIdStr<'a>],
-    ) -> Result<std::collections::HashSet<macro_user_id::user_id::MacroUserIdStr<'static>>, Report>
+        _: &[rox_user_id::user_id::RoxUserIdStr<'a>],
+    ) -> Result<std::collections::HashSet<rox_user_id::user_id::RoxUserIdStr<'static>>, Report>
     {
         unimplemented!()
     }
     async fn get_unsubscribed_users<'a>(
         &self,
         _: &str,
-        _: &[macro_user_id::user_id::MacroUserIdStr<'a>],
-    ) -> Result<std::collections::HashSet<macro_user_id::user_id::MacroUserIdStr<'static>>, Report>
+        _: &[rox_user_id::user_id::RoxUserIdStr<'a>],
+    ) -> Result<std::collections::HashSet<rox_user_id::user_id::RoxUserIdStr<'static>>, Report>
     {
         unimplemented!()
     }
@@ -164,16 +164,16 @@ impl NotificationRepository for MockNotifRepo {
     async fn update_sent_status<'a>(
         &self,
         _: uuid::Uuid,
-        _: &[macro_user_id::user_id::MacroUserIdStr<'a>],
+        _: &[rox_user_id::user_id::RoxUserIdStr<'a>],
     ) -> Result<(), Report> {
         unimplemented!()
     }
     async fn get_device_endpoints<'a>(
         &self,
-        _: &[macro_user_id::user_id::MacroUserIdStr<'a>],
+        _: &[rox_user_id::user_id::RoxUserIdStr<'a>],
     ) -> Result<
         std::collections::HashMap<
-            macro_user_id::user_id::MacroUserIdStr<'static>,
+            rox_user_id::user_id::RoxUserIdStr<'static>,
             Vec<crate::domain::models::DeviceEndpoint>,
         >,
         Report,
@@ -182,14 +182,14 @@ impl NotificationRepository for MockNotifRepo {
     }
     async fn mark_notifications_seen(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &[uuid::Uuid],
     ) -> Result<Vec<crate::domain::models::UserNotificationRow<serde_json::Value>>, Report> {
         unimplemented!()
     }
     async fn mark_notifications_done(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &[uuid::Uuid],
         _: bool,
     ) -> Result<Vec<crate::domain::models::UserNotificationRow<serde_json::Value>>, Report> {
@@ -197,7 +197,7 @@ impl NotificationRepository for MockNotifRepo {
     }
     async fn reopen_notifications(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &[uuid::Uuid],
         _: &[uuid::Uuid],
     ) -> Result<Vec<crate::domain::models::UserNotificationRow<serde_json::Value>>, Report> {
@@ -205,7 +205,7 @@ impl NotificationRepository for MockNotifRepo {
     }
     async fn get_notification_ids_for_entities(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &[model_entity::Entity<'_>],
         _: &crate::domain::models::request::NotificationStatus,
     ) -> Result<Vec<uuid::Uuid>, Report> {
@@ -219,14 +219,14 @@ impl NotificationRepository for MockNotifRepo {
     }
     async fn get_digest_eligible_notification_ids(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &[uuid::Uuid],
     ) -> Result<HashSet<uuid::Uuid>, Report> {
         unimplemented!()
     }
     async fn get_user_notifications<T: serde::de::DeserializeOwned + Send>(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: u32,
         _: models_pagination::Query<uuid::Uuid, models_pagination::CreatedAt, ()>,
         _: crate::domain::models::request::NotificationListFilters,
@@ -235,7 +235,7 @@ impl NotificationRepository for MockNotifRepo {
     }
     async fn get_user_notifications_by_event_item_ids<T: serde::de::DeserializeOwned + Send>(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &[uuid::Uuid],
         _: u32,
         _: models_pagination::Query<uuid::Uuid, models_pagination::CreatedAt, ()>,
@@ -245,7 +245,7 @@ impl NotificationRepository for MockNotifRepo {
     }
     async fn get_entity_notifications_batch(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         entity_refs: Vec<model_entity::Entity<'static>>,
         _query: crate::domain::models::entity_query::EntityNotificationQuery,
     ) -> Result<
@@ -262,55 +262,55 @@ impl NotificationRepository for MockNotifRepo {
     }
     async fn get_user_notification_by_id<T: serde::de::DeserializeOwned + Send>(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: uuid::Uuid,
     ) -> Result<Option<crate::domain::models::UserNotificationRow<T>>, Report> {
         unimplemented!()
     }
     async fn delete_user_notification(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: uuid::Uuid,
     ) -> Result<(), Report> {
         unimplemented!()
     }
     async fn bulk_delete_user_notifications(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &[uuid::Uuid],
     ) -> Result<(), Report> {
         unimplemented!()
     }
     async fn delete_all_user_notifications(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<(), Report> {
         unimplemented!()
     }
     async fn get_users_with_type_disabled<'a>(
         &self,
         _: &str,
-        _: &[macro_user_id::user_id::MacroUserIdStr<'a>],
-    ) -> Result<std::collections::HashSet<macro_user_id::user_id::MacroUserIdStr<'static>>, Report>
+        _: &[rox_user_id::user_id::RoxUserIdStr<'a>],
+    ) -> Result<std::collections::HashSet<rox_user_id::user_id::RoxUserIdStr<'static>>, Report>
     {
         unimplemented!()
     }
     async fn get_disabled_notification_types(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Vec<crate::domain::models::DisabledNotificationType>, Report> {
         unimplemented!()
     }
     async fn disable_notification_type(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &str,
     ) -> Result<(), Report> {
         unimplemented!()
     }
     async fn enable_notification_type(
         &self,
-        _: macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: rox_user_id::user_id::RoxUserIdStr<'_>,
         _: &str,
     ) -> Result<(), Report> {
         unimplemented!()
@@ -443,7 +443,7 @@ async fn register_existing_token_valid_endpoint() {
 
     service
         .register_device(
-            MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap(),
             "device-token",
             &DeviceType::Ios,
             false,

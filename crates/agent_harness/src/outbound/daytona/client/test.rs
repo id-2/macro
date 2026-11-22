@@ -1,7 +1,7 @@
 use super::*;
 
 mod live_env {
-    macro_env_var::maybe_env_vars! {
+    rox_env_var::maybe_env_vars! {
         pub struct DaytonaApiKey;
         pub struct DaytonaSnapshot;
         pub struct DaytonaApiUrl;
@@ -22,7 +22,7 @@ fn sandbox_list_deserializes_the_paginated_daytona_response() {
             "state": "started",
             "errorReason": null,
             "labels": {
-                "macro.agent_session_id": "session-1"
+                "rox.agent_session_id": "session-1"
             }
         }],
         "nextCursor": null
@@ -92,8 +92,8 @@ async fn live_hot_resize_increases_cpu_and_memory_without_touching_disk() {
         .unwrap_or_else(|| "https://app.daytona.io/api".to_owned());
     let client = DaytonaClient::new(api_url, DaytonaApiKey::new(api_key));
     let labels = Labels::from(HashMap::from([(
-        "macro.test".to_owned(),
-        format!("sandbox-size-{}", macro_uuid::generate_uuid_v7()),
+        "rox.test".to_owned(),
+        format!("sandbox-size-{}", rox_uuid::generate_uuid_v7()),
     )]));
     let id = client
         .create(&Snapshot::new(snapshot), Env::from(HashMap::new()), labels)

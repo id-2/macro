@@ -144,11 +144,11 @@ async fn it_rejects_disallowed_original_url_without_side_effects() {
 }
 
 #[tokio::test]
-async fn it_allows_macro_scheme_original_url() {
+async fn it_allows_rox_scheme_original_url() {
     let mut dummy = DummyCb::default();
     let res = get_redirect_url(
         &Some(SsoState {
-            original_url: Some("macro://login".parse().unwrap()),
+            original_url: Some("rox://login".parse().unwrap()),
             is_mobile: false,
             referral_code: None,
             is_agent: false,
@@ -158,7 +158,7 @@ async fn it_allows_macro_scheme_original_url() {
     .await
     .unwrap();
     assert_eq!(dummy.called, 0);
-    assert_eq!(res.as_str(), "macro://login");
+    assert_eq!(res.as_str(), "rox://login");
 }
 
 #[tokio::test]

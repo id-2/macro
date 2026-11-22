@@ -46,7 +46,7 @@ const inlineImageMessage = {
 
 function quotedImageSources(html: string) {
   const body = new DOMParser().parseFromString(html, 'text/html').body;
-  return Array.from(body.querySelectorAll('.macro_quote img')).map((img) =>
+  return Array.from(body.querySelectorAll('.rox_quote img')).map((img) =>
     img.getAttribute('src')
   );
 }
@@ -173,7 +173,7 @@ describe('prepareEmailBodyFromHtml', () => {
     const prepared = prepareEmailBodyFromHtml('<p>hi there</p>');
     const decoded = decodeBase64Utf8(prepared.bodyHtml);
     expect(decoded).toContain('hi there');
-    expect(decoded).not.toContain('macro_quote');
+    expect(decoded).not.toContain('rox_quote');
   });
 
   it('appends the replied-to message when appendReply is provided', () => {
@@ -183,7 +183,7 @@ describe('prepareEmailBodyFromHtml', () => {
     });
     const decoded = decodeBase64Utf8(prepared.bodyHtml);
     const body = new DOMParser().parseFromString(decoded, 'text/html').body;
-    const quotes = body.querySelectorAll('.macro_quote');
+    const quotes = body.querySelectorAll('.rox_quote');
     expect(quotes).toHaveLength(1);
     expect(quotes[0].textContent).toContain('original message text');
     expect(quotes[0].textContent).toContain('wrote:');
@@ -191,12 +191,12 @@ describe('prepareEmailBodyFromHtml', () => {
 
   it('does not double-append when the quote is already in the body', () => {
     const prepared = prepareEmailBodyFromHtml(
-      '<p>hi there</p><div class="macro_quote gmail_quote">already quoted</div>',
+      '<p>hi there</p><div class="rox_quote gmail_quote">already quoted</div>',
       { replyType: 'reply', replyingTo }
     );
     const decoded = decodeBase64Utf8(prepared.bodyHtml);
     const body = new DOMParser().parseFromString(decoded, 'text/html').body;
-    const quotes = body.querySelectorAll('.macro_quote');
+    const quotes = body.querySelectorAll('.rox_quote');
     expect(quotes).toHaveLength(1);
     expect(quotes[0].textContent).toContain('already quoted');
   });

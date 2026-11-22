@@ -2,7 +2,7 @@ use super::{mark_message_as_sent, set_flags_from_labels};
 use crate::messages::get::fetch_messages_metadata;
 use crate::threads::get::get_thread_by_id_and_link_id;
 use crate::threads::update::update_thread_metadata;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::service::message::Message;
 use sqlx::{PgConnection, PgPool, types::Uuid};
 
@@ -20,7 +20,7 @@ async fn message(conn: &mut PgConnection, thread: Uuid) -> anyhow::Result<Messag
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("mark_message_as_sent"))
 )]
 async fn sent_message_has_recency_before_provider_sync(pool: PgPool) -> anyhow::Result<()> {
@@ -64,7 +64,7 @@ async fn sent_message_has_recency_before_provider_sync(pool: PgPool) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("mark_message_as_sent"))
 )]
 async fn sent_message_preserves_provider_timestamp(pool: PgPool) -> anyhow::Result<()> {
@@ -93,7 +93,7 @@ async fn sent_message_preserves_provider_timestamp(pool: PgPool) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("mark_message_as_sent"))
 )]
 async fn sent_message_update_is_scoped_to_its_inbox(pool: PgPool) -> anyhow::Result<()> {
@@ -115,7 +115,7 @@ async fn sent_message_update_is_scoped_to_its_inbox(pool: PgPool) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("mark_message_as_sent"))
 )]
 async fn failed_finalization_rolls_back_sent_recency(pool: PgPool) -> anyhow::Result<()> {
@@ -145,7 +145,7 @@ async fn row_version(pool: &PgPool) -> anyhow::Result<String> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("mark_message_as_sent"))
 )]
 async fn flags_that_already_match_their_labels_are_not_rewritten(

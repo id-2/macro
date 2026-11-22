@@ -23,7 +23,7 @@ struct Repo(Vec<UpdateCandidate>);
 impl CodingAgentUpdatesRepo for Repo {
     async fn candidates(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<UpdateCandidate>, CodingAgentError> {
         Ok(self.0.clone())
     }
@@ -34,7 +34,7 @@ impl CodingAgentUpdatesRepo for Repo {
 
 #[tokio::test]
 async fn stalled_excludes_archived_and_non_coding_sessions() {
-    let owner = MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
+    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
     let result = list_updates(
         &Repo(vec![
             candidate(UpdateTurnState::Running, "cursor", false),
@@ -56,7 +56,7 @@ async fn stalled_excludes_archived_and_non_coding_sessions() {
 
 #[tokio::test]
 async fn limits_session_work_and_explains_truncation() {
-    let owner = MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
+    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
     let result = list_updates(
         &Repo(
             (0..26)

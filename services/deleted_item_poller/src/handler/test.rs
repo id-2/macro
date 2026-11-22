@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 use serde_json::{Value, json};
 use tokio::sync::Semaphore;
 
@@ -63,8 +63,8 @@ impl FakeEventBroker {
     }
 }
 
-impl MacroEventBroker for FakeEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for FakeEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -119,7 +119,7 @@ async fn publish_document_purge_events_publishes_separately_keyed_events() {
     assert_eq!(published.len(), document_ids.len());
 
     for (event, document_id) in published.iter().zip(&document_ids) {
-        assert_eq!(event.topic, "macro.documents");
+        assert_eq!(event.topic, "rox.documents");
         assert_eq!(event.key, *document_id);
         assert_eq!(event.envelope["schema_version"], json!(1));
         assert_eq!(event.envelope["event_type"], json!("document.purged"));
@@ -217,7 +217,7 @@ async fn publish_project_purge_events_publishes_separately_keyed_events() {
     assert_eq!(published.len(), projects.len());
 
     for (event, project) in published.iter().zip(&projects) {
-        assert_eq!(event.topic, "macro.projects");
+        assert_eq!(event.topic, "rox.projects");
         assert_eq!(event.key, project.project_id);
         assert_eq!(event.envelope["schema_version"], json!(1));
         assert_eq!(
@@ -326,7 +326,7 @@ async fn publish_chat_purge_events_publishes_separately_keyed_events() {
     assert_eq!(published.len(), chat_ids.len());
 
     for (event, chat_id) in published.iter().zip(&chat_ids) {
-        assert_eq!(event.topic, "macro.chats");
+        assert_eq!(event.topic, "rox.chats");
         assert_eq!(event.key, *chat_id);
         assert_eq!(event.envelope["schema_version"], json!(1));
         assert_eq!(

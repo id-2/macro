@@ -26,7 +26,7 @@ async fn committed_reply_recovery(pool: sqlx::PgPool, extra_passage: bool) {
     let record = journal.get(source, command.bot_id).await.unwrap().unwrap();
     let mut stale = record.in_flight.unwrap();
     if extra_passage {
-        stale.presented.push(macro_uuid::generate_uuid_v7());
+        stale.presented.push(rox_uuid::generate_uuid_v7());
         stale.announcement_message_id = stale.presented.last().copied();
         journal
             .record_flight(record.action_id, &stale)
@@ -163,21 +163,21 @@ async fn committed_reply_recovery(pool: sqlx::PgPool, extra_passage: bool) {
     assert_eq!(announcer.presented().len(), before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outcome_only_reply_ids_survive_a_lost_post_response_and_stale_reconciliation(
     pool: sqlx::PgPool,
 ) {
     committed_reply_recovery(pool, false).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn extra_final_passage_ids_survive_a_lost_post_response_and_stale_reconciliation(
     pool: sqlx::PgPool,
 ) {
     committed_reply_recovery(pool, true).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_final_id_persistence_posts_nothing_until_recovery_can_reserve_ids(
     pool: sqlx::PgPool,
 ) {

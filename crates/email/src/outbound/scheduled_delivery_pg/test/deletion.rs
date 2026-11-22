@@ -1,10 +1,10 @@
 use crate::domain::scheduled_delivery::deletion::{MessageDeletion, delete_message_with_tx};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("sync_thread_calendar_flag")
@@ -48,7 +48,7 @@ async fn delete_message_clears_calendar_flag_when_last_ics_message_removed(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("sync_thread_attachment_kind_flags")
@@ -90,7 +90,7 @@ async fn delete_message_clears_kind_flags_of_its_attachments(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("sync_thread_calendar_flag")
@@ -134,7 +134,7 @@ async fn fetch_calendar_flag(pool: &Pool<Postgres>, thread_id: Uuid) -> anyhow::
 // values would strand the thread in inbox views (Signal) after the draft
 // is gone.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../email_db_client/fixtures",
         scripts("sync_thread_signal_flag")

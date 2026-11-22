@@ -3121,7 +3121,7 @@ impl Session {
         Ok(Some(step))
     }
 
-    /// The selection for the clipboard: Macro's own form, HTML and text.
+    /// The selection for the clipboard: Rox's own form, HTML and text.
     pub fn copy_selection(&mut self) -> Clip {
         let (s, e) = self.ordered();
         if s.same_place(&e) {

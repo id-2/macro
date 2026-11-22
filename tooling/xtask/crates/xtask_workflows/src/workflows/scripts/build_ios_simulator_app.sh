@@ -42,8 +42,8 @@ fi
 #
 # Carry the real developer dir in under a name nix has no opinion about, and
 # restore DEVELOPER_DIR once inside the shell.
-MACRO_DEVELOPER_DIR="$(xcode-select -p)"
-export MACRO_DEVELOPER_DIR
+ROX_DEVELOPER_DIR="$(xcode-select -p)"
+export ROX_DEVELOPER_DIR
 
 # cargo-tauri, bun, just, wasm-pack and the pinned toolchain (which carries
 # aarch64-apple-ios-sim, see rust-toolchain.toml) all come from the dev shell.
@@ -67,7 +67,7 @@ nix develop --command bash -euo pipefail -c '
 nix develop --command bash -euo pipefail -c '
   echo "before: DEVELOPER_DIR=$(xcode-select -p 2>&1), xcodebuild=$(command -v xcodebuild || echo none)"
 
-  export DEVELOPER_DIR="$MACRO_DEVELOPER_DIR"
+  export DEVELOPER_DIR="$ROX_DEVELOPER_DIR"
   APPLE_TOOLS="$(mktemp -d)"
   for tool in xcodebuild xcrun xcode-select simctl actool ibtool plutil ditto \
               clang clang++ cc c++ ld ar ranlib libtool lipo strip nm \

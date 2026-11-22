@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -12,8 +12,8 @@ const TINY_PNG: &[u8] = &[
     0x42, 0x60, 0x82,
 ];
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("User@rox.one").unwrap()
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("User@rox.one").unwrap()
 }
 
 fn read_content_markdown(nodes: serde_json::Value) -> serde_json::Value {
@@ -35,7 +35,7 @@ impl MarkdownImageResolver for FakeResolver {
         self.static_images.get(url).cloned()
     }
 
-    async fn resolve_dss(&self, _user_id: &MacroUserIdStr<'_>, id: &str) -> Option<ResolvedImage> {
+    async fn resolve_dss(&self, _user_id: &RoxUserIdStr<'_>, id: &str) -> Option<ResolvedImage> {
         self.dss_images.get(id).cloned()
     }
 
@@ -58,7 +58,7 @@ impl MarkdownImageResolver for CountingResolver {
         })
     }
 
-    async fn resolve_dss(&self, _user_id: &MacroUserIdStr<'_>, _id: &str) -> Option<ResolvedImage> {
+    async fn resolve_dss(&self, _user_id: &RoxUserIdStr<'_>, _id: &str) -> Option<ResolvedImage> {
         None
     }
 

@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 const REVISION: i16 = 1;
 
@@ -7,15 +7,15 @@ const REVISION: i16 = 1;
 /// Sent's round started at the current one, and Archive and a user folder
 /// predate them too. Only Inbox's stream is due to be claimed.
 async fn imported_link(db: &PgPool) -> MailboxKey {
-    let link = macro_uuid::generate_uuid_v7();
+    let link = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"
-        INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider,grant_generation)
+        INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider,grant_generation)
         VALUES ($1,'macro|outlook-test@example.com','outlook-owner','outlook-test@example.com','OUTLOOK',1)
     "#,link).execute(db).await.unwrap();
     sqlx::query!(r#"
         INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id,initial_complete,next_run_at,import_started_at,import_completed_at)
         VALUES ($1,$2,1,'folder_catalog','mail',true,now() + interval '1 hour',now() - interval '1 day',now() - interval '1 day')
-    "#,macro_uuid::generate_uuid_v7(),link).execute(db).await.unwrap();
+    "#,rox_uuid::generate_uuid_v7(),link).execute(db).await.unwrap();
     sqlx::query!(r#"
         INSERT INTO email_mailbox_folders (link_id,provider_id,display_name,role,catalog_generation,total_item_count)
         VALUES ($1,'inbox-id','Inbox','inbox',1,250),($1,'sent-id','Sent','sent',1,40),
@@ -27,7 +27,7 @@ async fn imported_link(db: &PgPool) -> MailboxKey {
             ($2,$5,1,'mail_folder','sent-id','sent-delta',true,1,now() + interval '1 hour',true),
             ($3,$5,1,'mail_folder','archive-id','archive-delta',true,NULL,now() + interval '1 hour',true),
             ($4,$5,1,'mail_folder','projects-id','projects-delta',true,NULL,now() + interval '1 hour',true)
-    "#,macro_uuid::generate_uuid_v7(),macro_uuid::generate_uuid_v7(),macro_uuid::generate_uuid_v7(),macro_uuid::generate_uuid_v7(),link)
+    "#,rox_uuid::generate_uuid_v7(),rox_uuid::generate_uuid_v7(),rox_uuid::generate_uuid_v7(),rox_uuid::generate_uuid_v7(),link)
         .execute(db).await.unwrap();
     MailboxKey {
         link_id: link,
@@ -57,7 +57,7 @@ async fn stream(
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inbox_and_sent_restart_alone_and_the_rest_waits_for_their_import(db: PgPool) {
     let repo = PgMailboxSync::new(db.clone());
     let mailbox = imported_link(&db).await;
@@ -126,7 +126,7 @@ async fn inbox_and_sent_restart_alone_and_the_rest_waits_for_their_import(db: Pg
 
     // The fresh Inbox round lists nothing new and ends on its deltaLink.
     let round = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -175,7 +175,7 @@ async fn inbox_and_sent_restart_alone_and_the_rest_waits_for_their_import(db: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn paused_imports_leave_import_rows_and_keep_live_changes_flowing(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     sqlx::query!(r#"
@@ -185,28 +185,28 @@ async fn paused_imports_leave_import_rows_and_keep_live_changes_flowing(db: PgPo
 
     let paused = repo.clone().with_imports_paused(true);
     let live = paused
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     assert_eq!(live.provider_id.as_str(), "new-message");
     assert!(
         paused
-            .claim_message(macro_uuid::generate_uuid_v7())
+            .claim_message(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .is_none()
     );
 
     let import = repo
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     assert_eq!(import.provider_id.as_str(), "old-message");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_restart_rechecks_the_mail_its_folders_already_hold(db: PgPool) {
     use email_api_client::domain::models::MailboxState;
     let repo = PgMailboxSync::new(db.clone());
@@ -221,7 +221,7 @@ async fn a_restart_rechecks_the_mail_its_folders_already_hold(db: PgPool) {
         .await
         .unwrap();
         let work = repo
-            .claim_message(macro_uuid::generate_uuid_v7())
+            .claim_message(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .unwrap();
@@ -262,7 +262,7 @@ async fn a_restart_rechecks_the_mail_its_folders_already_hold(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_link_without_a_folder_catalog_is_not_restarted(db: PgPool) {
     let repo = PgMailboxSync::new(db.clone());
     let mailbox = imported_link(&db).await;

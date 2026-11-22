@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "DELETE FROM in_progress_user_link WHERE id = $1 AND macro_user_id::text = $2",
+  "query": "DELETE FROM in_progress_user_link WHERE id = $1 AND rox_user_id::text = $2",
   "describe": {
     "columns": [],
     "parameters": {

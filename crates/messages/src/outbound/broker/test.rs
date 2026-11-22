@@ -4,7 +4,7 @@ use crate::domain::{
     ports::{MessageChange, MessageEvent, MessageEventPublisher},
 };
 use chrono::Utc;
-use macro_event_broker::{EventBrokerError, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEventBroker};
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Default)]
@@ -12,8 +12,8 @@ struct RecordingBroker {
     published: Arc<Mutex<Vec<(String, String, serde_json::Value)>>>,
 }
 
-impl MacroEventBroker for RecordingBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -130,7 +130,7 @@ async fn a_post_publishes_posted_attachment_and_one_mention_per_entity_for_both_
         assert!(
             published
                 .iter()
-                .all(|(topic, key, _)| { *topic == "macro.messages" && *key == ROOT.to_string() })
+                .all(|(topic, key, _)| { *topic == "rox.messages" && *key == ROOT.to_string() })
         );
         let posted = &published[0].2["metadata"];
         assert_eq!(posted["parent"], serde_json::to_value(&parent).unwrap());
@@ -246,7 +246,7 @@ fn only_finalized_bot_replies_reach_agent_triggers_with_or_without_a_mention() {
         let mut message = reply(parent.clone(), vec![]);
         if bot {
             message.sender_id =
-                channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_NEW_BOT_ID);
+                channel_sender::ChannelSender::new_from_bot(bot_id::ROX_NEW_BOT_ID);
             message.triggered_by = Some(SENDER.into());
         }
         let mentions = if has_mention {

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT d.revision,d.delete_requested,m.is_sent,f.in_trash,\n                (l.macro_id = $2 OR EXISTS (SELECT 1 FROM macro_user_links u WHERE u.link_id = l.id AND u.primary_macro_id = $2)) AS \"authorized!\"\n            FROM email_mailbox_drafts d JOIN email_messages m ON m.id = d.message_id\n                JOIN email_message_mailbox_facts f ON f.id = m.id JOIN email_links l ON l.id = d.link_id\n            WHERE d.message_id = $1\n        ",
+  "query": "\n            SELECT d.revision,d.delete_requested,m.is_sent,f.in_trash,\n                (l.rox_id = $2 OR EXISTS (SELECT 1 FROM rox_user_links u WHERE u.link_id = l.id AND u.primary_rox_id = $2)) AS \"authorized!\"\n            FROM email_mailbox_drafts d JOIN email_messages m ON m.id = d.message_id\n                JOIN email_message_mailbox_facts f ON f.id = m.id JOIN email_links l ON l.id = d.link_id\n            WHERE d.message_id = $1\n        ",
   "describe": {
     "columns": [
       {

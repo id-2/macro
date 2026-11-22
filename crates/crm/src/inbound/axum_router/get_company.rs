@@ -4,7 +4,7 @@ use axum::{
 };
 use chrono::{DateTime, Utc};
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
@@ -143,7 +143,7 @@ pub async fn handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: CrmCompanyAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,

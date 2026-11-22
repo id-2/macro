@@ -1,6 +1,6 @@
 use super::*;
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::email::service::address::ContactInfo;
 use models_email::email::service::attachment::Attachment;
 use models_email::email::service::label::Label;
@@ -64,7 +64,7 @@ fn message_with_oversized_fields(link_id: Uuid, thread_db_id: Uuid) -> message::
         labels: vec![],
         body_text: Some("body".to_string()),
         body_html_sanitized: Some("<p>body</p>".to_string()),
-        body_macro: None,
+        body_rox: None,
         attachments: vec![Attachment {
             db_id: Uuid::now_v7(),
             provider_id: Some("att1".to_string()),
@@ -85,7 +85,7 @@ fn message_with_oversized_fields(link_id: Uuid, thread_db_id: Uuid) -> message::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn oversized_provider_values_do_not_block_the_message_insert(
@@ -229,7 +229,7 @@ impl SyncedMessage<'_> {
                 .collect(),
             body_text: Some(self.body.to_string()),
             body_html_sanitized: Some(format!("<p>{}</p>", self.body)),
-            body_macro: None,
+            body_rox: None,
             attachments: vec![],
             attachments_draft: vec![],
             attachments_forwarded: vec![],
@@ -365,7 +365,7 @@ fn large_body() -> String {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn resyncing_an_unchanged_message_writes_nothing(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -449,7 +449,7 @@ async fn resyncing_an_unchanged_message_writes_nothing(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn changed_flag_updates_the_row_without_rewriting_body_toast(
@@ -517,7 +517,7 @@ async fn changed_flag_updates_the_row_without_rewriting_body_toast(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn resync_with_changed_labels_and_recipients_replaces_only_the_changes(
@@ -574,7 +574,7 @@ async fn resync_with_changed_labels_and_recipients_replaces_only_the_changes(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn resync_without_gmail_labels_removes_stored_labels_except_pending_ones(
@@ -597,7 +597,7 @@ async fn resync_without_gmail_labels_removes_stored_labels_except_pending_ones(
     let message_id = first_sync.db_id;
     insert_message(&pool, thread_db_id, &mut first_sync, link_id, true, None).await?;
 
-    // Marked unread in Macro, not yet in Gmail.
+    // Marked unread in Rox, not yet in Gmail.
     let mut tx = pool.begin().await?;
     labels::insert::insert_message_labels_batch(&mut *tx, &vec![message_id], "UNREAD", link_id)
         .await?;
@@ -640,7 +640,7 @@ async fn resync_without_gmail_labels_removes_stored_labels_except_pending_ones(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn resync_keeps_labels_with_a_pending_gmail_write(
@@ -663,7 +663,7 @@ async fn resync_keeps_labels_with_a_pending_gmail_write(
     let message_id = first_sync.db_id;
     insert_message(&pool, thread_db_id, &mut first_sync, link_id, true, None).await?;
 
-    // Archived and marked unread in Macro; Gmail has not applied either yet.
+    // Archived and marked unread in Rox; Gmail has not applied either yet.
     let write_id = Uuid::now_v7();
     let mut tx = pool.begin().await?;
     labels::delete::delete_message_labels_batch(&mut *tx, &vec![message_id], "INBOX", link_id)
@@ -741,7 +741,7 @@ async fn resync_keeps_labels_with_a_pending_gmail_write(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn resync_keeps_a_write_made_and_confirmed_while_gmail_was_fetched(

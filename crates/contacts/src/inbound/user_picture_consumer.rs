@@ -19,10 +19,10 @@ use crate::domain::{
     service::picture_fanout::{UserPictureFanout, coalesce_users},
 };
 use kafka_util::{GroupName, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message as _};
 use std::future::Future;
@@ -40,9 +40,9 @@ impl GroupName for UserPictureConsumerGroup {
 
 type UserPictureKafkaAdapter = KafkaConsumerAdapter<UserPictureConsumerGroup, DeclaredMacroEvent>;
 type UserPictureKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, UserPictureKafkaAdapter>;
+    RoxEventConsumerService<DeclaredMacroEvent, UserPictureKafkaAdapter>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: UserMacroEvent);
+rox_event_broker::declare_topics!(DeclaredMacroEvent: UserMacroEvent);
 
 /// How long a batch keeps collecting records after its first one.
 const BATCH_WINDOW: Duration = Duration::from_millis(250);
@@ -57,7 +57,7 @@ const MAX_ATTEMPTS: u32 = 3;
 const RETRY_BASE_DELAY: Duration = Duration::from_secs(1);
 
 /// The user a `macro.users` event asks to fan out, if any.
-pub(crate) fn picture_changed_user(event: &UserTopicEvent) -> Option<MacroUserIdStr<'static>> {
+pub(crate) fn picture_changed_user(event: &UserTopicEvent) -> Option<RoxUserIdStr<'static>> {
     match event {
         UserTopicEvent::PictureChanged(metadata) => Some(metadata.user_id.clone()),
     }
@@ -76,7 +76,7 @@ fn commit_logged(consumer: &UserPictureKafkaConsumer, message: &BorrowedMessage<
 
 async fn fan_out_with_retries<R, N>(
     fanout: &UserPictureFanout<R, N>,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
 ) where
     R: ContactsPageRepository,
     N: UserPictureNotifier,

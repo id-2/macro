@@ -11,7 +11,7 @@
 # has to dial the sidecar afterwards - `provision::SIDECAR_PORT` mirrors it and
 # a test asserts the two agree.
 #
-# MACRO_EGRESS_URL and MACRO_SESSION_TOKEN come from the sandbox environment.
+# ROX_EGRESS_URL and ROX_SESSION_TOKEN come from the sandbox environment.
 # Git presents the latter only to the Rox egress origin; the proxy selects the
 # repository from the session and exchanges it for a scoped GitHub App token.
 set -e
@@ -27,9 +27,9 @@ sidecar_log=/tmp/acp-sidecar.log
 # 1. The repo, unless it is already cloned. Scope the helper to Rox egress so
 #    an agent cannot redirect the session token to another host.
 if [ ! -d "$workspace_dir/.git" ]; then
-  egress_git_url="${MACRO_EGRESS_URL%/}/git"
-  git config --global "credential.${MACRO_EGRESS_URL}.helper" \
-    '!f() { echo username=x-access-token; echo "password=$MACRO_SESSION_TOKEN"; }; f'
+  egress_git_url="${ROX_EGRESS_URL%/}/git"
+  git config --global "credential.${ROX_EGRESS_URL}.helper" \
+    '!f() { echo username=x-access-token; echo "password=$ROX_SESSION_TOKEN"; }; f'
   git clone --depth 1 "$egress_git_url" "$workspace_dir"
 fi
 

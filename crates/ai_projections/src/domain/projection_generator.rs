@@ -1,6 +1,6 @@
 //! Outbound port for generating ai projection results via the AI toolset.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::model::AiProjectionError;
 
@@ -30,7 +30,7 @@ pub trait ProjectionGenerator: Clone + Send + Sync + 'static {
     /// the generated result text (or schema-conforming JSON).
     fn generate(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: GenerationRequest<'_>,
     ) -> impl Future<Output = Result<String, AiProjectionError>> + Send;
 }

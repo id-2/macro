@@ -34,7 +34,7 @@ composer's Auto mode.
 ## Boundaries
 
 - Depends on: `ai_usage` (usage metering); `outbound` feature adds
-  `macro_env_var`, `reqwest`, `tokio`.
+  `rox_env_var`, `reqwest`, `tokio`.
 - Used by: `scheduled_action` (trigger conditions),
   `document_cognition_service` (the `/decisions` endpoint), `agent_harness`
   (Auto mode choice, Clef Flash), `agent_session` (whether to retitle a

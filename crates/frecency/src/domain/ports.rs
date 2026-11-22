@@ -1,7 +1,7 @@
 //! This module defines all of the ports that the frecency domain requires
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 
 use crate::domain::models::{
@@ -68,7 +68,7 @@ pub trait AggregateFrecencyStorage: Send + Sync + 'static {
     /// retrieve the specific aggregate record for the input entities + user pair
     fn get_aggregate_for_user_entities<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         entities: &'a [Entity<'a>],
     ) -> impl Future<Output = Result<Vec<AggregateFrecency>, Self::Err>> + Send;
 }

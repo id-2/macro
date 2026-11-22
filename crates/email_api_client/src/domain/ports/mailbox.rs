@@ -291,7 +291,7 @@ pub trait MailboxSettingsClient: Send + Sync + 'static {
         token: &AccessToken,
         name: &str,
     ) -> impl Future<Output = Result<Vec<crate::domain::models::CategoryMessage>, EmailApiError>> + Send;
-    /// Read rules whose complete shape matches the Macro-owned rule contract.
+    /// Read rules whose complete shape matches the Rox-owned rule contract.
     fn sender_rules(
         &self,
         token: &AccessToken,

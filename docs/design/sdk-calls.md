@@ -203,12 +203,12 @@ All in `crates/call`, in its hexagonal layout.
 | `GET /call/record/{call_id}/recording` | Recording bytes through a Rox host |
 
 **Refuse tokens in code mode.** All token routes return `403` when the request carries
-`x-macro-code-execution`. The sandbox cannot use a token, and it would land in the model's
+`x-rox-code-execution`. The sandbox cannot use a token, and it would land in the model's
 context and the transcript. Tokens live 6 hours and cannot be revoked. `toJSON` on
 `CallConnection` also omits the token, and it is never logged or put on a span.
 
 **Mark programs in the room.** At join, the credential already says who is asking
-(`CredentialOrigin`: `UserApiKey` and `MacroApiJwt` versus `Session`), and `is_agent` says
+(`CredentialOrigin`: `UserApiKey` and `RoxApiJwt` versus `Session`), and `is_agent` says
 what the account is. Mint with a `macro.program` attribute (`with_attributes` exists in
 the `livekit-api` crate) and store `client` on `call_participants`, with a default of
 `person` per CS-70.

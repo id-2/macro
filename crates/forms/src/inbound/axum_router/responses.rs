@@ -4,7 +4,7 @@ use axum::Json;
 use axum::extract::State;
 use entity_access::domain::models::{EditAccessLevel, ViewAccessLevel};
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use models_forms::{
     FormErrorResponse, FormTally, MyResponse, ResponseSummary, Submission, SubmissionOutcome,
 };
@@ -30,7 +30,7 @@ pub async fn submit_form_response_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -53,7 +53,7 @@ pub async fn get_my_form_response_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(state.service.my_response(access.receipt).await?))
 }
@@ -74,7 +74,7 @@ pub async fn edit_my_form_response_handler<Service, EntityAccess, Authorization>
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -98,7 +98,7 @@ pub async fn get_form_response_summary_handler<Service, EntityAccess, Authorizat
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(state.service.response_summary(access.receipt).await?))
 }
@@ -118,7 +118,7 @@ pub async fn get_form_tally_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(state.service.tally(access.receipt).await?))
 }

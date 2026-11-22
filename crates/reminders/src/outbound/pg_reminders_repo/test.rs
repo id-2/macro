@@ -1,30 +1,30 @@
 use super::*;
 use crate::domain::email_followup::EmailFollowup;
 use chrono::{Duration, TimeZone};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 mod email_collection;
 const USER_A: &str = "macro|reminders-a@rox.one";
 const USER_B: &str = "macro|reminders-b@rox.one";
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 fn at(y: i32, m: u32, d: u32, h: u32) -> DateTime<Utc> {
     Utc.with_ymd_and_hms(y, m, d, h, 0, 0).single().unwrap()
 }
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let rox_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(id)
     .execute(pool)
     .await
     .expect("macro_user should insert");
-    sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#)
+    sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#)
         .bind(id)
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .execute(pool)
         .await
         .expect("user should insert");
@@ -42,7 +42,7 @@ async fn create_due(pool: &PgPool, user_id: &str, remind_at: DateTime<Utc>) -> E
     )
     .await
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn due_firings_returns_only_firings_that_have_arrived(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let now = at(2026, 8, 1, 12);
@@ -59,7 +59,7 @@ async fn due_firings_returns_only_firings_that_have_arrived(pool: PgPool) {
     assert_eq!(due[0].scheduled_for, past.remind_at);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn due_firings_span_users(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     insert_user(&pool, USER_B).await;
@@ -83,7 +83,7 @@ async fn due_firings_span_users(pool: PgPool) {
     assert_eq!(owners, vec![USER_B, USER_A], "soonest firing first");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_fanned_out_firing_resolves_to_its_reminder_and_owner(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let reminder = create_due(&pool, USER_A, at(2026, 8, 1, 11)).await;
@@ -103,7 +103,7 @@ async fn a_fanned_out_firing_resolves_to_its_reminder_and_owner(pool: PgPool) {
     assert_eq!(due.scheduled_for, reminder.remind_at);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_released_claim_can_be_taken_again_immediately(pool: PgPool) {
     // What makes a failed delivery retry on the queue's schedule rather than
     // waiting out the stale-claim window.
@@ -130,7 +130,7 @@ async fn a_released_claim_can_be_taken_again_immediately(pool: PgPool) {
     assert!(retaken);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn releasing_a_delivered_firing_does_not_un_send_it(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let reminder = create_due(&pool, USER_A, at(2026, 8, 1, 11)).await;
@@ -166,7 +166,7 @@ async fn releasing_a_delivered_firing_does_not_un_send_it(pool: PgPool) {
     assert!(!reclaimed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_firing_can_only_be_claimed_once(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let reminder = create_due(&pool, USER_A, at(2026, 8, 1, 11)).await;
@@ -185,7 +185,7 @@ async fn a_firing_can_only_be_claimed_once(pool: PgPool) {
     assert!(!second, "a peer must not take a firing already in flight");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stale_undelivered_claim_can_be_taken_over(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let reminder = create_due(&pool, USER_A, at(2026, 8, 1, 11)).await;
@@ -211,7 +211,7 @@ async fn a_stale_undelivered_claim_can_be_taken_over(pool: PgPool) {
     assert!(retaken);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_delivered_firing_is_never_reclaimed(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let reminder = create_due(&pool, USER_A, at(2026, 8, 1, 11)).await;
@@ -238,7 +238,7 @@ async fn a_delivered_firing_is_never_reclaimed(pool: PgPool) {
     assert!(!reclaimed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_delivered_firing_stops_being_due_without_completing_the_reminder(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let reminder = create_due(&pool, USER_A, at(2026, 8, 1, 11)).await;
@@ -270,7 +270,7 @@ async fn a_delivered_firing_stops_being_due_without_completing_the_reminder(pool
     assert!(due.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_snooze_retracts_only_its_email_notification(pool: PgPool) {
     use crate::domain::email_followup::{EmailFollowupRepo, FollowupState};
     insert_user(&pool, USER_A).await;

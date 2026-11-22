@@ -55,11 +55,11 @@ just apps/web/ensure-agent-fold-wasm
 setsid env \
   PORT="${FRONTEND_PORT}" \
   NODE_EXTRA_CA_CERTS="${WORKSPACE_ROOT}/infra/local/certs/ca.pem" \
-  MACRO_LOCAL_HOSTNAME="$(hostname)" \
+  ROX_LOCAL_HOSTNAME="$(hostname)" \
   VITE_LOCAL_SERVERS=ALL \
   VITE_LOCAL_BACKEND_ORIGIN="same-origin" \
-  MACRO_LOCAL_BACKEND_PROXY="${PROXY_ORIGIN}" \
-  MACRO_LOCAL_BACKEND_ROUTES="${BACKEND_ROUTES}" \
+  ROX_LOCAL_BACKEND_PROXY="${PROXY_ORIGIN}" \
+  ROX_LOCAL_BACKEND_ROUTES="${BACKEND_ROUTES}" \
   VITE_AI_EDITING_WORKER_URL="/ai-editing" \
   python3 -c 'import subprocess; child = subprocess.Popen(["node", "../../node_modules/vite/bin/vite.js", "-c", "vite.config.ts"], stdin=subprocess.PIPE); raise SystemExit(child.wait())' \
   >>"${DEV_LOG}" 2>&1 </dev/null &

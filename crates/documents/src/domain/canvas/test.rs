@@ -17,7 +17,7 @@ async fn render_mints_view_access_and_does_not_admit_or_meter_a_model() {
     worker.expect_canvas().times(1).returning(|id, token, request, _| {
         assert_eq!(id, DOCUMENT);
         assert!(matches!(request, CanvasRequest::Render { .. }));
-        let claims: serde_json::Value = macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+        let claims: serde_json::Value = rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
         assert_eq!(claims["access_level"], "view");
         assert_eq!(claims["actor"], "macro|ai@rox.one");
         assert_eq!(serde_json::to_value(request).unwrap(), serde_json::json!({"action":"render"}));
@@ -75,7 +75,7 @@ async fn invalid_render_crop_never_starts_storage_or_worker_access() {
             .is_err()
     );
 }
-fn user() -> MacroUserIdStr<'static> {
+fn user() -> RoxUserIdStr<'static> {
     "macro|canvas@example.com".to_owned().try_into().unwrap()
 }
 fn receipt<T: RequiredPermission>(access_level: AccessLevel) -> EntityAccessReceipt<T> {
@@ -93,7 +93,7 @@ struct Admission(Result<(), AiAdmissionError>);
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        caller: &'a MacroUserIdStr<'_>,
+        caller: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {
@@ -134,7 +134,7 @@ async fn read_mints_only_view_access_and_preserves_actor_without_admission_or_us
             assert_eq!(id, DOCUMENT);
             assert!(matches!(request, CanvasRequest::Read { .. }));
             let claims: serde_json::Value =
-                macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+                rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
             assert_eq!(claims["document_id"], DOCUMENT);
             assert_eq!(claims["access_level"], "view");
             assert_eq!(claims["actor"], "macro|ai@rox.one");
@@ -221,7 +221,7 @@ async fn admitted_edit_mints_edit_access_and_records_actual_worker_usage() {
     let mut worker = MockEditingWorkerService::new();
     worker.expect_canvas().times(1).returning(|_, token, request, _| {
         assert!(matches!(request,CanvasRequest::Edit {instructions, ..} if instructions=="Make a flowchart"));
-        let claims: serde_json::Value=macro_sync_service_jwt::decode(token.as_str(),SECRET).unwrap();
+        let claims: serde_json::Value=rox_sync_service_jwt::decode(token.as_str(),SECRET).unwrap();
         assert_eq!(claims["access_level"],"edit");
         assert_eq!(claims["actor"],"macro|ai@rox.one");
         Box::pin(async {Ok(CanvasResult { failure: None,response:CanvasResponse { render: None,canvas:None,operations_applied:3,summary:"Applied".into(),clarification:None},usage:vec![EditUsage {model:"test-model".into(),input_tokens:100,output_tokens:20}]})})
@@ -339,7 +339,7 @@ async fn failed_later_step_still_records_completed_provider_usage() {
 async fn direct_batch_has_edit_capability_without_a_second_model_or_admission() {
     let mut worker = MockEditingWorkerService::new();
     worker.expect_canvas().times(1).returning(|_, token, request, _| {
-        let claims: serde_json::Value = macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+        let claims: serde_json::Value = rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
         assert_eq!(claims["access_level"], "edit");
         assert_eq!(claims["actor"], "macro|ai@rox.one");
         assert!(matches!(request, CanvasRequest::Apply { code, .. } if code == "editor.move(['a'],0,20)"));
@@ -451,7 +451,7 @@ async fn a_user_without_a_bot_mints_a_token_with_no_actor() {
     let mut worker = MockEditingWorkerService::new();
     worker.expect_canvas().times(1).returning(|_, token, _, _| {
         let claims: serde_json::Value =
-            macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+            rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
         assert_eq!(claims["user_id"], "macro|canvas@example.com");
         assert!(claims.get("actor").is_none_or(serde_json::Value::is_null));
         Box::pin(async {
@@ -541,7 +541,7 @@ struct Images(Mutex<Vec<(String, String, Vec<u8>)>>);
 impl CanvasImageStore for Images {
     async fn save_png(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         name: &str,
         png: Vec<u8>,
     ) -> anyhow::Result<StoredCanvasImage> {

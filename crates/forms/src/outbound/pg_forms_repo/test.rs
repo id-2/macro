@@ -1,7 +1,7 @@
 use activity::domain::ports::EntityActivityReads;
 use chrono::TimeZone;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::views::{
     Conjunction, FilterCondition, FilterGroup, FilterNode, FilterTest, PresenceOperator,
 };
@@ -29,8 +29,8 @@ use crate::domain::sharing::FormSharingRepo;
 const OWNER: &str = "macro|owner@forms-repo.test";
 const RESPONDENT: &str = "macro|respondent@forms-repo.test";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 fn at(hour: u32) -> DateTime<Utc> {
@@ -47,21 +47,21 @@ struct Table {
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
     let email = user_id.trim_start_matches("macro|");
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)"#,
-        macro_user_id,
+        rox_user_id,
         email,
-        format!("cus_{macro_user_id}"),
+        format!("cus_{rox_user_id}"),
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -226,7 +226,7 @@ fn layout_over(table: &Table) -> FormLayout {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_created_form_reads_back_with_its_layout_and_owner_grant(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -262,7 +262,7 @@ async fn a_created_form_reads_back_with_its_layout_and_owner_grant(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_form_hidden_in_drive_stays_hidden_through_a_rename(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -288,7 +288,7 @@ async fn a_form_hidden_in_drive_stays_hidden_through_a_rename(pool: PgPool) {
     assert!(renamed.is_hidden_in_drive);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_layout_is_replaced_whole_and_a_trashed_forms_is_not(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool);
@@ -351,7 +351,7 @@ async fn a_layout_is_replaced_whole_and_a_trashed_forms_is_not(pool: PgPool) {
     assert_eq!(repo.form(form.id).await.unwrap().unwrap().trashed_at, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sections_show_when_rules_read_back_as_written_and_clear_with_a_replace(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -424,7 +424,7 @@ async fn a_sections_show_when_rules_read_back_as_written_and_clear_with_a_replac
     assert!(gate_with_show_when.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn facts_change_only_where_given_and_a_closing_time_can_be_cleared(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool);
@@ -508,7 +508,7 @@ async fn facts_change_only_where_given_and_a_closing_time_can_be_cleared(pool: P
     assert_eq!(renamed.updated_at, at(12));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_signed_in_stop_gives_way_to_a_response_which_then_holds_the_key(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -586,7 +586,7 @@ async fn a_signed_in_stop_gives_way_to_a_response_which_then_holds_the_key(pool:
     assert_eq!(repointed.submitted_at, at(12));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn anonymous_responses_are_unbounded_and_counted(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -615,7 +615,7 @@ async fn anonymous_responses_are_unbounded_and_counted(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn respondents_by_row_name_signed_in_responses_in_submission_order(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -642,7 +642,7 @@ async fn respondents_by_row_name_signed_in_responses_in_submission_order(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_responses_by_one_person_record_exactly_one(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -684,7 +684,7 @@ async fn concurrent_responses_by_one_person_record_exactly_one(pool: PgPool) {
     assert_eq!(entries, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_deleted_row_leaves_its_entry_without_a_row(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -709,7 +709,7 @@ async fn a_deleted_row_leaves_its_entry_without_a_row(pool: PgPool) {
     assert_eq!(entry.status, ResponseStatus::Submitted);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn channel_grants_change_only_on_a_live_form_and_go_with_it(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -750,7 +750,7 @@ async fn channel_grants_change_only_on_a_live_form_and_go_with_it(pool: PgPool) 
     assert_eq!(grants, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn appearance_survives_reads_without_touching_content_dates(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -824,7 +824,7 @@ async fn appearance_survives_reads_without_touching_content_dates(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_failure_rolls_back_appearance(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());

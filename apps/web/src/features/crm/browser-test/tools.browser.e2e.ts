@@ -5,7 +5,7 @@ test('agent entry and update cards retain amount denominations', async ({
 }) => {
   await page.routeWebSocket('**', (socket) => socket.close());
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await page.goto('/src/features/crm/browser-test/tools.html');
   await expect(
     page.getByText('Contract value: EUR 1,234.567 · Outcome: Won · Owner: Alex')

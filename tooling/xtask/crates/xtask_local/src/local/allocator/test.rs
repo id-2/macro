@@ -10,8 +10,8 @@ fn networks_map_back_to_their_instance() {
         Some("crmgp")
     );
     assert_eq!(instance_of_network("databases"), None);
-    assert_eq!(instance_of_network("macro_services"), None);
-    assert_eq!(instance_of_network("macro_auth-internal"), None);
+    assert_eq!(instance_of_network("rox_services"), None);
+    assert_eq!(instance_of_network("rox_auth-internal"), None);
     assert_eq!(instance_of_network("bridge"), None);
 }
 

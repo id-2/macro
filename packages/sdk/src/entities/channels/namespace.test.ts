@@ -4,7 +4,7 @@ import type {
   ApiChannelWithLatest,
   GetChannelsData,
 } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { ChannelNamespace } from './namespace';
 
 function channel(id: string, name: string | null): ApiChannelWithLatest {
@@ -45,7 +45,7 @@ function channelsClient() {
         return { data: pages[options?.query?.cursor ?? 'first'] };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, requests };
 }
 

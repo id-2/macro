@@ -3,7 +3,7 @@
 use agent_credentials::AgentCreators;
 use feature_flags::FeatureFlags;
 use futures::StreamExt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{
@@ -68,7 +68,7 @@ impl<Repos: RepoRepository, Store, Admins, Limiter, Backend, Creators, Flags>
     /// The agent's repo row, which must belong to `team_id`.
     async fn team_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> Result<(), AgentGitError> {
         let repo = self
@@ -120,7 +120,7 @@ fn limit_body(body: GitBody, limit: u64) -> GitBody {
 impl<Repos, Store, Admins, Limiter, Backend, Creators: AgentCreators, Flags: FeatureFlags>
     AgentGitServiceImpl<Repos, Store, Admins, Limiter, Backend, Creators, Flags>
 {
-    async fn rollout_on(&self, agent_user_id: &MacroUserIdStr<'_>) -> bool {
+    async fn rollout_on(&self, agent_user_id: &RoxUserIdStr<'_>) -> bool {
         agent_credentials::agent_teammates_enabled(
             &self.adapters.creators,
             self.adapters.flags.as_ref(),
@@ -143,7 +143,7 @@ where
 {
     async fn create_repo(
         &self,
-        agent_user_id: MacroUserIdStr<'static>,
+        agent_user_id: RoxUserIdStr<'static>,
         team_id: Uuid,
         seed: &PersonaSeed,
     ) -> Result<CreatedRepo, AgentGitError> {
@@ -200,7 +200,7 @@ where
     #[cfg_attr(any(feature = "inbound", feature = "outbound"), tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref()), %team_id), err))]
     async fn ensure_repo(
         &self,
-        agent_user_id: MacroUserIdStr<'static>,
+        agent_user_id: RoxUserIdStr<'static>,
         team_id: Uuid,
         seed: &PersonaSeed,
         token: RepoToken,
@@ -248,7 +248,7 @@ where
         })
     }
 
-    async fn delete_repo(&self, agent_user_id: &MacroUserIdStr<'_>) -> Result<(), AgentGitError> {
+    async fn delete_repo(&self, agent_user_id: &RoxUserIdStr<'_>) -> Result<(), AgentGitError> {
         let _lock = self
             .adapters
             .repos
@@ -272,7 +272,7 @@ where
     #[cfg_attr(any(feature = "inbound", feature = "outbound"), tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref()), %team_id), err))]
     async fn voice(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> Result<VoiceConfig, AgentGitError> {
         self.team_repo(agent_user_id, team_id).await?;
@@ -291,7 +291,7 @@ where
     #[cfg_attr(any(feature = "inbound", feature = "outbound"), tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(agent_user_id.as_ref()), %team_id, voice = %voice.model), err))]
     async fn set_voice(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
         voice: &VoiceConfig,
     ) -> Result<(), AgentGitError> {
@@ -321,7 +321,7 @@ where
     async fn serve_git(
         &self,
         credential: GitCredential,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         mut request: GitRequest,
     ) -> Result<GitResponse, AgentGitError> {
         let repo = self

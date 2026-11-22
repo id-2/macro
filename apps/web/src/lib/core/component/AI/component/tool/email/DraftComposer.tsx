@@ -157,7 +157,7 @@ export function EmailDraftComposer(props: EmailDraftComposerProps) {
         : undefined,
       primaryInboxId:
         findPrimaryEmailLinkId(list, userId()) ??
-        list.find((link) => link.macro_id === userId())?.id,
+        list.find((link) => link.rox_id === userId())?.id,
     });
   });
   const fromAddress = () => explicitFrom() ?? sendingLink()?.email_address;

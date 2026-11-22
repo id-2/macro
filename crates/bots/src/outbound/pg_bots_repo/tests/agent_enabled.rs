@@ -1,6 +1,6 @@
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn agent_update_and_patch_restore_mention_dispatch_flag(pool: PgPool) -> anyhow::Result<()> {
     let service = service(&pool);
     let mut request = create_agent_req("chat-agent", AgentChannelScope::All);
@@ -48,7 +48,7 @@ async fn agent_update_and_patch_restore_mention_dispatch_flag(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn backfill_enables_configured_agents_and_preserves_plain_bots(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -71,7 +71,7 @@ async fn backfill_enables_configured_agents_and_preserves_plain_bots(
 
     for _ in 0..2 {
         sqlx::raw_sql(include_str!(
-            "../../../../../macro_db_client/migrations/20261105072859_enable_configured_bot_agents.sql"
+            "../../../../../rox_db_client/migrations/20261105072859_enable_configured_bot_agents.sql"
         ))
         .execute(&pool)
         .await?;

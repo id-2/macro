@@ -149,7 +149,7 @@ export async function restoreSendWorkingCopy(
         bcc: draft.bcc,
         body_html: draft.bodyHtml,
         body_text: draft.bodyText,
-        body_macro: draft.bodyMacro,
+        body_rox: draft.bodyMacro,
         replying_to_id:
           draft.replyingToId == null
             ? draft.replyingToId
@@ -207,7 +207,7 @@ export async function restoreSendWorkingCopy(
     providerThreadId: local.content.provider_thread_id,
     bodyHtml: local.content.body_html,
     bodyText: local.content.body_text,
-    bodyMacro: local.content.body_macro,
+    bodyMacro: local.content.body_rox,
     optimisticBodyHtml: local.content.body_html
       ? decodeBase64Utf8(local.content.body_html)
       : null,

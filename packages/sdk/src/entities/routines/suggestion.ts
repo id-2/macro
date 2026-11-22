@@ -5,7 +5,7 @@ import type {
   Surface,
 } from '../../../generated/scheduled-action/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 /**
  * A routine suggestion AI made for the user, as a routines session reviews
@@ -14,13 +14,13 @@ import type { MacroClient } from '../../utils/client';
  */
 export class RoutineSuggestion {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     private readonly record: ReviewedSuggestion,
   ) {}
 
   /** Wrap a reviewed suggestion already in hand. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     record: ReviewedSuggestion,
   ): RoutineSuggestion {
     return new RoutineSuggestion(client, record);

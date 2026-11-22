@@ -2,7 +2,7 @@
 // wherever it is awaited.
 #![recursion_limit = "256"]
 
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 
 /// Unoptimized builds of this service compile `run()` and its handlers into
 /// futures deep enough to overflow a default 2 MiB worker stack while polling
@@ -18,7 +18,7 @@ fn main() -> anyhow::Result<()> {
         .thread_stack_size(TOKIO_WORKER_STACK_SIZE)
         .build()?
         .block_on(async {
-            let entrypoint = MacroEntrypoint::default().init();
+            let entrypoint = RoxEntrypoint::default().init();
             let result = document_storage_service::run().await;
             entrypoint.shutdown();
             result

@@ -10,7 +10,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
@@ -142,15 +142,15 @@ pub struct ImportNotionPageResponse {
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id), err(Debug))]
-pub async fn list_entities_handler<T: ImportStager, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id), err(Debug))]
+pub async fn list_entities_handler<T: ImportStager, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(query): Query<ListImportEntitiesQuery>,
 ) -> Result<Json<ImportEntitiesResponse>, LedgerError> {
     let entities = service
         .list_entities(
-            &user.authorization.user.macro_user_id,
+            &user.authorization.user.rox_user_id,
             query.source,
             query.status,
         )
@@ -174,13 +174,13 @@ pub async fn list_entities_handler<T: ImportStager, Auth: MacroAuthorizationServ
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user, body), fields(user_id = %user.authorization.user.macro_user_id, source = body.source.as_ref()), err(Debug))]
-pub async fn track_entity_handler<T: ImportStager, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user, body), fields(user_id = %user.authorization.user.rox_user_id, source = body.source.as_ref()), err(Debug))]
+pub async fn track_entity_handler<T: ImportStager, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<TrackImportEntityRequest>,
 ) -> Result<Json<TrackImportEntityResponse>, LedgerError> {
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     let response = match body.status {
         TrackImportStatus::Staged => {
             let outcome = service
@@ -268,14 +268,14 @@ pub async fn track_entity_handler<T: ImportStager, Auth: MacroAuthorizationServi
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.macro_user_id), err(Debug))]
-pub async fn decline_entity_handler<T: ImportStager, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user), fields(user_id = %user.authorization.user.rox_user_id), err(Debug))]
+pub async fn decline_entity_handler<T: ImportStager, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, LedgerError> {
     match service
-        .discard_entity(&user.authorization.user.macro_user_id, id)
+        .discard_entity(&user.authorization.user.rox_user_id, id)
         .await?
     {
         DiscardOutcome::Discarded => Ok(StatusCode::NO_CONTENT),
@@ -300,10 +300,10 @@ pub async fn decline_entity_handler<T: ImportStager, Auth: MacroAuthorizationSer
     ),
     tag = "import"
 )]
-#[tracing::instrument(skip(service, user, body), fields(user_id = %user.authorization.user.macro_user_id), err(Debug))]
-pub async fn import_notion_page_handler<T: NotionPageImporter, Auth: MacroAuthorizationService>(
+#[tracing::instrument(skip(service, user, body), fields(user_id = %user.authorization.user.rox_user_id), err(Debug))]
+pub async fn import_notion_page_handler<T: NotionPageImporter, Auth: RoxAuthorizationService>(
     State(service): State<Arc<T>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<ImportNotionPageRequest>,
 ) -> Result<Json<ImportNotionPageResponse>, LedgerError> {
     let page = body.page.trim();
@@ -311,7 +311,7 @@ pub async fn import_notion_page_handler<T: NotionPageImporter, Auth: MacroAuthor
         return Err(LedgerError::Invalid("a Notion page URL or id is required"));
     }
     let response = match service
-        .import_notion_page(&user.authorization.user.macro_user_id, page)
+        .import_notion_page(&user.authorization.user.rox_user_id, page)
         .await?
     {
         ImportNotionPageOutcome::Imported {

@@ -7,8 +7,8 @@ use entity_access_management::domain::models::EntityAccessManagementError;
 use entity_access_management::domain::ports::EntityAccessManagementService;
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_event_broker::NoopMacroEventBroker;
 use sqlx::PgPool;
 
 use super::*;
@@ -160,7 +160,7 @@ impl ProjectContentCopier for FakeContents {
         }
         Ok(Some(
             EntityAccessReceipt::dangerously_assert_authenticated_user(
-                MacroUserIdStr::try_from(OWNER.to_string()).unwrap(),
+                RoxUserIdStr::try_from(OWNER.to_string()).unwrap(),
                 &entity.entity_id,
                 entity.entity_type,
             ),
@@ -243,7 +243,7 @@ async fn duplicate(
     project_id: &str,
     display_name: Option<&str>,
 ) -> Result<Vec<EntityMutationEffect>, EntityMutationErrorCode> {
-    let owner = MacroUserIdStr::try_from(OWNER.to_string()).unwrap();
+    let owner = RoxUserIdStr::try_from(OWNER.to_string()).unwrap();
     duplicator
         .duplicate_entity(
             EntityType::Project.with_entity_string(project_id.to_string()),
@@ -286,7 +286,7 @@ fn copy_id(effects: &[EntityMutationEffect]) -> String {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn copies_subfolders_documents_and_chats_into_a_new_tree(pool: PgPool) {
@@ -326,7 +326,7 @@ async fn copies_subfolders_documents_and_chats_into_a_new_tree(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn places_the_copy_beside_the_source_only_when_the_user_can_add_there(pool: PgPool) {
@@ -352,7 +352,7 @@ async fn places_the_copy_beside_the_source_only_when_the_user_can_add_there(pool
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn leaves_email_threads_filed_in_the_source(pool: PgPool) {
@@ -360,7 +360,7 @@ async fn leaves_email_threads_filed_in_the_source(pool: PgPool) {
     let thread_id = Uuid::now_v7();
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, 'fusionauth-owner', 'owner@test.com', 'GMAIL')
         "#,
         link_id,
@@ -402,7 +402,7 @@ async fn leaves_email_threads_filed_in_the_source(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn skips_entries_the_user_cannot_view_with_their_contents(pool: PgPool) {
@@ -428,7 +428,7 @@ async fn skips_entries_the_user_cannot_view_with_their_contents(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn refuses_a_tree_over_the_limit_without_creating_anything(pool: PgPool) {
@@ -464,7 +464,7 @@ async fn refuses_a_tree_over_the_limit_without_creating_anything(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn duplicates_a_tree_at_the_limit(pool: PgPool) {
@@ -489,7 +489,7 @@ async fn duplicates_a_tree_at_the_limit(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn a_failed_copy_discards_everything_already_copied(pool: PgPool) {
@@ -535,7 +535,7 @@ async fn a_failed_copy_discards_everything_already_copied(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn refuses_a_deleted_project(pool: PgPool) {

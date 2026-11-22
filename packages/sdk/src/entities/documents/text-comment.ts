@@ -1,7 +1,7 @@
 import type { CommentOnTextRefused } from '../../../generated/storage/types.gen';
 import { type RichMessage, toBody } from '../../mentions';
-import type { MacroClient } from '../../utils/client';
-import { MacroApiError, unwrap } from '../../utils/unwrap';
+import type { RoxClient } from '../../utils/client';
+import { RoxApiError, unwrap } from '../../utils/unwrap';
 import { Comment } from './comment';
 import type { Document } from './document';
 
@@ -36,7 +36,7 @@ export interface TextComment {
  * posted. `reason` lists each appearance to choose from with `occurrence`, or
  * says the text was not found: read the document again rather than guessing.
  */
-export class CommentQuoteNotPlacedError extends MacroApiError {
+export class CommentQuoteNotPlacedError extends RoxApiError {
   /** Why the quote could not be anchored, in the document's words. */
   readonly reason: string;
 
@@ -50,7 +50,7 @@ export class CommentQuoteNotPlacedError extends MacroApiError {
 
 /** Post a comment on quoted text; `Document.commentOnText` calls this. */
 export async function commentOnText(
-  client: MacroClient,
+  client: RoxClient,
   document: Document,
   body: string | RichMessage,
   options: TextCommentOptions,

@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 use ai_toolset::{
     AsyncTool, RequestContext, ServiceContext, schema::generate_validated_input_schema,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use uuid::Uuid;
 
@@ -52,7 +52,7 @@ impl FavoritesMutationService for RecordingFavorites {
 
     async fn reorder_favorites(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         _ordered: Vec<Entity<'static>>,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         unimplemented!("the favorites toolset never reorders")
@@ -60,7 +60,7 @@ impl FavoritesMutationService for RecordingFavorites {
 }
 
 fn request() -> RequestContext {
-    RequestContext::new(MacroUserIdStr::try_from(USER.to_owned()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from(USER.to_owned()).unwrap())
 }
 
 #[test]

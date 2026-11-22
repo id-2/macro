@@ -1,6 +1,6 @@
 use email::domain::scheduled_delivery::{PreparationError, SubmissionError};
 use email_api_client::domain::models::{EmailApiError, RateLimitOrigin, SentIds};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::service::message::MessageToSend;
 use uuid::Uuid;
 
@@ -91,7 +91,7 @@ fn message_to_send() -> MessageToSend {
         bcc: None,
         body_text: Some("body".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         attachments: None,
         headers_json: None,
         send_time: None,
@@ -99,7 +99,7 @@ fn message_to_send() -> MessageToSend {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../crates/email_db_client/fixtures",
         scripts("mark_message_as_sent")

@@ -2,11 +2,11 @@
 mod test;
 
 use documents_hex::domain::events::{DocumentMacroEvent, DocumentPurgedMetadata};
-use macro_event_broker::{EventBrokerError, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEventBroker};
 
 /// Schedules a document-purged event for asynchronous broker delivery.
 #[tracing::instrument(skip(event_broker), err)]
-pub(crate) fn publish_document_purged_event<B: MacroEventBroker>(
+pub(crate) fn publish_document_purged_event<B: RoxEventBroker>(
     event_broker: &B,
     document_id: &str,
 ) -> Result<(), EventBrokerError> {

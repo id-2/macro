@@ -491,7 +491,7 @@ export type AgentSessionFilters = {
 };
 
 /**
- * Events publishable to [`MacroAgentSessionLifecycleTopic`].
+ * Events publishable to [`RoxAgentSessionLifecycleTopic`].
  *
  * The serde tag and [`AgentSessionLifecycleEventName`] spell the same wire
  * names: subscribers filter on them, so they are API. The
@@ -2713,7 +2713,7 @@ export type CallRecord = {
      */
     isActive: boolean;
     /**
-     * Macro-account participants (both active and historic).
+     * Rox-account participants (both active and historic).
      */
     participants: Array<CallRecordParticipant>;
     /**
@@ -3487,12 +3487,12 @@ export type ChannelAccessRequest = {
     /**
      * Person asking to join.
      */
-    requester_id: MacroUserIdStr;
+    requester_id: RoxUserIdStr;
     /**
      * When the attempt stopped being pending.
      */
     resolved_at?: string | null;
-    resolved_by?: null | MacroUserIdStr;
+    resolved_by?: null | RoxUserIdStr;
     /**
      * Current outcome.
      */
@@ -3534,7 +3534,7 @@ export type ChannelAccessRequestedMetadata = {
     /**
      * Person asking to join.
      */
-    requester_id: MacroUserIdStr;
+    requester_id: RoxUserIdStr;
     /**
      * The requester's profile name when they asked, if they had one. Absent
      * on events from before it was added.
@@ -3562,11 +3562,11 @@ export type ChannelCreatedMetadata = {
      * Type of channel that was created.
      */
     channel_type: ChannelType;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * Active participants after creation (including the owner).
      */
-    participant_user_ids: Array<MacroUserIdStr>;
+    participant_user_ids: Array<RoxUserIdStr>;
 };
 
 /**
@@ -3800,7 +3800,7 @@ export type ChannelParticipantAddedMetadata = {
     /**
      * Users added by this mutation.
      */
-    added_user_ids: Array<MacroUserIdStr>;
+    added_user_ids: Array<RoxUserIdStr>;
     /**
      * Channel receiving new participants.
      */
@@ -3827,11 +3827,11 @@ export type ChannelParticipantRemovedMetadata = {
      * Actor who removed the participants; equals the sole removed user for a
      * self-service leave.
      */
-    removed_by: MacroUserIdStr;
+    removed_by: RoxUserIdStr;
     /**
      * Users removed by this mutation.
      */
-    removed_user_ids: Array<MacroUserIdStr>;
+    removed_user_ids: Array<RoxUserIdStr>;
 };
 
 /**
@@ -3841,7 +3841,7 @@ export type ChannelPictureChangedMetadata = {
     /**
      * User who changed the picture.
      */
-    actor: MacroUserIdStr;
+    actor: RoxUserIdStr;
     /**
      * Channel whose picture changed.
      */
@@ -3931,7 +3931,7 @@ export type ChannelThreadFilters = {
 };
 
 /**
- * Events that can be published to [`MacroChannelsTopic`].
+ * Events that can be published to [`RoxChannelsTopic`].
  */
 export type ChannelTopicEvent = {
     event_type: 'channel.picture_changed';
@@ -3989,7 +3989,7 @@ export type ChannelUpdatedMetadata = {
     /**
      * The user who updated the channel.
      */
-    actor: MacroUserIdStr;
+    actor: RoxUserIdStr;
     /**
      * The id of the updated channel.
      */
@@ -4185,7 +4185,7 @@ export type ClaimedPairing = {
  * How Claude Code on a Rox computer is paid for: its own Claude account
  * when it has an active Claude login, otherwise Rox credits.
  */
-export type ClaudeMode = 'macro_credits' | 'own_account';
+export type ClaudeMode = 'rox_credits' | 'own_account';
 
 export type CloudStorageItemType = 'document' | 'chat' | 'project';
 
@@ -4577,7 +4577,7 @@ export type CommandRejectedMetadata = {
      * The command that will not execute.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The command's thread announcement, when one was created.
      */
@@ -6434,8 +6434,8 @@ export type CropMode = 'fill' | 'fit';
  * One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].
  *
  * `custom_speaker = None` clears any existing override for this
- * `diarized_speaker_id`; `Some(macro_user_id)` sets it. The string is
- * expected to parse as a `MacroUserId` (e.g. `macro|alice@example.com`);
+ * `diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is
+ * expected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);
  * the service layer rejects malformed values with `400 Bad Request`.
  */
 export type CustomSpeakerAssignment = {
@@ -6925,7 +6925,7 @@ export type DocumentCopiedMetadata = {
      */
     document_name: string;
     file_type?: null | FileType;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * The principal who owns the new copy.
      */
@@ -6968,7 +6968,7 @@ export type DocumentCreatedMetadata = {
      */
     document_name: string;
     file_type?: null | FileType;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * The principal who owns the document.
      */
@@ -6990,12 +6990,12 @@ export type DocumentDeletedMetadata = {
      * [`Self::actor_user_id`]).
      */
     actor?: string | null;
-    actor_user_id?: null | MacroUserIdStr;
+    actor_user_id?: null | RoxUserIdStr;
     /**
      * The id of the deleted document.
      */
     document_id: string;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * Project the document belonged to, when any.
      */
@@ -7226,7 +7226,7 @@ export type DocumentPermissionsToken = {
      * The issuer of the token
      */
     iss: string;
-    user_id?: null | MacroUserIdStr;
+    user_id?: null | RoxUserIdStr;
 };
 
 export type DocumentPermissionsTokenRequest = {
@@ -7435,7 +7435,7 @@ export type DocumentSyncContentUpdatedMetadata = {
      * File type of the sync document, resolved by the document backend.
      */
     file_type: FileType;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
 };
 
 /**
@@ -7450,7 +7450,7 @@ export type DocumentSyncEditor = {
      * Invocation from the editor's signed document grant.
      */
     agent_correlation_id?: string | null;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
 };
 
 /**
@@ -7543,7 +7543,7 @@ export type DocumentUpdatedMetadata = {
      * [`Self::actor_user_id`]).
      */
     actor?: string | null;
-    actor_user_id?: null | MacroUserIdStr;
+    actor_user_id?: null | RoxUserIdStr;
     /**
      * Previous and new presentation overrides, in that order; no content edit occurred.
      */
@@ -7557,7 +7557,7 @@ export type DocumentUpdatedMetadata = {
      */
     document_name?: string | null;
     file_type?: null | FileTypeUpdate;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * The owner of the document.
      */
@@ -9734,7 +9734,7 @@ export type EntryFieldValue = {
 } | {
     type: 'references';
     /**
-     * Macro ids: people as macro| user ids, records or other items.
+     * Rox ids: people as macro| user ids, records or other items.
      */
     value: Array<string>;
 };
@@ -9774,7 +9774,7 @@ export type ErrorResponse = {
  */
 export type EventReminderOverride = {
     /**
-     * Provider method, stored verbatim; only `popup` fires Macro
+     * Provider method, stored verbatim; only `popup` fires Rox
      * notifications.
      */
     method: string;
@@ -12627,7 +12627,7 @@ export type GuestChatThread = {
  *
  * The id doubles as the guest's RTC participant identity, so identities are
  * opaque UUIDs and never share a namespace (or a column) with Rox user
- * ids. Only the server mints them; Macro users keep `macro|…` identities,
+ * ids. Only the server mints them; Rox users keep `macro|…` identities,
  * so an RTC identity classifies as exactly one of the two.
  */
 export type GuestId = string;
@@ -12751,7 +12751,7 @@ export type Harness = {
      * Teams it is a team machine for: their every member is a user of it.
      */
     shared_team_ids?: Array<string>;
-    team_agent_user_id?: null | MacroUserIdStr;
+    team_agent_user_id?: null | RoxUserIdStr;
     /**
      * Update timestamp.
      */
@@ -13100,7 +13100,7 @@ export type InFlightTurnSummary = {
      * The action that opened the turn.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The magic-chip message posted for this turn, when one was.
      */
@@ -13235,7 +13235,7 @@ export type InitiativeDetail = {
     /**
      * Member user ids. The owner is never stored here.
      */
-    memberIds: Array<MacroUserIdStr>;
+    memberIds: Array<RoxUserIdStr>;
     /**
      * Display name.
      */
@@ -13243,7 +13243,7 @@ export type InitiativeDetail = {
     /**
      * Owner of the initiative.
      */
-    ownerId: MacroUserIdStr;
+    ownerId: RoxUserIdStr;
     /**
      * Current share permission.
      */
@@ -13893,7 +13893,7 @@ export type LocationResponseV3 = {
     type: 'syncServiceContent';
 };
 
-export type MacroUserIdStr = string;
+export type RoxUserIdStr = string;
 
 /**
  * Mark messages through this message read.
@@ -17901,7 +17901,7 @@ export type SessionIdentity = {
      * who has prompted or answered this session. Resolved by the emitter so
      * a consumer fanning out never has to read the session's log.
      */
-    audience?: Array<MacroUserIdStr>;
+    audience?: Array<RoxUserIdStr>;
     /**
      * Bot the session runs for.
      */
@@ -17914,7 +17914,7 @@ export type SessionIdentity = {
     /**
      * User who owns the session.
      */
-    owner_id: MacroUserIdStr;
+    owner_id: RoxUserIdStr;
     /**
      * The session.
      */
@@ -17948,8 +17948,8 @@ export type SessionMentionedMetadata = {
      * The users named, already narrowed to those who can open the session
      * and never including the author.
      */
-    mentioned: Array<MacroUserIdStr>;
-    mentioned_by?: null | MacroUserIdStr;
+    mentioned: Array<RoxUserIdStr>;
+    mentioned_by?: null | RoxUserIdStr;
     /**
      * The channel or document message the prompt was posted as, when it
      * arrived from a thread rather than the session view. That message
@@ -18911,7 +18911,7 @@ export type SoupCallRecordGuest = {
 };
 
 /**
- * A Macro-account participant in a call record, as displayed in Soup.
+ * A Rox-account participant in a call record, as displayed in Soup.
  */
 export type SoupCallRecordParticipant = {
     /**
@@ -18980,7 +18980,7 @@ export type SoupCallRecordSoupPropertiesField = {
      */
     isActive: boolean;
     /**
-     * Macro-account participants in the call.
+     * Rox-account participants in the call.
      */
     participants: Array<SoupCallRecordParticipant>;
     /**
@@ -22069,7 +22069,7 @@ export type TurnEndedMetadata = {
      * The action that opened the turn.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The magic-chip message posted for this turn, when one was.
      */
@@ -22100,7 +22100,7 @@ export type TurnStartedMetadata = {
      * The action that opened the turn.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The magic-chip message posted for this turn, when one was.
      */
@@ -22123,7 +22123,7 @@ export type TurnSummary = {
      * The action that opened the turn.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The magic-chip message posted for this turn, when one was.
      */
@@ -22756,7 +22756,7 @@ export type UserPictureChangedMetadata = {
     /**
      * User whose profile picture changed.
      */
-    user_id: MacroUserIdStr;
+    user_id: RoxUserIdStr;
 };
 
 export type UserPinsResponse = {
@@ -23278,7 +23278,7 @@ export type WhatsAppChat = {
      */
     archived: boolean;
     /**
-     * "Add to Macro" works now.
+     * "Add to Rox" works now.
      */
     canAdd: boolean;
     cannotAddReason?: null | WhatsAppCannotAdd;
@@ -26882,13 +26882,13 @@ export type PostChannelBotWebhookData = {
         /**
          * Preferred bot authentication token
          */
-        'x-macro-bot-token'?: string | null;
+        'x-rox-bot-token'?: string | null;
         /**
          * Legacy channel-scoped bot authentication token
          *
          * @deprecated
          */
-        'x-macro-channel-bot-token'?: string | null;
+        'x-rox-channel-bot-token'?: string | null;
     };
     path: {
         /**
@@ -31969,7 +31969,7 @@ export type RemoveFavoriteByEntityData = {
     body?: never;
     path: {
         /**
-         * The type of an entity in Macro
+         * The type of an entity in Rox
          */
         entity_type: 'user' | 'chat' | 'channel' | 'channel_message' | 'document' | 'project' | 'email_thread' | 'calendar_event' | 'team' | 'call' | 'foreign_entity' | 'static_file' | 'crm_company' | 'crm_contact' | 'crm_pipeline' | 'reminder' | 'harness' | 'skill' | 'agent_session' | 'scheduled_action' | 'initiative' | 'database' | 'database_row' | 'form' | 'external_chat';
         /**

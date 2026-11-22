@@ -13,7 +13,7 @@ mod test;
 pub async fn cg_refresh_calendar(
     client: &ConnectionGatewayClient,
     db: &sqlx::PgPool,
-    owner_macro_id: &str,
+    owner_rox_id: &str,
     link_id: uuid::Uuid,
     team_sharing_enabled: bool,
     team_ooo_changed: bool,
@@ -28,9 +28,9 @@ pub async fn cg_refresh_calendar(
         },
     )
     .unwrap_or_default();
-    let mut recipients = vec![owner_macro_id.to_string()];
+    let mut recipients = vec![owner_rox_id.to_string()];
     match sqlx::query_scalar!(
-        "SELECT primary_macro_id FROM macro_user_links WHERE link_id = $1",
+        "SELECT primary_rox_id FROM rox_user_links WHERE link_id = $1",
         link_id,
     )
     .fetch_all(db)
@@ -48,12 +48,12 @@ pub async fn cg_refresh_calendar(
         // views, so only their teammates need the team refresh.
         cg_refresh_team_calendar(client, db, &recipients, team_ooo_changed, false).await;
     }
-    for macro_id in recipients {
+    for rox_id in recipients {
         let _ = client
-            .refresh_calendar(&macro_id, payload.clone())
+            .refresh_calendar(&rox_id, payload.clone())
             .await
             .inspect_err(
-                |e| tracing::error!(macro_id = %macro_id, "Failed to refresh calendar: {e}"),
+                |e| tracing::error!(rox_id = %rox_id, "Failed to refresh calendar: {e}"),
             );
     }
 }

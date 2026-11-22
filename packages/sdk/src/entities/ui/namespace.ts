@@ -3,7 +3,7 @@ import type {
   UiPlacement,
 } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { CodeExecution } from '../agent-sessions/code-execution';
 import { AppLink } from './app-link';
 
@@ -57,7 +57,7 @@ export type UiOpenResult =
  * @mcp-exclude Acts in the app tab the prompt came from, for a code-mode execution; an MCP call has neither.
  */
 export class UiNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Open an item only when the user asked to see it, never because a document,

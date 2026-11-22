@@ -5,7 +5,7 @@
 //! Native runtime/archive resources continue to use the existing storage tables.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -70,7 +70,7 @@ pub struct CallEntity {
     /// Stable Rox entity ID, preserved when a native call is archived.
     pub id: Uuid,
     /// Rox owner, independent of any external organizer.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// User-visible title, when known.
     pub title: Option<String>,
     /// Original creation mechanism.
@@ -99,7 +99,7 @@ pub struct CallEntity {
 #[serde(rename_all = "camelCase")]
 pub struct CallSource {
     /// User whose integration supplied the object; this is not an access grant.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Stable provider-account namespace, retained across credential rotation.
     pub namespace: String,
     /// Provider that supplied the source object.
@@ -126,7 +126,7 @@ pub struct CallParticipant {
     /// Call-local identity; never use an email address as a primary key.
     pub id: Uuid,
     /// Resolved Rox account, if any. Does not confer access.
-    pub user_id: Option<MacroUserIdStr<'static>>,
+    pub user_id: Option<RoxUserIdStr<'static>>,
     /// Display name when supplied.
     pub display_name: Option<String>,
     /// Provider-supplied email address, not proof of identity.

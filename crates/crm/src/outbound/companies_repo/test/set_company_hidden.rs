@@ -5,11 +5,11 @@ use crate::domain::service::{CrmService, CrmServiceImpl};
 use crate::outbound::companies_repo::*;
 use crate::outbound::no_op_resolver::NoOpCompanyMetadataResolver;
 use entity_access::domain::models::EditAccessLevel;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_company_hidden_toggles_flag(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@test.com").await?;
@@ -27,7 +27,7 @@ async fn set_company_hidden_toggles_flag(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_company_hidden_returns_not_found_for_unknown_company(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -46,7 +46,7 @@ async fn set_company_hidden_returns_not_found_for_unknown_company(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_company_hidden_isolates_companies_across_teams(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -64,7 +64,7 @@ async fn set_company_hidden_isolates_companies_across_teams(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_set_company_hidden_true_soft_hides_contacts_and_disables_email_sync(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -96,7 +96,7 @@ async fn service_set_company_hidden_true_soft_hides_contacts_and_disables_email_
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn set_company_hidden_false_cascades_contacts_visible(pool: PgPool) -> anyhow::Result<()> {
     // After un-hide, every contact under the company becomes visible —
     // including ones an admin previously hid individually. Cascade
@@ -130,7 +130,7 @@ async fn set_company_hidden_false_cascades_contacts_visible(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn service_set_company_hidden_false_does_not_re_enable_email_sync(
     pool: PgPool,
 ) -> anyhow::Result<()> {

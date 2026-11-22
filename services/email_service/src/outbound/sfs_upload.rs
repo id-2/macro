@@ -59,10 +59,10 @@ impl SfsPhotoUploader for SfsPhotoUploadClient {
 pub struct PhotoSyncedGateway(pub ConnectionGatewayClient);
 
 impl PhotoSyncedNotifier for PhotoSyncedGateway {
-    async fn photo_synced(&self, macro_id: &str, link_id: Uuid) {
+    async fn photo_synced(&self, rox_id: &str, link_id: Uuid) {
         cg_refresh_email(
             &self.0,
-            macro_id,
+            rox_id,
             RefreshEmailEvent::PhotoSynced { link_id },
         )
         .await;

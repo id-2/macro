@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT macro_user_id, profile_picture as \"profile_picture!\", profile_picture_hash FROM macro_user_info\n        WHERE macro_user_id = ANY($1) and profile_picture IS NOT NULL\n        ",
+  "query": "\n        SELECT rox_user_id, profile_picture as \"profile_picture!\", profile_picture_hash FROM rox_user_info\n        WHERE rox_user_id = ANY($1) and profile_picture IS NOT NULL\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "macro_user_id",
+        "name": "rox_user_id",
         "type_info": "Uuid"
       },
       {

@@ -8,10 +8,10 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
 use harness_id::HarnessId;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -159,12 +159,12 @@ impl CredentialRejectedResponse {
 /// Router state for model discovery.
 pub struct AgentModelsRouterState<Service, Auth> {
     service: Arc<Service>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Service, Auth> AgentModelsRouterState<Service, Auth> {
     /// Build model-discovery route state.
-    pub fn new(service: Arc<Service>, authorization: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<Service>, authorization: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization,
@@ -182,7 +182,7 @@ impl<Service, Auth> Clone for AgentModelsRouterState<Service, Auth> {
 }
 
 impl<Service, Auth> FromRef<AgentModelsRouterState<Service, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &AgentModelsRouterState<Service, Auth>) -> Self {
         state.authorization.clone()
@@ -195,7 +195,7 @@ pub fn agent_models_router<Service, Auth, S>(
 ) -> Router<S>
 where
     Service: AgentModelsService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -225,12 +225,12 @@ where
 )]
 pub async fn load_agent_models_handler<Service, Auth>(
     State(state): State<AgentModelsRouterState<Service, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOnly>,
     Json(request): Json<LoadAgentModelsRequest>,
 ) -> Response
 where
     Service: AgentModelsService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let request = match request.try_into() {
         Ok(request) => request,
@@ -238,7 +238,7 @@ where
     };
     match state
         .service
-        .load(authorization.authorization.macro_user_id.clone(), request)
+        .load(authorization.authorization.rox_user_id.clone(), request)
         .await
     {
         Ok(models) => (StatusCode::OK, Json(LoadAgentModelsResponse::from(models))).into_response(),

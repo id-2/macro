@@ -1083,7 +1083,7 @@ test('a browser hands WhatsApp’s passkey step to Rox desktop by pairing id', a
   await expect(dialog.getByText('Confirm on your desktop')).toBeVisible();
   await expect(
     dialog.getByRole('link', { name: 'Continue in Rox desktop' })
-  ).toHaveAttribute('href', 'macro:///external?whatsappPairing=pairing-1');
+  ).toHaveAttribute('href', 'rox:///external?whatsappPairing=pairing-1');
   expect(state.passkeyAnswers).toEqual([]);
 });
 

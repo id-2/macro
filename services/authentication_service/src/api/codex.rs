@@ -9,12 +9,12 @@ use axum::{
     routing::{get, post, put},
 };
 use codex_connection::domain::{ConnectionError, ConnectionStatus, LoginStatus};
-use macro_authorization::{MacroAuthorizationExtractor, UserOnly};
+use rox_authorization::{RoxAuthorizationExtractor, UserOnly};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-type User = MacroAuthorizationExtractor<AuthorizationService, UserOnly>;
+type User = RoxAuthorizationExtractor<AuthorizationService, UserOnly>;
 
 /// Safe connection metadata; no secret or masked token is returned.
 #[derive(Serialize, Deserialize, ToSchema)]
@@ -164,7 +164,7 @@ pub async fn status(
         ctx.codex_connection
             .as_ref()
             .ok_or(ApiError::Unavailable)?
-            .status(user.authorization.macro_user_id.as_ref())
+            .status(user.authorization.rox_user_id.as_ref())
             .await?
             .into(),
     ))
@@ -178,7 +178,7 @@ pub async fn start_login(
         .codex_connection
         .as_ref()
         .ok_or(ApiError::Unavailable)?
-        .start_login(user.authorization.macro_user_id.as_ref())
+        .start_login(user.authorization.rox_user_id.as_ref())
         .await?;
     Ok(Json(CodexLoginStart {
         attempt_id: started.attempt_id,
@@ -198,7 +198,7 @@ pub async fn poll_login(
         .codex_connection
         .as_ref()
         .ok_or(ApiError::Unavailable)?
-        .poll_login(user.authorization.macro_user_id.as_ref(), id)
+        .poll_login(user.authorization.rox_user_id.as_ref(), id)
         .await?;
     Ok(Json(CodexLoginPoll {
         status: match status {
@@ -218,7 +218,7 @@ pub async fn cancel_login(
     ctx.codex_connection
         .as_ref()
         .ok_or(ApiError::Unavailable)?
-        .cancel_login(user.authorization.macro_user_id.as_ref(), id)
+        .cancel_login(user.authorization.rox_user_id.as_ref(), id)
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -227,7 +227,7 @@ pub async fn disconnect(State(ctx): State<ApiContext>, user: User) -> Result<Sta
     ctx.codex_connection
         .as_ref()
         .ok_or(ApiError::Unavailable)?
-        .disconnect(user.authorization.macro_user_id.as_ref())
+        .disconnect(user.authorization.rox_user_id.as_ref())
         .await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -240,7 +240,7 @@ pub async fn environments(
         ctx.codex_connection
             .as_ref()
             .ok_or(ApiError::Unavailable)?
-            .environments(user.authorization.macro_user_id.as_ref())
+            .environments(user.authorization.rox_user_id.as_ref())
             .await?
             .into_iter()
             .map(|environment| CodexEnvironment {
@@ -270,7 +270,7 @@ pub async fn configure(
             .as_ref()
             .ok_or(ApiError::Unavailable)?
             .configure(
-                user.authorization.macro_user_id.as_ref(),
+                user.authorization.rox_user_id.as_ref(),
                 &request.environment_id,
             )
             .await?

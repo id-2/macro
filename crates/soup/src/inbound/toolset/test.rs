@@ -26,7 +26,7 @@ fn test_list_entities_schema_validation() {
 }
 
 #[test]
-fn test_list_entities_schema_guides_macro_task_queries() {
+fn test_list_entities_schema_guides_rox_task_queries() {
     let validated = generate_validated_input_schema::<ListEntities>().unwrap();
     let schema_json = serde_json::to_string(&validated.schema).unwrap();
 
@@ -45,7 +45,7 @@ fn test_list_entities_schema_guides_macro_task_queries() {
 }
 
 #[test]
-fn test_macro_task_completed_assigned_to_me_filter_deserializes() {
+fn test_rox_task_completed_assigned_to_me_filter_deserializes() {
     let input = serde_json::json!({
         "includeTypes": ["document"],
         "df": {

@@ -11,7 +11,7 @@ pub trait ExecutionTurns: Send + Sync + 'static {
     async fn active(
         &self,
         session: AgentSessionId,
-    ) -> Result<Option<macro_uuid::Uuid>, CodeModeError>;
+    ) -> Result<Option<rox_uuid::Uuid>, CodeModeError>;
 }
 
 /// Authorize a run and mint a short-lived user credential before starting Deno.

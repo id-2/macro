@@ -3,7 +3,7 @@
 
 use super::{jid::PhoneNumber, models::*, ports::*};
 use external_chat::domain::{models::*, ports::ExternalChatResult};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ impl WhatsAppService {
     }
 
     /// Personal settings never depend on workspace administration.
-    pub async fn account(&self, user: &MacroUserIdStr<'_>) -> ExternalChatResult<Option<Account>> {
+    pub async fn account(&self, user: &RoxUserIdStr<'_>) -> ExternalChatResult<Option<Account>> {
         self.accounts.owned_account(user).await
     }
 
@@ -38,7 +38,7 @@ impl WhatsAppService {
     #[tracing::instrument(name = "whatsapp.linked.connect", skip_all, err, fields(replace = replace, pairing_id, account_id))]
     pub async fn connect(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         replace: bool,
         authority: SendAuthority,
     ) -> ExternalChatResult<Pairing> {
@@ -53,7 +53,7 @@ impl WhatsAppService {
     /// Poll the initiating person's transaction, including secret enrollment material.
     pub async fn pair_state(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         pairing: Uuid,
         authority: SendAuthority,
     ) -> ExternalChatResult<PairState> {
@@ -66,7 +66,7 @@ impl WhatsAppService {
     #[tracing::instrument(name = "whatsapp.linked.passkey", skip_all, err, fields(pairing_id = %pairing))]
     pub async fn passkey(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         pairing: Uuid,
         response: &serde_json::Value,
         authority: SendAuthority,
@@ -82,7 +82,7 @@ impl WhatsAppService {
     #[tracing::instrument(name = "whatsapp.linked.cancel_pairing", skip_all, err, fields(pairing_id = %pairing))]
     pub async fn cancel(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         pairing: Uuid,
         authority: SendAuthority,
     ) -> ExternalChatResult<()> {
@@ -94,7 +94,7 @@ impl WhatsAppService {
     #[tracing::instrument(name = "whatsapp.linked.disconnect", skip_all, err, fields(generation = generation))]
     pub async fn disconnect(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         generation: i64,
         authority: SendAuthority,
     ) -> ExternalChatResult<Disconnect> {
@@ -116,7 +116,7 @@ impl WhatsAppService {
         err,
         fields(count, account_id)
     )]
-    pub async fn chats(&self, user: &MacroUserIdStr<'_>) -> ExternalChatResult<ChatList> {
+    pub async fn chats(&self, user: &RoxUserIdStr<'_>) -> ExternalChatResult<ChatList> {
         let (account, identity) = connected(self.accounts.as_ref(), user).await?;
         tracing::Span::current().record("account_id", tracing::field::display(account.id));
         self.groups.request_groups_refresh(&[account.id]).await?;
@@ -228,7 +228,7 @@ impl WhatsAppService {
     )]
     pub async fn lookup(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         phone_number: &str,
         authority: SendAuthority,
     ) -> ExternalChatResult<Lookup> {
@@ -256,7 +256,7 @@ impl WhatsAppService {
     )]
     pub async fn import_history(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         authority: SendAuthority,
     ) -> ExternalChatResult<HistoryImport> {
         human(authority)?;
@@ -271,7 +271,7 @@ impl WhatsAppService {
     /// Poll the owner's lookup.
     pub async fn lookup_state(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         lookup: Uuid,
         authority: SendAuthority,
     ) -> ExternalChatResult<Lookup> {
@@ -307,7 +307,7 @@ fn human(authority: SendAuthority) -> ExternalChatResult<()> {
 /// The person's connected account and its verified identity.
 pub(crate) async fn connected(
     accounts: &dyn AccountRepository,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
 ) -> ExternalChatResult<(Account, String)> {
     let account = accounts
         .owned_account(user)
@@ -324,7 +324,7 @@ pub(crate) async fn connected(
 /// The caller's own external chat for a WhatsApp chat, else someone else's
 /// external chat for it that was shared with them.
 fn adoption_of(
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     adoptions: &[VisibleAdoption],
     jid: &str,
 ) -> (Option<ChatReference>, Option<SharedChatReference>) {

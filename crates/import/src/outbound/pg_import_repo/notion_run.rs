@@ -7,8 +7,8 @@ use std::time::Duration;
 use agent_session::domain::model::AgentSessionId;
 use agent_session::domain::notifications::PendingNotification;
 use import_notion::domain::model::ImportScope;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{PgImportRepo, run_status_strings};
@@ -29,7 +29,7 @@ struct WrittenDbRow {
     import_id: Uuid,
     kind: String,
     object: String,
-    macro_id: Uuid,
+    rox_id: Uuid,
 }
 
 impl TryFrom<WrittenDbRow> for WrittenObject {
@@ -41,7 +41,7 @@ impl TryFrom<WrittenDbRow> for WrittenObject {
             kind: WrittenKind::from_str(&row.kind)
                 .map_err(|_| anyhow::anyhow!("unknown written kind: {}", row.kind))?,
             object: row.object,
-            macro_id: row.macro_id,
+            rox_id: row.rox_id,
         })
     }
 }
@@ -57,7 +57,7 @@ impl NotionRunRepo for PgImportRepo {
     #[tracing::instrument(skip(self, job), err)]
     async fn take_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         owner: Uuid,
         lease: Duration,
         job: &NotionJob,
@@ -100,7 +100,7 @@ impl NotionRunRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn renew_lease(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         owner: Uuid,
         lease: Duration,
     ) -> Result<bool> {
@@ -123,7 +123,7 @@ impl NotionRunRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn release_lease(&self, user: &MacroUserIdStr<'static>, owner: Uuid) -> Result<bool> {
+    async fn release_lease(&self, user: &RoxUserIdStr<'static>, owner: Uuid) -> Result<bool> {
         // Lapsed as of now, so the next adopter takes it straight away.
         let result = sqlx::query!(
             r#"
@@ -143,7 +143,7 @@ impl NotionRunRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn adopt_stalled_runs(
         &self,
-        user: Option<&MacroUserIdStr<'static>>,
+        user: Option<&RoxUserIdStr<'static>>,
         owner: Uuid,
         lease: Duration,
         stale_after: Duration,
@@ -184,7 +184,7 @@ impl NotionRunRepo for PgImportRepo {
         .await?;
         let mut adopted = Vec::with_capacity(rows.len());
         for row in rows {
-            let user = MacroUserIdStr::parse_from_str(&row.user_id)
+            let user = RoxUserIdStr::parse_from_str(&row.user_id)
                 .map_err(|error| anyhow::anyhow!("unparseable import run user: {error:?}"))?
                 .into_owned();
             let status = RunStatus::from_str(&row.status)
@@ -221,7 +221,7 @@ impl NotionRunRepo for PgImportRepo {
     #[tracing::instrument(skip(self, event), fields(notified = tracing::field::Empty), err)]
     async fn transition_reviewed_run<Event>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         from: &[RunStatus],
         to: RunStatus,
         error: Option<&str>,
@@ -278,7 +278,7 @@ impl NotionRunRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn root_folder(&self, user: &MacroUserIdStr<'static>) -> Result<Option<Uuid>> {
+    async fn root_folder(&self, user: &RoxUserIdStr<'static>) -> Result<Option<Uuid>> {
         let folder = sqlx::query_scalar!(
             r#"SELECT root_folder_id FROM import_run WHERE user_id = $1 AND source = $2"#,
             user.as_ref(),
@@ -290,7 +290,7 @@ impl NotionRunRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn set_root_folder(&self, user: &MacroUserIdStr<'static>, folder: Uuid) -> Result<()> {
+    async fn set_root_folder(&self, user: &RoxUserIdStr<'static>, folder: Uuid) -> Result<()> {
         sqlx::query!(
             r#"UPDATE import_run SET root_folder_id = $2 WHERE user_id = $1 AND source = $3"#,
             user.as_ref(),
@@ -303,7 +303,7 @@ impl NotionRunRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn settle_importing(&self, user: &MacroUserIdStr<'static>, reason: &str) -> Result<u64> {
+    async fn settle_importing(&self, user: &RoxUserIdStr<'static>, reason: &str) -> Result<u64> {
         let mut transaction = self.pool.begin().await?;
         let settled = sqlx::query_scalar!(
             r#"
@@ -338,13 +338,13 @@ impl WrittenObjects for PgImportRepo {
     #[tracing::instrument(skip(self, import_ids), fields(rows = import_ids.len()), err)]
     async fn written(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_ids: &[Uuid],
     ) -> Result<Vec<WrittenObject>> {
         let rows = sqlx::query_as!(
             WrittenDbRow,
             r#"
-            SELECT written.import_id, written.kind, written.object, written.macro_id
+            SELECT written.import_id, written.kind, written.object, written.rox_id
             FROM import_entity_written AS written
             JOIN import_entity AS entity ON entity.id = written.import_id
             WHERE entity.user_id = $1 AND written.import_id = ANY($2::uuid[])
@@ -360,7 +360,7 @@ impl WrittenObjects for PgImportRepo {
     #[tracing::instrument(skip(self, objects), fields(objects = objects.len()), err)]
     async fn record_written(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         objects: &[WrittenObject],
     ) -> Result<Vec<WrittenObject>> {
         if objects.is_empty() {
@@ -372,7 +372,7 @@ impl WrittenObjects for PgImportRepo {
             .map(|object| object.kind.as_ref().to_string())
             .collect();
         let names: Vec<String> = objects.iter().map(|object| object.object.clone()).collect();
-        let macro_ids: Vec<Uuid> = objects.iter().map(|object| object.macro_id).collect();
+        let rox_ids: Vec<Uuid> = objects.iter().map(|object| object.rox_id).collect();
         // The final SELECT sees the table as it was before the insert, so an
         // object comes back either as inserted now or as recorded earlier.
         let rows = sqlx::query_as!(
@@ -380,21 +380,21 @@ impl WrittenObjects for PgImportRepo {
             r#"
             WITH input AS (
                 SELECT * FROM UNNEST($2::uuid[], $3::text[], $4::text[], $5::uuid[])
-                    AS input(import_id, kind, object, macro_id)
+                    AS input(import_id, kind, object, rox_id)
             ),
             inserted AS (
-                INSERT INTO import_entity_written (import_id, kind, object, macro_id)
-                SELECT input.import_id, input.kind, input.object, input.macro_id
+                INSERT INTO import_entity_written (import_id, kind, object, rox_id)
+                SELECT input.import_id, input.kind, input.object, input.rox_id
                 FROM input
                 JOIN import_entity AS entity ON entity.id = input.import_id AND entity.user_id = $1
                 ON CONFLICT (import_id, kind, object) DO NOTHING
-                RETURNING import_id, kind, object, macro_id
+                RETURNING import_id, kind, object, rox_id
             )
             SELECT import_id AS "import_id!", kind AS "kind!", object AS "object!",
-                   macro_id AS "macro_id!"
+                   rox_id AS "rox_id!"
             FROM inserted
             UNION ALL
-            SELECT written.import_id, written.kind, written.object, written.macro_id
+            SELECT written.import_id, written.kind, written.object, written.rox_id
             FROM import_entity_written AS written
             JOIN input USING (import_id, kind, object)
             JOIN import_entity AS entity ON entity.id = written.import_id AND entity.user_id = $1
@@ -403,7 +403,7 @@ impl WrittenObjects for PgImportRepo {
             &import_ids,
             &kinds,
             &names,
-            &macro_ids,
+            &rox_ids,
         )
         .fetch_all(&self.pool)
         .await?;

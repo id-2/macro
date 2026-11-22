@@ -1,15 +1,15 @@
 import {
-  MACRO_AGENT_NAME,
-  MACRO_AGENT_PRINCIPAL_ID,
+  ROX_AGENT_NAME,
+  ROX_AGENT_PRINCIPAL_ID,
 } from '@core/constant/macroAgent';
 import {
-  MACRO_CODER_NAME,
-  MACRO_CODER_PRINCIPAL_ID,
+  ROX_CODER_NAME,
+  ROX_CODER_PRINCIPAL_ID,
 } from '@core/constant/macroCoder';
 import {
-  MACRO_SYSTEM_BOT_ID,
-  MACRO_SYSTEM_NAME,
-  MACRO_SYSTEM_PRINCIPAL_ID,
+  ROX_SYSTEM_BOT_ID,
+  ROX_SYSTEM_NAME,
+  ROX_SYSTEM_PRINCIPAL_ID,
 } from '@core/constant/macroSystem';
 import { describe, expect, it } from 'vitest';
 import {
@@ -123,14 +123,14 @@ describe('message sender normalization', () => {
   });
 
   it('resolves built-in agent names without channel bot data', () => {
-    expect(getBotDisplayName(MACRO_CODER_PRINCIPAL_ID)).toBe(MACRO_CODER_NAME);
+    expect(getBotDisplayName(ROX_CODER_PRINCIPAL_ID)).toBe(ROX_CODER_NAME);
   });
 
   it('names the system principal without channel bot data', () => {
-    expect(getBotDisplayName(MACRO_SYSTEM_PRINCIPAL_ID)).toBe(
-      MACRO_SYSTEM_NAME
+    expect(getBotDisplayName(ROX_SYSTEM_PRINCIPAL_ID)).toBe(
+      ROX_SYSTEM_NAME
     );
-    expect(firstPartyBotName(MACRO_SYSTEM_BOT_ID)).toBe(MACRO_SYSTEM_NAME);
+    expect(firstPartyBotName(ROX_SYSTEM_BOT_ID)).toBe(ROX_SYSTEM_NAME);
     expect(firstPartyBotName('00000000-0000-0000-0000-000000000002')).toBe(
       undefined
     );
@@ -141,8 +141,8 @@ describe('message sender normalization', () => {
       id: 'reply-1',
       parent: { type: 'channel', id: 'channel-1' },
       mentions: [],
-      sender_id: MACRO_AGENT_PRINCIPAL_ID,
-      bot_profile: { name: MACRO_AGENT_NAME },
+      sender_id: ROX_AGENT_PRINCIPAL_ID,
+      bot_profile: { name: ROX_AGENT_NAME },
       triggered_by: 'macro|alice@example.com',
       triggered_via: 'Claude Code',
       content: 'posted from Claude Code',
@@ -155,7 +155,7 @@ describe('message sender normalization', () => {
     expect(getBotDisplayName(message.sender_id, message.sender)).toBe(
       'Claude Code'
     );
-    expect(getBotDisplayName(MACRO_AGENT_PRINCIPAL_ID)).toBe(MACRO_AGENT_NAME);
+    expect(getBotDisplayName(ROX_AGENT_PRINCIPAL_ID)).toBe(ROX_AGENT_NAME);
   });
 
   it('uses a generic label rather than exposing an unknown bot UUID', () => {

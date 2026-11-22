@@ -1,4 +1,4 @@
-import { MACRO_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
+import { ROX_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
 import { createRoot } from 'solid-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useRoutinePromptMentionUsers } from './routine-prompt-mention-users';
@@ -65,13 +65,13 @@ describe('useRoutinePromptMentionUsers', () => {
       const users = useRoutinePromptMentionUsers();
       expect(users().map((user) => user.id)).toEqual([
         'macro|person@example.com',
-        MACRO_AGENT_PRINCIPAL_ID,
+        ROX_AGENT_PRINCIPAL_ID,
       ]);
 
       state.agents = [savedAgent('saved-agent', 'Saved', 'none')];
       expect(users().map((user) => user.id)).toEqual([
         'macro|person@example.com',
-        MACRO_AGENT_PRINCIPAL_ID,
+        ROX_AGENT_PRINCIPAL_ID,
         'bot|saved-agent',
       ]);
       dispose();

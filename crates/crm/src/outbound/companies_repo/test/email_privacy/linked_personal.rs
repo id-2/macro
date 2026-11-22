@@ -11,9 +11,9 @@ use entity_access::{
     domain::{models::EntityType, ports::EntityAccessService, service::EntityAccessServiceImpl},
     outbound::PgAccessRepository,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn linked_personal_parent_consent_and_domain_matrix(pool: PgPool) -> anyhow::Result<()> {
     let member = "macro|member@example.com";
     let reader_team = Uuid::now_v7();
@@ -25,7 +25,7 @@ async fn linked_personal_parent_consent_and_domain_matrix(pool: PgPool) -> anyho
     )
     .execute(&pool)
     .await?;
-    let reader = MacroUserIdStr::try_from(member.to_string()).unwrap();
+    let reader = RoxUserIdStr::try_from(member.to_string()).unwrap();
     let access = EntityAccessServiceImpl::new(PgAccessRepository::new(pool.clone()));
     for (index, (case, parent_enabled, consent, block)) in [
         ("enabled", true, true, None),
@@ -225,7 +225,7 @@ async fn linked_personal_parent_consent_and_domain_matrix(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reassignment_waits_for_population_then_blocks_disabled_parent_writes(
     pool: PgPool,
 ) -> anyhow::Result<()> {

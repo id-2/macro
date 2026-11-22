@@ -3,7 +3,7 @@ import { useCurrentTeamQuery } from '@queries/team/teams';
 import { type Accessor, createEffect, createMemo } from 'solid-js';
 import { createAssertedContextProvider } from './createContext';
 
-export const MACRO_TEAM_SLUG = 'MACRO';
+export const ROX_TEAM_SLUG = 'MACRO';
 
 type TeamContextValue = {
   isMacroTeam: Accessor<boolean>;
@@ -17,7 +17,7 @@ export const [TeamContextProvider, useTeamContext] =
     // provider wraps the whole app.
     const isMacroTeam = createMemo(
       () =>
-        currentTeam.isSuccess && currentTeam.data?.team.slug === MACRO_TEAM_SLUG
+        currentTeam.isSuccess && currentTeam.data?.team.slug === ROX_TEAM_SLUG
     );
 
     // Keep the PostHog team group in step with membership: creating, joining,

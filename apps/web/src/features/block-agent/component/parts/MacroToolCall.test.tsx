@@ -5,7 +5,7 @@
 import { fireEvent, render, screen } from '@solidjs/testing-library';
 import { createSignal } from 'solid-js';
 import { describe, expect, it, vi } from 'vitest';
-import { MacroToolCall } from './MacroToolCall';
+import { RoxToolCall } from './RoxToolCall';
 import type { ToolCallContext } from './shared';
 
 vi.mock('@app/lib/analytics/posthog', () => ({
@@ -20,12 +20,12 @@ const context: ToolCallContext = {
   followedBy: () => false,
 };
 
-describe('MacroToolCall failures', () => {
+describe('RoxToolCall failures', () => {
   it('shows a failed call on its own card and reveals the reason on request', () => {
     const reason =
       'The calendar event no longer exists: it was deleted or cancelled, or the id is not a calendar event.';
     render(() => (
-      <MacroToolCall
+      <RoxToolCall
         detail={{
           kind: 'macro',
           input: { eventId: '01a16cb6-0000-7000-8000-00000000dead' },
@@ -54,7 +54,7 @@ describe('MacroToolCall failures', () => {
   });
 });
 
-describe('MacroToolCall unfinished calls', () => {
+describe('RoxToolCall unfinished calls', () => {
   const readEvent = {
     kind: 'macro' as const,
     input: { eventId: '01a16cb6-0000-7000-8000-000000000001' },
@@ -64,7 +64,7 @@ describe('MacroToolCall unfinished calls', () => {
 
   it('shows a running call by its own label while it runs', () => {
     render(() => (
-      <MacroToolCall
+      <RoxToolCall
         detail={readEvent}
         common={{
           id: 'call-1',
@@ -85,7 +85,7 @@ describe('MacroToolCall unfinished calls', () => {
 
   it('says a call cut off by its turn was stopped, by its own label', () => {
     render(() => (
-      <MacroToolCall
+      <RoxToolCall
         detail={readEvent}
         common={{
           id: 'call-1',
@@ -107,7 +107,7 @@ describe('MacroToolCall unfinished calls', () => {
   it("shows a running call's latest arguments when the harness replaces them", () => {
     const [query, setQuery] = createSignal('first draft');
     render(() => (
-      <MacroToolCall
+      <RoxToolCall
         detail={{
           kind: 'macro',
           input: { query: query() },
@@ -135,7 +135,7 @@ describe('MacroToolCall unfinished calls', () => {
 
   it('keeps a running call whose arguments are still arriving on the summary row', () => {
     render(() => (
-      <MacroToolCall
+      <RoxToolCall
         detail={{ ...readEvent, input: {} }}
         common={{
           id: 'call-1',

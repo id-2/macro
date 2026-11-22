@@ -1,5 +1,5 @@
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, UserOnly};
+use rox_authorization::{RoxAuthorizationExtractor, UserOnly};
 
 use super::{CursorApiKeyError, CursorApiKeyStatus};
 use crate::api::context::{ApiContext, AuthorizationService};
@@ -18,12 +18,12 @@ use crate::api::context::{ApiContext, AuthorizationService};
         (status = 403, body = model::response::ErrorResponse),
     )
 )]
-#[tracing::instrument(skip(ctx, user_context), err, fields(user_id = %user_context.authorization.macro_user_id))]
+#[tracing::instrument(skip(ctx, user_context), err, fields(user_id = %user_context.authorization.rox_user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOnly>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOnly>,
 ) -> Result<Json<CursorApiKeyStatus>, CursorApiKeyError> {
-    let user_id = &user_context.authorization.macro_user_id;
+    let user_id = &user_context.authorization.rox_user_id;
 
     // Read even when the deployment has no KMS key: a key registered before the
     // deployment lost its configuration is still stored, and reporting it as

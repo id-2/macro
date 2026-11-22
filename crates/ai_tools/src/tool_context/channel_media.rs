@@ -11,8 +11,8 @@ pub fn build_channel_media_upload_tool_context() -> anyhow::Result<ToolChannelMe
 {
     Ok(with_client(
         static_file_service_client::StaticFileServiceClient::new(
-            macro_auth::InternalApiKey::new()?.to_string(),
-            macro_service_urls::StaticFileServiceUrl::new()?.to_string(),
+            rox_auth::InternalApiKey::new()?.to_string(),
+            rox_service_urls::StaticFileServiceUrl::new()?.to_string(),
         ),
     ))
 }

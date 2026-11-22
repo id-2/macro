@@ -31,7 +31,7 @@ key issuance, and account merge/link flows.
   at `/team_agents`, plus its internal enrollment route; computer-facing
   addresses come from `outbound/agent_addresses.rs`).
 - Not here: authorization/permission decisions on other entities →
-  `crates/macro_authorization`; metered AI credits → `crates/ai_billing`;
+  `crates/rox_authorization`; metered AI credits → `crates/ai_billing`;
   team lifecycle and seats → `crates/teams`; a person's interface language
   (`/user/language`) → `crates/user_language`.
 

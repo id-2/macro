@@ -2,7 +2,7 @@
 //! swapped for a new one, and the copy is written as one batch that also
 //! creates the database.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::views::{CardPosition, ViewLayout};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
@@ -118,7 +118,7 @@ fn copy_name(name: &str) -> String {
 fn plan(
     source: &Source,
     copy: &Database,
-    created_by: MacroUserIdStr<'static>,
+    created_by: RoxUserIdStr<'static>,
 ) -> Result<Writes, DatabaseError> {
     let mut remap = Remap(HashMap::from([(
         source.database.id.into_uuid(),
@@ -479,7 +479,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     /// Read the source whole: schema, views, card places, rows and cells.
     async fn duplicate_source(
@@ -613,13 +613,13 @@ where
     Cells: CellStore + DatabaseDuplicateRepo,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     #[tracing::instrument(skip(self, receipt, owner, acting_bot, name), fields(database_id = %receipt.entity().entity_id, copy_id = tracing::field::Empty, tables = tracing::field::Empty, rows = tracing::field::Empty), err)]
     async fn duplicate_database(
         &self,
         receipt: EntityAccessReceipt<ViewAccessLevel>,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         acting_bot: Option<bot_id::BotId>,
         name: Option<String>,
     ) -> Result<Database, DatabaseError> {

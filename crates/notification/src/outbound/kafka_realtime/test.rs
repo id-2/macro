@@ -1,10 +1,10 @@
 use std::sync::{Arc, Mutex};
 
 use chrono::Utc;
-use macro_event_broker::{
-    EventBrokerError, EventPublisher, MacroEvent, MacroEventBrokerService, Spawner,
+use rox_event_broker::{
+    EventBrokerError, EventPublisher, RoxEvent, RoxEventBrokerService, Spawner,
 };
-use macro_event_topics::Topic;
+use rox_event_topics::Topic;
 use model_entity::EntityType;
 use serde::ser::Error as _;
 use uuid::Uuid;
@@ -58,8 +58,8 @@ impl Spawner for TokioSpawner {
     }
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn notification() -> RealtimeNotif<serde_json::Value> {
@@ -85,7 +85,7 @@ fn notification() -> RealtimeNotif<serde_json::Value> {
 #[tokio::test]
 async fn publishes_one_event_per_call_with_all_recipients() {
     let records = Arc::new(Mutex::new(Vec::new()));
-    let sender = KafkaRealtimeSender::new(MacroEventBrokerService::new(
+    let sender = KafkaRealtimeSender::new(RoxEventBrokerService::new(
         RecordingPublisher {
             records: records.clone(),
             fail: false,
@@ -108,7 +108,7 @@ async fn publishes_one_event_per_call_with_all_recipients() {
     assert_eq!(records.len(), 1);
 
     let record = &records[0];
-    assert_eq!(record.topic, "macro.notifications");
+    assert_eq!(record.topic, "rox.notifications");
     let expected_metadata = WebSocketNotificationMetadata {
         notifications: recipients
             .iter()
@@ -157,7 +157,7 @@ async fn publishes_one_event_per_call_with_all_recipients() {
 #[tokio::test]
 async fn empty_recipients_still_publishes_one_event() {
     let records = Arc::new(Mutex::new(Vec::new()));
-    let sender = KafkaRealtimeSender::new(MacroEventBrokerService::new(
+    let sender = KafkaRealtimeSender::new(RoxEventBrokerService::new(
         RecordingPublisher {
             records: records.clone(),
             fail: false,
@@ -179,7 +179,7 @@ async fn empty_recipients_still_publishes_one_event() {
 
 #[tokio::test]
 async fn propagates_publish_failures() {
-    let sender = KafkaRealtimeSender::new(MacroEventBrokerService::new(
+    let sender = KafkaRealtimeSender::new(RoxEventBrokerService::new(
         RecordingPublisher {
             records: Arc::new(Mutex::new(Vec::new())),
             fail: true,
@@ -207,7 +207,7 @@ impl Serialize for SerializationFailure {
 #[tokio::test]
 async fn propagates_serialization_failures_without_publishing() {
     let records = Arc::new(Mutex::new(Vec::new()));
-    let sender = KafkaRealtimeSender::new(MacroEventBrokerService::new(
+    let sender = KafkaRealtimeSender::new(RoxEventBrokerService::new(
         RecordingPublisher {
             records: records.clone(),
             fail: false,

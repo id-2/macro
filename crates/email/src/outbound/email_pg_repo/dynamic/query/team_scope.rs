@@ -120,8 +120,8 @@ const ALLOWED: &str = r#"
                                 WHERE substr(participant.domain, dot, 1) = '.'
                             ) suffix
                             WHERE (suffix.suffix IN (SELECT suffix FROM team_blocked)) IS TRUE
-                               OR ((cb.macro_id, suffix.suffix)
-                                   IN (SELECT macro_id, suffix FROM personal_blocked)) IS TRUE
+                               OR ((cb.rox_id, suffix.suffix)
+                                   IN (SELECT rox_id, suffix FROM personal_blocked)) IS TRUE
                         )
                   )"#;
 
@@ -402,20 +402,20 @@ impl<'a> TeamRead<'a> {
         builder.push(
             r#"
         WITH contributing AS MATERIALIZED (
-            SELECT l.id AS link_id, l.macro_id
+            SELECT l.id AS link_id, l.rox_id
             FROM email_links l
             JOIN crm_email_consent consent
               ON consent.team_id = "#,
         );
         builder.push_bind(self.team_id);
         builder.push(
-            r#" AND consent.user_id = l.macro_id
+            r#" AND consent.user_id = l.rox_id
              AND consent.link_id = l.id AND consent.enabled
             JOIN team_user member ON member.team_id = "#,
         );
         builder.push_bind(self.team_id);
         builder.push(
-            r#" AND member.user_id = l.macro_id
+            r#" AND member.user_id = l.rox_id
             WHERE l.id = ANY("#,
         );
         builder.push_bind(self.inboxes.clone());
@@ -438,13 +438,13 @@ impl<'a> TeamRead<'a> {
             r#" AND NOT c.email_sync
         ),
         personal_blocked AS MATERIALIZED (
-            SELECT b.user_id AS macro_id, lower(b.domain) AS suffix
+            SELECT b.user_id AS rox_id, lower(b.domain) AS suffix
             FROM crm_personal_email_blocklist b
             WHERE b.team_id = "#,
         );
         builder.push_bind(self.team_id);
         builder.push(
-            r#" AND b.user_id IN (SELECT macro_id FROM contributing)
+            r#" AND b.user_id IN (SELECT rox_id FROM contributing)
         )"#,
         );
         if stream == Stream::Superset {

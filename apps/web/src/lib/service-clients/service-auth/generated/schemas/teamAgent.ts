@@ -29,6 +29,6 @@ export interface TeamAgent {
   status: TeamAgentStatus;
   /** Team the agent belongs to. */
   teamId: string;
-  /** The agent's Macro user id (`macro|<email>`). */
+  /** The agent's Rox user id (`macro|<email>`). */
   userId: string;
 }

@@ -8,7 +8,7 @@ use entity_access::{
     domain::{models::MemberTeamRole, ports::EntityAccessService},
     inbound::axum_extractors::OptionalMacroUserTeamExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 
 use crate::domain::{
@@ -33,7 +33,7 @@ use super::TeamRouterState;
     ),
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: TeamService, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn handler<T: TeamService, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
     access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<TeamRouterState<T, Eas, Auth>>,
 ) -> Result<Response, TeamError> {

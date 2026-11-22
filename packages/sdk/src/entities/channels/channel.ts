@@ -9,7 +9,7 @@ import type {
 } from '../../../generated/storage/types.gen';
 import { type RichMessage, toBody } from '../../mentions';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { AgentConversation } from '../agent-sessions/conversation';
 import { Bot } from '../bots/bot';
 import { CallRecord } from '../calls/call-record';
@@ -169,12 +169,12 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
   }
 
   /** A handle to a channel by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Channel {
+  static byId(client: RoxClient, id: string): Channel {
     return new Channel(client, id);
   }
 
   /** Open (creating if needed) the DM channel with a user. */
-  static async dm(client: MacroClient, recipient: User): Promise<Channel> {
+  static async dm(client: RoxClient, recipient: User): Promise<Channel> {
     const { channel_id } = unwrap(
       await client.storage.getOrCreateDm({
         body: { recipient_id: recipient.id },
@@ -185,7 +185,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
 
   /** Open (creating if needed) the group direct message with exactly these people, excluding the caller. */
   static async private(
-    client: MacroClient,
+    client: RoxClient,
     recipients: User[],
   ): Promise<Channel> {
     const { channel_id } = unwrap(
@@ -198,7 +198,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
 
   /** Create a channel. The caller becomes the owner. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: {
       type: ChannelType;
       name?: string;
@@ -230,7 +230,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
   /**
    * Post a message. Plain text, or a rich body composed with `msg`.
    * `images` attaches static images, such as one from
-   * `macro.images.generate()`, below the text; `documents` attaches Macro
+   * `macro.images.generate()`, below the text; `documents` attaches Rox
    * documents as file chips, such as a file from `macro.documents.upload()`.
    *
    * Works with a channel webhook token as well as a normal one — see

@@ -1,7 +1,7 @@
 //! Outbound adapter for recording the mentions embedded in document content.
 
 use lexical_client::LexicalClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::sync::Arc;
 
@@ -26,7 +26,7 @@ impl DocumentMentionTrackingPort for LexicalCommsMentionTracker {
     async fn track_document_mentions(
         &self,
         document_id: &str,
-        user_id: Option<&MacroUserIdStr<'static>>,
+        user_id: Option<&RoxUserIdStr<'static>>,
         markdown: &str,
     ) -> anyhow::Result<()> {
         if markdown.trim().is_empty() {

@@ -88,7 +88,7 @@ pub struct EventWithMacroCall {
 
 /// Failures writing an event that carries a Rox call.
 #[derive(Debug, thiserror::Error)]
-pub enum MacroCallEventError {
+pub enum RoxCallEventError {
     /// The calendar write failed. A meeting minted for it was cancelled on a
     /// best-effort basis unless the event may have reached the provider.
     #[error(transparent)]
@@ -113,7 +113,7 @@ const LEGACY_JOIN_LINE_LABEL: &str = "Join Macro call";
 /// becomes the link only when the user supplied no physical location, so a
 /// room is never overwritten. Both mirror the calendar UI's own attachment,
 /// which is what lets it later find, strip, or replace the link.
-pub fn attach_macro_call(
+pub fn attach_rox_call(
     description: Option<&str>,
     location: Option<&str>,
     url: &str,
@@ -131,7 +131,7 @@ pub fn attach_macro_call(
 
 /// The join link already written into an event, including inside the
 /// generated HTML paragraph.
-pub fn first_macro_call_url(location: Option<&str>, description: Option<&str>) -> Option<String> {
+pub fn first_rox_call_url(location: Option<&str>, description: Option<&str>) -> Option<String> {
     for text in [location, description].into_iter().flatten() {
         for token in text.split(|character: char| {
             character.is_whitespace() || matches!(character, '"' | '\'' | '<' | '>' | '&')
@@ -147,13 +147,13 @@ pub fn first_macro_call_url(location: Option<&str>, description: Option<&str>) -
     None
 }
 
-/// Take back out what [`attach_macro_call`] wrote, as the calendar UI does
+/// Take back out what [`attach_rox_call`] wrote, as the calendar UI does
 /// before showing an event: the join line of a description already reduced
 /// to plain text, whichever call it names, and a location that is only the
 /// event's call link `url`. Everything the user wrote stays, including a
 /// link written anywhere else. The text may show the link in brackets, as
 /// html2text writes links.
-pub fn strip_macro_call(description_text: &str, location: &str, url: &str) -> (String, String) {
+pub fn strip_rox_call(description_text: &str, location: &str, url: &str) -> (String, String) {
     let description = description_text
         .lines()
         .filter(|line| !is_join_line(&line.trim().replace(['[', ']'], "")))
@@ -181,7 +181,7 @@ fn is_labeled_join_line(line: &str, label: &str) -> bool {
         Some("") => true,
         Some(rest) => rest
             .strip_prefix(": ")
-            .is_some_and(|link| first_macro_call_url(Some(link), None).as_deref() == Some(link)),
+            .is_some_and(|link| first_rox_call_url(Some(link), None).as_deref() == Some(link)),
         None => false,
     }
 }
@@ -195,14 +195,14 @@ fn is_labeled_join_line(line: &str, label: &str) -> bool {
 /// in the user's meeting list; an outcome that may have left the event (and
 /// its link) at the provider keeps the meeting alive.
 #[tracing::instrument(skip_all, err)]
-pub async fn create_event_with_macro_call<M, L>(
+pub async fn create_event_with_rox_call<M, L>(
     mutations: &M,
     meeting_links: &L,
     requester_id: &str,
     email_link_id: Option<Uuid>,
     calendar_id: Option<Uuid>,
     mut draft: CalendarEventDraft,
-) -> Result<EventWithMacroCall, MacroCallEventError>
+) -> Result<EventWithMacroCall, RoxCallEventError>
 where
     M: CalendarMutationService,
     L: MeetingLinkProvider,
@@ -223,7 +223,7 @@ where
     let link = meeting_links
         .create_meeting_link(requester_id, MeetingLinkRequest::for_draft(&draft))
         .await?;
-    let (description, location) = attach_macro_call(
+    let (description, location) = attach_rox_call(
         draft.description.as_deref(),
         draft.location.as_deref(),
         &link.url,
@@ -255,7 +255,7 @@ where
 /// line; only what is left of the patch is written. An Outlook event's Teams
 /// meeting cannot be removed, which the calendar write refuses.
 #[tracing::instrument(skip_all, fields(event_id = %event_id), err)]
-pub async fn update_event_with_macro_call<M, L>(
+pub async fn update_event_with_rox_call<M, L>(
     mutations: &M,
     meeting_links: &L,
     requester_id: &str,
@@ -263,7 +263,7 @@ pub async fn update_event_with_macro_call<M, L>(
     calendar_id: Option<Uuid>,
     mut patch: CalendarEventPatch,
     scope: CalendarUpdateScope,
-) -> Result<CalendarEvent, MacroCallEventError>
+) -> Result<CalendarEvent, RoxCallEventError>
 where
     M: CalendarMutationService + CalendarEventDetailsReader,
     L: MeetingLinkProvider,
@@ -293,15 +293,15 @@ where
         .as_deref()
         .or(stored.description.as_deref());
     let location = patch.location.as_deref().or(stored.location.as_deref());
-    if let Some(url) = first_macro_call_url(location, description)
-        .or_else(|| first_macro_call_url(stored.location.as_deref(), stored.description.as_deref()))
+    if let Some(url) = first_rox_call_url(location, description)
+        .or_else(|| first_rox_call_url(stored.location.as_deref(), stored.description.as_deref()))
     {
         // A replacement description that leaves the stored call's link out
         // would drop it from the event, so it keeps the join line.
         if let Some(replacement) = patch.description.as_deref()
-            && first_macro_call_url(None, Some(replacement)).is_none()
+            && first_rox_call_url(None, Some(replacement)).is_none()
         {
-            patch.description = Some(attach_macro_call(Some(replacement), None, &url).0);
+            patch.description = Some(attach_rox_call(Some(replacement), None, &url).0);
         }
         if patch.is_empty() {
             return Err(CalendarMutationError::InvalidInput(
@@ -320,7 +320,7 @@ where
     let link = meeting_links
         .create_meeting_link(requester_id, MeetingLinkRequest::for_event(title, time))
         .await?;
-    let (description, location) = attach_macro_call(description, location, &link.url);
+    let (description, location) = attach_rox_call(description, location, &link.url);
     patch.description = Some(description);
     patch.location = Some(location);
 

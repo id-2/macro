@@ -15,7 +15,7 @@ fn posted(parent: MessageParent, bot: bool) -> MessageEvent {
     let mut message = message(1, None, "@macro explain this");
     message.parent = parent.clone();
     if bot {
-        message.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+        message.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID);
     }
     MessageEvent {
         parent,
@@ -85,7 +85,7 @@ async fn attributed_posts_and_completed_replies_reach_the_local_detector() {
     message.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::CURSOR_BOT_ID);
     let mentions = vec![SimpleMention {
         entity_type: "bot".into(),
-        entity_id: bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string(),
+        entity_id: bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(),
     }];
     for change in [
         MessageChange::Posted {

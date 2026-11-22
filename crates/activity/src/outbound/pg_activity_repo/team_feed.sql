@@ -18,9 +18,9 @@ WITH viewer_source AS (
 viewer_inbox AS (
     -- Inboxes whose threads the viewer owns: their own links and those
     -- delegated to them as primary.
-    SELECT l.id AS link_id FROM email_links l WHERE l.macro_id = $1
+    SELECT l.id AS link_id FROM email_links l WHERE l.rox_id = $1
     UNION
-    SELECT mul.link_id FROM macro_user_links mul WHERE mul.primary_macro_id = $1
+    SELECT mul.link_id FROM rox_user_links mul WHERE mul.primary_rox_id = $1
 ),
 teammate AS (
     SELECT DISTINCT member.user_id

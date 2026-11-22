@@ -17,7 +17,7 @@ const laptop: Harness = {
   last_connected_at: '2026-11-13T00:00:00Z',
   computer_id: null,
   team_agent_user_id: null,
-  claude_mode: 'macro_credits',
+  claude_mode: 'rox_credits',
 };
 
 const teamComputer: Harness = {

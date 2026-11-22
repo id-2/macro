@@ -7,9 +7,9 @@ use url::Url;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct MacroScheme(pub Url);
+pub struct RoxScheme(pub Url);
 
-impl MacroScheme {
+impl RoxScheme {
     pub fn new(url: Url) -> Result<Self, SchemeError> {
         let "macro" = url.scheme() else {
             return Err(SchemeError::InvalidScheme {
@@ -46,22 +46,22 @@ impl MacroScheme {
         }
         let query = url.query();
         let mut inner = match query {
-            Some(q) => format!("macro:///{rest}?{q}"),
-            None => format!("macro:///{rest}"),
+            Some(q) => format!("rox:///{rest}?{q}"),
+            None => format!("rox:///{rest}"),
         }
         .parse::<Url>()?;
         inner.set_fragment(fragment);
-        Ok(MacroScheme(inner))
+        Ok(RoxScheme(inner))
     }
 }
 
-impl AsRef<str> for MacroScheme {
+impl AsRef<str> for RoxScheme {
     fn as_ref(&self) -> &str {
         self.0.as_str()
     }
 }
 
-impl Deref for MacroScheme {
+impl Deref for RoxScheme {
     type Target = Url;
 
     fn deref(&self) -> &Self::Target {

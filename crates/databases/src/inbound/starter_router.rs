@@ -7,8 +7,8 @@ use axum::{
     extract::{FromRef, State},
     routing::post,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 
 use crate::domain::{
@@ -20,14 +20,14 @@ use crate::inbound::axum_router::viewer_of;
 /// Starter service and authenticated identity extraction.
 pub struct DatabaseStarterRouterState<Service, Authorization> {
     service: Arc<Service>,
-    authorization_state: MacroAuthorizationState<Authorization>,
+    authorization_state: RoxAuthorizationState<Authorization>,
 }
 
 impl<Service, Authorization> DatabaseStarterRouterState<Service, Authorization> {
     /// Compose the route at the service entry point.
     pub fn new(
         service: Arc<Service>,
-        authorization_state: MacroAuthorizationState<Authorization>,
+        authorization_state: RoxAuthorizationState<Authorization>,
     ) -> Self {
         Self {
             service,
@@ -46,7 +46,7 @@ impl<Service, Authorization> Clone for DatabaseStarterRouterState<Service, Autho
 }
 
 impl<Service, Authorization> FromRef<DatabaseStarterRouterState<Service, Authorization>>
-    for MacroAuthorizationState<Authorization>
+    for RoxAuthorizationState<Authorization>
 {
     fn from_ref(state: &DatabaseStarterRouterState<Service, Authorization>) -> Self {
         state.authorization_state.clone()
@@ -59,7 +59,7 @@ pub fn starter_router<Service, Authorization, RouterState>(
 ) -> Router<RouterState>
 where
     Service: DatabaseStarterService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
     RouterState: Send + Sync + 'static,
 {
     Router::new()
@@ -79,11 +79,11 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn ensure_starter_handler<Service, Authorization>(
     State(state): State<DatabaseStarterRouterState<Service, Authorization>>,
-    user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
 ) -> Result<Json<StarterDatabase>, DatabaseError>
 where
     Service: DatabaseStarterService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service

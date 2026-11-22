@@ -15,14 +15,14 @@ fn send_snapshot() -> SendSnapshot {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn offline_inbox_change_moves_uploaded_attachments_with_admission(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let service = service(pool.clone());
-    let attachment = macro_uuid::generate_uuid_v7();
+    let attachment = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO email_attachments_drafts (id, draft_id, file_name, content_type, sha, size, s3_key)
            VALUES ($1, $2, 'approved.txt', 'text/plain', 'sha', 3, 'approved-bytes')"#,
@@ -35,7 +35,7 @@ async fn offline_inbox_change_moves_uploaded_attachments_with_admission(
     input.attachment_ids.push(attachment);
     // Offline autosave is suppressed by the send. Admission must apply the
     // selected inbox directly to the existing source draft, including uploads.
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let admitted = service
         .send_email(actor(), destination(), attempt, input.clone())
         .await?;
@@ -84,7 +84,7 @@ async fn offline_inbox_change_moves_uploaded_attachments_with_admission(
         .send_email(
             actor(),
             link(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             input,
         )
         .await?;
@@ -103,20 +103,20 @@ async fn offline_inbox_change_moves_uploaded_attachments_with_admission(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn rejected_attachment_set_rolls_back_the_inbox_move(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let mut input = send_snapshot();
-    input.attachment_ids.push(macro_uuid::generate_uuid_v7());
+    input.attachment_ids.push(rox_uuid::generate_uuid_v7());
     assert!(matches!(
         service(pool.clone())
             .send_email(
                 actor(),
                 destination(),
-                SendAttemptId(macro_uuid::generate_uuid_v7()),
+                SendAttemptId(rox_uuid::generate_uuid_v7()),
                 input
             )
             .await,
@@ -142,11 +142,11 @@ async fn rejected_attachment_set_rolls_back_the_inbox_move(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn inbox_move_preserves_approved_forwarded_files(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let attachment = macro_uuid::generate_uuid_v7();
+    let attachment = rox_uuid::generate_uuid_v7();
     let source = Uuid::parse_str("ee000001-0000-0000-0000-000000000001")?;
     sqlx::query!(
         r#"INSERT INTO email_attachments (id, message_id, provider_attachment_id, filename, mime_type, size_bytes)
@@ -169,7 +169,7 @@ async fn inbox_move_preserves_approved_forwarded_files(pool: Pool<Postgres>) -> 
         .send_email(
             actor(),
             destination(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             input,
         )
         .await?;
@@ -188,7 +188,7 @@ async fn inbox_move_preserves_approved_forwarded_files(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn concurrent_inbox_sends_admit_one_delivery(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -197,13 +197,13 @@ async fn concurrent_inbox_sends_admit_one_delivery(pool: Pool<Postgres>) -> anyh
         service.send_email(
             actor(),
             link(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             send_snapshot()
         ),
         service.send_email(
             actor(),
             destination(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             send_snapshot()
         ),
     );
@@ -224,7 +224,7 @@ async fn concurrent_inbox_sends_admit_one_delivery(pool: Pool<Postgres>) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn inbox_move_does_not_replace_an_existing_destination_reply(
@@ -243,7 +243,7 @@ async fn inbox_move_does_not_replace_an_existing_destination_reply(
         .send_email(
             actor(),
             destination(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             input,
         )
         .await?;
@@ -278,7 +278,7 @@ async fn inbox_move_does_not_replace_an_existing_destination_reply(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn deferred_moved_send_keeps_the_source_inbox_autosave_fence(
@@ -288,7 +288,7 @@ async fn deferred_moved_send_keeps_the_source_inbox_autosave_fence(
         .send_email(
             actor(),
             destination(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             send_snapshot(),
         )
         .await?;

@@ -1,6 +1,6 @@
 import type { CreateDocumentRequest } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { rejectUnknownOptions } from '../../utils/options';
 import type { EmailAttachment } from '../email/attachment';
 import type { Project } from '../projects/project';
@@ -210,7 +210,7 @@ export class DocumentNamespace {
     };
   }
 
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to a document by id. Details load on first access. */
   byId(id: string): Document {

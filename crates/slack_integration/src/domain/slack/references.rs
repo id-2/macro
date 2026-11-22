@@ -3,7 +3,7 @@
 
 use std::ops::Range;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mention_utils::serialize::{ChannelMentionParams, channel_mention};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -64,7 +64,7 @@ pub struct ConvertedText {
     /// Safe initially rendered body, including code verbatim.
     pub body: String,
     /// Only user mentions actively emitted outside code, in occurrence order.
-    pub user_mentions: Vec<MacroUserIdStr<'static>>,
+    pub user_mentions: Vec<RoxUserIdStr<'static>>,
     /// Bounded source reference occurrences, in body order.
     pub references: Vec<ReferenceIntent>,
 }

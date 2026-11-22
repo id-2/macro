@@ -16,7 +16,7 @@ options in `voices.ts`.
 
 | Credential         | For                                                                        |
 | ------------------ | -------------------------------------------------------------------------- |
-| `MACRO_API_KEY`    | Everything: the calls list, the seat, the room, chat, `ai.decide`.         |
+| `ROX_API_KEY`    | Everything: the calls list, the seat, the room, chat, `ai.decide`.         |
 | `DEEPGRAM_API_KEY` | Hearing (Nova-3) and the default voice (Aura-2). Calls are off without it. |
 | `INWORLD_API_KEY`  | Only if `voiceSpec` in `voices.ts` names an Inworld voice.                 |
 

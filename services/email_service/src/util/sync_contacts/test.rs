@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 use serde_json::{Value, json};
 
 use super::*;
@@ -17,8 +17,8 @@ struct RecordingEventBroker {
     published: Mutex<Vec<PublishedEvent>>,
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -35,8 +35,8 @@ impl MacroEventBroker for RecordingEventBroker {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid owner")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid owner")
 }
 
 fn thread_ids(count: usize) -> Vec<Uuid> {
@@ -71,7 +71,7 @@ fn assert_published_batches(thread_count: usize, expected_batch_sizes: &[usize])
     let published_thread_ids: Vec<Uuid> = published
         .iter()
         .flat_map(|event| {
-            assert_eq!(event.topic, "macro.email");
+            assert_eq!(event.topic, "rox.email");
             assert_eq!(event.key, link_id.to_string());
             assert_eq!(event.envelope["schema_version"], json!(1));
             assert_eq!(
@@ -184,13 +184,13 @@ async fn publishes_ordered_bounded_batches_for_larger_inputs() {
     assert_published_batches(137, &[50, 50, 37]);
 }
 
-fn link_for(macro_id: &str, email: &str) -> Link {
-    let macro_id = MacroUserIdStr::try_from(macro_id.to_string()).expect("valid macro id");
-    let email_address = macro_user_id::email::EmailStr::try_from(email.to_string()).expect("email");
+fn link_for(rox_id: &str, email: &str) -> Link {
+    let rox_id = RoxUserIdStr::try_from(rox_id.to_string()).expect("valid macro id");
+    let email_address = rox_user_id::email::EmailStr::try_from(email.to_string()).expect("email");
     Link {
         id: Uuid::nil(),
         is_primary: Link::derive_is_primary(models_email::service::link::UserProvider::Gmail),
-        macro_id,
+        rox_id,
         fusionauth_user_id: "fa".to_string(),
         email_address,
         provider: models_email::service::link::UserProvider::Gmail,
@@ -228,6 +228,6 @@ fn address_book_connections_cover_saved_contacts_and_skip_noise() {
     assert!(
         connections
             .iter()
-            .all(|connection| connection.first == link.macro_id)
+            .all(|connection| connection.first == link.rox_id)
     );
 }

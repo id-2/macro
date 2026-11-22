@@ -5,7 +5,7 @@
 
 use super::model::SeatPlan;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::convert::Infallible;
 
 /// Original provider facts for a newly activated team subscription.
@@ -40,7 +40,7 @@ pub trait OpenSeatRelease: Clone + Send + Sync + 'static {
     /// Notify billing of a seat plan change after the provider accepted it.
     fn change_plan(
         &self,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
         change: SeatPlanChange,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
@@ -48,7 +48,7 @@ pub trait OpenSeatRelease: Clone + Send + Sync + 'static {
     fn release(
         &self,
         team_id: uuid::Uuid,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 }
 
@@ -61,7 +61,7 @@ impl OpenSeatRelease for NoOpOpenSeatRelease {
 
     async fn change_plan(
         &self,
-        _member: &MacroUserIdStr<'_>,
+        _member: &RoxUserIdStr<'_>,
         _change: SeatPlanChange,
     ) -> Result<(), Self::Err> {
         Ok(())
@@ -70,7 +70,7 @@ impl OpenSeatRelease for NoOpOpenSeatRelease {
     async fn release(
         &self,
         _team_id: uuid::Uuid,
-        _member: &MacroUserIdStr<'_>,
+        _member: &RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
         Ok(())
     }

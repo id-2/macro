@@ -4,7 +4,7 @@ use item_filters::ast::{
     calendar_event::CalendarEventLiteral,
     properties::{PropertiesLiteral, PropertyEntityType, properties_filter_can_apply_to},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_pagination::{Query, SimpleSortMethod};
 use models_soup::{
@@ -161,11 +161,11 @@ pub(super) async fn by_ids(
 /// for every clause rendered after it. The delegated links are collected once
 /// rather than probed per event, which lets the planner index both sides of
 /// the OR.
-fn push_access(query: &mut QueryBuilder<'_, Postgres>, user_id: MacroUserIdStr<'_>) {
+fn push_access(query: &mut QueryBuilder<'_, Postgres>, user_id: RoxUserIdStr<'_>) {
     query.push("(event.owner_id = ");
     query.push_bind(user_id.as_ref().to_string());
     query.push(
-        " OR event.source_link_id = ANY(ARRAY(SELECT link.link_id FROM macro_user_links link WHERE link.primary_macro_id = $1)))",
+        " OR event.source_link_id = ANY(ARRAY(SELECT link.link_id FROM rox_user_links link WHERE link.primary_rox_id = $1)))",
     );
 }
 

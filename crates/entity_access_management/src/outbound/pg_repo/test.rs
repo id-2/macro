@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use model_entity::EntityType;
 use models_permissions::share_permission::access_level::AccessLevel;
 use sqlx::{Pool, Postgres};
@@ -13,7 +13,7 @@ const CHILD_PROJECT_ID: Uuid = Uuid::from_u128(0x22222222_2222_2222_2222_2222222
 const GRANDCHILD_PROJECT_ID: Uuid = Uuid::from_u128(0x33333333_3333_3333_3333_333333333333);
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn propagation_waits_for_revocation_before_reading_project_grants(pool: Pool<Postgres>) {
@@ -73,7 +73,7 @@ async fn propagation_waits_for_revocation_before_reading_project_grants(pool: Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn walk_up_from_grandchild_returns_all_ancestors(pool: Pool<Postgres>) {
@@ -92,7 +92,7 @@ async fn walk_up_from_grandchild_returns_all_ancestors(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn walk_up_from_root_returns_only_self(pool: Pool<Postgres>) {
@@ -109,7 +109,7 @@ async fn walk_up_from_root_returns_only_self(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn walk_up_nonexistent_project_returns_empty(pool: Pool<Postgres>) {
@@ -126,7 +126,7 @@ async fn walk_up_nonexistent_project_returns_empty(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn source_entities_returns_direct_shares_across_projects(pool: Pool<Postgres>) {
@@ -171,7 +171,7 @@ async fn source_entities_returns_direct_shares_across_projects(pool: Pool<Postgr
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn source_entities_excludes_inherited_access(pool: Pool<Postgres>) {
@@ -192,7 +192,7 @@ async fn source_entities_excludes_inherited_access(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn source_entities_excludes_non_project_entity_type(pool: Pool<Postgres>) {
@@ -214,7 +214,7 @@ async fn source_entities_excludes_non_project_entity_type(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn source_entities_empty_for_project_without_access(pool: Pool<Postgres>) {
@@ -231,7 +231,7 @@ async fn source_entities_empty_for_project_without_access(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("project_tree_test_data"))
 )]
 async fn source_entities_empty_for_nonexistent_project(pool: Pool<Postgres>) {
@@ -275,7 +275,7 @@ async fn source_entities_empty_for_nonexistent_project(pool: Pool<Postgres>) {
 /// 6 direct shares (where `granted_from_project_id IS NULL`), excluding the 6
 /// inherited rows.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("complex_project_tree_test_data"))
 )]
 async fn source_entities_for_full_tree_walk_returns_only_direct_shares(pool: Pool<Postgres>) {
@@ -349,7 +349,7 @@ async fn source_entities_for_full_tree_walk_returns_only_direct_shares(pool: Poo
 /// | team_1    | team        | edit         | project_b               |
 /// | channel_2 | channel     | comment      | project_c               |
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("complex_project_tree_test_data"))
 )]
 async fn add_entity_to_project_inserts_access_for_all_ancestor_shares(pool: Pool<Postgres>) {
@@ -448,7 +448,7 @@ async fn add_entity_to_project_inserts_access_for_all_ancestor_shares(pool: Pool
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("bot_owned_child_project_test_data")
@@ -516,7 +516,7 @@ async fn add_bot_owned_child_project_keeps_its_owner_grants_and_inherits_the_par
 /// inherited access rows are deleted while the pre-existing project
 /// access rows remain untouched.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("complex_project_tree_test_data"))
 )]
 async fn remove_entity_from_project_deletes_inherited_access(pool: Pool<Postgres>) {
@@ -567,7 +567,7 @@ async fn remove_entity_from_project_deletes_inherited_access(pool: Pool<Postgres
 /// Calling from PROJECT_A (root) should return the full tree:
 /// 3 projects (A, B, C) + 1 document in A + 1 chat in B + 1 document in C = 6 entities
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("complex_project_tree_test_data"))
 )]
 async fn nested_entities_from_root_returns_full_tree(pool: Pool<Postgres>) {
@@ -605,7 +605,7 @@ async fn nested_entities_from_root_returns_full_tree(pool: Pool<Postgres>) {
 /// 2 projects (B, C) + 1 chat in B + 1 document in C = 4 entities
 /// Should NOT include project_a or doc-in-a.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("complex_project_tree_test_data"))
 )]
 async fn nested_entities_from_mid_returns_subtree_only(pool: Pool<Postgres>) {
@@ -639,7 +639,7 @@ async fn nested_entities_from_mid_returns_subtree_only(pool: Pool<Postgres>) {
 /// Calling from PROJECT_C (leaf) should return:
 /// 1 project (C) + 1 document in C = 2 entities
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("complex_project_tree_test_data"))
 )]
 async fn nested_entities_from_leaf_returns_self_and_children(pool: Pool<Postgres>) {
@@ -665,7 +665,7 @@ async fn nested_entities_from_leaf_returns_self_and_children(pool: Pool<Postgres
 
 /// Non-existent project returns empty.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("complex_project_tree_test_data"))
 )]
 async fn nested_entities_nonexistent_project_returns_empty(pool: Pool<Postgres>) {
@@ -704,7 +704,7 @@ async fn nested_entities_nonexistent_project_returns_empty(pool: Pool<Postgres>)
 /// - Add inherited access from project_d for B's nested entities (8 rows)
 /// - Leave project_a's own access and project_d's own access untouched
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("move_project_test_data"))
 )]
 async fn move_project_from_a_to_d_updates_inherited_access(pool: Pool<Postgres>) {
@@ -876,7 +876,7 @@ async fn move_project_from_a_to_d_updates_inherited_access(pool: Pool<Postgres>)
 /// A database and a form filed in PROJECT_C move with PROJECT_B: they take
 /// on PROJECT_D's two grants, as the documents beside them do.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("move_project_test_data"))
 )]
 async fn move_project_carries_inherited_access_to_its_databases_and_forms(pool: Pool<Postgres>) {
@@ -937,7 +937,7 @@ async fn move_project_carries_inherited_access_to_its_databases_and_forms(pool: 
 /// people who don't see it yet, and the refused move writes nothing; moving
 /// it back where its grants already come from is allowed.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("move_project_test_data"))
 )]
 async fn a_scoped_session_cant_move_a_folder_under_a_shared_one(pool: Pool<Postgres>) {
@@ -999,7 +999,7 @@ async fn a_scoped_session_cant_move_a_folder_under_a_shared_one(pool: Pool<Postg
 /// The filing write checks the scope; under a scope that may not share, the
 /// second step still restores the grants both folders pass down.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("complex_project_tree_test_data"))
 )]
 async fn a_scoped_move_keeps_the_grants_both_folders_pass_down(pool: Pool<Postgres>) {

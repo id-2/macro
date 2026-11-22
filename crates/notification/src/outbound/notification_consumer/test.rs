@@ -1,10 +1,10 @@
 use std::borrow::Cow;
 
 use chrono::Utc;
-use macro_event_broker::{
-    EventBrokerError, MacroEventCollection as _, MessageParts, MessageWrapper,
+use rox_event_broker::{
+    EventBrokerError, RoxEventCollection as _, MessageParts, MessageWrapper,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use uuid::Uuid;
 
@@ -28,13 +28,13 @@ impl MessageParts for TestMessage {
     }
 
     fn topic(&self) -> &str {
-        "macro.notifications"
+        "rox.notifications"
     }
 }
 
 #[test]
 fn assigns_only_the_typed_notifications_topic() {
-    assert_eq!(DeclaredMacroEvent::topics(), ["macro.notifications"]);
+    assert_eq!(DeclaredMacroEvent::topics(), ["rox.notifications"]);
 }
 
 #[test]
@@ -63,7 +63,7 @@ fn declared_topic_decoder_rejects_unsupported_schema_versions() {
 
 fn row() -> UserNotificationRow<serde_json::Value> {
     UserNotificationRow {
-        owner_id: MacroUserIdStr::try_from("macro|recipient@example.com".to_string())
+        owner_id: RoxUserIdStr::try_from("macro|recipient@example.com".to_string())
             .expect("valid user ID"),
         notification_id: Uuid::nil(),
         notification_event_type: "test".to_string(),

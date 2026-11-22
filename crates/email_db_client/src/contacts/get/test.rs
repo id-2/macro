@@ -3,7 +3,7 @@ use crate::contacts::get::{
     fetch_senders_by_message_ids, fetch_top_sent_contact_emails_by_link_id,
 };
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::db::address::EmailRecipientType;
 use models_email::email::service::address::ContactInfoWithInteraction;
 use sqlx::types::Uuid;
@@ -14,7 +14,7 @@ use std::collections::HashMap;
 /// group each inbox's contacts by link id. A two-inbox user must see both
 /// inboxes' contacts under their own link ids.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_two_links"))
 )]
 async fn fetch_contacts_unions_across_links_for_one_user(pool: Pool<Postgres>) -> Result<()> {
@@ -42,13 +42,13 @@ async fn fetch_contacts_unions_across_links_for_one_user(pool: Pool<Postgres>) -
 // ============================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_senders_by_message_ids_returns_senders_grouped_by_message_id(
     pool: Pool<Postgres>,
 ) -> Result<()> {
-    const _: &sqlx::migrate::Migrator = &MACRO_DB_MIGRATIONS;
+    const _: &sqlx::migrate::Migrator = &ROX_DB_MIGRATIONS;
 
     let message_id_1 = Uuid::parse_str("00000000-0000-0000-0000-000000006501")?;
     let message_id_2 = Uuid::parse_str("00000000-0000-0000-0000-000000006502")?;
@@ -63,7 +63,7 @@ async fn fetch_senders_by_message_ids_returns_senders_grouped_by_message_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_senders_by_message_ids_returns_correct_contact_data(
@@ -94,7 +94,7 @@ async fn fetch_senders_by_message_ids_returns_correct_contact_data(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_senders_by_message_ids_uses_contact_name_when_no_from_name(
@@ -112,7 +112,7 @@ async fn fetch_senders_by_message_ids_uses_contact_name_when_no_from_name(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_senders_by_message_ids_excludes_messages_without_from_contact(
@@ -132,7 +132,7 @@ async fn fetch_senders_by_message_ids_excludes_messages_without_from_contact(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_senders_by_message_ids_returns_empty_for_empty_input(
@@ -146,7 +146,7 @@ async fn fetch_senders_by_message_ids_returns_empty_for_empty_input(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_senders_by_message_ids_returns_empty_for_nonexistent_messages(
@@ -166,7 +166,7 @@ async fn fetch_senders_by_message_ids_returns_empty_for_nonexistent_messages(
 // ============================================================================
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_db_recipients_in_bulk_returns_recipients_grouped_by_message_id(
@@ -191,7 +191,7 @@ async fn fetch_db_recipients_in_bulk_returns_recipients_grouped_by_message_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_db_recipients_in_bulk_returns_correct_contact_data(
@@ -223,7 +223,7 @@ async fn fetch_db_recipients_in_bulk_returns_correct_contact_data(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_db_recipients_in_bulk_excludes_messages_without_recipients(
@@ -246,7 +246,7 @@ async fn fetch_db_recipients_in_bulk_excludes_messages_without_recipients(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_db_recipients_in_bulk_returns_empty_for_empty_input(
@@ -260,7 +260,7 @@ async fn fetch_db_recipients_in_bulk_returns_empty_for_empty_input(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("fetch_contacts_in_bulk"))
 )]
 async fn fetch_db_recipients_in_bulk_returns_empty_for_nonexistent_messages(
@@ -276,7 +276,7 @@ async fn fetch_db_recipients_in_bulk_returns_empty_for_nonexistent_messages(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("address_book_and_top_contacts"))
 )]
 async fn fetch_address_book_emails_returns_every_non_automated_contact(
@@ -300,7 +300,7 @@ async fn fetch_address_book_emails_returns_every_non_automated_contact(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("address_book_and_top_contacts"))
 )]
 async fn fetch_top_sent_contact_emails_ranks_by_messages_sent(pool: Pool<Postgres>) -> Result<()> {

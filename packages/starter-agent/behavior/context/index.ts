@@ -57,7 +57,7 @@ import { state as makeState, type State } from './state.ts';
 import { trace } from './telemetry.ts';
 
 /** The credential holding the key of the agent's own Rox account. */
-export const macroKey = 'MACRO_API_KEY';
+export const macroKey = 'ROX_API_KEY';
 
 type Environment = Readonly<Record<string, string | undefined>>;
 

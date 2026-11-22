@@ -17,7 +17,7 @@ mod test;
 
 use std::sync::Arc;
 
-use agent_egress::domain::approval::MACRO_SERVER_SLUG;
+use agent_egress::domain::approval::ROX_SERVER_SLUG;
 use agent_fold::domain::model::{ActivityStatus, ProjectedSegment, SegmentKind, TurnId, TurnPhase};
 use agent_session::domain::model::AgentSessionId;
 use bot_id::BotId;
@@ -31,7 +31,7 @@ use lexical_client::parse_markdown::{
     AgentChatReply, AgentChatReplyBody, AgentConnectionChip, AgentConnectionPrompt,
     AgentReplySegment,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MessageCommands,
     models::{
@@ -212,9 +212,9 @@ fn reply_body(outcome: ReplyOutcome) -> AgentChatReplyBody {
 fn awaiting_approval(call: &HeldToolCall) -> String {
     let tool = &call.tool_name;
     // People never see that the agent works in code; the step stands for itself.
-    if call.server_slug == MACRO_SERVER_SLUG && tool == "ExecuteCode" {
+    if call.server_slug == ROX_SERVER_SLUG && tool == "ExecuteCode" {
         "Waiting for the session owner to allow a step in their workspace.".to_owned()
-    } else if call.server_slug == MACRO_SERVER_SLUG {
+    } else if call.server_slug == ROX_SERVER_SLUG {
         format!("Waiting for the session owner to allow `{tool}`.")
     } else {
         let server = &call.server_name;
@@ -329,7 +329,7 @@ impl<Access: EntityAccessService> MessageAnnouncer<Access> {
     async fn bot_write(
         &self,
         bot_id: BotId,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>> {
         self.access

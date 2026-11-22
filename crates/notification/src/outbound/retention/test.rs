@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::models::NotificationState;
 use chrono::TimeDelta;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::postgres::PgListener;
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -36,7 +36,7 @@ async fn remaining(pool: &PgPool) -> Vec<Uuid> {
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn boundary_is_strict_and_preview_is_read_only_and_bounded(pool: PgPool) {
     let old = insert(&pool, cutoff() - TimeDelta::days(1)).await;
     let just_old = insert(&pool, cutoff() - TimeDelta::microseconds(1)).await;
@@ -61,7 +61,7 @@ async fn boundary_is_strict_and_preview_is_read_only_and_bounded(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn bounded_oldest_first_batches_resume_on_retry(pool: PgPool) {
     let later = insert(&pool, cutoff() - TimeDelta::seconds(1)).await;
     let oldest_a = insert(&pool, cutoff() - TimeDelta::days(2)).await;
@@ -79,7 +79,7 @@ async fn bounded_oldest_first_batches_resume_on_retry(pool: PgPool) {
     assert_eq!(remaining(&pool).await, [later]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn parent_age_controls_all_states_and_cascades_to_receipts(pool: PgPool) {
     let old = insert(&pool, cutoff() - TimeDelta::days(1)).await;
     let fresh = insert(&pool, cutoff() + TimeDelta::days(1)).await;
@@ -149,7 +149,7 @@ async fn parent_age_controls_all_states_and_cascades_to_receipts(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn locked_parents_are_revisited_and_advisory_lock_is_transaction_scoped(pool: PgPool) {
     let oldest = insert(&pool, cutoff() - TimeDelta::days(2)).await;
     let next = insert(&pool, cutoff() - TimeDelta::days(1)).await;
@@ -191,7 +191,7 @@ async fn locked_parents_are_revisited_and_advisory_lock_is_transaction_scoped(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cascade_lock_timeout_rolls_back_entire_batch_and_allows_retry(pool: PgPool) {
     let old = insert(&pool, cutoff() - TimeDelta::days(1)).await;
     sqlx::query!("INSERT INTO user_notification (user_id, notification_id) VALUES ('macro|locked@test.com', $1)", old)
@@ -217,7 +217,7 @@ async fn cascade_lock_timeout_rolls_back_entire_batch_and_allows_retry(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deletion_notifies_every_recipient_in_byte_bounded_chunks(pool: PgPool) {
     let old = insert(&pool, cutoff() - TimeDelta::days(1)).await;
     // Multibyte addresses ensure the trigger measures bytes, not characters.
@@ -259,7 +259,7 @@ async fn deletion_notifies_every_recipient_in_byte_bounded_chunks(pool: PgPool) 
     assert_eq!(received, users.into_iter().collect());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn database_clock_uses_utc_even_with_a_non_utc_session(pool: PgPool) {
     let non_utc_pool = sqlx::postgres::PgPoolOptions::new()
         .max_connections(1)

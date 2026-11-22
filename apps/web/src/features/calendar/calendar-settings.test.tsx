@@ -64,7 +64,7 @@ it('re-consents the Outlook account whose Connect calendar was clicked', () => {
   mocks.links = [
     {
       id: 'gmail-link',
-      macro_id: 'macro|self',
+      rox_id: 'macro|self',
       email_address: 'teo@rox.one',
       provider: 'GMAIL',
       needs_calendar_permission: false,
@@ -72,7 +72,7 @@ it('re-consents the Outlook account whose Connect calendar was clicked', () => {
     },
     {
       id: 'outlook-link',
-      macro_id: 'macro|self',
+      rox_id: 'macro|self',
       email_address: 'teo@contoso.onmicrosoft.com',
       provider: 'OUTLOOK',
       needs_calendar_permission: true,
@@ -93,7 +93,7 @@ it('re-consents a lone Gmail account, restoring mail access it lost', () => {
   mocks.links = [
     {
       id: 'gmail-link',
-      macro_id: 'macro|self',
+      rox_id: 'macro|self',
       email_address: 'teo@rox.one',
       provider: 'GMAIL',
       needs_calendar_permission: true,
@@ -114,7 +114,7 @@ it('asks for a provider when connecting another account', () => {
   mocks.links = [
     {
       id: 'outlook-link',
-      macro_id: 'macro|self',
+      rox_id: 'macro|self',
       email_address: 'teo@contoso.onmicrosoft.com',
       provider: 'OUTLOOK',
       needs_calendar_permission: false,
@@ -132,7 +132,7 @@ it("saves a calendar's Busy switch to the viewer's availability setting", () => 
   mocks.links = [
     {
       id: 'gmail-link',
-      macro_id: 'macro|self',
+      rox_id: 'macro|self',
       email_address: 'teo@rox.one',
       provider: 'GMAIL',
       needs_calendar_permission: false,

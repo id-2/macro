@@ -16,7 +16,7 @@
 use crate::util::corpus::{full_text, load_corpus};
 use crate::util::harness::{EVAL_CONCURRENCY, openai_key};
 use futures::StreamExt;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use task_dedup::domain::ports::TaskDuplicateJudge;
 use task_dedup::eval::PairCase;
@@ -69,7 +69,7 @@ impl PairStats {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 #[ignore = "hits Anthropic; run locally with API keys"]
 async fn judge_variance_baseline(pool: PgPool) {
     let _ = openai_key(); // fail fast if the router keys are unset

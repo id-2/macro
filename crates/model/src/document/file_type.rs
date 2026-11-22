@@ -21,7 +21,7 @@ static SUFFIX_TRIE: LazyLock<ReversedSuffixTrie> = LazyLock::new(|| {
     trie
 });
 
-const PLAINTEXT_TYPES: &[&str] = &["application/x-macro-canvas"];
+const PLAINTEXT_TYPES: &[&str] = &["application/x-rox-canvas"];
 
 /// extension methods for the [FileType] enum
 pub trait FileTypeExt {

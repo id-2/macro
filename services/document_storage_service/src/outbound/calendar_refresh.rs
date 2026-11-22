@@ -58,7 +58,7 @@ impl ConnectionGatewayCalendarRefresh {
         let mut recipients = vec![owner_id.to_string()];
         let mut delegates_resolved = true;
         match sqlx::query_scalar!(
-            "SELECT primary_macro_id FROM macro_user_links WHERE link_id = $1",
+            "SELECT primary_rox_id FROM rox_user_links WHERE link_id = $1",
             link_id,
         )
         .fetch_all(&self.db)
@@ -75,10 +75,10 @@ impl ConnectionGatewayCalendarRefresh {
         let span = tracing::Span::current();
         span.record("recipients", recipients.len());
         let mut failed_sends = 0_usize;
-        for macro_id in recipients {
+        for rox_id in recipients {
             let sent = self
                 .client
-                .refresh_calendar(&macro_id, payload.clone())
+                .refresh_calendar(&rox_id, payload.clone())
                 .await
                 .inspect_err(
                     |error| tracing::error!(error=?error, %link_id, "failed to refresh calendar"),

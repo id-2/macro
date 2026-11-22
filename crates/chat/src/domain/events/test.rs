@@ -1,6 +1,6 @@
-use macro_event_broker::{Event, MacroEvent};
-use macro_event_topics::{MacroChatsTopic, Topic};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent};
+use rox_event_topics::{RoxChatsTopic, Topic};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -12,8 +12,8 @@ const MESSAGE_ID: &str = "7d2c1e5a-4b3f-4c6d-8e9f-0a1b2c3d4e5f";
 const PROJECT_ID: &str = "c1a2b3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d";
 const EVENT_ID: &str = "01998a30-1a2b-7c3d-9e4f-5a6b7c8d9e0f";
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 #[test]
@@ -209,7 +209,7 @@ fn topic_events() -> Vec<(ChatTopicEvent, Value)> {
     ]
 }
 
-fn macro_events() -> Vec<ChatMacroEvent> {
+fn rox_events() -> Vec<ChatMacroEvent> {
     topic_events()
         .into_iter()
         .map(|(event, _)| match event {
@@ -247,22 +247,22 @@ fn every_variant_has_exact_json_envelope() {
 
 #[test]
 fn every_variant_round_trips() {
-    for original in macro_events() {
+    for original in rox_events() {
         let payload = serde_json::to_vec(original.event()).expect("serializable event");
         let decoded = ChatMacroEvent::decode(original.key(), &payload).expect("decodable event");
 
         assert_eq!(decoded.key(), CHAT_ID);
         assert_eq!(decoded.event(), original.event());
-        assert_eq!(decoded.topic(), MacroChatsTopic::TOPIC_STR);
-        assert_eq!(decoded.topic(), "macro.chats");
+        assert_eq!(decoded.topic(), RoxChatsTopic::TOPIC_STR);
+        assert_eq!(decoded.topic(), "rox.chats");
     }
 }
 
 #[test]
 fn constructors_use_chats_topic_bare_chat_id_key_and_schema_version_one() {
-    for event in macro_events() {
+    for event in rox_events() {
         assert_eq!(event.key(), CHAT_ID);
-        assert_eq!(event.topic(), "macro.chats");
+        assert_eq!(event.topic(), "rox.chats");
         assert_eq!(event.event().schema_version, 1);
     }
 }

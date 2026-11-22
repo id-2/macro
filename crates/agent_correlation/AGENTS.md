@@ -42,7 +42,7 @@ code, not in its prompt. The harness also signs the scope into the credential
   (`current_session`), and the scope stored with it, else the one the
   credential signs (`current_scope`)); capture before spawning,
   scope each message. `current_routine()` feeds
-  `macro_event_broker::Event.routine_id`, which keeps routines from starting
+  `rox_event_broker::Event.routine_id`, which keeps routines from starting
   on routine writes. `may_share` says whether the request may change who can
   see an item. `entity_access_db_utils::scoped_grants` checks it wherever
   access grants are written, so creation, filing in a folder, assignment and
@@ -63,7 +63,7 @@ code, not in its prompt. The harness also signs the scope into the credential
 ## Boundaries
 
 - Owns `agent_correlations`; reads the session's bound agent for validation.
-- Depends on `macro_auth` only for the HTTP adapter.
+- Depends on `rox_auth` only for the HTTP adapter.
 - Used by code-mode credential minting, HTTP services, and the event broker.
 
 ## Checks
@@ -77,7 +77,7 @@ code, not in its prompt. The harness also signs the scope into the credential
 - `scope` sets only a correlation and clears any routine; use
   `scope_attribution` to carry both. A bare `tokio::spawn` drops both; wrap
   request work in `capture`.
-- Read `x-macro-sdk-verb` only after signed correlation validation; unknown
+- Read `x-rox-sdk-verb` only after signed correlation validation; unknown
   verbs are absent, a verb never outlives its correlation, and it grants no
   authority.
 - Do not check session state: accepted work can complete after a session ends.

@@ -11,7 +11,7 @@ export const postMeta: PostMeta = {
     'One source of truth for every service’s configuration, a typed loader that fails at startup instead of drifting, and CI that catches a missing value before it becomes a failed deploy.',
   date: '2026-07-12',
   description:
-    'How Rox moved service configuration to Doppler: Config Sync into AWS Secrets Manager, a single APP_SECRETS_JSON injected at deploy time, typed loading through the macro_env_var and macro_config crates, and CI validation with doppler-config-rs.',
+    'How Rox moved service configuration to Doppler: Config Sync into AWS Secrets Manager, a single APP_SECRETS_JSON injected at deploy time, typed loading through the rox_env_var and rox_config crates, and CI validation with doppler-config-rs.',
   preview:
     'Deploy fails. Dig through the logs. Find the environment variable nobody added to the infra. We got tired of that loop.',
   tags: ['macro', 'engineering'],
@@ -28,9 +28,9 @@ export const postMeta: PostMeta = {
 
 const CONFIG_EXAMPLE = `use anyhow::Context;
 use database_env_vars::{DatabaseUrl, RedisUri};
-pub use macro_env::Environment;
-use macro_env_var::{env_vars, maybe_env_vars};
-use macro_middleware::auth::internal_access::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::{env_vars, maybe_env_vars};
+use rox_middleware::auth::internal_access::InternalApiKey;
 
 env_vars! {
     pub struct BaseUrl;
@@ -41,16 +41,16 @@ maybe_env_vars! {
     pub struct ContactsQueueWaitTimeSeconds;
 }
 
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// The services base url
     pub base_url: BaseUrl,
     /// port number of service
-    #[macro_config_default(8080)]
+    #[rox_config_default(8080)]
     pub port: usize,
     /// The environment we are in
-    #[macro_config_default(Environment::new_or_prod())]
+    #[rox_config_default(Environment::new_or_prod())]
     pub environment: Environment,
     /// The connection URL for the Postgres database this application should use.
     pub database_url: DatabaseUrl,
@@ -66,7 +66,7 @@ pub struct Config {
 
 impl Config {
     pub fn from_env() -> anyhow::Result<Self> {
-        macro_config::ConfigLoader::load::<Config>()
+        rox_config::ConfigLoader::load::<Config>()
             .context("failed to load contacts service config")
     }
 
@@ -85,7 +85,7 @@ impl Config {
     }
 }`;
 
-const CI_VALIDATION = `use macro_env::Environment;
+const CI_VALIDATION = `use rox_env::Environment;
 
 mod config;
 
@@ -190,15 +190,15 @@ export default function DopplerConfigPost() {
         <p>
           This was incompatible with our existing model, which read each value
           individually using <code>std::env::var</code>, so we adapted{' '}
-          <code>macro_env_var</code> and <code>macro_config</code> to support
+          <code>rox_env_var</code> and <code>rox_config</code> to support
           the new runtime flow.
         </p>
 
         <h2>
-          The <code>macro_env_var</code> crate
+          The <code>rox_env_var</code> crate
         </h2>
         <p>
-          The <code>macro_env_var</code> crate provides type-safe access to
+          The <code>rox_env_var</code> crate provides type-safe access to
           environment variables. After some refactoring and the addition of
           custom Clippy rules, it became the only approved way to access
           environment variables in our Rust services.
@@ -212,14 +212,14 @@ export default function DopplerConfigPost() {
         </p>
 
         <h2>
-          The <code>macro_config</code> crate
+          The <code>rox_config</code> crate
         </h2>
         <p>
-          While <code>macro_env_var</code> provides type-safe access to
-          individual values, the <code>macro_config</code> crate brings those
+          While <code>rox_env_var</code> provides type-safe access to
+          individual values, the <code>rox_config</code> crate brings those
           values together into a single typed service configuration. When{' '}
           <code>ConfigLoader</code> loads a type that derives{' '}
-          <code>macro_config::MacroConfig</code>, the generated implementation
+          <code>rox_config::RoxConfig</code>, the generated implementation
           attempts to construct every field in that configuration.
         </p>
         <p>
@@ -236,14 +236,14 @@ export default function DopplerConfigPost() {
         </p>
         <pre
           class="dpl-code"
-          aria-label="A service configuration deriving MacroConfig"
+          aria-label="A service configuration deriving RoxConfig"
         >
           {CONFIG_EXAMPLE}
         </pre>
         <p>
           Calling <code>Config::from_env()</code> gives each service a single
           startup path for loading its configuration. If{' '}
-          <code>macro_config</code> cannot derive a required field because its
+          <code>rox_config</code> cannot derive a required field because its
           value is missing or invalid, the <code>Config</code> value is not
           created. Instead the loader returns an error and{' '}
           <span class="dpl-hl">
@@ -340,11 +340,11 @@ export default function DopplerConfigPost() {
           <li>
             When the service starts, <code>Config::from_env()</code> invokes{' '}
             <code>ConfigLoader</code>, which uses the generated{' '}
-            <code>MacroConfig</code> implementation to construct every field in{' '}
+            <code>RoxConfig</code> implementation to construct every field in{' '}
             <code>Config</code>.
           </li>
           <li>
-            For fields backed by <code>macro_env_var</code>, the crate reads the
+            For fields backed by <code>rox_env_var</code>, the crate reads the
             corresponding value from <code>APP_SECRETS_JSON</code>. If the key
             is not present there, it falls back to the individual environment
             variable used during local development.
@@ -352,7 +352,7 @@ export default function DopplerConfigPost() {
           <li>
             Defaults and optional values are handled according to the{' '}
             <code>Config</code> definition. If any required value is missing or
-            invalid, <code>macro_config</code> cannot create the{' '}
+            invalid, <code>rox_config</code> cannot create the{' '}
             <code>Config</code>, and service startup fails with an error.
           </li>
           <li>

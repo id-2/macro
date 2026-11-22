@@ -12,10 +12,10 @@ use serde::{Deserialize, Serialize};
 use super::{
     AttendeeInput, CalendarEventTypeInput, CalendarLabels, CalendarToolContext,
     EventRemindersInput, EventTimeInput, OutOfOfficeInput, ToolCalendarEvent,
-    macro_call_create_tool_error, mutation_tool_error,
+    rox_call_create_tool_error, mutation_tool_error,
 };
 use crate::domain::{
-    meeting_links::create_event_with_macro_call,
+    meeting_links::create_event_with_rox_call,
     models::{CalendarEventDraft, ConferenceChange, GuestPolicy},
     ports::{CalendarMutationService, CalendarOccurrenceService, MeetingLinkProvider},
 };
@@ -115,7 +115,7 @@ pub struct CreateCalendarEvent {
                        description. Mutually exclusive with `addConference`."
     )]
     #[serde(default)]
-    pub add_macro_call: bool,
+    pub add_rox_call: bool,
 
     /// Whether to attach the calendar provider's meeting conference.
     #[schemars(
@@ -178,11 +178,11 @@ where
             calendar_id=?self.calendar_id,
             attendee_count = self.attendees.len(),
             add_conference = self.add_conference,
-            add_macro_call = self.add_macro_call,
+            add_rox_call = self.add_rox_call,
             "Create calendar event"
         );
 
-        if self.add_macro_call && self.add_conference {
+        if self.add_rox_call && self.add_conference {
             return Err(ToolCallError {
                 description: "`addMacroCall` and `addConference` are mutually exclusive; pick \
                               one kind of video conferencing."
@@ -232,8 +232,8 @@ where
             guest_policy: self.guest_policy,
         };
 
-        if self.add_macro_call {
-            let created = create_event_with_macro_call(
+        if self.add_rox_call {
+            let created = create_event_with_rox_call(
                 &*service_context.mutations,
                 &*service_context.meeting_links,
                 &requester_id,
@@ -242,9 +242,9 @@ where
                 draft,
             )
             .await
-            .map_err(macro_call_create_tool_error)?;
+            .map_err(rox_call_create_tool_error)?;
             let labels = CalendarLabels::load(&*service_context.mutations, &requester_id).await;
-            return Ok(ToolCalendarEvent::from_event_with_macro_call(
+            return Ok(ToolCalendarEvent::from_event_with_rox_call(
                 &created, &labels,
             ));
         }

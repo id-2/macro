@@ -12,9 +12,9 @@ describe('parseEnvFile', () => {
         [
           '# written at enrollment',
           '',
-          'MACRO_API_KEY=mak_secret',
+          'ROX_API_KEY=mak_secret',
           '  ',
-          'MACRO_GATEWAY=https://gateway.example.com',
+          'ROX_GATEWAY=https://gateway.example.com',
           'EMPTY=',
           'WITH_EQUALS=a=b=c',
         ].join('\n')
@@ -22,8 +22,8 @@ describe('parseEnvFile', () => {
     ).toEqual({
       kind: 'parsed',
       values: {
-        MACRO_API_KEY: 'mak_secret',
-        MACRO_GATEWAY: 'https://gateway.example.com',
+        ROX_API_KEY: 'mak_secret',
+        ROX_GATEWAY: 'https://gateway.example.com',
         EMPTY: '',
         WITH_EQUALS: 'a=b=c',
       },
@@ -34,7 +34,7 @@ describe('parseEnvFile', () => {
     expect(
       parseEnvFile(
         [
-          'MACRO_API_KEY="mak_secret"',
+          'ROX_API_KEY="mak_secret"',
           'ODD_VALUE="a \\"quoted\\" \\\\ value"',
           'WINDOWS="crlf"\r',
         ].join('\n')
@@ -42,7 +42,7 @@ describe('parseEnvFile', () => {
     ).toEqual({
       kind: 'parsed',
       values: {
-        MACRO_API_KEY: 'mak_secret',
+        ROX_API_KEY: 'mak_secret',
         ODD_VALUE: 'a "quoted" \\ value',
         WINDOWS: 'crlf',
       },
@@ -89,11 +89,11 @@ describe('envFileCredentials', () => {
 
 describe('withheldCredentials', () => {
   test('lists the names but hands out no value and stores none', async () => {
-    const credentials = withheldCredentials(['MACRO_API_KEY', 'OTHER']);
-    expect(await credentials.names()).toEqual(['MACRO_API_KEY', 'OTHER']);
+    const credentials = withheldCredentials(['ROX_API_KEY', 'OTHER']);
+    expect(await credentials.names()).toEqual(['ROX_API_KEY', 'OTHER']);
     expect(await credentials.has('OTHER')).toBe(true);
     expect(await credentials.has('MISSING')).toBe(false);
-    expect(credentials.get('MACRO_API_KEY')).rejects.toThrow(
+    expect(credentials.get('ROX_API_KEY')).rejects.toThrow(
       'credentials stay with the agent'
     );
     expect(credentials.set('OTHER', 'value')).rejects.toThrow(

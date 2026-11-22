@@ -40,7 +40,7 @@ fn channel_name_hit_has_top_level_highlight() {
         entity_type: SearchEntityType::Channels,
         score: None,
         highlight: Highlight {
-            name: Some("<macro_em>acme-h</macro_em>q".to_string()),
+            name: Some("<rox_em>acme-h</rox_em>q".to_string()),
             ..Default::default()
         },
         goto: None,
@@ -53,7 +53,7 @@ fn channel_name_hit_has_top_level_highlight() {
     assert_eq!(items.len(), 1);
     assert_eq!(
         items[0].highlight.name.as_deref(),
-        Some("<macro_em>acme-h</macro_em>q")
+        Some("<rox_em>acme-h</rox_em>q")
     );
     let json = serde_json::to_value(&items[0]).unwrap();
     assert!(json.get("highlight").is_some());
@@ -938,7 +938,7 @@ fn name_hits_split_from_message_hits_and_never_become_message_items() {
         entity_type: SearchEntityType::Channels,
         score: None,
         highlight: Highlight {
-            name: Some("<macro_em>Gab</macro_em>riel Birman".to_string()),
+            name: Some("<rox_em>Gab</rox_em>riel Birman".to_string()),
             ..Default::default()
         },
         goto: None,
@@ -981,6 +981,6 @@ fn name_hits_split_from_message_hits_and_never_become_message_items() {
     assert_eq!(name_items.len(), 1);
     assert_eq!(
         name_items[0].highlight.name.as_deref(),
-        Some("<macro_em>Gab</macro_em>riel Birman")
+        Some("<rox_em>Gab</rox_em>riel Birman")
     );
 }

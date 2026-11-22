@@ -5,11 +5,11 @@ DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
 -- NOTE: This is used purely to setup the testing DB
--- Changes from `crates/macro_db_client/migrations` need to be reflected here as raw SQL
+-- Changes from `crates/rox_db_client/migrations` need to be reflected here as raw SQL
 -- Changes here WILL NOT ever make it into the dev/production db.
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE "macro_user" (
+CREATE TABLE "rox_user" (
     "id"                 UUID PRIMARY KEY,
     "username"           TEXT UNIQUE NOT NULL,
     "email"              TEXT UNIQUE NOT NULL,
@@ -21,8 +21,8 @@ CREATE TABLE "User" (
     "email"            TEXT UNIQUE NOT NULL,
     "name"             TEXT,
     "stripeCustomerId" TEXT UNIQUE,
-    "macro_user_id"    UUID NOT NULL,
-    FOREIGN KEY ("macro_user_id") REFERENCES "macro_user"("id")
+    "rox_user_id"    UUID NOT NULL,
+    FOREIGN KEY ("rox_user_id") REFERENCES "rox_user"("id")
 );
 
 CREATE TABLE "Permission" (

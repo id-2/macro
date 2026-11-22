@@ -169,9 +169,9 @@ set -eu
 umask 077
 preview_known_hosts=$(mktemp)
 trap 'rm -f "$preview_known_hosts"' EXIT HUP INT TERM
-cat > "$preview_known_hosts" <<'MACRO_PREVIEW_HOST_KEY'
+cat > "$preview_known_hosts" <<'ROX_PREVIEW_HOST_KEY'
 {known_host}
-MACRO_PREVIEW_HOST_KEY
+ROX_PREVIEW_HOST_KEY
 preview_connect() {{
 ssh -F /dev/null -fNT \
   -o BatchMode=yes \

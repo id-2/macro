@@ -36,7 +36,7 @@ const fakeRelay = () => {
     fetch: (request, server) => {
       opened.push({
         path: new URL(request.url).pathname,
-        capability: request.headers.get('x-macro-user-api-key'),
+        capability: request.headers.get('x-rox-user-api-key'),
       });
       return server.upgrade(request, { data: { index: opened.length - 1 } })
         ? undefined

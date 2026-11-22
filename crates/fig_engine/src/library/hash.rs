@@ -135,7 +135,7 @@ fn strip(p: &mut Props) {
     p.recomputed = false;
     p.library = None;
     p.key = None;
-    p.macro_data = None;
+    p.rox_data = None;
     p.sort_position = None;
     if let Some(symbol) = &p.symbol {
         let mut s = (**symbol).clone();

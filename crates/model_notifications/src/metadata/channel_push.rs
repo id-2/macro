@@ -1,5 +1,5 @@
 use super::{NotificationTitle, alert_apns};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use notification::domain::models::apple::{
     APNSPushNotification, PushNotificationData, PushNotificationNavigation,
@@ -11,7 +11,7 @@ mod test;
 
 pub(super) fn channel_apns<T: NotificationTitle>(
     notification: &T,
-    sender_id: Option<MacroUserIdStr<'_>>,
+    sender_id: Option<RoxUserIdStr<'_>>,
     notification_id: Uuid,
     sender_profile_picture_url: Option<String>,
     entity: &Entity<'_>,

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT included_public, extra_public, prepaid, reclaimed_prepaid, postpaid, macro_absorbed\n                 FROM ai_funding_reservation WHERE invocation_id = $1 AND allocated",
+  "query": "SELECT included_public, extra_public, prepaid, reclaimed_prepaid, postpaid, rox_absorbed\n                 FROM ai_funding_reservation WHERE invocation_id = $1 AND allocated",
   "describe": {
     "columns": [
       {
@@ -30,7 +30,7 @@
       },
       {
         "ordinal": 5,
-        "name": "macro_absorbed",
+        "name": "rox_absorbed",
         "type_info": "Int8"
       }
     ],

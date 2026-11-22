@@ -89,7 +89,7 @@ From `infra/`:
   behind their flag.
 - `monitors/harness-runtimes.ts` reads the `agent.runtime.reattach` span fields
   in `crates/agent_harness/src/domain/service.rs` and matches the text of the
-  `tokio runtime starvation detected` warning in `crates/macro_tower_layers`;
+  `tokio runtime starvation detected` warning in `crates/rox_tower_layers`;
   its header is the field contract.
 - `monitors/calls.ts` matches the text of the `voip push: SNS delivery failed`
   log in `crates/notification/src/domain/service/voip.rs` and the

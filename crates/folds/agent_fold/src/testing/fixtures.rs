@@ -6,7 +6,7 @@ pub const TURN: &str = include_str!("../../fixtures/turn.jsonl");
 /// A hand-shaped Claude Code turn calling Rox tools over MCP - a read, a
 /// user tool (`SendEmail`) the user later edits and sends, and a failed call -
 /// with the MCP `CallToolResult` envelope around every output.
-pub const MACRO_MCP: &str = include_str!("../../fixtures/macro_mcp.jsonl");
+pub const ROX_MCP: &str = include_str!("../../fixtures/rox_mcp.jsonl");
 
 /// A sanitized real resumed session followed by fresh prompts.
 pub const RESUMED_AND_CONTINUED: &str =
@@ -45,8 +45,8 @@ pub const SUBAGENT_CURSOR: &str = include_str!("../../fixtures/real/subagent_cur
 /// `_meta.macro.subagent: true`, with `{ "task" }` as input and the bare
 /// `{ "result": "<answer>" }` response on completion. Nothing of the child is
 /// streamed.
-pub const SUBAGENT_MACRO_INMEM: &str =
-    include_str!("../../fixtures/real/subagent_macro_inmem.jsonl");
+pub const SUBAGENT_ROX_INMEM: &str =
+    include_str!("../../fixtures/real/subagent_rox_inmem.jsonl");
 
 /// A real Claude Code turn where `AskUserQuestion` asks a single-select
 /// question through `elicitation/create`, the client answers with both the

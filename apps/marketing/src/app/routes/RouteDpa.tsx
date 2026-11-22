@@ -4,7 +4,7 @@ import './RouteDpa.css';
 import './RouteLegal.css';
 
 /**
- * Rox's Data Protection Agreement, transcribed from MacroDPA.docx (version
+ * Rox's Data Protection Agreement, transcribed from RoxDPA.docx (version
  * August 2026). The wording is the executed document's and the presentation is
  * ours, with one deliberate correction: clause 1.7 reads "all l and regulations"
  * in the source, and is published here as "all laws and regulations".
@@ -81,7 +81,7 @@ export const RouteDpa: Component = () => {
 
         {/* Rox's own notice, not part of the contract. The class carries no
               styling of its own; it exists so the page can be checked against
-              MacroDPA.docx with the notice excluded. */}
+              RoxDPA.docx with the notice excluded. */}
         <p class="dpa-note">
           The following is a reference to the body of our Data Protection
           Addendum (DPA) that acts as a supplement for our Cloud Terms of

@@ -8,7 +8,7 @@ import {
 } from './featured-search-results';
 
 const localSearch = {
-  nameHighlight: '<macro_em>budget</macro_em> review',
+  nameHighlight: '<rox_em>budget</rox_em> review',
   senderHighlightTerms: null,
   contentHitData: null,
   source: 'local',

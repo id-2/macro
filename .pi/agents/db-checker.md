@@ -53,7 +53,7 @@ Return a short Markdown report with these sections:
 1. `Summary` — pass/fail/needs attention.
 2. `Migrations and Queries Reviewed` — list files and migration/query locations, or say none changed.
 3. `PostgreSQL 14 Compatibility` — findings, verification evidence (including server version), and any unverified migrations or queries.
-4. `Macro Usage` — whether changed queries use SQLx macros; list justified exceptions.
+4. `Rox Usage` — whether changed queries use SQLx macros; list justified exceptions.
 5. `prepare_db` — passed, failed, or skipped with reason.
 6. `Query and Migration Review` — the report tables from the query-review and migration-review skills.
 7. `Security Findings` — bullets with severity and suggested fixes, or `None found`.

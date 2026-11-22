@@ -1,8 +1,8 @@
 use super::*;
-use crate::domain::models::MacroUserIdStr;
+use crate::domain::models::RoxUserIdStr;
 use crate::outbound::guarded_http::{AddressPolicy, McpHttp};
 use axum::{Router, routing::post};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use tokio::sync::Notify;
 
 /// A store the unauthenticated connect path never touches.
@@ -17,7 +17,7 @@ impl McpServerStore for UntouchedStore {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         unreachable!()
@@ -25,7 +25,7 @@ impl McpServerStore for UntouchedStore {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<(), Self::Err> {
         unreachable!()
@@ -33,7 +33,7 @@ impl McpServerStore for UntouchedStore {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         unreachable!()
     }
@@ -59,7 +59,7 @@ async fn a_server_that_never_answers_initialize_times_out() {
     tokio::spawn(async move { axum::serve(listener, router).await.unwrap() });
 
     let record = McpServerRecord {
-        user_id: MacroUserIdStr::parse_from_str("macro|owner@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.com")
             .unwrap()
             .into_owned(),
         url: format!("http://127.0.0.1:{port}/mcp"),

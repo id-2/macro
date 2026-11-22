@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex, PoisonError, Weak};
 
 use http::header::{CONTENT_TYPE, HeaderMap, HeaderName, HeaderValue};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::models::PipedreamConnection;
 use pipedream_mcp::domain::ports::{ConnectedAppProxy, ConnectionStore};
 use rootcause::compat::IntoRootcause;
@@ -66,7 +66,7 @@ where
     #[tracing::instrument(skip_all, err)]
     async fn for_user(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Option<Self::Api>, NotionError> {
         let Some(proxy) = &self.proxy else {
             return Ok(None);

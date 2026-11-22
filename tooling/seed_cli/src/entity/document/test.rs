@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use clap::Parser;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::{DocumentMetadata, FileType};
 use model_owner::Owner;
 use tempfile::NamedTempFile;
@@ -178,7 +178,7 @@ fn write_temp_json(content: &str) -> NamedTempFile {
 }
 
 fn test_document_metadata() -> DocumentMetadata {
-    let owner = MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
     DocumentMetadata::new_document(
         "doc-123",
         1,
@@ -198,7 +198,7 @@ fn test_document_metadata() -> DocumentMetadata {
 }
 
 fn test_document_metadata_with_type(file_type: FileType) -> DocumentMetadata {
-    let owner = MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
     DocumentMetadata::new_document(
         "doc-123",
         1,

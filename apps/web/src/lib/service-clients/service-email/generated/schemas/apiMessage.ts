@@ -39,7 +39,7 @@ export interface ApiMessage {
   attachments_forwarded: ApiAttachmentForwarded[];
   bcc: ApiContactInfo[];
   body_html_sanitized?: ApiMessageBodyHtmlSanitized;
-  body_macro?: ApiMessageBodyMacro;
+  body_rox?: ApiMessageBodyMacro;
   body_replyless?: ApiMessageBodyReplyless;
   body_text?: ApiMessageBodyText;
   calendar_invitations?: CalendarInvitation[];

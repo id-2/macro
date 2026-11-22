@@ -18,7 +18,7 @@ path = "src/doppler_config.rs"
 
 [features]
 dynamodb_client_test = []
-local_auth = ["macro_authorization/local_auth"]
+local_auth = ["rox_authorization/local_auth"]
 tree_trace = []
 
 [dependencies]
@@ -32,15 +32,15 @@ aws-sdk-sqs.workspace = true
 axum = { workspace = true, features = ["tower-log", "ws"] }
 chrono = { workspace = true }
 doppler-config = { workspace = true }
-macro_auth = { path = "../../crates/macro_auth" }
-macro_authorization = { path = "../../crates/macro_authorization" }
-macro_aws_config = { path = "../../crates/macro_aws_config", features = ["s3"] }
-macro_config = { path = "../../crates/macro_config" }
-macro_cors = { path = "../../crates/macro_cors" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env = { path = "../../crates/macro_env" }
-macro_env_var = { path = "../../crates/macro_env_var" }
-macro_queues = { path = "../../crates/macro_queues" }
+rox_auth = { path = "../../crates/rox_auth" }
+rox_authorization = { path = "../../crates/rox_authorization" }
+rox_aws_config = { path = "../../crates/rox_aws_config", features = ["s3"] }
+rox_config = { path = "../../crates/rox_config" }
+rox_cors = { path = "../../crates/rox_cors" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env = { path = "../../crates/rox_env" }
+rox_env_var = { path = "../../crates/rox_env_var" }
+rox_queues = { path = "../../crates/rox_queues" }
 model = { path = "../../crates/model" }
 models_sfs = { path = "../../crates/models_sfs" }
 s3_key = { path = "../../crates/s3_key" }
@@ -57,9 +57,9 @@ utoipa = { workspace = true }
 utoipa-swagger-ui = { workspace = true, features = ["axum"] }
 uuid.workspace = true
 
-macro_service_urls = { path = "../../crates/macro_service_urls" }
+rox_service_urls = { path = "../../crates/rox_service_urls" }
 workspace-hack = { version = "0.1", path = "../../crates/workspace-hack" }
 
 [dev-dependencies]
-macro_auth = { path = "../../crates/macro_auth", features = ["testing"] }
+rox_auth = { path = "../../crates/rox_auth", features = ["testing"] }
 tower = { workspace = true, features = ["util"] }

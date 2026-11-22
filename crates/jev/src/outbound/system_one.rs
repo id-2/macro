@@ -8,7 +8,7 @@
 
 use std::{collections::HashMap, time::Duration};
 
-use macro_env_var::maybe_env_var;
+use rox_env_var::maybe_env_var;
 use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

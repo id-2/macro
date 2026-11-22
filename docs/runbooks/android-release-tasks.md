@@ -87,7 +87,7 @@ Scope:
 
 Acceptance: acknowledged work survives lifecycle/network changes without duplication or cross-account leakage; an older installed Android release remains functional when a newer iOS/shared-JS release ships; failed or rejected updates recover cleanly.
 
-Starting points: `apps/web/src/lib/core/mobile/native-network-status.ts`, `apps/web/src/lib/queries/client.ts`, `apps/web/tauri/{graphql_cache_plugin,macro_bundle_updater_plugin}`, `crates/native_app_service/src/domain/service.rs`, and audit items 11–12. Depends on task 1 and coordinates with tasks 2–4 for lifecycle testing.
+Starting points: `apps/web/src/lib/core/mobile/native-network-status.ts`, `apps/web/src/lib/queries/client.ts`, `apps/web/tauri/{graphql_cache_plugin,rox_bundle_updater_plugin}`, `crates/native_app_service/src/domain/service.rs`, and audit items 11–12. Depends on task 1 and coordinates with tasks 2–4 for lifecycle testing.
 
 ## 6. Qualify and release the Android app on Google Play
 

@@ -457,7 +457,7 @@ where
         match &command {
             HarnessCommand::Open(open)
                 if AgentKind::of(open.bot_id) == AgentKind::SandboxedCoder
-                    && !is_macro_staff(open.origin.actor()) =>
+                    && !is_rox_staff(open.origin.actor()) =>
             {
                 return Err(AgentSessionError::Forbidden.into());
             }
@@ -483,7 +483,7 @@ where
                     return Err(AgentSessionError::Archived(session_id).into());
                 }
                 if AgentKind::of(session.bot_id) == AgentKind::SandboxedCoder
-                    && !actor.as_ref().is_some_and(is_macro_staff)
+                    && !actor.as_ref().is_some_and(is_rox_staff)
                 {
                     return Err(AgentSessionError::Forbidden.into());
                 }
@@ -1221,7 +1221,7 @@ where
         &self,
         session_id: AgentSessionId,
         action_id: AgentActionId,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> Result<CommandOutcome> {
         self.revalidate_queue(session_id).await?;
         queue_result(self.queues.move_to_front(session_id, action_id), session_id)?;
@@ -1266,7 +1266,7 @@ where
         session_id: AgentSessionId,
         action_id: AgentActionId,
         action: &AgentAction,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
         announce: Option<AnnounceOrigin>,
     ) -> Result<()> {
         self.revalidate_queue(session_id).await?;

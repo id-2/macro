@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT \n            id,\n            email,\n            \"organizationId\" as \"organization_id?\",\n            macro_user_id as \"macro_user_id?\"\n        FROM \"User\"\n        WHERE \"email\" = $1\n        ",
+  "query": "\n        SELECT \n            id,\n            email,\n            \"organizationId\" as \"organization_id?\",\n            rox_user_id as \"rox_user_id?\"\n        FROM \"User\"\n        WHERE \"email\" = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -20,7 +20,7 @@
       },
       {
         "ordinal": 3,
-        "name": "macro_user_id?",
+        "name": "rox_user_id?",
         "type_info": "Uuid"
       }
     ],

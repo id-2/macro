@@ -6,8 +6,8 @@ use axum::{
     http::StatusCode,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService};
-use macro_uuid::Uuid;
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService};
+use rox_uuid::Uuid;
 use model_owner::Owner;
 use serde::Deserialize;
 use shared_entity_registry::OwnedPurgeOutcome;
@@ -28,14 +28,14 @@ pub(super) struct OwnerQuery {
 #[tracing::instrument(skip_all, fields(%session_id, owner.kind = ?owner.owner_type()))]
 pub(super) async fn purge_owned_session_handler<R, Access, Auth>(
     State(state): State<AgentSessionControlState<R, Access, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Path(session_id): Path<Uuid>,
     Query(OwnerQuery { owner }): Query<OwnerQuery>,
 ) -> StatusCode
 where
     R: AgentSessionNotificationRecipient,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let id = AgentSessionId::new_from_uuid(session_id);
     match state.recipient.purge_owned_session(id, &owner).await {

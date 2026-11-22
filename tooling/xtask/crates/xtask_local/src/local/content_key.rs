@@ -116,7 +116,7 @@ pub fn git(repo: &Path, args: &[&str], index: Option<&Path>) -> Result<Vec<u8>> 
 
 /// A private directory for the index copy, unique per process and thread.
 fn scratch_dir() -> Result<PathBuf> {
-    let home = macro_env_var::maybe_read_env("HOME").context("HOME is not set")?;
+    let home = rox_env_var::maybe_read_env("HOME").context("HOME is not set")?;
     let dir = PathBuf::from(home).join(format!(
         ".cache/macro-local/.index-{}-{:?}",
         std::process::id(),

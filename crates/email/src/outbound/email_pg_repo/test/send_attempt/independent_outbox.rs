@@ -5,14 +5,14 @@ use crate::domain::draft_attachments::{
 use crate::domain::scheduled::{EmailSchedulingRepo, ScheduleChange};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn cancelled_send_fences_old_saves_deletes_attachments_and_schedules(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     assert!(matches!(
@@ -107,14 +107,14 @@ async fn cancelled_send_fences_old_saves_deletes_attachments_and_schedules(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn send_later_deadline_is_part_of_immutable_approval(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let deadline = Utc::now() + chrono::Duration::days(2);
     let mut input = prepared();
     input.snapshot.message.send_time = Some(deadline);
@@ -140,14 +140,14 @@ async fn send_later_deadline_is_part_of_immutable_approval(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn pending_sends_are_scoped_to_actor_inbox_and_cursor(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool);
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     let rows = repo
@@ -160,7 +160,7 @@ async fn pending_sends_are_scoped_to_actor_inbox_and_cursor(
             .await?
             .is_empty()
     );
-    let other = MacroUserIdStr::parse_from_str("macro|other@test.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@test.com").unwrap();
     assert!(
         repo.pending_send_attempts(&other, &[link()], None)
             .await?
@@ -181,7 +181,7 @@ async fn pending_sends_are_scoped_to_actor_inbox_and_cursor(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn outlook_ambiguous_submission_cannot_be_cancelled_or_reapproved(
@@ -194,7 +194,7 @@ async fn outlook_ambiguous_submission_cannot_be_cancelled_or_reapproved(
     .execute(&pool)
     .await?;
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!("UPDATE email_mailbox_drafts SET state='failed', error_code='send_unknown', checkpoint=jsonb_build_object('stage','confirming') WHERE message_id=$1", message()).execute(&pool).await?;
@@ -213,7 +213,7 @@ async fn outlook_ambiguous_submission_cannot_be_cancelled_or_reapproved(
         repo.admit_send(
             &actor(),
             link(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             prepared()
         )
         .await
@@ -223,7 +223,7 @@ async fn outlook_ambiguous_submission_cannot_be_cancelled_or_reapproved(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_draft"))
 )]
 async fn outlook_cancel_revokes_the_prepared_provider_revision(
@@ -236,7 +236,7 @@ async fn outlook_cancel_revokes_the_prepared_provider_revision(
     .execute(&pool)
     .await?;
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     let before = sqlx::query_scalar!(

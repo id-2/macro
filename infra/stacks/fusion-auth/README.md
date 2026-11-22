@@ -1,4 +1,4 @@
-# Macro Fusion Auth
+# Rox Fusion Auth
 
 The FusionAuth infrastucture consists of a dedicated `ECS Cluster` to run the FusionAuth service, the `ECS Fargate container` for the FusionAuth service and a postgres database deployed via `RDS`.
 

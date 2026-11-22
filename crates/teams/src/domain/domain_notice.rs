@@ -8,7 +8,7 @@
 mod test;
 
 use entity_access::domain::models::{AdminTeamRole, EntityAccessReceipt};
-use macro_user_id::{email::ReadEmailParts, user_id::MacroUserIdStr};
+use rox_user_id::{email::ReadEmailParts, user_id::RoxUserIdStr};
 use rootcause::{Report, prelude::*};
 
 use super::join_announcement::{AnnounceJoin, AnnounceReport, JoinAnnouncementService};
@@ -29,13 +29,13 @@ pub trait ColleagueDirectory: Send + Sync + 'static {
     /// The user's contacts, in no particular order.
     fn contacts(
         &self,
-        user_id: &MacroUserIdStr<'_>,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Report>> + Send;
+        user_id: &RoxUserIdStr<'_>,
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Report>> + Send;
 }
 
 /// Sends a team's domain notice.
 pub trait DomainNoticeService: Send + Sync + 'static {
-    /// Emails the admin's same-domain contacts that the team exists. Contacts already on Macro,
+    /// Emails the admin's same-domain contacts that the team exists. Contacts already on Rox,
     /// on the team, invited, or emailed before are skipped.
     fn send_domain_notice(
         &self,
@@ -74,7 +74,7 @@ where
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
     ) -> Result<AnnounceReport, Report<DomainNoticeError>> {
-        let team_id = macro_uuid::string_to_uuid(&receipt.entity().entity_id)
+        let team_id = rox_uuid::string_to_uuid(&receipt.entity().entity_id)
             .map_err(|_| Report::new(DomainNoticeError::InvalidReceipt))?;
         let sender = receipt
             .acting_user_id()

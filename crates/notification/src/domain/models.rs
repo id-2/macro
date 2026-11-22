@@ -18,7 +18,7 @@ pub mod websocket_notification_event;
 
 use crate::domain::models::{apple::APNSPushNotification, queue_message::EmailContent};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 pub use mobile::{DeviceEndpoint, HashedCollapseKey, NotifCollapseKey};
 use model_entity::Entity;
 use models_pagination::{CreatedAt, CursorVal, Identify, SortOn};
@@ -43,7 +43,7 @@ pub struct NotificationIdAndCollapseKey {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VoipPushTarget {
     /// Recipient whose VoIP-capable endpoints were resolved.
-    pub recipient_id: MacroUserIdStr<'static>,
+    pub recipient_id: RoxUserIdStr<'static>,
     /// Registered mobile endpoints, retaining ordinary devices for fallback decisions.
     pub endpoints: Vec<DeviceEndpoint>,
 }
@@ -52,9 +52,9 @@ pub struct VoipPushTarget {
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MobilePushRecipients {
     /// Users whose iOS devices are included.
-    pub ios: HashSet<MacroUserIdStr<'static>>,
+    pub ios: HashSet<RoxUserIdStr<'static>>,
     /// Users whose Android devices are included.
-    pub android: HashSet<MacroUserIdStr<'static>>,
+    pub android: HashSet<RoxUserIdStr<'static>>,
 }
 
 /// Native call delivery results used to select ordinary mobile fallbacks.
@@ -63,7 +63,7 @@ pub struct NativeCallPushResult {
     /// Users with a successful native delivery on each platform.
     pub delivered: MobilePushRecipients,
     /// Users whose registered mobile platforms were all handled natively.
-    pub fully_delivered: HashSet<MacroUserIdStr<'static>>,
+    pub fully_delivered: HashSet<RoxUserIdStr<'static>>,
 }
 
 /// A compact patch describing user notification status fields that changed.
@@ -133,14 +133,14 @@ pub enum NotificationStatusPayload<'a> {
     /// One notification deletion applied to many users.
     NotificationForUsers {
         /// Users who should receive the deletion.
-        users: Vec<MacroUserIdStr<'a>>,
+        users: Vec<RoxUserIdStr<'a>>,
         /// The notification deletion shared by the users.
         update: Box<NotificationDelete<Uuid>>,
     },
     /// Many notification updates applied to one user.
     UserNotifications {
         /// User who should receive the updates.
-        user: MacroUserIdStr<'a>,
+        user: RoxUserIdStr<'a>,
         /// Notification patches and deletions for the user.
         updates: Vec<PatchDelete<Uuid, Cow<'a, UserNotificationRow<serde_json::Value>>>>,
     },
@@ -168,7 +168,7 @@ impl<'a> NotificationStatusUpdate<'a> {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UserNotificationRow<T> {
     /// The user who owns this notification.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// The notification ID.
     #[serde(rename = "id")]
     pub notification_id: uuid::Uuid,
@@ -193,7 +193,7 @@ pub struct UserNotificationRow<T> {
     /// Deserialized notification metadata.
     pub notification_metadata: T,
     /// The user who triggered the notification.
-    pub sender_id: Option<MacroUserIdStr<'static>>,
+    pub sender_id: Option<RoxUserIdStr<'static>>,
 }
 
 impl<T> UserNotificationRow<T> {
@@ -403,7 +403,7 @@ impl<T> SortOn<CreatedAt> for UserNotificationRow<T> {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DisabledNotificationType {
     /// The user who disabled this type.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The notification event type (e.g. "channel_message_send").
     pub notification_event_type: String,
 }
@@ -432,13 +432,13 @@ pub trait NotificationTitle {
     /// Format the notification into a user-facing title.
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report>;
 
     /// Format the notification into a user-facing body.
     fn format_body(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report>;
 }
 
@@ -451,7 +451,7 @@ pub trait NotificationExtIos: Notification {
     /// Convert this notification into an APNS push notification.
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         entity: &Entity<'_>,
         notification_id: uuid::Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>>;

@@ -9,7 +9,7 @@ interface FuzzyNameMatchResultWithItem<T> {
 const uf = new uFuzzy({});
 
 const mark = (part: string, matched: boolean) =>
-  matched ? `<macro_em>${part}</macro_em>` : part;
+  matched ? `<rox_em>${part}</rox_em>` : part;
 
 const append = (accum: string, part: string) => accum + part;
 

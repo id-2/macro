@@ -26,7 +26,7 @@ fn shared_system_block_gets_its_own_breakpoint() {
         ],
         "messages": [{"role": "user", "content": [{"type": "text", "text": "hi"}]}],
         "cache_control": {"type": "ephemeral"},
-        "macro_prompt_layout": {"cache_shared_system": true, "tool_references": []},
+        "rox_prompt_layout": {"cache_shared_system": true, "tool_references": []},
     });
     assert_eq!(
         shaped(body),
@@ -56,7 +56,7 @@ fn shared_system_needs_exactly_two_blocks_the_first_unmarked() {
             {"type": "text", "text": "Memory"},
         ]),
     ] {
-        let body = json!({"system": system, "messages": [], "macro_prompt_layout": layout});
+        let body = json!({"system": system, "messages": [], "rox_prompt_layout": layout});
         assert_eq!(shaped(body), Err(PromptLayoutError::SharedSystem));
     }
 }
@@ -80,7 +80,7 @@ fn a_loading_result_references_its_tools_and_keeps_its_text_after_the_results() 
                 {"type": "tool_result", "tool_use_id": "toolu_other", "content": "found nothing"},
             ]},
         ],
-        "macro_prompt_layout": {
+        "rox_prompt_layout": {
             "cache_shared_system": false,
             "tool_references": [{"tool_use_id": "toolu_load", "tool_names": ["EditPresentation", "ReadPresentation"]}],
         },
@@ -97,7 +97,7 @@ fn a_loading_result_references_its_tools_and_keeps_its_text_after_the_results() 
             {"type": "text", "text": "<tool_result_text tool_use_id=\"toolu_load\">{\"loaded\":2}</tool_result_text>"},
         ]})
     );
-    assert_eq!(shaped.get("macro_prompt_layout"), None);
+    assert_eq!(shaped.get("rox_prompt_layout"), None);
 }
 
 #[test]
@@ -111,7 +111,7 @@ fn moved_texts_follow_the_order_their_results_were_referenced_in() {
             {"type": "tool_result", "tool_use_id": "toolu_1", "content": "one"},
             {"type": "tool_result", "tool_use_id": "toolu_2", "content": "two"},
         ]}],
-        "macro_prompt_layout": {
+        "rox_prompt_layout": {
             "cache_shared_system": false,
             "tool_references": [
                 {"tool_use_id": "toolu_1", "tool_names": ["A"]},
@@ -137,7 +137,7 @@ fn a_reference_must_name_a_deferred_tool() {
         "messages": [{"role": "user", "content": [
             {"type": "tool_result", "tool_use_id": "toolu_load", "content": "loaded"},
         ]}],
-        "macro_prompt_layout": {
+        "rox_prompt_layout": {
             "cache_shared_system": false,
             "tool_references": [{"tool_use_id": "toolu_load", "tool_names": ["EditPresentation"]}],
         },
@@ -157,7 +157,7 @@ fn a_reference_must_land_in_exactly_one_text_result() {
         "cache_shared_system": false,
         "tool_references": [{"tool_use_id": "toolu_load", "tool_names": ["EditPresentation"]}],
     });
-    let missing = json!({"tools": tools, "messages": [], "macro_prompt_layout": layout});
+    let missing = json!({"tools": tools, "messages": [], "rox_prompt_layout": layout});
     assert_eq!(
         shaped(missing),
         Err(PromptLayoutError::ToolResult("toolu_load".to_owned(), 0))
@@ -167,7 +167,7 @@ fn a_reference_must_land_in_exactly_one_text_result() {
         "messages": [{"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_load", "content": [
             {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AA=="}},
         ]}]}],
-        "macro_prompt_layout": layout,
+        "rox_prompt_layout": layout,
     });
     assert_eq!(
         shaped(image),
@@ -190,14 +190,14 @@ fn a_layout_cannot_exceed_four_breakpoints() {
         ],
         "messages": [],
         "cache_control": {"type": "ephemeral"},
-        "macro_prompt_layout": {"cache_shared_system": true, "tool_references": []},
+        "rox_prompt_layout": {"cache_shared_system": true, "tool_references": []},
     });
     assert_eq!(shaped(body), Err(PromptLayoutError::Breakpoints(5)));
 }
 
 #[test]
 fn a_malformed_layout_fails() {
-    let body = json!({"messages": [], "macro_prompt_layout": {"cache_shared_system": "yes"}});
+    let body = json!({"messages": [], "rox_prompt_layout": {"cache_shared_system": "yes"}});
     assert!(matches!(shaped(body), Err(PromptLayoutError::Malformed(_))));
 }
 
@@ -266,7 +266,7 @@ async fn the_adapter_forwards_plain_bodies_byte_for_byte_and_fails_bad_layouts()
         json!({
             "system": [{"type": "text", "text": "Shared"}, {"type": "text", "text": "Rest"}],
             "messages": [],
-            "macro_prompt_layout": {"cache_shared_system": true, "tool_references": []},
+            "rox_prompt_layout": {"cache_shared_system": true, "tool_references": []},
         })
         .to_string(),
     );
@@ -289,7 +289,7 @@ async fn the_adapter_forwards_plain_bodies_byte_for_byte_and_fails_bad_layouts()
     );
 
     let bad = Bytes::from(
-        json!({"messages": [], "macro_prompt_layout": {"cache_shared_system": true, "tool_references": []}})
+        json!({"messages": [], "rox_prompt_layout": {"cache_shared_system": true, "tool_references": []}})
             .to_string(),
     );
     let Err(error) = layout

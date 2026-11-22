@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use whatsmeow::store::{IdentityStore, PreKeyStore, SenderKeyStore, SessionStore, StoreError};
 use whatsmeow::types::{DEFAULT_USER_SERVER, HIDDEN_USER_SERVER, new_jid};
@@ -8,7 +8,7 @@ use whatsmeow::util::keys::new_key_pair_from_private_key;
 
 use crate::store::test::open_new_store;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn identities_are_trusted_on_first_use_and_deleted_by_user(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     assert!(store.is_trusted_identity("111:0", [1; 32]).await.unwrap());
@@ -33,7 +33,7 @@ async fn identities_are_trusted_on_first_use_and_deleted_by_user(pool: Pool<Post
     assert!(store.is_trusted_identity("1112:0", [9; 32]).await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sessions_round_trip_singly_and_in_batches(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     assert_eq!(store.get_session("111:0").await.unwrap(), None);
@@ -82,7 +82,7 @@ async fn sessions_round_trip_singly_and_in_batches(pool: Pool<Postgres>) {
     assert!(!store.has_session("222:0").await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn migrate_pn_to_lid_moves_sessions_identities_and_sender_keys(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let pn = new_jid("1234567890", DEFAULT_USER_SERVER);
@@ -165,7 +165,7 @@ async fn migrate_pn_to_lid_moves_sessions_identities_and_sender_keys(pool: Pool<
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pre_keys_are_numbered_from_one_and_marked_uploaded(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let first_batch = store.get_or_gen_pre_keys(3).await.unwrap();
@@ -206,7 +206,7 @@ async fn pre_keys_are_numbered_from_one_and_marked_uploaded(pool: Pool<Postgres>
     assert_eq!(store.gen_one_pre_key().await.unwrap().key_id, 5);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_large_pre_key_batch_is_generated_and_uploaded_at_once(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let keys = store.get_or_gen_pre_keys(5000).await.unwrap();
@@ -225,7 +225,7 @@ async fn a_large_pre_key_batch_is_generated_and_uploaded_at_once(pool: Pool<Post
     assert_eq!(store.get_or_gen_pre_keys(1).await.unwrap()[0].key_id, 5001);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn sender_keys_are_per_group_and_sender(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     store

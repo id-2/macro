@@ -15,7 +15,7 @@ import { startFixtureServer } from './fixtures/server';
 
 assert.equal(process.platform, 'linux', 'Linux is the initial driver target');
 assert.equal(
-  process.env.MACRO_E2E_NETNS,
+  process.env.ROX_E2E_NETNS,
   '1',
   'Use run.sh: native tests must have network isolation'
 );
@@ -137,7 +137,7 @@ try {
     {
       MODE: 'development',
       // The isolated fixture and Tauri dev URL both use loopback HTTP.
-      MACRO_DEV_HTTPS: 'false',
+      ROX_DEV_HTTPS: 'false',
       PORT: '3009',
       VITE_LOCAL_SERVERS: 'ALL',
       VITE_LOCAL_BACKEND_ORIGIN: fixture.origin,

@@ -4,7 +4,7 @@
 use super::*;
 use std::collections::BTreeMap;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn entries_list_referencing_rows_from_visible_live_pipelines(pool: PgPool) {
     use databases::domain::storage::DatabaseStorageService;
     use models_properties::service::property_value::PropertyValue;
@@ -22,7 +22,7 @@ async fn entries_list_referencing_rows_from_visible_live_pipelines(pool: PgPool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1,$1,$2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1,$1,$2)"#,
         teammate,
         teammate_id
     )
@@ -177,7 +177,7 @@ async fn entries_list_referencing_rows_from_visible_live_pipelines(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn entries_come_only_from_primary_references_of_tracked_pipelines(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let op = |value| serde_json::from_value::<DatabaseOp>(value).unwrap();
@@ -293,7 +293,7 @@ async fn copy_cell(
 /// The lookup the card starts from and the guard it takes next, each on its
 /// own: cells that only look like a primary reference, and pipelines trashed
 /// before the lookup or between it and the guard.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn referencing_rows_and_the_live_guard_keep_only_live_primary_references(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let repo = PgPipelineRepo::new(
@@ -439,7 +439,7 @@ async fn entry_grants(s: &Service, viewer: &str, record: Uuid) -> BTreeMap<Uuid,
 /// Another team's pipeline can hold a record this team works on. Its entries
 /// reach only those it is shared with, never this team's viewer, whatever
 /// grants the viewer holds on their own team's pipelines.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn entries_leave_out_another_teams_pipeline_holding_the_record(pool: PgPool) {
     let (s, _db, a, team, company) = fixture(&pool).await;
     let lead = fresh_user(&pool, Some(team)).await;

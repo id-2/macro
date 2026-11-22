@@ -33,7 +33,7 @@ pub const TEAM_ID_METADATA_KEY: &str = "team_id";
 /// The metadata key a team subscription carries its owner in.
 pub const OWNER_ID_METADATA_KEY: &str = "owner_id";
 /// The metadata key Rox stamps on an immediate plan change.
-pub const PLAN_CHANGE_AT_METADATA_KEY: &str = "macro_plan_change_at";
+pub const PLAN_CHANGE_AT_METADATA_KEY: &str = "rox_plan_change_at";
 /// The metadata key a computer's subscription item (or its price) carries.
 pub const COMPUTER_ID_METADATA_KEY: &str = "computer_id";
 
@@ -288,7 +288,7 @@ pub fn subscription_facts(object: &Value) -> Result<SubscriptionFacts, Translate
         .transpose()
         .map_err(|_| TranslateError::Invalid("subscription team_id metadata"))?;
     let owner_id = non_empty(&raw.metadata, OWNER_ID_METADATA_KEY).and_then(|owner| {
-        macro_user_id::user_id::MacroUserIdStr::try_from(owner)
+        rox_user_id::user_id::RoxUserIdStr::try_from(owner)
             .inspect_err(|_| {
                 tracing::warn!(subscription_id = %raw.id, "subscription has an invalid owner_id");
             })

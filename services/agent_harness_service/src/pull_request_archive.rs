@@ -11,8 +11,8 @@ use agent_session::domain::auto_archive::AutoArchive;
 use agent_session::domain::work_registration::WorkRegistrations;
 use github_pull_requests::broker::{GithubPullRequestMacroEvent, GithubPullRequestTopicEvent};
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer, consumer_span, record_span_error};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::BorrowedMessage;
@@ -29,11 +29,11 @@ impl GroupName for PullRequestArchiveConsumerGroup {
     const INITIAL_OFFSET: InitialOffset = InitialOffset::Latest;
 }
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: GithubPullRequestMacroEvent);
+rox_event_broker::declare_topics!(DeclaredMacroEvent: GithubPullRequestMacroEvent);
 
 type ArchiveKafkaAdapter =
     KafkaConsumerAdapter<PullRequestArchiveConsumerGroup, DeclaredMacroEvent>;
-type ArchiveConsumer = MacroEventConsumerService<DeclaredMacroEvent, ArchiveKafkaAdapter>;
+type ArchiveConsumer = RoxEventConsumerService<DeclaredMacroEvent, ArchiveKafkaAdapter>;
 
 const LOOKUP_ATTEMPTS: usize = 3;
 
@@ -74,7 +74,7 @@ pub async fn run(
                     match message.decode_payload() {
                         Ok(DeclaredMacroEvent::GithubPullRequestMacroEvent(event)) => {
                             tracing::Span::current()
-                                .record("macro.event.id", tracing::field::display(event.event().event_id));
+                                .record("rox.event.id", tracing::field::display(event.event().event_id));
                             let GithubPullRequestTopicEvent::Updated(update) = &event.event().event;
                             // Before archiving, so these end for their pull requests rather than
                             // for the archive that follows from them.

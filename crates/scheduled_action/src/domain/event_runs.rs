@@ -6,8 +6,8 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::{
     EntityAccessReceipt, EntityType, RequiredPermission, ViewAccessLevel, ViewOnly,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model_owner::Owner;
 use rootcause::Report;
 use serde::{Deserialize, Serialize};
@@ -217,7 +217,7 @@ pub enum EventAccessCapability {
     Call(EntityAccessReceipt<ViewAccessLevel>),
     /// The owner has a claim to the GitHub App installation that delivered.
     GithubInstallation {
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         installation_id: u64,
     },
 }
@@ -225,7 +225,7 @@ pub enum EventAccessCapability {
 impl EventAccessCapability {
     /// Require a directly authenticated owner, the exact entity, and its kind.
     /// In particular, a bot acting on behalf of the owner is not the owner.
-    pub fn authorizes(&self, owner: &MacroUserIdStr<'static>, event: &EventReference) -> bool {
+    pub fn authorizes(&self, owner: &RoxUserIdStr<'static>, event: &EventReference) -> bool {
         match (self, event.entity_type()) {
             (Self::Document(receipt), EventEntityType::Document) => {
                 receipt_matches(receipt, owner, event, EntityType::Document)
@@ -259,7 +259,7 @@ impl EventAccessCapability {
 
 fn receipt_matches<T: RequiredPermission>(
     receipt: &EntityAccessReceipt<T>,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     event: &EventReference,
     kind: EntityType,
 ) -> bool {
@@ -450,7 +450,7 @@ pub trait EventRunRepository: Send + Sync + 'static {
 pub trait CurrentOwnerAccess: Send + Sync + 'static {
     fn authorize(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         event: &EventReference,
     ) -> impl Future<Output = Result<Option<EventAccessCapability>, Report>> + Send;
 }

@@ -3,7 +3,7 @@
 use async_trait::async_trait;
 pub use jev::domain::batches::{Answer, BatchedDecision, BatchedOutcome, decide_in_batches};
 pub use jev::domain::{DecisionRequest, DecisionResponse, MAX_QUESTIONS};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -134,14 +134,14 @@ pub trait Cognition: Send + Sync + 'static {
     /// Generate from supplied context only; never discover or execute tools.
     async fn generate_object(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         request: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report>;
 
     /// Estimate named yes/no probabilities through the shared Jev endpoint.
     async fn decide(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report>;
 }

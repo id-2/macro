@@ -55,7 +55,7 @@ async fn enhanced_search_uses_next_page_token_and_site_namespace() {
         json!({"issues":[],"isLast":false,"nextPageToken":"second"}),
         json!({"issues":[],"isLast":true}),
     ]));
-    let user = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let connections = Connections::new(
         Arc::new(support::Store),
         Some(proxy.clone()),

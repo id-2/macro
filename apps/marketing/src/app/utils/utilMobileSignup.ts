@@ -49,8 +49,8 @@ export const mobileStorePlatform = (
 
 // Survives the navigation from the capture step to the confirmation step (and a
 // refresh of it), which is where the conversions fire.
-const SUBMITTED_EMAIL_KEY = 'macro_mobile_signup_email';
-const CONVERSION_FIRED_KEY = 'macro_mobile_signup_conversion_fired';
+const SUBMITTED_EMAIL_KEY = 'rox_mobile_signup_email';
+const CONVERSION_FIRED_KEY = 'rox_mobile_signup_conversion_fired';
 
 const readSession = (key: string): string | null => {
   try {

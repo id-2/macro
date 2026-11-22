@@ -11,7 +11,7 @@ across scripts and applications; Rox checks permissions on every request.
 ## Quick start
 
 Install the SDK with `npm install @macro-inc/sdk`. Create an API key in Macro's
-**Settings → API Keys**, then set `MACRO_API_KEY` in your script's environment.
+**Settings → API Keys**, then set `ROX_API_KEY` in your script's environment.
 
 ```ts
 import { Macro } from '@macro-inc/sdk';
@@ -31,8 +31,8 @@ for await (const document of macro.documents.search('weekly update')) {
 An agent gets its own Rox account and seat. Have a teammate invite you with
 `(await macro.teams.current()).invite('agent@example.com', { agent: true })`, or,
 sign up at https://rox.one/app/signup/agent with Google or an email address. If you use email, verify the code
-sent to your address. Macro then shows your SDK token once. Set it as
-`MACRO_API_KEY`, then introduce yourself:
+sent to your address. Rox then shows your SDK token once. Set it as
+`ROX_API_KEY`, then introduce yourself:
 
 ```ts
 const macro = new Macro({});
@@ -47,12 +47,12 @@ await macro.me.update({ name: 'Research Agent', profilePicture: image });
 To get another token, call `macro.apiKeys.create('my token')` and save the
 returned `secret`, or use **Settings → API Keys**.
 
-See {@link src/config!MacroOpts | client options} for explicit credentials, bot identity,
-and service configuration, or {@link src/macro!Macro | the Rox client} for every entry point.
+See {@link src/config!RoxOpts | client options} for explicit credentials, bot identity,
+and service configuration, or {@link src/macro!Rox | the Rox client} for every entry point.
 
 ## Find the right entity
 
-An **entity** is a thing in Macro, such as a document, person, or project.
+An **entity** is a thing in Rox, such as a document, person, or project.
 The SDK groups related operations into namespaces on `macro`. Each link below
 opens the methods and exact request and response types for that namespace.
 
@@ -67,7 +67,7 @@ opens the methods and exact request and response types for that namespace.
 | {@link src/entities/databases/namespace!DatabaseNamespace | macro.databases} | Structured information in tables, with typed handles, SQL queries, atomic version-guarded writes, and views. |
 | {@link src/entities/forms/namespace!FormNamespace | macro.forms} | Questions that collect responses into a database without giving respondents access to its other rows. |
 | {@link src/entities/properties/namespace!PropertiesNamespace | macro.properties} | Custom fields and their options, used to describe and filter entities. |
-| {@link src/entities/foreign/namespace!ForeignEntityNamespace | macro.foreignEntities} | References to items in external systems that are linked into Macro. |
+| {@link src/entities/foreign/namespace!ForeignEntityNamespace | macro.foreignEntities} | References to items in external systems that are linked into Rox. |
 
 ### Communication
 
@@ -84,12 +84,12 @@ opens the methods and exact request and response types for that namespace.
 
 | Entry point | What it represents |
 | --- | --- |
-| {@link src/entities/users/namespace!UserNamespace | macro.users} | People in Macro and their profiles, including the authenticated user. |
+| {@link src/entities/users/namespace!UserNamespace | macro.users} | People in Rox and their profiles, including the authenticated user. |
 | {@link src/entities/teams/namespace!TeamNamespace | macro.teams} | Teams and their memberships. |
 | {@link src/entities/crm/namespace!CrmNamespace | macro.crm} | Company and contact records, with notes and relationships. |
 | {@link src/entities/favorites/namespace!FavoritesNamespace | macro.favorites} | Entities the current user has saved as favorites. |
 | {@link src/entities/pins/namespace!PinsNamespace | macro.pins} | Items pinned to fixed positions in the user's home view. |
-| {@link src/entities/activity/namespace!ActivityNamespace | macro.activity} | What the current user did across Macro in a time range, including actions agents took for them. |
+| {@link src/entities/activity/namespace!ActivityNamespace | macro.activity} | What the current user did across Rox in a time range, including actions agents took for them. |
 
 ### AI and integrations
 
@@ -99,7 +99,7 @@ opens the methods and exact request and response types for that namespace.
 | {@link src/entities/bots/namespace!BotsNamespace | macro.bots} | Bots: create, configure, channel access, webhooks and tokens. |
 | {@link src/entities/ai/namespace!AiNamespace | macro.ai} | AI operations on content you supply: structured generation and yes/no classification with Jev. |
 | {@link src/entities/memory/namespace!MemoryNamespace | macro.memory} | The current user's private explicit AI memory, edited one line at a time. |
-| {@link src/events/receiver!MacroEvents | macro.events} | Live entity events your application can subscribe to through a stream or webhook receiver. |
+| {@link src/events/receiver!RoxEvents | macro.events} | Live entity events your application can subscribe to through a stream or webhook receiver. |
 | {@link src/entities/webhooks/namespace!WebhooksNamespace | macro.webhooks} | Persistent subscriptions that deliver events to your application's URL. |
 
 ### Automation and resource management
@@ -157,5 +157,5 @@ const [name, content] = await Promise.all([
 Follow an entity link above to see its methods, examples, and linked types.
 The reference is generated from the SDK's declarations and comments using
 TypeDoc, including the API request and response types used by those methods.
-For shared behavior, see {@link src/entities/entity!MacroEntity | entity handles},
+For shared behavior, see {@link src/entities/entity!RoxEntity | entity handles},
 {@link src/entities/search!SearchOpts | search options}, and {@link src/mentions!msg | rich messages and mentions}.

@@ -54,7 +54,7 @@ async fn builds_posts_and_returns_provider_ids() {
             bcc: None,
             body_text: Some("Adapter body".to_string()),
             body_html: None,
-            body_macro: None,
+            body_rox: None,
             attachments: None,
             headers_json: None,
             send_time: None,

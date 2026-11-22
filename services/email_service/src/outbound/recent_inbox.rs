@@ -11,7 +11,7 @@ use email_api_client::domain::{
     service::mailbox::MailboxApiService,
 };
 use futures::StreamExt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::service::message::{Message, RecentInboxMessage};
 use models_email::service::link::UserProvider;
 use uuid::Uuid;
@@ -27,7 +27,7 @@ pub struct PgRecentInboxes(pub sqlx::PgPool);
 impl RecentInboxMailboxes for PgRecentInboxes {
     async fn readable_owned_inboxes(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> Result<Vec<RecentInboxMailbox>, MailboxError> {
         let inboxes = email_db_client::links::get::fetch_readable_owned_inboxes(&self.0, actor)
             .await

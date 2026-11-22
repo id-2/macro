@@ -62,47 +62,47 @@ pub const ERROR_TYPE: &str = "error.type";
 
 /// Rox-specific: how many of the oldest messages were dropped from
 /// [`INPUT_MESSAGES`] to fit the size budget (see [`crate::Limits`]).
-pub const MACRO_INPUT_MESSAGES_OMITTED: &str = "macro.genai.input_messages_omitted";
+pub const ROX_INPUT_MESSAGES_OMITTED: &str = "rox.genai.input_messages_omitted";
 /// Rox-specific: `true` when any content attribute on the span was cut to fit
 /// the size budget (see [`crate::Limits`]).
-pub const MACRO_CONTENT_TRUNCATED: &str = "macro.genai.content_truncated";
+pub const ROX_CONTENT_TRUNCATED: &str = "rox.genai.content_truncated";
 /// Rox-specific: tokens in the agent's context window after a turn, as the
 /// harness reported it (ACP `usage_update.used`).
-pub const MACRO_CONTEXT_USED_TOKENS: &str = "macro.genai.context.used_tokens";
+pub const ROX_CONTEXT_USED_TOKENS: &str = "rox.genai.context.used_tokens";
 /// Rox-specific: the agent's context window size in tokens (ACP
 /// `usage_update.size`).
-pub const MACRO_CONTEXT_SIZE_TOKENS: &str = "macro.genai.context.size_tokens";
+pub const ROX_CONTEXT_SIZE_TOKENS: &str = "rox.genai.context.size_tokens";
 /// Rox-specific: milliseconds from sending `session/prompt` to the first
 /// output the harness streamed back (prose, reasoning or a tool call), as the
 /// session actor observed it. Absent when the turn ended without output.
-pub const MACRO_TIME_TO_FIRST_OUTPUT_MS: &str = "macro.genai.turn.time_to_first_output_ms";
+pub const ROX_TIME_TO_FIRST_OUTPUT_MS: &str = "rox.genai.turn.time_to_first_output_ms";
 /// Milliseconds from sending `session/prompt` to the first non-whitespace
 /// agent message text observed by the session actor. Excludes thoughts and
 /// tool calls; absent for turns with no answer text. This is server-observed,
 /// not browser render latency, and excludes session initialization.
-pub const MACRO_TIME_TO_FIRST_TEXT_MS: &str = "macro.genai.turn.time_to_first_text_ms";
+pub const ROX_TIME_TO_FIRST_TEXT_MS: &str = "rox.genai.turn.time_to_first_text_ms";
 /// Milliseconds from sending `session/prompt` to the first non-whitespace thought.
-pub const MACRO_TIME_TO_FIRST_REASONING_MS: &str = "macro.genai.turn.time_to_first_reasoning_ms";
+pub const ROX_TIME_TO_FIRST_REASONING_MS: &str = "rox.genai.turn.time_to_first_reasoning_ms";
 /// Milliseconds from sending `session/prompt` to the first tool call.
-pub const MACRO_TIME_TO_FIRST_TOOL_CALL_MS: &str = "macro.genai.turn.time_to_first_tool_call_ms";
+pub const ROX_TIME_TO_FIRST_TOOL_CALL_MS: &str = "rox.genai.turn.time_to_first_tool_call_ms";
 /// Rox-specific: milliseconds from a model call's request to the first chunk
 /// it streamed back (text, reasoning or a tool call), on its `chat` span. The
 /// call's duration includes generation; this is the provider's latency alone.
-pub const MACRO_CHAT_TIME_TO_FIRST_CHUNK_MS: &str = "macro.genai.chat.time_to_first_chunk_ms";
+pub const ROX_CHAT_TIME_TO_FIRST_CHUNK_MS: &str = "rox.genai.chat.time_to_first_chunk_ms";
 /// Rox-specific: what a model call streamed first: `text`, `reasoning` or
 /// `tool_call`.
-pub const MACRO_CHAT_FIRST_CHUNK_KIND: &str = "macro.genai.chat.first_chunk_kind";
+pub const ROX_CHAT_FIRST_CHUNK_KIND: &str = "rox.genai.chat.first_chunk_kind";
 
 /// Rox-specific: the coarse ACP tool kind (`execute`, `edit`, `read`, …).
-pub const MACRO_TOOL_KIND: &str = "macro.genai.tool.kind";
+pub const ROX_TOOL_KIND: &str = "rox.genai.tool.kind";
 /// Rox-specific: the human-readable title the harness gave a tool call.
-pub const MACRO_TOOL_TITLE: &str = "macro.genai.tool.title";
+pub const ROX_TOOL_TITLE: &str = "rox.genai.tool.title";
 /// Rox-specific: the size of a tool's whole result in bytes (a string
 /// result's text, anything else's JSON), recorded whether or not content is,
 /// so an oversized result shows without the result itself.
-pub const MACRO_TOOL_RESULT_BYTES: &str = "macro.genai.tool.result_bytes";
+pub const ROX_TOOL_RESULT_BYTES: &str = "rox.genai.tool.result_bytes";
 /// Rox-specific: the MCP server a tool was reached through, when it was.
-pub const MACRO_MCP_SERVER: &str = "macro.genai.mcp.server";
+pub const ROX_MCP_SERVER: &str = "rox.genai.mcp.server";
 
 /// Well-known [`OPERATION_NAME`] values.
 pub mod operation {

@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 fn actor() -> InboxActor {
     InboxActor {
-        macro_id: MacroUserIdStr::parse_from_str("macro|leaving@example.com").unwrap(),
+        rox_id: RoxUserIdStr::parse_from_str("macro|leaving@example.com").unwrap(),
         credential_owner: "leaving-owner".into(),
     }
 }
@@ -81,7 +81,7 @@ fn non_custodian_leaving_does_not_change_credentials() {
 #[test]
 fn last_delegate_removes_a_promoted_mailbox_but_cannot_remove_a_human_owners_mailbox() {
     let mut snapshot = snapshot();
-    snapshot.delegates = vec![actor().macro_id.to_string()];
+    snapshot.delegates = vec![actor().rox_id.to_string()];
     assert_eq!(removal(&snapshot, &actor()), InboxRemoval::Disconnect);
     snapshot.promoted = false;
     assert!(matches!(
@@ -92,7 +92,7 @@ fn last_delegate_removes_a_promoted_mailbox_but_cannot_remove_a_human_owners_mai
 #[test]
 fn owner_removes_the_owned_mailbox() {
     let mut snapshot = snapshot();
-    snapshot.owner = actor().macro_id.to_string();
+    snapshot.owner = actor().rox_id.to_string();
     assert_eq!(removal(&snapshot, &actor()), InboxRemoval::Disconnect);
 }
 
@@ -137,7 +137,7 @@ impl InboxLifecycleRepository for FakeLifecycleRepository {
         if !current.disconnecting {
             current
                 .delegates
-                .retain(|delegate| delegate != actor.macro_id.as_ref());
+                .retain(|delegate| delegate != actor.rox_id.as_ref());
             match decision {
                 InboxRemoval::Disconnect => {
                     current.disconnecting = true;
@@ -149,7 +149,7 @@ impl InboxLifecycleRepository for FakeLifecycleRepository {
                 } => {
                     current
                         .custodians
-                        .retain(|custodian| custodian.actor_id != actor.macro_id.as_ref());
+                        .retain(|custodian| custodian.actor_id != actor.rox_id.as_ref());
                     if *replace_custodian {
                         current.sync_generation += 1;
                         current.grant_id = replacement.as_ref().map(|custodian| custodian.grant_id);
@@ -165,7 +165,7 @@ impl InboxLifecycleRepository for FakeLifecycleRepository {
         }
         state.removals.push((
             expected.clone(),
-            actor.macro_id.to_string(),
+            actor.rox_id.to_string(),
             decision.clone(),
         ));
         Ok(())
@@ -219,7 +219,7 @@ async fn assert_double_match_removal(with_replacement: bool) {
         before.owner = "macro|a-owner@example.com".into();
         let replacement = with_replacement.then(|| before.custodians[0].clone());
         before.custodians = vec![MailboxCustodian {
-            actor_id: actor().macro_id.to_string(),
+            actor_id: actor().rox_id.to_string(),
             credential_owner: "leaving-owner".into(),
             grant_id: before.grant_id.unwrap(),
             grant_generation: 1,
@@ -233,7 +233,7 @@ async fn assert_double_match_removal(with_replacement: bool) {
         };
         let owner = DeletedUserBinding {
             actor: InboxActor {
-                macro_id: MacroUserIdStr::try_from(before.owner.clone()).unwrap(),
+                rox_id: RoxUserIdStr::try_from(before.owner.clone()).unwrap(),
                 credential_owner: "leaving-owner".into(),
             },
             link_id: before.link_id,
@@ -264,7 +264,7 @@ async fn assert_double_match_removal(with_replacement: bool) {
             panic!("both bindings must be processed")
         };
         assert_eq!(first, &before);
-        assert_eq!(first_actor, actor().macro_id.as_ref());
+        assert_eq!(first_actor, actor().rox_id.as_ref());
         assert_eq!(
             first_decision,
             &InboxRemoval::Detach {
@@ -296,7 +296,7 @@ async fn assert_double_match_removal(with_replacement: bool) {
             second.custodians,
             replacement.into_iter().collect::<Vec<_>>()
         );
-        assert!(!second.delegates.contains(&actor().macro_id.to_string()));
+        assert!(!second.delegates.contains(&actor().rox_id.to_string()));
     }
 }
 
@@ -322,7 +322,7 @@ async fn deleted_user_single_binding_keeps_existing_removal_decision() {
             actor()
         } else {
             InboxActor {
-                macro_id: MacroUserIdStr::try_from(before.owner.clone()).unwrap(),
+                rox_id: RoxUserIdStr::try_from(before.owner.clone()).unwrap(),
                 credential_owner: "leaving-owner".into(),
             }
         };
@@ -334,7 +334,7 @@ async fn deleted_user_single_binding_keeps_existing_removal_decision() {
         } else {
             InboxRemoval::Disconnect
         };
-        let expected_actor = leaving.macro_id.to_string();
+        let expected_actor = leaving.rox_id.to_string();
         let repo = FakeLifecycleRepository {
             bindings: vec![DeletedUserBinding {
                 actor: leaving,
@@ -362,7 +362,7 @@ async fn deleted_user_single_binding_keeps_existing_removal_decision() {
 async fn deleted_user_same_actor_in_both_roles_matches_single_binding_calls() {
     let mut before = snapshot();
     before.promoted = false;
-    before.owner = actor().macro_id.to_string();
+    before.owner = actor().rox_id.to_string();
     before.custodians.push(MailboxCustodian {
         actor_id: before.owner.clone(),
         credential_owner: "leaving-owner".into(),
@@ -450,7 +450,7 @@ async fn deleted_user_orders_links_then_binding_kind_then_actors() {
     .into_iter()
     .map(|(link_id, actor_id, kind)| DeletedUserBinding {
         actor: InboxActor {
-            macro_id: MacroUserIdStr::parse_from_str(actor_id).unwrap(),
+            rox_id: RoxUserIdStr::parse_from_str(actor_id).unwrap(),
             credential_owner: "leaving-owner".into(),
         },
         link_id,

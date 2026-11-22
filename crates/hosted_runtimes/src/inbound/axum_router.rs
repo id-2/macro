@@ -15,10 +15,10 @@ use entity_access::{
         AdminTeamRole, EntityAccessAuth, EntityAccessReceipt, MemberTeamRole, RequiredPermission,
     },
     domain::ports::EntityAccessService,
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -40,7 +40,7 @@ pub struct ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment,
     /// Team access receipt provider.
     pub entity_access_service: Arc<EntityAccess>,
     /// Authentication services for route extractors.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy> Clone
@@ -68,7 +68,7 @@ impl<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>
 
 impl<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>
     FromRef<ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(
         state: &ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
@@ -86,7 +86,7 @@ where
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
     S: Send + Sync + 'static,
@@ -138,7 +138,7 @@ fn team_id<T: RequiredPermission>(
 
 fn user_id<T: RequiredPermission>(
     receipt: &EntityAccessReceipt<T>,
-) -> Result<MacroUserIdStr<'static>, ComputersHttpError> {
+) -> Result<RoxUserIdStr<'static>, ComputersHttpError> {
     match receipt.auth() {
         EntityAccessAuth::Authenticated(user_id) => Ok(user_id.clone()),
         _ => Err(ComputersHttpError(ComputerError::BadRequest(
@@ -164,11 +164,11 @@ pub async fn list<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -190,11 +190,11 @@ pub async fn offers<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -287,11 +287,11 @@ pub async fn purchase<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -336,11 +336,11 @@ pub async fn power<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -374,11 +374,11 @@ pub async fn retry<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -407,11 +407,11 @@ pub async fn complete_setup<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -437,11 +437,11 @@ pub async fn cancel<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -465,11 +465,11 @@ pub async fn undo_cancel<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -499,11 +499,11 @@ pub async fn restore<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,
@@ -539,11 +539,11 @@ pub async fn release<
     Bill: Billing,
     Time: Clock,
     EntityAccess: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Attachment: FleetAttachmentSource,
     Policy: CompPolicy,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, EntityAccess, Auth>,
     State(state): State<
         ComputerRouterState<Repo, Bill, Time, EntityAccess, Auth, Attachment, Policy>,
     >,

@@ -16,14 +16,14 @@ struct Classifier {
 impl Cognition for Classifier {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         panic!("selection must not generate text")
     }
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         let probabilities = request
@@ -44,8 +44,8 @@ impl Cognition for Classifier {
         Ok(DecisionResponse { probabilities })
     }
 }
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
 }
 #[tokio::test]
 async fn one_bounded_request_expands_only_selected_entities() {
@@ -114,7 +114,7 @@ async fn errors_and_absent_provider_retain_catalog() {
         .await,
         fallback
     );
-    assert!(fallback.ends_with("</macro_sdk>\n"));
+    assert!(fallback.ends_with("</rox_sdk>\n"));
 }
 #[tokio::test]
 async fn deadline_and_cancellation_fall_back_without_waiting_for_provider() {
@@ -358,7 +358,7 @@ fn every_entity_routes_on_a_use_when_sentence() {
         assert!(doc.description.starts_with("Use when "), "{}", doc.name);
         assert!(doc.description.contains("; not "), "{}", doc.name);
     }
-    assert!(search_guide().contains("macro.documents.search"));
+    assert!(search_guide().contains("rox.documents.search"));
 }
 
 #[tokio::test]
@@ -445,7 +445,7 @@ fn the_routines_guide_carries_the_compose_routines_skill_each_host_can_follow() 
     assert!(!code.contains("`NameSearch` for a channel"));
     let direct = inline_guides(GuideHost::Direct);
     assert!(direct.contains(&format!("{guide}\n\n{direct_skill}")));
-    assert!(!direct.contains("macro.routines.check(routine, { created })"));
+    assert!(!direct.contains("rox.routines.check(routine, { created })"));
 }
 
 #[tokio::test]
@@ -506,7 +506,7 @@ async fn the_attached_skill_leaves_byte_budgets_to_the_entities() {
         .count();
     assert!(loaded >= 3, "only {loaded} entities fit beside the skill");
     let without_skill = routed.replacen(&format!("\n{skill}\n"), "", 1);
-    assert!(without_skill.len() <= 48 * 1024 + "</macro_sdk>\n".len());
+    assert!(without_skill.len() <= 48 * 1024 + "</rox_sdk>\n".len());
     let classifier: Arc<dyn Cognition> = Arc::new(Classifier {
         requests: Mutex::new(vec![]),
         delay: Duration::ZERO,
@@ -557,7 +557,7 @@ struct BookingLinkClassifier;
 impl Cognition for BookingLinkClassifier {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         panic!("selection must not generate text")
@@ -565,7 +565,7 @@ impl Cognition for BookingLinkClassifier {
 
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         let mentions_booking_link = request.input.to_string().contains("booking link");

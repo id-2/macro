@@ -42,7 +42,7 @@ read it before changing behaviour.
 ## Boundaries
 
 - Depends on: `incus_client` (fleet), `feature_flags` (rollout),
-  `entity_access`, `macro_authorization`; with `outbound`, `harnesses` (its
+  `entity_access`, `rox_authorization`; with `outbound`, `harnesses` (its
   repository for Claude logins, never its tables).
 - Used by: authentication_service (routes, billing worker), agent_harness_service
   (operator, harnessd), `coding_agent_worker` (enrollment).

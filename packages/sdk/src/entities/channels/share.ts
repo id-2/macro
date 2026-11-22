@@ -1,6 +1,6 @@
 import type { ChannelShareEntityType } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Channel } from './channel';
 
 /**
@@ -9,7 +9,7 @@ import type { Channel } from './channel';
  * sharing again changes nothing.
  */
 export async function shareWithChannel(
-  client: MacroClient,
+  client: RoxClient,
   channel: Channel,
   entityType: ChannelShareEntityType,
   entityId: string,

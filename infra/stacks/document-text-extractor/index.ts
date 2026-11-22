@@ -15,7 +15,7 @@ const tags = {
 
 const DATABASE_URL = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require(`macro_db_proxy_secret_key`),
+    secretId: config.require(`rox_db_proxy_secret_key`),
   })
   .apply((secret) => secret.secretString);
 
@@ -36,7 +36,7 @@ const documentStorageBucketId: pulumi.Output<string> = cloudStorageStack
 const documentTextExtractorEnvVars: DocumentTextExtractorLambdaEnvVars = {
   DATABASE_URL: pulumi.interpolate`${DATABASE_URL}`,
   ENVIRONMENT: stack,
-  RUST_LOG: 'document_text_extractor=trace,macro_http_request=info',
+  RUST_LOG: 'document_text_extractor=trace,rox_http_request=info',
   DOCUMENT_STORAGE_BUCKET: pulumi.interpolate`${documentStorageBucketId}`,
 };
 

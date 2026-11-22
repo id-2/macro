@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use rootcause::Report;
 use uuid::Uuid;
@@ -39,7 +39,7 @@ pub trait FeedNotifications: Send + Sync + 'static {
     /// The viewer's active (unseen or seen) notifications about each entity.
     fn active(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> impl Future<Output = Result<HashMap<Entity<'static>, Vec<FeedNotification>>, Report>> + Send;
 
@@ -47,7 +47,7 @@ pub trait FeedNotifications: Send + Sync + 'static {
     /// ids whose state changed.
     fn transition(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         transition: NotificationTransition,
     ) -> impl Future<Output = Result<Vec<Uuid>, Report>> + Send;
@@ -57,7 +57,7 @@ pub trait FeedNotifications: Send + Sync + 'static {
     /// changed.
     fn reopen(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         unseen: Vec<Uuid>,
     ) -> impl Future<Output = Result<Vec<Uuid>, Report>> + Send;
@@ -68,7 +68,7 @@ pub trait FeedMail: Send + Sync + 'static {
     /// Archive or unarchive one of the viewer's threads.
     fn set_archived(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> impl Future<Output = Result<(), Report>> + Send;
@@ -80,7 +80,7 @@ pub trait FeedSignals: Send + Sync + 'static {
     /// Best effort: failures are logged, never returned.
     fn changed(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> impl Future<Output = ()> + Send;
 }
@@ -93,7 +93,7 @@ pub trait FeedTriggers: Send + Sync + 'static {
     /// falls behind receives [`FeedTrigger::Invalidated`] first.
     fn subscribe(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         keying: CandidateKeying,
         own_work: bool,
     ) -> tokio::sync::mpsc::Receiver<FeedTrigger>;

@@ -58,7 +58,7 @@ export function getAiToolsInfra(): AiToolsInfra {
     .getOutput('deleteDocumentQueueArn')
     .apply((v) => v as string);
 
-  // Queue names come from the `macro_queues` crate at runtime; we only need the
+  // Queue names come from the `rox_queues` crate at runtime; we only need the
   // ARNs here for the IAM send/receive grants below.
   const emailScheduledQueueArn: pulumi.Output<string> = emailServiceStack
     .getOutput('scheduledQueueArn')

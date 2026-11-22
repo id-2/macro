@@ -45,7 +45,7 @@ async fn one_at_a_time(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_access"))
 )]
 async fn batch_matches_one_at_a_time_for_every_reader(pool: PgPool) -> anyhow::Result<()> {
@@ -71,7 +71,7 @@ async fn batch_matches_one_at_a_time_for_every_reader(pool: PgPool) -> anyhow::R
 /// Pins what the viewer gets from each source, so the comparison above is
 /// never between two empty answers.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_access"))
 )]
 async fn batch_reaches_every_source(pool: PgPool) -> anyhow::Result<()> {
@@ -114,7 +114,7 @@ async fn batch_reaches_every_source(pool: PgPool) -> anyhow::Result<()> {
 /// The service's batched receipts are the receipts it hands out one at a time,
 /// and a refused document gets none.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_access"))
 )]
 async fn batched_receipts_match_single_receipts(pool: PgPool) -> anyhow::Result<()> {
@@ -153,7 +153,7 @@ async fn batched_receipts_match_single_receipts(pool: PgPool) -> anyhow::Result<
 
 /// More documents than one statement checks: every batch's grants come back.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("documents_access"))
 )]
 async fn batch_spans_several_statements(pool: PgPool) -> anyhow::Result<()> {

@@ -62,9 +62,9 @@ type SampleSink = {
 /** Preserve missing coverage instead of reporting unavailable memory as zero. */
 export function memoryAttributes(sample: MemorySample): Attributes {
   const attributes: Attributes = {
-    'macro.memory.timestamp_ms': sample.timestampMs,
-    'macro.memory.sequence': sample.sequence,
-    'macro.memory.frontend.status': sample.frontendStatus,
+    'rox.memory.timestamp_ms': sample.timestampMs,
+    'rox.memory.sequence': sample.sequence,
+    'rox.memory.frontend.status': sample.frontendStatus,
   };
   for (const role of ['native', 'web_content', 'gpu', 'network'] as const) {
     const processes = sample.processes.filter(
@@ -85,7 +85,7 @@ export function memoryAttributes(sample: MemorySample): Attributes {
     );
   }
   if (sample.frontendStatus !== 'unavailable') {
-    attributes['macro.memory.frontend.footprint_bytes'] = sample.processes
+    attributes['rox.memory.frontend.footprint_bytes'] = sample.processes
       .filter((process) => process.role !== 'native')
       .reduce((sum, process) => sum + process.footprintBytes, 0);
   }
@@ -93,7 +93,7 @@ export function memoryAttributes(sample: MemorySample): Attributes {
     sample.frontendStatus === 'available' &&
     sample.processes.some((p) => p.role === 'native')
   ) {
-    attributes['macro.memory.app.footprint_bytes'] = sample.processes.reduce(
+    attributes['rox.memory.app.footprint_bytes'] = sample.processes.reduce(
       (sum, process) => sum + process.footprintBytes,
       0
     );
@@ -107,12 +107,12 @@ const desktopResourceReaders: Record<
 > = {
   'service.instance.id': (snapshot) => snapshot.identity.instanceId,
   native_instance_id: (snapshot) => snapshot.identity.instanceId,
-  'macro.recording.id': (snapshot) =>
+  'rox.recording.id': (snapshot) =>
     snapshot.identity.recordingId ?? undefined,
-  'macro.recording.enabled': (snapshot) =>
+  'rox.recording.enabled': (snapshot) =>
     snapshot.identity.recordingId !== null,
-  'macro.native.version': (snapshot) => snapshot.identity.nativeVersion,
-  'macro.native.pid': (snapshot) => snapshot.identity.hostPid,
+  'rox.native.version': (snapshot) => snapshot.identity.nativeVersion,
+  'rox.native.pid': (snapshot) => snapshot.identity.hostPid,
 };
 
 export function desktopResourceAttributes(
@@ -163,7 +163,7 @@ export function createMemoryRecording(
       : 0;
     if (droppedSamples > 0) {
       sink.warn('Native memory recording buffer overflowed', {
-        'macro.memory.dropped_samples': droppedSamples,
+        'rox.memory.dropped_samples': droppedSamples,
       });
     }
     for (const sample of snapshot.samples) {
@@ -176,7 +176,7 @@ export function createMemoryRecording(
       );
       if (sample.error && sample.error !== lastError) {
         sink.warn('Native memory recording has incomplete coverage', {
-          'macro.memory.error': sample.error,
+          'rox.memory.error': sample.error,
         });
       }
       lastError = sample.error;
@@ -209,18 +209,18 @@ export function createMemoryRecording(
     accept,
     start: poll,
     attributes(): Attributes {
-      if (!latest) return { 'macro.memory.status': 'pending' };
+      if (!latest) return { 'rox.memory.status': 'pending' };
       const age = Math.max(0, Date.now() - latest.timestampMs);
       if (age > 5000) {
         return {
-          'macro.memory.status': 'stale',
-          'macro.memory.sample_age_ms': age,
+          'rox.memory.status': 'stale',
+          'rox.memory.sample_age_ms': age,
         };
       }
       return {
         ...memoryAttributes(latest),
-        'macro.memory.status': 'current',
-        'macro.memory.sample_age_ms': age,
+        'rox.memory.status': 'current',
+        'rox.memory.sample_age_ms': age,
       };
     },
     dispose() {

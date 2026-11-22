@@ -19,7 +19,7 @@ export const queryPersistence = { restoreQuery: async () => {} };
 export const link: Link = {
   id: 'signature-fixture-inbox',
   email_address: 'alex@example.com',
-  macro_id: 'macro|alex@example.com',
+  rox_id: 'macro|alex@example.com',
   fusionauth_user_id: 'fixture-user',
   calendar_disabled: false,
   has_calendar_data: false,
@@ -36,13 +36,13 @@ export const link: Link = {
 let settings = { ...link.settings };
 const patches: Settings[] = [];
 queryClient.setQueryData(authKeys.userInfo.queryKey, {
-  id: link.macro_id,
+  id: link.rox_id,
   authenticated: true,
 });
-queryClient.setQueryData(emailKeys.links(link.macro_id).queryKey, {
+queryClient.setQueryData(emailKeys.links(link.rox_id).queryKey, {
   links: [link],
 });
-const [activeViewer, setActiveViewer] = createSignal(link.macro_id);
+const [activeViewer, setActiveViewer] = createSignal(link.rox_id);
 export const useUserId = () => activeViewer;
 let holdSources = false;
 let sourceRefresh: Promise<void> | undefined;
@@ -86,7 +86,7 @@ export const storageServiceClient = {
   async getChannels() {
     const owner = activeViewer();
     const name =
-      activeViewer() === link.macro_id ? 'First channel' : 'Second channel';
+      activeViewer() === link.rox_id ? 'First channel' : 'Second channel';
     await holdSourceResponse();
     return ok({
       items: [
@@ -109,7 +109,7 @@ export const useIsAuthenticated = () => () => true;
 export const useNonPrimaryEmailLinkIdHeader = () => (id: string) => id;
 export function useEmailLinksQuery() {
   return useQuery(() => ({
-    queryKey: emailKeys.links(link.macro_id).queryKey,
+    queryKey: emailKeys.links(link.rox_id).queryKey,
     queryFn: async (): Promise<ListLinksResponse> => ({
       links: [{ ...link, settings }],
     }),
@@ -143,7 +143,7 @@ function releaseAccountRefresh() {
 export const emailClient = {
   async getLinks() {
     const email =
-      activeViewer() === link.macro_id
+      activeViewer() === link.rox_id
         ? 'first@example.com'
         : 'second@example.com';
     await holdSourceResponse();

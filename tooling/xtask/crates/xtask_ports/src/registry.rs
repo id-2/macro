@@ -156,7 +156,7 @@ pub struct Registry {
 impl Registry {
     /// The machine-wide registry, `~/.local/state/macro-local`.
     pub fn machine() -> Result<Self, RegistryError> {
-        let home = macro_env_var::maybe_read_env("HOME").ok_or(RegistryError::NoHome)?;
+        let home = rox_env_var::maybe_read_env("HOME").ok_or(RegistryError::NoHome)?;
         Ok(Self::at(Path::new(&home).join(".local/state/macro-local")))
     }
 

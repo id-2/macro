@@ -4,7 +4,7 @@
 //! joining user and their teammates without depending on a particular queue or
 //! contacts service implementation.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::convert::Infallible;
 
 /// Enqueues contact connections created when a user joins a team.
@@ -15,7 +15,7 @@ pub trait ContactsEnqueuer: Clone + Send + Sync + 'static {
     /// Enqueues owned pairs of users that should be connected.
     fn enqueue_contact_connections(
         &self,
-        connections: Vec<(MacroUserIdStr<'static>, MacroUserIdStr<'static>)>,
+        connections: Vec<(RoxUserIdStr<'static>, RoxUserIdStr<'static>)>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 }
 
@@ -28,7 +28,7 @@ impl ContactsEnqueuer for NoOpContactsEnqueuer {
 
     async fn enqueue_contact_connections(
         &self,
-        _connections: Vec<(MacroUserIdStr<'static>, MacroUserIdStr<'static>)>,
+        _connections: Vec<(RoxUserIdStr<'static>, RoxUserIdStr<'static>)>,
     ) -> Result<(), Self::Err> {
         Ok(())
     }

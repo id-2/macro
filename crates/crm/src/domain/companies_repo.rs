@@ -422,14 +422,14 @@ pub trait CompaniesRepository: super::email_privacy::EmailPrivacyRepository {
         link_id: &uuid::Uuid,
     ) -> impl Future<Output = Result<(), CrmError>> + Send;
 
-    /// Returns the team id that `macro_id` belongs to. When the user is on
+    /// Returns the team id that `rox_id` belongs to. When the user is on
     /// multiple teams the highest-privileged role wins (Postgres orders the
     /// `team_role` enum as `member < admin < owner`), matching the
     /// behavior of `entity_access::ports::get_user_team`. Returns
     /// `Ok(None)` when the user has no team membership.
     fn get_team_id_for_user(
         &self,
-        macro_id: &str,
+        rox_id: &str,
     ) -> impl Future<Output = Result<Option<uuid::Uuid>, CrmError>> + Send;
 
     /// Legacy company exclusion switch. False blocks email ingestion and CRM

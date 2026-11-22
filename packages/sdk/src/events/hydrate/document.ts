@@ -2,17 +2,17 @@ import { match } from 'ts-pattern';
 import { Document } from '../../entities/documents/document';
 import { Project } from '../../entities/projects/project';
 import { User } from '../../entities/users/user';
-import type { MacroClient } from '../../utils/client';
-import type { MacroEvent } from '../types';
+import type { RoxClient } from '../../utils/client';
+import type { RoxEvent } from '../types';
 
 export type DocumentEvent = Extract<
-  MacroEvent,
+  RoxEvent,
   { event_type: `document.${string}` }
 >;
 
 /** Attach SDK entity handles to a document webhook event. */
 export function hydrateDocumentEvent(
-  client: MacroClient,
+  client: RoxClient,
   event: DocumentEvent,
 ) {
   return match(event)

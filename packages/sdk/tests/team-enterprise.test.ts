@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { Macro } from '../src/macro';
-import { MacroError } from '../src/utils';
+import { RoxError } from '../src/utils';
 
 const TEAM_ID = '0198a4cc-e138-7670-a308-a6b766602700';
 const OTHER_TEAM_ID = '0198a4cc-e138-7670-a308-a6b766602701';
@@ -117,7 +117,7 @@ describe('Team enterprise administration', () => {
 
     await expect(
       macro().teams.byId(TEAM_ID).setRuntimePresets(['omp']),
-    ).rejects.toBeInstanceOf(MacroError);
+    ).rejects.toBeInstanceOf(RoxError);
     expect(
       requests.map(
         (request) => `${request.method} ${new URL(request.url).pathname}`,

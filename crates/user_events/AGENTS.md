@@ -13,7 +13,7 @@ profile that other people see, such as a new profile picture.
 
 ## Boundaries
 
-- Depends on: `macro_event_broker`, `macro_event_topics`, `macro_user_id`.
+- Depends on: `rox_event_broker`, `rox_event_topics`, `rox_user_id`.
 - Used by: `authentication_service`, `contacts`, `webhook`.
 
 ## Checks

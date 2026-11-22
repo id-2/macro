@@ -42,7 +42,7 @@ pub trait SfsPhotoUploader: Send + Sync + 'static {
 /// Best-effort notification that the inbox's own photo has changed.
 pub trait PhotoSyncedNotifier: Send + Sync + 'static {
     /// Send the existing photo refresh, retaining the gateway's failure logging.
-    fn photo_synced(&self, macro_id: &str, link_id: Uuid) -> impl Future<Output = ()> + Send;
+    fn photo_synced(&self, rox_id: &str, link_id: Uuid) -> impl Future<Output = ()> + Send;
 }
 
 /// Final acknowledgement policy for the delivered photo upload.
@@ -124,7 +124,7 @@ impl<M: SfsPhotoMappings, C: SfsPhotoContacts, U: SfsPhotoUploader, N: PhotoSync
         }
 
         self.notifier
-            .photo_synced(link.macro_id.as_ref(), link_id)
+            .photo_synced(link.rox_id.as_ref(), link_id)
             .await;
     }
 

@@ -14,7 +14,7 @@ use crate::outbound::{
 };
 use chrono::{Duration, Utc};
 use entity_access::domain::models::{EditAccessLevel, TeamRole};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -105,7 +105,7 @@ async fn add(
     .await
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn addresses_are_added_chosen_and_removed_without_touching_the_record(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -171,7 +171,7 @@ async fn addresses_are_added_chosen_and_removed_without_touching_the_record(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_added_address_must_be_free_across_the_team(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, OWNER).await?;
@@ -231,7 +231,7 @@ async fn an_added_address_must_be_free_across_the_team(pool: PgPool) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_adds_of_one_address_reach_one_contact(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, OWNER).await?;
@@ -264,7 +264,7 @@ async fn concurrent_adds_of_one_address_reach_one_contact(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_company_domain_contact_stays_linked_and_keeps_its_tie(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -313,7 +313,7 @@ async fn a_company_domain_contact_stays_linked_and_keeps_its_tie(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_linked_personal_contact_can_be_unlinked(pool: PgPool) -> anyhow::Result<()> {
     let (team, link, service) = team_with_mailbox(&pool).await?;
     let repo = CompaniesRepositoryImpl::new(pool.clone());
@@ -339,7 +339,7 @@ async fn a_linked_personal_contact_can_be_unlinked(pool: PgPool) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unlinking_cannot_reveal_or_duplicate_a_contact(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, OWNER).await?;
@@ -385,7 +385,7 @@ async fn unlinking_cannot_reveal_or_duplicate_a_contact(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn company_sync_refreshes_the_contact_that_holds_a_further_address(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -426,7 +426,7 @@ async fn company_sync_refreshes_the_contact_that_holds_a_further_address(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn company_sync_reaches_a_further_address_held_outside_its_domain(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -471,7 +471,7 @@ async fn company_sync_reaches_a_further_address_held_outside_its_domain(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn company_sync_without_further_addresses_files_as_before(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -510,7 +510,7 @@ async fn company_sync_without_further_addresses_files_as_before(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_sync_refreshes_a_company_contact_through_an_added_address(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -544,7 +544,7 @@ async fn personal_sync_refreshes_a_company_contact_through_an_added_address(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn teardown_keeps_a_source_another_address_still_justifies(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -589,7 +589,7 @@ async fn teardown_keeps_a_source_another_address_still_justifies(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn teardown_of_a_single_address_contact_is_unchanged(pool: PgPool) -> anyhow::Result<()> {
     let (team, link, service) = team_with_mailbox(&pool).await?;
     sync(&pool, &service, team, link, "jane@acme.example.com", true).await?;
@@ -609,7 +609,7 @@ async fn teardown_of_a_single_address_contact_is_unchanged(pool: PgPool) -> anyh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unfiled_primary_holder_does_not_hide_a_further_address_holder(
     pool: PgPool,
 ) -> anyhow::Result<()> {

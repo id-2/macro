@@ -1,8 +1,8 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_job_dedupes_active_job(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let first = create_job(&pool, 10, 100).await?;
     assert!(first.is_some(), "first create should insert a job");
@@ -27,7 +27,7 @@ async fn create_job_dedupes_active_job(pool: Pool<Postgres>) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn job_counters_and_status_roundtrip(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let job = create_job(&pool, 5, 50).await?.unwrap();
     assert_eq!(job.total_candidates, 5);
@@ -46,7 +46,7 @@ async fn job_counters_and_status_roundtrip(pool: Pool<Postgres>) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn job_updates_fail_for_unknown_id(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let missing = Uuid::new_v4();
     assert!(add_dispatched_count(&pool, missing, 1).await.is_err());

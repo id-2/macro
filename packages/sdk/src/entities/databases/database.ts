@@ -24,11 +24,11 @@ import type {
   TakenId,
   UpdateSharePermissionRequestV2,
 } from '../../../generated/storage/types.gen';
-import { MacroApiError, MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxApiError, RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import type { Channel } from '../channels/channel';
 import { shareWithChannel } from '../channels/share';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import type { PropertyDefinition } from '../properties/property-definition';
 import { EntityAccess } from '../sharing/access';
 import { User } from '../users/user';
@@ -137,7 +137,7 @@ export type InferColumnTypeOptions = {
  * op at fault and, when the batch minted an id that already names something
  * (a retry of a batch that committed, or an id minted twice), that id.
  */
-export class MacroOpRefusedError extends MacroApiError {
+export class RoxOpRefusedError extends RoxApiError {
   /** The refused op's index in the batch. */
   readonly op: number;
 
@@ -152,7 +152,7 @@ export class MacroOpRefusedError extends MacroApiError {
 
   constructor(status: number, refusal: OpRefusalResponse) {
     super(status, refusal);
-    this.name = 'MacroOpRefusedError';
+    this.name = 'RoxOpRefusedError';
     this.message = refusal.message;
     this.op = refusal.op;
     this.row = refusal.row;
@@ -241,7 +241,7 @@ function soleResult<
 >(results: OpResult[], kind: Kind, change: Change): OpResultOf<Kind, Change> {
   const [result] = results;
   if (results.length !== 1 || !isResultOf(result, kind, change))
-    throw new MacroError(
+    throw new RoxError(
       `expected one ${kind}.${change} result, got ${results.map(resultName).join(', ') || 'none'}`,
     );
   return result;
@@ -265,7 +265,7 @@ export type CreateDatabaseOptions = {
  * A free-to-construct `(client, id)` handle like any other entity — the schema
  * loads lazily on first field access and is dropped after any mutation.
  */
-export class Database extends MacroEntity<DatabaseDetail> {
+export class Database extends RoxEntity<DatabaseDetail> {
   /** How entity-addressed APIs identify this entity's type. */
   readonly entityType = 'database';
 
@@ -292,7 +292,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
 
   private assertOwns(part: string, owner: Database): void {
     if (owner.id !== this.id)
-      throw new MacroError(`${part} does not belong to database ${this.id}`);
+      throw new RoxError(`${part} does not belong to database ${this.id}`);
   }
 
   /**
@@ -310,13 +310,13 @@ export class Database extends MacroEntity<DatabaseDetail> {
   }
 
   /** A handle to a database by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Database {
+  static byId(client: RoxClient, id: string): Database {
     return new Database(client, id);
   }
 
   /** Create a database owned by the caller; see {@link CreateDatabaseOptions}. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     options: CreateDatabaseOptions,
   ): Promise<Database> {
     const record = unwrap(
@@ -348,7 +348,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
   }
 
   /** The databases the caller can see, each with the caller's access level. */
-  static async list(client: MacroClient): Promise<Database[]> {
+  static async list(client: RoxClient): Promise<Database[]> {
     const listed = unwrap(await client.storage.listDatabases());
     return listed.map((entry) => new Database(client, entry.database.id));
   }
@@ -497,7 +497,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
    * reorder, or delete views; move board cards. Later ops see what earlier
    * ones did, so a table or column created by one op (under an id the caller
    * mints, as a UUIDv7) can be named by the next. A refused op leaves the
-   * whole batch unwritten and throws {@link MacroOpRefusedError}. Returns one
+   * whole batch unwritten and throws {@link RoxOpRefusedError}. Returns one
    * result per op, in the order sent.
    *
    * @destructive
@@ -520,7 +520,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
         body,
       });
       if (outcome.error !== undefined && 'op' in outcome.error)
-        throw new MacroOpRefusedError(
+        throw new RoxOpRefusedError(
           outcome.response?.status ?? 0,
           outcome.error,
         );
@@ -544,7 +544,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
     ]);
     const [reordered] = results;
     if (results.length !== 1 || reordered?.kind !== 'reorder_tables')
-      throw new MacroError(
+      throw new RoxError(
         `expected one reorder_tables result, got ${results.map(resultName).join(', ') || 'none'}`,
       );
     return reordered.tables.map(({ table }) => DatabaseTable.byId(this, table));
@@ -822,7 +822,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
       baseVersions: [{ table: column.table, version: conversion.tableVersion }],
     });
     if (!isResultOf(created, 'column', 'created'))
-      throw new MacroError(
+      throw new RoxError(
         `expected a column.created result, got ${created ? resultName(created) : 'none'}`,
       );
     return DatabaseColumn.byId(column.table, created.column);
@@ -871,7 +871,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
     this.assertOwns(`table ${table.id}`, table.database);
     for (const column of columns)
       if (column.table.id !== table.id)
-        throw new MacroError(
+        throw new RoxError(
           `column ${column.id} does not belong to table ${table.id}`,
         );
     const version = await table.version();
@@ -893,7 +893,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
       'columns_reordered',
     );
     if (tableVersion === undefined)
-      throw new MacroError(
+      throw new RoxError(
         `table ${table.id} reordered its columns without a version`,
       );
     return tableVersion;
@@ -921,7 +921,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
       'renamed',
     );
     if (tableVersion === undefined)
-      throw new MacroError(`table ${table.id} was renamed without a version`);
+      throw new RoxError(`table ${table.id} was renamed without a version`);
     return tableVersion;
   }
 
@@ -991,7 +991,7 @@ export class Database extends MacroEntity<DatabaseDetail> {
   ): Promise<DatabaseColumn> {
     this.assertOwns(`table ${table.id}`, table.database);
     if (options.after !== undefined && options.after.table.id !== table.id)
-      throw new MacroError(
+      throw new RoxError(
         `column ${options.after.id} does not belong to table ${table.id}`,
       );
     const definition: NewColumn =

@@ -1,6 +1,6 @@
 use super::*;
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{
     collections::VecDeque,
     sync::{Arc, Mutex},
@@ -79,7 +79,7 @@ fn context(event: &ImportEvent, owner: WorkerId, generation: u64) -> ClaimedConv
             attempts: generation as u32,
         },
         team_id: Uuid::now_v7().try_into().unwrap(),
-        requested_by: MacroUserIdStr::try_from_email("admin@example.com").unwrap(),
+        requested_by: RoxUserIdStr::try_from_email("admin@example.com").unwrap(),
         metadata: ConversationMetadata {
             slack_channel_id: event.slack_channel_id.clone(),
             kind: ConversationKind::PublicChannel,

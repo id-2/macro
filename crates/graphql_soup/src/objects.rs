@@ -7,7 +7,7 @@ use graphql_common::{
 };
 use graphql_email::GraphqlEmailLabel;
 use graphql_permission::GraphqlEntityPermission;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use models_pagination::PaginatedOpaqueCursor;
 use models_soup::{
@@ -2858,7 +2858,7 @@ impl<E: SoupEntityEdges> SoupPatch<E> {
     /// Neither outcome is interpreted as a deletion. Entity kinds Soup does not
     /// represent, such as databases, have no record to patch and are omitted.
     pub async fn hydrate_updated(
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entity: Entity<'static>,
         loader: Option<&SoupItemDataLoader>,
     ) -> async_graphql::Result<Option<Self>> {

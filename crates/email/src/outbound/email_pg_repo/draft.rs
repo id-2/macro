@@ -97,8 +97,8 @@ pub(super) async fn insert_message_in_transaction(
     // Match the mailbox workers' link -> message lock order, and revalidate the
     // actor at the transaction that accepts an Outlook write.
     let mailbox = sqlx::query!(r#"
-        SELECT macro_id,
-            ($2::text = macro_id OR EXISTS (SELECT 1 FROM macro_user_links u WHERE u.link_id = email_links.id AND u.primary_macro_id = $2)) AS authorized
+        SELECT rox_id,
+            ($2::text = rox_id OR EXISTS (SELECT 1 FROM rox_user_links u WHERE u.link_id = email_links.id AND u.primary_rox_id = $2)) AS authorized
         FROM email_links WHERE id = $1 AND provider = 'OUTLOOK' FOR UPDATE
     "#,link_id,input.actor_id).fetch_optional(&mut **tx).await.map_err(anyhow::Error::from)?;
     if mailbox
@@ -256,7 +256,7 @@ pub(super) async fn insert_message_in_transaction(
             &mut *tx,
             message_db_id,
             link_id,
-            input.actor_id.as_deref().unwrap_or(&mailbox.macro_id),
+            input.actor_id.as_deref().unwrap_or(&mailbox.rox_id),
         )
         .await
         .map_err(anyhow::Error::from)?;
@@ -310,7 +310,7 @@ pub(crate) async fn upsert_draft(
             id, provider_id, link_id, thread_id, provider_thread_id,
             replying_to_id, subject, from_contact_id, sent_at,
             has_attachments, is_read, is_starred, is_sent, is_draft,
-            body_text, body_html_sanitized, body_macro, headers_jsonb,
+            body_text, body_html_sanitized, body_rox, headers_jsonb,
             created_at, updated_at, draft_generation, from_name
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
@@ -329,7 +329,7 @@ pub(crate) async fn upsert_draft(
             is_draft = EXCLUDED.is_draft,
             body_text = EXCLUDED.body_text,
             body_html_sanitized = EXCLUDED.body_html_sanitized,
-            body_macro = EXCLUDED.body_macro,
+            body_rox = EXCLUDED.body_rox,
             headers_jsonb = EXCLUDED.headers_jsonb,
             updated_at = NOW()
         WHERE email_messages.link_id = EXCLUDED.link_id
@@ -355,7 +355,7 @@ pub(crate) async fn upsert_draft(
         is_draft,
         input.body_text,
         input.body_html,
-        input.body_macro,
+        input.body_rox,
         input.headers_json,
         now,
         now,
@@ -381,7 +381,7 @@ pub(super) async fn snapshot_outlook_draft(
         SELECT m.id,m.link_id,l.sync_generation,$3,
             jsonb_build_object('db_id',m.id,'provider_id',m.provider_id,'replying_to_id',m.replying_to_id,
                 'provider_thread_id',m.provider_thread_id,'thread_db_id',m.thread_id,'subject',COALESCE(m.subject,''),
-                'body_text',m.body_text,'body_html',m.body_html_sanitized,'body_macro',m.body_macro,'headers_json',m.headers_jsonb,
+                'body_text',m.body_text,'body_html',m.body_html_sanitized,'body_rox',m.body_rox,'headers_json',m.headers_jsonb,
                 'actor_id',$3::text,'send_time',(SELECT send_time FROM email_scheduled_messages WHERE message_id = m.id),
                 'to',COALESCE(recipients.to_addresses,'[]'::jsonb),'cc',COALESCE(recipients.cc_addresses,'[]'::jsonb),'bcc',COALESCE(recipients.bcc_addresses,'[]'::jsonb),
                 '_attachments',jsonb_build_object(

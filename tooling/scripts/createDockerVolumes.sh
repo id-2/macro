@@ -6,9 +6,9 @@ create_volume() {
 }
 
 # Create Docker volumes
-create_volume macro_db_volume
-create_volume macro_cache_volume
+create_volume rox_db_volume
+create_volume rox_cache_volume
 
 # Opensearch
-create_volume macro_opensearch_1
-create_volume macro_opensearch_2
+create_volume rox_opensearch_1
+create_volume rox_opensearch_2

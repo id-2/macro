@@ -27,7 +27,7 @@ impl Repo {
 
 impl ForwardedAttachmentRepo for Repo {
     type Err = Infallible;
-    async fn accessible_inboxes(&self, actor: &MacroUserIdStr<'_>) -> Result<Vec<Uuid>, Self::Err> {
+    async fn accessible_inboxes(&self, actor: &RoxUserIdStr<'_>) -> Result<Vec<Uuid>, Self::Err> {
         // The selected sending inbox belongs to someone else. Its owner's private
         // inbox must never replace the authenticated delegate's accessible set.
         assert_eq!(actor.as_ref(), "macro|delegate@example.com");
@@ -88,7 +88,7 @@ impl ForwardedAttachmentRepo for Repo {
 #[tokio::test]
 async fn registers_an_owned_source_on_a_delegated_sending_inbox() {
     let service = ForwardedAttachmentService::new(Repo::new(SOURCE));
-    let actor = MacroUserIdStr::parse_from_str("macro|delegate@example.com").unwrap();
+    let actor = RoxUserIdStr::parse_from_str("macro|delegate@example.com").unwrap();
     let attachment = service
         .add(&actor, SENDING, DRAFT, ATTACHMENT)
         .await
@@ -109,7 +109,7 @@ async fn registers_an_owned_source_on_a_delegated_sending_inbox() {
 #[tokio::test]
 async fn inaccessible_and_missing_sources_have_the_same_error_without_registration() {
     let service = ForwardedAttachmentService::new(Repo::new(PRIVATE));
-    let actor = MacroUserIdStr::parse_from_str("macro|delegate@example.com").unwrap();
+    let actor = RoxUserIdStr::parse_from_str("macro|delegate@example.com").unwrap();
     for attachment in [ATTACHMENT, Uuid::nil()] {
         let error = service
             .add(&actor, SENDING, DRAFT, attachment)
@@ -129,7 +129,7 @@ async fn missing_or_inaccessible_drafts_never_register_an_attachment() {
     let mut repo = Repo::new(SOURCE);
     repo.exists = false;
     let service = ForwardedAttachmentService::new(repo);
-    let actor = MacroUserIdStr::parse_from_str("macro|delegate@example.com").unwrap();
+    let actor = RoxUserIdStr::parse_from_str("macro|delegate@example.com").unwrap();
     for sending in [SENDING, PRIVATE] {
         assert!(matches!(
             service.add(&actor, sending, DRAFT, ATTACHMENT).await,
@@ -142,7 +142,7 @@ async fn missing_or_inaccessible_drafts_never_register_an_attachment() {
 #[tokio::test]
 async fn revoking_source_access_after_registration_blocks_scheduled_delivery() {
     let service = ForwardedAttachmentService::new(Repo::new(SOURCE));
-    let actor = MacroUserIdStr::parse_from_str("macro|delegate@example.com").unwrap();
+    let actor = RoxUserIdStr::parse_from_str("macro|delegate@example.com").unwrap();
     service
         .add(&actor, SENDING, DRAFT, ATTACHMENT)
         .await

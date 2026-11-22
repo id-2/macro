@@ -130,11 +130,11 @@ the gateway `/email` prefix.
 ## Gotchas
 
 - `POST /email/init` without `link_id` returns or creates the claimed handle's non-syncing primary `ROX` link without calling Gmail. `link_id` remains the Gmail/Outlook import path. `outbound/rox_provisioning` calls only the existing mail-host contract with a caller-supplied broker token; no broker token source is wired yet.
-- The API's server spans come from `macro_tower_layers`
+- The API's server spans come from `rox_tower_layers`
   (`api::traced`). tower-http's default `TraceLayer` span is DEBUG, below the
   exporter's INFO filter, so an API wrapped in it sends no server spans.
 - `models_email`'s `Link` `Debug` prints only opaque fields. Keep addresses,
-  `macro_id`, contact emails and whole messages out of span fields: skip them
+  `rox_id`, contact emails and whole messages out of span fields: skip them
   in `#[tracing::instrument]` and record `link_id` or provider ids instead.
 
 - Provider-sync deletions deferred by active sends publish no deletion event; scheduled recovery reconciles the retained marker before trying to claim delivery.
@@ -263,7 +263,7 @@ the gateway `/email` prefix.
   a `label_write_sim` test runs the label paths on 1.5 MiB worker stacks.
 - gmail_ops moves transient Gmail failures to the retry queue like rate limits;
   the primary queue dead-letters after three receives.
-- Header addresses that Gmail accepts can fail `MacroUserIdStr::try_from_email`.
+- Header addresses that Gmail accepts can fail `RoxUserIdStr::try_from_email`.
   Skip the bad address with a WARN that omits it (the parse error echoes it)
   instead of failing the step; see
   `email::domain::mailbox::inbox_sync::build_contact_connections`.

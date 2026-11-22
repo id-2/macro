@@ -37,7 +37,7 @@ use item_filters::ast::{
     database_row::DatabaseRowLiteral, document::DocumentLiteral, initiative::InitiativeLiteral,
     project::ProjectLiteral,
 };
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 use models_properties::EntityType as PropertyEntityType;
 use std::collections::BTreeSet;
 
@@ -502,7 +502,7 @@ where
     )]
     pub(super) async fn resolve_crm_associations(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         team_receipt: Option<&EntityAccessReceipt<MemberTeamRole>>,
         ast: Option<&EntityFilterAst>,
     ) -> Result<Option<ResolvedAssociations>, SoupErr> {
@@ -563,7 +563,7 @@ where
     /// scope, so Soup never holds the scope's ids.
     async fn resolve_activity(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         access: Option<&CrmTeamReceipt<MemberTeamRole>>,
         reads: &ActivityReads,
     ) -> Result<(Option<Arc<Expr<EmailLiteral>>>, AssociatedEntities), SoupErr> {
@@ -607,7 +607,7 @@ where
     /// company or contact, the references to them.
     async fn resolve_record(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         access: Option<&CrmTeamReceipt<MemberTeamRole>>,
         record: CrmAssociation,
     ) -> Result<(CrmRecordAssociation, AssociatedEntities), SoupErr> {

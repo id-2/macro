@@ -10,8 +10,8 @@ mod test;
 use std::time::Duration;
 
 use kafka_util::{InitialOffset, KafkaEventConsumer, Ungrouped};
-use macro_event_broker::{
-    EventBrokerError, KafkaConsumerAdapter, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    EventBrokerError, KafkaConsumerAdapter, RoxEventCollection, RoxEventConsumerService,
 };
 use rdkafka::message::Message as _;
 use rootcause::prelude::{Report, ResultExt as _};
@@ -25,9 +25,9 @@ use crate::domain::{
 const TOPIC_METADATA_TIMEOUT: Duration = Duration::from_secs(10);
 
 type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredMacroEvent>;
-type SoupEventConsumer = MacroEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
+type SoupEventConsumer = RoxEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: SoupMacroEvent);
+rox_event_broker::declare_topics!(DeclaredMacroEvent: SoupMacroEvent);
 
 /// Independent consumer of recipient-targeted Soup messages.
 ///

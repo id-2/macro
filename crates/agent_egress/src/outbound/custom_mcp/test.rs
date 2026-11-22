@@ -6,8 +6,8 @@ use rmcp::transport::auth::OAuthTokenResponse;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
 }
 
 fn connected(slug: &str) -> McpDestination {
@@ -27,7 +27,7 @@ struct SpyInner {
 impl McpCredentials for &SpyInner {
     async fn resolve(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _agent: BotId,
         _session: uuid::Uuid,
         destination: &McpDestination,
@@ -65,7 +65,7 @@ impl McpServerStore for FixedServers {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         unreachable!("resolution lists, never loads one")
@@ -73,7 +73,7 @@ impl McpServerStore for FixedServers {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<(), Self::Err> {
         unreachable!("resolution never deletes")
@@ -81,7 +81,7 @@ impl McpServerStore for FixedServers {
 
     async fn list(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         self.listed_for
             .lock()

@@ -61,7 +61,7 @@ pub struct Mismatch {
     /// Stripe's side.
     pub stripe_value: Option<serde_json::Value>,
     /// Rox's side.
-    pub macro_value: Option<serde_json::Value>,
+    pub rox_value: Option<serde_json::Value>,
 }
 
 /// Counts from one run.
@@ -202,7 +202,7 @@ where
                             "type": event.type_name,
                             "created": event.created_at.timestamp(),
                         })),
-                        macro_value: None,
+                        rox_value: None,
                     }),
             );
 
@@ -229,7 +229,7 @@ where
                 kind: MismatchKind::UnconsumedEventType,
                 object_id: type_name,
                 stripe_value: None,
-                macro_value: None,
+                rox_value: None,
             })
             .collect())
     }
@@ -276,7 +276,7 @@ where
                         kind: MismatchKind::StaleSnapshot,
                         object_id: stripe.id.to_string(),
                         stripe_value: Some(serde_json::json!({ "status": stripe.status.as_str() })),
-                        macro_value: Some(serde_json::json!({ "status": held.status.as_str() })),
+                        rox_value: Some(serde_json::json!({ "status": held.status.as_str() })),
                     });
                 }
             }

@@ -1,10 +1,10 @@
 use super::*;
 use crate::domain::event_trigger::ActionTrigger;
 use crate::domain::models::{ActionConfiguration, ActionKind, CreatedItem};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 
 fn check(name: &str) -> RoutineCheck {
@@ -28,10 +28,10 @@ fn check(name: &str) -> RoutineCheck {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_drafts_latest_check_by_its_owner_is_its_answer(pool: PgPool) {
     let drafts = PgDraftHandBacks::new(pool);
-    let session = macro_uuid::generate_uuid_v7();
+    let session = rox_uuid::generate_uuid_v7();
     drafts
         .begin(session, &owner(), bot_id::BotId::TEST_A)
         .await
@@ -41,7 +41,7 @@ async fn a_drafts_latest_check_by_its_owner_is_its_answer(pool: PgPool) {
         HandedBack::default()
     );
 
-    let stranger = MacroUserIdStr::try_from_email("stranger@example.com").unwrap();
+    let stranger = RoxUserIdStr::try_from_email("stranger@example.com").unwrap();
     let database = CreatedItem {
         entity_type: model_entity::EntityType::Database,
         entity_id: "bug-log".into(),
@@ -77,7 +77,7 @@ async fn a_drafts_latest_check_by_its_owner_is_its_answer(pool: PgPool) {
     assert!(
         !drafts
             .record(
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 &owner(),
                 &check("Other"),
                 &[]
@@ -109,12 +109,12 @@ async fn a_drafts_latest_check_by_its_owner_is_its_answer(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_sweep_finds_only_drafts_started_before_its_cutoff(pool: PgPool) {
     let drafts = PgDraftHandBacks::new(pool.clone());
     let (old, new) = (
-        macro_uuid::generate_uuid_v7(),
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
     );
     for session in [old, new] {
         drafts
@@ -145,10 +145,10 @@ async fn the_sweep_finds_only_drafts_started_before_its_cutoff(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failing_check_keeps_the_last_passing_one(pool: PgPool) {
     let drafts = PgDraftHandBacks::new(pool);
-    let session = macro_uuid::generate_uuid_v7();
+    let session = rox_uuid::generate_uuid_v7();
     drafts
         .begin(session, &owner(), bot_id::BotId::TEST_A)
         .await
@@ -174,12 +174,12 @@ async fn a_failing_check_keeps_the_last_passing_one(pool: PgPool) {
 
 /// The blocking sweep leaves background drafts alone, however old: their
 /// rows outlive their drafter until opened.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_blocking_sweep_skips_background_drafts(pool: PgPool) {
     let drafts = PgDraftHandBacks::new(pool.clone());
     let (job, waited) = (
-        macro_uuid::generate_uuid_v7(),
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
     );
     for session in [job, waited] {
         drafts
@@ -236,17 +236,17 @@ mod jobs {
         }
     }
 
-    async fn begin(drafts: &PgDraftHandBacks, owner: &MacroUserIdStr<'static>) -> Uuid {
-        let session = macro_uuid::generate_uuid_v7();
+    async fn begin(drafts: &PgDraftHandBacks, owner: &RoxUserIdStr<'static>) -> Uuid {
+        let session = rox_uuid::generate_uuid_v7();
         assert_eq!(
-            begin_as(drafts, owner, session, macro_uuid::generate_uuid_v7()).await,
+            begin_as(drafts, owner, session, rox_uuid::generate_uuid_v7()).await,
             Begun::Started,
             "a new client id starts a job"
         );
         session
     }
 
-    fn new_job(owner: &MacroUserIdStr<'static>, session: Uuid, client_id: Uuid) -> NewDraftJob {
+    fn new_job(owner: &RoxUserIdStr<'static>, session: Uuid, client_id: Uuid) -> NewDraftJob {
         NewDraftJob {
             session,
             owner: owner.clone(),
@@ -265,7 +265,7 @@ mod jobs {
     /// Start job `session` for the start with `client_id`, with no limit.
     async fn begin_as(
         drafts: &PgDraftHandBacks,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: Uuid,
         client_id: Uuid,
     ) -> Begun {
@@ -283,11 +283,11 @@ mod jobs {
     const LIMIT: u32 = 3;
 
     /// Start a job for a new start, at most [`LIMIT`] drafting since an hour ago.
-    async fn begin_limited(drafts: &PgDraftHandBacks, owner: &MacroUserIdStr<'static>) -> Begun {
+    async fn begin_limited(drafts: &PgDraftHandBacks, owner: &RoxUserIdStr<'static>) -> Begun {
         let job = new_job(
             owner,
-            macro_uuid::generate_uuid_v7(),
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
         );
         drafts
             .begin_job(&job, LIMIT, Utc::now() - chrono::Duration::hours(1))
@@ -295,7 +295,7 @@ mod jobs {
             .unwrap()
     }
 
-    async fn drafting(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> i64 {
+    async fn drafting(pool: &PgPool, owner: &RoxUserIdStr<'static>) -> i64 {
         sqlx::query_scalar!(
             r#"SELECT count(*) AS "count!" FROM scheduled_action_draft WHERE owner_id = $1 AND state = 'drafting'"#,
             owner.as_ref(),
@@ -308,14 +308,14 @@ mod jobs {
     /// Starts sent together, each a new start, never pass the limit
     /// together: each round sends more than the limit at once, for a new
     /// person each time.
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn starts_sent_together_never_pass_the_limit(pool: PgPool) {
         const ROUNDS: u8 = 10;
         const AT_ONCE: usize = 5;
         let drafts = Arc::new(PgDraftHandBacks::new(pool.clone()));
         for round in 0..ROUNDS {
             let owner =
-                MacroUserIdStr::try_from_email(&format!("owner-{round}@example.com")).unwrap();
+                RoxUserIdStr::try_from_email(&format!("owner-{round}@example.com")).unwrap();
             let together = Arc::new(Barrier::new(AT_ONCE));
             let mut starts = JoinSet::new();
             for _ in 0..AT_ONCE {
@@ -350,11 +350,11 @@ mod jobs {
 
     /// At the limit, a start sent again still finds its job; a job that
     /// started before `since` doesn't count, nor one that finished.
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn the_limit_counts_jobs_drafting_since_and_lets_repeats_through(pool: PgPool) {
         let drafts = PgDraftHandBacks::new(pool.clone());
-        let client_id = macro_uuid::generate_uuid_v7();
-        let first = macro_uuid::generate_uuid_v7();
+        let client_id = rox_uuid::generate_uuid_v7();
+        let first = rox_uuid::generate_uuid_v7();
         assert_eq!(
             begin_as(&drafts, &owner(), first, client_id).await,
             Begun::Started
@@ -363,7 +363,7 @@ mod jobs {
             assert_eq!(begin_limited(&drafts, &owner()).await, Begun::Started);
         }
         assert_eq!(begin_limited(&drafts, &owner()).await, Begun::TooMany);
-        let again = new_job(&owner(), macro_uuid::generate_uuid_v7(), client_id);
+        let again = new_job(&owner(), rox_uuid::generate_uuid_v7(), client_id);
         assert_eq!(
             drafts
                 .begin_job(&again, LIMIT, Utc::now() - chrono::Duration::hours(1))
@@ -409,11 +409,11 @@ mod jobs {
         .unwrap();
     }
 
-    fn stranger() -> MacroUserIdStr<'static> {
-        MacroUserIdStr::try_from_email("stranger@example.com").unwrap()
+    fn stranger() -> RoxUserIdStr<'static> {
+        RoxUserIdStr::try_from_email("stranger@example.com").unwrap()
     }
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn a_job_keeps_its_progress_and_result_for_its_owner(pool: PgPool) {
         let drafts = PgDraftHandBacks::new(pool);
         let session = begin(&drafts, &owner()).await;
@@ -459,7 +459,7 @@ mod jobs {
         assert!(!drafts.handed_back(session).await.unwrap().cancelled);
     }
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn cancelling_hides_a_job_and_tells_its_drafter(pool: PgPool) {
         let drafts = PgDraftHandBacks::new(pool);
         let drafting = begin(&drafts, &owner()).await;
@@ -502,11 +502,11 @@ mod jobs {
     /// A start sent again finds the job the first began, and begins no
     /// second one, until that job is cancelled; other people's ids are
     /// their own.
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn a_start_sent_again_finds_its_job(pool: PgPool) {
         let drafts = PgDraftHandBacks::new(pool.clone());
-        let client_id = macro_uuid::generate_uuid_v7();
-        let first = macro_uuid::generate_uuid_v7();
+        let client_id = rox_uuid::generate_uuid_v7();
+        let first = rox_uuid::generate_uuid_v7();
         assert_eq!(
             begin_as(&drafts, &owner(), first, client_id).await,
             Begun::Started
@@ -521,7 +521,7 @@ mod jobs {
             first
         );
 
-        let again = macro_uuid::generate_uuid_v7();
+        let again = rox_uuid::generate_uuid_v7();
         assert_eq!(
             begin_as(&drafts, &owner(), again, client_id).await,
             Begun::Repeated
@@ -557,12 +557,12 @@ mod jobs {
         drafts.cancel_job(&owner(), first).await.unwrap();
         assert_eq!(drafts.started(&owner(), client_id).await.unwrap(), None);
         assert_eq!(
-            begin_as(&drafts, &owner(), macro_uuid::generate_uuid_v7(), client_id).await,
+            begin_as(&drafts, &owner(), rox_uuid::generate_uuid_v7(), client_id).await,
             Begun::Started
         );
     }
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn the_job_sweep_fails_dead_drafts_and_finds_what_to_delete(pool: PgPool) {
         let drafts = PgDraftHandBacks::new(pool.clone());
         let died = begin(&drafts, &owner()).await;

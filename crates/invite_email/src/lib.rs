@@ -16,11 +16,11 @@ mod colleague_joined;
 pub use colleague_joined::ColleagueJoinedMacro;
 
 use askama::Template;
-use macro_env::Environment;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::email::EmailStr;
-use macro_user_id::email::ReadEmailParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_env::Environment;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::email::EmailStr;
+use rox_user_id::email::ReadEmailParts;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use notification::domain::models::{
     NotifCollapseKey, Notification, NotificationExtEmail, NotificationExtIos, NotificationTitle,
@@ -154,7 +154,7 @@ pub struct ChannelInviteMetadata {
     /// The user who sent the invitation
     #[serde(alias = "invited_by")]
     #[schema(value_type = String)]
-    pub invited_by: MacroUserIdStr<'static>,
+    pub invited_by: RoxUserIdStr<'static>,
     /// The name of the channel
     #[serde(default)]
     #[serde(alias = "channel_name")]
@@ -169,7 +169,7 @@ pub struct ChannelInviteMetadata {
     pub message_id: Option<Uuid>,
     /// Destination used while building a separate email retry key per recipient.
     #[serde(skip)]
-    pub email_recipient: Option<MacroUserIdStr<'static>>,
+    pub email_recipient: Option<RoxUserIdStr<'static>>,
     /// Message content to show in the invite email, when the invite was triggered by a message.
     #[serde(default)]
     pub message_content: Option<String>,
@@ -195,7 +195,7 @@ impl Notification for ChannelInviteMetadata {
 impl NotificationTitle for ChannelInviteMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let email = self.invited_by.email_part();
         let sender = email.email_str();
@@ -211,7 +211,7 @@ impl NotificationTitle for ChannelInviteMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok("Open Rox to continue".to_string())
     }
@@ -265,7 +265,7 @@ impl NotificationExtIos for ChannelInviteMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -313,7 +313,7 @@ pub struct InviteToTeamMetadata {
     /// The user who sent the invitation
     #[serde(alias = "invited_by")]
     #[schema(value_type = String)]
-    pub invited_by: MacroUserIdStr<'static>,
+    pub invited_by: RoxUserIdStr<'static>,
     /// Role/permission level in the team
     pub role: Option<String>,
 

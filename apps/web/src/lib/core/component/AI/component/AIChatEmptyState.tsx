@@ -2,7 +2,7 @@ import CheckIcon from '@icon/system/bold/check-bold.svg?component-solid';
 import ClipboardIcon from '@icon/system/bold/clipboard-bold.svg?component-solid';
 import { Button } from '@ui';
 import { For } from 'solid-js';
-import { CLI_COMMANDS, MACRO_MCP_CONFIG } from './mcpConstants';
+import { CLI_COMMANDS, ROX_MCP_CONFIG } from './mcpConstants';
 import { useClipboardCopy } from './useClipboardCopy';
 
 export function AiChatEmptyState() {
@@ -69,7 +69,7 @@ export function AiChatEmptyState() {
                 variant={copiedKey() === 'json' ? 'secondary' : 'ghost'}
                 size="sm"
                 class="shrink-0"
-                onClick={() => copy('json', MACRO_MCP_CONFIG)}
+                onClick={() => copy('json', ROX_MCP_CONFIG)}
               >
                 {copiedKey() === 'json' ? (
                   <>
@@ -86,7 +86,7 @@ export function AiChatEmptyState() {
             </div>
           </div>
           <pre class="overflow-x-auto p-4 text-[12px]/5 text-ink select-text cursor-text">
-            <code>{MACRO_MCP_CONFIG}</code>
+            <code>{ROX_MCP_CONFIG}</code>
           </pre>
         </div>
       </div>

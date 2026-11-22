@@ -3,8 +3,8 @@
 use super::financial::*;
 use super::ports::{AiFeature, FinancialFuture};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use std::sync::Arc;
 
 /// Immutable attribution for an observation, not a funding request or reservation.
@@ -15,7 +15,7 @@ pub struct TrackedInvocation {
     /// Unique provider execution identity; delivery retries retain this identity.
     pub invocation_id: InvocationId,
     /// Trusted originating user; the system identity is internal work, not a payer.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// Host-selected feature, including existing excluded features.
     pub feature: AiFeature,
     /// Related entity.

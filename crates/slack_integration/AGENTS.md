@@ -28,7 +28,7 @@ export, map it onto Rox channels/messages/users, and import it as a job.
 ## Boundaries
 
 - Depends on: `mention_utils`; feature-gated: `s3_key`/`aws-sdk-s3` (`s3`),
-  `connection_gateway_client` (`gateway`), `aws-sdk-sqs`/`macro_queues` (`sqs`),
+  `connection_gateway_client` (`gateway`), `aws-sdk-sqs`/`rox_queues` (`sqs`),
   `import` (`ledger`), `reqwest` (`search`).
 - Used by: `document_storage_service`, `slack_import_worker`.
 

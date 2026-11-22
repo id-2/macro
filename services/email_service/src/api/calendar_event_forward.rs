@@ -14,7 +14,7 @@ use email::domain::{
     event_forward::{EventForwardError, EventForwardRequest, forward_event},
     models::ContactInfo,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -141,11 +141,11 @@ impl From<EventForwardError> for ForwardCalendarEventError {
     ))]
 pub(crate) async fn handler(
     State(state): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(event_id): Path<Uuid>,
     Json(request): Json<ForwardCalendarEventRequest>,
 ) -> Result<(StatusCode, Json<ForwardCalendarEventResponse>), ForwardCalendarEventError> {
-    let actor = authorization.authorization.user.macro_user_id.clone();
+    let actor = authorization.authorization.user.rox_user_id.clone();
     let email = state.email_service.service();
     let sent = forward_event(
         state.calendar_service.as_ref(),

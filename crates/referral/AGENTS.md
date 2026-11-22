@@ -24,7 +24,7 @@ port. Also sends invite-to-Rox emails.
 
 ## Boundaries
 
-- Depends on: `notification`, `macro_user_id`, `rate_limit` (via
+- Depends on: `notification`, `rox_user_id`, `rate_limit` (via
   `services/authentication_service`'s wiring).
 - Used by: `services/authentication_service`.
 

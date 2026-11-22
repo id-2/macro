@@ -62,7 +62,7 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use lexical_client::LexicalClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MessageServiceApi, models::MessageAttribution, ports::MessageError, service::MessageWrite,
 };
@@ -267,7 +267,7 @@ impl<
             document_permission_jwt_secret,
             admission: Arc::new(ai_billing::domain::admission::DisabledAiAdmissionService),
             recorder: Arc::new(ai_usage::NoOpUsageRecorder),
-            actor: bot_id::MACRO_AI_BOT_ID,
+            actor: bot_id::ROX_AI_BOT_ID,
             actor_name: None,
             via: None,
         }
@@ -404,7 +404,7 @@ impl<
     }
 
     /// Who these tools create entities as when acting for `user`.
-    pub fn creation_principal(&self, user: MacroUserIdStr<'static>) -> CreationPrincipal {
+    pub fn creation_principal(&self, user: RoxUserIdStr<'static>) -> CreationPrincipal {
         CreationPrincipal::BotForUser {
             bot: self.actor,
             user,

@@ -12,7 +12,7 @@ bun run dev:billing
 
 Open `/billing-lab.html` on the URL printed by Vite. If another worktree uses the
 default port, choose a free one with `PORT=3003 bun run dev:billing`.
-`MACRO_DEV_HTTPS=false` uses HTTP. You can also open the lab from a local app's
+`ROX_DEV_HTTPS=false` uses HTTP. You can also open the lab from a local app's
 **Settings → Usage → Developer tools → Open Billing Lab**.
 
 ## Try Max → Pro

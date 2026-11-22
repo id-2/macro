@@ -87,7 +87,7 @@ function reconstructBoot(
   }
   const refreshStarts = new Map<number, number>();
   for (const mark of performance.getEntriesByType('mark')) {
-    if (mark.name.startsWith('macro.') && mark.startTime <= end) {
+    if (mark.name.startsWith('rox.') && mark.startTime <= end) {
       boot.event(mark.name, undefined, performance.timeOrigin + mark.startTime);
       const detail = 'detail' in mark ? mark.detail : undefined;
       if (
@@ -97,9 +97,9 @@ function reconstructBoot(
         typeof detail.generation !== 'number'
       )
         continue;
-      if (mark.name === 'macro.auth.refresh-start') {
+      if (mark.name === 'rox.auth.refresh-start') {
         refreshStarts.set(detail.generation, mark.startTime);
-      } else if (mark.name === 'macro.auth.refresh-end') {
+      } else if (mark.name === 'rox.auth.refresh-end') {
         const start = refreshStarts.get(detail.generation);
         // Provider registration may follow refresh; account resets can overlap
         // old and new attempts, so pair only marks from the same generation.

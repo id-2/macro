@@ -9,8 +9,8 @@ use std::num::NonZeroU16;
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::{Uuid, generate_uuid_v7};
 use thiserror::Error;
 
 use super::ports::{AiFeature, FinancialUsage};
@@ -398,7 +398,7 @@ pub struct BeginInvocation {
     /// Provider attempt identity, retained only across delivery retries.
     pub invocation_id: InvocationId,
     /// Authenticated originating user; funding resolves payer/seat attribution.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// Calling feature, verified by the host.
     pub feature: AiFeature,
     /// Related entity, if any.

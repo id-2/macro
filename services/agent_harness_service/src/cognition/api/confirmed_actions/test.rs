@@ -1,7 +1,7 @@
 use super::*;
 use crate::cognition::api::context::test::{authorized_request, test_api_context};
 use axum::{Router, routing::post};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use tower::ServiceExt;
 
@@ -13,7 +13,7 @@ async fn message(response: Response) -> String {
     body["message"].as_str().unwrap().to_owned()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_email_without_the_users_approval_is_never_sent(pool: sqlx::PgPool) {
     let ctx = test_api_context(pool).await;
     let router = Router::new()
@@ -46,7 +46,7 @@ async fn an_email_without_the_users_approval_is_never_sent(pool: sqlx::PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_event_without_the_users_approval_is_never_created(pool: sqlx::PgPool) {
     let ctx = test_api_context(pool).await;
     let router = Router::new()

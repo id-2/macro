@@ -10,7 +10,7 @@ use axum::{
 };
 use documents_hex::domain::docx_export::{DocxExport, export_docx};
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::{
     document::{DocumentBasic, FileType, response::LocationResponseData},
     response::{ErrorResponse, GenericErrorResponse},
@@ -57,12 +57,12 @@ pub struct ExportDocumentResponse {
             (status = 500, body=GenericErrorResponse),
         )
     )]
-#[tracing::instrument(skip(state, user, access), fields(user_id=?user.authorization.user.macro_user_id))]
+#[tracing::instrument(skip(state, user, access), fields(user_id=?user.authorization.user.rox_user_id))]
 pub async fn handler(
     access: DocumentAccessExtractor<ViewAccessLevel, EntityAccessService, AuthorizationService>,
     Path(Params { .. }): Path<Params>,
     State(state): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     document_context: Extension<DocumentBasic>,
 ) -> Result<Response, Response> {
     tracing::info!("export document");

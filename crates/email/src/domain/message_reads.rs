@@ -1,6 +1,6 @@
 //! Synced-mail reads, including the public and internal routes' distinct policies.
 
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_email::service::{
     message::{
         MessageSenderInfo, MessageSendersRequest, MessageSendersResponse, ParsedMessage,
@@ -351,7 +351,7 @@ impl<R: MessageReadRepository> MessageReadService<R> {
             .await
             .map_err(ThreadOwnerError::Query)?
             .ok_or(ThreadOwnerError::NotFound)?;
-        let user_id = MacroUserIdStr::parse_from_str(&owner)
+        let user_id = RoxUserIdStr::parse_from_str(&owner)
             .map_err(|_| ThreadOwnerError::InvalidOwner)?
             .into_owned();
         Ok(GetThreadOwnerResponse { user_id })

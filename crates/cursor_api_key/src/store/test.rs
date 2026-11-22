@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 const USER_ID: &str = "macro-user-1";
@@ -17,7 +17,7 @@ fn encrypted(seed: u8) -> EncryptedCursorApiKey {
 ///
 /// A Rox user is two rows: `macro_user` holds the identity and `"User"` the
 /// profile that references it. `cursor_configs` keys on `"User"."id"`, the
-/// text id that `MacroUserIdStr` carries — not the `macro_user_id` uuid.
+/// text id that `RoxUserIdStr` carries — not the `rox_user_id` uuid.
 async fn insert_user(pool: &Pool<Postgres>, user_id: &str) -> anyhow::Result<()> {
     let email = format!("{user_id}@example.com");
     sqlx::query!(
@@ -27,7 +27,7 @@ async fn insert_user(pool: &Pool<Postgres>, user_id: &str) -> anyhow::Result<()>
             VALUES (gen_random_uuid(), $2, $2, $3)
             RETURNING id
         )
-        INSERT INTO "User" ("id", "email", "macro_user_id")
+        INSERT INTO "User" ("id", "email", "rox_user_id")
         SELECT $1, $2, new_macro_user.id FROM new_macro_user
         "#,
         user_id,
@@ -39,7 +39,7 @@ async fn insert_user(pool: &Pool<Postgres>, user_id: &str) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_registered_key_round_trips(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     let encrypted = encrypted(1);
@@ -56,7 +56,7 @@ async fn a_registered_key_round_trips(pool: Pool<Postgres>) -> anyhow::Result<()
 
 /// Registering again replaces the key rather than failing: that is what
 /// pasting a rotated key looks like.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn registering_again_replaces_the_key_and_keeps_created_at(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
@@ -75,14 +75,14 @@ async fn registering_again_replaces_the_key_and_keeps_created_at(
 }
 
 /// A user with no key is `None`, not an error: it is the ordinary state.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_user_without_a_key_reads_as_none(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     assert!(get_cursor_api_key(&pool, USER_ID).await?.is_none());
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn keys_are_scoped_to_their_owner(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     insert_user(&pool, OTHER_USER_ID).await?;
@@ -107,7 +107,7 @@ async fn keys_are_scoped_to_their_owner(pool: Pool<Postgres>) -> anyhow::Result<
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_reports_whether_there_was_a_key(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     upsert_cursor_api_key(&pool, USER_ID, &encrypted(1)).await?;
@@ -124,7 +124,7 @@ async fn deleting_reports_whether_there_was_a_key(pool: Pool<Postgres>) -> anyho
 /// Deleting the user takes the key with it, which the Microsoft grants table
 /// does not do — it keys on the FusionAuth id with no foreign key, so its rows
 /// outlive their users.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_the_user_cascades_to_the_key(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     upsert_cursor_api_key(&pool, USER_ID, &encrypted(1)).await?;
@@ -138,7 +138,7 @@ async fn deleting_the_user_cascades_to_the_key(pool: Pool<Postgres>) -> anyhow::
 }
 
 /// A key cannot be registered for a user that does not exist.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_key_for_an_unknown_user_is_refused(pool: Pool<Postgres>) -> anyhow::Result<()> {
     assert!(
         upsert_cursor_api_key(&pool, "nobody", &encrypted(1))
@@ -150,7 +150,7 @@ async fn a_key_for_an_unknown_user_is_refused(pool: Pool<Postgres>) -> anyhow::R
 
 /// A freshly registered key has no default model: the user gets the
 /// deployment's built-in default until they choose one.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_key_has_no_default_model(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     let stored = upsert_cursor_api_key(&pool, USER_ID, &encrypted(1)).await?;
@@ -160,7 +160,7 @@ async fn a_new_key_has_no_default_model(pool: Pool<Postgres>) -> anyhow::Result<
 
 /// The chosen model round-trips, and clearing it with `None` reverts to the
 /// deployment default.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_default_model_round_trips_and_clears(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     upsert_cursor_api_key(&pool, USER_ID, &encrypted(1)).await?;
@@ -188,7 +188,7 @@ async fn the_default_model_round_trips_and_clears(pool: Pool<Postgres>) -> anyho
 
 /// The effort is stored with its model, a new model without one clears it,
 /// and an effort with no model is dropped rather than stored.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_default_effort_round_trips_with_its_model(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     upsert_cursor_api_key(&pool, USER_ID, &encrypted(1)).await?;
@@ -211,7 +211,7 @@ async fn the_default_effort_round_trips_with_its_model(pool: Pool<Postgres>) -> 
 }
 
 /// Rotating the key leaves the chosen model and effort alone — a new paste is not a reset.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rotating_the_key_keeps_the_default_model(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     upsert_cursor_api_key(&pool, USER_ID, &encrypted(1)).await?;
@@ -225,7 +225,7 @@ async fn rotating_the_key_keeps_the_default_model(pool: Pool<Postgres>) -> anyho
 
 /// Choosing a model before connecting is not an error, just a no-op: there is
 /// no row to hold it, and no session would use it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn setting_a_model_without_a_key_is_a_noop(pool: Pool<Postgres>) -> anyhow::Result<()> {
     insert_user(&pool, USER_ID).await?;
     assert!(!set_default_model(&pool, USER_ID, Some("grok-4.6"), None).await?);

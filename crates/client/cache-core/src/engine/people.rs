@@ -6,11 +6,11 @@ use crate::people::{
     PeopleReferenceRequest, PeopleReferenceResult, PeopleSearch, PeopleSearchResult, StoredFacts,
 };
 use crate::value::CacheValue;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 impl<S: Storage> Engine<S> {
     async fn people_scope(&mut self, scope: &HydrationScope) -> Result<(), EngineError<S::Error>> {
-        if MacroUserIdStr::try_from(scope.identity.as_str()).is_err()
+        if RoxUserIdStr::try_from(scope.identity.as_str()).is_err()
             || self.stored_storage_generation().await? != Some(scope.storage_generation)
             || self
                 .current_identity()

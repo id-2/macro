@@ -53,7 +53,7 @@ function CalendarSettingsContent() {
   const ownedLinks = () =>
     (links.isSuccess ? (links.data?.links ?? []) : [])
       .filter(isExternalEmailLink)
-      .filter((l) => l.macro_id === userId());
+      .filter((l) => l.rox_id === userId());
   const accounts = (): ConnectedCalendarAccount[] => {
     const groups = groupCalendarSourcesByAccount(
       sources().filter((s) => s.emailLinkId)

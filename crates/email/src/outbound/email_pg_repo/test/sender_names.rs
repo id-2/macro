@@ -25,7 +25,7 @@ const EXPECTED_SENDERS: [(Uuid, &str); 5] = [
 ];
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_sender_names")
@@ -58,7 +58,7 @@ async fn filtered_previews_preserve_message_sender_names(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query", "email_sender_names")
@@ -71,7 +71,7 @@ async fn cached_mail_previews_preserve_message_sender_names(
     let thread_ids = EXPECTED_SENDERS.map(|(id, _)| id);
     let rows = repo
         .thread_mail_projections_by_ids(
-            MacroUserIdStr::parse_from_str("macro|user1@test.com")?,
+            RoxUserIdStr::parse_from_str("macro|user1@test.com")?,
             &thread_ids,
         )
         .await?;

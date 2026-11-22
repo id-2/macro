@@ -1,5 +1,5 @@
 use async_graphql::{EmptySubscription, Schema, parser::types::TypeSystemDefinition};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::{CalendarMutationRoot, GraphqlCalendarQuery};
 
@@ -7,7 +7,7 @@ use crate::{CalendarMutationRoot, GraphqlCalendarQuery};
 fn calendar_types_match_the_shared_schema() {
     let generated = Schema::build(
         GraphqlCalendarQuery::new(
-            MacroUserIdStr::parse_from_str("macro|viewer@example.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap(),
         ),
         CalendarMutationRoot,
         EmptySubscription,

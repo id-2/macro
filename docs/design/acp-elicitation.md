@@ -10,7 +10,7 @@ Sources:
 - [Announcement](https://agentclientprotocol.com/announcements/elicitation-stabilized) (2026-07-24)
 - [Schema reference](https://agentclientprotocol.com/protocol/schema)
 
-The RFD is done. The remaining work is ours: Macro is an ACP client today and
+The RFD is done. The remaining work is ours: Rox is an ACP client today and
 does not advertise, hold, render, or answer `elicitation/create`.
 
 ## Elevator pitch

@@ -68,7 +68,7 @@ export function RoxMailboxSettings() {
   const links = () => (query.isSuccess ? query.data.links : []);
   const roxLink = () =>
     links().find(
-      (link) => link.provider === 'ROX' && link.macro_id === userId()
+      (link) => link.provider === 'ROX' && link.rox_id === userId()
     );
   const mailboxId = () => roxLink()?.id ?? 'pending';
   const roxAddress = () => {

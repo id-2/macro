@@ -583,7 +583,7 @@ describe('destination adapters', () => {
           'Hello José'
         );
         expect(draft.body_text).toBe('Hello José');
-        expect(draft.body_macro).toBe('**Hello José**');
+        expect(draft.body_rox).toBe('**Hello José**');
       } finally {
         dispose();
       }

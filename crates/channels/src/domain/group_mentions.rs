@@ -1,6 +1,6 @@
 //! Channel policy for resolving authored group mentions into human recipients.
 use super::ports::ChannelRepo;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::ports::{MessageError, MessageGroupRecipients};
 use uuid::Uuid;
 
@@ -13,7 +13,7 @@ impl<R: ChannelRepo> MessageGroupRecipients for ChannelGroupRecipients<R> {
     async fn channel_members(
         &self,
         channel: Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, MessageError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, MessageError> {
         let participants = self.0.get_participants(channel).await.map_err(|error| {
             let error: anyhow::Error = error.into();
             MessageError::Repository(rootcause::report!(error).into())
@@ -21,7 +21,7 @@ impl<R: ChannelRepo> MessageGroupRecipients for ChannelGroupRecipients<R> {
         Ok(participants
             .into_iter()
             .filter(|participant| participant.left_at.is_none())
-            .filter_map(|participant| MacroUserIdStr::try_from(participant.user_id).ok())
+            .filter_map(|participant| RoxUserIdStr::try_from(participant.user_id).ok())
             .collect())
     }
 }

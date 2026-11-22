@@ -7,7 +7,7 @@ use super::*;
 use crate::domain::models::{DatabaseError, OpRefusal, SchemaError};
 use crate::domain::ports::{DatabasesRepo, DatabasesService};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reordering_three_tables_rewrites_every_position_and_reads_back_in_order(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -114,7 +114,7 @@ async fn reordering_three_tables_rewrites_every_position_and_reads_back_in_order
     assert_eq!(notes.position.as_str(), "8280");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_order_missing_or_repeating_a_table_is_refused_and_changes_nothing(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -181,7 +181,7 @@ async fn an_order_missing_or_repeating_a_table_is_refused_and_changes_nothing(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_order_naming_another_databases_table_is_refused_and_changes_neither(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
@@ -247,7 +247,7 @@ async fn an_order_naming_another_databases_table_is_refused_and_changes_neither(
     assert_eq!(other_after[0].version, other_before[0].version);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reordering_a_trashed_databases_tables_is_not_found(pool: PgPool) {
     let guests = guests(&pool).await;
     PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool.clone()))

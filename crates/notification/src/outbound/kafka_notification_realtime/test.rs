@@ -2,11 +2,11 @@ use std::borrow::Cow;
 use std::sync::{Arc, Mutex};
 
 use chrono::Utc;
-use macro_event_broker::{
-    EventBrokerError, EventPublisher, MacroEvent, MacroEventBrokerService, Spawner,
+use rox_event_broker::{
+    EventBrokerError, EventPublisher, RoxEvent, RoxEventBrokerService, Spawner,
 };
-use macro_event_topics::Topic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_topics::Topic;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 
 use super::*;
@@ -57,12 +57,12 @@ impl Spawner for TokioSpawner {
     }
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user ID")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user ID")
 }
 
 fn row(
-    owner_id: MacroUserIdStr<'static>,
+    owner_id: RoxUserIdStr<'static>,
     notification_id: uuid::Uuid,
 ) -> UserNotificationRow<serde_json::Value> {
     UserNotificationRow {
@@ -84,15 +84,15 @@ fn row(
 fn publisher(
     records: Arc<Mutex<Vec<PublishedRecord>>>,
     fail: bool,
-) -> KafkaNotificationRealtimePublisher<MacroEventBrokerService<RecordingPublisher, TokioSpawner>> {
-    KafkaNotificationRealtimePublisher::new(MacroEventBrokerService::new(
+) -> KafkaNotificationRealtimePublisher<RoxEventBrokerService<RecordingPublisher, TokioSpawner>> {
+    KafkaNotificationRealtimePublisher::new(RoxEventBrokerService::new(
         RecordingPublisher { records, fail },
         TokioSpawner,
     ))
 }
 
 fn assert_envelope(record: &PublishedRecord, event_type: &str) -> serde_json::Value {
-    assert_eq!(record.topic, "macro.notifications");
+    assert_eq!(record.topic, "rox.notifications");
     let payload: serde_json::Value =
         serde_json::from_slice(&record.payload).expect("payload is valid JSON");
     assert_eq!(

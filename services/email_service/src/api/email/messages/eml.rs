@@ -5,7 +5,7 @@ use axum::{
     http::header,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use uuid::Uuid;
 
@@ -48,12 +48,12 @@ impl utoipa::ToSchema for EmlFile {}
 #[tracing::instrument(skip(ctx, authorization), fields(eml_bytes = tracing::field::Empty), err)]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<Response, AttachmentApiError> {
     let source = ctx
         .message_sources
-        .download(&authorization.authorization.user.macro_user_id, id)
+        .download(&authorization.authorization.user.rox_user_id, id)
         .await?;
     tracing::Span::current().record("eml_bytes", source.bytes.len());
     Ok((

@@ -23,7 +23,7 @@ fn notifying_repo(pool: &PgPool, sessions: &Arc<Sessions>) -> PgImportRepo {
 /// planned, and the run still `running`.
 async fn presented_while_planning(
     pool: &PgPool,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
 ) -> (Uuid, AgentSessionId, Vec<Uuid>) {
     let (review, rows) = approved_plan(pool, owner).await;
     let session = sqlx::query_scalar!(
@@ -53,7 +53,7 @@ fn settled_import(
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_plan_presented_while_planning_tells_its_session_once_it_is_ready(pool: PgPool) {
     let owner = user("planned");
     let (review, session, _) = presented_while_planning(&pool, &owner).await;
@@ -92,7 +92,7 @@ async fn a_plan_presented_while_planning_tells_its_session_once_it_is_ready(pool
     assert_eq!(plan.copy, 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_linear_plan_tells_its_session_it_came_from_linear(pool: PgPool) {
     let owner = user("linear-planned");
     let issue = PlanRow {
@@ -141,7 +141,7 @@ async fn a_linear_plan_tells_its_session_it_came_from_linear(pool: PgPool) {
     assert_eq!(plan.task_lists, 1, "the issue becomes a task");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_plan_that_fails_tells_no_session_it_is_ready(pool: PgPool) {
     let owner = user("plan-failed");
     presented_while_planning(&pool, &owner).await;
@@ -163,7 +163,7 @@ async fn a_plan_that_fails_tells_no_session_it_is_ready(pool: PgPool) {
     assert!(sessions.0.lock().unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_finished_write_tells_its_session_once_with_the_final_report(pool: PgPool) {
     let owner = user("settled");
     let (review, session, _) = presented_while_planning(&pool, &owner).await;
@@ -211,7 +211,7 @@ async fn a_finished_write_tells_its_session_once_with_the_final_report(pool: PgP
     assert!(settled.root_folder_id.is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_adopted_write_tells_its_session_once_when_it_finishes(pool: PgPool) {
     let owner = user("adopted-settled");
     let (review, session, rows) = presented_while_planning(&pool, &owner).await;
@@ -259,7 +259,7 @@ async fn an_adopted_write_tells_its_session_once_when_it_finishes(pool: PgPool) 
     assert_eq!(settled.imported, 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_write_given_up_on_tells_its_session_it_failed(pool: PgPool) {
     let owner = user("given-up-settled");
     let (review, session, rows) = presented_while_planning(&pool, &owner).await;

@@ -87,7 +87,7 @@ where
             .create_database_definition_in(
                 &mut transaction,
                 NewDatabaseDefinition {
-                    id: macro_uuid::generate_uuid_v7(),
+                    id: rox_uuid::generate_uuid_v7(),
                     database_id: database_id.into_uuid(),
                     name,
                     data_type,

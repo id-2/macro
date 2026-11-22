@@ -39,9 +39,9 @@ own permission checks and agent attribution apply.
 - `TOOL_GROUPING` switches between entity tools and one tool per operation;
   both lists are snapshotted in `packages/sdk-mcp`.
 - `RESOURCE_URL` and `AUTHORIZATION_SERVER_URL` mirror
-  `McpChatgptServiceUrl` and `McpPublicUrl` in `crates/macro_service_urls`;
+  `McpChatgptServiceUrl` and `McpPublicUrl` in `crates/rox_service_urls`;
   change all of them together. Service hosts come from the SDK for
-  `MACRO_ENV`; `MACRO_HOSTS` (JSON) only points a local run at a named stack.
+  `ROX_ENV`; `ROX_HOSTS` (JSON) only points a local run at a named stack.
 - Deploys are `workflow_dispatch` only (`Deploy MCP ChatGPT Worker`).
 - The SDK is imported by relative path from `packages/sdk/src`; SDK changes
   reach this Worker on its next deploy.

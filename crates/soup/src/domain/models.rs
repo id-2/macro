@@ -22,7 +22,7 @@ use item_filters::{
     EntityFilters,
     ast::{EntityFilterAst, ExpandErr},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use models_grouping::GroupingConfig;
 use models_pagination::{
@@ -101,7 +101,7 @@ pub struct SimpleSortRequest<'a> {
     /// the [Query] the client passes (if any)
     pub(crate) cursor: SimpleSortQuery,
     /// the id of the user
-    pub(crate) user_id: MacroUserIdStr<'a>,
+    pub(crate) user_id: RoxUserIdStr<'a>,
 }
 
 pub use grouping::query::GroupedSortRequest;
@@ -181,7 +181,7 @@ pub struct AdvancedSortParams<'a> {
     /// Entities to fetch and preserve in the requested order.
     pub entities: &'a [Entity<'a>],
     /// User whose accessible soup items should be fetched.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
 }
 
 /// Cursor or initial-sort query for a soup request.
@@ -372,10 +372,10 @@ pub struct SoupRequest<T> {
     /// the GraphQL adapter cannot express frecency at all.
     pub sort_direction: SoupSortDirection,
     /// User whose soup should be queried.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// Email preview view used when hydrating email soup items.
     pub email_preview_view: PreviewView,
-    /// Every inbox the caller can read (own + delegated via macro_user_links).
+    /// Every inbox the caller can read (own + delegated via rox_user_links).
     /// Empty when the caller has no inboxes — `build_email_request` returns
     /// `None` so the email branch is skipped, unless the request is CRM-scoped.
     pub link_ids: Vec<Uuid>,
@@ -502,7 +502,7 @@ impl SoupRequest<Option<EntityFilterAst>> {
         Some(GetEmailsRequest {
             view: self.email_preview_view.clone(),
             link_ids: self.link_ids.clone(),
-            macro_id: self.user.clone(),
+            rox_id: self.user.clone(),
             limit: Some(self.limit as u32),
             query: match &self.cursor {
                 SoupQuery::Property(_) => return None,
@@ -727,7 +727,7 @@ impl SoupRequest<Option<EntityFilterAst>> {
             return None;
         }
         Some(GetChannelsRequest {
-            macro_id: self.user.clone(),
+            rox_id: self.user.clone(),
             limit: Some(self.limit as u32),
             include_frecency: false,
             query: match &self.cursor {
@@ -807,7 +807,7 @@ impl SoupRequest<Option<EntityFilterAst>> {
         }?;
 
         Some(GetThreadReplyRowsRequest {
-            macro_id: self.user.clone(),
+            rox_id: self.user.clone(),
             limit: Some(self.limit as u32),
             query,
         })
@@ -895,7 +895,7 @@ pub struct TouchedPagePosition {
 #[derive(Debug)]
 pub struct TouchedSoupRequest<'a> {
     /// User whose touches are listed; also the access-check subject.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// Maximum entities to return.
     pub limit: u16,
     /// Resume after this position; `None` for the first page.
@@ -933,7 +933,7 @@ pub struct NotifiedPagePosition {
 #[derive(Debug)]
 pub struct NotifiedSoupRequest<'a> {
     /// User whose notifications are listed; also the access-check subject.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// Maximum candidates to return.
     pub limit: u16,
     /// Resume after this position; `None` for the first page.
@@ -1010,7 +1010,7 @@ pub struct AttentionPagePosition {
 #[derive(Debug)]
 pub struct AttentionCandidateRequest<'a> {
     /// User whose feed is listed; also the access-check subject.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// Maximum candidates to return.
     pub limit: u16,
     /// Whether the viewer's own work admits candidates besides attention.
@@ -1064,7 +1064,7 @@ pub struct AttentionCandidate {
 #[derive(Debug, Clone)]
 pub struct AttentionSoupRequest {
     /// User whose feed is listed.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// Every inbox the caller can read.
     pub link_ids: Vec<Uuid>,
     /// Maximum items to return.
@@ -1202,7 +1202,7 @@ pub struct GetCrmCompaniesRequest {
     /// Requesting user — used to scope the per-user `UserHistory` join
     /// behind the `Viewed*` sort variants. Always populated; the soup
     /// request always has a user.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Filter to specific company ids. Empty = all of the team's
     /// companies matching `hidden` (subject to the killswitch).
     pub company_ids: Vec<Uuid>,

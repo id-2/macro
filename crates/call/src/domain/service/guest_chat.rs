@@ -17,7 +17,7 @@ impl<
     Sm: CallSummarizer + Clone,
     V: VoipPushSender,
     Vr: VoiceRepository + Clone,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 > GuestCallAuthorizer for CallServiceImpl<R, C, Cn, E, N, S, Sm, V, Vr, B>
 {
     #[tracing::instrument(err, skip_all, fields(%call_id))]

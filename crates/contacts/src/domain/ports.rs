@@ -3,7 +3,7 @@ use crate::domain::models::messages::{ContactConnection, ContactConnections, Con
 use crate::domain::models::page::{ContactCursor, ContactIdPage, ContactPageSize};
 use crate::domain::models::people::{PeopleSearchLimit, PeopleSearchQuery, PersonMatch};
 use crate::domain::models::query::{ContactLookup, ContactSearch};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -13,13 +13,13 @@ pub trait ContactsRepository: Send + Sync + 'static {
     /// Gets the list of contact user IDs for a given user.
     fn get_contacts(
         &self,
-        user_id: MacroUserIdStr<'_>,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Report>> + Send;
+        user_id: RoxUserIdStr<'_>,
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Report>> + Send;
 
     /// Creates connection pairs between users within a transaction.
     fn create_connections(
         &self,
-        connections: Vec<(MacroUserIdStr<'_>, MacroUserIdStr<'_>)>,
+        connections: Vec<(RoxUserIdStr<'_>, RoxUserIdStr<'_>)>,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 }
 
@@ -28,16 +28,16 @@ pub trait ContactsPageRepository: Send + Sync + 'static {
     /// Select only requested graph neighbors or self, preserving request order.
     fn lookup_contact_ids(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Report>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Report>> + Send;
 
     /// Return only the viewer's graph neighbors and self, in stable contact-ID
     /// order, after the cursor. Apply the bound in storage, not after loading all
     /// contacts. Preserve continuation progress when skipping invalid legacy IDs.
     fn contact_id_page(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> impl Future<Output = Result<ContactIdPage, Report>> + Send;
@@ -48,16 +48,16 @@ pub trait ContactsPageService: Send + Sync + 'static {
     /// Authorize exact IDs against the authenticated viewer's directory.
     fn lookup_contact_ids(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Report>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Report>> + Send;
 
     /// Read the authenticated viewer's contacts, including self, without an
     /// in-memory full-directory intermediate. The adapter supplies the viewer
     /// from authentication, never from a request body or cursor.
     fn contact_id_page(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> impl Future<Output = Result<ContactIdPage, Report>> + Send;
@@ -70,7 +70,7 @@ pub trait PeopleSearchRepository: Send + Sync + 'static {
     /// Rank teammates first, then prefix matches, and return at most `limit`.
     fn search_people(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         needle: &str,
         limit: PeopleSearchLimit,
     ) -> impl Future<Output = Result<Vec<PersonMatch>, Report>> + Send;
@@ -82,7 +82,7 @@ pub trait PeopleSearchService: Send + Sync + 'static {
     /// too short to search returns no people without reading storage.
     fn search_people(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         query: &PeopleSearchQuery,
         limit: PeopleSearchLimit,
     ) -> impl Future<Output = Result<Vec<PersonMatch>, Report>> + Send;
@@ -94,8 +94,8 @@ pub trait ContactNameReader: Send + Sync + 'static {
     /// precedence over this viewer's address book. Missing names are not errors.
     fn contact_names(
         &self,
-        viewer: MacroUserIdStr<'_>,
-        contacts: &[MacroUserIdStr<'static>],
+        viewer: RoxUserIdStr<'_>,
+        contacts: &[RoxUserIdStr<'static>],
     ) -> impl Future<Output = Result<Vec<ContactName>, Report>> + Send;
 }
 
@@ -105,7 +105,7 @@ pub trait ContactDirectory: Send + Sync + 'static {
     /// means more source rows remain, even when no matches were returned.
     fn search_contacts(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         search: &ContactSearch,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
@@ -115,14 +115,14 @@ pub trait ContactDirectory: Send + Sync + 'static {
     /// or unrelated people and retaining first-requested order.
     fn lookup_contacts(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
     ) -> impl Future<Output = Result<Vec<Contact>, Report>> + Send;
 
     /// Read and enrich only one authorized page, preserving its continuation.
     fn contact_page(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> impl Future<Output = Result<ContactPage, Report>> + Send;
@@ -133,7 +133,7 @@ pub trait ContactsNotifier: Send + Sync + 'static {
     /// Invalidates cached contacts for the given user IDs.
     fn invalidate_contacts_for_users(
         &self,
-        user_ids: Vec<MacroUserIdStr<'_>>,
+        user_ids: Vec<RoxUserIdStr<'_>>,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 }
 
@@ -143,8 +143,8 @@ pub trait UserPictureNotifier: Send + Sync + 'static {
     /// picture changed so they refetch it.
     fn notify_picture_changed(
         &self,
-        user_id: &MacroUserIdStr<'_>,
-        recipients: &[MacroUserIdStr<'static>],
+        user_id: &RoxUserIdStr<'_>,
+        recipients: &[RoxUserIdStr<'static>],
     ) -> impl Future<Output = Result<(), Report>> + Send;
 }
 
@@ -168,7 +168,7 @@ pub trait ContactsIngress: Send + Sync + 'static {
     /// Enqueues a set of user IDs to have their pairwise connections upserted.
     fn enqueue_contacts(
         &self,
-        users: HashSet<MacroUserIdStr<'static>>,
+        users: HashSet<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     /// Enqueues only the supplied contact relationships for upsert.
@@ -183,8 +183,8 @@ pub trait ContactsService: Send + Sync + 'static {
     /// Queries a user's contacts.
     fn query_contacts(
         &self,
-        user_id: MacroUserIdStr<'_>,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, rootcause::Report>> + Send;
+        user_id: RoxUserIdStr<'_>,
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, rootcause::Report>> + Send;
 
     /// Adds a contact connection between n users as a complete graph.
     fn add_contact_nodes(
@@ -203,7 +203,7 @@ pub(crate) struct ContactsBackfillOutboxMessage {
     pub(crate) id: u64,
     #[allow(dead_code)]
     pub(crate) channel_id: Uuid,
-    pub(crate) channel_participants: HashSet<MacroUserIdStr<'static>>,
+    pub(crate) channel_participants: HashSet<RoxUserIdStr<'static>>,
 }
 
 pub(crate) trait ContactsBackfillOutboxRepo: Send + Sync + 'static {

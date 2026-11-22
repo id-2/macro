@@ -32,7 +32,7 @@ async fn rejected_rename_succeeds_without_provider_or_persistence_work() {
         // rejection neither tries a fallback completion nor patches the name.
         rename_initial_chat(
             Arc::new(state),
-            MacroUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
+            RoxUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
             uuid::Uuid::now_v7().to_string(),
             "stream-id".into(),
             "Plan Q3 hiring".into(),

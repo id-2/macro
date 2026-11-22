@@ -15,7 +15,7 @@ and adds selected recipients to the global blocked-email list.
 ## Scope
 
 - Owns: bounce and complaint suppression decisions.
-- The existing `macro_db_client::blocked_email` helper owns lowercase conversion
+- The existing `rox_db_client::blocked_email` helper owns lowercase conversion
   and the conflict-ignoring bulk insert. Keep its input order and duplicates.
 
 ## Checks

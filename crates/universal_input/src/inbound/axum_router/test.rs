@@ -8,9 +8,9 @@ use axum::{
 };
 use chrono::NaiveDate;
 use jev::domain::{JevError, Probability, YesNoQuestion};
-use macro_authorization::{
-    INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, ValidatedCredential,
+use rox_authorization::{
+    INTERNAL_API_KEY_HEADER, INTERNAL_ROX_USER_ID_HEADER, InternalIdentityClaims,
+    RoxAuthorizationError, ValidatedCredential,
 };
 use model_user::UserContext;
 use rootcause::Report;
@@ -19,17 +19,17 @@ use tower::ServiceExt;
 
 #[derive(Clone)]
 struct Identity;
-impl MacroAuthorizationService for Identity {
+impl RoxAuthorizationService for Identity {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt).await.map(ValidatedCredential::session)
     }
 
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: "macro|router@rox.one".into(),
@@ -42,9 +42,9 @@ impl MacroAuthorizationService for Identity {
         &self,
         key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if key != INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(claims.user_id.map(|user_id| UserContext {
             user_id,
@@ -88,7 +88,7 @@ fn router() -> Router {
                 Extractor,
                 Arc::new(DisabledAiAdmissionService),
             )),
-            MacroAuthorizationState::new(Arc::new(Identity)),
+            RoxAuthorizationState::new(Arc::new(Identity)),
         )),
     )
 }
@@ -155,7 +155,7 @@ fn due_date_router(facts: Facts) -> Router {
                 facts,
                 Arc::new(DisabledAiAdmissionService),
             )),
-            MacroAuthorizationState::new(Arc::new(Identity)),
+            RoxAuthorizationState::new(Arc::new(Identity)),
         )),
     )
 }
@@ -209,7 +209,7 @@ async fn a_due_date_is_metered_against_the_owner_as_background_focus_usage() {
             Request::post("/universal_input/thread-due-date")
                 .header("content-type", "application/json")
                 .header(INTERNAL_API_KEY_HEADER, INTERNAL_KEY)
-                .header(INTERNAL_MACRO_USER_ID_HEADER, "macro|owner@rox.one")
+                .header(INTERNAL_ROX_USER_ID_HEADER, "macro|owner@rox.one")
                 .body(due_date_body())
                 .unwrap(),
         )

@@ -30,7 +30,7 @@ service with Axum, agent-tool and Postgres adapters.
 
 - Depends on: `entity_access` (permission scoping), `entity_access_db_utils` and
   `share_permission_db_utils` (channel grants and the team share), `properties` (cell values),
-  `macro_event_broker`/`macro_event_topics` (change notifications),
+  `rox_event_broker`/`rox_event_topics` (change notifications),
   `connection_gateway_client` (liveness), `entity_mutation`
   (rename/move/duplicate/trash/restore).
 - Used by: `databases_sql` (agent SQL), `crm` and `forms` (own storage via

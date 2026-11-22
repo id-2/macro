@@ -10,13 +10,13 @@ use crate::domain::{
 };
 use entity_access::domain::models::EntityAccessReceipt;
 use entity_access_management::domain::ports::EntityAccessManagementService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use model_entity::EntityType;
 use model_owner::Owner;
 use rootcause::{Report, prelude::*};
 use shared_entity_registry::{OwnedPurgeOutcome, PurgeOwnedEntity};
 
-impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: MacroEventBroker>
+impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: RoxEventBroker>
     PurgeOwnedEntity for ChatServiceImpl<R, ToolSetContext, Eam, B>
 where
     ToolSetContext: Clone + Send + Sync + 'static,

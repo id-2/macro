@@ -23,7 +23,7 @@ import { PresentedReviewPart } from '../../views/PresentedReviewPart';
 import { DisplayResultsToolCall } from './DisplayResultsToolCall';
 import { EditToolCall } from './EditToolCall';
 import { ExchangeToolCall } from './ExchangeToolCall';
-import { MacroToolCall } from './MacroToolCall';
+import { RoxToolCall } from './RoxToolCall';
 import { OutputToolCall } from './OutputToolCall';
 import { PathsToolCall } from './PathsToolCall';
 import { SearchToolCall } from './SearchToolCall';
@@ -128,7 +128,7 @@ export function ToolCallPart(props: {
             }
             fallback={<ExchangeToolCall detail={detail()} common={common()} />}
           >
-            <MacroToolCall
+            <RoxToolCall
               detail={{
                 kind: 'macro',
                 input: detail().input,
@@ -144,7 +144,7 @@ export function ToolCallPart(props: {
       </Match>
       <Match when={props.part.detail.kind === 'macro' && props.part.detail}>
         {(detail) => (
-          <MacroToolCall
+          <RoxToolCall
             detail={detail()}
             common={common()}
             grouped={!rendersOwnView(props.part)}

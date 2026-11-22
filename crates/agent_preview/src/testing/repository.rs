@@ -2,7 +2,7 @@
 use crate::domain::{storage::*, *};
 use agent_fold::domain::log::AgentSessionId;
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{
     collections::HashMap,
     net::SocketAddr,
@@ -229,7 +229,7 @@ impl PreviewRepository for MemoryRepository {
     async fn watch(
         &self,
         _: AgentSessionId,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: WatchLimits,
     ) -> Result<(), PreviewError> {
         Ok(())
@@ -238,7 +238,7 @@ impl PreviewRepository for MemoryRepository {
         &self,
         _: AgentSessionId,
         _: i64,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, PreviewError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, PreviewError> {
         Ok(vec![])
     }
     async fn sweep(&self) -> Result<Vec<Preview>, PreviewError> {

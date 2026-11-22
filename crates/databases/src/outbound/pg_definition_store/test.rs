@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::shared::PropertyOwner;
 use sqlx::PgPool;
@@ -12,7 +12,7 @@ use crate::domain::models::Viewer;
 
 fn viewer_for_tests() -> Viewer {
     Viewer {
-        user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(
+        user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(
             "macro|definitions-test@rox.one",
         )
         .expect("valid user id"),
@@ -23,19 +23,19 @@ fn viewer_for_tests() -> Viewer {
 const USER: &str = "macro|databases-defs@rox.one";
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let rox_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         id,
     )
     .execute(pool)
     .await
     .expect("macro_user should insert");
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -45,7 +45,7 @@ async fn insert_user(pool: &PgPool, id: &str) {
 /// A core database resource for database-scoped definitions.
 async fn insert_database(pool: &PgPool) -> DatabaseId {
     insert_user(pool, USER).await;
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO databases (id) VALUES ($1)", id,)
         .execute(pool)
         .await
@@ -59,7 +59,7 @@ async fn insert_option(
     string_value: Option<&str>,
     number_value: Option<f64>,
 ) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO property_options (id, property_definition_id, display_order, string_value, number_value)
@@ -80,7 +80,7 @@ fn store(pool: &PgPool) -> PgDefinitionStore<PropertiesPgRepo> {
     PgDefinitionStore::new(pool.clone(), PropertiesPgRepo::new(pool.clone()))
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_typed_definition_is_owned_by_the_database(pool: PgPool) {
     let database_id = insert_database(&pool).await;
     let store = store(&pool);
@@ -114,7 +114,7 @@ async fn a_typed_definition_is_owned_by_the_database(pool: PgPool) {
     assert!(created.property_options.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_column_may_reuse_a_reserved_system_property_name(pool: PgPool) {
     let database_id = insert_database(&pool).await;
 
@@ -133,7 +133,7 @@ async fn a_column_may_reuse_a_reserved_system_property_name(pool: PgPool) {
         .expect("a database column may be named Status");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_existing_definition_of_the_database_is_bindable(pool: PgPool) {
     let database_id = insert_database(&pool).await;
     let store = store(&pool);
@@ -150,10 +150,10 @@ async fn an_existing_definition_of_the_database_is_bindable(pool: PgPool) {
     assert_eq!(bindable, Some(created.definition.id));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unknown_definition_is_not_bindable(pool: PgPool) {
     let database_id = insert_database(&pool).await;
-    let missing = macro_uuid::generate_uuid_v7();
+    let missing = rox_uuid::generate_uuid_v7();
 
     let bindable = store(&pool)
         .bindable_definition(database_id, &viewer_for_tests(), missing)
@@ -163,7 +163,7 @@ async fn an_unknown_definition_is_not_bindable(pool: PgPool) {
     assert_eq!(bindable, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn definitions_attaches_options_and_ignores_unknown_ids(pool: PgPool) {
     let database_id = insert_database(&pool).await;
     let store = store(&pool);
@@ -190,7 +190,7 @@ async fn definitions_attaches_options_and_ignores_unknown_ids(pool: PgPool) {
     insert_option(&pool, select_id, Some("Draft"), None).await;
     insert_option(&pool, select_id, Some("Sent"), None).await;
 
-    let unknown = macro_uuid::generate_uuid_v7();
+    let unknown = rox_uuid::generate_uuid_v7();
     let definitions = store
         .definitions(&[select_id, plain_id, unknown])
         .await
@@ -219,7 +219,7 @@ async fn definitions_attaches_options_and_ignores_unknown_ids(pool: PgPool) {
     assert!(plain.property_options.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn definitions_of_nothing_is_empty(pool: PgPool) {
     let definitions = store(&pool)
         .definitions(&[])
@@ -231,7 +231,7 @@ async fn definitions_of_nothing_is_empty(pool: PgPool) {
 
 /// First options come with the definition, in order, each coloured by its
 /// place so neighbours differ.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_typed_definition_starts_with_its_options_in_order_and_colour(pool: PgPool) {
     let database_id = insert_database(&pool).await;
     let store = store(&pool);
@@ -291,7 +291,7 @@ async fn a_typed_definition_starts_with_its_options_in_order_and_colour(pool: Pg
 
 /// A numeric select stores its options as numbers, which is what makes the
 /// catalog render `2` rather than `"2"` in the compiled CHECK.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_numeric_select_starts_with_numbers(pool: PgPool) {
     let database_id = insert_database(&pool).await;
     let store = store(&pool);

@@ -45,7 +45,7 @@ overrides:
     metrics_generator:
       processors: [service-graphs, span-metrics]
 
-# --- Macro override (see docker/docker-compose.yml `lgtm` service) ---
+# --- Rox override (see docker/docker-compose.yml `lgtm` service) ---
 # Tempo's experimental MCP server at /api/mcp: gives agents real TraceQL
 # query tools, surfaced through mcp-grafana's proxied-tools discovery.
 query_frontend:

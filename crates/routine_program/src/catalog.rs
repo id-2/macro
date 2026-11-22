@@ -1,4 +1,4 @@
-//! The routine catalog: Macro's checked routines, offered as templates when
+//! The routine catalog: Rox's checked routines, offered as templates when
 //! someone creates a routine, shown to the routine drafter as worked
 //! examples, and the only routines suggestions may pick from. The harness's
 //! real-Deno tests type-check every code step against the SDK.
@@ -90,7 +90,7 @@ pub struct CatalogRoutine {
     /// Offered among the templates when someone creates a routine; otherwise
     /// only the drafter and suggestions see it.
     pub template: bool,
-    /// Offered as a suggestion from Macro, unpicked, to fill a surface's
+    /// Offered as a suggestion from Rox, unpicked, to fill a surface's
     /// suggestions; otherwise only AI may suggest it, with its knobs filled.
     pub suggest: bool,
 }

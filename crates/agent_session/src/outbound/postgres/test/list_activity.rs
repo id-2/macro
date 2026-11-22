@@ -26,7 +26,7 @@ async fn age_list_timestamp(pool: &PgPool, id: AgentSessionId) -> DateTime<Utc> 
 
 /// Unused sessions were showing "2m" because claim, release, recovery, and
 /// connection events all stamped `modified_at`. Only open turn work should.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn lease_and_connection_lifecycle_do_not_reorder_the_session_list(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -59,7 +59,7 @@ async fn lease_and_connection_lifecycle_do_not_reorder_the_session_list(pool: Pg
     assert_eq!(modified_at(&pool, session.id).await, aged);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn open_turn_work_moves_the_session_list_and_disconnect_does_not(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -90,7 +90,7 @@ async fn open_turn_work_moves_the_session_list_and_disconnect_does_not(pool: PgP
     assert_eq!(modified_at(&pool, session.id).await, after_work);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stale_recovery_does_not_reorder_the_session_list(pool: PgPool) {
     let repo = test_repo(&pool);
     let bot_id = create_test_bot(&pool).await;
@@ -109,7 +109,7 @@ async fn stale_recovery_does_not_reorder_the_session_list(pool: PgPool) {
     assert_eq!(modified_at(&pool, session.id).await, aged);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_turn_open_when_the_session_disconnected_stays_unfinished_until_another_turn_state(
     pool: PgPool,
 ) {

@@ -1,7 +1,7 @@
 //! Map authorized session metadata and folded message matches into API results.
 
 use indexmap::IndexMap;
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::user_id::RoxUserId;
 use models_search::agent_session::{AgentSessionSearchResponseItem, AgentSessionSearchResult};
 use opensearch_client::search::model::{SearchGotoContent, SearchHit};
 
@@ -15,7 +15,7 @@ pub(super) async fn enrich_agent_sessions(
     if hits.is_empty() {
         return Ok(Vec::new());
     }
-    let user = MacroUserId::parse_from_str(user_id)
+    let user = RoxUserId::parse_from_str(user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_owned()))?
         .lowercase();
     let ids: Vec<_> = hits.iter().map(|hit| hit.entity_id).collect();

@@ -1,6 +1,6 @@
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn human_membership_admin_visibility_and_literal_search_are_authoritative(pool: PgPool) {
     let (repository, actor, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -92,12 +92,12 @@ async fn human_membership_admin_visibility_and_literal_search_are_authoritative(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn account_classification_and_current_role_facts_come_from_postgres(pool: PgPool) {
     let (repository, actor, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
     let missing =
-        MacroUserIdStr::parse_from_str("macro|missing@example.test").expect("missing fixture");
+        RoxUserIdStr::parse_from_str("macro|missing@example.test").expect("missing fixture");
     assert!(
         repository
             .is_human(&actor.user_id)

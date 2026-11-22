@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                l.fusionauth_user_id,\n                l.email_address::text AS \"email_address!\",\n                l.provider::text AS \"provider!\",l.id AS link_id,l.sync_generation,l.grant_generation,\n                COALESCE(g.granted_scopes, '{}') AS \"granted_scopes!\"\n            FROM email_links l\n            LEFT JOIN email_link_google_scopes g ON g.link_id = l.id\n            WHERE l.id = $1 AND l.macro_id = $2\n            FOR UPDATE OF l\n            ",
+  "query": "\n            SELECT\n                l.fusionauth_user_id,\n                l.email_address::text AS \"email_address!\",\n                l.provider::text AS \"provider!\",l.id AS link_id,l.sync_generation,l.grant_generation,\n                COALESCE(g.granted_scopes, '{}') AS \"granted_scopes!\"\n            FROM email_links l\n            LEFT JOIN email_link_google_scopes g ON g.link_id = l.id\n            WHERE l.id = $1 AND l.rox_id = $2\n            FOR UPDATE OF l\n            ",
   "describe": {
     "columns": [
       {

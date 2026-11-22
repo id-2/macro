@@ -3,14 +3,14 @@ use sqlx::types::Uuid;
 /// Flags every thread on one of the user's links that has at least one
 /// calendar attachment. One statement per link keeps transactions small and
 /// the progress output per-mailbox. Returns the number of threads flagged.
-pub async fn process_macro_id(pool: &sqlx::PgPool, macro_id: &str) -> anyhow::Result<u64> {
+pub async fn process_rox_id(pool: &sqlx::PgPool, rox_id: &str) -> anyhow::Result<u64> {
     let link_ids: Vec<Uuid> =
-        sqlx::query_scalar!("SELECT id FROM email_links WHERE macro_id = $1", macro_id)
+        sqlx::query_scalar!("SELECT id FROM email_links WHERE rox_id = $1", rox_id)
             .fetch_all(pool)
             .await?;
 
     if link_ids.is_empty() {
-        println!("No email links found for {macro_id}.");
+        println!("No email links found for {rox_id}.");
         return Ok(0);
     }
 
@@ -41,7 +41,7 @@ pub async fn process_macro_id(pool: &sqlx::PgPool, macro_id: &str) -> anyhow::Re
         .rows_affected();
 
         // Prefix with the user so interleaved concurrent output stays readable.
-        println!("[{macro_id}] link {link_id}: flagged {flagged} threads");
+        println!("[{rox_id}] link {link_id}: flagged {flagged} threads");
         total_flagged += flagged;
     }
 
@@ -49,11 +49,11 @@ pub async fn process_macro_id(pool: &sqlx::PgPool, macro_id: &str) -> anyhow::Re
 }
 
 /// Every macro ID that owns at least one email link. Connected secondary
-/// mailboxes carry their own macro_id row in email_links, so iterating these
+/// mailboxes carry their own rox_id row in email_links, so iterating these
 /// covers every link exactly once.
-pub async fn fetch_all_macro_ids(pool: &sqlx::PgPool) -> anyhow::Result<Vec<String>> {
+pub async fn fetch_all_rox_ids(pool: &sqlx::PgPool) -> anyhow::Result<Vec<String>> {
     Ok(
-        sqlx::query_scalar!("SELECT DISTINCT macro_id FROM email_links ORDER BY macro_id")
+        sqlx::query_scalar!("SELECT DISTINCT rox_id FROM email_links ORDER BY rox_id")
             .fetch_all(pool)
             .await?,
     )

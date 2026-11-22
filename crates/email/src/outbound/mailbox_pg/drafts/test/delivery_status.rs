@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::send_attempt::{EmailSendRepo, SendAttempt, SendAttemptStatus};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 async fn claim(sync: &PgMailboxSync) -> DraftLease {
     sync.claim_draft(
@@ -12,8 +12,8 @@ async fn claim(sync: &PgMailboxSync) -> DraftLease {
     .unwrap()
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(ACTOR).unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(ACTOR).unwrap()
 }
 
 async fn submitted_send(db: &PgPool) -> (PgMailboxSync, EmailPgRepo, DraftLease, Uuid) {
@@ -40,7 +40,7 @@ async fn pending_status(repo: &EmailPgRepo, link: Uuid) -> SendAttemptStatus {
     pending_attempt(repo, link).await.status
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn routine_outlook_confirmation_reads_as_sending_until_delivery_is_unknown(db: PgPool) {
     let (sync, repo, lease, link) = submitted_send(&db).await;
     assert_eq!(
@@ -63,7 +63,7 @@ async fn routine_outlook_confirmation_reads_as_sending_until_delivery_is_unknown
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cancelling_while_outlook_confirms_is_too_late(db: PgPool) {
     let (_, repo, lease, link) = submitted_send(&db).await;
     let attempt = pending_attempt(&repo, link).await.attempt_id;
@@ -84,7 +84,7 @@ async fn cancelling_while_outlook_confirms_is_too_late(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn losing_access_after_submission_reads_as_unconfirmed_not_failed(db: PgPool) {
     let (sync, repo, lease, link) = submitted_send(&db).await;
     sync.fail_draft(&lease, DraftFailure::Denied).await.unwrap();

@@ -1,12 +1,12 @@
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { MACRO_AGENT_BOT_ID } from '@core/constant/macroAgent';
-import { MACRO_CODER_BOT_ID } from '@core/constant/macroCoder';
+import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
+import { ROX_CODER_BOT_ID } from '@core/constant/macroCoder';
 import { RoxMark } from '@core/component/RoxMark';
 import CodeIcon from '@icon/system/regular/code.svg';
 import RobotIcon from '@icon/system/regular/robot.svg';
 import CursorIcon from '@icon/wide-cursor-ide.svg';
 import { type JSX, Show } from 'solid-js';
-import { MACRO_PERSONA_ID } from '../core/roster';
+import { ROX_PERSONA_ID } from '../core/roster';
 
 /** What an agent's avatar shows when it has no picture of its own. */
 export type GlyphAgent = {
@@ -16,10 +16,10 @@ export type GlyphAgent = {
   avatarUrl?: string;
 };
 
-const MACRO_IDS: ReadonlySet<string> = new Set([
-  MACRO_PERSONA_ID,
-  MACRO_AGENT_BOT_ID,
-  MACRO_CODER_BOT_ID,
+const ROX_IDS: ReadonlySet<string> = new Set([
+  ROX_PERSONA_ID,
+  ROX_AGENT_BOT_ID,
+  ROX_CODER_BOT_ID,
 ]);
 
 /** The mark for an agent: Rox's own logo, Cursor's, or a robot. */
@@ -30,7 +30,7 @@ export function AgentIcon(props: {
   const id = () => props.agent.botId ?? props.agent.id;
   return (
     <Show
-      when={MACRO_IDS.has(id())}
+      when={ROX_IDS.has(id())}
       fallback={
         <Show
           when={id() === CURSOR_BOT_ID}

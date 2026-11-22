@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::Correlation;
 use async_trait::async_trait;
 use axum::http::Request;
-use macro_auth::macro_api_token::{EncodeMacroApiTokenArgs, encode_macro_api_token};
+use rox_auth::rox_api_token::{EncodeMacroApiTokenArgs, encode_rox_api_token};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 const PRIVATE: &str = include_str!(
@@ -45,9 +45,9 @@ fn mint(
     routine: Option<Uuid>,
     scope: Option<&str>,
 ) -> String {
-    encode_macro_api_token(EncodeMacroApiTokenArgs {
+    encode_rox_api_token(EncodeMacroApiTokenArgs {
         fusionauth_id: "fixture".into(),
-        macro_user_id: "macro|owner@example.com".into(),
+        rox_user_id: "macro|owner@example.com".into(),
         organization_id: None,
         issuer: "fixture".into(),
         private_key: PRIVATE.into(),
@@ -68,14 +68,14 @@ async fn optional_claim_is_validated_before_a_handler_can_use_it() {
         calls: AtomicUsize::new(0),
     });
     let state = CorrelationState {
-        jwt: JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+        jwt: JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
         repository: repository.clone(),
     };
     for bearer in [None, Some(token(None, None))] {
         let mut request = Request::builder()
             .uri("/")
             .header("x-agent-correlation-id", Uuid::from_u128(1).to_string())
-            .header("x-macro-sdk-verb", "edited");
+            .header("x-rox-sdk-verb", "edited");
         if let Some(bearer) = bearer {
             request = request.header("authorization", format!("Bearer {bearer}"));
         }
@@ -97,7 +97,7 @@ async fn optional_claim_is_validated_before_a_handler_can_use_it() {
         let (mut parts, _) = Request::builder()
             .uri("/")
             .header("authorization", format!("Bearer {bearer}"))
-            .header("x-macro-sdk-verb", "edited")
+            .header("x-rox-sdk-verb", "edited")
             .body(())
             .unwrap()
             .into_parts();
@@ -116,7 +116,7 @@ async fn optional_claim_is_validated_before_a_handler_can_use_it() {
     let (mut parts, _) = Request::builder()
         .uri("/")
         .header("authorization", format!("Bearer {bearer}"))
-        .header("x-macro-sdk-verb", "unknown")
+        .header("x-rox-sdk-verb", "unknown")
         .body(())
         .unwrap()
         .into_parts();
@@ -139,7 +139,7 @@ async fn propagate_scopes_the_signed_routine_beside_the_correlation() {
         calls: AtomicUsize::new(0),
     });
     let state = CorrelationState {
-        jwt: JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+        jwt: JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
         repository: repository.clone(),
     };
     let app = axum::Router::new()
@@ -205,7 +205,7 @@ async fn a_scoped_session_is_refused_outside_its_scope() {
     use tower::ServiceExt;
 
     let state = CorrelationState {
-        jwt: JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+        jwt: JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
         repository: Arc::new(Repository {
             calls: AtomicUsize::new(0),
         }),
@@ -261,7 +261,7 @@ async fn a_scoped_session_is_refused_outside_its_scope() {
         .unwrap()
         .into_parts();
     let state = CorrelationState {
-        jwt: JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+        jwt: JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
         repository: Arc::new(Repository {
             calls: AtomicUsize::new(0),
         }),
@@ -284,7 +284,7 @@ async fn a_signed_scope_is_refused_outside_it_without_a_lookup() {
         calls: AtomicUsize::new(0),
     });
     let state = CorrelationState {
-        jwt: JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+        jwt: JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
         repository: repository.clone(),
     };
     let app = axum::Router::new()
@@ -336,7 +336,7 @@ async fn a_handler_reads_the_signed_scope_when_none_is_stored() {
     use tower::ServiceExt;
 
     let state = CorrelationState {
-        jwt: JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+        jwt: JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
         repository: Arc::new(Repository {
             calls: AtomicUsize::new(0),
         }),
@@ -392,7 +392,7 @@ async fn a_service_without_a_database_enforces_the_signed_scope() {
             axum::routing::delete(|| async { StatusCode::OK }).get(|| async { StatusCode::OK }),
         )
         .layer(axum::middleware::from_fn_with_state(
-            JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+            JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
             enforce_signed_scope,
         ));
     let scoped = |scope| {
@@ -469,7 +469,7 @@ async fn a_refused_sharing_change_is_answered_as_a_refusal() {
     use tower::ServiceExt;
 
     let state = CorrelationState {
-        jwt: JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
+        jwt: JwtValidationArgs::testing_rox_token("fixture", PUBLIC),
         repository: Arc::new(Repository {
             calls: AtomicUsize::new(0),
         }),

@@ -86,7 +86,7 @@ impl McpServerStore for FakeStore {
 
     async fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         self.loads.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
@@ -104,7 +104,7 @@ impl McpServerStore for FakeStore {
 
     async fn delete(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<(), Self::Err> {
         self.records
@@ -116,7 +116,7 @@ impl McpServerStore for FakeStore {
 
     async fn list(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         Ok(self
             .records
@@ -129,8 +129,8 @@ impl McpServerStore for FakeStore {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user-1@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user-1@example.com").unwrap()
 }
 
 fn server() -> McpServerRecord {

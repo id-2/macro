@@ -3,7 +3,7 @@
 ## What it is
 
 A pinned copy of Rox Connect's public Rust client, `crates/connect_client`
-in the private repo macro-inc/macro-connect, at commit `0814a61`. Macro reaches
+in the private repo macro-inc/macro-connect, at commit `0814a61`. Rox reaches
 Connect only through this crate.
 
 ## Start here
@@ -21,14 +21,14 @@ Connect only through this crate.
 
 - Do not edit it here. Change it upstream, then copy `src/` over again and
   update the commit above. The one local difference: trace headers are
-  injected with `macro_tower_layers::inject_trace_headers` instead of
+  injected with `rox_tower_layers::inject_trace_headers` instead of
   Connect's `connect_platform`.
 - It is a copy because Rox's CI and image builds cannot read the private
   repo. Replace it with a git dependency pinned to a rev once they can.
 
 ## Boundaries
 
-- Depends on: `macro_tower_layers` (trace injection).
+- Depends on: `rox_tower_layers` (trace injection).
 - Used by: `pipedream_mcp`.
 
 ## Checks

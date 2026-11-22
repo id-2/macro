@@ -3,7 +3,7 @@
 ## What it is
 
 The public TypeScript SDK wraps generated service clients in entity handles.
-Authentication and service hosts come from `MacroClient`; permissions remain
+Authentication and service hosts come from `RoxClient`; permissions remain
 enforced by the ordinary backend APIs.
 
 ## Start here
@@ -107,7 +107,7 @@ enforced by the ordinary backend APIs.
   and `Connector.inspect()` mirror `DiscoverConnectors`; `addServer` mirrors
   `ConnectMcpServer`. Only works inside a running execution.
 - `src/entities/ui/`: `macro.ui.open(execution, item)` opens an item (a handle
-  with `webUrl()`, or `macro.ui.link(url)`, which refuses non-Macro links) in a
+  with `webUrl()`, or `macro.ui.link(url)`, which refuses non-Rox links) in a
   new pane of the tab the user prompted from, through the harness's
   `ui-commands` route; it resolves `sent`, `no_client` or `declined` with the
   item's `url` to link instead. Only works inside a running execution.

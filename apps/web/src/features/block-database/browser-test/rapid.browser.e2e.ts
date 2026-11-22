@@ -5,7 +5,7 @@ test('Enter moves down immediately before any pending save completes', async ({
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(
     page,
     '/src/features/block-database/browser-test/records.html?rapid&holdWrites'
@@ -58,7 +58,7 @@ test('a column inference response keeps the current draft focused and Tab saves 
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(
     page,
     '/src/features/block-database/browser-test/records.html?rapid'
@@ -94,7 +94,7 @@ test('rapid typing and Tab keep values in their own cells while row saves arrive
   page,
 }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/__macro_dev/**', (route) => route.abort());
+  await page.route('**/__rox_dev/**', (route) => route.abort());
   await openFixture(
     page,
     '/src/features/block-database/browser-test/records.html?rapid'

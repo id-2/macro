@@ -10,8 +10,8 @@
 
 use chrono::{TimeDelta, Utc};
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 
 use super::{Runs, SuggestionService};
@@ -62,7 +62,7 @@ where
     ), err)]
     pub(super) async fn start_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         suggestion: &Suggestion,
         prompt: &str,
         sends: Option<&str>,

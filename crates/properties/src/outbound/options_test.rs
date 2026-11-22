@@ -6,7 +6,7 @@ use crate::domain::model::{
     PropertyOptionReplacePlan, PropertyOptionRewrite, UpdatePropertyOptionOutcome,
 };
 use crate::domain::ports::PropertiesRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::service::property_value::PropertyValue;
 use models_properties::{DataType, EntityType};
@@ -25,7 +25,7 @@ fn team_1() -> Uuid {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_option_string(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -58,7 +58,7 @@ async fn create_property_option_string(pool: Pool<Postgres>) -> anyhow::Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_option_number(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -80,7 +80,7 @@ async fn create_property_option_number(pool: Pool<Postgres>) -> anyhow::Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_option_duplicate_fails(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -112,7 +112,7 @@ async fn create_property_option_duplicate_fails(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn create_property_option_invalid_property_fails(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -133,7 +133,7 @@ async fn create_property_option_invalid_property_fails(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn update_property_option_renames_and_recolors(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -171,7 +171,7 @@ async fn update_property_option_renames_and_recolors(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn update_property_option_missing_returns_not_found(
@@ -194,7 +194,7 @@ async fn update_property_option_missing_returns_not_found(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn update_property_option_duplicate_value(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -220,7 +220,7 @@ async fn update_property_option_duplicate_value(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn delete_property_option_removes_option(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -239,7 +239,7 @@ async fn delete_property_option_removes_option(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn delete_nonexistent_property_option(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -254,7 +254,7 @@ async fn delete_nonexistent_property_option(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn delete_property_option_reduces_count(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -276,7 +276,7 @@ async fn delete_property_option_reduces_count(pool: Pool<Postgres>) -> anyhow::R
 /// [A, B, C, D] must drop D once option D is deleted, so a later set-value
 /// echoing the surviving ids passes option validation.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn delete_property_option_strips_value_references(
@@ -374,7 +374,7 @@ async fn delete_property_option_strips_value_references(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn get_or_create_tag_definition_is_idempotent(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -395,7 +395,7 @@ async fn get_or_create_tag_definition_is_idempotent(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn get_or_create_tag_definition_race_reuses_winner(
@@ -419,7 +419,7 @@ async fn get_or_create_tag_definition_race_reuses_winner(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn get_tag_definition_none_then_some(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -442,7 +442,7 @@ async fn get_tag_definition_none_then_some(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn get_or_create_tag_definition_coexists_with_same_named_property(
@@ -469,7 +469,7 @@ async fn get_or_create_tag_definition_coexists_with_same_named_property(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn replace_property_options_applies_the_plan_in_one_pass(
@@ -551,7 +551,7 @@ async fn replace_property_options_applies_the_plan_in_one_pass(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn replace_property_options_strips_every_deleted_id(
@@ -629,7 +629,7 @@ async fn replace_property_options_strips_every_deleted_id(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn replace_property_options_rejects_duplicates_within_the_batch(
@@ -667,7 +667,7 @@ async fn replace_property_options_rejects_duplicates_within_the_batch(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn replace_property_options_rolls_back_on_duplicate(
@@ -699,7 +699,7 @@ async fn replace_property_options_rolls_back_on_duplicate(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn replace_property_options_rejects_foreign_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -723,7 +723,7 @@ async fn replace_property_options_rejects_foreign_ids(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("properties"))
 )]
 async fn get_or_create_option_converges_under_concurrency(
@@ -767,7 +767,7 @@ async fn get_or_create_option_converges_under_concurrency(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_or_create_option_propagates_non_duplicate_errors(pool: Pool<Postgres>) {
     let repo = PropertiesPgRepo::new(pool);
     let error = repo

@@ -11,7 +11,7 @@ import {
 import { importExcalidraw } from './core/excalidraw';
 import { validCanvasTextDocument } from './core/text-codec';
 
-const mime = 'application/x-macro-graphics';
+const mime = 'application/x-rox-graphics';
 // Exact placement must not be shifted by the destination canvas's snap grid.
 const pasteAtPositionCommand: typeof pasteCommand = {
   ...pasteCommand,

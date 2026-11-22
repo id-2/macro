@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::AttachmentDraft;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 const ACTOR: &str = "macro|attachment-owner@example.com";
@@ -8,7 +8,7 @@ async fn fixture(db: &PgPool) -> (EmailPgRepo, Uuid, Uuid) {
     let link = Uuid::now_v7();
     let thread = Uuid::now_v7();
     let draft = Uuid::now_v7();
-    sqlx::query!("INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider) VALUES ($1,$2,'owner','attachment-owner@example.com','OUTLOOK')",link,ACTOR).execute(db).await.unwrap();
+    sqlx::query!("INSERT INTO email_links (id,rox_id,fusionauth_user_id,email_address,provider) VALUES ($1,$2,'owner','attachment-owner@example.com','OUTLOOK')",link,ACTOR).execute(db).await.unwrap();
     sqlx::query!(
         "INSERT INTO email_threads (id,link_id) VALUES ($1,$2)",
         thread,
@@ -44,7 +44,7 @@ fn upload(draft: Uuid, size: i32) -> AttachmentDraft {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn upload_reservations_are_idempotent_and_never_send_unverified_bytes(db: PgPool) {
     let (repo, link, draft) = fixture(&db).await;
     let mut file = upload(draft, 120_000_000);
@@ -154,7 +154,7 @@ async fn upload_reservations_are_idempotent_and_never_send_unverified_bytes(db: 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_expired_upload_requires_an_explicit_reservation_retry(db: PgPool) {
     let (repo, link, draft) = fixture(&db).await;
     let mut file = upload(draft, 123);
@@ -200,7 +200,7 @@ async fn an_expired_upload_requires_an_explicit_reservation_retry(db: PgPool) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn file_changes_commit_with_frozen_revision_and_defer_byte_cleanup(db: PgPool) {
     let (repo, link, draft) = fixture(&db).await;
     let file = upload(draft, 123);
@@ -269,7 +269,7 @@ async fn file_changes_commit_with_frozen_revision_and_defer_byte_cleanup(db: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn send_and_attachment_edits_share_the_same_transaction_boundary(db: PgPool) {
     let (repo, link, draft) = fixture(&db).await;
     sqlx::query!(
@@ -314,7 +314,7 @@ async fn send_and_attachment_edits_share_the_same_transaction_boundary(db: PgPoo
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_additions_cannot_overrun_the_aggregate_limit(db: PgPool) {
     let (repo, link, draft) = fixture(&db).await;
     let (one, two) = tokio::join!(
@@ -347,7 +347,7 @@ async fn concurrent_additions_cannot_overrun_the_aggregate_limit(db: PgPool) {
 }
 
 #[cfg(feature = "mailbox")]
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cleanup_retains_active_claims_and_recovery_checkpoints(db: PgPool) {
     use crate::domain::{
         attachment_cleanup::DraftObjectCleanupRepository, mailbox::drafts::ports::DraftRepository,
@@ -427,7 +427,7 @@ async fn cleanup_retains_active_claims_and_recovery_checkpoints(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn transferred_upload_provider_echo_does_not_consume_quota_twice(db: PgPool) {
     let (repo, link, draft) = fixture(&db).await;
     let mut original = upload(draft, 80_000_000);

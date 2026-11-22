@@ -1,12 +1,12 @@
 -- Every way the initiative listing policy can show, or must not show, an
 -- initiative. Initiative N is updated N hours into 2026, so listings return
 -- them in descending N.
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
 ('a1000000-0000-0000-0000-000000000001', 'viewer', 'viewer@paths.test', 'paths-stripe-1'),
 ('a1000000-0000-0000-0000-000000000002', 'teammate', 'teammate@paths.test', 'paths-stripe-2'),
 ('a1000000-0000-0000-0000-000000000003', 'outsider', 'outsider@paths.test', 'paths-stripe-3'),
 ('a1000000-0000-0000-0000-000000000004', 'loner', 'loner@paths.test', 'paths-stripe-4');
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
 ('macro|viewer@paths.test', 'viewer@paths.test', 'a1000000-0000-0000-0000-000000000001'),
 ('macro|teammate@paths.test', 'teammate@paths.test', 'a1000000-0000-0000-0000-000000000002'),
 ('macro|outsider@paths.test', 'outsider@paths.test', 'a1000000-0000-0000-0000-000000000003'),

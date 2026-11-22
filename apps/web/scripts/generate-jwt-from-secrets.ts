@@ -93,11 +93,11 @@ async function generateAccessToken(params: {
     iss: issuer,
     email: email,
     fusion_user_id: fusionUserId,
-    macro_user_id: macroUserId,
+    rox_user_id: macroUserId,
   };
 
   if (organizationId !== undefined) {
-    payload.macro_organization_id = organizationId;
+    payload.rox_organization_id = organizationId;
   }
 
   // Create the secret key for HS256
@@ -127,11 +127,11 @@ async function generateMacroApiToken(params: {
   const payload: Record<string, unknown> = {
     iss: issuer,
     fusion_user_id: fusionUserId,
-    macro_user_id: macroUserId,
+    rox_user_id: macroUserId,
   };
 
   if (organizationId !== undefined) {
-    payload.macro_organization_id = organizationId;
+    payload.rox_organization_id = organizationId;
   }
 
   // Import the RSA private key - handle both PKCS#8 and RSA PRIVATE KEY formats
@@ -251,18 +251,18 @@ async function main() {
   if (output === "json") {
     const result = {
       access_token: accessToken,
-      macro_api_token: macroApiToken,
+      rox_api_token: macroApiToken,
       access_token_cookie_name: config.accessTokenCookie,
       email,
-      macro_user_id: macroUserId,
+      rox_user_id: macroUserId,
       fusion_user_id: fusionUserId,
       expires_at: expiryTime.toISOString(),
       environment: env,
     };
     console.log(JSON.stringify(result, null, 2));
   } else if (output === "env") {
-    console.log(`export MACRO_ACCESS_TOKEN='${accessToken}'`);
-    console.log(`export MACRO_API_TOKEN='${macroApiToken}'`);
+    console.log(`export ROX_ACCESS_TOKEN='${accessToken}'`);
+    console.log(`export ROX_API_TOKEN='${macroApiToken}'`);
   } else {
     // Default: simple output with browser command and curl
     const serviceSuffix = env === "prod" ? "" : "-dev";

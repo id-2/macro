@@ -19,22 +19,22 @@ impl FakeGateway {
 }
 
 impl UserDeletionGateway for FakeGateway {
-    async fn delete_scheduled_actions(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn delete_scheduled_actions(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.call("actions", user.as_ref())
     }
-    async fn delete_agent_sessions(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn delete_agent_sessions(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.call("sessions", user.as_ref())
     }
-    async fn leave_teams(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn leave_teams(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.call("teams", user.as_ref())
     }
-    async fn delete_items(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn delete_items(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.call("items", user.as_ref())
     }
-    async fn delete_onboarding(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn delete_onboarding(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.call("onboarding", user.as_ref())
     }
-    async fn delete_profile(&self, user: &MacroUserIdStr<'static>, _: &Uuid) -> Result<(), Report> {
+    async fn delete_profile(&self, user: &RoxUserIdStr<'static>, _: &Uuid) -> Result<(), Report> {
         self.call("profile", user.as_ref())
     }
     async fn delete_billing_customer(&self, _: &Uuid) -> Result<(), Report> {
@@ -45,10 +45,10 @@ impl UserDeletionGateway for FakeGateway {
     }
 }
 
-fn users() -> Vec<MacroUserIdStr<'static>> {
+fn users() -> Vec<RoxUserIdStr<'static>> {
     ["a@example.com", "b@example.com"]
         .into_iter()
-        .map(|email| MacroUserIdStr::try_from_email(email).unwrap())
+        .map(|email| RoxUserIdStr::try_from_email(email).unwrap())
         .collect()
 }
 

@@ -1,6 +1,6 @@
 use chrono::{Duration, SubsecRound, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -8,16 +8,16 @@ use crate::domain::models::{InviteLink, InviteLinkStatus, InviteToken, ListInvit
 use crate::domain::ports::GtmInviteRepo;
 use crate::outbound::pg_gtm_invite_repo::PgGtmInviteRepo;
 
-fn staff(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn staff(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
-fn prospect() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("ada@startup.io").unwrap()
+fn prospect() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("ada@startup.io").unwrap()
 }
 
-fn other_prospect() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("grace@startup.io").unwrap()
+fn other_prospect() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("grace@startup.io").unwrap()
 }
 
 fn link(created_by: &str, first_name: &str) -> InviteLink {
@@ -40,7 +40,7 @@ fn link(created_by: &str, first_name: &str) -> InviteLink {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn insert_and_read_back_by_token_and_id(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let created = link("valentina@rox.one", "Ada");
@@ -63,7 +63,7 @@ async fn insert_and_read_back_by_token_and_id(pool: Pool<Postgres>) {
     assert_eq!(by_token.status(Utc::now()), InviteLinkStatus::Active);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unknown_tokens_and_ids_are_none(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
 
@@ -76,7 +76,7 @@ async fn unknown_tokens_and_ids_are_none(pool: Pool<Postgres>) {
     assert!(repo.get_link_by_id(Uuid::now_v7()).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn tokens_are_unique(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let first = link("valentina@rox.one", "Ada");
@@ -90,7 +90,7 @@ async fn tokens_are_unique(pool: Pool<Postgres>) {
     assert!(repo.insert_link(&duplicate).await.is_err());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_is_newest_first_and_filters_by_creator(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let older = InviteLink {
@@ -134,7 +134,7 @@ async fn list_is_newest_first_and_filters_by_creator(pool: Pool<Postgres>) {
     assert_eq!(limited.len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn record_open_counts_and_keeps_the_first_open_time(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let created = link("valentina@rox.one", "Ada");
@@ -153,7 +153,7 @@ async fn record_open_counts_and_keeps_the_first_open_time(pool: Pool<Postgres>) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn revoke_only_touches_open_links(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let created = link("valentina@rox.one", "Ada");
@@ -174,7 +174,7 @@ async fn revoke_only_touches_open_links(pool: Pool<Postgres>) {
     assert!(!repo.revoke_link(redeemed.id, Utc::now()).await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn redeem_is_first_come_and_idempotent_for_the_winner(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let created = link("valentina@rox.one", "Ada");
@@ -225,7 +225,7 @@ async fn redeem_is_first_come_and_idempotent_for_the_winner(pool: Pool<Postgres>
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn redeem_refuses_expired_and_revoked_links(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let expired = InviteLink {
@@ -251,7 +251,7 @@ async fn redeem_refuses_expired_and_revoked_links(pool: Pool<Postgres>) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_user_can_only_hold_one_redeemed_link(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let first = link("valentina@rox.one", "Ada");
@@ -272,7 +272,7 @@ async fn a_user_can_only_hold_one_redeemed_link(pool: Pool<Postgres>) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn mark_converted_records_the_subscription_once(pool: Pool<Postgres>) {
     let repo = PgGtmInviteRepo::new(pool);
     let created = link("valentina@rox.one", "Ada");

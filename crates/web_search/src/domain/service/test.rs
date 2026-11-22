@@ -3,8 +3,8 @@ use std::sync::{Arc, Mutex};
 use ai_billing::{AiAdmissionError, AiAdmissionService, DenyReason, DisabledAiAdmissionService};
 use ai_usage::{AiFeature, UsageAmount, UsageEvent, UsageRecorder};
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::{WebCaller, WebSearchService};
 use crate::domain::models::{
@@ -78,15 +78,15 @@ struct Denied;
 impl AiAdmissionService for Denied {
     fn admit<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
         _: AiFeature,
     ) -> ai_billing::AdmissionFuture<'a> {
         Box::pin(async { Err(AiAdmissionError::Denied(DenyReason::AllowanceExhausted)) })
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|web-search@example.com".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|web-search@example.com".to_owned()).unwrap()
 }
 
 #[tokio::test]

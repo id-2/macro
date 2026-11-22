@@ -125,7 +125,7 @@ impl RedisLogStreamConsumer {
 
     /// [`Self::connect`] to a stream other than [`STREAM_KEY`].
     pub(crate) async fn connect_to(client: redis::Client, stream: String) -> Result<Self, Report> {
-        let instance = macro_uuid::generate_uuid_v7();
+        let instance = rox_uuid::generate_uuid_v7();
         let group = format!("{GROUP_PREFIX}{instance}");
         tracing::Span::current().record("messaging.consumer.group.name", group.as_str());
         let now = Instant::now();
@@ -597,7 +597,7 @@ impl RedisLogStreamConsumer {
 /// in. `None` for a name this crate did not mint.
 fn group_age(group: &str) -> Option<Duration> {
     let instance = group.strip_prefix(GROUP_PREFIX)?;
-    let (seconds, nanos) = macro_uuid::Uuid::parse_str(instance)
+    let (seconds, nanos) = rox_uuid::Uuid::parse_str(instance)
         .ok()?
         .get_timestamp()?
         .to_unix();

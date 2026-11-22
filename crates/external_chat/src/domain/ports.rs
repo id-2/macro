@@ -10,7 +10,7 @@
 use super::{models::*, timeline::view::People};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Result of every port and service call.
@@ -66,7 +66,7 @@ pub struct StoredSend {
 /// A validated intent, authorized by the domain.
 pub struct SendIntent<'a> {
     /// Sending person.
-    pub user: &'a MacroUserIdStr<'a>,
+    pub user: &'a RoxUserIdStr<'a>,
     /// Their account at its current generation.
     pub account: &'a AccountRef,
     /// Chat.
@@ -97,7 +97,7 @@ pub trait ChatProvider: Send + Sync + 'static {
     /// provider, named in the text the way the provider renders it.
     fn validate_mentions(&self, text: &str, mentions: &[String]) -> ExternalChatResult<()>;
     /// The person's own account at the provider, in any state.
-    async fn account(&self, user: &MacroUserIdStr<'_>) -> ExternalChatResult<Option<AccountRef>>;
+    async fn account(&self, user: &RoxUserIdStr<'_>) -> ExternalChatResult<Option<AccountRef>>;
     /// Whether `account` can send in each of `chats` now, in order.
     async fn sending_facts(
         &self,
@@ -130,7 +130,7 @@ pub trait ChatProvider: Send + Sync + 'static {
     /// returns the existing one. Signals the provider.
     async fn adopt(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         request: &AddChat,
     ) -> ExternalChatResult<ChatRef>;
     /// Detach locally: end observing consents and fail undispatched sends.
@@ -146,7 +146,7 @@ pub trait ChatProvider: Send + Sync + 'static {
     async fn stored_send(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         idempotency_key: Uuid,
     ) -> ExternalChatResult<Option<StoredSend>>;
     /// Record the intent and assign the chat sequence. Replays with the same
@@ -158,13 +158,13 @@ pub trait ChatProvider: Send + Sync + 'static {
     async fn open_sends(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ExternalChatResult<Vec<SendProgress>>;
     /// The person's sends for these chat messages or intent ids.
     async fn sends_for(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         ids: &[Uuid],
     ) -> ExternalChatResult<Vec<SendProgress>>;
     /// The state of the viewer's newest send of each of these messages.
@@ -181,13 +181,13 @@ pub trait ChatProvider: Send + Sync + 'static {
 pub trait SendRateLimiter: Send + Sync {
     /// Consume one request across all chats and service replicas. Requests
     /// rejected later still count; infrastructure failure must fail closed.
-    async fn check(&self, user: &MacroUserIdStr<'_>) -> ExternalChatResult<()>;
+    async fn check(&self, user: &RoxUserIdStr<'_>) -> ExternalChatResult<()>;
 }
 
 /// A validated attachment upload.
 pub struct StagedUpload<'a> {
     /// Uploader, who will own the static file.
-    pub user: &'a MacroUserIdStr<'a>,
+    pub user: &'a RoxUserIdStr<'a>,
     /// Chat it may be sent to.
     pub chat_id: Uuid,
     /// Display filename.
@@ -218,7 +218,7 @@ pub trait ChatRepository: Send + Sync {
     /// MIME type of the person's unsent staged upload in this chat.
     async fn staged_upload_mime(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         chat_id: Uuid,
         upload: Uuid,
     ) -> ExternalChatResult<Option<String>>;

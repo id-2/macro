@@ -1,5 +1,5 @@
 import { PostProductGraphic } from '../../PostProductGraphic';
-import '../macro-vs-notion/MacroVsNotion.css';
+import '../macro-vs-notion/RoxVsNotion.css';
 import { featureNavGlyphs } from '../../../../app/components/graphics/FeatureNavGlyphs';
 import avatarJacob from '../../../../assets/people/jacob.webp';
 import {
@@ -119,10 +119,10 @@ export const postMeta: PostMeta = {
   showTOC: true,
   tocDepth: 2,
   author: { name: 'Jacob Beckerman', role: 'Rox', avatar: avatarJacob },
-  ctaButtonName: 'macro_vs_slack_cta',
+  ctaButtonName: 'rox_vs_slack_cta',
 };
 
-export default function MacroVsSlackPost() {
+export default function RoxVsSlackPost() {
   return (
     <div class="mvn-post">
       <article>

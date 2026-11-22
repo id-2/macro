@@ -1,6 +1,6 @@
 use crate::domain::ports::ChannelSideEffectContext;
 use crate::outbound::pg_side_effect_context::PgChannelSideEffectContext;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -12,7 +12,7 @@ const LEFT_USER: &str = "macro|left-user@test.com";
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_notification_context_excludes_departed_senders(
     pool: Pool<Postgres>,
@@ -37,7 +37,7 @@ async fn thread_notification_context_excludes_departed_senders(
 
 #[sqlx::test(
     fixtures(path = "../../../fixtures", scripts("channels_repo")),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn thread_notification_context_excludes_deleted_messages(
     pool: Pool<Postgres>,

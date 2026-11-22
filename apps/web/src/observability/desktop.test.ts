@@ -48,10 +48,10 @@ afterEach(() => {
 describe('desktop recording', () => {
   it('separates native, frontend, and app memory without pretending RSS is footprint', () => {
     expect(memoryAttributes(sample())).toMatchObject({
-      'macro.memory.native.rss_bytes': 100,
-      'macro.memory.native.footprint_bytes': 80,
-      'macro.memory.frontend.footprint_bytes': 290,
-      'macro.memory.app.footprint_bytes': 370,
+      'rox.memory.native.rss_bytes': 100,
+      'rox.memory.native.footprint_bytes': 80,
+      'rox.memory.frontend.footprint_bytes': 290,
+      'rox.memory.app.footprint_bytes': 370,
     });
     const unavailable = {
       ...sample(),
@@ -59,14 +59,14 @@ describe('desktop recording', () => {
       processes: sample().processes.slice(0, 1),
     };
     expect(memoryAttributes(unavailable)).not.toHaveProperty(
-      'macro.memory.frontend.footprint_bytes'
+      'rox.memory.frontend.footprint_bytes'
     );
     expect(memoryAttributes(unavailable)).not.toHaveProperty(
-      'macro.memory.app.footprint_bytes'
+      'rox.memory.app.footprint_bytes'
     );
     expect(
       memoryAttributes({ ...sample(), frontendStatus: 'partial' })
-    ).not.toHaveProperty('macro.memory.app.footprint_bytes');
+    ).not.toHaveProperty('rox.memory.app.footprint_bytes');
   });
 
   it('correlates launches independently of recordings and tags the native runtime', () => {
@@ -75,12 +75,12 @@ describe('desktop recording', () => {
       'app.runtime': 'tauri',
       'app.platform': 'desktop',
       'service.instance.id': 'launch-1',
-      'macro.recording.id': 'recording-1',
+      'rox.recording.id': 'recording-1',
     });
     recorded.identity.recordingId = null;
     expect(desktopResourceAttributes(recorded)).toMatchObject({
-      'macro.recording.enabled': false,
-      'macro.recording.id': undefined,
+      'rox.recording.enabled': false,
+      'rox.recording.id': undefined,
     });
   });
 
@@ -91,7 +91,7 @@ describe('desktop recording', () => {
     expect(await attributes['service.instance.id']).toBeUndefined();
     const recorded = desktopResourceAttributes(Promise.resolve(snapshot([])));
     expect(await recorded['service.instance.id']).toBe('launch-1');
-    expect(await recorded['macro.recording.id']).toBe('recording-1');
+    expect(await recorded['rox.recording.id']).toBe('recording-1');
   });
 
   it('exports each new sample once, preserves sample times, and expires stale readings', () => {
@@ -110,13 +110,13 @@ describe('desktop recording', () => {
     );
     expect(save).toHaveBeenCalledWith(2);
     expect(recording.attributes()).toMatchObject({
-      'macro.memory.status': 'current',
-      'macro.memory.sample_age_ms': 1000,
+      'rox.memory.status': 'current',
+      'rox.memory.sample_age_ms': 1000,
     });
     vi.setSystemTime(7000);
     expect(recording.attributes()).toEqual({
-      'macro.memory.status': 'stale',
-      'macro.memory.sample_age_ms': 6000,
+      'rox.memory.status': 'stale',
+      'rox.memory.sample_age_ms': 6000,
     });
     recording.dispose();
   });
@@ -135,7 +135,7 @@ describe('desktop recording', () => {
     recording.accept({ ...snapshot([sample(9)]), droppedSamples: 8 });
     expect(sink.warn).toHaveBeenCalledWith(
       'Native memory recording buffer overflowed',
-      { 'macro.memory.dropped_samples': 8 }
+      { 'rox.memory.dropped_samples': 8 }
     );
     const started = recording.start();
     recording.dispose();

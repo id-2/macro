@@ -28,8 +28,8 @@ pub fn main() {
             HighlightField::new()
                 .highlight_type("unified")
                 .number_of_fragments(500)
-                .pre_tags(["<macro_em>"])
-                .post_tags(["</macro_em>"]),
+                .pre_tags(["<rox_em>"])
+                .post_tags(["</rox_em>"]),
         ),
     );
 
@@ -60,8 +60,8 @@ pub fn main() {
                 "content": {
                     "type": "unified", // The way the highlight is done
                     "number_of_fragments": 500, // Breaks up the "content" field into said
-                    "pre_tags": ["<macro_em>"], // HTML tag before highlight
-                    "post_tags": ["</macro_em>"], // HTML tag after highlight
+                    "pre_tags": ["<rox_em>"], // HTML tag before highlight
+                    "post_tags": ["</rox_em>"], // HTML tag after highlight
                 }
             }
         },

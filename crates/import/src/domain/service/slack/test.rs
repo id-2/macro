@@ -40,7 +40,7 @@ impl CanonicalImportRepo for Harness {
 
     async fn reserve_target(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         key: &ImportTargetKey,
         kind: ImportTargetKind,
         existing: Option<Uuid>,
@@ -91,7 +91,7 @@ impl CanonicalImportRepo for Harness {
 impl EntityCreator for Harness {
     async fn create_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &str,
         _: &ImportedTaskProperties,
@@ -101,7 +101,7 @@ impl EntityCreator for Harness {
 
     async fn create_notion_document(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &str,
         _: &NotionLinks,
@@ -112,7 +112,7 @@ impl EntityCreator for Harness {
 
     async fn create_channel(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         target: &ImportTargetReservation,
         participant_emails: &[String],
@@ -139,8 +139,8 @@ impl EntityCreator for Harness {
     }
 }
 
-fn fixture() -> (MacroUserIdStr<'static>, ImportEntity, ImportTargetKey) {
-    let user = MacroUserIdStr::try_from("macro|onboarder@example.com".to_string()).unwrap();
+fn fixture() -> (RoxUserIdStr<'static>, ImportEntity, ImportTargetKey) {
+    let user = RoxUserIdStr::try_from("macro|onboarder@example.com".to_string()).unwrap();
     let key = ImportTargetKey {
         team_id: Uuid::now_v7(),
         foreign_id: SlackConversationId::new("C0123456789").unwrap(),
@@ -171,7 +171,7 @@ impl Harness {
     async fn archive(&self, key: &ImportTargetKey) -> Uuid {
         // A different admin uses the same namespace and silently ensures the
         // target, just as the archive worker does through its channel port.
-        let admin = MacroUserIdStr::try_from("macro|archiver@example.com".to_string()).unwrap();
+        let admin = RoxUserIdStr::try_from("macro|archiver@example.com".to_string()).unwrap();
         let target = self
             .reserve_target(&admin, key, ImportTargetKind::Team, None)
             .await

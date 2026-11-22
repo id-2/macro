@@ -65,7 +65,7 @@ async fn every_candidate_failure_is_retryable_with_the_original_context_and_caus
     for (name, context, index) in [
         ("claim", "Failed to claim crm cleanup candidate", 1),
         ("link", "Failed to fetch link for crm cleanup", 2),
-        ("team", "Failed to look up team for link.macro_id", 3),
+        ("team", "Failed to look up team for link.rox_id", 3),
         (
             "target",
             "Failed to check for a CRM contact to tear down",

@@ -9,7 +9,7 @@ use super::models::{
 };
 use bot_token::HashedBotToken;
 use entity_access::domain::models::{EntityAccessReceipt, MemberParticipantRole};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::{collections::HashMap, future::Future};
 use uuid::Uuid;
@@ -25,7 +25,7 @@ pub trait BotRepo: Send + Sync + 'static {
     fn create_agent(
         &self,
         owner: BotOwner,
-        created_by: MacroUserIdStr<'static>,
+        created_by: RoxUserIdStr<'static>,
         req: CreateAgentRequest,
     ) -> impl Future<Output = Result<Agent, Self::Err>> + Send;
 
@@ -48,14 +48,14 @@ pub trait BotRepo: Send + Sync + 'static {
     /// channel.
     fn list_manageable_agents(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Agent>, Self::Err>> + Send;
 
     /// Check whether the caller is an active member of every supplied channel.
     /// A direct agent conversation never counts: it is not a channel to select.
     fn user_has_channels(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_ids: &[Uuid],
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -63,7 +63,7 @@ pub trait BotRepo: Send + Sync + 'static {
     fn create_owned_bot(
         &self,
         owner: BotOwner,
-        created_by: MacroUserIdStr<'static>,
+        created_by: RoxUserIdStr<'static>,
         req: CreateBotRequest,
     ) -> impl Future<Output = Result<Bot, Self::Err>> + Send;
 
@@ -71,7 +71,7 @@ pub trait BotRepo: Send + Sync + 'static {
     fn create_channel_scoped_bot(
         &self,
         owner: BotOwner,
-        created_by: MacroUserIdStr<'static>,
+        created_by: RoxUserIdStr<'static>,
         channel_id: Uuid,
         token: HashedBotToken,
         req: CreateChannelScopedBotRequest,
@@ -80,7 +80,7 @@ pub trait BotRepo: Send + Sync + 'static {
     /// List active bots manageable by a caller.
     fn list_manageable_bots(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Bot>, Self::Err>> + Send;
 
     /// Get an active bot by id.
@@ -111,7 +111,7 @@ pub trait BotRepo: Send + Sync + 'static {
     /// Check team membership.
     fn user_has_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -160,21 +160,21 @@ pub trait BotRepo: Send + Sync + 'static {
     /// have one, so it never makes the persona available.
     fn user_shares_channel_with_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
     /// Check whether a user is an administrator or owner of a team.
     fn user_can_administer_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
     /// Check whether a user owns a team.
     fn user_owns_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -269,7 +269,7 @@ pub trait AgentDmEligibility: Send + Sync + 'static {
     /// Channel placement does not confer or restrict private DM eligibility.
     fn authorize_agent_dm(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<(), BotError>> + Send;
 }
@@ -280,14 +280,14 @@ pub trait BotService: Send + Sync + 'static {
     /// Create an agent owned by the caller or a team they administer.
     fn create_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         req: CreateAgentRequest,
     ) -> impl Future<Output = Result<Agent, BotError>> + Send;
 
     /// Replace the editable configuration of a manageable agent.
     fn update_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: UpdateAgentRequest,
     ) -> impl Future<Output = Result<Agent, BotError>> + Send;
@@ -296,7 +296,7 @@ pub trait BotService: Send + Sync + 'static {
     /// settings kept beside the agent, such as its API key.
     fn manageable_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<Agent, BotError>> + Send;
 
@@ -304,7 +304,7 @@ pub trait BotService: Send + Sync + 'static {
     /// everything the patch leaves unnamed - owner and profile included.
     fn patch_agent(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: PatchAgentRequest,
     ) -> impl Future<Output = Result<Agent, BotError>> + Send;
@@ -312,20 +312,20 @@ pub trait BotService: Send + Sync + 'static {
     /// List agents the caller can manage or start a managed session as.
     fn list_agents(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Agent>, BotError>> + Send;
 
     /// Create a bot owned by the caller or a team they administer.
     fn create_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         req: CreateBotRequest,
     ) -> impl Future<Output = Result<Bot, BotError>> + Send;
 
     /// Create a bot owned by the caller or a team they administer and scoped to a channel.
     fn create_channel_scoped_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_id: Uuid,
         req: CreateChannelScopedBotRequest,
     ) -> impl Future<Output = Result<CreateChannelScopedBotResponse, BotError>> + Send;
@@ -333,13 +333,13 @@ pub trait BotService: Send + Sync + 'static {
     /// List bots manageable by the caller.
     fn list_bots(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Bot>, BotError>> + Send;
 
     /// Get a manageable bot.
     fn get_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<Bot, BotError>> + Send;
 
@@ -355,7 +355,7 @@ pub trait BotService: Send + Sync + 'static {
     /// Patch a manageable bot.
     fn patch_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: PatchBotRequest,
     ) -> impl Future<Output = Result<Bot, BotError>> + Send;
@@ -363,7 +363,7 @@ pub trait BotService: Send + Sync + 'static {
     /// Delete a manageable bot.
     fn delete_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<(), BotError>> + Send;
 
@@ -377,7 +377,7 @@ pub trait BotService: Send + Sync + 'static {
     /// Remove a bot from a channel.
     fn remove_bot_from_channel(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_id: Uuid,
         bot_id: BotId,
     ) -> impl Future<Output = Result<(), BotError>> + Send;
@@ -399,7 +399,7 @@ pub trait BotService: Send + Sync + 'static {
     /// Create a token for a manageable bot.
     fn create_token(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: CreateBotTokenRequest,
     ) -> impl Future<Output = Result<CreateBotTokenResponse, BotError>> + Send;
@@ -407,14 +407,14 @@ pub trait BotService: Send + Sync + 'static {
     /// List token metadata for a manageable bot.
     fn list_tokens(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<Vec<BotToken>, BotError>> + Send;
 
     /// Revoke a token for a manageable bot.
     fn revoke_token(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         token_id: Uuid,
     ) -> impl Future<Output = Result<(), BotError>> + Send;
@@ -516,7 +516,7 @@ pub trait HarnessAgentDeletion: Send + Sync {
     /// on whose behalf they went. Returns how many were deleted; none is fine.
     fn delete_harness_agents(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         harness: HarnessId,
     ) -> impl Future<Output = Result<usize, BotError>> + Send;
 }

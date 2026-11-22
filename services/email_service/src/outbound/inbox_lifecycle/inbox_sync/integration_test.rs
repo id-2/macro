@@ -6,7 +6,7 @@ use email::domain::mailbox::inbox_sync::{
 };
 use email_api_client::domain::models::{CalendarPart, RateLimitOrigin};
 use email_db_client::attachments::provider::upload::new_email_media_atts;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::service::attachment::{AttachmentUploadArgs, AttachmentUploadDestination};
 use models_email::service::link::UserProvider;
 use models_email::service::message::Message;
@@ -67,7 +67,7 @@ fn received_message(link_id: Uuid, thread_db_id: Uuid) -> Message {
         labels: vec![],
         body_text: Some("body".to_string()),
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         attachments: vec![],
         attachments_draft: vec![],
         attachments_forwarded: vec![],
@@ -77,12 +77,12 @@ fn received_message(link_id: Uuid, thread_db_id: Uuid) -> Message {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inserting_into_a_concurrently_deleted_thread_is_retryable(pool: PgPool) {
     let link_id = Uuid::now_v7();
     let thread_db_id = Uuid::now_v7();
     sqlx::query(
-        "INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
          VALUES ($1, 'macro|deleted-thread@example.com', 'fa-user', 'deleted-thread@example.com', 'GMAIL')",
     )
     .bind(link_id)
@@ -128,7 +128,7 @@ async fn inserting_into_a_concurrently_deleted_thread_is_retryable(pool: PgPool)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../crates/email_db_client/fixtures",
         scripts("upload_claim_tests")
@@ -201,7 +201,7 @@ async fn a_refused_attachment_fetch_is_claimed_again_by_the_retry(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../crates/email_db_client/fixtures",
         scripts("upload_claim_tests")
@@ -260,7 +260,7 @@ async fn insert_email_link(pool: &PgPool) -> (Uuid, String) {
     sqlx::query!(
         r#"
         INSERT INTO email_links (
-            id, macro_id, fusionauth_user_id, email_address, provider
+            id, rox_id, fusionauth_user_id, email_address, provider
         )
         VALUES ($1, $2, $2, $3, 'GMAIL')
         "#,
@@ -280,7 +280,7 @@ async fn stored_history_id(pool: &PgPool, email_address: &str) -> Option<String>
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn recovery_backfill_job_is_created_once_and_then_reused(pool: PgPool) {
     let (link_id, _) = insert_email_link(&pool).await;
 
@@ -312,7 +312,7 @@ async fn recovery_backfill_job_is_created_once_and_then_reused(pool: PgPool) {
     assert!(is_recovery);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stale_cursor_repair_persists_the_notification_history_id(pool: PgPool) {
     let (link_id, email_address) = insert_email_link(&pool).await;
     email_db_client::histories::upsert_gmail_history(&pool, link_id, "12345")
@@ -330,7 +330,7 @@ async fn stale_cursor_repair_persists_the_notification_history_id(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stale_cursor_repair_inserts_a_cursor_when_none_exists(pool: PgPool) {
     let (link_id, email_address) = insert_email_link(&pool).await;
 

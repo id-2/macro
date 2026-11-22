@@ -58,7 +58,7 @@ impl CalendarTeamRepository for PgCalendarTeamRepository {
                 preference.contributes_to_availability, counter.seq)::text, '|' ORDER BY members.user_id, account.id, calendar.id), '')) AS "revision!"
             FROM members LEFT JOIN calendar_team_sharing policy ON policy.user_id = members.user_id
             LEFT JOIN calendar_accounts account ON (account.owner_id = members.user_id OR EXISTS (
-                SELECT 1 FROM macro_user_links link WHERE link.link_id = account.email_link_id AND link.primary_macro_id = members.user_id
+                SELECT 1 FROM rox_user_links link WHERE link.link_id = account.email_link_id AND link.primary_rox_id = members.user_id
             ))
             LEFT JOIN calendars calendar ON calendar.account_id = account.id
             LEFT JOIN calendar_availability_preferences preference ON preference.calendar_id = calendar.id AND preference.user_id = members.user_id
@@ -84,7 +84,7 @@ impl CalendarTeamRepository for PgCalendarTeamRepository {
                 UNION
                 SELECT members.user_id, account.id AS account_id
                 FROM members
-                JOIN macro_user_links link ON link.primary_macro_id = members.user_id
+                JOIN rox_user_links link ON link.primary_rox_id = members.user_id
                 JOIN calendar_accounts account ON account.email_link_id = link.link_id
                 WHERE account.sync_status <> 'disabled'
             )
@@ -158,7 +158,7 @@ impl CalendarTeamRepository for PgCalendarTeamRepository {
                 UNION
                 SELECT eligible.user_id, account.id AS account_id
                 FROM eligible
-                JOIN macro_user_links link ON link.primary_macro_id = eligible.user_id
+                JOIN rox_user_links link ON link.primary_rox_id = eligible.user_id
                 JOIN calendar_accounts account ON account.email_link_id = link.link_id
                 WHERE eligible.user_id = ANY($2::text[])
             ), authorized_sources AS MATERIALIZED (
@@ -183,7 +183,7 @@ impl CalendarTeamRepository for PgCalendarTeamRepository {
             SELECT shared_by AS "shared_by!", source_id AS "source_id!",
                 calendar_id AS "calendar_id!", calendar_name AS "calendar_name!", time_zone,
                 contributes AS "contributes!",
-                ARRAY(SELECT owned.email_address::text FROM email_links owned WHERE owned.macro_id = shared_by) AS "owner_emails!",
+                ARRAY(SELECT owned.email_address::text FROM email_links owned WHERE owned.rox_id = shared_by) AS "owner_emails!",
                 (normalized_payload - 'occurrences') AS "snapshot!", occurrence.value AS "occurrence!"
             FROM authorized_sources
             CROSS JOIN LATERAL jsonb_array_elements(normalized_payload->'occurrences') occurrence(value)
@@ -228,7 +228,7 @@ impl CalendarTeamRepository for PgCalendarTeamRepository {
 
     async fn owned_emails(&self, requester: &str) -> Result<Vec<String>, Report> {
         sqlx::query_scalar!(
-            r#"SELECT email_address::text AS "email!" FROM email_links WHERE macro_id = $1"#,
+            r#"SELECT email_address::text AS "email!" FROM email_links WHERE rox_id = $1"#,
             requester
         )
         .fetch_all(&self.pool)
@@ -274,7 +274,7 @@ impl CalendarTeamRepository for PgCalendarTeamRepository {
             FROM calendars calendar JOIN calendar_accounts account ON account.id = calendar.account_id
             LEFT JOIN calendar_availability_preferences preference ON preference.calendar_id = calendar.id AND preference.user_id = $1
             WHERE NOT calendar.is_deleted AND account.sync_status <> 'disabled'
-              AND (account.owner_id = $1 OR EXISTS (SELECT 1 FROM macro_user_links link WHERE link.link_id = account.email_link_id AND link.primary_macro_id = $1))
+              AND (account.owner_id = $1 OR EXISTS (SELECT 1 FROM rox_user_links link WHERE link.link_id = account.email_link_id AND link.primary_rox_id = $1))
             ORDER BY calendar.name, calendar.id
         "#, requester).fetch_all(&self.pool).await.map_err(|error| rootcause::report!(error))?;
         Ok(rows
@@ -299,7 +299,7 @@ impl CalendarTeamRepository for PgCalendarTeamRepository {
             SELECT $1, calendar.id, $3 FROM calendars calendar
             JOIN calendar_accounts account ON account.id = calendar.account_id
             WHERE calendar.id = $2 AND NOT calendar.is_deleted AND account.sync_status <> 'disabled'
-              AND (account.owner_id = $1 OR EXISTS (SELECT 1 FROM macro_user_links link WHERE link.link_id = account.email_link_id AND link.primary_macro_id = $1))
+              AND (account.owner_id = $1 OR EXISTS (SELECT 1 FROM rox_user_links link WHERE link.link_id = account.email_link_id AND link.primary_rox_id = $1))
             ON CONFLICT(user_id,calendar_id) DO UPDATE SET contributes_to_availability=EXCLUDED.contributes_to_availability
         "#, requester, calendar, contributes).execute(&self.pool).await.map_err(|error| rootcause::report!(error))?;
         Ok(result.rows_affected() == 1)

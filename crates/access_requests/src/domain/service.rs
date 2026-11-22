@@ -2,7 +2,7 @@
 use super::{models::*, ports::*};
 use chrono::Duration;
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use models_permissions::{
     share_permission::access_level::AccessLevel,
@@ -28,7 +28,7 @@ pub struct AccessRequestService<R, A, C = SystemClock> {
 }
 
 /// Human reviewers come from recorded ownership, never an arbitrary Owner-level grant.
-pub fn reviewers(facts: &SharingFacts) -> Vec<MacroUserIdStr<'static>> {
+pub fn reviewers(facts: &SharingFacts) -> Vec<RoxUserIdStr<'static>> {
     match &facts.owner {
         Owner::User(user) => vec![user.clone()],
         Owner::Bot(_) => match facts.sponsor.as_ref() {
@@ -39,7 +39,7 @@ pub fn reviewers(facts: &SharingFacts) -> Vec<MacroUserIdStr<'static>> {
         Owner::Team(_) => team_reviewers(facts),
     }
 }
-fn team_reviewers(facts: &SharingFacts) -> Vec<MacroUserIdStr<'static>> {
+fn team_reviewers(facts: &SharingFacts) -> Vec<RoxUserIdStr<'static>> {
     facts
         .team_members
         .iter()
@@ -80,7 +80,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
 
     async fn begin(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         entity: ShareEntity,
     ) -> Result<R::Transaction, RequestError> {
         // Do not hold a transaction connection while the access service needs
@@ -103,7 +103,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     }
     async fn level(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         entity: ShareEntity,
     ) -> Result<Option<AccessLevel>, RequestError> {
         self.access
@@ -120,7 +120,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     // they are asking for. The repository still checks that the entity is live.
     async fn begin_request(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         entity: ShareEntity,
     ) -> Result<(R::Transaction, Option<AccessLevel>), RequestError> {
         let level = self.level(user, entity).await?;
@@ -140,7 +140,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     fn require_reviewer(
         &self,
         facts: &SharingFacts,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<(), RequestError> {
         if reviewers(facts).contains(user) {
             Ok(())
@@ -153,7 +153,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
         &self,
         tx: &mut R::Transaction,
         entity: ShareEntity,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<(), RequestError> {
         if entity.entity_type != ShareEntityType::Harness {
             return Ok(());
@@ -171,9 +171,9 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
         &self,
         entity: ShareEntity,
         facts: &SharingFacts,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         request: Option<AccessRequest>,
-        affected: MacroUserIdStr<'static>,
+        affected: RoxUserIdStr<'static>,
     ) -> RequestEvent {
         let reviewers = reviewers(facts);
         let mut affected_users = reviewers.clone();
@@ -199,7 +199,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     #[tracing::instrument(name = "access_requests.state", skip_all, fields(entity_id = %entity.entity_id, entity_type = ?entity.entity_type), err(level = Level::DEBUG))]
     pub async fn state(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entity: ShareEntity,
         offset: u32,
     ) -> Result<AccessRequestState, RequestError> {
@@ -241,7 +241,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     #[tracing::instrument(name = "access_requests.submit", skip_all, fields(entity_id = %entity.entity_id, entity_type = ?entity.entity_type), err(level = Level::DEBUG))]
     pub async fn submit(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entity: ShareEntity,
         args: RequestAccess,
         requested_by_agent: Option<Uuid>,
@@ -309,7 +309,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     #[tracing::instrument(name = "access_requests.cancel", skip_all, fields(entity_id = %entity.entity_id, entity_type = ?entity.entity_type), err(level = Level::DEBUG))]
     pub async fn cancel(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entity: ShareEntity,
         revision: i32,
     ) -> Result<(), RequestError> {
@@ -333,7 +333,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     #[tracing::instrument(name = "access_requests.resolve", skip_all, fields(entity_id = %entity.entity_id, entity_type = ?entity.entity_type), err(level = Level::DEBUG))]
     pub async fn resolve(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entity: ShareEntity,
         id: Uuid,
         args: ResolveRequest,
@@ -378,7 +378,7 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     #[tracing::instrument(name = "access_requests.direct_access", skip_all, fields(entity_id = %entity.entity_id, entity_type = ?entity.entity_type), err(level = Level::DEBUG))]
     pub async fn direct_access(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entity: ShareEntity,
     ) -> Result<Vec<DirectAccess>, RequestError> {
         let mut tx = self.begin(&user, entity).await?;
@@ -395,9 +395,9 @@ impl<R: RequestRepository, A: EntityAccessService, C: Clock> AccessRequestServic
     #[tracing::instrument(name = "access_requests.set_direct_access", skip_all, fields(entity_id = %entity.entity_id, entity_type = ?entity.entity_type), err(level = Level::DEBUG))]
     pub async fn set_direct_access(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entity: ShareEntity,
-        recipient: MacroUserIdStr<'static>,
+        recipient: RoxUserIdStr<'static>,
         level: Option<AccessLevel>,
     ) -> Result<(), RequestError> {
         let mut tx = self.begin(&user, entity).await?;

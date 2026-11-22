@@ -7,13 +7,13 @@ use crm::domain::{
 };
 use entity_access::domain::models::{EntityAccessReceipt, MemberTeamRole};
 use item_filters::ast::EntityFilterAst;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{CursorWithValAndFilter, Query, SimpleSortMethod};
 
 use super::{SimpleQueryInner, SoupErr, SoupQuery, SoupRequest, SoupSortDirection};
 
 pub(crate) struct GetCrmContactsRequest {
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     pub access: Option<CrmTeamReceipt<MemberTeamRole>>,
     pub query: CrmContactListQuery,
 }

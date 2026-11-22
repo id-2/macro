@@ -1,7 +1,7 @@
 use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -24,7 +24,7 @@ async fn set_contact(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_contacts_matches_email_or_name_most_recent_first(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -67,7 +67,7 @@ async fn search_contacts_matches_email_or_name_most_recent_first(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_contacts_treats_like_wildcards_literally(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     let owner_id = "macro|owner@test.com";
@@ -85,7 +85,7 @@ async fn search_contacts_treats_like_wildcards_literally(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_contacts_is_team_scoped_and_hides_hidden_rows_from_members(
     pool: PgPool,
 ) -> anyhow::Result<()> {

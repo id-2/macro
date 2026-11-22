@@ -1,6 +1,6 @@
 //! PostgreSQL implementation of the [`DocumentRepo`] port.
 //!
-//! All SQL queries are written directly here (not delegated to `macro_db_client`).
+//! All SQL queries are written directly here (not delegated to `rox_db_client`).
 
 #[cfg(test)]
 mod tests;
@@ -15,7 +15,7 @@ mod share;
 use document_sub_type::DocumentSubType;
 use entity_registry::BotFacts;
 use entity_registry_db_utils::{NewEntityRecord, OwnedEntityRegistrar, RegisteredEntityType};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model::document::{DocumentBasic, DocumentMetadata};
 use model_owner::Owner;
 use models_permissions::share_permission::{LinkShare, SharePermissionV2, TeamLinkShareDefault};
@@ -365,8 +365,8 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
                 u.id as user_profile_id, 
                 mui.first_name, 
                 mui.last_name
-            FROM macro_user_info mui
-            JOIN "User" u ON mui.macro_user_id = u.macro_user_id
+            FROM rox_user_info mui
+            JOIN "User" u ON mui.rox_user_id = u.rox_user_id
             WHERE u.id = ANY($1)
         "#,
             &ids
@@ -411,7 +411,7 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
         .execute(&mut *transaction)
         .await?;
 
-        if let Ok(id) = macro_uuid::string_to_uuid(document_id) {
+        if let Ok(id) = rox_uuid::string_to_uuid(document_id) {
             entity_registry_db_utils::mark_deleted(&mut transaction, id, chrono::Utc::now())
                 .await
                 .map_err(registry_protocol_error)?;
@@ -693,7 +693,7 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
             FileTypeUpdate::Clear => None,
         });
 
-        let document_uuid = macro_uuid::string_to_uuid(&args.document_id).ok();
+        let document_uuid = rox_uuid::string_to_uuid(&args.document_id).ok();
         if document_uuid.is_none()
             && args.project_id.is_some()
             && !agent_correlation::context::may_share()
@@ -748,7 +748,7 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
                 .await?;
 
             if share_link_created {
-                let actor = MacroUserIdStr::parse_from_str(&args.actor_id)
+                let actor = RoxUserIdStr::parse_from_str(&args.actor_id)
                     .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
                 enterprise::audit::append(
                     &mut transaction,
@@ -771,7 +771,7 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
             let owner_principal = owner.principal_id();
 
             // SAFETY: document IDs are UUID strings.
-            let entity_id = macro_uuid::string_to_uuid(&args.document_id).unwrap();
+            let entity_id = rox_uuid::string_to_uuid(&args.document_id).unwrap();
 
             entity_access_db_utils::remove_non_owner_user_entity_access(
                 &mut transaction,
@@ -859,7 +859,7 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
         sqlx::query!(r#"DELETE FROM "Document" WHERE id = $1"#, document_id)
             .execute(&mut *transaction)
             .await?;
-        if let Ok(id) = macro_uuid::string_to_uuid(document_id) {
+        if let Ok(id) = rox_uuid::string_to_uuid(document_id) {
             entity_registry_db_utils::delete_entity(&mut transaction, id)
                 .await
                 .map_err(registry_protocol_error)?;
@@ -1050,7 +1050,7 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
             LEFT JOIN LATERAL (
                 SELECT github_username
                 FROM github_links
-                WHERE macro_id = request_user.user_id
+                WHERE rox_id = request_user.user_id
                 ORDER BY updated_at DESC
                 LIMIT 1
             ) gl ON true
@@ -1315,7 +1315,7 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
     async fn get_project_owner(
         &self,
         project_id: &str,
-    ) -> Result<MacroUserIdStr<'static>, Self::Err> {
+    ) -> Result<RoxUserIdStr<'static>, Self::Err> {
         let row = sqlx::query!(
             r#"SELECT "userId" as user_id FROM "Project" WHERE id = $1"#,
             project_id,
@@ -1323,7 +1323,7 @@ impl<B: BotFacts + 'static> DocumentRepo for PgDocumentRepo<B> {
         .fetch_one(&self.pool)
         .await?;
 
-        MacroUserIdStr::parse_from_str(&row.user_id)
+        RoxUserIdStr::parse_from_str(&row.user_id)
             .map(|u| u.into_owned())
             .map_err(|e| sqlx::Error::Decode(Box::new(e)))
     }

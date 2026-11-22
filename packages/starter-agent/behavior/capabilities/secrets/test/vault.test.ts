@@ -20,9 +20,9 @@ test('every call carries the key and the wake; only writes carry the passwords h
     `POST /storage/passwords/agent/teams/${teamId}/items/${id}/access-requests`,
   ]);
   for (const call of stub.calls) {
-    expect(call.headers['x-macro-user-api-key']).toBe(agentKey);
-    expect(call.headers['x-macro-agent-session-id']).toBe(wake);
-    expect(call.headers['x-macro-passwords']).toBe(
+    expect(call.headers['x-rox-user-api-key']).toBe(agentKey);
+    expect(call.headers['x-rox-agent-session-id']).toBe(wake);
+    expect(call.headers['x-rox-passwords']).toBe(
       call.method === 'GET' ? undefined : '1'
     );
   }
@@ -155,9 +155,9 @@ test("through the agent's relay a script presents only its capability, and the v
   expect(stub.calls[0]?.path).toBe(
     `/dss/passwords/agent/teams/${teamId}/items`
   );
-  expect(stub.calls[0]?.headers['x-macro-user-api-key']).toBe(realKey);
-  expect(stub.calls[0]?.headers['x-macro-passwords']).toBe('1');
-  expect(stub.calls[0]?.headers['x-macro-agent-session-id']).toBeDefined();
+  expect(stub.calls[0]?.headers['x-rox-user-api-key']).toBe(realKey);
+  expect(stub.calls[0]?.headers['x-rox-passwords']).toBe('1');
+  expect(stub.calls[0]?.headers['x-rox-agent-session-id']).toBeDefined();
 });
 
 test('a disclosure sends the closed selector and purpose copy; a code request purpose copy', async () => {

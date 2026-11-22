@@ -51,14 +51,14 @@ describe('call resolution signaling', () => {
       resolution
     );
     expect(
-      JSON.parse(localStorage.getItem('macro.call-resolution') ?? '')
+      JSON.parse(localStorage.getItem('rox.call-resolution') ?? '')
     ).toEqual(resolution);
 
     // Both transports can deliver the same cross-tab message.
     MockBroadcastChannel.instance?.emit(resolution);
     window.dispatchEvent(
       new StorageEvent('storage', {
-        key: 'macro.call-resolution',
+        key: 'rox.call-resolution',
         newValue: JSON.stringify(resolution),
       })
     );
@@ -91,7 +91,7 @@ describe('call resolution signaling', () => {
     MockBroadcastChannel.instance?.emit({ type: 'declined', callId: 'call-3' });
     window.dispatchEvent(
       new StorageEvent('storage', {
-        key: 'macro.call-resolution',
+        key: 'rox.call-resolution',
         newValue: JSON.stringify(ended),
       })
     );

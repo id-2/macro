@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 const TEAM_ALPHA: Uuid = Uuid::from_u128(0x000000000000000000000000000ea001);
@@ -32,7 +32,7 @@ async fn insert_company(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_crm_company_access_returns_view_member_facts(pool: PgPool) -> anyhow::Result<()> {
@@ -53,7 +53,7 @@ async fn team_crm_company_access_returns_view_member_facts(pool: PgPool) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_crm_company_access_denies_hidden_company(pool: PgPool) -> anyhow::Result<()> {
@@ -67,7 +67,7 @@ async fn team_crm_company_access_denies_hidden_company(pool: PgPool) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn team_crm_company_access_denies_other_team(pool: PgPool) -> anyhow::Result<()> {

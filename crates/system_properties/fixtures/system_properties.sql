@@ -1,12 +1,12 @@
 -- Test fixture for system properties
 
--- Test macro_user (same as properties_db_client fixtures)
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+-- Test rox_user (same as properties_db_client fixtures)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES ('a1111111-1111-1111-1111-111111111111', 'user1@test.com', 'user1@test.com', 'cus_test1')
 ON CONFLICT (id) DO NOTHING;
 
 -- Test user (same as properties_db_client fixtures)
-INSERT INTO "User" (id, email, name, "stripeCustomerId", macro_user_id)
+INSERT INTO "User" (id, email, name, "stripeCustomerId", rox_user_id)
 VALUES ('user1', 'user1@test.com', 'Test User 1', 'cus_test1', 'a1111111-1111-1111-1111-111111111111')
 ON CONFLICT (id) DO NOTHING;
 

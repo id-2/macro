@@ -139,8 +139,8 @@ async function scriptAuthService(
     samples: [] as string[],
     computerConnected: options.computerConnected ?? false,
     // The agent computer's Claude: its mode, and the sign-in calls it saw.
-    claude: { mode: 'macro_credits' } as {
-      mode: 'macro_credits' | 'own_account';
+    claude: { mode: 'rox_credits' } as {
+      mode: 'rox_credits' | 'own_account';
       account?: { signedInAt: string; signedInBy: string };
     },
     claudeCalls: [] as string[],
@@ -381,7 +381,7 @@ async function scriptAuthService(
         };
         return json(200, { signedIn: true });
       }
-      backend.claude = { mode: 'macro_credits' };
+      backend.claude = { mode: 'rox_credits' };
       return json(200, backend.claude);
     }
 

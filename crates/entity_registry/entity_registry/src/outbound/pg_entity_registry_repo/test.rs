@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use model_owner::{Owner, OwnerType};
 use shared_entity_registry::{EntityRegistryError, NewEntityRecord, RegisteredEntityType};
 use sqlx::PgPool;
@@ -59,7 +59,7 @@ async fn mark_deleted_committed(pool: &PgPool, id: Uuid, at: DateTime<Utc>) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_returns_live_and_soft_deleted_rows_and_none_for_unknown(pool: PgPool) {
     let live_id = Uuid::from_u128(1);
     let deleted_id = Uuid::from_u128(2);
@@ -91,7 +91,7 @@ async fn get_returns_live_and_soft_deleted_rows_and_none_for_unknown(pool: PgPoo
     assert_eq!(repo.get(Uuid::from_u128(99)).await.unwrap(), None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_many_returns_present_ids_only_and_collapses_duplicates(pool: PgPool) {
     let present = Uuid::from_u128(1);
     let missing = Uuid::from_u128(2);
@@ -109,7 +109,7 @@ async fn get_many_returns_present_ids_only_and_collapses_duplicates(pool: PgPool
     assert_eq!(rows[0].id, present);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_owned_by_user_bot_and_team_each_see_only_their_rows(pool: PgPool) {
     let user = user_owner();
     let bot = bot_owner();
@@ -150,7 +150,7 @@ async fn list_owned_by_user_bot_and_team_each_see_only_their_rows(pool: PgPool) 
     assert_eq!(team_rows[0].owner, team);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_owned_by_filters_by_kind_and_skips_soft_deleted(pool: PgPool) {
     let owner = user_owner();
     let live_chat = Uuid::from_u128(1);
@@ -194,7 +194,7 @@ async fn list_owned_by_filters_by_kind_and_skips_soft_deleted(pool: PgPool) {
     assert_eq!(ids, vec![live_chat, live_document]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_owned_by_orders_newest_created_first(pool: PgPool) {
     let owner = user_owner();
     let older = Uuid::from_u128(1);
@@ -229,7 +229,7 @@ async fn list_owned_by_orders_newest_created_first(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_all_owned_by_returns_live_and_trashed_rows_of_that_owner_newest_first(pool: PgPool) {
     let owner = team_owner();
     let live_chat = Uuid::from_u128(1);
@@ -289,7 +289,7 @@ async fn list_all_owned_by_returns_live_and_trashed_rows_of_that_owner_newest_fi
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn count_by_type_splits_live_and_deleted(pool: PgPool) {
     let owner = user_owner();
     insert_committed(
@@ -351,7 +351,7 @@ async fn count_by_type_splits_live_and_deleted(pool: PgPool) {
     assert_eq!(projects.deleted, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn decode_of_a_row_outside_the_checks_is_corrupt_row(_pool: PgPool) {
     let id = Uuid::from_u128(1);
     let now = ts("2024-01-01T00:00:00Z");

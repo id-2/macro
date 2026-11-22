@@ -1,7 +1,7 @@
-# A completed workflow can report failures without exposing the Macro bot token
+# A completed workflow can report failures without exposing the Rox bot token
 # to the build runners or checking out code from a pull request.
-# Configure MACRO_BUILD_ALERT_WEBHOOK_URL (repository variable) and
-# MACRO_BUILD_ALERT_BOT_TOKEN (repository secret). The token is a channel-scoped
+# Configure ROX_BUILD_ALERT_WEBHOOK_URL (repository variable) and
+# ROX_BUILD_ALERT_BOT_TOKEN (repository secret). The token is a channel-scoped
 # webhook credential for the Alerts channel.
 name: Alert native build failures
 
@@ -28,8 +28,8 @@ jobs:
           SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
           SOURCE_WORKFLOW: ${{ github.event.workflow_run.name }}
           SOURCE_REF: ${{ github.event.workflow_run.head_branch }}
-          MACRO_WEBHOOK_URL: ${{ vars.MACRO_BUILD_ALERT_WEBHOOK_URL }}
-          MACRO_BOT_TOKEN: ${{ secrets.MACRO_BUILD_ALERT_BOT_TOKEN }}
+          ROX_WEBHOOK_URL: ${{ vars.ROX_BUILD_ALERT_WEBHOOK_URL }}
+          ROX_BOT_TOKEN: ${{ secrets.ROX_BUILD_ALERT_BOT_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
@@ -55,7 +55,7 @@ jobs:
             exit 0
           fi
 
-          if [[ -z "$MACRO_WEBHOOK_URL" || -z "$MACRO_BOT_TOKEN" ]]; then
+          if [[ -z "$ROX_WEBHOOK_URL" || -z "$ROX_BOT_TOKEN" ]]; then
             echo 'Configure the Macro Alerts webhook URL and bot token' >&2
             exit 1
           fi
@@ -64,5 +64,5 @@ jobs:
           jq -n --arg content "$message" '{content: $content}' |
             curl --fail-with-body --silent --show-error --retry 3 \
               --header 'Content-Type: application/json' \
-              --header "x-macro-channel-bot-token: $MACRO_BOT_TOKEN" \
-              --data-binary @- "$MACRO_WEBHOOK_URL"
+              --header "x-rox-channel-bot-token: $ROX_BOT_TOKEN" \
+              --data-binary @- "$ROX_WEBHOOK_URL"

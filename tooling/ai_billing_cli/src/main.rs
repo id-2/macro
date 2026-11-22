@@ -7,9 +7,9 @@ use std::process::ExitCode;
 use ai_billing::composition::pg_credit_grant_service;
 use ai_billing::domain::CreditGrant;
 use clap::{Parser, Subcommand};
-use macro_env_var::env_var;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_env_var::env_var;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use sqlx::postgres::PgPoolOptions;
 
 env_var! {
@@ -69,14 +69,14 @@ async fn run(cli: Cli) -> Result<(), rootcause::Report> {
         grant_id,
         execute,
     } = cli.command;
-    let user = MacroUserIdStr::try_from(user)?;
+    let user = RoxUserIdStr::try_from(user)?;
     let pool = PgPoolOptions::new()
         .max_connections(2)
         .connect(&DatabaseUrl::new()?)
         .await?;
     let service = pg_credit_grant_service(pool);
     let grant = CreditGrant {
-        id: grant_id.unwrap_or_else(macro_uuid::generate_uuid_v7),
+        id: grant_id.unwrap_or_else(rox_uuid::generate_uuid_v7),
         amount_cents,
         note: format!("manual grant: {reason}"),
     };

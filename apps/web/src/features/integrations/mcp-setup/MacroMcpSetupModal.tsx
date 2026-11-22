@@ -18,7 +18,7 @@ const _closeMacroMcpSetupModal = () => {
   setMacroMcpSetupOpen(false);
 };
 
-export function MacroMcpSetupModal() {
+export function RoxMcpSetupModal() {
   return (
     <Show when={macroMcpSetupOpen()}>
       <Dialog

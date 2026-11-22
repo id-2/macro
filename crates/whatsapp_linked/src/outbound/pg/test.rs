@@ -16,7 +16,7 @@ use external_chat::domain::{
     timeline::TimelineRepository,
 };
 use external_chat::outbound::pg::PgExternalChatRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::sync::Arc;
 
 mod changes;
@@ -32,7 +32,7 @@ mod timeline;
 
 const GROUP: &str = "120363000000000001@g.us";
 /// A test user's id, typed.
-fn person(user: &str) -> macro_user_id::user_id::MacroUserIdStr<'static> {
+fn person(user: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
     user.to_owned().try_into().expect("test user ids are valid")
 }
 
@@ -85,7 +85,7 @@ async fn user(pool: &PgPool, id: &str) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         id,
         email,
         macro_user
@@ -269,7 +269,7 @@ async fn adopted(
     (linked, session, repository, binding, alice, bob)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn adoption_creates_a_shared_entity_and_leaving_whatsapp_keeps_view_access(pool: PgPool) {
     let (linked, session, _, binding, _, bob) = adopted(&pool).await;
     assert_eq!(binding.user_id, ALICE);
@@ -334,7 +334,7 @@ async fn adoption_creates_a_shared_entity_and_leaving_whatsapp_keeps_view_access
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn each_person_adds_their_own_group_once(pool: PgPool) {
     let (linked, _, _, binding, _, _) = adopted(&pool).await;
     let request = AddChat {
@@ -372,7 +372,7 @@ async fn each_person_adds_their_own_group_once(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn observers_converge_on_one_group_message_and_unadopted_groups_are_dropped(pool: PgPool) {
     let (linked, session, _, binding, alice, bob) = adopted(&pool).await;
     assert_eq!(
@@ -428,7 +428,7 @@ async fn observers_converge_on_one_group_message_and_unadopted_groups_are_droppe
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unverified_lid_is_quarantined_instead_of_guessed(pool: PgPool) {
     let (_, session, _, _, alice, _) = adopted(&pool).await;
     let event = text(1, "987654321@lid", "3EB0CCCC", "who am I");
@@ -460,7 +460,7 @@ async fn aliases(pool: &PgPool, binding: Uuid) -> Vec<(String, Uuid, Option<Stri
     .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_message_from_me_is_the_account_owner_even_when_addressed_by_lid(pool: PgPool) {
     let (_, session, _, binding, alice, _) = adopted(&pool).await;
     let by_phone = text(1, ALICE_JID, "3EB0D001", "from my phone number");
@@ -489,7 +489,7 @@ async fn a_message_from_me_is_the_account_owner_even_when_addressed_by_lid(pool:
     assert_eq!(aliases[0].1, aliases[1].1, "one person for both addresses");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_quarantined_lid_sender_ingests_once_the_roster_pairs_it(pool: PgPool) {
     let (_, session, _, binding, alice, _) = adopted(&pool).await;
     const CUSTOMER_LID: &str = "987654321@lid";
@@ -529,7 +529,7 @@ async fn a_quarantined_lid_sender_ingests_once_the_roster_pairs_it(pool: PgPool)
     assert_eq!(remaining, 0);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reaction_before_its_message_is_deferred_and_replayed(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let reaction = InboundEvent {
@@ -587,7 +587,7 @@ async fn a_reaction_before_its_message_is_deferred_and_replayed(pool: PgPool) {
     assert!(page.messages[0].reactions[0].mine);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn edits_apply_in_source_order_and_deletes_are_permanent(pool: PgPool) {
     let (_, session, _, binding, alice, _) = adopted(&pool).await;
     session
@@ -651,7 +651,7 @@ async fn edits_apply_in_source_order_and_deletes_are_permanent(pool: PgPool) {
     assert_eq!(row.content, "");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_dispatched_send_becomes_unknown_after_takeover_and_settles_from_its_echo(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let request = SendReply {
@@ -763,7 +763,7 @@ async fn a_dispatched_send_becomes_unknown_after_takeover_and_settles_from_its_e
         .unwrap();
     assert_eq!(state[0].state, DeliveryState::Unknown);
 
-    // Alice's own echo settles it as a Macro-authored message, once.
+    // Alice's own echo settles it as a Rox-authored message, once.
     let echo = text(7, ALICE_JID, "3EB0SENT", "On it");
     session.ingest_event(takeover.scope, &echo).await.unwrap();
     session.ingest_event(takeover.scope, &echo).await.unwrap();
@@ -785,7 +785,7 @@ async fn a_dispatched_send_becomes_unknown_after_takeover_and_settles_from_its_e
     assert_eq!(state[0].state, DeliveryState::Accepted);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_accepted_send_writes_the_group_message_and_its_echo_converges(pool: PgPool) {
     let (linked, session, _, binding, alice, bob) = adopted(&pool).await;
     session
@@ -906,7 +906,7 @@ async fn an_accepted_send_writes_the_group_message_and_its_echo_converges(pool: 
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn disconnecting_fails_undispatched_sends_and_stops_observation(pool: PgPool) {
     let (linked, session, _, binding, alice, _) = adopted(&pool).await;
     let progress = linked
@@ -970,7 +970,7 @@ async fn disconnecting_fails_undispatched_sends_and_stops_observation(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stored_group_facts_authorize_adoption_and_sending_however_old(pool: PgPool) {
     workspace(&pool).await;
     let (linked, session, _) = services(&pool);
@@ -1050,7 +1050,7 @@ async fn stored_group_facts_authorize_adoption_and_sending_however_old(pool: PgP
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn messages_stamped_around_adoption_follow_the_second_granular_boundary(pool: PgPool) {
     let (_, session, _, binding, alice, _) = adopted(&pool).await;
     let adopted_at = sqlx::query_scalar!(
@@ -1083,13 +1083,13 @@ async fn messages_stamped_around_adoption_follow_the_second_granular_boundary(po
 impl SendRateLimiter for Allow {
     async fn check(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> ExternalChatResult<()> {
         Ok(())
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rate_limited_send_never_creates_a_dispatchable_intent(pool: PgPool) {
     struct Denied;
 
@@ -1097,7 +1097,7 @@ async fn rate_limited_send_never_creates_a_dispatchable_intent(pool: PgPool) {
     impl SendRateLimiter for Denied {
         async fn check(
             &self,
-            _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+            _: &rox_user_id::user_id::RoxUserIdStr<'_>,
         ) -> ExternalChatResult<()> {
             Err(ExternalChatError::RateLimited.into())
         }

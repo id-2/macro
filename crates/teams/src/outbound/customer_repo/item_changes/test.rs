@@ -2,14 +2,14 @@ use super::*;
 use crate::outbound::customer_repo::test::{
     computer, mount, repo, subscription, subscription_update,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use wiremock::{
     Mock, MockServer, ResponseTemplate,
     matchers::{method, path},
 };
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn receipts_survive_intervening_item_changes_and_replay_without_stripe(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -41,7 +41,7 @@ async fn receipts_survive_intervening_item_changes_and_replay_without_stripe(poo
     assert_eq!(server.received_requests().await.unwrap().len(), 4);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unknown_charge_replays_the_exact_request(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -98,12 +98,12 @@ async fn an_unknown_charge_replays_the_exact_request(pool: sqlx::PgPool) {
     assert_eq!(outcome, "succeeded");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_lost_success_is_recovered_from_the_atomic_marker_without_another_charge(
     pool: sqlx::PgPool,
 ) {
     let server = MockServer::start().await;
-    sqlx::query!("INSERT INTO subscription_item_change (idempotency_key, subscription_id, path, request) VALUES ('computer-add:lost', 'sub_team', '/subscriptions/sub_team', $1)", json!({"items": [{"price": "price_computer", "quantity": 1}], "metadata": {"macro_item_change": "computer-add:lost"}, "payment_behavior": "error_if_incomplete"})).execute(&pool).await.unwrap();
+    sqlx::query!("INSERT INTO subscription_item_change (idempotency_key, subscription_id, path, request) VALUES ('computer-add:lost', 'sub_team', '/subscriptions/sub_team', $1)", json!({"items": [{"price": "price_computer", "quantity": 1}], "metadata": {"rox_item_change": "computer-add:lost"}, "payment_behavior": "error_if_incomplete"})).execute(&pool).await.unwrap();
     let mut sub = subscription();
     sub.metadata
         .insert(ITEM_CHANGE_KEY.to_owned(), "computer-add:lost".to_owned());
@@ -114,7 +114,7 @@ async fn a_lost_success_is_recovered_from_the_atomic_marker_without_another_char
     assert_eq!(server.received_requests().await.unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_declined_receipt_cannot_later_charge_even_if_the_subscription_changes(
     pool: sqlx::PgPool,
 ) {
@@ -129,7 +129,7 @@ async fn a_declined_receipt_cannot_later_charge_even_if_the_subscription_changes
     assert!(server.received_requests().await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_schedule_charge_marks_the_same_atomic_request_and_recovers_without_reinvoicing(
     pool: sqlx::PgPool,
 ) {
@@ -205,7 +205,7 @@ async fn a_schedule_charge_marks_the_same_atomic_request_and_recovers_without_re
 /// A change left pending (its response lost, then never replayed) must not
 /// wedge the subscription: the next guarded mutation settles it by the
 /// provider's marker and goes ahead.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_next_mutation_settles_a_pending_change_instead_of_refusing(pool: sqlx::PgPool) {
     for (landed, expected) in [(false, "abandoned"), (true, "succeeded")] {
         sqlx::query!("DELETE FROM subscription_item_change")
@@ -270,7 +270,7 @@ async fn the_next_mutation_settles_a_pending_change_instead_of_refusing(pool: sq
 /// Settling a change that was never sent fences it: a send still on its way
 /// (another replica, or a request that has not taken the guard yet) finds
 /// the abandoned receipt and never charges.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settling_an_unsent_change_fences_a_later_send(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -305,7 +305,7 @@ async fn settling_an_unsent_change_fences_a_later_send(pool: sqlx::PgPool) {
 /// Stripe even though its sender gave up the guard (a dropped request), so it
 /// is not abandoned: its own key is sent again, and Stripe answering that
 /// the first request is still running makes the next mutation wait.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_change_still_in_flight_is_not_settled(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -357,11 +357,11 @@ async fn a_change_still_in_flight_is_not_settled(pool: sqlx::PgPool) {
 /// and a purchase right after it was refused for five minutes. Now the
 /// purchase finishes the removal under the removal's own key (Stripe runs a
 /// key at most once) and goes ahead at once.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_change_whose_sender_died_is_finished_under_its_own_key(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
-    let removal = json!({"items": [{"id": "si_pro", "deleted": true}], "metadata": {"macro_item_change": "computer-remove:2:0"}});
+    let removal = json!({"items": [{"id": "si_pro", "deleted": true}], "metadata": {"rox_item_change": "computer-remove:2:0"}});
     sqlx::query!(
         "INSERT INTO subscription_item_change (idempotency_key, subscription_id, path, request) VALUES ('computer-remove:2:0', 'sub_team', '/subscriptions/sub_team', $1)",
         removal,

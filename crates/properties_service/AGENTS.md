@@ -22,13 +22,13 @@ the routes and domain logic now live entirely in `properties`.
 
 ## Scope
 
-- Owns: picking concrete adapter types (Postgres repo, MacroAuthorization,
+- Owns: picking concrete adapter types (Postgres repo, RoxAuthorization,
   SQS notification ingress) for `properties`' generic router.
 - Not here: route handlers or domain logic → `properties`.
 
 ## Boundaries
 
-- Depends on: `properties`, `entity_access`, `macro_authorization`,
+- Depends on: `properties`, `entity_access`, `rox_authorization`,
   `notification`.
 - Used by: `services/document_storage_service`.
 

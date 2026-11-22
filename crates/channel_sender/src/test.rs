@@ -1,4 +1,4 @@
-use macro_user_id::email::ReadEmailParts;
+use rox_user_id::email::ReadEmailParts;
 use uuid::Uuid;
 
 use super::*;
@@ -59,7 +59,7 @@ fn sender_round_trips_bot_storage_string() {
 
 #[test]
 fn fallback_user_name_uses_email_local_part() {
-    let user_id = MacroUserIdStr::parse_from_str("macro|shepherd.hatton@gmail.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|shepherd.hatton@gmail.com").unwrap();
 
     assert_eq!(user_id.email_part().local_part(), "shepherd.hatton");
 }

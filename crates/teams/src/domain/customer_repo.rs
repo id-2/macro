@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::model::{
     CustomerError, ItemChangeSettlement, ItemChangeStatus, ItemProration, ItemQuantityChange,
@@ -25,12 +25,12 @@ pub trait CustomerRepository: Clone + Send + Sync + 'static {
         team_id: &uuid::Uuid,
     ) -> impl Future<Output = Result<Self::TeamBillingGuard, CustomerError>> + Send;
 
-    /// Read only this user's plan from an attached, Macro-owned schedule.
+    /// Read only this user's plan from an attached, Rox-owned schedule.
     fn scheduled_seat_plan(
         &self,
         subscription: &stripe::SubscriptionId,
         schedule: &stripe::SubscriptionScheduleId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<ScheduledSeatPlan>, CustomerError>> + Send;
 
     /// Read this member's pending change from the subscription's attached schedule.
@@ -38,10 +38,10 @@ pub trait CustomerRepository: Clone + Send + Sync + 'static {
     fn pending_seat_plan(
         &self,
         subscription: &stripe::SubscriptionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<ScheduledSeatPlan>, CustomerError>> + Send;
 
-    /// Read all pending seat changes from the attached, Macro-owned schedule.
+    /// Read all pending seat changes from the attached, Rox-owned schedule.
     /// Already applied phases do not count as pending changes.
     fn pending_seat_plans(
         &self,
@@ -53,7 +53,7 @@ pub trait CustomerRepository: Clone + Send + Sync + 'static {
         &self,
         subscription_id: &stripe::SubscriptionId,
         team_id: &uuid::Uuid,
-        team_owner_id: &MacroUserIdStr<'_>,
+        team_owner_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), CustomerError>> + Send;
 
     /// The customer's active subscription, or their trialing one when none is
@@ -97,7 +97,7 @@ pub trait CustomerRepository: Clone + Send + Sync + 'static {
     fn schedule_seat_plan(
         &self,
         subscription: &stripe::SubscriptionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         plan: Option<SeatPlan>,
     ) -> impl Future<Output = Result<(), CustomerError>> + Send;
 

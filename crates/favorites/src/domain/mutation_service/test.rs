@@ -10,7 +10,7 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use uuid::Uuid;
 
 use super::*;
@@ -56,7 +56,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn add_favorite_with_established_access(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> Result<Favorite, FavoritesError> {
         Ok(favorite(entity.entity_type, &entity.entity_id, 0.0))
@@ -64,7 +64,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn list_favorites(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         filter: &FavoriteFilter,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         self.calls
@@ -76,7 +76,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn remove_favorite_by_entity(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> Result<(), FavoritesError> {
         self.calls
@@ -94,7 +94,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn reorder_favorites(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         ordered: &[Entity<'_>],
     ) -> Result<(), FavoritesError> {
         self.calls
@@ -111,7 +111,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn favorited_entities(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _entities: &[Entity<'_>],
     ) -> Result<HashSet<Entity<'static>>, FavoritesError> {
         Ok(HashSet::new())
@@ -176,13 +176,13 @@ struct ResolvedAccess {
 impl EntityAccessService for ResolvedAccess {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<EntityAccessReceipt<T>, AccessError> {
         EntityAccessReceipt::try_new_authenticated_user(
-            MacroUserIdStr(user_id.clone().into_owned()),
+            RoxUserIdStr(user_id.clone().into_owned()),
             AccessEntity {
                 entity_id: entity_id.to_string(),
                 entity_type,
@@ -201,7 +201,7 @@ impl EntityAccessService for ResolvedAccess {
     }
     async fn get_access_level(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -209,7 +209,7 @@ impl EntityAccessService for ResolvedAccess {
     }
     async fn check_access(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: AccessLevel,
@@ -226,7 +226,7 @@ impl EntityAccessService for ResolvedAccess {
     }
     async fn get_entity_permission(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: Option<i64>,
@@ -235,7 +235,7 @@ impl EntityAccessService for ResolvedAccess {
     }
     async fn get_crm_entity_permission_with_team(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -245,7 +245,7 @@ impl EntityAccessService for ResolvedAccess {
         &self,
         _: &str,
         _: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unreachable!()
     }
     async fn get_call_channel(&self, _: &Uuid) -> Result<Option<CallChannelInfo>, AccessError> {
@@ -259,7 +259,7 @@ impl EntityAccessService for ResolvedAccess {
     }
     async fn get_user_team(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unreachable!()
     }
@@ -267,7 +267,7 @@ impl EntityAccessService for ResolvedAccess {
 
 fn actor() -> FavoritesMutationActor {
     FavoritesMutationActor {
-        user_id: MacroUserIdStr::parse_from_str(USER_ID).expect("valid user id"),
+        user_id: RoxUserIdStr::parse_from_str(USER_ID).expect("valid user id"),
         organization_id: Some(42),
     }
 }

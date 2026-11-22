@@ -271,10 +271,10 @@ impl OutlookCalendarRepository for PgCalendarRepository {
             disable_calendar_capability_tx(&mut tx, &mut log, row.email_link_id).await?;
         }
         sqlx::query!(r#"INSERT INTO calendar_accounts(id,owner_id,email_link_id,provider,provider_account_id)
-            SELECT gen_random_uuid(),l.macro_id,l.id,'outlook',l.email_address::text FROM email_links l
+            SELECT gen_random_uuid(),l.rox_id,l.id,'outlook',l.email_address::text FROM email_links l
             JOIN email_link_microsoft_scopes s ON s.link_id=l.id AND s.grant_generation=l.grant_generation
             WHERE l.provider='OUTLOOK' AND l.is_sync_active AND s.calendar_disabled_at IS NULL AND s.granted_scopes @> ARRAY['Calendars.ReadWrite']::text[]
-              AND NOT EXISTS(SELECT 1 FROM calendar_accounts x WHERE x.email_link_id=l.id AND x.owner_id=l.macro_id AND x.sync_status<>'disabled')
+              AND NOT EXISTS(SELECT 1 FROM calendar_accounts x WHERE x.email_link_id=l.id AND x.owner_id=l.rox_id AND x.sync_status<>'disabled')
             ON CONFLICT(email_link_id) DO UPDATE SET owner_id=EXCLUDED.owner_id,
                 sync_status=CASE WHEN calendar_accounts.sync_status='disabled' THEN 'pending' ELSE calendar_accounts.sync_status END
             WHERE calendar_accounts.owner_id<>EXCLUDED.owner_id OR calendar_accounts.sync_status='disabled'"#).execute(&mut *tx).await.map_err(report)?;

@@ -1,4 +1,4 @@
-use macro_sync_service_jwt::session::SessionKind;
+use rox_sync_service_jwt::session::SessionKind;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, PartialOrd, Ord, Default)]

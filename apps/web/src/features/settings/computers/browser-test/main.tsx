@@ -14,7 +14,7 @@ import { Layer } from '@ui/components/Layer';
 import { createSignal, ErrorBoundary, lazy, Match, Switch } from 'solid-js';
 import { SettingsPage } from '../../primitives';
 import { GetComputerEntry } from '../views/get-computer-entry';
-import { MacroComputers } from '../views/MacroComputers';
+import { RoxComputers } from '../views/RoxComputers';
 import {
   agentsPageOpened,
   harnesses,
@@ -64,7 +64,7 @@ function Fixture() {
               description="Providers and machines your agents can run on."
             >
               <GetComputerEntry onGet={() => setBuying(true)} />
-              <MacroComputers
+              <RoxComputers
                 harnesses={harnesses()}
                 buying={buying()}
                 onBuyingChange={setBuying}

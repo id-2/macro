@@ -28,11 +28,11 @@ INSERT INTO public."Organization" ("id", "name", "status")
 VALUES (1, 'Test Organization', 'PILOT')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO public."macro_user" ("id", "username", "email", "stripe_customer_id")
+INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id")
 VALUES ('a1111111-1111-1111-1111-111111111111', 'user@example.com', 'user@example.com', 'stripe_id_1'),
        ('a2222222-2222-2222-2222-222222222222', 'user2@example.com', 'user2@example.com', 'stripe_id_2');
 
-INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "macro_user_id")
+INSERT INTO public."User" ("id", "email", "stripeCustomerId", "organizationId", "rox_user_id")
 VALUES ('macro|user-1@example.com', 'user@example.com', 'stripe_id_1', 1, 'a1111111-1111-1111-1111-111111111111'),
        ('macro|user-2@example.com', 'user2@example.com', 'stripe_id_2', 1, 'a2222222-2222-2222-2222-222222222222')
 ON CONFLICT DO NOTHING;
@@ -71,7 +71,7 @@ VALUES ('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'channel', '33333333-aaaa-aaaa-a
 INSERT INTO public.comms_channel_participants ("channel_id", "role", "user_id", "joined_at", "left_at")
 VALUES ('33333333-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'member', 'macro|user-1@example.com', '2023-01-07 10:00:00', NULL);
 
-INSERT INTO public.email_links ("id", "macro_id", "fusionauth_user_id", "email_address", "provider")
+INSERT INTO public.email_links ("id", "rox_id", "fusionauth_user_id", "email_address", "provider")
 VALUES ('55555555-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'macro|user-1@example.com', 'fa-user-1', 'user@example.com', 'GMAIL');
 
 INSERT INTO public.email_threads ("id", "link_id", "inbox_visible", "is_signal", "latest_inbound_message_ts", "created_at", "updated_at")

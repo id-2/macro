@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 use feature_flags::outbound::fake::FakeFeatureFlags;
 use feature_flags::{FlagSnapshot, FlagValue};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use model_entity::EntityType;
 use sqlx::PgPool;
 
@@ -20,8 +20,8 @@ pub(crate) mod runs;
 pub(crate) const OWNER: &str = "macro|suggestions-owner@rox.one";
 const OTHER: &str = "macro|suggestions-other@rox.one";
 
-pub(crate) fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+pub(crate) fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 /// Items the person can open: all but those named in `denied`; those in
@@ -41,7 +41,7 @@ pub(crate) struct AccessDown;
 impl SuggestionAccess for FakeAccess {
     type Err = AccessDown;
 
-    async fn can_view(&self, _: &MacroUserIdStr<'_>, target: &Target) -> Result<bool, Self::Err> {
+    async fn can_view(&self, _: &RoxUserIdStr<'_>, target: &Target) -> Result<bool, Self::Err> {
         if self.failing.lock().unwrap().contains(&target.entity_id) {
             return Err(AccessDown);
         }
@@ -71,7 +71,7 @@ impl SuggestionDrafts for FakeDrafts {
 
     async fn email_draft(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         draft: Uuid,
     ) -> Result<Option<FoundDraft>, Self::Err> {
         Ok(self
@@ -102,7 +102,7 @@ pub(crate) struct FakeWaits {
 impl ReplyWaits for FakeWaits {
     async fn waiting(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> Result<Option<Waiting>, rootcause::Report> {
         if self.failing.lock().unwrap().contains(&target.entity_id) {
@@ -143,7 +143,7 @@ impl GenerationSessions for RowSessions {
         Ok(row.map(|row| GenerationSession {
             session: row.session_id,
             generation: row.generation_id,
-            user: MacroUserIdStr::try_from(row.user_id).unwrap(),
+            user: RoxUserIdStr::try_from(row.user_id).unwrap(),
             kind: row.kind.parse().unwrap(),
             surfaces: Vec::new(),
             trace_id: None,
@@ -171,7 +171,7 @@ struct FakeAudience(Mutex<Vec<(String, String)>>);
 impl SuggestionAudience for FakeAudience {
     async fn seen(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: &str,
         _: chrono::DateTime<Utc>,
     ) -> Result<(), rootcause::Report> {
@@ -198,7 +198,7 @@ struct FakeRoutineSuggestions {
 impl RoutineSuggestions for FakeRoutineSuggestions {
     async fn dismiss_suggestion(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         suggestion: Uuid,
     ) -> Result<bool, rootcause::Report> {
         self.dismissed.lock().unwrap().push(suggestion);
@@ -207,7 +207,7 @@ impl RoutineSuggestions for FakeRoutineSuggestions {
 
     async fn texts(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         suggestions: &[Uuid],
         timezone: chrono_tz::Tz,
     ) -> Result<Vec<(Uuid, RoutineText)>, rootcause::Report> {
@@ -343,7 +343,7 @@ impl Harness {
     /// The person accepts suggestion `id` in the app, as it is now.
     pub(crate) async fn accept(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<(), SuggestionError> {
         let shown = PgSuggestionRepo::new(self.pool.clone())
@@ -445,7 +445,7 @@ impl Harness {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_suggestions_session_adds_an_suggestion_the_person_sees(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -496,7 +496,7 @@ async fn an_suggestions_session_adds_an_suggestion_the_person_sees(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_persons_open_suggestions_session_may_write(pool: PgPool) {
     let h = harness(pool, true).await;
     let suggestions = h.session(OWNER, "suggestions").await;
@@ -537,7 +537,7 @@ async fn only_the_persons_open_suggestions_session_may_write(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn suggestions_are_off_without_the_flag(pool: PgPool) {
     let h = harness(pool, false).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -563,7 +563,7 @@ async fn suggestions_are_off_without_the_flag(pool: PgPool) {
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_same_dedup_key_updates_the_suggestion_and_its_kind_never_changes(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -615,7 +615,7 @@ async fn the_same_dedup_key_updates_the_suggestion_and_its_kind_never_changes(po
     assert_eq!(actions, vec!["created", "rewritten"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_dismissed_suggestion_comes_back_only_with_a_reason(pool: PgPool) {
     let h = harness(pool, true).await;
     let night = h.session(OWNER, "suggestions").await;
@@ -665,7 +665,7 @@ async fn a_dismissed_suggestion_comes_back_only_with_a_reason(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_rewrites_and_retires_open_suggestions_and_a_retired_one_comes_back(
     pool: PgPool,
 ) {
@@ -750,7 +750,7 @@ async fn a_session_rewrites_and_retires_open_suggestions_and_a_retired_one_comes
     assert_eq!(actions, vec!["created", "rewritten", "retired", "restored"]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_generation_adds_at_most_its_limit_and_a_person_has_at_most_thirty_open(pool: PgPool) {
     let h = harness(pool, true).await;
     let per_night = usize::try_from(NEW_PER_GENERATION).unwrap();
@@ -800,7 +800,7 @@ async fn a_generation_adds_at_most_its_limit_and_a_person_has_at_most_thirty_ope
     assert!(rewrite.ok, "{:?}", rewrite.problems);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn writes_are_checked_before_they_are_kept(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -844,7 +844,7 @@ async fn writes_are_checked_before_they_are_kept(pool: PgPool) {
 }
 
 /// A part is kept only with the item it belongs to.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_suggestion_names_a_part_only_with_its_own_item(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -878,7 +878,7 @@ async fn an_suggestion_names_a_part_only_with_its_own_item(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_feed_hides_suggestions_about_items_the_person_lost(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -912,7 +912,7 @@ async fn the_feed_hides_suggestions_about_items_the_person_lost(pool: PgPool) {
 
 /// One suggestion whose items can't be checked is left out; the rest of the
 /// feed is read.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_suggestion_whose_items_cant_be_checked_is_left_out_of_the_feed(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -944,7 +944,7 @@ async fn a_suggestion_whose_items_cant_be_checked_is_left_out_of_the_feed(pool: 
 
 /// `limit` caps the open list, best first, and leaves out done; the counts
 /// count every suggestion the person can open either way.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_feed_returns_at_most_limit_open_suggestions_and_counts_all(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1028,7 +1028,7 @@ async fn the_feed_returns_at_most_limit_open_suggestions_and_counts_all(pool: Pg
 
 /// Reading the feed counts the person in once per timezone while it is
 /// remembered, and again when they read it from another one.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reading_the_feed_counts_the_person_in_once_per_timezone(pool: PgPool) {
     let h = harness(pool, true).await;
     for timezone in [
@@ -1053,7 +1053,7 @@ async fn reading_the_feed_counts_the_person_in_once_per_timezone(pool: PgPool) {
         ["Europe/Paris", "Europe/London", "Europe/Paris"]
     );
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_person_accepts_and_dismisses_only_their_open_suggestions(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1095,7 +1095,7 @@ fn chat_agent() -> SuggestionCaller {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_persons_own_agent_reads_accepts_and_dismisses_their_suggestions(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1145,7 +1145,7 @@ async fn the_persons_own_agent_reads_accepts_and_dismisses_their_suggestions(poo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_persons_agent_never_reaches_the_persons_suggestions(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1187,7 +1187,7 @@ async fn another_persons_agent_never_reaches_the_persons_suggestions(pool: PgPoo
     assert_eq!(feed.suggestions[0].state, SuggestionState::Proposed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn generation_sessions_never_read_accept_or_dismiss_for_the_person(pool: PgPool) {
     let h = harness(pool, true).await;
     let suggestions = h.session(OWNER, "suggestions").await;
@@ -1244,7 +1244,7 @@ async fn generation_sessions_never_read_accept_or_dismiss_for_the_person(pool: P
     assert_eq!(feed.suggestions[0].state, SuggestionState::Proposed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_routine_card_follows_its_suggestion(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1488,7 +1488,7 @@ fn problems(outcome: &SuggestionWriteOutcome) -> String {
     outcome.problems.join(" | ")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_draft_is_attached_only_to_an_open_reply_suggestion_in_its_thread(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1586,7 +1586,7 @@ async fn a_draft_is_attached_only_to_an_open_reply_suggestion_in_its_thread(pool
     assert!(problems(&refused).contains("only attached to an open suggestion"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_draft_replaces_the_old_one_and_the_log_keeps_both(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1693,7 +1693,7 @@ async fn a_new_draft_replaces_the_old_one_and_the_log_keeps_both(pool: PgPool) {
     assert!(reworded.ok, "{:?}", reworded.problems);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_persons_open_suggestions_session_attaches_drafts(pool: PgPool) {
     let h = harness(pool, true).await;
     let suggestions = h.session(OWNER, "suggestions").await;
@@ -1736,7 +1736,7 @@ async fn only_the_persons_open_suggestions_session_attaches_drafts(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_feed_keeps_suggestions_done_in_the_last_day(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1798,7 +1798,7 @@ async fn the_feed_keeps_suggestions_done_in_the_last_day(pool: PgPool) {
 
 /// Who a reply waits on, read from its item when a session writes it: kept
 /// when the item can't be read, and never read for other suggestions.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reply_suggestion_shows_who_it_waits_on(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1872,7 +1872,7 @@ async fn a_reply_suggestion_shows_who_it_waits_on(pool: PgPool) {
     assert_eq!(waiting_of(&review), (None, None));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn resolving_a_reply_clears_who_it_waits_on(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1912,7 +1912,7 @@ async fn resolving_a_reply_clears_who_it_waits_on(pool: PgPool) {
 
 /// The person takes back a dismissal within five minutes of it: the
 /// suggestion is proposed again. Later, or anything not dismissed, is refused.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_person_restores_a_suggestion_they_just_dismissed(pool: PgPool) {
     let h = harness(pool, true).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -1993,7 +1993,7 @@ async fn the_person_restores_a_suggestion_they_just_dismissed(pool: PgPool) {
     assert_eq!(stored.state, SuggestionState::Dismissed);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn restoring_is_gated_on_the_flag(pool: PgPool) {
     let off = harness(pool, false).await;
     assert!(matches!(
@@ -2020,7 +2020,7 @@ async fn new_in_feed(h: &Harness) -> HashSet<Uuid> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_suggestion_is_new_until_the_person_opens_the_feed_after_it_was_proposed(pool: PgPool) {
     let h = harness(pool, true).await;
     let night = h.session(OWNER, "suggestions").await;

@@ -9,7 +9,7 @@ use email::domain::send_attempt::{
     EmailSendService, SendAttempt, SendAttemptId, SendAttemptStatus, SendSnapshot,
 };
 use graphql_common::{parse_id, require_authenticated_user};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{marker::PhantomData, sync::Arc};
 
 /// Identifies one send action independently of its server message identity.
@@ -41,7 +41,7 @@ pub struct SendEmailAttemptInput {
     /// Editor plain text before the watermark.
     pub restore_body_text: Option<String>,
     /// Editor document before the watermark.
-    pub restore_body_macro: Option<String>,
+    pub restore_body_rox: Option<String>,
 }
 
 /// Authoritative delivery state; acceptance is not proof of provider delivery.
@@ -154,7 +154,7 @@ impl<S: EmailSendService + 'static, O: EmailThreadMutationOutput> GraphqlEmailSe
                 .collect::<Result<_, _>>()?,
             restore_body_html: input.restore_body_html,
             restore_body_text: input.restore_body_text,
-            restore_body_macro: input.restore_body_macro,
+            restore_body_rox: input.restore_body_rox,
         };
         let result = ctx
             .data::<Arc<S>>()?
@@ -187,7 +187,7 @@ impl<S: EmailSendService + 'static, O: EmailThreadMutationOutput> GraphqlEmailSe
 
 async fn payload<O: EmailThreadMutationOutput>(
     ctx: &Context<'_>,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
     attempt: SendAttempt,
 ) -> async_graphql::Result<SendEmailAttemptPayload<O>> {
     use async_graphql::ErrorExtensions;
@@ -211,7 +211,7 @@ async fn payload<O: EmailThreadMutationOutput>(
 /// Resolve status on the authenticated viewer without resubmitting delivery.
 pub async fn load_send_attempt<S: EmailSendService>(
     service: &S,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
     input: EmailSendAttemptInput,
 ) -> async_graphql::Result<Option<EmailSendAttemptPayload>> {
     service
@@ -246,7 +246,7 @@ pub struct PendingEmailSends {
 /// Parse the cursor and delegate ownership/access policy to the email domain.
 pub async fn load_pending_sends<S: EmailSendService>(
     service: &S,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
     after: Option<String>,
 ) -> async_graphql::Result<PendingEmailSends> {
     let cursor = after

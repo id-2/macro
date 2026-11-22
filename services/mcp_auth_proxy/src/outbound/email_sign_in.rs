@@ -73,7 +73,7 @@ impl AuthServiceEmailCodes {
 
 fn trace_headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
-    macro_tower_layers::inject_trace_headers(&mut headers);
+    rox_tower_layers::inject_trace_headers(&mut headers);
     headers
 }
 

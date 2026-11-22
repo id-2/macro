@@ -26,7 +26,7 @@ async fn an_owner_gets_a_view_receipt_and_no_edit_receipt() {
 
     let view = access
         .generate_bot_entity_access_receipt::<ViewAccessLevel>(
-            bot_id::MACRO_AI_BOT_ID,
+            bot_id::ROX_AI_BOT_ID,
             BotAccessScope::user(user(OWNER)),
             &OFFSITE.to_string(),
             EntityType::Database,
@@ -42,7 +42,7 @@ async fn an_owner_gets_a_view_receipt_and_no_edit_receipt() {
 
     let edit = access
         .generate_bot_entity_access_receipt::<EditAccessLevel>(
-            bot_id::MACRO_AI_BOT_ID,
+            bot_id::ROX_AI_BOT_ID,
             BotAccessScope::user(user(OWNER)),
             &OFFSITE.to_string(),
             EntityType::Database,

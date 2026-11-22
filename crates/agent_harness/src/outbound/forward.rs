@@ -31,7 +31,7 @@ impl CommandForwarder for RedisCommandForwarder {
         target: CommandTarget,
     ) -> Result<CommandOutcome> {
         let request = RuntimeCommandRequest {
-            request_id: macro_uuid::Uuid::new_v4(),
+            request_id: rox_uuid::Uuid::new_v4(),
             target: RuntimeCommandTarget::from(target),
             session,
             command,
@@ -58,7 +58,7 @@ pub const COMMAND_CHANNEL: &str = "agent-harness.runtime-commands";
 /// A command broadcast received from another replica.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct RuntimeCommandRequest {
-    request_id: macro_uuid::Uuid,
+    request_id: rox_uuid::Uuid,
     target: RuntimeCommandTarget,
     session: AgentSessionId,
     command: HarnessCommand,
@@ -71,7 +71,7 @@ pub struct RuntimeCommandRequest {
 #[serde(rename_all = "snake_case")]
 pub enum RuntimeCommandTarget {
     /// A specific session-owning replica.
-    Replica(macro_uuid::Uuid),
+    Replica(rox_uuid::Uuid),
     /// Whichever replica currently holds this harness runtime connection.
     Harness(HarnessId),
 }
@@ -79,7 +79,7 @@ pub enum RuntimeCommandTarget {
 impl RuntimeCommandRequest {
     /// The unique ID used to claim and trace this command.
     #[must_use]
-    pub fn request_id(&self) -> macro_uuid::Uuid {
+    pub fn request_id(&self) -> rox_uuid::Uuid {
         self.request_id
     }
 

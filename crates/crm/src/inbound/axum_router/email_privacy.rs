@@ -10,9 +10,9 @@ use crate::domain::{
 use axum::{Json, extract::State};
 use entity_access::{
     domain::{models::MemberTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 
 /// Read the caller's mailbox consent and both exclusion lists.
 #[utoipa::path(get, path = "/crm/email-privacy", operation_id = "get_crm_email_privacy", responses((status = 200, body = EmailPrivacySettings)))]
@@ -20,9 +20,9 @@ pub async fn get_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
 ) -> Result<Json<EmailPrivacySettings>, CrmError> {
     let access = CrmTeamReceipt::from_team_receipt(access.entity_access_receipt)?;
@@ -35,9 +35,9 @@ pub async fn update_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
     Json(change): Json<EmailPrivacyChange>,
 ) -> Result<Json<EmailPrivacySettings>, CrmError> {

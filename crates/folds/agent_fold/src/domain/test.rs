@@ -8,7 +8,7 @@ mod harness_readers;
 mod interactions;
 mod lifecycle;
 mod machine;
-mod macro_tools;
+mod rox_tools;
 mod metadata;
 mod real_recordings;
 mod service;

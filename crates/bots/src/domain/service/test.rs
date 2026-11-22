@@ -11,11 +11,11 @@ impl HarnessTeamAgents for TeamAgentHarnesses {
     async fn harness_team_agent(
         &self,
         harness_id: HarnessId,
-    ) -> Result<Option<MacroUserIdStr<'static>>, HarnessError> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, HarnessError> {
         Ok(self
             .0
             .contains(&harness_id)
-            .then(|| MacroUserIdStr::try_from("macro|agent@example.com".to_owned()).unwrap()))
+            .then(|| RoxUserIdStr::try_from("macro|agent@example.com".to_owned()).unwrap()))
     }
 }
 

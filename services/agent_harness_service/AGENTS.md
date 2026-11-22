@@ -14,7 +14,7 @@ Pulumi stacks; they do not host extra agent processes.
   container manager, channel/session services, and wires
   `macro.channels`-derived triggers into `macro.agent_sessions`. All modules
   live in the library so the crate compiles once and caches; `src/main.rs` only
-  starts it (allocator, `MacroEntrypoint`, `run()`). Never add a `mod` to
+  starts it (allocator, `RoxEntrypoint`, `run()`). Never add a `mod` to
   `main.rs`.
 - `src/api.rs`: the full agent-session HTTP API (durable metadata/log reads
   plus live in-memory transport operations), composed from each domain
@@ -38,7 +38,7 @@ Pulumi stacks; they do not host extra agent processes.
 - `src/anthropic_gateway.rs` + `src/anthropic_gateway/`: `/anthropic/v1/messages`
   and `/anthropic/v1/messages/count_tokens` on the egress listener, for runtimes
   on Rox credits (Claude Code on a Rox computer). Both values come from
-  the `macro_internal` MCP server in `session/new`/`load`/`resume`:
+  the `rox_internal` MCP server in `session/new`/`load`/`resume`:
   `ANTHROPIC_BASE_URL` is its URL with `/mcp/internal` replaced by
   `/anthropic`, and `ANTHROPIC_AUTH_TOKEN` is the session egress token from
   its `Authorization: Bearer` header (re-minted on every attach, so restart
@@ -66,7 +66,7 @@ Pulumi stacks; they do not host extra agent processes.
   403). Agent git and agent MCP keys share the same check.
 - `src/speech_gateway.rs` + `src/speech_gateway/`: `/brain/inference/stt` and
   `/brain/inference/tts` WebSockets on the egress listener, for agent
-  teammates' calls (`MACRO_SPEECH_URL` in the enrollment). Same brain key,
+  teammates' calls (`ROX_SPEECH_URL` in the enrollment). Same brain key,
   `enable-agent-teammates` check and admission as `/brain/anthropic`; the upgrade query must be exactly
   `model=deepgram/nova-3` (STT) or `model=deepgram/aura-2` (TTS). The gateway
   opens LiveKit Inference with a 60-second `inference.perform` JWT signed with
@@ -106,7 +106,7 @@ Pulumi stacks; they do not host extra agent processes.
   harness belongs to the computer's team: its owner and admins manage it
   (Claude sign-in included) and every member can run agents on it.
   `src/computers/default_agent.rs` creates the team's `<buyer first name>'s Agent`
-  (`Agent` without one, read from `macro_user_info`) coding agent through
+  (`Agent` without one, read from `rox_user_info`) coding agent through
   `BotService::create_agent` as the buyer (roxd harness, `default` model, all
   channels, owner connections, the bots default of bypassing permissions on a
   computer), skipping a harness `HarnessAssignments::bots_on_harness` already
@@ -375,13 +375,13 @@ Local orchestration supplies every value explicitly for each fleet; see
 
 All feature configs read the same harness `APP_SECRETS_JSON`; the harness
 Doppler validation binary validates each config. Stable public origins resolve
-once at startup through `macro_service_urls`: `McpPublicUrl` preserves the
+once at startup through `rox_service_urls`: `McpPublicUrl` preserves the
 `mcp-server[-dev].rox.one` OAuth identity, `CognitionPublicUrl` preserves
 `document-cognition[-dev].rox.one` integration callbacks, and `AppServiceUrl`
 supplies browser links and preview form origin. Preview control accepts the
 `PreviewGatewayUrl` host (plus app/loopback hosts locally). Use process-level
 `OVERRIDE_*` values for local instances; each computer enrollment carries a
-typed `Deployment` resolved from this process's `macro_service_urls` values
+typed `Deployment` resolved from this process's `rox_service_urls` values
 (`computers::ServiceDeployment`) when it is issued. The shared gateway preserves the public
 hostnames and internally rewrites cognition paths. `PREVIEW_DOMAIN` and
 `PREVIEW_SSH_HOST` remain infrastructure-generated Doppler settings. Legacy
@@ -447,7 +447,7 @@ listener failure shuts down the process so ECS can replace the task.
   into its SDK token: the agent, or the Rox bot plus the client name as
   `agent_via`. The OAuth broker signs the same Rox bot attribution into the
   tokens it issues for the ChatGPT MCP Worker's resource
-  (`McpChatgptServiceUrl`; `public_mcp/macro_api_tokens.rs`). Never read a bot
+  (`McpChatgptServiceUrl`; `public_mcp/rox_api_tokens.rs`). Never read a bot
   id or client name from the request itself.
 - The public MCP server is stateless, so tool calls carry no `clientInfo`; the
   client is identified per call by its `User-Agent` / `x-anthropic-client`

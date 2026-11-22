@@ -23,7 +23,7 @@ export type BatchSendMessageBody = {
 };
 
 /**
- * The Entity describes the minimum amount of information required to describe a unique thing in Macro
+ * The Entity describes the minimum amount of information required to describe a unique thing in Rox
  * This contains the type of the entity [EntityType] and the string id of that entity
  */
 export type Entity = {
@@ -38,7 +38,7 @@ export type Entity = {
 };
 
 /**
- * The type of an entity in Macro
+ * The type of an entity in Rox
  */
 export type EntityType = 'user' | 'chat' | 'channel' | 'channel_message' | 'document' | 'project' | 'email_thread' | 'calendar_event' | 'team' | 'call' | 'foreign_entity' | 'static_file' | 'crm_company' | 'crm_contact' | 'crm_pipeline' | 'reminder' | 'harness' | 'skill' | 'agent_session' | 'scheduled_action' | 'initiative' | 'database' | 'database_row' | 'form' | 'external_chat';
 

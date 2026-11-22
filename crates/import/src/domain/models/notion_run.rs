@@ -3,7 +3,7 @@
 
 use agent_session::domain::model::AgentSessionId;
 use import_notion::domain::model::{ImportScope, NotionId};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{NotionSharing, RunStatus};
@@ -35,7 +35,7 @@ pub enum NotionJob {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AdoptedRun {
     /// Whose import it is.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// `running` (planning) or `importing` (writing).
     pub status: RunStatus,
     /// The job to resume; `None` when its process stopped before recording it.
@@ -102,7 +102,7 @@ pub enum WrittenKind {
 }
 
 /// One thing a write created: `kind` for ledger row `import_id` (and, for
-/// per-row kinds, the Notion `object` it stands for) is Rox's `macro_id`.
+/// per-row kinds, the Notion `object` it stands for) is Rox's `rox_id`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WrittenObject {
     /// The ledger row it was written for.
@@ -112,27 +112,27 @@ pub struct WrittenObject {
     /// The Notion row or property it is for; empty for the row's own object.
     pub object: String,
     /// The Rox id.
-    pub macro_id: Uuid,
+    pub rox_id: Uuid,
 }
 
 impl WrittenObject {
     /// The ledger row's own object of `kind`.
-    pub fn own(import_id: Uuid, kind: WrittenKind, macro_id: Uuid) -> Self {
+    pub fn own(import_id: Uuid, kind: WrittenKind, rox_id: Uuid) -> Self {
         Self {
             import_id,
             kind,
             object: String::new(),
-            macro_id,
+            rox_id,
         }
     }
 
     /// The object of `kind` for Notion row `row`.
-    pub fn for_row(import_id: Uuid, kind: WrittenKind, row: &NotionId, macro_id: Uuid) -> Self {
+    pub fn for_row(import_id: Uuid, kind: WrittenKind, row: &NotionId, rox_id: Uuid) -> Self {
         Self {
             import_id,
             kind,
             object: row.as_str().to_string(),
-            macro_id,
+            rox_id,
         }
     }
 }

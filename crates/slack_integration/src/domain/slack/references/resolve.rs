@@ -3,7 +3,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{ConvertedText, MAX_REFERENCES, ResolvedTarget, SourceReference};
@@ -31,7 +31,7 @@ pub struct ReferenceContext {
     /// Job whose selected work may still supply missing mappings.
     pub job: JobId,
     /// Original administrator; current read access is checked separately.
-    pub requester: MacroUserIdStr<'static>,
+    pub requester: RoxUserIdStr<'static>,
     /// Archive identity or explicit unknown-source confirmation.
     pub source: SourceIdentity,
     /// Current durable source binding.

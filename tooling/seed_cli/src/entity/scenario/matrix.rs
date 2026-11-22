@@ -14,7 +14,7 @@ use std::collections::BTreeMap;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_permissions::share_permission::{LinkShare, access_level::AccessLevel};
 
@@ -292,7 +292,7 @@ pub async fn verify(pool: sqlx::PgPool, spec: &ScenarioSpec) -> anyhow::Result<u
     let mut user_ids = BTreeMap::new();
     for user_key in &user_keys {
         let user_id = spec.user_id(user_key);
-        let parsed = MacroUserIdStr::parse_from_str(user_id.clone().leak())
+        let parsed = RoxUserIdStr::parse_from_str(user_id.clone().leak())
             .map_err(|e| anyhow::anyhow!("invalid user id {user_id}: {e:?}"))?;
         user_ids.insert((*user_key).clone(), parsed);
     }

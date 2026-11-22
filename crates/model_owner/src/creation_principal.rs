@@ -1,7 +1,7 @@
 //! The verified principal a new entity is created for.
 
 use bot_id::{BotId, NonSystemBotId};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::Owner;
@@ -16,13 +16,13 @@ mod test;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CreationPrincipal {
     /// A user creating for themself.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
     /// A bot acting for a verified user. The user owns the result.
     BotForUser {
         /// The acting bot.
         bot: BotId,
         /// The user the bot acts for.
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     },
     /// A team-scoped bot with no acting user. The bot owns the result.
     TeamBot {
@@ -45,7 +45,7 @@ impl CreationPrincipal {
 
     /// The user this creation acts as, or `None` for a team bot.
     #[must_use]
-    pub fn user(&self) -> Option<&MacroUserIdStr<'static>> {
+    pub fn user(&self) -> Option<&RoxUserIdStr<'static>> {
         match self {
             Self::User(user) | Self::BotForUser { user, .. } => Some(user),
             Self::TeamBot { .. } => None,

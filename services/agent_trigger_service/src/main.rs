@@ -34,12 +34,12 @@ use jev::domain::JevClassifier;
 use jev::outbound::SystemOneJev;
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer, consumer_span, record_span_error};
 use lexical_client::LexicalClient;
-use macro_entrypoint::{MacroEntrypoint, shutdown_signal};
-use macro_event_broker::{
-    KafkaConsumerAdapter, KafkaEventPublisher, MacroEventBrokerService, MacroEventCollection,
-    MacroEventConsumerService,
+use rox_entrypoint::{RoxEntrypoint, shutdown_signal};
+use rox_event_broker::{
+    KafkaConsumerAdapter, KafkaEventPublisher, RoxEventBrokerService, RoxEventCollection,
+    RoxEventConsumerService,
 };
-use macro_service_urls::{
+use rox_service_urls::{
     ConnectionGatewayUrl, DocumentStorageServiceUrl, LexicalServiceUrl, StaticFileServiceUrl,
 };
 use messages::domain::api::MessageCommands;
@@ -79,11 +79,11 @@ type Trigger = AgentTriggerService<
         >,
     >,
 >;
-type Publisher = MacroEventBrokerService<KafkaEventPublisher, macro_event_broker::GlobalSpawner>;
+type Publisher = RoxEventBrokerService<KafkaEventPublisher, rox_event_broker::GlobalSpawner>;
 type ChannelTypes = ChannelRepoTypeLookup<PgChannelsRepo>;
 
 type TriggerKafkaAdapter<M> = KafkaConsumerAdapter<AgentTriggerConsumerGroup, M>;
-type TriggerConsumer<M> = MacroEventConsumerService<M, TriggerKafkaAdapter<M>>;
+type TriggerConsumer<M> = RoxEventConsumerService<M, TriggerKafkaAdapter<M>>;
 
 // This worker only posts silent assignment roots. Session replies and their
 // notifications are delivered by the harness's full message service.
@@ -109,7 +109,7 @@ impl properties::NotificationService for SilentAssignmentNotifications {
     }
 }
 
-fn commit_message<M: MacroEventCollection + 'static>(
+fn commit_message<M: RoxEventCollection + 'static>(
     consumer: &TriggerConsumer<M>,
     message: &BorrowedMessage<'_>,
 ) -> anyhow::Result<()> {
@@ -121,7 +121,7 @@ fn commit_message<M: MacroEventCollection + 'static>(
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let entrypoint = MacroEntrypoint::default().init();
+    let entrypoint = RoxEntrypoint::default().init();
     let result = run().await;
     entrypoint.shutdown();
     result
@@ -225,9 +225,9 @@ async fn run() -> anyhow::Result<()> {
     )
     .with_admission(admission);
     let channel_types = ChannelRepoTypeLookup::new(PgChannelsRepo::new(pool.clone()));
-    let publisher = MacroEventBrokerService::new(
+    let publisher = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())?,
-        macro_event_broker::GlobalSpawner,
+        rox_event_broker::GlobalSpawner,
     );
     let project_assignments = ProjectAssignmentService::new(
         PropertiesServiceImpl::new(
@@ -352,8 +352,8 @@ async fn consume<Events: TriggerEvents>(
                             return Ok::<(), anyhow::Error>(());
                         }
                     };
-                    tracing::Span::current().record("macro.event.id", tracing::field::display(decoded.event_id));
-                    tracing::Span::current().record("macro.event.type", decoded.event_type);
+                    tracing::Span::current().record("rox.event.id", tracing::field::display(decoded.event_id));
+                    tracing::Span::current().record("rox.event.type", decoded.event_type);
 
                     if let Some(posted) = &decoded.posted {
                         process_message_event(trigger, publisher, &readers.channel_types, &readers.discussions, posted).await?;

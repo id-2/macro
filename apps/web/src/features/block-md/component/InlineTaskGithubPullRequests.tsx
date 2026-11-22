@@ -1,6 +1,6 @@
 import { GithubPullRequestStatusIcon } from '@components/app/side-panel';
 import { useSplitLayout } from '@components/app/split-layout/layout';
-import { USE_MACRO_PR_SUMMARY_BLOCK } from '@core/constant/featureFlags';
+import { USE_ROX_PR_SUMMARY_BLOCK } from '@core/constant/featureFlags';
 import { TOKENS } from '@core/hotkey/tokens';
 import { copyBranchNameToClipboard } from '@core/util/branchName';
 import { openInNewSplitForMention } from '@core/util/openInNewSplit';
@@ -112,7 +112,7 @@ function PullRequestPillFace(props: { pr: GithubPullRequest }): JSX.Element {
 function PullRequestPill(props: { pr: GithubPullRequest }): JSX.Element {
   const { openWithSplit } = useSplitLayout();
   const foreignEntityId = () =>
-    USE_MACRO_PR_SUMMARY_BLOCK ? props.pr.foreignEntityId : undefined;
+    USE_ROX_PR_SUMMARY_BLOCK ? props.pr.foreignEntityId : undefined;
   const navHandlers = useSplitNavigationHandler<HTMLButtonElement>((event) => {
     const id = foreignEntityId();
     if (!id) return;

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT c.link_id AS \"link_id!\",c.actor_id AS \"actor_id!\",true AS \"is_custodian!\" FROM email_mailbox_custodians c WHERE c.fusionauth_user_id = $1\n            UNION SELECT l.id AS link_id,l.macro_id AS actor_id,false AS is_custodian FROM email_links l WHERE l.fusionauth_user_id = $1\n                AND NOT EXISTS(SELECT 1 FROM promoted_shared_mailboxes p WHERE p.macro_id = l.macro_id)",
+  "query": "SELECT c.link_id AS \"link_id!\",c.actor_id AS \"actor_id!\",true AS \"is_custodian!\" FROM email_mailbox_custodians c WHERE c.fusionauth_user_id = $1\n            UNION SELECT l.id AS link_id,l.rox_id AS actor_id,false AS is_custodian FROM email_links l WHERE l.fusionauth_user_id = $1\n                AND NOT EXISTS(SELECT 1 FROM promoted_shared_mailboxes p WHERE p.rox_id = l.rox_id)",
   "describe": {
     "columns": [
       {

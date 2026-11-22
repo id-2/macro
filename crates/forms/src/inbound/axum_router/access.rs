@@ -11,9 +11,9 @@ use axum::http::request::Parts;
 use entity_access::domain::models::{EntityAccessReceipt, RequiredPermission};
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::{ExtractorError, FormAccessLevelExtractor};
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorizationExtractor, MacroAuthorizationRejection,
-    MacroAuthorizationService, MacroAuthorizationState, OptionalMacroAuthorizationExtractor,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorizationExtractor, RoxAuthorizationRejection,
+    RoxAuthorizationService, RoxAuthorizationState, OptionalMacroAuthorizationExtractor,
     UserOrInternal,
 };
 
@@ -46,8 +46,8 @@ where
     Permission: RequiredPermission,
     Arc<AccessService>: FromRef<State>,
     AccessService: EntityAccessService,
-    MacroAuthorizationState<Authorization>: FromRef<State>,
-    Authorization: MacroAuthorizationService,
+    RoxAuthorizationState<Authorization>: FromRef<State>,
+    Authorization: RoxAuthorizationService,
     State: Send + Sync + 'static,
 {
     type Rejection = FormsApiError;
@@ -108,24 +108,24 @@ fn status_refusal(status: StatusCode) -> AccessRefusal {
 /// A signed-in caller, or Rox's own machinery acting for one.
 pub struct SignedIn<Authorization> {
     /// The authorization the request carries.
-    pub user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    pub user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
 }
 
 impl<State, Authorization> FromRequestParts<State> for SignedIn<Authorization>
 where
-    MacroAuthorizationState<Authorization>: FromRef<State>,
-    Authorization: MacroAuthorizationService,
+    RoxAuthorizationState<Authorization>: FromRef<State>,
+    Authorization: RoxAuthorizationService,
     State: Send + Sync + 'static,
 {
     type Rejection = FormsApiError;
 
     async fn from_request_parts(parts: &mut Parts, state: &State) -> Result<Self, Self::Rejection> {
-        MacroAuthorizationExtractor::<Authorization, UserOrInternal>::from_request_parts(
+        RoxAuthorizationExtractor::<Authorization, UserOrInternal>::from_request_parts(
             parts, state,
         )
         .await
         .map(|user| Self { user })
-        .map_err(|MacroAuthorizationRejection { status, .. }| {
+        .map_err(|RoxAuthorizationRejection { status, .. }| {
             FormsApiError::Access(status_refusal(status))
         })
     }

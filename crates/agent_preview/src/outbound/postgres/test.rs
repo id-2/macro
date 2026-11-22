@@ -14,7 +14,7 @@ use axum::{
 use entity_access::domain::models::AccessLevel;
 use futures_util::{SinkExt, StreamExt};
 use http_body_util::BodyExt;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use std::sync::{Arc, Mutex};
 use tokio::{
     net::{TcpListener, TcpStream},
@@ -32,7 +32,7 @@ impl Events for RecordedEvents {
     async fn changed(
         &self,
         p: &crate::domain::Preview,
-        _: &[MacroUserIdStr<'static>],
+        _: &[RoxUserIdStr<'static>],
     ) -> Result<(), PreviewError> {
         self.changes.lock().unwrap().push(p.clone());
         if p.status == PreviewStatus::Ready {
@@ -95,7 +95,7 @@ async fn http(
     result.map(axum::body::Body::new)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_replicas_route_stock_ssh_browser_http_and_websocket(pool: PgPool) {
     let repo = repository(pool.clone());
     let upstream = TcpListener::bind("127.0.0.1:0").await.unwrap();
@@ -274,7 +274,7 @@ async fn two_replicas_route_stock_ssh_browser_http_and_websocket(pool: PgPool) {
             "GET",
             &[
                 ("cookie", cookie.clone()),
-                ("x-macro-preview-hop", "1".into())
+                ("x-rox-preview-hop", "1".into())
             ],
             ""
         )
@@ -338,7 +338,7 @@ async fn two_replicas_route_stock_ssh_browser_http_and_websocket(pool: PgPool) {
     upstream_task.abort();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replacement_stop_stale_owner_and_late_cleanup_are_fenced(pool: PgPool) {
     let repo = repository(pool.clone());
     let (base, authority, _) = fixture(2222);
@@ -469,7 +469,7 @@ async fn replacement_stop_stale_owner_and_late_cleanup_are_fenced(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_credentials_are_single_use_host_bound_and_bounded(pool: PgPool) {
     let repo = repository(pool.clone());
     let (base, authority, _) = fixture(2222);
@@ -552,10 +552,10 @@ async fn concurrent_credentials_are_single_use_host_bound_and_bounded(pool: PgPo
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn expired_watchers_cannot_renew_past_active_limits(pool: PgPool) {
     let repo = repository(pool.clone());
-    let other = MacroUserIdStr::try_from("macro|second@example.com".to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("macro|second@example.com".to_owned()).unwrap();
     let limits = WatchLimits {
         sessions: 1,
         viewers: 1,

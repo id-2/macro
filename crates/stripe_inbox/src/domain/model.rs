@@ -380,8 +380,8 @@ pub struct SubscriptionFacts {
     /// The `team_id` metadata: set for team subscriptions.
     pub team_id: Option<Uuid>,
     /// The `owner_id` metadata of a team subscription.
-    pub owner_id: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
-    /// The `macro_plan_change_at` metadata Rox stamps on an immediate plan change.
+    pub owner_id: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
+    /// The `rox_plan_change_at` metadata Rox stamps on an immediate plan change.
     pub plan_change_at: Option<DateTime<Utc>>,
     /// Marketing attribution.
     pub attribution: Attribution,
@@ -449,7 +449,7 @@ pub struct PreviousAttributes {
     pub items: Option<Vec<PreviousItem>>,
     /// The subscription-level period start before the update.
     pub period_start: Option<DateTime<Utc>>,
-    /// Whether the update set `macro_plan_change_at`.
+    /// Whether the update set `rox_plan_change_at`.
     pub plan_change_stamped: bool,
 }
 
@@ -538,7 +538,7 @@ pub struct InvoiceFacts {
     pub status: Option<String>,
     /// Why it was created (`subscription_cycle`, ...).
     pub billing_reason: Option<String>,
-    /// Its metadata (Rox's own invoices carry `macro_purpose`).
+    /// Its metadata (Rox's own invoices carry `rox_purpose`).
     pub metadata: HashMap<String, String>,
     /// Its lines.
     pub lines: Vec<InvoiceLine>,
@@ -593,7 +593,7 @@ pub struct CheckoutFacts {
     pub paid: bool,
     /// The session's total.
     pub amount_total: Option<i64>,
-    /// Its metadata (credit purchases carry `macro_purpose` and the payer).
+    /// Its metadata (credit purchases carry `rox_purpose` and the payer).
     pub metadata: HashMap<String, String>,
 }
 

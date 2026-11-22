@@ -47,7 +47,7 @@ pub async fn update_preview_key(
 #[cfg(test)]
 mod test {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::ROX_DB_MIGRATIONS;
     use sqlx::{Pool, Postgres};
     use uuid::Uuid;
 
@@ -181,7 +181,7 @@ mod test {
         Ok(preview_url)
     }
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn update_preview_key_updates_active_and_archived_rows(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {
@@ -203,7 +203,7 @@ mod test {
         Ok(())
     }
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn update_preview_key_updates_only_matching_recording_key(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {
@@ -222,7 +222,7 @@ mod test {
         Ok(())
     }
 
-    #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+    #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
     async fn update_preview_key_returns_zero_when_no_rows_match(
         pool: Pool<Postgres>,
     ) -> anyhow::Result<()> {

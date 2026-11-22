@@ -39,7 +39,7 @@
 //!
 //! - [`mcp`] - the envelope MCP wraps every external tool's result in, which
 //!   a harness may copy into `rawOutput` whole.
-//! - [`macro_tools`] - Rox's own tools, which any harness may call (over
+//! - [`rox_tools`] - Rox's own tools, which any harness may call (over
 //!   Rox's MCP server, or natively when the harness *is* Rox's agent).
 //!   Their names and result shapes are Rox's whichever harness relayed
 //!   them.
@@ -65,9 +65,9 @@ pub mod generic;
 /// Nous Research's Hermes agent.
 pub mod hermes;
 /// Rox's own in-process agent (`agent_inmem`).
-pub mod macro_inmem;
+pub mod rox_inmem;
 /// Rox's tools: their names and what they return.
-pub mod macro_tools;
+pub mod rox_tools;
 /// MCP's result envelope.
 pub mod mcp;
 /// OpenClaw's ACP gateway.
@@ -82,7 +82,7 @@ use agent_client_protocol::schema::v1::{
     Content, ContentBlock, Meta, ToolCall, ToolCallContent, ToolCallLocation, ToolCallUpdate,
     ToolKind,
 };
-use macro_tools::MacroTool;
+use rox_tools::RoxTool;
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
@@ -239,8 +239,8 @@ pub trait HarnessReader: Sync {
     /// For most harnesses that means a tool reached over Rox's own MCP
     /// server; Rox's in-process agent calls the same tools natively and
     /// says so by being the harness it is.
-    fn macro_tool<'name>(&self, name: &'name ToolName) -> Option<&'name str> {
-        macro_tools::mcp_tool(name)
+    fn rox_tool<'name>(&self, name: &'name ToolName) -> Option<&'name str> {
+        rox_tools::mcp_tool(name)
     }
 
     /// A tool's own arguments, out of whatever this harness wrapped them in
@@ -380,7 +380,7 @@ impl Harness {
     pub fn reader(self) -> &'static dyn HarnessReader {
         match self {
             Self::ClaudeCode => &claude_code::ClaudeCode,
-            Self::Macro => &macro_inmem::MacroInmem,
+            Self::Macro => &rox_inmem::RoxInmem,
             Self::OpenCode => &opencode::OpenCode,
             Self::Codex => &codex::Codex,
             Self::Cursor => &cursor::Cursor,
@@ -441,11 +441,11 @@ pub fn tool_shape<'name>(
     name: &'name ToolName,
     frame: &ToolFrame<'_>,
 ) -> ToolShape<'name> {
-    match reader.macro_tool(name).map(MacroTool::of) {
-        Some(MacroTool::User(tool)) => ToolShape::UserTool(tool),
-        Some(MacroTool::Subagent) => ToolShape::Subagent,
-        Some(MacroTool::View) => ToolShape::View,
-        Some(MacroTool::Other(tool)) => ToolShape::Macro(tool),
+    match reader.rox_tool(name).map(RoxTool::of) {
+        Some(RoxTool::User(tool)) => ToolShape::UserTool(tool),
+        Some(RoxTool::Subagent) => ToolShape::Subagent,
+        Some(RoxTool::View) => ToolShape::View,
+        Some(RoxTool::Other(tool)) => ToolShape::Macro(tool),
         None if reader.is_subagent(name, frame) => ToolShape::Subagent,
         None => ToolShape::Harness,
     }
@@ -462,9 +462,9 @@ pub fn subagent_result(
     name: &ToolName,
     frame: &ToolFrame<'_>,
 ) -> Option<SubagentResult> {
-    if reader.macro_tool(name).map(MacroTool::of) == Some(MacroTool::Subagent) {
+    if reader.rox_tool(name).map(RoxTool::of) == Some(RoxTool::Subagent) {
         let (value, error) = reader.unwrap_tool_output(frame.raw_output?);
-        return macro_tools::subagent_result(&value, error);
+        return rox_tools::subagent_result(&value, error);
     }
     reader.subagent_result(frame)
 }
@@ -480,7 +480,7 @@ pub fn user_tool_outcome(
 ) -> UserToolOutcome {
     match reader.unwrap_tool_output(raw_output) {
         (_, Some(error)) => UserToolOutcome::Failed { message: error },
-        (value, None) => macro_tools::user_tool_outcome(tool, &value),
+        (value, None) => rox_tools::user_tool_outcome(tool, &value),
     }
 }
 

@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rdkafka::message::{OwnedMessage, Timestamp};
 use serde_json::{Value, json};
 
@@ -41,8 +41,8 @@ fn envelope(event_type: &str, metadata: Value) -> Value {
     })
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap()
 }
 
 fn posted(sender: &str, thread_id: Option<&str>) -> Value {
@@ -68,7 +68,7 @@ fn posted(sender: &str, thread_id: Option<&str>) -> Value {
 #[test]
 fn a_sent_email_is_a_reply_on_its_thread() {
     let event = decoded(
-        "macro.email",
+        "rox.email",
         &envelope(
             "email.message_sent",
             json!({
@@ -106,7 +106,7 @@ fn a_sent_email_is_a_reply_on_its_thread() {
 /// no reply of the person's.
 #[test]
 fn a_posted_message_is_a_reply_only_from_a_person() {
-    let event = decoded("macro.messages", &posted(OWNER, Some(ROOT)));
+    let event = decoded("rox.messages", &posted(OWNER, Some(ROOT)));
     assert_eq!(
         event,
         Some(ResolutionEvent::Replied {
@@ -121,7 +121,7 @@ fn a_posted_message_is_a_reply_only_from_a_person() {
     );
 
     let bot = decoded(
-        "macro.messages",
+        "rox.messages",
         &posted("bot|01900000-0000-7000-8000-0000000000f1", None),
     );
     assert_eq!(bot, None);
@@ -131,7 +131,7 @@ fn a_posted_message_is_a_reply_only_from_a_person() {
 #[test]
 fn a_participant_removal_is_an_access_change_for_those_people() {
     let event = decoded(
-        "macro.channels",
+        "rox.channels",
         &envelope(
             "channel.participant_removed",
             json!({
@@ -209,16 +209,16 @@ async fn bad_records_never_stall_the_partition() {
     {
         let mut state = fake.state.lock().unwrap();
         state.messages.push_back(record(
-            "macro.messages",
+            "rox.messages",
             1,
             &json!({ "event_type": "message.posted", "metadata": "nonsense" }),
         ));
         state
             .messages
-            .push_back(record("macro.messages", 2, &posted(OWNER, None)));
+            .push_back(record("rox.messages", 2, &posted(OWNER, None)));
         state
             .messages
-            .push_back(record("macro.messages", 3, &posted(OWNER, Some(ROOT))));
+            .push_back(record("rox.messages", 3, &posted(OWNER, Some(ROOT))));
     }
 
     consume(

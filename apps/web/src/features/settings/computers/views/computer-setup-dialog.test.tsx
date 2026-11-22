@@ -161,8 +161,8 @@ it('marks Bring your AI skipped, not struck, when the agent runs on Rox credits'
 it('marks Bring your AI done on Rox credits once its sign-in was opened', () => {
   expect(claudeStepMark(undefined, false)).toBe('step');
   expect(claudeStepMark('own_account', true)).toBe('step');
-  expect(claudeStepMark('macro_credits', false)).toBe('skipped');
-  expect(claudeStepMark('macro_credits', true)).toBe('credits');
+  expect(claudeStepMark('rox_credits', false)).toBe('skipped');
+  expect(claudeStepMark('rox_credits', true)).toBe('credits');
 
   render(() => <StepHeader step="ready" claude="credits" />);
   const items = screen
@@ -277,7 +277,7 @@ it('drops the shared sign-in note from Bring your AI once setup has failed', () 
 
 function agentStep(
   computer: ComputerStatus,
-  options: { choice?: 'own_account' | 'macro_credits' } = {}
+  options: { choice?: 'own_account' | 'rox_credits' } = {}
 ) {
   const onChoice = vi.fn();
   render(() => (
@@ -346,7 +346,7 @@ it('asks for Claude with two one-line options, and no hint under Continue', () =
   const options = choice.querySelectorAll('input[type="radio"]');
   expect(options).toHaveLength(2);
   fireEvent.click(screen.getByRole('radio', { name: 'Rox credits' }));
-  expect(onChoice).toHaveBeenCalledWith('macro_credits');
+  expect(onChoice).toHaveBeenCalledWith('rox_credits');
 });
 
 it('replaces the progress line with one banner when setup fails', () => {

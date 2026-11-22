@@ -9,8 +9,8 @@ use crate::domain::{
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use frecency::domain::ports::FrecencyQueryService;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::EmailServiceImpl;
@@ -28,13 +28,13 @@ where
 {
     pub(crate) async fn message_operation_status_impl(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         message_id: Uuid,
     ) -> Result<Option<crate::domain::models::mailbox_operation::MessageOperationStatus>, EmailErr>
     {
         let ids = self
             .email_repo
-            .inboxes_for_macro_id(actor)
+            .inboxes_for_rox_id(actor)
             .await
             .map_err(anyhow::Error::from)?
             .into_iter()
@@ -56,12 +56,12 @@ where
 
     pub(crate) async fn resolve_message_operation_impl(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         request: crate::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> Result<Uuid, EmailErr> {
         let ids: Vec<Uuid> = self
             .email_repo
-            .inboxes_for_macro_id(actor.clone())
+            .inboxes_for_rox_id(actor.clone())
             .await
             .map_err(anyhow::Error::from)?
             .into_iter()
@@ -102,17 +102,17 @@ where
     #[tracing::instrument(err, skip(self, input))]
     pub(crate) async fn save_draft_for_user_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         link_id: Option<Uuid>,
         mut input: CreateDraftInput,
     ) -> Result<SavedUserDraft, EmailErr> {
-        input.actor = Some(macro_id.clone().into_owned());
+        input.actor = Some(rox_id.clone().into_owned());
         let accessible_inboxes = self
             .email_repo
-            .inboxes_for_macro_id(macro_id.clone())
+            .inboxes_for_rox_id(rox_id.clone())
             .await
             .map_err(anyhow::Error::from)?;
-        let link = resolve_target_link(&accessible_inboxes, link_id, &macro_id)?.clone();
+        let link = resolve_target_link(&accessible_inboxes, link_id, &rox_id)?.clone();
         let accessible_link_ids: Vec<Uuid> = accessible_inboxes.iter().map(|l| l.id).collect();
         self.resolve_client_handles(&mut input, &accessible_link_ids)
             .await?;
@@ -243,14 +243,14 @@ where
     #[tracing::instrument(err, skip(self))]
     pub(crate) async fn delete_draft_for_user_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        rox_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         draft_id: Uuid,
 
         expected_generation: i32,
     ) -> Result<DeletedUserDraft, EmailErr> {
         let accessible_link_ids: Vec<Uuid> = self
             .email_repo
-            .inboxes_for_macro_id(macro_id.clone())
+            .inboxes_for_rox_id(rox_id.clone())
             .await
             .map_err(anyhow::Error::from)?
             .iter()
@@ -309,7 +309,7 @@ where
                 msg.db_id,
                 msg.thread_db_id,
                 &accessible_link_ids,
-                Some(macro_id.as_ref()),
+                Some(rox_id.as_ref()),
                 expected_generation,
             )
             .await
@@ -437,7 +437,7 @@ where
             bcc: resolved.bcc,
             body_text: resolved.body_text,
             body_html: resolved.body_html,
-            body_macro: resolved.body_macro,
+            body_rox: resolved.body_rox,
             headers_json: resolved.headers_json,
             send_time: resolved.send_time,
         })
@@ -520,7 +520,7 @@ where
         let (thread_db_id, new_thread) = self.build_new_thread_if_needed(link_id, &input);
 
         // Resolve all IDs and build the insert-ready struct
-        let message_db_id = input.db_id.unwrap_or_else(macro_uuid::generate_uuid_v7);
+        let message_db_id = input.db_id.unwrap_or_else(rox_uuid::generate_uuid_v7);
 
         // Start the undo window only after provider validation and preparation.
         // A slow send-as lookup must not consume the user's cancellation window.
@@ -544,7 +544,7 @@ where
             bcc: input.bcc,
             body_text: input.body_text,
             body_html: input.body_html,
-            body_macro: input.body_macro,
+            body_rox: input.body_rox,
             headers_json: input.headers_json,
             send_time: input.send_time,
             actor_id: input.actor.as_ref().map(|actor| actor.as_ref().to_owned()),
@@ -753,7 +753,7 @@ where
     /// owner's inbox, so the reply always starts a thread in the caller's.
     async fn reply_target(
         &self,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
         replying_to_id: Uuid,
         accessible_link_ids: &[Uuid],
     ) -> Result<SimpleMessageInfo, EmailErr> {
@@ -846,7 +846,7 @@ where
 
         let now = chrono::Utc::now();
         let thread = ThreadRow {
-            db_id: macro_uuid::generate_uuid_v7(),
+            db_id: rox_uuid::generate_uuid_v7(),
             provider_id: None,
             link_id,
             inbox_visible: false,
@@ -879,13 +879,13 @@ fn apply_reply_target(
         // The target lives in a different inbox (a different provider
         // account, possibly another user's through a share), so it cannot
         // thread into that account's provider thread. Start a fresh thread in
-        // the sending inbox; the Macro-In-Reply-To header below preserves the
+        // the sending inbox; the Rox-In-Reply-To header below preserves the
         // reference.
         input.thread_db_id = None;
         input.provider_thread_id = None;
     }
 
-    // Generate Macro-In-Reply-To header
+    // Generate Rox-In-Reply-To header
     input.headers_json = Some(serde_json::json!([{
         "Macro-In-Reply-To": reply_target.db_id.to_string()
     }]));
@@ -916,20 +916,20 @@ fn resolve_thread_hint(existing: Option<&ThreadRow>, link_id: Uuid) -> ThreadHin
 
 /// Resolve the single inbox a draft save targets from the caller's accessible
 /// `links`. With an explicit `link_id`, the matching accessible link is used;
-/// without one, the caller's own `is_primary` link. The `macro_id` guard
+/// without one, the caller's own `is_primary` link. The `rox_id` guard
 /// matters: the links list includes delegated inboxes, which are primary for
 /// *their* account. Mirrors the `X-Email-Link-Id` axum extractor's semantics
 /// for transports that carry the inbox by value instead of a header.
 pub(super) fn resolve_target_link<'a>(
     links: &'a [Link],
     link_id: Option<Uuid>,
-    caller: &macro_user_id::user_id::MacroUserIdStr<'_>,
+    caller: &rox_user_id::user_id::RoxUserIdStr<'_>,
 ) -> Result<&'a Link, EmailErr> {
     match link_id {
         Some(id) => links.iter().find(|link| link.id == id),
         None => links
             .iter()
-            .find(|link| link.is_primary && &link.macro_id == caller),
+            .find(|link| link.is_primary && &link.rox_id == caller),
     }
     .ok_or(EmailErr::InboxNotFound)
 }

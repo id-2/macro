@@ -183,7 +183,7 @@ const $appendPreviousEmail = (
   if (!replyingTo) return true;
   const wrapper = $createClassedBlockNode({
     tag: 'div',
-    classes: ['macro_quote', 'gmail_quote'],
+    classes: ['rox_quote', 'gmail_quote'],
     attributes: replyingTo.replying_to_id
       ? {
           [REPLYING_TO_ID_ATTRIBUTE]: replyingTo.replying_to_id,
@@ -245,7 +245,7 @@ function* $findPreviousEmailNode(replyingToId: string | undefined) {
       // should be valid. This is probably fine but we might not want to do this.
       // The backend seems to strip the html of data attributes during sanitization
       // so we can't check for the replying id attribute
-      if (node.__classes.includes('macro_quote')) {
+      if (node.__classes.includes('rox_quote')) {
         yield node;
       }
       continue;
@@ -339,7 +339,7 @@ async function _appendItemsAsMacroMentions(
       const candidate = children[i];
       if (
         $isClassedBlockNode(candidate) &&
-        (candidate as any).__classes?.includes('macro_mentions')
+        (candidate as any).__classes?.includes('rox_mentions')
       ) {
         wrapper = candidate as any;
         break;
@@ -352,7 +352,7 @@ async function _appendItemsAsMacroMentions(
       root.append(spacer);
       wrapper = $createClassedBlockNode({
         tag: 'div',
-        classes: ['macro_mentions'],
+        classes: ['rox_mentions'],
       });
       root.append(wrapper);
     }
@@ -383,7 +383,7 @@ function getAppendedReplyElement(
   reopenable = false
 ) {
   const wrapper = document.createElement('div');
-  wrapper.classList.add('macro_quote', 'gmail_quote');
+  wrapper.classList.add('rox_quote', 'gmail_quote');
   // The editor imports only marked blocks as its appended thread; unmarked, a
   // reopened draft would append the thread a second time.
   if (reopenable) wrapper.setAttribute('data-classed-block', 'true');
@@ -500,7 +500,7 @@ export function prepareEmailBodyFromHtml(
     }
   }
 
-  if (appendReply && !parsed.body.querySelector('.macro_quote')) {
+  if (appendReply && !parsed.body.querySelector('.rox_quote')) {
     const appendedReplyElement = getAppendedReplyElement(
       appendReply.replyingTo,
       appendReply.replyType,
@@ -544,7 +544,7 @@ export function hasDraftContent(
 
 export function prepareMacroBody(bodyMacro: string): string {
   // Remove appended-quote blocks from the markdown string
-  // We want these in the HTML, but not in body_macro
+  // We want these in the HTML, but not in body_rox
   // TODO (seamus + peter) Add logic for binding a markdown signal that skips certain transforms
   return bodyMacro
     .replace(/<m-email-thread-embed>.*?<\/m-email-thread-embed>/gs, '')

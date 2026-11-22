@@ -39,7 +39,7 @@ fn read(id: &str, paths: &[&str], status: ToolStatus) -> MessagePart {
     }
 }
 
-fn macro_tool(id: &str, name: &str, input: serde_json::Value, status: ToolStatus) -> MessagePart {
+fn rox_tool(id: &str, name: &str, input: serde_json::Value, status: ToolStatus) -> MessagePart {
     MessagePart::ToolUse {
         id: ToolUseId(id.to_owned()),
         name: ToolName::native(name),
@@ -73,7 +73,7 @@ fn code_execution_steps_show_observed_sdk_operations_without_source_or_results()
     let part = MessagePart::ToolUse {
         id: ToolUseId("code-1".into()),
         name: ToolName::Mcp {
-            server: "macro_internal".into(),
+            server: "rox_internal".into(),
             tool: "ExecuteCode".into(),
         },
         status: ToolStatus::Completed,
@@ -147,7 +147,7 @@ fn code_without_observed_requests_reads_as_workspace_work() {
     let part = MessagePart::ToolUse {
         id: ToolUseId("code-2".into()),
         name: ToolName::Mcp {
-            server: "macro_internal".into(),
+            server: "rox_internal".into(),
             tool: "ExecuteCode".into(),
         },
         status: ToolStatus::Completed,
@@ -208,14 +208,14 @@ fn code_mode_lookups_are_not_steps() {
         lookup(
             "describe",
             ToolName::Mcp {
-                server: "macro_internal".into(),
+                server: "rox_internal".into(),
                 tool: "DescribeCodeTools".into(),
             },
         ),
         lookup(
             "docs",
             ToolName::Mcp {
-                server: "macro_internal".into(),
+                server: "rox_internal".into(),
                 tool: "ReadCodeDocs".into(),
             },
         ),
@@ -251,7 +251,7 @@ fn an_unfinished_or_failed_code_run_still_reads_as_workspace_work() {
     let code = |status: ToolStatus| MessagePart::ToolUse {
         id: ToolUseId("code-3".into()),
         name: ToolName::Mcp {
-            server: "macro_internal".into(),
+            server: "rox_internal".into(),
             tool: "ExecuteCode".into(),
         },
         status,
@@ -467,21 +467,21 @@ fn several_files_are_counted_rather_than_listed() {
 }
 
 #[test]
-fn macro_tools_read_as_their_name_with_what_they_acted_on() {
+fn rox_tools_read_as_their_name_with_what_they_acted_on() {
     let parts = [
-        macro_tool(
+        rox_tool(
             "a",
             "SearchDocuments",
             serde_json::json!({"query": "quarterly report", "limit": 5}),
             ToolStatus::Completed,
         ),
-        macro_tool(
+        rox_tool(
             "b",
             "list_entities",
             serde_json::json!({"limit": 5}),
             ToolStatus::Failed,
         ),
-        macro_tool(
+        rox_tool(
             "c",
             "CreateDocument",
             serde_json::json!({"documentName": "Launch FAQ", "fileContent": "..."}),
@@ -512,7 +512,7 @@ fn session_activity_retains_command_and_tool_input_details_for_authorized_live_v
     let query = "confidential acquisition";
     let parts = [
         run("terminal", command, ToolStatus::Completed),
-        macro_tool(
+        rox_tool(
             "search",
             "search",
             serde_json::json!({"query": query}),
@@ -528,7 +528,7 @@ fn present_view(id: &str, view: Option<dynamic_ui::View>, status: ToolStatus) ->
     MessagePart::ToolUse {
         id: ToolUseId(id.to_owned()),
         name: ToolName::Mcp {
-            server: "macro_internal".into(),
+            server: "rox_internal".into(),
             tool: "PresentView".into(),
         },
         status,

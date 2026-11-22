@@ -13,8 +13,8 @@ use axum::{
     extract::{FromRef, FromRequestParts, Path},
     http::request::Parts,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
     OptionalMacroAuthorizationExtractor,
 };
 use tracing::Level;
@@ -57,8 +57,8 @@ where
     Permission: RequiredPermission,
     Arc<AccessService>: FromRef<State>,
     AccessService: EntityAccessService,
-    MacroAuthorizationState<Authorization>: FromRef<State>,
-    Authorization: MacroAuthorizationService,
+    RoxAuthorizationState<Authorization>: FromRef<State>,
+    Authorization: RoxAuthorizationService,
     State: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -79,7 +79,7 @@ where
             .await
             .map_err(|_| ExtractorError::BadRequest("missing id path parameter"))?;
 
-        if let Some(MacroAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
+        if let Some(RoxAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
         {
             let entity_access_receipt = generate_bot_entity_access_receipt::<Permission>(
                 service.as_ref(),
@@ -98,16 +98,16 @@ where
         let is_internal_access = authorization
             .authorization
             .as_ref()
-            .is_some_and(MacroAuthorization::is_internal);
-        let macro_user_id = authorization
+            .is_some_and(RoxAuthorization::is_internal);
+        let rox_user_id = authorization
             .authorization
             .as_ref()
-            .and_then(MacroAuthorization::acting_user)
-            .map(|user| user.macro_user_id.clone());
+            .and_then(RoxAuthorization::acting_user)
+            .map(|user| user.rox_user_id.clone());
 
         // An internal service with no acting user is trusted: it is Rox's
         // own machinery, not a person whose grants we could look up.
-        if macro_user_id.is_none() && is_internal_access {
+        if rox_user_id.is_none() && is_internal_access {
             return Ok(Self {
                 entity_access_receipt: EntityAccessReceipt {
                     entity: Entity {
@@ -124,12 +124,12 @@ where
             });
         }
 
-        let Some(macro_user_id) = macro_user_id else {
+        let Some(rox_user_id) = rox_user_id else {
             return public_receipt(service.as_ref(), form_id).await;
         };
 
         let permission = service
-            .get_entity_permission(Some(&macro_user_id), &form_id, EntityType::Form, None)
+            .get_entity_permission(Some(&rox_user_id), &form_id, EntityType::Form, None)
             .await
             .map_err(ExtractorError::from)?;
 
@@ -143,7 +143,7 @@ where
                     entity_id: form_id,
                     entity_type: EntityType::Form,
                 },
-                auth: EntityAccessAuth::Authenticated(macro_user_id),
+                auth: EntityAccessAuth::Authenticated(rox_user_id),
                 entity_permission: permission,
                 _marker: PhantomData,
             },

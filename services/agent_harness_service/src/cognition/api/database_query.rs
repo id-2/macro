@@ -5,7 +5,7 @@ use super::structured_completion::StructuredCompletionError;
 use crate::cognition::service::database_query::{self, DatabaseQueryAnswer, DatabaseQueryRequest};
 use ai_billing::inbound::admission::admission_status;
 use axum::{Json, extract::State, http::StatusCode};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::Instrument;
@@ -29,12 +29,12 @@ fn discovery_tools() -> ai_toolset::AsyncToolCollection<ai_tools::ToolServiceCon
         (status = 500, body = StructuredCompletionError),
         (status = 503, body = StructuredCompletionError),
         (status = 504, body = StructuredCompletionError)))]
-#[tracing::instrument(skip_all, fields(user_id = %user.authorization.user.macro_user_id,
+#[tracing::instrument(skip_all, fields(user_id = %user.authorization.user.rox_user_id,
     database_query.model = %request.model), err)]
 pub async fn generate_database_query(
     State(state): State<ApiContext>,
     model_access: DcsChatModelAccess,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     Json(request): Json<DatabaseQueryRequest>,
 ) -> Result<Json<DatabaseQueryAnswer>, StructuredCompletionError> {
     if !model_access.has_access(&request.model) {
@@ -44,7 +44,7 @@ pub async fn generate_database_query(
             code: None,
         });
     }
-    let user_id = user.authorization.user.macro_user_id.clone();
+    let user_id = user.authorization.user.rox_user_id.clone();
     state
         .ai_admission
         .admit(&user_id, ai_usage::AiFeature::DynamicCompletionsApi)

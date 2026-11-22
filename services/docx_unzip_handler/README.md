@@ -20,7 +20,7 @@ One time setup -- connect to the local database and run the following command:
     `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
 
 From the repository root, run `just initialize_dbs` to apply the canonical
-migrations from `crates/macro_db_client/migrations`.
+migrations from `crates/rox_db_client/migrations`.
 
 Create and fill in your `.env` file based on the `.env.sample`
 

@@ -10,7 +10,7 @@ use agent::{AgentError, StreamPart};
 use attachment::image::ImageData;
 use attachment::{AttachmentContent, AttachmentPart, AttachmentService, Attachments};
 use futures::future::BoxFuture;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use model_owner::Owner;
 use non_empty::NonEmpty;

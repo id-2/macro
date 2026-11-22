@@ -13,7 +13,7 @@ import {
   fromPriceText,
   GetComputerRow,
   offersBlockedByPlan,
-} from './MacroComputers';
+} from './RoxComputers';
 
 /**
  * Whether the viewer can buy the team a computer from Settings → Agents, and

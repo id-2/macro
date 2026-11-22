@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { type Browser, remote } from 'webdriverio';
 import type {} from './fixtures/notifications-browser';
 
-assert.equal(process.env.MACRO_E2E_NETNS, '1', 'Run through isolated run.sh');
+assert.equal(process.env.ROX_E2E_NETNS, '1', 'Run through isolated run.sh');
 const web = resolve(import.meta.dirname, '../..');
 const binaries = resolve(web, 'tauri/target/e2e');
 const artifacts = resolve(

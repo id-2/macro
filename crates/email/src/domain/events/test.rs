@@ -1,11 +1,11 @@
 use chrono::{DateTime, Utc};
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 use serde_json::json;
 
 use super::*;
 
-fn user_id(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user_id(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn timestamp() -> DateTime<Utc> {

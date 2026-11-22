@@ -173,7 +173,7 @@ async fn inheritance_preserves_a_delegated_bot_actor() {
             );
             Box::pin(async move { Ok(snapshot) })
         });
-    let bot_id = bot_id::MACRO_SYSTEM_BOT_ID;
+    let bot_id = bot_id::ROX_SYSTEM_BOT_ID;
     let scope = BotReceiptScope::User {
         acting_user: caller_user_id(),
     };

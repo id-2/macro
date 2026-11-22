@@ -1,5 +1,5 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
 import type { SearchOpts } from '../search/options';
 import { CallRecord } from './call-record';
@@ -19,7 +19,7 @@ export type CallSummary = {
  * @agent A program uses an agent account's own API key to enter a call. Use active() to reconcile missed events. Join an existing call with call.join(); start a channel call only when intending to ring its members. Calls with only programs end after the server timeout. Keep room tokens private and connect with a LiveKit client outside code mode.
  */
 export class CallRecordNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Get a lazy call handle; joining it never creates a call. */
   byId(id: string): CallRecord {

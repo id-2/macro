@@ -16,7 +16,7 @@ use external_chat::domain::models::{
 use external_chat::domain::ports::ExternalChatResult;
 use external_chat::domain::service::ExternalChatService;
 use external_chat::outbound::pg::PgExternalChatRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Connection, PgConnection, PgPool};
 use uuid::Uuid;
 use whatsapp_fake_server::{FakePhone, FakeWhatsApp};
@@ -36,7 +36,7 @@ mod pictures;
 
 const TIMEOUT: Duration = Duration::from_secs(60);
 /// A test user's id, typed.
-fn person(user: &str) -> macro_user_id::user_id::MacroUserIdStr<'static> {
+fn person(user: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
     user.to_owned().try_into().expect("test user ids are valid")
 }
 
@@ -401,7 +401,7 @@ async fn user(pool: &PgPool, id: &str) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         id,
         email,
         macro_user
@@ -451,7 +451,7 @@ async fn observations(pool: &PgPool, binding: Uuid, source_id: &str) -> i64 {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pair_adopt_receive_once_and_send_from_your_own_number(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -481,7 +481,7 @@ async fn pair_adopt_receive_once_and_send_from_your_own_number(pool: PgPool) {
         1
     );
 
-    // Alice replies from Macro; the customer gets it from Alice's number.
+    // Alice replies from Rox; the customer gets it from Alice's number.
     let send = world.send(ALICE, &binding, "sorry, on it").await;
     let received = world
         .customer
@@ -510,7 +510,7 @@ async fn pair_adopt_receive_once_and_send_from_your_own_number(pool: PgPool) {
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_killed_replica_is_taken_over_without_losing_or_duplicating(pool: PgPool) {
     let world = World::new(pool).await;
     let first = world.replica().await;
@@ -557,7 +557,7 @@ async fn a_killed_replica_is_taken_over_without_losing_or_duplicating(pool: PgPo
     second.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_drained_replica_hands_over_without_loss(pool: PgPool) {
     let world = World::new(pool).await;
     let first = world.replica().await;
@@ -597,7 +597,7 @@ async fn a_drained_replica_hands_over_without_loss(pool: PgPool) {
     second.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_send_cut_off_after_submission_is_unknown_and_never_resent(pool: PgPool) {
     let world = World::new(pool).await;
     let first = world.replica().await;
@@ -639,7 +639,7 @@ async fn a_send_cut_off_after_submission_is_unknown_and_never_resent(pool: PgPoo
     second.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_send_without_an_ack_times_out_as_unknown(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -726,7 +726,7 @@ async fn a_phone_group_message_maps_to_one_inbound_text() {
     assert_eq!(message.sender.alternate_jid, Some(bob.jid().to_string()));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_phone_image_is_downloaded_for_import(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -763,8 +763,8 @@ async fn a_phone_image_is_downloaded_for_import(pool: PgPool) {
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn a_macro_attachment_reaches_the_group_intact(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn a_rox_attachment_reaches_the_group_intact(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
     let (_, binding) = world.alice_adopted().await;
@@ -821,7 +821,7 @@ async fn a_macro_attachment_reaches_the_group_intact(pool: PgPool) {
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_message_queued_before_a_crash_is_ingested_once(pool: PgPool) {
     let world = World::new(pool).await;
     let first = world.replica().await;
@@ -874,14 +874,14 @@ async fn a_message_queued_before_a_crash_is_ingested_once(pool: PgPool) {
 impl external_chat::domain::ports::SendRateLimiter for Allow {
     async fn check(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> ExternalChatResult<()> {
         Ok(())
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn group_renames_and_removals_in_whatsapp_reach_macro_live(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn group_renames_and_removals_in_whatsapp_reach_rox_live(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
     let (_, binding) = world.alice_adopted().await;
@@ -952,7 +952,7 @@ async fn group_renames_and_removals_in_whatsapp_reach_macro_live(pool: PgPool) {
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn senders_named_only_by_lid_land_as_the_people_they_are(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -1058,7 +1058,7 @@ async fn origins(pool: &PgPool, binding: Uuid) -> Vec<(String, String)> {
     .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn adding_a_group_imports_its_earlier_messages_once_without_notifying(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -1130,7 +1130,7 @@ async fn adding_a_group_imports_its_earlier_messages_once_without_notifying(pool
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn backfill_waits_for_an_offline_phone_and_never_duplicates_live_messages(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -1196,7 +1196,7 @@ async fn backfill_waits_for_an_offline_phone_and_never_duplicates_live_messages(
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_quiet_group_waits_for_its_first_message_then_imports(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;
@@ -1236,7 +1236,7 @@ async fn a_quiet_group_waits_for_its_first_message_then_imports(pool: PgPool) {
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_chat_list_follows_history_sync_and_live_messages(pool: PgPool) {
     let world = World::new(pool).await;
     // Before linking: a direct chat and a group message on Alice's phone.
@@ -1303,7 +1303,7 @@ async fn the_chat_list_follows_history_sync_and_live_messages(pool: PgPool) {
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_device_whose_kms_key_was_lost_asks_to_reconnect_and_pairs_again(pool: PgPool) {
     let world = World::new(pool).await;
     let replica = world.replica().await;

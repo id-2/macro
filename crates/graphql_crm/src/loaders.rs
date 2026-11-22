@@ -7,7 +7,7 @@ use async_graphql::{
     dataloader::{DataLoader, Loader},
 };
 use crm::domain::pipelines::{PipelineEntry, PipelineRecordType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Instrument;
 use uuid::Uuid;
 
@@ -41,7 +41,7 @@ impl CrmRecord {
 /// record a request asks about.
 pub struct PipelineEntriesLoader {
     context: CrmGraphqlContext,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
 }
 
 impl Loader<CrmRecord> for PipelineEntriesLoader {
@@ -90,7 +90,7 @@ impl Loader<CrmRecord> for PipelineEntriesLoader {
 /// retaining data across mutations or subscription events.
 pub fn pipeline_entries_loader(
     context: CrmGraphqlContext,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
 ) -> DataLoader<PipelineEntriesLoader> {
     DataLoader::new(PipelineEntriesLoader { context, user }, |batch| {
         tokio::spawn(batch.in_current_span())

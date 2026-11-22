@@ -11,8 +11,8 @@
 //! picks the backend and [`complete_connect_connection`] records the
 //! connection once Connect confirms it.
 
-use crate::domain::models::{ConnectApp, ConnectionProvider, MacroUserIdStr, PipedreamConnection};
-use crate::domain::ports::{ConnectionStore, ConnectorOverlays, MacroConnect, PipedreamConnect};
+use crate::domain::models::{ConnectApp, ConnectionProvider, RoxUserIdStr, PipedreamConnection};
+use crate::domain::ports::{ConnectionStore, ConnectorOverlays, RoxConnect, PipedreamConnect};
 
 #[cfg(test)]
 mod test;
@@ -52,7 +52,7 @@ pub async fn complete_pipedream_connection<S, O, P>(
     store: &S,
     overlays: &O,
     pipedream: &P,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     account_id: &str,
     server_name: Option<&str>,
 ) -> Result<PipedreamConnection, PipedreamConnectError>
@@ -124,7 +124,7 @@ pub async fn recover_pipedream_connection<S, O, P>(
     store: &S,
     overlays: &O,
     pipedream: &P,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     app_slug: &str,
     server_name: Option<&str>,
     now: chrono::DateTime<chrono::Utc>,
@@ -179,12 +179,12 @@ where
 pub async fn disconnect_mcp_server<S, P>(
     store: &S,
     backends: &P,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     app_slug: &str,
 ) -> anyhow::Result<Option<PipedreamConnection>>
 where
     S: ConnectionStore,
-    P: PipedreamConnect + MacroConnect,
+    P: PipedreamConnect + RoxConnect,
     anyhow::Error: From<S::Err>,
 {
     let record = store
@@ -204,7 +204,7 @@ where
 }
 
 /// Best-effort removal of `record`'s grant from the backend holding it.
-async fn revoke<P: PipedreamConnect + MacroConnect>(backends: &P, record: &PipedreamConnection) {
+async fn revoke<P: PipedreamConnect + RoxConnect>(backends: &P, record: &PipedreamConnection) {
     let result = match record.provider {
         ConnectionProvider::Pipedream => backends.delete_account(&record.account_id).await,
         ConnectionProvider::Connect => {
@@ -227,12 +227,12 @@ async fn revoke<P: PipedreamConnect + MacroConnect>(backends: &P, record: &Piped
 /// not serve it.
 ///
 /// Only for users on Connect alone (callers check
-/// [`MacroConnect::connect_only`]), for whom Connect serves every app it
+/// [`RoxConnect::connect_only`]), for whom Connect serves every app it
 /// lists, overlaid or not, Granola included: nothing falls back to Pipedream.
 #[tracing::instrument(skip(connect), err)]
 pub async fn connect_app_for<C>(connect: &C, app_slug: &str) -> anyhow::Result<Option<ConnectApp>>
 where
-    C: MacroConnect,
+    C: RoxConnect,
 {
     connect.app_for_slug(app_slug).await
 }
@@ -242,11 +242,11 @@ where
 #[tracing::instrument(skip(connect), err)]
 pub async fn start_connect_session<C>(
     connect: &C,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     app_slug: &str,
 ) -> anyhow::Result<Option<String>>
 where
-    C: MacroConnect,
+    C: RoxConnect,
 {
     let Some(app) = connect_app_for(connect, app_slug).await? else {
         return Ok(None);
@@ -268,13 +268,13 @@ where
 pub async fn complete_connect_connection<S, P>(
     store: &S,
     backends: &P,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     app_slug: &str,
     server_name: Option<&str>,
 ) -> Result<PipedreamConnection, PipedreamConnectError>
 where
     S: ConnectionStore,
-    P: PipedreamConnect + MacroConnect,
+    P: PipedreamConnect + RoxConnect,
     anyhow::Error: From<S::Err>,
 {
     let app = connect_app_for(backends, app_slug)

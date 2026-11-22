@@ -1,7 +1,7 @@
 //! Guests share the persisted call thread through a narrowly scoped session capability.
 use super::*;
 use chrono::{DateTime, Utc};
-use macro_user_id::email::ReadEmailParts;
+use rox_user_id::email::ReadEmailParts;
 use mention_utils::parse::{
     ParsedAgentSessionMention, ParsedBookingLinkMention, ParsedContactMention, ParsedDateMention,
     ParsedDocumentMention, ParsedGroupMention, ParsedLink, ParsedPullRequestMention,

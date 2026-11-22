@@ -6,7 +6,7 @@ use crate::{
     search::{
         builder::{SearchQueryBuilder, SearchQueryConfig, thread_sort, updated_at_sort},
         model::{
-            DefaultSearchResponse, Hit, MacroEm, SearchGotoChannel, SearchGotoContent, SearchHit,
+            DefaultSearchResponse, Hit, RoxEm, SearchGotoChannel, SearchGotoContent, SearchHit,
             exclude_source_content, inject_fragment_size, parse_highlight_hit,
         },
         query::{Keys, TermCombine},
@@ -203,8 +203,8 @@ fn build_channel_search_request(
     let em_field = || {
         HighlightField::new()
             .highlight_type("plain")
-            .pre_tags(vec![MacroEm::Open.to_string()])
-            .post_tags(vec![MacroEm::Close.to_string()])
+            .pre_tags(vec![RoxEm::Open.to_string()])
+            .post_tags(vec![RoxEm::Close.to_string()])
     };
     let highlight = Highlight::new()
         .require_field_match(true)

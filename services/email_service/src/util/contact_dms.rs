@@ -12,7 +12,7 @@ use channels::{
     outbound::pg_channels_repo::PgChannelsRepo,
 };
 use generic_email_domains::is_generic_email_domain;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::link::Link;
 use sqlx::PgPool;
 
@@ -55,11 +55,11 @@ pub(crate) fn colleague_emails(own_email: &str, emails: &[String]) -> Vec<String
 /// addresses and the owner's own address are skipped.
 async fn ensure_dms_with(db: &PgPool, link: &Link, emails: impl IntoIterator<Item = String>) {
     let own_email = link.email_address.0.as_ref().to_ascii_lowercase();
-    let roster: Vec<MacroUserIdStr<'static>> = emails
+    let roster: Vec<RoxUserIdStr<'static>> = emails
         .into_iter()
         .filter(|email| *email != own_email)
-        .filter_map(|email| MacroUserIdStr::try_from_email(&email).ok())
-        .filter(|contact| *contact != link.macro_id)
+        .filter_map(|email| RoxUserIdStr::try_from_email(&email).ok())
+        .filter(|contact| *contact != link.rox_id)
         .collect();
     if roster.is_empty() {
         return;
@@ -67,7 +67,7 @@ async fn ensure_dms_with(db: &PgPool, link: &Link, emails: impl IntoIterator<Ite
 
     let channels = ChannelServiceImpl::new(PgChannelsRepo::new(db.clone()));
     match channels
-        .ensure_dms(ensure_dms_for_joining_member(link.macro_id.clone(), roster))
+        .ensure_dms(ensure_dms_for_joining_member(link.rox_id.clone(), roster))
         .await
     {
         Ok(summary) => tracing::info!(

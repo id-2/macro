@@ -1,7 +1,7 @@
 // AI provider accounts: suspensions, exhausted credit, and spend against the
-// monthly caps Macro set with providers.
+// monthly caps Rox set with providers.
 //
-// A provider that suspends Macro's account fails every request until someone
+// A provider that suspends Rox's account fails every request until someone
 // fixes billing (Fireworks answered `412 Precondition Failed: Account … is
 // suspended` once its $30 monthly limit was reached, and nothing alerted). The
 // metrics below are built from telemetry the services emit, so these are their
@@ -10,7 +10,7 @@
 // - The `ai provider account unavailable` ERROR log, with `provider`,
 //   `http_status` and `reason` (`suspended` | `out_of_credit`), from
 //   `genai_telemetry::provider_account` in every Rust service that calls a
-//   provider with Macro's key.
+//   provider with Rox's key.
 // - The `ai.provider_account_unavailable` span with `ai.provider` and
 //   `ai.account_unavailable`, from ai-editing-worker
 //   (services/ai-editing-worker/src/provider-account.ts): the worker's logs do
@@ -25,7 +25,7 @@ import { graphGroup, prodMonitor, thresholdGraph } from '../prod-monitor';
 const RUNBOOK = 'docs/runbooks/ai-providers.md';
 
 new datadog.LogsMetric('ai-provider-account-unavailable', {
-  name: 'macro.ai.provider_account_unavailable',
+  name: 'rox.ai.provider_account_unavailable',
   compute: { aggregationType: 'count' },
   filter: { query: 'status:error "ai provider account unavailable"' },
   groupBies: [
@@ -37,7 +37,7 @@ new datadog.LogsMetric('ai-provider-account-unavailable', {
 });
 
 new datadog.SpansMetric('ai-editing-provider-account-unavailable', {
-  name: 'macro.ai.editing.provider_account_unavailable',
+  name: 'rox.ai.editing.provider_account_unavailable',
   compute: { aggregationType: 'count' },
   filter: { query: 'resource_name:ai.provider_account_unavailable' },
   groupBies: [
@@ -48,7 +48,7 @@ new datadog.SpansMetric('ai-editing-provider-account-unavailable', {
 });
 
 new datadog.LogsMetric('ai-usage-cost', {
-  name: 'macro.ai.usage.cost_usd',
+  name: 'rox.ai.usage.cost_usd',
   compute: { aggregationType: 'distribution', path: '@cost_usd' },
   filter: { query: 'status:info "ai usage priced"' },
   groupBies: [

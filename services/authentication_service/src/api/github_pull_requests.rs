@@ -15,7 +15,7 @@ use github::domain::{
     },
     ports::GithubLinkService,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use upstream_error::UpstreamErrorResponse;
 
@@ -164,10 +164,10 @@ pub fn router() -> Router<ApiContext> {
         (status = 503, body = UpstreamErrorResponse),
     )
 )]
-#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.rox_user_id), err)]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(request): extract::Json<EnrichGithubPullRequestsProxyRequest>,
 ) -> Result<Json<EnrichGithubPullRequestsResponse>, EnrichGithubPullRequestsProxyError> {
     tracing::info!("enrich_github_pull_requests");
@@ -175,7 +175,7 @@ pub async fn handler(
     let pull_requests = ctx
         .github_link_service
         .enrich_pull_requests(
-            &authorization.authorization.user.macro_user_id,
+            &authorization.authorization.user.rox_user_id,
             request.pull_requests,
         )
         .await?;
@@ -204,17 +204,17 @@ pub async fn handler(
         (status = 503, body = UpstreamErrorResponse),
     )
 )]
-#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.rox_user_id), err)]
 pub async fn merge_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(request): extract::Json<MergeGithubPullRequestRequest>,
 ) -> Result<Json<MergeGithubPullRequestResponse>, MergeGithubPullRequestError> {
     tracing::info!("merge_github_pull_request");
 
     let response = ctx
         .github_link_service
-        .merge_pull_request(&authorization.authorization.user.macro_user_id, request)
+        .merge_pull_request(&authorization.authorization.user.rox_user_id, request)
         .await?;
 
     Ok(Json(response))
@@ -239,17 +239,17 @@ pub async fn merge_handler(
         (status = 503, body = UpstreamErrorResponse),
     )
 )]
-#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.rox_user_id), err)]
 pub async fn draft_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(request): extract::Json<SetGithubPullRequestDraftRequest>,
 ) -> Result<Json<SetGithubPullRequestDraftResponse>, UpdateGithubPullRequestError> {
     tracing::info!("set_github_pull_request_draft");
 
     let response = ctx
         .github_link_service
-        .set_pull_request_draft(&authorization.authorization.user.macro_user_id, request)
+        .set_pull_request_draft(&authorization.authorization.user.rox_user_id, request)
         .await?;
 
     Ok(Json(response))
@@ -274,17 +274,17 @@ pub async fn draft_handler(
         (status = 503, body = UpstreamErrorResponse),
     )
 )]
-#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.rox_user_id), err)]
 pub async fn state_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(request): extract::Json<SetGithubPullRequestStateRequest>,
 ) -> Result<Json<SetGithubPullRequestStateResponse>, UpdateGithubPullRequestError> {
     tracing::info!("set_github_pull_request_state");
 
     let response = ctx
         .github_link_service
-        .set_pull_request_state(&authorization.authorization.user.macro_user_id, request)
+        .set_pull_request_state(&authorization.authorization.user.rox_user_id, request)
         .await?;
 
     Ok(Json(response))
@@ -309,16 +309,16 @@ pub async fn state_handler(
         (status = 503, body = UpstreamErrorResponse),
     )
 )]
-#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(ctx, authorization, request), fields(user_id = %authorization.authorization.user.rox_user_id), err)]
 pub async fn mergeability_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(request): extract::Json<GithubPullRequestMergeabilityRequest>,
 ) -> Result<Json<GithubPullRequestMergeabilityResponse>, UpdateGithubPullRequestError> {
     let pull_requests = ctx
         .github_link_service
         .get_pull_request_mergeability(
-            &authorization.authorization.user.macro_user_id,
+            &authorization.authorization.user.rox_user_id,
             request.pull_requests,
         )
         .await?;

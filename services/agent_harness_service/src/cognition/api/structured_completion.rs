@@ -13,7 +13,7 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use futures::StreamExt;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::sync::Arc;
@@ -95,11 +95,11 @@ impl IntoResponse for StructuredCompletionError {
         (status = 504, description = "Tool-free completion deadline exceeded", body = StructuredCompletionError),
     )
 )]
-#[tracing::instrument(skip(state, model_access, user, request), fields(user_id = %user.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(state, model_access, user, request), fields(user_id = %user.authorization.user.rox_user_id), err)]
 pub async fn structured_completion(
     State(state): State<ApiContext>,
     model_access: DcsChatModelAccess,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     Json(request): Json<StructuredCompletionRequest>,
 ) -> Result<Json<StructuredCompletionResponse>, StructuredCompletionError> {
     let ctx = Arc::new(state);
@@ -119,7 +119,7 @@ pub async fn structured_completion(
     })?;
     let model = request.model.clone();
 
-    let user_id = user.authorization.user.macro_user_id.clone();
+    let user_id = user.authorization.user.rox_user_id.clone();
 
     if tools_refused_to_current_session(&request.toolset) {
         return Err(StructuredCompletionError {

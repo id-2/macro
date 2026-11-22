@@ -94,7 +94,7 @@ pub enum ExpandErr {
     Uuid(#[from] uuid::Error),
     /// invalid macro user id
     #[error(transparent)]
-    MacroIdErr(#[from] macro_user_id::error::ParseErr),
+    RoxIdErr(#[from] rox_user_id::error::ParseErr),
     /// invalid owner principal
     #[error(transparent)]
     OwnerErr(#[from] model_owner::OwnerParseError),

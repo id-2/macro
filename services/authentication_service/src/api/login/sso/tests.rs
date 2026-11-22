@@ -9,10 +9,10 @@ use super::*;
 #[test]
 fn allowed_original_urls_are_accepted() {
     for original_url in [
-        "macro://login",
-        "macro:///welcome",
-        "macro:///otherthing",
-        "macro://otherthing/path",
+        "rox://login",
+        "rox:///welcome",
+        "rox:///otherthing",
+        "rox://otherthing/path",
         "tauri://localhost/app/login",
         "http://tauri.localhost/app/login",
         "https://tauri.localhost/app/login",
@@ -189,7 +189,7 @@ async fn it_works_with_everything() {
 }
 
 #[tokio::test]
-async fn it_works_with_macro_scheme() {
+async fn it_works_with_rox_scheme() {
     let request = Request::builder().uri("https://example.com/login/sso?original_url=macro%3A%2F%2Flogin&idp_name=google&is_mobile=true").body(Body::from(())).unwrap();
 
     let extracted = Query::<LoginQueryParams>::from_request(request, &())
@@ -206,7 +206,7 @@ async fn it_works_with_macro_scheme() {
        is_agent: false
     }) => {
         assert_eq!(idp_name, "google");
-        assert_eq!(original_url.0.as_str(), "macro://login");
+        assert_eq!(original_url.0.as_str(), "rox://login");
     });
 }
 

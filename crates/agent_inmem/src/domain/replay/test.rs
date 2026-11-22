@@ -742,16 +742,16 @@ fn cards_presented_before_the_marker_are_left_out_of_the_conversation() {
     let history = replay_history(vec![
         prompt_frame("show me the cards"),
         update_frame(SessionUpdate::ToolCall(
-            AcpToolCall::new("call-code", "mcp__macro_internal__ExecuteCode")
+            AcpToolCall::new("call-code", "mcp__rox_internal__ExecuteCode")
                 .status(ToolCallStatus::InProgress)
                 .raw_input(code.clone())
                 .meta(serde_json::Map::from_iter([(
                     "macro".to_owned(),
-                    serde_json::json!({"toolName": "mcp__macro_internal__ExecuteCode"}),
+                    serde_json::json!({"toolName": "mcp__rox_internal__ExecuteCode"}),
                 )])),
         )),
         update_frame(SessionUpdate::ToolCall(
-            AcpToolCall::new("view_01", "mcp__macro_internal__PresentView")
+            AcpToolCall::new("view_01", "mcp__rox_internal__PresentView")
                 .status(ToolCallStatus::InProgress)
                 .raw_input(serde_json::json!({"view": {"widgets": []}})),
         )),
@@ -762,7 +762,7 @@ fn cards_presented_before_the_marker_are_left_out_of_the_conversation() {
                 .raw_output(serde_json::json!({"view": {"widgets": []}})),
         ))),
         update_frame(SessionUpdate::ToolCall(
-            AcpToolCall::new("review_02", "mcp__macro_internal__PresentReview")
+            AcpToolCall::new("review_02", "mcp__rox_internal__PresentReview")
                 .status(ToolCallStatus::InProgress)
                 .raw_input(serde_json::json!({"reviewId": "02"})),
         )),
@@ -791,13 +791,13 @@ fn cards_presented_before_the_marker_are_left_out_of_the_conversation() {
         &[
             AssistantMessagePart::McpToolCall {
                 name: "ExecuteCode".to_owned(),
-                service: "macro_internal".to_owned(),
+                service: "rox_internal".to_owned(),
                 display_name: None,
                 json: code,
                 id: "call-code".to_owned(),
             },
             AssistantMessagePart::ToolCallResponseJson {
-                name: "mcp__macro_internal__ExecuteCode".to_owned(),
+                name: "mcp__rox_internal__ExecuteCode".to_owned(),
                 json: result,
                 id: "call-code".to_owned(),
             },
@@ -813,7 +813,7 @@ fn a_call_named_like_a_presentation_with_the_models_id_still_replays() {
     let history = replay_history(vec![
         prompt_frame("present it"),
         update_frame(SessionUpdate::ToolCall(
-            AcpToolCall::new("call-7", "mcp__macro_internal__PresentView")
+            AcpToolCall::new("call-7", "mcp__rox_internal__PresentView")
                 .status(ToolCallStatus::InProgress)
                 .raw_input(input.clone()),
         )),

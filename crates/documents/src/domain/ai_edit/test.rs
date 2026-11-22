@@ -4,9 +4,9 @@ use crate::domain::ports::editing::{EditResult, MockEditingWorkerService};
 use ai_billing::domain::DenyReason;
 use ai_billing::domain::admission::{AdmissionFuture, AiAdmissionService};
 use ai_usage::AiFeature;
-use bot_id::MACRO_AI_BOT_ID;
+use bot_id::ROX_AI_BOT_ID;
 use entity_access::domain::models::{BotReceiptScope, Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use std::sync::Arc;
 
@@ -28,7 +28,7 @@ fn document(file_type: &str) -> DocumentBasic {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
+fn user() -> RoxUserIdStr<'static> {
     "macro|editor@example.com".to_owned().try_into().unwrap()
 }
 
@@ -50,7 +50,7 @@ struct Refuse(AiAdmissionError);
 impl AiAdmissionService for Refuse {
     fn admit<'a>(
         &'a self,
-        caller: &'a MacroUserIdStr<'_>,
+        caller: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {
@@ -327,7 +327,7 @@ async fn instructions_refuse_an_edit_receipt_for_another_document() {
 #[tokio::test]
 async fn bot_instructions_carry_the_user_and_bot_in_the_token_and_the_bot_name_on_the_cursor() {
     let receipt = EntityAccessReceipt::<EditAccessLevel>::try_new_bot(
-        MACRO_AI_BOT_ID.into_storage_id(),
+        ROX_AI_BOT_ID.into_storage_id(),
         BotReceiptScope::User {
             acting_user: user(),
         },

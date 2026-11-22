@@ -2,7 +2,7 @@ use async_graphql::{Enum, ID};
 use graphql_common::{GraphqlPropertyEntityType, parse_id};
 use graphql_soup_filter_input::GraphqlEntityFilterAst;
 use item_filters::ast::{EntityFilterAst, properties::PropertyEntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::{GroupByField, GroupingConfig};
 
 /// Caller-defined property date-range inputs.
@@ -121,11 +121,11 @@ impl GroupedSoupInput {
     /// Convert this value into the grouped Soup domain request.
     pub(crate) fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        rox_user_id: RoxUserIdStr<'static>,
     ) -> async_graphql::Result<GroupedSortRequest<'static>> {
         match self {
-            Self::Initial(input) => input.into_request(macro_user_id),
-            Self::Continuation(input) => input.into_request(macro_user_id),
+            Self::Initial(input) => input.into_request(rox_user_id),
+            Self::Continuation(input) => input.into_request(rox_user_id),
         }
     }
 }
@@ -134,7 +134,7 @@ impl GroupedSoupInitialInput {
     /// Convert an initial input into the grouped Soup domain request.
     fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        rox_user_id: RoxUserIdStr<'static>,
     ) -> async_graphql::Result<GroupedSortRequest<'static>> {
         let filters = self
             .filters
@@ -149,7 +149,7 @@ impl GroupedSoupInitialInput {
         )?;
         let limit = self.limit.unwrap_or(20).clamp(1, 500);
         Ok(GroupedSortRequest::initial(
-            macro_user_id,
+            rox_user_id,
             limit,
             sort_method,
             filters,
@@ -166,10 +166,10 @@ impl GroupedSoupContinuationInput {
     /// Decode a bin cursor into the grouped Soup domain request.
     fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        rox_user_id: RoxUserIdStr<'static>,
     ) -> async_graphql::Result<GroupedSortRequest<'static>> {
         Ok(GroupedSortRequest::continue_from(
-            macro_user_id,
+            rox_user_id,
             self.cursor,
             GroupingConfig {
                 field: self.group_by.into_group_by_field()?,
@@ -265,12 +265,12 @@ impl SoupInput {
     /// Convert this value into the request representation.
     pub(crate) fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        rox_user_id: RoxUserIdStr<'static>,
         link_ids: Vec<Uuid>,
     ) -> async_graphql::Result<SoupRequest<EntityFilterAst>> {
         match self {
-            Self::Initial(input) => input.into_request(macro_user_id, link_ids),
-            Self::Continuation(input) => input.into_request(macro_user_id, link_ids),
+            Self::Initial(input) => input.into_request(rox_user_id, link_ids),
+            Self::Continuation(input) => input.into_request(rox_user_id, link_ids),
         }
     }
 }
@@ -279,7 +279,7 @@ impl SoupInitialInput {
     /// Convert an initial input into the request representation.
     fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        rox_user_id: RoxUserIdStr<'static>,
         link_ids: Vec<Uuid>,
     ) -> async_graphql::Result<SoupRequest<EntityFilterAst>> {
         let filter = self
@@ -316,7 +316,7 @@ impl SoupInitialInput {
             limit: self.limit.unwrap_or(20).min(500),
             sort_direction: sort_direction(&cursor, self.sort_direction)?,
             cursor,
-            user: macro_user_id,
+            user: rox_user_id,
             email_preview_view: email_preview_view(self.email_view)?,
             link_ids,
         })
@@ -327,7 +327,7 @@ impl SoupContinuationInput {
     /// Decode a cursor continuation into the request representation.
     fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        rox_user_id: RoxUserIdStr<'static>,
         link_ids: Vec<Uuid>,
     ) -> async_graphql::Result<SoupRequest<EntityFilterAst>> {
         let cursor = Base64Str::<SoupContinuationCursor>::new_from_string(self.cursor)
@@ -352,7 +352,7 @@ impl SoupContinuationInput {
             limit,
             sort_direction: sort_direction(&cursor, self.sort_direction)?,
             cursor,
-            user: macro_user_id,
+            user: rox_user_id,
             email_preview_view: email_preview_view(self.email_view)?,
             link_ids,
         })

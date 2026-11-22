@@ -3,8 +3,8 @@ use crate::FlagValue;
 
 #[tokio::test]
 async fn user_results_are_isolated_and_snapshots_remain_stable() {
-    let alice = MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
-    let bob = MacroUserIdStr::parse_from_str("macro|bob@example.com").unwrap();
+    let alice = RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
+    let bob = RoxUserIdStr::parse_from_str("macro|bob@example.com").unwrap();
     let mut flags = FakeFeatureFlags::default();
     flags.set(
         alice.clone(),
@@ -39,7 +39,7 @@ async fn user_results_are_isolated_and_snapshots_remain_stable() {
 
 #[tokio::test]
 async fn load_errors_are_not_successful_empty_snapshots() {
-    let user = MacroUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|alice@example.com").unwrap();
     let mut flags = FakeFeatureFlags::default();
     assert!(flags.load(&user).await.is_err());
     flags.set(user.clone(), Err("provider unavailable".into()));

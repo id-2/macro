@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use macro_env::Environment;
+use rox_env::Environment;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 
 use super::{ProbeOutcome, connect_options, connection_wait, primary_limits, readonly_limits};

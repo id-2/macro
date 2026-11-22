@@ -3,7 +3,7 @@
 
 use axum::{Json, extract::State};
 use chrono::{DateTime, Utc};
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use tracing::Level;
 
 use crate::domain::{
@@ -97,9 +97,9 @@ impl From<UserAiProjection> for ProjectionStateResponse {
     ),
 )]
 #[tracing::instrument(skip_all, err(level = Level::WARN))]
-pub async fn handler<T: AiProjectionService, Auth: MacroAuthorizationService>(
+pub async fn handler<T: AiProjectionService, Auth: RoxAuthorizationService>(
     State(state): State<AiProjectionRouterState<T, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<UpsertProjectionRequest>,
 ) -> Result<Json<ProjectionStateResponse>, UpsertProjectionError> {
     let user = user.authorization.user;
@@ -109,7 +109,7 @@ pub async fn handler<T: AiProjectionService, Auth: MacroAuthorizationService>(
     if requires_professional_features(req.model.as_deref())
         && !state
             .service
-            .has_professional_features(&user.macro_user_id)
+            .has_professional_features(&user.rox_user_id)
             .await?
     {
         return Err(UpsertProjectionError::ProfessionalFeaturesRequired);
@@ -118,7 +118,7 @@ pub async fn handler<T: AiProjectionService, Auth: MacroAuthorizationService>(
     let target_projection = state
         .service
         .upsert_projection(
-            &user.macro_user_id,
+            &user.rox_user_id,
             UpsertProjectionParams {
                 id: req.id,
                 prompt: req.prompt,

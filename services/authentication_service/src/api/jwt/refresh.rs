@@ -12,11 +12,11 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use fusionauth::{FusionAuthClient, error::FusionAuthClientError};
-use macro_auth::{
-    error::MacroAuthError,
+use rox_auth::{
+    error::RoxAuthError,
     middleware::decode_jwt::{
         JwtValidationArgs, validate_fusionauth_access_token_allow_expired,
-        validate_macro_access_token,
+        validate_rox_access_token,
     },
 };
 use model::response::UserTokensResponse;
@@ -27,7 +27,7 @@ use tower_cookies::Cookies;
 /// likely came from a refresh whose populate lambda just failed, and while the lambda keeps
 /// failing, every client retry (websocket reconnects refresh on each attempt) would otherwise be
 /// another FusionAuth refresh and lambda run.
-const MISSING_MACRO_CLAIMS_REFRESH_COOLDOWN: Duration = Duration::from_secs(30);
+const MISSING_ROX_CLAIMS_REFRESH_COOLDOWN: Duration = Duration::from_secs(30);
 
 #[derive(Debug, thiserror::Error)]
 pub enum RefreshError {
@@ -63,7 +63,7 @@ impl IntoResponse for RefreshError {
 /// You can either have your access token and refresh token in the cookies or in the request
 /// headers
 /// Authorization: Bearer <access_token>
-/// x-macro-refresh-token: <refresh_token>
+/// x-rox-refresh-token: <refresh_token>
 /// This returns the cookies with the new access and refresh token
 #[utoipa::path(
         post,
@@ -84,7 +84,7 @@ pub async fn handler(
     token_context: Extension<TokenContext>,
     cookies: Cookies,
 ) -> Result<Json<UserTokensResponse>, RefreshError> {
-    match validate_macro_access_token(&token_context.access_token, &jwt) {
+    match validate_rox_access_token(&token_context.access_token, &jwt) {
         Ok(_) => {
             // jwt is valid, return back original tokens
             tracing::trace!("jwt still valid");
@@ -93,7 +93,7 @@ pub async fn handler(
                 refresh_token: token_context.refresh_token.clone(),
             }));
         }
-        Err(MacroAuthError::JwtExpired) => {}
+        Err(RoxAuthError::JwtExpired) => {}
         // FusionAuth issues the token without the Rox claims when the JWT populate lambda
         // fails; refreshing runs the lambda again.
         Err(e) => {
@@ -101,7 +101,7 @@ pub async fn handler(
             {
                 Ok(issued_at)
                     if issued_at.elapsed().unwrap_or_default()
-                        < MISSING_MACRO_CLAIMS_REFRESH_COOLDOWN =>
+                        < MISSING_ROX_CLAIMS_REFRESH_COOLDOWN =>
                 {
                     tracing::info!(error=?e, "access token without macro claims is too new to refresh");
                     return Err(RefreshError::MissingMacroClaimsCooldown);
@@ -119,7 +119,7 @@ pub async fn handler(
 
     // NOTE: Disabled until we fix FE auth setup.
     // // Decode the JWT (allowing expired) to get the user ID for the advisory lock
-    // let user_id = decode_macro_access_token_allow_expired(&token_context.access_token, &jwt)
+    // let user_id = decode_rox_access_token_allow_expired(&token_context.access_token, &jwt)
     //     .map_err(|e| {
     //         // Keeping this log in here to see why we couldn't decode the jwt
     //         tracing::error!(error=?e, "unable to decode jwt for user id");
@@ -157,7 +157,7 @@ pub async fn handler(
 
     tracing::info!(time_taken=?start_time.elapsed(), "refresh token time");
 
-    validate_macro_access_token(&access_token, &jwt)
+    validate_rox_access_token(&access_token, &jwt)
         .inspect_err(|e| {
             tracing::warn!(error=?e, "fusionauth issued an access token that fails validation");
         })

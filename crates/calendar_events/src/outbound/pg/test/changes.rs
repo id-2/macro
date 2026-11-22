@@ -97,7 +97,7 @@ async fn claimed_job(
     (key, lease_token, account_id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn event_writes_log_one_row_per_change_and_skip_unchanged_echoes(pool: PgPool) {
     let owner_id = "macro|changes-upsert@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -125,7 +125,7 @@ async fn event_writes_log_one_row_per_change_and_skip_unchanged_echoes(pool: PgP
     assert_eq!(counter(&pool, link_id).await, 3);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_upserts_log_only_visible_changes(pool: PgPool) {
     let owner_id = "macro|changes-calendar@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -159,7 +159,7 @@ async fn calendar_upserts_log_only_visible_changes(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_calendar_list_reconcile_logs_its_removals_contiguously(pool: PgPool) {
     let owner_id = "macro|changes-reconcile@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -231,7 +231,7 @@ async fn a_calendar_list_reconcile_logs_its_removals_contiguously(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn snapshot_tombstones_and_source_removal_log_deletions(pool: PgPool) {
     let owner_id = "macro|changes-tombstone@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -300,7 +300,7 @@ async fn snapshot_tombstones_and_source_removal_log_deletions(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sync_error_badge_logs_when_it_appears_changes_and_clears(pool: PgPool) {
     let owner_id = "macro|changes-badge@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -388,7 +388,7 @@ async fn a_sync_error_badge_logs_when_it_appears_changes_and_clears(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn disconnecting_logs_every_calendar_and_event_removal(pool: PgPool) {
     let owner_id = "macro|changes-disconnect@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -414,7 +414,7 @@ async fn disconnecting_logs_every_calendar_and_event_removal(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn watermarks_cover_owned_and_delegated_links_only(pool: PgPool) {
     let owner_id = "macro|changes-owner@example.com";
     let delegate_id = "macro|changes-delegate@example.com";
@@ -428,7 +428,7 @@ async fn watermarks_cover_owned_and_delegated_links_only(pool: PgPool) {
     provider_ids(&repo, private).await;
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
         VALUES ($1, $2, $3)
         "#,
         delegate_id,
@@ -461,7 +461,7 @@ async fn watermarks_cover_owned_and_delegated_links_only(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pruning_raises_the_floor_and_forces_stale_clients_to_reset(pool: PgPool) {
     let owner_id = "macro|changes-prune@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -510,7 +510,7 @@ async fn pruning_raises_the_floor_and_forces_stale_clients_to_reset(pool: PgPool
     assert_eq!(resumed.new_watermark, at(4));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_prune_batch_inside_a_timestamp_tie_removes_the_lowest_sequences(pool: PgPool) {
     let owner_id = "macro|changes-prune-tie@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -553,7 +553,7 @@ async fn a_prune_batch_inside_a_timestamp_tie_removes_the_lowest_sequences(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pruning_drops_counters_of_deleted_links(pool: PgPool) {
     let owner_id = "macro|changes-orphan@example.com";
     let link_id = insert_link(&pool, owner_id).await;
@@ -692,7 +692,7 @@ async fn assert_replay_matches_reads(repo: &PgCalendarRepository, viewer: &str, 
     });
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replaying_the_log_reproduces_what_the_viewer_reads(pool: PgPool) {
     let owner_id = "macro|changes-replay@example.com";
     let delegate_id = "macro|changes-replay-delegate@example.com";
@@ -814,7 +814,7 @@ async fn replaying_the_log_reproduces_what_the_viewer_reads(pool: PgPool) {
     .unwrap();
     sqlx::query!(
         r#"
-        INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
         VALUES ($1, $2, $3)
         "#,
         delegate_id,

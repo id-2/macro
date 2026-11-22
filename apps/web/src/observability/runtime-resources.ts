@@ -31,8 +31,8 @@ export async function browserMemoryAttributes(): Promise<Attributes> {
     try {
       const memory = await browser.measureUserAgentSpecificMemory();
       return {
-        'macro.memory.browser.source': 'user_agent_specific',
-        'macro.memory.browser.bytes': memory.bytes,
+        'rox.memory.browser.source': 'user_agent_specific',
+        'rox.memory.browser.bytes': memory.bytes,
       };
     } catch {
       // The browser can reject the measurement despite exposing the API.
@@ -40,12 +40,12 @@ export async function browserMemoryAttributes(): Promise<Attributes> {
   }
   if (browser.memory)
     return {
-      'macro.memory.browser.source': 'js_heap',
-      'macro.memory.js_heap.used_bytes': browser.memory.usedJSHeapSize,
-      'macro.memory.js_heap.total_bytes': browser.memory.totalJSHeapSize,
-      'macro.memory.js_heap.limit_bytes': browser.memory.jsHeapSizeLimit,
+      'rox.memory.browser.source': 'js_heap',
+      'rox.memory.js_heap.used_bytes': browser.memory.usedJSHeapSize,
+      'rox.memory.js_heap.total_bytes': browser.memory.totalJSHeapSize,
+      'rox.memory.js_heap.limit_bytes': browser.memory.jsHeapSizeLimit,
     };
-  return { 'macro.memory.browser.source': 'unavailable' };
+  return { 'rox.memory.browser.source': 'unavailable' };
 }
 
 /** One visible-tab window per minute; no timer or listeners when unsampled. */

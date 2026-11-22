@@ -4,7 +4,7 @@ use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
 #[tokio::test]
 async fn only_flagged_owners_route_and_unavailable_flags_do_not() {
     let owners: Vec<_> = ["enabled", "disabled", "failure"]
-        .map(|name| MacroUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap())
+        .map(|name| RoxUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap())
         .into();
     let mut flags = FakeFeatureFlags::default();
     flags.set(

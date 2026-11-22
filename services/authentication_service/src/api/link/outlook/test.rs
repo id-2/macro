@@ -68,7 +68,7 @@ fn outlook_link_openapi_includes_path_schema_and_error_responses() {
 
 #[tokio::test]
 async fn providers_offer_outlook_only_when_the_switch_and_the_users_flag_allow() {
-    let user = MacroUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
     let cases = [
         // (switch, flags configured, the user's flag load, outlook offered)
         (
@@ -123,7 +123,7 @@ async fn providers_offer_outlook_only_when_the_switch_and_the_users_flag_allow()
 
 #[tokio::test]
 async fn flagged_off_user_gets_404_for_a_new_link_but_can_reconnect() {
-    let user = MacroUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
     let reconnect = uuid::Uuid::now_v7();
     let mut repo = MockMicrosoftGrantRepository::new();
     repo.expect_connection_facts().times(2).returning(|_, id| {

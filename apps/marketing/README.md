@@ -15,7 +15,7 @@ future re-enablement.
 Use a pale blue selection highlight (#b8d5ff) with dark text (#101820) in both website entry styles. Keep public website text selectable with native browser behavior; restrict `user-select: none` to interactive controls that need it, never the page globally.
 
 The homepage uses one opening section on desktop and phones: a large Rox mark
-surrounded by the production welcome graphic's app logos, followed by `MacroHero`'s
+surrounded by the production welcome graphic's app logos, followed by `RoxHero`'s
 current H1, supporting H2, Sign Up button, and backing/security badges. Reuse
 `ContextScene` unchanged on desktop and phones, including its radial rings,
 Rox bubble, and varied logo sizes. Render the concentric rings at 75% opacity and keep the two major rings only slightly stronger. Add a very faint, wide oval peach, rose, and warm-gold accent wash around the outer bubbles and reuse onboarding’s `WorkspaceTexture` at subdued dot/grain opacity. Give the logo bubbles a nearly transparent glass surface with background blur, a faint gradient edge at 40% of the earlier rim strength, and no bevel or cast shadow; use solid surfaces for reduced transparency. On desktop, scale the graphic to 110%, add 20px above it and 10px below it, and reserve the scaled height in the layout. Keep its orbit tiles centered on their
@@ -48,7 +48,7 @@ Add 40px above the hero graphic on phones 390–699px wide; preserve the smaller
 Keep the homepage H1 on two lines on narrow phones, reducing it to 32px at 375px and scaling down further below that width.
 Use the same hero markup below 700px, with 24px side gutters, the responsive
 welcome constellation, and 13px supporting copy. Keep the 144 × 48px
-signup action and allow the backing/security badges to wrap. `MacroHero` keeps
+signup action and allow the backing/security badges to wrap. `RoxHero` keeps
 the headline “The unified workspace for your company” and current supporting
 copy. The introduction scrolls naturally rather than filling a viewport.
 Use quiet text links labeled “Learn about [feature] →” below homepage demos, matching the small Inter section descriptions: 370 weight, 14px desktop / 13px phone, 1.65 line height, and placeholder ink. Scale arrows to the text. Use no boxed buttons or separate “Learn more” heading. Preserve 44px touch targets and direct product-page destinations.

@@ -28,7 +28,7 @@ impl TestAdmission {
 impl ai_billing::AiAdmissionService for TestAdmission {
     fn admit<'a>(
         &'a self,
-        user: &'a macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &'a rox_user_id::user_id::RoxUserIdStr<'_>,
         feature: ai_usage::AiFeature,
     ) -> ai_billing::domain::admission::AdmissionFuture<'a> {
         self.calls.lock().unwrap().push((user.to_string(), feature));
@@ -335,15 +335,15 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
     );
     // Producer creation is lazy: nothing connects to Kafka unless an event
     // is published, so a dummy broker address is safe for tests.
-    let macro_event_broker = macro_event_broker::MacroEventBrokerService::new(
-        macro_event_broker::KafkaEventPublisher::new("localhost:9092")
+    let rox_event_broker = rox_event_broker::RoxEventBrokerService::new(
+        rox_event_broker::KafkaEventPublisher::new("localhost:9092")
             .expect("kafka producer config is valid"),
         TaskTracker::new(),
     );
     let properties_service = ai_tools::build_properties_service_with_broker(
         pool.clone(),
         entity_access_service.clone(),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     );
     let task_properties_service = ai_tools::build_task_properties_adapter(
         pool.clone(),
@@ -362,7 +362,7 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
             entity_access_management::outbound::PgRepository::new(pool.clone()),
         ),
         ForeignEntityServiceImpl::new(PgForeignEntityRepo::new(pool.clone())),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     );
     let test_lexical_client = LexicalClient::new("test".into(), "http://nofileshere".into());
     let test_editing_client =
@@ -403,7 +403,7 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
             ),
             0,
         )
-        .with_macro_event_broker(macro_event_broker.clone()),
+        .with_rox_event_broker(rox_event_broker.clone()),
     );
     let email_tool_context = email::inbound::toolset::EmailToolContext::new(
         user_email_service.clone(),
@@ -443,18 +443,18 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
         &document_tool_context,
         properties_service.clone(),
         entity_access_service.clone(),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     );
 
     let databases_tool_context = ai_tools::build_databases_tool_context(
         pool.clone(),
         entity_access_service.clone(),
         ai_tools::ToolTableEventPublisher::NoOp(Default::default()),
-        ai_tools::MaybeToolEventBroker::Real(macro_event_broker.clone()),
+        ai_tools::MaybeToolEventBroker::Real(rox_event_broker.clone()),
     );
     let project_tool_context = ai_tools::build_project_tool_context(
         pool.clone(),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
         entity_access_service.clone(),
         document_tool_context.service.clone(),
         user_email_service.clone(),
@@ -479,10 +479,10 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
 
     let calendar_tool_context = ai_tools::build_calendar_tool_context(
         pool.clone(),
-        macro_service_urls::ServiceUrl::owned("http://localhost:0").into(),
+        rox_service_urls::ServiceUrl::owned("http://localhost:0").into(),
         "test-internal-api-key".to_string(),
         call_tool_context.service.clone(),
-        macro_service_urls::AppServiceUrl::local(),
+        rox_service_urls::AppServiceUrl::local(),
         true,
     );
     let forms_tool_context = ai_tools::build_forms_tool_context(
@@ -491,7 +491,7 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
         &databases_tool_context,
         &calendar_tool_context,
         None,
-        ai_tools::MaybeToolEventBroker::Real(macro_event_broker.clone()),
+        ai_tools::MaybeToolEventBroker::Real(rox_event_broker.clone()),
         ai_tools::FormsToolConfig {
             app_origin: "https://macro.test".into(),
             editing_worker_url: "http://localhost:8933".into(),
@@ -527,20 +527,20 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
         email_tool_context: email_tool_context.clone(),
         call_tool_context: call_tool_context.clone(),
         booking_management_tool_context: ai_tools::build_booking_management_tool_context(
-            macro_service_urls::ServiceUrl::owned("http://localhost:0").into(),
+            rox_service_urls::ServiceUrl::owned("http://localhost:0").into(),
             "test-internal-api-key".to_string(),
-            macro_env::Environment::Local,
+            rox_env::Environment::Local,
         ),
         booking_link_tool_context: ai_tools::build_booking_link_tool_context(
             pool.clone(),
-            macro_env::Environment::Local,
+            rox_env::Environment::Local,
         ),
         calendar_tool_context: ai_tools::build_calendar_tool_context(
             pool.clone(),
-            macro_service_urls::ServiceUrl::owned("http://localhost:0").into(),
+            rox_service_urls::ServiceUrl::owned("http://localhost:0").into(),
             "test-internal-api-key".to_string(),
             call_tool_context.service.clone(),
-            macro_service_urls::AppServiceUrl::local(),
+            rox_service_urls::AppServiceUrl::local(),
             true,
         ),
         team_calendar_tool_context: ai_tools::build_team_calendar_tool_context(pool.clone(), true),
@@ -560,7 +560,7 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
         channel_media_upload_tool_context: ai_tools::build_channel_media_upload_tool_context_test(),
         bot_tool_context: ai_tools::build_bot_tool_context(
             pool.clone(),
-            ai_tools::MaybeToolEventBroker::Real(macro_event_broker.clone()),
+            ai_tools::MaybeToolEventBroker::Real(rox_event_broker.clone()),
             entity_access_service.clone(),
             "http://localhost:8086".to_string(),
             None,
@@ -570,7 +570,7 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
             entity_access_service.clone(),
         ),
         coding_agent_tool_context: ai_tools::build_coding_agent_tool_context(
-            macro_service_urls::ServiceUrl::owned("http://localhost:0").into(),
+            rox_service_urls::ServiceUrl::owned("http://localhost:0").into(),
             "test-internal-api-key".to_string(),
         )
         .expect("valid test coding agent context"),
@@ -702,16 +702,16 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
     );
 
     let authorization_state =
-        MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
-            MacroAuthJwtValidator::new(
-                macro_auth::middleware::decode_jwt::JwtValidationArgs::new_testing(),
+        RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
+            RoxAuthJwtValidator::new(
+                rox_auth::middleware::decode_jwt::JwtValidationArgs::new_testing(),
             ),
-            macro_authorization::InternalAuthConfig {
+            rox_authorization::InternalAuthConfig {
                 api_key: "testing".to_string(),
                 default_user_id: None,
             },
-            macro_authorization::NoBotAuthorizer,
-            macro_authorization::NoUserApiKeyAuthorizer,
+            rox_authorization::NoBotAuthorizer,
+            rox_authorization::NoUserApiKeyAuthorizer,
         )));
 
     let user_permissions_service = Arc::new(
@@ -815,7 +815,7 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
                     ),
                 },
             )
-            .with_event_broker(macro_event_broker.clone()),
+            .with_event_broker(rox_event_broker.clone()),
         ),
         ai_stream_registry: crate::cognition::service::ai_stream_registry::AiStreamRegistry::new(
             Arc::new(redis::Client::open("redis://127.0.0.1:6379/").expect("valid redis url")),
@@ -863,7 +863,7 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
         },
         import_service: import_service.clone(),
         onboarding_service,
-        macro_event_broker,
+        rox_event_broker,
     };
     Arc::new(api_context)
 }

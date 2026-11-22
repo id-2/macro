@@ -6,8 +6,8 @@ use axum::{
     response::IntoResponse,
 };
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{OptionalMacroAuthorizationExtractor, UserOrInternalService};
-use macro_db_client::document::get_document_process_content_from_job_id;
+use rox_authorization::{OptionalMacroAuthorizationExtractor, UserOrInternalService};
+use rox_db_client::document::get_document_process_content_from_job_id;
 use model::response::GenericErrorResponse;
 use model::response::GenericResponse;
 use models_permissions::share_permission::access_level::ViewAccessLevel;

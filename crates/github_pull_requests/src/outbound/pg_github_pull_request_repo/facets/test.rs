@@ -5,7 +5,7 @@ use foreign_entity::{
     },
     outbound::pg_foreign_entity_repo::PgForeignEntityRepo,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -63,7 +63,7 @@ fn row(github_key: &str, repository_id: Option<i64>, number: i64) -> GithubPullR
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn facets_count_each_visible_pull_request_once_by_repository_and_author(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
 
@@ -155,7 +155,7 @@ fn label(name: &str, color: &str) -> GithubPullRequestLabel {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn facets_count_assignees_and_labels_once_per_visible_pull_request(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
 
@@ -253,7 +253,7 @@ async fn set_synced_at(pool: &PgPool, github_key: &str, timestamp: &str) {
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn facet_names_follow_sync_time_instead_of_pull_request_update_time(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     for (key, number, repository, login, github_updated_at, synced_at) in [
@@ -297,7 +297,7 @@ async fn facet_names_follow_sync_time_instead_of_pull_request_update_time(pool: 
     assert_eq!(facets.authors[0].count, 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn assignee_logins_and_label_colors_follow_sync_time(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     for (key, number, login, color, github_updated_at, synced_at) in [

@@ -33,7 +33,7 @@ if [[ ${XDG_TEST_CHECK_ENV:-} == 1 ]]; then
   [[ $LD_LIBRARY_PATH == "$XDG_TEST_ORIGINAL_LD" ]]
   [[ -v SSL_CERT_FILE && -z $SSL_CERT_FILE ]]
   [[ ! -v GSETTINGS_SCHEMA_DIR && ! -v GIO_EXTRA_MODULES ]]
-  [[ ! -v MACRO_APPIMAGE_HOST_ENV_CAPTURED && ! -v APPDIR && ! -v APPIMAGE ]]
+  [[ ! -v ROX_APPIMAGE_HOST_ENV_CAPTURED && ! -v APPDIR && ! -v APPIMAGE ]]
 fi
 printf "%s\n" "$@" > "$XDG_TEST_BROWSER_LOG"
 ' >> "$PWD/fake-bin/macro-test-browser"
@@ -55,11 +55,11 @@ cp -r "$helpers/." "$appdir/usr/"
   export SSL_CERT_FILE=''
   export LD_LIBRARY_PATH="$PWD/original library path"
   export XDG_TEST_ORIGINAL_LD="$LD_LIBRARY_PATH" XDG_TEST_CHECK_ENV=1
-  macro_capture_host_environment
+  rox_capture_host_environment
   export APPDIR="$appdir" APPIMAGE="$PWD/test.AppImage"
   export LD_LIBRARY_PATH="$appdir/usr/lib" GIO_EXTRA_MODULES="$appdir/usr/lib/gio/modules"
   export GSETTINGS_SCHEMA_DIR="$appdir/usr/share/glib-2.0/schemas" SSL_CERT_FILE="$appdir/bundle-ca.pem"
-  macro_capture_host_environment # Must not replace the original snapshot.
+  rox_capture_host_environment # Must not replace the original snapshot.
   bash "$appdir/usr/bin/xdg-open" "$url"
 )
 test "$(< "$XDG_TEST_BROWSER_LOG")" = "$url"

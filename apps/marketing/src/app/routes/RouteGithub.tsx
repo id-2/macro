@@ -41,7 +41,7 @@ import { breakpoint, viewportWidth } from '../utils/utilBreakpoint';
 import { CtaIcon, ctaHref, ctaLabel, handleCtaClick } from '../utils/utilCta';
 import { setPageSeo } from '../utils/utilSeo';
 
-const MACRO_REPO_URL = 'https://github.com/macro-inc/macro';
+const ROX_REPO_URL = 'https://github.com/macro-inc/macro';
 
 // ---------------------------------------------------------------------------
 // Shared style fragments (matching the homepage / email / crm bento language)
@@ -161,7 +161,7 @@ function GithubStarButton() {
   });
   return (
     <a
-      href={MACRO_REPO_URL}
+      href={ROX_REPO_URL}
       target="_blank"
       rel="noreferrer"
       class="gh-cta-button"
@@ -273,7 +273,7 @@ function navIconStyle(props: {
   };
 }
 
-function MacroNavIcon(props: {
+function RoxNavIcon(props: {
   name: string;
   active?: boolean;
   accent?: boolean;
@@ -1473,7 +1473,7 @@ function _UnifiedInboxGraphic() {
             padding: '11px 16px',
           }}
         >
-          <MacroNavIcon name="inbox" active size={15} />
+          <RoxNavIcon name="inbox" active size={15} />
           <span
             style={{
               color: 'var(--c1)',

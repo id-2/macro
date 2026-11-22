@@ -26,10 +26,10 @@ pub const TIMESTAMP_HEADER: &str = "x-rox-timestamp";
 /// Deliveries still send it, so an endpoint that verifies the old name keeps
 /// working; a receiver that reads both takes the timestamp from the pair that
 /// carried the signature it checks.
-pub const LEGACY_SIGNATURE_HEADER: &str = "x-macro-signature";
+pub const LEGACY_SIGNATURE_HEADER: &str = "x-rox-signature";
 
 /// Timestamp header deliveries carried before the rename.
-pub const LEGACY_TIMESTAMP_HEADER: &str = "x-macro-timestamp";
+pub const LEGACY_TIMESTAMP_HEADER: &str = "x-rox-timestamp";
 
 /// Sign a delivery: the `x-rox-signature` header value.
 ///
@@ -45,7 +45,7 @@ pub fn sign(secret: &str, timestamp: &str, raw_body: &[u8]) -> Option<String> {
     Some(format!("v1={}", hex::encode(mac.finalize().into_bytes())))
 }
 
-/// Verify a delivery's `x-rox-signature` (or legacy `x-macro-signature`)
+/// Verify a delivery's `x-rox-signature` (or legacy `x-rox-signature`)
 /// value in constant time.
 ///
 /// An empty secret can never verify: HMAC accepts a zero-length key, so a

@@ -904,11 +904,11 @@ impl MessageGroupRecipients for GroupMembers {
     async fn channel_members(
         &self,
         channel: Uuid,
-    ) -> Result<Vec<macro_user_id::user_id::MacroUserIdStr<'static>>, MessageError> {
+    ) -> Result<Vec<rox_user_id::user_id::RoxUserIdStr<'static>>, MessageError> {
         assert_eq!(channel, Uuid::from_u128(20));
         Ok((0..300)
             .map(|i| {
-                macro_user_id::user_id::MacroUserIdStr::try_from_email(&format!(
+                rox_user_id::user_id::RoxUserIdStr::try_from_email(&format!(
                     "participant-{i}@example.com"
                 ))
                 .unwrap()
@@ -1122,11 +1122,11 @@ async fn human_can_post_canonical_agent_mentions_on_documents_and_channels() {
         input.mentions = vec![
             SimpleMention {
                 entity_type: "bot".into(),
-                entity_id: bot_id::MACRO_NEW_BOT_ID.into_storage_id().to_string(),
+                entity_id: bot_id::ROX_NEW_BOT_ID.into_storage_id().to_string(),
             },
             SimpleMention {
                 entity_type: "user".into(),
-                entity_id: bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string(),
+                entity_id: bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(),
             },
         ];
         let message = service.post(receipt(), input.clone()).await.unwrap();
@@ -1137,7 +1137,7 @@ async fn human_can_post_canonical_agent_mentions_on_documents_and_channels() {
             events.0.lock().unwrap()[0].nonce.as_deref(),
             Some("client-nonce")
         );
-        input.mentions[0].entity_id = bot_id::MACRO_NEW_BOT_ID.to_string();
+        input.mentions[0].entity_id = bot_id::ROX_NEW_BOT_ID.to_string();
         assert!(matches!(
             service.post(receipt(), input).await,
             Err(MessageError::Invalid(_))
@@ -1171,7 +1171,7 @@ async fn bot_posts_and_edits_extract_mentions_and_preserve_trusted_attribution_a
     ] {
         let receipt = || {
             EntityAccessReceipt::try_new_bot(
-                bot_id::MACRO_AI_BOT_ID.into_storage_id(),
+                bot_id::ROX_AI_BOT_ID.into_storage_id(),
                 BotReceiptScope::User {
                     acting_user: "macro|author@example.com".to_string().try_into().unwrap(),
                 },
@@ -1186,7 +1186,7 @@ async fn bot_posts_and_edits_extract_mentions_and_preserve_trusted_attribution_a
             .unwrap()
         };
         let mut repo = fixture();
-        repo.message.sender_id = ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+        repo.message.sender_id = ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID);
         repo.message.parent = parent.clone();
         let events = Events::default();
         let service = MessageService::new(repo.clone(), events.clone())
@@ -1266,7 +1266,7 @@ async fn bot_posts_and_edits_extract_mentions_and_preserve_trusted_attribution_a
 #[tokio::test]
 async fn reconciling_an_unchanged_bot_reply_does_not_publish_a_second_completion() {
     let mut repo = fixture();
-    let bot = bot_id::MACRO_AI_BOT_ID;
+    let bot = bot_id::ROX_AI_BOT_ID;
     repo.message.sender_id = ChannelSender::new_from_bot(bot);
     let receipt = EntityAccessReceipt::try_new_bot(
         bot.into_storage_id(),
@@ -1302,7 +1302,7 @@ async fn reconciling_an_unchanged_bot_reply_does_not_publish_a_second_completion
 
 fn bot_receipt() -> EntityAccessReceipt<MessageWrite> {
     EntityAccessReceipt::try_new_bot(
-        bot_id::MACRO_AI_BOT_ID.into_storage_id(),
+        bot_id::ROX_AI_BOT_ID.into_storage_id(),
         entity_access::domain::models::BotReceiptScope::User {
             acting_user: "macro|author@example.com".to_string().try_into().unwrap(),
         },

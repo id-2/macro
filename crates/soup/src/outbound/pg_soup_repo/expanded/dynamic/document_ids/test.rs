@@ -11,8 +11,8 @@ use item_filters::ast::{
     EntityFilterAst, calendar_event::CalendarEventLiteral, chat::ChatLiteral,
     document::DocumentLiteral, project::ProjectLiteral,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::{GroupByField, GroupingConfig};
 use models_pagination::{CursorWithValAndFilter, Identify, Query, SimpleSortMethod, SortOn};
 use models_soup::item::SoupItem;
@@ -91,8 +91,8 @@ fn status(entity_type: Option<&str>) -> GroupByField {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
 }
 
 #[test]
@@ -262,8 +262,8 @@ fn ids(items: &[SoupItem<()>]) -> Vec<Uuid> {
 }
 
 #[sqlx::test(
-    fixtures("../../../../../../../macro_db_client/fixtures/mixed_items_expanded.sql"),
-    migrator = "MACRO_DB_MIGRATIONS"
+    fixtures("../../../../../../../rox_db_client/fixtures/mixed_items_expanded.sql"),
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn flat_pages_match_bound_id_sets(pool: PgPool) -> anyhow::Result<()> {
     let set = |ids: &[Uuid], tag| any_of(&among_absent(ids, tag));
@@ -334,8 +334,8 @@ async fn flat_pages_match_bound_id_sets(pool: PgPool) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    fixtures("../../../../../../../macro_db_client/fixtures/mixed_items_expanded.sql"),
-    migrator = "MACRO_DB_MIGRATIONS"
+    fixtures("../../../../../../../rox_db_client/fixtures/mixed_items_expanded.sql"),
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn flat_continuations_keep_bound_id_sets(pool: PgPool) -> anyhow::Result<()> {
     let filter = || {
@@ -385,10 +385,10 @@ async fn grouped_page(
 
 #[sqlx::test(
     fixtures(
-        "../../../../../../../macro_db_client/fixtures/mixed_items_expanded.sql",
+        "../../../../../../../rox_db_client/fixtures/mixed_items_expanded.sql",
         "test/tasks.sql"
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_pages_match_bound_id_sets(pool: PgPool) -> anyhow::Result<()> {
     // Of the associated tasks A, C, and D, every one but D.
@@ -475,10 +475,10 @@ fn task_pages() -> Vec<Uuid> {
 
 #[sqlx::test(
     fixtures(
-        "../../../../../../../macro_db_client/fixtures/mixed_items_expanded.sql",
+        "../../../../../../../rox_db_client/fixtures/mixed_items_expanded.sql",
         "test/task_pages.sql"
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_continuations_keep_bound_id_sets(pool: PgPool) -> anyhow::Result<()> {
     let all_tasks = task_pages();

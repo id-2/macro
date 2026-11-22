@@ -9,7 +9,7 @@ use ai_toolset::{ToolAnnotated, ToolAnnotations};
 use async_trait::async_trait;
 use email_validator::EmailAddress;
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -140,7 +140,7 @@ where
         service_context: ServiceContext<EmailToolContext<T, G, E>>,
         request_context: RequestContext,
     ) -> ToolResult<Self::Output> {
-        let acting_user = MacroUserIdStr((*request_context.user_id).clone());
+        let acting_user = RoxUserIdStr((*request_context.user_id).clone());
         let sender = service_context
             .resolve_sending_inbox(
                 acting_user.clone(),
@@ -186,7 +186,7 @@ where
             bcc: self.bcc.iter().cloned().map(ContactInfo::from).collect(),
             body_text: body.text,
             body_html: Some(body.html),
-            body_macro: None,
+            body_rox: None,
             headers_json: None,
             send_time: None,
             // Composer override when present; otherwise None lets the backend

@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { attributes } from "../attributes.ts";
 import {
 	defineOutcomes,
-	type MacroSpan,
-	type MacroTelemetry,
+	type RoxSpan,
+	type RoxTelemetry,
 	macroTelemetry,
 	wakeTelemetry,
 } from "../index.ts";
@@ -120,7 +120,7 @@ const fake = () => {
 	};
 	const context = (): string => active.at(-1) ?? "none";
 	const remote = "remote 00-";
-	const span = (name: string, startTime: number | undefined): MacroSpan => {
+	const span = (name: string, startTime: number | undefined): RoxSpan => {
 		const id = String(++spans).padStart(16, "0");
 		const parent = context();
 		const traceId = parent.startsWith(remote)
@@ -148,7 +148,7 @@ const fake = () => {
 				`${level} in ${context()}: ${String(message)} [${details?.["event.name"]}]`,
 			);
 		};
-	const telemetry: MacroTelemetry = {
+	const telemetry: RoxTelemetry = {
 		span: (name, options) => span(name, options?.startTime),
 		remoteContext: (traceparent) => ({
 			run: (operation) => within(`remote ${traceparent}`, operation),

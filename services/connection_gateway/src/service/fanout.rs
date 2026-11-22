@@ -17,7 +17,7 @@ use connection_gateway_models::fanout::{
     outbound_channel,
 };
 use futures::StreamExt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use redis::AsyncCommands;
 
 async fn publish(ctx: &ConnectionContext<'_>, message: &FromGateway) -> Result<()> {
@@ -39,7 +39,7 @@ async fn publish_best_effort(ctx: &ConnectionContext<'_>, message: &FromGateway)
 }
 
 /// Announce an accepted, authenticated connection.
-pub async fn connected(ctx: &ConnectionContext<'_>, user_id: &MacroUserIdStr<'static>) {
+pub async fn connected(ctx: &ConnectionContext<'_>, user_id: &RoxUserIdStr<'static>) {
     publish_best_effort(
         ctx,
         &FromGateway::Connected {

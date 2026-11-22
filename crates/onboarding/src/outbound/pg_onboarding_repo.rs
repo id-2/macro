@@ -3,7 +3,7 @@
 use crate::domain::models::{OnboardingRow, OnboardingStatus, PromptId};
 use crate::domain::ports::{OnboardingRepo, Result};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::str::FromStr;
 
@@ -47,7 +47,7 @@ impl TryFrom<OnboardingDbRow> for OnboardingRow {
 
 impl OnboardingRepo for PgOnboardingRepo {
     #[tracing::instrument(skip(self), err)]
-    async fn ensure_row(&self, user: &MacroUserIdStr<'static>) -> Result<OnboardingRow> {
+    async fn ensure_row(&self, user: &RoxUserIdStr<'static>) -> Result<OnboardingRow> {
         // One round trip: insert-or-noop, returning the current row either
         // way (the no-op DO UPDATE makes RETURNING yield the existing row).
         let row = sqlx::query_as!(
@@ -65,7 +65,7 @@ impl OnboardingRepo for PgOnboardingRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn get_row(&self, user: &MacroUserIdStr<'static>) -> Result<Option<OnboardingRow>> {
+    async fn get_row(&self, user: &RoxUserIdStr<'static>) -> Result<Option<OnboardingRow>> {
         let row = sqlx::query_as!(
             OnboardingDbRow,
             r#"
@@ -83,7 +83,7 @@ impl OnboardingRepo for PgOnboardingRepo {
     #[tracing::instrument(skip(self), err)]
     async fn complete(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         skipped: bool,
     ) -> Result<OnboardingRow> {
         let row = sqlx::query_as!(
@@ -110,7 +110,7 @@ impl OnboardingRepo for PgOnboardingRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn delete_row(&self, user: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn delete_row(&self, user: &RoxUserIdStr<'static>) -> Result<()> {
         let mut tx = self.pool.begin().await?;
         sqlx::query!(
             r#"
@@ -135,7 +135,7 @@ impl OnboardingRepo for PgOnboardingRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn dismissed_prompts(&self, user: &MacroUserIdStr<'static>) -> Result<Vec<String>> {
+    async fn dismissed_prompts(&self, user: &RoxUserIdStr<'static>) -> Result<Vec<String>> {
         let rows = sqlx::query_scalar!(
             r#"
             SELECT prompt_id
@@ -153,7 +153,7 @@ impl OnboardingRepo for PgOnboardingRepo {
     #[tracing::instrument(skip(self), err)]
     async fn dismiss_prompt(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         prompt: &PromptId,
     ) -> Result<()> {
         sqlx::query!(

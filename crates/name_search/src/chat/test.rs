@@ -1,6 +1,6 @@
 //! Tests for chat module
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_search_cursor::{SearchCursorOption, SearchMethodCursor};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
@@ -8,11 +8,11 @@ use uuid::Uuid;
 use super::*;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_empty_term(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -39,13 +39,13 @@ async fn test_search_chat_names_empty_term(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_ids_only_with_empty_ids(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -72,11 +72,11 @@ async fn test_search_chat_names_ids_only_with_empty_ids(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_ids_only_mode(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -111,7 +111,7 @@ async fn test_search_chat_names_ids_only_mode(pool: Pool<Postgres>) -> anyhow::R
     assert_eq!(response.items[0].entity_type, SearchEntityType::Chats);
     assert_eq!(
         response.items[0].name,
-        "<macro_em>Project</macro_em> Review Chat"
+        "<rox_em>Project</rox_em> Review Chat"
     );
 
     assert_eq!(
@@ -120,20 +120,20 @@ async fn test_search_chat_names_ids_only_mode(pool: Pool<Postgres>) -> anyhow::R
     );
     assert_eq!(
         response.items[1].name,
-        "<macro_em>Project</macro_em> Planning Chat"
+        "<rox_em>Project</rox_em> Planning Chat"
     );
 
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_normal_mode_owned_chats(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -161,7 +161,7 @@ async fn test_search_chat_names_normal_mode_owned_chats(
     );
     assert_eq!(
         response.items[0].name,
-        "IMPORTANT <macro_em>PROJECT</macro_em>"
+        "IMPORTANT <rox_em>PROJECT</rox_em>"
     );
 
     assert_eq!(
@@ -170,18 +170,18 @@ async fn test_search_chat_names_normal_mode_owned_chats(
     );
     assert_eq!(
         response.items[1].name,
-        "<macro_em>Project</macro_em> Review Chat"
+        "<rox_em>Project</rox_em> Review Chat"
     );
 
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_case_insensitive(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -237,11 +237,11 @@ async fn test_search_chat_names_case_insensitive(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_with_shared_chats(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -273,18 +273,18 @@ async fn test_search_chat_names_with_shared_chats(pool: Pool<Postgres>) -> anyho
     assert!(user3_chat.is_some());
     assert_eq!(
         user3_chat.unwrap().name,
-        "User3 Shared <macro_em>Project</macro_em>"
+        "User3 Shared <rox_em>Project</rox_em>"
     );
 
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_pagination_limit(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -321,11 +321,11 @@ async fn test_search_chat_names_pagination_limit(pool: Pool<Postgres>) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_pagination_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -401,11 +401,11 @@ async fn test_search_chat_names_pagination_cursor(pool: Pool<Postgres>) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_no_results(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -430,11 +430,11 @@ async fn test_search_chat_names_no_results(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_partial_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -459,7 +459,7 @@ async fn test_search_chat_names_partial_match(pool: Pool<Postgres>) -> anyhow::R
     );
     assert_eq!(
         response.items[0].name,
-        "Client <macro_em>Meet</macro_em>ing"
+        "Client <rox_em>Meet</rox_em>ing"
     );
 
     assert_eq!(
@@ -468,18 +468,18 @@ async fn test_search_chat_names_partial_match(pool: Pool<Postgres>) -> anyhow::R
     );
     assert_eq!(
         response.items[1].name,
-        "Team <macro_em>Meet</macro_em>ing Chat"
+        "Team <rox_em>Meet</rox_em>ing Chat"
     );
 
     Ok(())
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_user_isolation(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -504,11 +504,11 @@ async fn test_search_chat_names_user_isolation(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_excludes_soft_deleted(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -544,11 +544,11 @@ async fn test_search_chat_names_excludes_soft_deleted(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_rejects_thread_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -579,11 +579,11 @@ async fn test_search_chat_names_rejects_thread_cursor(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat", "chat_tags"))
 )]
 async fn test_search_chat_names_tag_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -629,11 +629,11 @@ async fn test_search_chat_names_tag_filter(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat", "chat_tags"))
 )]
 async fn test_search_chat_names_tag_filter_ids_only(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -670,11 +670,11 @@ async fn test_search_chat_names_tag_filter_ids_only(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("chat", "chat_tags"))
 )]
 async fn test_search_chat_names_tag_filter_match_all(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -768,7 +768,7 @@ async fn the_search_span_leaves_out_the_term() {
     let db = sqlx::postgres::PgPoolOptions::new()
         .connect_lazy("postgres://localhost/unused")
         .expect("a lazy pool never connects");
-    let user_id = MacroUserId::parse_from_str("macro|user@example.com")
+    let user_id = RoxUserId::parse_from_str("macro|user@example.com")
         .map(|l| l.lowercase())
         .unwrap();
 

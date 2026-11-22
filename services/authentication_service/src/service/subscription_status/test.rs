@@ -1,8 +1,8 @@
 use super::*;
 use ai_billing::domain::{Entitlement, PayerScope};
 use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
-use hosted_runtimes::domain::rollout::{ComputerRollout, ENABLE_MACRO_COMPUTERS};
-use macro_user_id::cowlike::CowLike;
+use hosted_runtimes::domain::rollout::{ComputerRollout, ENABLE_ROX_COMPUTERS};
+use rox_user_id::cowlike::CowLike;
 use std::sync::Mutex;
 use teams::domain::model::SeatPlan;
 
@@ -11,20 +11,20 @@ struct Entitlements {
     customer_for: Mutex<Vec<String>>,
 }
 impl EntitlementSource for Entitlements {
-    async fn entitlement(&self, _: &MacroUserIdStr<'_>) -> ai_billing::domain::Result<Entitlement> {
+    async fn entitlement(&self, _: &RoxUserIdStr<'_>) -> ai_billing::domain::Result<Entitlement> {
         Ok(self.value.clone())
     }
     async fn stripe_customer_id(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ai_billing::domain::Result<Option<String>> {
         self.customer_for.lock().unwrap().push(user.to_string());
         Ok(Some("cus_payer".into()))
     }
     async fn team_payer(
         &self,
-        _: macro_uuid::Uuid,
-    ) -> ai_billing::domain::Result<Option<MacroUserIdStr<'static>>> {
+        _: rox_uuid::Uuid,
+    ) -> ai_billing::domain::Result<Option<RoxUserIdStr<'static>>> {
         unreachable!()
     }
 }
@@ -39,7 +39,7 @@ impl SubscriptionStatusGateway for Gateway {
     async fn billing_access(
         &self,
         _: SubscriptionScope,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<billing_facts::BillingAccess, PlanChangeError> {
         *self.access_reads.lock().unwrap() += 1;
         Ok(self.access.clone())
@@ -49,7 +49,7 @@ impl SubscriptionStatusGateway for Gateway {
         &self,
         customer: &str,
         scope: SubscriptionScope,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         read_billing: bool,
     ) -> Result<Option<SubscriptionPlanFacts>, PlanChangeError> {
         self.billing_reads.lock().unwrap().push(read_billing);
@@ -60,8 +60,8 @@ impl SubscriptionStatusGateway for Gateway {
         Ok(self.facts.clone())
     }
 }
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|member@example.com")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|member@example.com")
         .unwrap()
         .into_owned()
 }
@@ -73,7 +73,7 @@ fn rollout(enabled: bool) -> ComputerRollout {
     flags.set(
         user(),
         Ok(FlagSnapshot::new([(
-            ENABLE_MACRO_COMPUTERS.into(),
+            ENABLE_ROX_COMPUTERS.into(),
             FlagValue::Boolean(enabled),
         )])),
     );
@@ -137,10 +137,10 @@ async fn returns_pending_downgrade_from_the_authenticated_personal_scope() {
 
 #[tokio::test]
 async fn team_member_reads_the_owners_customer_but_only_their_own_seat() {
-    let owner = MacroUserIdStr::try_from("macro|owner@example.com")
+    let owner = RoxUserIdStr::try_from("macro|owner@example.com")
         .unwrap()
         .into_owned();
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     let mut entitlement = Entitlement::personal(user(), PlanTier::Max);
     entitlement.payer = owner.clone();
     entitlement.scope = PayerScope::TeamMember { team_id };
@@ -223,7 +223,7 @@ async fn unlimited_ai_usage_does_not_hide_an_existing_paid_subscription() {
 
 #[tokio::test]
 async fn ordinary_team_members_keep_renewal_without_requesting_financial_details() {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     let mut entitlement = Entitlement::personal(user(), PlanTier::Max);
     entitlement.scope = PayerScope::TeamMember { team_id };
     let mut service = service(entitlement, None);
@@ -247,7 +247,7 @@ async fn ordinary_team_members_keep_renewal_without_requesting_financial_details
 
 #[tokio::test]
 async fn flag_off_billing_admins_keep_renewal_without_reading_the_billing_breakdown() {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     let mut entitlement = Entitlement::personal(user(), PlanTier::Max);
     entitlement.scope = PayerScope::TeamMember { team_id };
     let mut service = service_with_rollout(entitlement, None, rollout(false));

@@ -17,7 +17,7 @@ const COMMANDS: string[] = [];
 let nativePending: string | undefined;
 const FRAMES: FrameRequestCallback[] = [];
 const requestFrame = window.requestAnimationFrame;
-window.__MACRO_IOS_NOTIFICATION_LAUNCH__ = true;
+window.__ROX_IOS_NOTIFICATION_LAUNCH__ = true;
 mockIPC((command, payload) => {
   COMMANDS.push(command);
   if (command === 'plugin:notifications|release_notification_cover') {

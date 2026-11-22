@@ -6,12 +6,12 @@ use crate::domain::model::{TeamInviteLinkTeam, TeamInviteLinkToken};
 const TEAM_1: Uuid = Uuid::from_u128(0x11111111_1111_1111_1111_111111111111);
 const TEAM_2: Uuid = Uuid::from_u128(0x22222222_2222_2222_2222_222222222222);
 
-fn creator() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user@user.com").unwrap()
+fn creator() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user@user.com").unwrap()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("teams"))
 )]
 async fn invite_links_are_set_reset_and_turned_off_per_team(

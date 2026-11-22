@@ -7,7 +7,7 @@ use agent_session::domain::{
 };
 use chrono::{DateTime, Utc};
 use futures::future::BoxFuture;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use soup_realtime::domain::{models::Patch, ports::SoupRealtimeSubscriptionService};
 use tokio::sync::mpsc::Receiver;
@@ -18,15 +18,15 @@ pub trait RegisteredWorkGraphqlService: Send + Sync + 'static {
     /// See [`WorkRegistrations::visible_registrations`].
     fn visible_registrations<'a>(
         &'a self,
-        viewer: &'a MacroUserIdStr<'static>,
-        accounts: &'a [MacroUserIdStr<'static>],
+        viewer: &'a RoxUserIdStr<'static>,
+        accounts: &'a [RoxUserIdStr<'static>],
     ) -> BoxFuture<'a, Result<Vec<WorkRegistration>, AgentSessionError>>;
 
     /// See [`WorkRegistrations::changes`].
     fn changes<'a>(
         &'a self,
-        viewer: &'a MacroUserIdStr<'static>,
-        accounts: &'a [MacroUserIdStr<'static>],
+        viewer: &'a RoxUserIdStr<'static>,
+        accounts: &'a [RoxUserIdStr<'static>],
         sessions: &'a [AgentSessionId],
         ended_after: DateTime<Utc>,
     ) -> BoxFuture<'a, Result<WorkRegistrationChanges, AgentSessionError>>;
@@ -35,8 +35,8 @@ pub trait RegisteredWorkGraphqlService: Send + Sync + 'static {
 impl<T: WorkRegistrations> RegisteredWorkGraphqlService for T {
     fn visible_registrations<'a>(
         &'a self,
-        viewer: &'a MacroUserIdStr<'static>,
-        accounts: &'a [MacroUserIdStr<'static>],
+        viewer: &'a RoxUserIdStr<'static>,
+        accounts: &'a [RoxUserIdStr<'static>],
     ) -> BoxFuture<'a, Result<Vec<WorkRegistration>, AgentSessionError>> {
         Box::pin(WorkRegistrations::visible_registrations(
             self, viewer, accounts,
@@ -45,8 +45,8 @@ impl<T: WorkRegistrations> RegisteredWorkGraphqlService for T {
 
     fn changes<'a>(
         &'a self,
-        viewer: &'a MacroUserIdStr<'static>,
-        accounts: &'a [MacroUserIdStr<'static>],
+        viewer: &'a RoxUserIdStr<'static>,
+        accounts: &'a [RoxUserIdStr<'static>],
         sessions: &'a [AgentSessionId],
         ended_after: DateTime<Utc>,
     ) -> BoxFuture<'a, Result<WorkRegistrationChanges, AgentSessionError>> {
@@ -85,7 +85,7 @@ impl RegisteredWorkGraphqlContext {
     /// The Soup patches addressed to `viewer` from now on.
     pub(crate) fn patches(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
     ) -> Receiver<Patch<Entity<'static>>> {
         self.soup.subscribe(viewer)
     }

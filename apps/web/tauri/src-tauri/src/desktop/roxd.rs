@@ -150,9 +150,9 @@ fn emit_status(app: &AppHandle, status: &RoxdStatus) {
 
 /// Brackets the shell's `env` output, so rc-file banners are never parsed.
 #[cfg(any(unix, test))]
-const ENV_START: &str = "__MACRO_SHELL_ENV_START__";
+const ENV_START: &str = "__ROX_SHELL_ENV_START__";
 #[cfg(any(unix, test))]
-const ENV_END: &str = "__MACRO_SHELL_ENV_END__";
+const ENV_END: &str = "__ROX_SHELL_ENV_END__";
 
 /// How long an interactive login shell may take to print its environment.
 #[cfg(unix)]

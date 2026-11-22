@@ -43,7 +43,7 @@ export function postAuthTarget(input: {
 
 /**
  * The desktop sign-in callback, carrying the page's `redirect`. Desktop SSO
- * returns through a pinned `macro:///login` deep link rather than the page
+ * returns through a pinned `rox:///login` deep link rather than the page
  * sign-in started on, so the deep link would otherwise be lost; the auth
  * service keeps the query and appends the session code.
  *

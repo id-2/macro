@@ -17,7 +17,7 @@ if (stack === 'prod') {
 
   const DATABASE_URL = aws.secretsmanager
     .getSecretVersionOutput({
-      secretId: config.require(`macro_db_proxy_secret_key`),
+      secretId: config.require(`rox_db_proxy_secret_key`),
     })
     .apply((secret) => secret.secretString);
 
@@ -29,7 +29,7 @@ if (stack === 'prod') {
   const emailSuppressionEnvVars: EmailSuppressionLambdaEnvVars = {
     DATABASE_URL: pulumi.interpolate`${DATABASE_URL}`,
     ENVIRONMENT: stack,
-    RUST_LOG: 'email_suppression_handler=trace,macro_http_request=info',
+    RUST_LOG: 'email_suppression_handler=trace,rox_http_request=info',
   };
 
   emailSuppression = new EmailSuppressionLambda(`email-suppression-${stack}`, {

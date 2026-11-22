@@ -128,11 +128,11 @@ fn a_turn_becomes_an_agent_span_with_a_tool_span_per_call() {
     assert_eq!(int_attribute(agent, attr::USAGE_INPUT_TOKENS), Some(10));
     assert_eq!(int_attribute(agent, attr::USAGE_OUTPUT_TOKENS), Some(8));
     assert_eq!(
-        int_attribute(agent, attr::MACRO_CONTEXT_USED_TOKENS),
+        int_attribute(agent, attr::ROX_CONTEXT_USED_TOKENS),
         Some(10)
     );
     assert_eq!(
-        int_attribute(agent, attr::MACRO_CONTEXT_SIZE_TOKENS),
+        int_attribute(agent, attr::ROX_CONTEXT_SIZE_TOKENS),
         Some(1_000_000)
     );
 
@@ -174,7 +174,7 @@ fn a_turn_becomes_an_agent_span_with_a_tool_span_per_call() {
         Some("tc-run")
     );
     assert_eq!(
-        string_attribute(bash, attr::MACRO_TOOL_KIND).as_deref(),
+        string_attribute(bash, attr::ROX_TOOL_KIND).as_deref(),
         Some("execute")
     );
     assert_eq!(
@@ -188,7 +188,7 @@ fn a_turn_becomes_an_agent_span_with_a_tool_span_per_call() {
         "terminal output recorded: {result}"
     );
     assert_eq!(
-        int_attribute(bash, attr::MACRO_TOOL_RESULT_BYTES),
+        int_attribute(bash, attr::ROX_TOOL_RESULT_BYTES),
         Some(i64::try_from(result.len()).unwrap())
     );
     assert_eq!(bash.status, Status::Unset);
@@ -254,7 +254,7 @@ fn usage_is_recorded_per_turn_from_the_running_totals() {
 fn a_failed_mcp_call_marks_its_span_and_unwraps_the_envelope() {
     let (exporter, provider, _guard) = otel_test_pipeline();
     let mut projector = projector(ContentPolicy::enabled());
-    replay(&mut projector, fixtures::MACRO_MCP);
+    replay(&mut projector, fixtures::ROX_MCP);
     let spans = finished(&exporter, &provider);
 
     let tools: Vec<_> = spans
@@ -264,7 +264,7 @@ fn a_failed_mcp_call_marks_its_span_and_unwraps_the_envelope() {
     assert!(!tools.is_empty(), "tool spans: {spans:#?}");
     for tool in &tools {
         assert_eq!(
-            string_attribute(tool, attr::MACRO_MCP_SERVER).as_deref(),
+            string_attribute(tool, attr::ROX_MCP_SERVER).as_deref(),
             Some("macro"),
             "Rox's tools are reached over its MCP server: {tool:#?}"
         );
@@ -351,7 +351,7 @@ fn a_refused_prompt_ends_the_turn_in_error() {
         Some(vec!["error".to_owned()])
     );
     assert_eq!(
-        int_attribute(agent[0], attr::MACRO_TIME_TO_FIRST_OUTPUT_MS),
+        int_attribute(agent[0], attr::ROX_TIME_TO_FIRST_OUTPUT_MS),
         None,
         "a turn that streamed nothing has no time to first output"
     );
@@ -366,14 +366,14 @@ fn time_to_first_output_dates_the_first_streamed_chunk() {
 
     let agent = spans_named(&spans, "invoke_agent");
     assert_eq!(agent.len(), 1);
-    let ttfo = int_attribute(agent[0], attr::MACRO_TIME_TO_FIRST_OUTPUT_MS)
+    let ttfo = int_attribute(agent[0], attr::ROX_TIME_TO_FIRST_OUTPUT_MS)
         .expect("a turn with output records its time to first output");
     // A replay streams instantly; what matters is the value is a sane,
     // non-negative duration recorded once on the turn span.
     assert!((0..1_000).contains(&ttfo), "replay is instant: {ttfo}ms");
     let tools = spans_named(&spans, "execute_tool Bash");
     assert_eq!(
-        int_attribute(tools[0], attr::MACRO_TIME_TO_FIRST_OUTPUT_MS),
+        int_attribute(tools[0], attr::ROX_TIME_TO_FIRST_OUTPUT_MS),
         None,
         "tool spans do not carry the turn's time to first output"
     );
@@ -400,7 +400,7 @@ fn content_is_not_recorded_when_capture_is_off() {
     assert!(attribute(bash, attr::TOOL_CALL_ARGUMENTS).is_none());
     assert!(attribute(bash, attr::TOOL_CALL_RESULT).is_none());
     // A size is not content: it is recorded either way.
-    assert!(int_attribute(bash, attr::MACRO_TOOL_RESULT_BYTES).is_some_and(|bytes| bytes > 0));
+    assert!(int_attribute(bash, attr::ROX_TOOL_RESULT_BYTES).is_some_and(|bytes| bytes > 0));
     assert_eq!(
         string_attribute(bash, attr::TOOL_NAME).as_deref(),
         Some("Bash")
@@ -418,7 +418,7 @@ fn published_tool_definitions_reach_the_turn_and_describe_its_calls() {
     );
     definitions.publish(vec![
         SessionToolDefinition {
-            name: "mcp__macro__ReadContent".to_owned(),
+            name: "mcp__rox__ReadContent".to_owned(),
             description: "Read a document.".to_owned(),
             parameters: json!({ "type": "object", "properties": { "id": { "type": "string" } } }),
         },
@@ -428,13 +428,13 @@ fn published_tool_definitions_reach_the_turn_and_describe_its_calls() {
             parameters: json!({ "type": "object" }),
         },
     ]);
-    replay(&mut projector, fixtures::MACRO_MCP);
+    replay(&mut projector, fixtures::ROX_MCP);
     let spans = finished(&exporter, &provider);
 
     let agent = spans_named(&spans, "invoke_agent");
     assert!(!agent.is_empty());
     let listed = json_attribute(agent[0], attr::TOOL_DEFINITIONS).expect("definitions recorded");
-    assert_eq!(listed[0]["name"], "mcp__macro__ReadContent");
+    assert_eq!(listed[0]["name"], "mcp__rox__ReadContent");
     assert_eq!(listed[0]["description"], "Read a document.");
     assert_eq!(listed[1]["name"], "mcp__linear__create_issue");
 
@@ -474,7 +474,7 @@ fn definitions_published_after_the_prompt_are_recorded_when_the_turn_closes() {
 }
 
 #[test]
-fn macro_tools_are_listed_by_their_bare_names_for_the_in_process_agent() {
+fn rox_tools_are_listed_by_their_bare_names_for_the_in_process_agent() {
     let (exporter, provider, _guard) = otel_test_pipeline();
     let definitions = SharedToolDefinitions::default();
     let mut projector = GenAiProjector::new(
@@ -484,7 +484,7 @@ fn macro_tools_are_listed_by_their_bare_names_for_the_in_process_agent() {
     );
     definitions.publish(vec![
         SessionToolDefinition {
-            name: "mcp__macro__ReadContent".to_owned(),
+            name: "mcp__rox__ReadContent".to_owned(),
             description: "Read a document.".to_owned(),
             parameters: json!({ "type": "object" }),
         },
@@ -494,7 +494,7 @@ fn macro_tools_are_listed_by_their_bare_names_for_the_in_process_agent() {
             parameters: json!({ "type": "object" }),
         },
     ]);
-    replay(&mut projector, fixtures::SUBAGENT_MACRO_INMEM);
+    replay(&mut projector, fixtures::SUBAGENT_ROX_INMEM);
     let spans = finished(&exporter, &provider);
 
     let agent = spans_named(&spans, "invoke_agent");
@@ -649,7 +649,7 @@ fn oversized_tool_results_are_cut_and_marked() {
     let result = string_attribute(read[0], attr::TOOL_CALL_RESULT).expect("result");
     assert!(result.len() <= 64, "cut to the budget: {}", result.len());
     assert_eq!(
-        attribute(read[0], attr::MACRO_CONTENT_TRUNCATED),
+        attribute(read[0], attr::ROX_CONTENT_TRUNCATED),
         Some(&OtelValue::Bool(true))
     );
 }
@@ -733,7 +733,7 @@ fn attached_resources_are_named_not_copied() {
                     "mimeType": "text/markdown",
                     "text": "CONFIDENTIAL BODY"
                 } },
-                { "type": "resource_link", "name": "notes", "uri": "macro://doc/42#p3" }
+                { "type": "resource_link", "name": "notes", "uri": "rox://doc/42#p3" }
             ]
         }),
         RequestId::Str("p1".to_owned()),
@@ -760,7 +760,7 @@ fn attached_resources_are_named_not_copied() {
         parsed[0]["parts"][1]["uri"],
         "https://files.example.com/doc.md"
     );
-    assert_eq!(parsed[0]["parts"][2]["uri"], "macro://doc/42");
+    assert_eq!(parsed[0]["parts"][2]["uri"], "rox://doc/42");
 }
 
 #[test]
@@ -845,11 +845,11 @@ fn first_text_is_independent_of_tools_reasoning_and_empty_chunks() {
     let turn = spans_named(&spans, "invoke_agent")[0];
     assert!(
         (5_000..10_000)
-            .contains(&int_attribute(turn, attr::MACRO_TIME_TO_FIRST_TEXT_MS).expect("text"))
+            .contains(&int_attribute(turn, attr::ROX_TIME_TO_FIRST_TEXT_MS).expect("text"))
     );
     for attr in [
-        attr::MACRO_TIME_TO_FIRST_REASONING_MS,
-        attr::MACRO_TIME_TO_FIRST_TOOL_CALL_MS,
+        attr::ROX_TIME_TO_FIRST_REASONING_MS,
+        attr::ROX_TIME_TO_FIRST_TOOL_CALL_MS,
     ] {
         assert!((1_000..5_000).contains(&int_attribute(turn, attr).expect("milestone")));
     }
@@ -870,8 +870,8 @@ fn tool_only_turn_has_no_first_text_measurement() {
     projector.on_stopped(&StopReason::Closed(CloseReason::TransportClosed));
     let spans = finished(&exporter, &provider);
     let turn = spans_named(&spans, "invoke_agent")[0];
-    assert!(int_attribute(turn, attr::MACRO_TIME_TO_FIRST_TOOL_CALL_MS).is_some());
-    assert!(int_attribute(turn, attr::MACRO_TIME_TO_FIRST_TEXT_MS).is_none());
+    assert!(int_attribute(turn, attr::ROX_TIME_TO_FIRST_TOOL_CALL_MS).is_some());
+    assert!(int_attribute(turn, attr::ROX_TIME_TO_FIRST_TEXT_MS).is_none());
 }
 
 #[test]

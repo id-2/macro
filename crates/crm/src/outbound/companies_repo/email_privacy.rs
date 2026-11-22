@@ -65,7 +65,7 @@ impl CompaniesRepositoryImpl {
         // Pre-enrichment callers use an autocommit connection, so this is only
         // admission there; the writer repeats it inside its transaction.
         let live = sqlx::query_scalar!(
-            "SELECT l.id FROM email_links l JOIN team_user tu ON tu.user_id = l.macro_id AND tu.team_id = $1 WHERE l.id = $2 AND l.is_primary AND l.deleting_at IS NULL AND l.disconnect_requested_at IS NULL AND NOT l.needs_reauth FOR SHARE OF l FOR KEY SHARE OF tu",
+            "SELECT l.id FROM email_links l JOIN team_user tu ON tu.user_id = l.rox_id AND tu.team_id = $1 WHERE l.id = $2 AND l.is_primary AND l.deleting_at IS NULL AND l.disconnect_requested_at IS NULL AND NOT l.needs_reauth FOR SHARE OF l FOR KEY SHARE OF tu",
             team, link
         ).fetch_optional(&mut *conn).await.map_err(|e| CrmError::StorageLayerError(e.into()))?;
         if live.is_none() {
@@ -75,7 +75,7 @@ impl CompaniesRepositoryImpl {
         let consented = sqlx::query_scalar!(
             r#"SELECT EXISTS (
                 SELECT 1 FROM crm_email_consent c
-                JOIN email_links l ON l.id = c.link_id AND l.macro_id = c.user_id AND l.is_primary AND l.deleting_at IS NULL
+                JOIN email_links l ON l.id = c.link_id AND l.rox_id = c.user_id AND l.is_primary AND l.deleting_at IS NULL
                 JOIN team_user tu ON tu.team_id = c.team_id AND tu.user_id = c.user_id
                 WHERE c.team_id = $1 AND c.link_id = $2 AND c.enabled
                   AND NOT crm_email_domain_blocked($1, c.user_id, split_part($3, '@', 2))
@@ -120,7 +120,7 @@ impl EmailPrivacyRepository for CompaniesRepositoryImpl {
         sqlx::query_as!(
             EmailContributionMailbox,
             r#"SELECT l.id AS link_id, l.email_address FROM crm_email_consent c
-               JOIN email_links l ON l.id = c.link_id AND l.macro_id = c.user_id AND l.is_primary AND l.deleting_at IS NULL
+               JOIN email_links l ON l.id = c.link_id AND l.rox_id = c.user_id AND l.is_primary AND l.deleting_at IS NULL
                JOIN team_user tu ON tu.team_id = c.team_id AND tu.user_id = c.user_id
                WHERE c.team_id = $1 AND c.user_id = $2 AND c.enabled"#,
             team,
@@ -160,7 +160,7 @@ impl EmailPrivacyRepository for CompaniesRepositoryImpl {
             r#"SELECT l.id, l.email_address, COALESCE(c.enabled, FALSE) AS "enabled!"
                FROM email_links l LEFT JOIN crm_email_consent c
                  ON c.link_id = l.id AND c.user_id = $2 AND c.team_id = $1
-               WHERE l.macro_id = $2 AND l.is_primary AND l.deleting_at IS NULL AND l.disconnect_requested_at IS NULL AND NOT l.needs_reauth LIMIT 1"#,
+               WHERE l.rox_id = $2 AND l.is_primary AND l.deleting_at IS NULL AND l.disconnect_requested_at IS NULL AND NOT l.needs_reauth LIMIT 1"#,
             team,
             user
         )
@@ -220,7 +220,7 @@ impl EmailPrivacyRepository for CompaniesRepositoryImpl {
                 // writers hold the mailbox row before revoking consent; do not
                 // acquire this lock after touching the consent row.
                 let current = sqlx::query_scalar!(
-                    "SELECT l.id FROM email_links l JOIN team_user tu ON tu.user_id = l.macro_id AND tu.team_id = $3 WHERE l.id = $1 AND l.macro_id = $2 AND l.is_primary AND l.deleting_at IS NULL AND l.disconnect_requested_at IS NULL AND NOT l.needs_reauth FOR SHARE OF l FOR KEY SHARE OF tu",
+                    "SELECT l.id FROM email_links l JOIN team_user tu ON tu.user_id = l.rox_id AND tu.team_id = $3 WHERE l.id = $1 AND l.rox_id = $2 AND l.is_primary AND l.deleting_at IS NULL AND l.disconnect_requested_at IS NULL AND NOT l.needs_reauth FOR SHARE OF l FOR KEY SHARE OF tu",
                     link_id, user, team
                 ).fetch_optional(&mut *tx).await.map_err(|e| CrmError::StorageLayerError(e.into()))?;
                 if current.is_none() {
@@ -230,7 +230,7 @@ impl EmailPrivacyRepository for CompaniesRepositoryImpl {
                 }
                 let changed = sqlx::query!(
                     r#"INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled)
-                       SELECT $1, $2, l.id, $3 FROM email_links l WHERE l.macro_id = $2 AND l.is_primary AND l.deleting_at IS NULL AND l.id = $4
+                       SELECT $1, $2, l.id, $3 FROM email_links l WHERE l.rox_id = $2 AND l.is_primary AND l.deleting_at IS NULL AND l.id = $4
                        ON CONFLICT (team_id, user_id) DO UPDATE SET link_id = EXCLUDED.link_id,
                          enabled = EXCLUDED.enabled, updated_at = now()"#, team, user, enabled, link_id
                 ).execute(&mut *tx).await.map_err(|e| CrmError::StorageLayerError(e.into()))?;

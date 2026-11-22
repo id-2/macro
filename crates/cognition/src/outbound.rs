@@ -5,8 +5,8 @@ use crate::domain::{
     GenerateObjectResponse, ModelId,
 };
 use async_trait::async_trait;
-use macro_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_ROX_USER_ID_HEADER};
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::{Client, Url, header::HeaderValue};
 use rootcause::Report;
 use serde::{Deserialize, de::DeserializeOwned};
@@ -79,19 +79,19 @@ impl CognitionClient {
 
     async fn request<T: DeserializeOwned>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         path: &str,
         body: Value,
     ) -> Result<T, Report> {
         let request = async {
             let mut headers = reqwest::header::HeaderMap::new();
-            macro_tower_layers::inject_trace_headers(&mut headers);
+            rox_tower_layers::inject_trace_headers(&mut headers);
             let mut response = self
                 .client
                 .post(self.base.join(path)?)
                 .headers(headers)
                 .header(INTERNAL_API_KEY_HEADER, self.key.clone())
-                .header(INTERNAL_MACRO_USER_ID_HEADER, user.as_ref())
+                .header(INTERNAL_ROX_USER_ID_HEADER, user.as_ref())
                 .json(&body)
                 .send()
                 .await
@@ -137,7 +137,7 @@ impl Cognition for CognitionClient {
     #[tracing::instrument(skip_all, err)]
     async fn generate_object(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         request: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         request.validate()?;
@@ -167,7 +167,7 @@ impl Cognition for CognitionClient {
     #[tracing::instrument(skip_all, err)]
     async fn decide(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         request.validate()?;

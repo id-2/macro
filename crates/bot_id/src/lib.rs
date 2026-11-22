@@ -55,61 +55,61 @@ fn bot_id_str(input: &str) -> IResult<&str, BotIdStorage<ArcCowStr<'_>>> {
 ///
 /// Mentioning it answers with the classic in-channel chat reply (the
 /// `channel_bots` agent loop in `document_storage_service`). Agent sessions
-/// belong to [`MACRO_NEW_BOT_ID`] instead.
-pub const MACRO_AI_BOT_ID: BotId =
+/// belong to [`ROX_NEW_BOT_ID`] instead.
+pub const ROX_AI_BOT_ID: BotId =
     BotId::new_from_uuid(Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_a1a1));
 
 /// Stable handle for the classic "Rox" system bot (used for `@` mentions).
-pub const MACRO_AI_HANDLE: &str = "macro";
+pub const ROX_AI_HANDLE: &str = "macro";
 
 /// Product name rendered by backend display strings.
 pub const PRODUCT_DISPLAY_NAME: &str = "Rox";
 
 /// Display name for Rox, shared by both of its bot ids.
-pub const MACRO_AI_NAME: &str = PRODUCT_DISPLAY_NAME;
+pub const ROX_AI_NAME: &str = PRODUCT_DISPLAY_NAME;
 
 /// Stable [`BotId`] for the agent-session half of Rox.
 ///
 /// Mentioning it opens an agent session served by the in-process (in-memory)
 /// agent harness, which answers with the Rox product toolset. A separate bot
-/// from [`MACRO_AI_BOT_ID`] because one id cannot mean both a chat reply and a
+/// from [`ROX_AI_BOT_ID`] because one id cannot mean both a chat reply and a
 /// session - but the same persona to a reader: both are named "Rox", and the
 /// web client's chat-v3 rollout decides which of the two a single `@macro`
 /// mention targets.
-pub const MACRO_NEW_BOT_ID: BotId =
+pub const ROX_NEW_BOT_ID: BotId =
     BotId::new_from_uuid(Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_a2a2));
 
 /// Stable handle for the agent-session Rox bot.
 ///
-/// Distinct from [`MACRO_AI_HANDLE`] only because handles identify a bot;
+/// Distinct from [`ROX_AI_HANDLE`] only because handles identify a bot;
 /// nothing offers it as a second `@` entry. The display name is
-/// [`MACRO_AI_NAME`], the same as the classic bot's.
-pub const MACRO_NEW_HANDLE: &str = "macro-new";
+/// [`ROX_AI_NAME`], the same as the classic bot's.
+pub const ROX_NEW_HANDLE: &str = "macro-new";
 
 /// Stable [`BotId`] for autonomous Rox platform operations.
-pub const MACRO_SYSTEM_BOT_ID: BotId =
+pub const ROX_SYSTEM_BOT_ID: BotId =
     BotId::new_from_uuid(Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_5759));
 
 /// Display name for the autonomous Rox platform principal.
-pub const MACRO_SYSTEM_NAME: &str = "Rox System";
+pub const ROX_SYSTEM_NAME: &str = "Rox System";
 
 /// Stable [`BotId`] for the "Rox Coder" system bot, our coding-agent harness.
 ///
-/// Distinct from [`MACRO_AI_BOT_ID`] on purpose: the Rox bot's sessions run
+/// Distinct from [`ROX_AI_BOT_ID`] on purpose: the Rox bot's sessions run
 /// in-process on the in-memory harness, while this one's run in a provisioned
 /// sandbox, and one id cannot mean both.
-pub const MACRO_CODER_BOT_ID: BotId =
+pub const ROX_CODER_BOT_ID: BotId =
     BotId::new_from_uuid(Uuid::from_u128(0x0000_0000_0000_0000_0000_0000_0000_a9e7));
 
 /// Stable handle for the "Rox Coder" system bot (used for `@` mentions).
-pub const MACRO_CODER_HANDLE: &str = "coder";
+pub const ROX_CODER_HANDLE: &str = "coder";
 
 /// Display name for the Rox coding bot.
-pub const MACRO_CODER_NAME: &str = "Rox Coder";
+pub const ROX_CODER_NAME: &str = "Rox Coder";
 
 /// Stable [`BotId`] for the "Cursor" system bot.
 ///
-/// Mentioning it opens an agent session like [`MACRO_CODER_BOT_ID`] does, but
+/// Mentioning it opens an agent session like [`ROX_CODER_BOT_ID`] does, but
 /// the session is served by a Cursor cloud agent rather than a Rox-managed
 /// sandbox.
 pub const CURSOR_BOT_ID: BotId =
@@ -129,7 +129,7 @@ pub const CODEX_HANDLE: &str = "codex";
 pub const CODEX_NAME: &str = "Codex";
 
 /// Stable handle for the autonomous Rox platform principal.
-pub const MACRO_SYSTEM_HANDLE: &str = "macro-system";
+pub const ROX_SYSTEM_HANDLE: &str = "macro-system";
 
 /// A first-party bot.
 ///
@@ -156,23 +156,23 @@ pub const SYSTEM_BOTS: &[SystemBot] = &[
     // needs no agent session; its next-generation replacement below is the
     // one whose mentions open sessions.
     SystemBot {
-        id: MACRO_AI_BOT_ID,
-        name: MACRO_AI_NAME,
-        handle: MACRO_AI_HANDLE,
+        id: ROX_AI_BOT_ID,
+        name: ROX_AI_NAME,
+        handle: ROX_AI_HANDLE,
         has_agent: false,
     },
     // The same persona as the bot above, under a second id because only this
     // one opens sessions. It carries the same name for the same reason.
     SystemBot {
-        id: MACRO_NEW_BOT_ID,
-        name: MACRO_AI_NAME,
-        handle: MACRO_NEW_HANDLE,
+        id: ROX_NEW_BOT_ID,
+        name: ROX_AI_NAME,
+        handle: ROX_NEW_HANDLE,
         has_agent: true,
     },
     SystemBot {
-        id: MACRO_CODER_BOT_ID,
-        name: MACRO_CODER_NAME,
-        handle: MACRO_CODER_HANDLE,
+        id: ROX_CODER_BOT_ID,
+        name: ROX_CODER_NAME,
+        handle: ROX_CODER_HANDLE,
         has_agent: true,
     },
     SystemBot {
@@ -190,9 +190,9 @@ pub const SYSTEM_BOTS: &[SystemBot] = &[
     // Posts as itself for autonomous platform operations, but nothing mentions
     // it and it opens no sessions.
     SystemBot {
-        id: MACRO_SYSTEM_BOT_ID,
-        name: MACRO_SYSTEM_NAME,
-        handle: MACRO_SYSTEM_HANDLE,
+        id: ROX_SYSTEM_BOT_ID,
+        name: ROX_SYSTEM_NAME,
+        handle: ROX_SYSTEM_HANDLE,
         has_agent: false,
     },
 ];
@@ -211,7 +211,7 @@ pub fn system_bot_by_handle(handle: &str) -> Option<&'static SystemBot> {
 
 /// Names earlier releases showed for the first-party bots.
 ///
-/// Rows, mention tags and messages written while the product was called Macro
+/// Rows, mention tags and messages written while the product was called Rox
 /// still carry these, and they name the same bots the registry does now, so
 /// a reader of an old mention should see the current name.
 const LEGACY_AI_NAMES: &[&str] = &["Macro"];
@@ -224,9 +224,9 @@ const LEGACY_CODER_NAMES: &[&str] = &["Macro Coder"];
 #[must_use]
 pub fn is_legacy_display_name(bot: &SystemBot, name: &str) -> bool {
     let name = name.trim();
-    let legacy = if bot.id == MACRO_AI_BOT_ID || bot.id == MACRO_NEW_BOT_ID {
+    let legacy = if bot.id == ROX_AI_BOT_ID || bot.id == ROX_NEW_BOT_ID {
         LEGACY_AI_NAMES
-    } else if bot.id == MACRO_CODER_BOT_ID {
+    } else if bot.id == ROX_CODER_BOT_ID {
         LEGACY_CODER_NAMES
     } else {
         &[]
@@ -239,11 +239,11 @@ pub fn is_legacy_display_name(bot: &SystemBot, name: &str) -> bool {
 /// The handle users type to reach the bot `id`, whose own handle is `handle`.
 ///
 /// Rox's agent-session bot is reached through `@macro`; its own handle,
-/// [`MACRO_NEW_HANDLE`], only tells it apart from the classic bot.
+/// [`ROX_NEW_HANDLE`], only tells it apart from the classic bot.
 #[must_use]
 pub fn mention_handle(id: BotId, handle: &str) -> &str {
-    if id == MACRO_NEW_BOT_ID {
-        MACRO_AI_HANDLE
+    if id == ROX_NEW_BOT_ID {
+        ROX_AI_HANDLE
     } else {
         handle
     }

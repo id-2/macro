@@ -7,7 +7,7 @@ use chrono::{TimeZone, Utc};
 use databases::domain::models::{DatabaseError, Viewer};
 use databases::domain::ports::CreatorAccess;
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt, EntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{CellWrite, DatabaseId, RowId, TableId};
 use uuid::Uuid;
 
@@ -141,7 +141,7 @@ pub(crate) struct FakeAccess {
 impl CreatorAccess for FakeAccess {
     async fn edit_receipt(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         database_id: DatabaseId,
     ) -> Result<Option<EntityAccessReceipt<EditAccessLevel>>, rootcause::Report> {
         let can_edit = self

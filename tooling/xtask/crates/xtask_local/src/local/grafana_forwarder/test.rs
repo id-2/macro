@@ -105,8 +105,8 @@ fn unusable_settings_leave_a_running_forwarder_alone() {
 }
 
 #[test]
-fn instance_networks_are_the_services_networks_of_macro_projects() {
-    assert!(is_instance_network("macro_services"));
+fn instance_networks_are_the_services_networks_of_rox_projects() {
+    assert!(is_instance_network("rox_services"));
     assert!(is_instance_network("macro-channels-b_services"));
     assert!(!is_instance_network("macro-channels-b_auth-internal"));
     assert!(!is_instance_network("bridge"));
@@ -115,8 +115,8 @@ fn instance_networks_are_the_services_networks_of_macro_projects() {
 
 #[test]
 fn the_instance_is_added_to_existing_resource_attributes() {
-    assert_eq!(with_instance(None, "ltg"), "macro.local.instance=ltg");
-    assert_eq!(with_instance(Some(" "), "ltg"), "macro.local.instance=ltg");
+    assert_eq!(with_instance(None, "ltg"), "rox.local.instance=ltg");
+    assert_eq!(with_instance(Some(" "), "ltg"), "rox.local.instance=ltg");
     assert_eq!(
         with_instance(Some("service.namespace=macro"), "ltg"),
         "service.namespace=macro,macro.local.instance=ltg"

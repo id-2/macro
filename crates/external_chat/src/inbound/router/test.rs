@@ -23,12 +23,12 @@ fn verified_owner_api_credentials_remain_distinct_from_sessions_and_bots() {
             SendAuthority::Automation,
         ),
         (
-            CredentialOrigin::MacroApiJwt,
+            CredentialOrigin::RoxApiJwt,
             None,
             SendAuthority::UserApiToken,
         ),
         (
-            CredentialOrigin::MacroApiJwt,
+            CredentialOrigin::RoxApiJwt,
             agent(),
             SendAuthority::UserApiToken,
         ),
@@ -41,11 +41,11 @@ fn verified_owner_api_credentials_remain_distinct_from_sessions_and_bots() {
         (CredentialOrigin::Harness, None, SendAuthority::Automation),
         (CredentialOrigin::Internal, None, SendAuthority::Automation),
     ] {
-        let user = MacroUserAuthentication {
+        let user = RoxUserAuthentication {
             origin: origin.clone(),
             agent_id,
             agent_via: None,
-            macro_user_id: "macro|person@example.com".to_string().try_into().unwrap(),
+            rox_user_id: "macro|person@example.com".to_string().try_into().unwrap(),
             user_context: Default::default(),
         };
         assert_eq!(authority(&user), expected, "{origin:?}");

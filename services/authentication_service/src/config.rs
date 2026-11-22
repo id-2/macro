@@ -5,9 +5,9 @@ use crate::service::signup_policy::SignupPolicy;
 use anyhow::Context;
 use database_env_vars::{DatabaseUrl, RedisUri};
 use gtm_invite::domain::models::{GtmInviteConfig, PromoCode};
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::{env_vars, maybe_env_vars};
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::{env_vars, maybe_env_vars};
 
 // BASE_URL config value. This is validated when creating the config in main.rs
 pub static BASE_URL: LazyLock<String> = LazyLock::new(|| {
@@ -55,7 +55,7 @@ maybe_env_vars! {
     /// deserializes this struct from Doppler alone — a required field it
     /// cannot see fails CI. The service still refuses to start without it;
     /// see [`Config::cursor_api_key_kms_key_id`], which also reads the
-    /// process environment because `MacroConfig` does not fall back to it
+    /// process environment because `RoxConfig` does not fall back to it
     /// when `APP_SECRETS_JSON` is present.
     pub struct CursorApiKeyKmsKeyId;
     /// Dedicated CMK for encrypted Codex OAuth envelopes, injected by infrastructure.
@@ -95,20 +95,20 @@ maybe_env_vars! {
 /// populate the Docker container
 ///
 /// See `.env.sample` in document-storage-service root for details.
-#[derive(macro_config::MacroConfig)]
-// #[macro_config::from_ref_all]
+#[derive(rox_config::RoxConfig)]
+// #[rox_config::from_ref_all]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Admit new Outlook accounts only after the deployment is ready. Reconnect is separate.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub outlook_connections_enabled: bool,
     /// Default-off quota admission and prospective usage counting.
-    #[macro_config_default(ai_billing::AiUsageEnforcement::Disabled)]
+    #[rox_config_default(ai_billing::AiUsageEnforcement::Disabled)]
     pub enable_ai_usage_enforcement: ai_billing::AiUsageEnforcement,
     /// Default-off settlement of usage past allowances: prepaid credit
     /// consumption and Stripe overage collection. This service owns Stripe, so
     /// its policy decides every settlement, however it was requested.
-    #[macro_config_default(ai_billing::AiUsageBilling::Disabled)]
+    #[rox_config_default(ai_billing::AiUsageBilling::Disabled)]
     pub enable_ai_usage_billing: ai_billing::AiUsageBilling,
     /// The free plan's hard monthly AI cap, in cents at provider cost.
     /// Mandatory; set in Doppler.
@@ -161,10 +161,10 @@ pub struct Config {
     /// Stripe secret key
     pub stripe_secret_key: StripeSecretKey,
     /// The port to listen for HTTP requests on.
-    #[macro_config_default(8080)]
+    #[rox_config_default(8080)]
     pub port: usize,
     /// The environment we are in
-    #[macro_config_default(Environment::new_or_prod())]
+    #[rox_config_default(Environment::new_or_prod())]
     pub environment: Environment,
     /// The internal auth key used by other services
     pub service_internal_auth_key: ServiceInternalAuthKey,
@@ -200,7 +200,7 @@ pub struct Config {
     pub development_signup_allowlist_json: DevelopmentSignupAllowlistJson,
     /// Whether Develop allows every public signup without reading
     /// `DEVELOPMENT_SIGNUP_ALLOWLIST_JSON`. Production and Local ignore it.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub development_bypass_signup_allowlist: bool,
     /// Stripe promotion code applied at checkout for accounts that signed up
     /// through a GTM invite link (optional, defaults to `1MF`).
@@ -221,11 +221,11 @@ pub struct Config {
     pub stripe_computer_xl_yearly_price_id: StripeComputerXlYearlyPriceId,
     /// Days a Rox computer whose billing ended keeps its disk, restorable,
     /// before it is destroyed.
-    #[macro_config_default(14)]
+    #[rox_config_default(14)]
     pub computer_retention_days: u32,
     /// Days a Rox computer keeps running on a past-due subscription before
     /// it is turned off.
-    #[macro_config_default(7)]
+    #[rox_config_default(7)]
     pub computer_past_due_grace_days: u32,
     /// The internal api key
     pub internal_api_key: InternalApiKey,
@@ -234,7 +234,7 @@ pub struct Config {
     /// Whether Gmail link consent requests the Google Calendar scope. Off by
     /// default so deployed environments don't ask users for a scope the
     /// calendar feature isn't using yet.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub calendar_scope_enabled: bool,
 }
 
@@ -349,7 +349,7 @@ impl Config {
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let billing = ai_billing::config::load_ai_usage_billing()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
-        let mut config = macro_config::ConfigLoader::load::<Config>()
+        let mut config = rox_config::ConfigLoader::load::<Config>()
             .context("failed to load authentication service config")?;
         config.enable_ai_usage_enforcement = enforcement;
         config.enable_ai_usage_billing = billing;
@@ -365,7 +365,7 @@ impl Config {
     /// feature of the settings surface, and a service that cannot encrypt one
     /// should fail at startup rather than at the first user who tries.
     pub(crate) fn cursor_api_key_kms_key_id(&self) -> anyhow::Result<String> {
-        // `MacroConfig` will not see a Pulumi-injected process env var once
+        // `RoxConfig` will not see a Pulumi-injected process env var once
         // Doppler's `APP_SECRETS_JSON` is present. Re-read through the env-var
         // type, which does fall back to process env.
         let from_process_env = CursorApiKeyKmsKeyId::new();
@@ -538,7 +538,7 @@ fn nonblank_value(value: Option<&str>) -> Option<&str> {
 }
 
 /// Pulumi injects `CURSOR_API_KEY_KMS_KEY_ID` as a container env var, not
-/// through Doppler. ECS always has `APP_SECRETS_JSON`, and `MacroConfig` will
+/// through Doppler. ECS always has `APP_SECRETS_JSON`, and `RoxConfig` will
 /// not look at process env once that blob is present, so the field on `Config`
 /// is unset in deployed environments. `CursorApiKeyKmsKeyId::new()` still
 /// falls back to process env, which is what `process_env` is.

@@ -1503,11 +1503,11 @@ export type Language = 'en' | 'de' | 'fr' | 'es' | 'it' | 'nl' | 'pt-PT' | 'sv' 
  */
 export type LinkShare = 'PUBLIC' | 'TEAM';
 
-export type MacroApiTokenResponse = {
+export type RoxApiTokenResponse = {
     /**
-     * The newly created macro_api_token
+     * The newly created rox_api_token
      */
-    macro_api_token: string;
+    rox_api_token: string;
 };
 
 /**
@@ -2442,7 +2442,7 @@ export type TeamAgent = {
      */
     teamId: string;
     /**
-     * The agent's Macro user id (`macro|<email>`).
+     * The agent's Rox user id (`macro|<email>`).
      */
     userId: string;
 };
@@ -3757,7 +3757,7 @@ export type HealthHandlerResponses = {
 
 export type HealthHandlerResponse = HealthHandlerResponses[keyof HealthHandlerResponses];
 
-export type MacroApiTokenData = {
+export type RoxApiTokenData = {
     body?: never;
     path?: never;
     query: {
@@ -3766,21 +3766,21 @@ export type MacroApiTokenData = {
          */
         email: string;
     };
-    url: '/jwt/macro_api_token';
+    url: '/jwt/rox_api_token';
 };
 
-export type MacroApiTokenErrors = {
+export type RoxApiTokenErrors = {
     401: string;
     500: string;
 };
 
-export type MacroApiTokenError = MacroApiTokenErrors[keyof MacroApiTokenErrors];
+export type RoxApiTokenError = RoxApiTokenErrors[keyof RoxApiTokenErrors];
 
-export type MacroApiTokenResponses = {
-    200: MacroApiTokenResponse;
+export type RoxApiTokenResponses = {
+    200: RoxApiTokenResponse;
 };
 
-export type MacroApiTokenResponse2 = MacroApiTokenResponses[keyof MacroApiTokenResponses];
+export type RoxApiTokenResponse2 = RoxApiTokenResponses[keyof RoxApiTokenResponses];
 
 export type RefreshData = {
     body?: never;

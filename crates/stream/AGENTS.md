@@ -17,7 +17,7 @@ consumer-group event log without a full Kafka dependency.
 ## Scope
 
 - Owns: the Redis Streams read/append/ack contract and its Redis adapter.
-- Not here: Kafka topics or `macro_event_broker` — this is for services that
+- Not here: Kafka topics or `rox_event_broker` — this is for services that
   want an ordered, consumer-group log without a full Kafka dependency.
 
 ## Boundaries

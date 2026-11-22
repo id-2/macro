@@ -185,7 +185,7 @@ async fn a_server_entry_without_a_token_is_refused_before_the_service_is_called(
 }
 
 #[tokio::test]
-async fn the_macro_route_names_macros_own_server() {
+async fn the_rox_route_names_macros_own_server() {
     let egress = Arc::new(StubEgress::default());
     let client = EgressMcpClient::new(Arc::clone(&egress), BASE_URL);
 

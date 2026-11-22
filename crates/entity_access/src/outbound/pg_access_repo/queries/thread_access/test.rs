@@ -1,8 +1,8 @@
 #[allow(unused_imports)]
 use super::*;
 use crate::domain::models::AccessLevel;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -10,8 +10,8 @@ const OWNER: &str = "macro|owner@corp.test";
 const REQUESTER: &str = "macro|requester@corp.test";
 const OTHER: &str = "macro|other@corp.test";
 
-fn user(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).unwrap()
+fn user(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).unwrap()
 }
 
 /// Runs `get_thread_access` as `REQUESTER` (authenticated, so the unauthenticated
@@ -42,11 +42,11 @@ async fn access_as_requester_on_team(
 
 /// macro_user + "User" rows so team / team_user FKs resolve.
 async fn insert_user(pool: &PgPool, user_id: &str, email: &str) {
-    let macro_uuid = Uuid::new_v4();
+    let rox_uuid = Uuid::new_v4();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $3, $4)"#,
-        macro_uuid,
+        rox_uuid,
         user_id,
         email,
         user_id,
@@ -56,10 +56,10 @@ async fn insert_user(pool: &PgPool, user_id: &str, email: &str) {
     .unwrap();
 
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         user_id,
         email,
-        macro_uuid,
+        rox_uuid,
     )
     .execute(pool)
     .await
@@ -174,10 +174,10 @@ async fn insert_email_contact(pool: &PgPool, link_id: Uuid, email: &str) -> Uuid
     id
 }
 
-async fn create_primary_link(pool: &PgPool, owner_macro_id: &str) -> Uuid {
+async fn create_primary_link(pool: &PgPool, owner_rox_id: &str) -> Uuid {
     let existing = sqlx::query_scalar!(
-        "SELECT id FROM email_links WHERE macro_id = $1 AND is_primary LIMIT 1",
-        owner_macro_id
+        "SELECT id FROM email_links WHERE rox_id = $1 AND is_primary LIMIT 1",
+        owner_rox_id
     )
     .fetch_optional(pool)
     .await
@@ -186,11 +186,11 @@ async fn create_primary_link(pool: &PgPool, owner_macro_id: &str) -> Uuid {
 
     if existing.is_none() {
         sqlx::query!(
-            r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+            r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
             link_id,
-            owner_macro_id,
-            owner_macro_id.strip_prefix("macro|").unwrap(),
+            owner_rox_id,
+            owner_rox_id.strip_prefix("macro|").unwrap(),
         )
         .execute(pool)
         .await
@@ -199,12 +199,12 @@ async fn create_primary_link(pool: &PgPool, owner_macro_id: &str) -> Uuid {
     link_id
 }
 
-async fn consent_to_email(pool: &PgPool, team_id: Uuid, owner_macro_id: &str) {
-    let link_id = create_primary_link(pool, owner_macro_id).await;
+async fn consent_to_email(pool: &PgPool, team_id: Uuid, owner_rox_id: &str) {
+    let link_id = create_primary_link(pool, owner_rox_id).await;
     sqlx::query!(
         "INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled) VALUES ($1, $2, $3, TRUE)",
         team_id,
-        owner_macro_id,
+        owner_rox_id,
         link_id,
     )
     .execute(pool)
@@ -212,10 +212,10 @@ async fn consent_to_email(pool: &PgPool, team_id: Uuid, owner_macro_id: &str) {
     .unwrap();
 }
 
-/// An empty link + thread owned by `owner_macro_id`. Returns `(link_id, thread_id)`.
+/// An empty link + thread owned by `owner_rox_id`. Returns `(link_id, thread_id)`.
 /// Creating a mailbox or thread never supplies CRM consent.
-async fn create_link_and_thread(pool: &PgPool, owner_macro_id: &str) -> (Uuid, Uuid) {
-    let link_id = create_primary_link(pool, owner_macro_id).await;
+async fn create_link_and_thread(pool: &PgPool, owner_rox_id: &str) -> (Uuid, Uuid) {
+    let link_id = create_primary_link(pool, owner_rox_id).await;
     let thread_id = Uuid::new_v4();
 
     sqlx::query!(
@@ -272,11 +272,11 @@ async fn add_message(
 /// Convenience: link + thread + a single message. Returns thread id.
 async fn create_thread(
     pool: &PgPool,
-    owner_macro_id: &str,
+    owner_rox_id: &str,
     from_email: &str,
     recipients: &[(&str, &str)],
 ) -> Uuid {
-    let (link_id, thread_id) = create_link_and_thread(pool, owner_macro_id).await;
+    let (link_id, thread_id) = create_link_and_thread(pool, owner_rox_id).await;
     add_message(pool, link_id, thread_id, from_email, recipients).await;
     thread_id
 }
@@ -372,7 +372,7 @@ async fn access_with_one_untracked(
     access_as_requester(pool, &thread_id).await
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn crm_consent_withdrawal_revokes_direct_access_but_keeps_mailbox_owner_access(pool: PgPool) {
     let team = setup_shared_team(&pool, true).await;
     let thread = create_thread(&pool, OWNER, "pat@acme.example.com", &[]).await;
@@ -418,7 +418,7 @@ async fn crm_consent_withdrawal_revokes_direct_access_but_keeps_mailbox_owner_ac
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admin_cannot_bypass_team_or_contributor_blocks_for_untracked_participants(pool: PgPool) {
     let team = setup_shared_team_as(&pool, true, "admin").await;
     let thread = create_thread(
@@ -455,9 +455,9 @@ async fn admin_cannot_bypass_team_or_contributor_blocks_for_untracked_participan
 // Owner / existence
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_gets_owner_access(pool: PgPool) -> anyhow::Result<()> {
-    // Requester owns the thread (link.macro_id == requester) — short-circuits to
+    // Requester owns the thread (link.rox_id == requester) — short-circuits to
     // Owner before any team/CRM logic.
     insert_user(&pool, REQUESTER, "requester@corp.test").await;
     let thread_id = create_thread(
@@ -475,7 +475,7 @@ async fn owner_gets_owner_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_access_wins_even_when_crm_would_deny(pool: PgPool) -> anyhow::Result<()> {
     // Requester is the thread owner AND on a CRM team whose only participant is
     // hidden (CRM path would deny). The owner short-circuit must still win.
@@ -491,7 +491,7 @@ async fn owner_access_wins_even_when_crm_would_deny(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn returns_none_when_thread_does_not_exist(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, REQUESTER, "requester@corp.test").await;
 
@@ -499,7 +499,7 @@ async fn returns_none_when_thread_does_not_exist(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn batch_owner_lookup_returns_only_owned_threads(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, REQUESTER, "requester@corp.test").await;
     insert_user(&pool, OWNER, "owner@corp.test").await;
@@ -515,22 +515,22 @@ async fn batch_owner_lookup_returns_only_owned_threads(pool: PgPool) -> anyhow::
 }
 
 // ---------------------------------------------------------------------------
-// Delegated / shared inboxes (macro_user_links)
+// Delegated / shared inboxes (rox_user_links)
 // ---------------------------------------------------------------------------
 
-/// `primary_macro_id` is delegated `child_macro_id`'s `link_id` inbox. Both users
+/// `primary_rox_id` is delegated `child_rox_id`'s `link_id` inbox. Both users
 /// must exist in "User".
 async fn insert_delegation(
     pool: &PgPool,
-    primary_macro_id: &str,
-    child_macro_id: &str,
+    primary_rox_id: &str,
+    child_rox_id: &str,
     link_id: Uuid,
 ) {
     sqlx::query!(
-        r#"INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id)
+        r#"INSERT INTO rox_user_links (primary_rox_id, child_rox_id, link_id)
            VALUES ($1, $2, $3)"#,
-        primary_macro_id,
-        child_macro_id,
+        primary_rox_id,
+        child_rox_id,
         link_id,
     )
     .execute(pool)
@@ -538,9 +538,9 @@ async fn insert_delegation(
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delegated_inbox_grants_access(pool: PgPool) -> anyhow::Result<()> {
-    // OWNER's inbox is delegated to REQUESTER via macro_user_links; the thread is
+    // OWNER's inbox is delegated to REQUESTER via rox_user_links; the thread is
     // owned by OWNER's inbox, so the delegate gets owner-equivalent access.
     insert_user(&pool, OWNER, "owner@corp.test").await;
     insert_user(&pool, REQUESTER, "requester@corp.test").await;
@@ -554,7 +554,7 @@ async fn delegated_inbox_grants_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delegation_scoped_to_the_primary(pool: PgPool) -> anyhow::Result<()> {
     // The inbox is delegated to OTHER, not REQUESTER. REQUESTER neither owns nor
     // is delegated the inbox, so it gets no access.
@@ -568,7 +568,7 @@ async fn delegation_scoped_to_the_primary(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delegation_scoped_to_another_link_denies_access(pool: PgPool) -> anyhow::Result<()> {
     // REQUESTER holds a grant on one of OWNER's inboxes, but the thread lives in a
     // different inbox of the same owner — the link-scoped grant must not reach it.
@@ -579,7 +579,7 @@ async fn delegation_scoped_to_another_link_denies_access(pool: PgPool) -> anyhow
     let other_link_id = Uuid::new_v4();
     let other_thread_id = Uuid::new_v4();
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, 'owner-second@mail.test', 'GMAIL')"#,
         other_link_id,
         OWNER,
@@ -602,7 +602,7 @@ async fn delegation_scoped_to_another_link_denies_access(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unauthenticated_user_never_gets_crm_access(pool: PgPool) -> anyhow::Result<()> {
     // Even a fully-synced thread is invisible to an unauthenticated caller: with
     // no user_id there are no source_ids, so the share-only branch returns before
@@ -623,7 +623,7 @@ async fn unauthenticated_user_never_gets_crm_access(pool: PgPool) -> anyhow::Res
 // Link sharing
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn public_link_grants_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER, "owner@corp.test").await;
     let (_, thread_id) = create_link_and_thread(&pool, OWNER).await;
@@ -642,7 +642,7 @@ async fn public_link_grants_anonymous_access(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn null_link_share_denies_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER, "owner@corp.test").await;
     insert_user(&pool, REQUESTER, "requester@corp.test").await;
@@ -653,7 +653,7 @@ async fn null_link_share_denies_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_grants_same_team_member(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER, "owner@corp.test").await;
     insert_user(&pool, REQUESTER, "requester@corp.test").await;
@@ -678,7 +678,7 @@ async fn team_link_grants_same_team_member(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_other_team_member(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER, "owner@corp.test").await;
     insert_user(&pool, REQUESTER, "requester@corp.test").await;
@@ -708,7 +708,7 @@ async fn team_link_denies_other_team_member(pool: PgPool) -> anyhow::Result<()> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER, "owner@corp.test").await;
     let team_id = Uuid::new_v4();
@@ -730,7 +730,7 @@ async fn team_link_denies_anonymous_access(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_when_owner_has_no_team(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER, "owner@corp.test").await;
     insert_user(&pool, REQUESTER, "requester@corp.test").await;
@@ -758,7 +758,7 @@ async fn team_link_denies_when_owner_has_no_team(pool: PgPool) -> anyhow::Result
 // CRM happy paths
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_comment_when_teammate_and_all_participants_synced(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -792,7 +792,7 @@ async fn grants_comment_when_teammate_and_all_participants_synced(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_synced_participants_span_multiple_messages(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -833,7 +833,7 @@ async fn grants_when_synced_participants_span_multiple_messages(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_any_duplicate_contact_signals_opt_out(pool: PgPool) -> anyhow::Result<()> {
     // Same address resolves to two contacts on the team: one hidden + in a
     // hidden company (opt-out), one clean. The opt-out signal wins — explicit
@@ -852,7 +852,7 @@ async fn denies_when_any_duplicate_contact_signals_opt_out(pool: PgPool) -> anyh
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_with_mixed_case_participant_address(pool: PgPool) -> anyhow::Result<()> {
     // Participant address is mixed-case; the CRM contact is lowercased. The
     // query lowercases the participant side, so it still matches.
@@ -872,7 +872,7 @@ async fn grants_with_mixed_case_participant_address(pool: PgPool) -> anyhow::Res
 // Combination with the share-permission / entity_access source
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn crm_comment_combines_with_lower_entity_access_view(pool: PgPool) -> anyhow::Result<()> {
     // entity_access grants View, CRM grants Comment → max is Comment.
     let team_id = setup_shared_team(&pool, true).await;
@@ -888,7 +888,7 @@ async fn crm_comment_combines_with_lower_entity_access_view(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn higher_entity_access_edit_wins_over_crm_comment(pool: PgPool) -> anyhow::Result<()> {
     // entity_access grants Edit, CRM grants Comment → max is Edit.
     let team_id = setup_shared_team(&pool, true).await;
@@ -908,7 +908,7 @@ async fn higher_entity_access_edit_wins_over_crm_comment(pool: PgPool) -> anyhow
 // Team membership / individual consent gating
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_requester_not_on_owners_team(pool: PgPool) -> anyhow::Result<()> {
     // Owner contributes to team A, requester belongs to team B. No shared team.
     insert_user(&pool, OWNER, "owner@corp.test").await;
@@ -931,7 +931,7 @@ async fn denies_when_requester_not_on_owners_team(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_without_individual_consent(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team(&pool, false).await;
     let thread_id = create_thread(&pool, OWNER, "alice@client.test", &[]).await;
@@ -942,7 +942,7 @@ async fn denies_without_individual_consent(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_without_individual_consent_even_when_teammates(pool: PgPool) -> anyhow::Result<()> {
     // Membership alone does not supply consent, with or without legacy settings.
     let team_id = Uuid::new_v4();
@@ -960,7 +960,7 @@ async fn denies_without_individual_consent_even_when_teammates(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_only_contact_for_participant_is_on_a_different_team(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -987,7 +987,7 @@ async fn grants_when_only_contact_for_participant_is_on_a_different_team(
 // Per-company / per-contact CRM gating (C + D), using a TO recipient
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_a_company_has_email_sync_off(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team(&pool, true).await;
     let thread_id = create_thread(
@@ -1008,7 +1008,7 @@ async fn denies_when_a_company_has_email_sync_off(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_a_company_is_hidden(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team(&pool, true).await;
     let thread_id = create_thread(
@@ -1029,7 +1029,7 @@ async fn denies_when_a_company_is_hidden(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_a_contact_is_hidden(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team(&pool, true).await;
     let thread_id = create_thread(
@@ -1049,7 +1049,7 @@ async fn denies_when_a_contact_is_hidden(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_a_hidden_contact_is_on_the_thread_under_a_second_address(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1076,7 +1076,7 @@ async fn denies_when_a_hidden_contact_is_on_the_thread_under_a_second_address(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_a_companyless_contact_is_hidden(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team(&pool, true).await;
     let thread_id = create_thread(
@@ -1095,7 +1095,7 @@ async fn denies_when_a_companyless_contact_is_hidden(pool: PgPool) -> anyhow::Re
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_a_companyless_contact_is_visible(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team(&pool, true).await;
     let thread_id = create_thread(&pool, OWNER, "bob@personal.test", &[]).await;
@@ -1108,7 +1108,7 @@ async fn grants_when_a_companyless_contact_is_visible(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admin_grants_despite_hidden_companyless_contact(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team_as(&pool, true, "admin").await;
     let thread_id = create_thread(&pool, OWNER, "bob@personal.test", &[]).await;
@@ -1126,7 +1126,7 @@ async fn admin_grants_despite_hidden_companyless_contact(pool: PgPool) -> anyhow
 // `email_sync=false` is a hard suppression that blocks every role.
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admin_grants_despite_hidden_contact(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team_as(&pool, true, "admin").await;
     let thread_id = create_thread(&pool, OWNER, "alice@client.test", &[]).await;
@@ -1140,7 +1140,7 @@ async fn admin_grants_despite_hidden_contact(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admin_grants_despite_hidden_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team_as(&pool, true, "admin").await;
     let thread_id = create_thread(&pool, OWNER, "alice@client.test", &[]).await;
@@ -1154,7 +1154,7 @@ async fn admin_grants_despite_hidden_company(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_grants_despite_hidden_contact_and_company(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team_as(&pool, true, "owner").await;
     let thread_id = create_thread(&pool, OWNER, "alice@client.test", &[]).await;
@@ -1168,7 +1168,7 @@ async fn owner_grants_despite_hidden_contact_and_company(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admin_denied_when_email_sync_off(pool: PgPool) -> anyhow::Result<()> {
     // email_sync=false is a hard suppression — even admins/owners can't see
     // threads through CRM grant for participants tracked in such companies.
@@ -1181,7 +1181,7 @@ async fn admin_denied_when_email_sync_off(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn owner_denied_when_email_sync_off(pool: PgPool) -> anyhow::Result<()> {
     let team_id = setup_shared_team_as(&pool, true, "owner").await;
     let thread_id = create_thread(&pool, OWNER, "alice@client.test", &[]).await;
@@ -1196,7 +1196,7 @@ async fn owner_denied_when_email_sync_off(pool: PgPool) -> anyhow::Result<()> {
 // Untracked external participants don't deny access (in any address slot)
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_the_from_sender_is_untracked(pool: PgPool) -> anyhow::Result<()> {
     let result = access_with_one_untracked(
         &pool,
@@ -1209,7 +1209,7 @@ async fn grants_when_the_from_sender_is_untracked(pool: PgPool) -> anyhow::Resul
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_a_to_participant_is_untracked(pool: PgPool) -> anyhow::Result<()> {
     let result = access_with_one_untracked(
         &pool,
@@ -1222,7 +1222,7 @@ async fn grants_when_a_to_participant_is_untracked(pool: PgPool) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_a_cc_participant_is_untracked(pool: PgPool) -> anyhow::Result<()> {
     let result = access_with_one_untracked(
         &pool,
@@ -1235,7 +1235,7 @@ async fn grants_when_a_cc_participant_is_untracked(pool: PgPool) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_a_bcc_participant_is_untracked(pool: PgPool) -> anyhow::Result<()> {
     let result = access_with_one_untracked(
         &pool,
@@ -1248,7 +1248,7 @@ async fn grants_when_a_bcc_participant_is_untracked(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_untracked_participant_in_a_later_message(pool: PgPool) -> anyhow::Result<()> {
     // A later message introduces an untracked external participant. Without
     // an opt-out signal the grant still holds.
@@ -1284,7 +1284,7 @@ async fn grants_when_untracked_participant_in_a_later_message(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_no_external_participant_is_tracked_at_all(pool: PgPool) -> anyhow::Result<()> {
     // Brand-new external folks (no CRM rows yet) on a CRM-enabled team —
     // grant. This is the typical "Evan opens a teammate's thread with new
@@ -1309,7 +1309,7 @@ async fn grants_when_no_external_participant_is_tracked_at_all(pool: PgPool) -> 
 // Requester's own domain is exempt from the CRM-contact requirement
 // ---------------------------------------------------------------------------
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn grants_when_only_unsynced_participant_is_on_requesters_domain(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1336,7 +1336,7 @@ async fn grants_when_only_unsynced_participant_is_on_requesters_domain(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_every_participant_is_on_requesters_domain(pool: PgPool) -> anyhow::Result<()> {
     // Purely-internal thread: all participants share the requester's domain, so
     // there's no external participant to anchor CRM access. Deny even though the
@@ -1408,7 +1408,7 @@ async fn insert_project_access(
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn project_access_grants_view_on_contained_thread(pool: PgPool) -> anyhow::Result<()> {
     // Project access is capped at View regardless of the project-level grant.
     insert_user(&pool, OWNER, "owner@corp.test").await;
@@ -1424,7 +1424,7 @@ async fn project_access_grants_view_on_contained_thread(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn denies_when_thread_project_not_shared_with_requester(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER, "owner@corp.test").await;
     let (_, thread_id) = create_link_and_thread(&pool, OWNER).await;
@@ -1436,7 +1436,7 @@ async fn denies_when_thread_project_not_shared_with_requester(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn direct_thread_grant_wins_over_project_view(pool: PgPool) -> anyhow::Result<()> {
     // Thread-level Edit beats the project-derived View.
     insert_user(&pool, OWNER, "owner@corp.test").await;
@@ -1453,7 +1453,7 @@ async fn direct_thread_grant_wins_over_project_view(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn no_project_grant_when_thread_has_no_project(pool: PgPool) -> anyhow::Result<()> {
     // Requester can access a project, but the thread isn't in one.
     insert_user(&pool, OWNER, "owner@corp.test").await;

@@ -1,8 +1,8 @@
 use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use chrono::{Duration, Utc};
 use frecency::domain::ports::FrecencyQueryService;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::time::Instant;
 use uuid::Uuid;
 
@@ -26,19 +26,19 @@ where
     E: EmailMessageEnqueuer,
     CS: crm::domain::service::CrmService,
     Eam: Send + Sync,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err> + From<E::Err>,
 {
     #[tracing::instrument(skip_all, err)]
     async fn pending_email_sends(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         after: Option<crate::domain::send_attempt::SendAttemptCursor>,
     ) -> Result<crate::domain::send_attempt::SendAttemptPage, EmailErr> {
         use crate::domain::send_attempt::{ListedSendAttempt, SendAttemptPage};
         let inboxes = self
             .email_repo
-            .inboxes_for_macro_id(actor.clone())
+            .inboxes_for_rox_id(actor.clone())
             .await
             .map_err(anyhow::Error::from)?;
         let ids: Vec<_> = inboxes.iter().map(|link| link.id).collect();
@@ -92,7 +92,7 @@ where
     #[tracing::instrument(skip_all, fields(%link_id, attempt_id = %attempt_id.0, phase = "authorization"), err)]
     async fn send_email(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
         snapshot: SendSnapshot,
@@ -100,7 +100,7 @@ where
         let started = Instant::now();
         let inboxes = self
             .email_repo
-            .inboxes_for_macro_id(actor.clone())
+            .inboxes_for_rox_id(actor.clone())
             .await
             .map_err(anyhow::Error::from)?;
         let link = resolve_target_link(&inboxes, Some(link_id), &actor)?;
@@ -157,9 +157,9 @@ where
                     .clone()
                     .or_else(|| snapshot.message.body_text.clone()),
                 restore_macro: snapshot
-                    .restore_body_macro
+                    .restore_body_rox
                     .clone()
-                    .or_else(|| snapshot.message.body_macro.clone()),
+                    .or_else(|| snapshot.message.body_rox.clone()),
             })
         }
         .await;
@@ -203,7 +203,7 @@ where
             self.publish_email_event(&EmailMacroEvent::message_send_queued(
                 MessageSendQueuedMetadata {
                     link_id,
-                    owner: link.macro_id.clone(),
+                    owner: link.rox_id.clone(),
                     actor: Some(actor),
                     message_id,
                     thread_id,
@@ -218,14 +218,14 @@ where
     #[tracing::instrument(skip_all, fields(%link_id, attempt_id = %attempt_id.0, phase = "authorization"), err)]
     async fn cancel_email_send(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
     ) -> Result<SendAttempt, EmailErr> {
         let started = Instant::now();
         let inboxes = self
             .email_repo
-            .inboxes_for_macro_id(actor.clone())
+            .inboxes_for_rox_id(actor.clone())
             .await
             .map_err(anyhow::Error::from)?;
         let link = resolve_target_link(&inboxes, Some(link_id), &actor)?;
@@ -242,7 +242,7 @@ where
             self.publish_email_event(&EmailMacroEvent::message_send_cancelled(
                 MessageSendCancelledMetadata {
                     link_id,
-                    owner: link.macro_id.clone(),
+                    owner: link.rox_id.clone(),
                     actor: Some(actor),
                     message_id,
                     thread_id,
@@ -256,13 +256,13 @@ where
     #[tracing::instrument(skip_all, fields(%link_id, attempt_id = %attempt_id.0, phase = "authorization"), err)]
     async fn email_send_status(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
     ) -> Result<Option<SendAttempt>, EmailErr> {
         let inboxes = self
             .email_repo
-            .inboxes_for_macro_id(actor.clone())
+            .inboxes_for_rox_id(actor.clone())
             .await
             .map_err(anyhow::Error::from)?;
         resolve_target_link(&inboxes, Some(link_id), &actor)?;
@@ -295,14 +295,14 @@ fn log_attempt_outcome(operation: &'static str, attempt: &SendAttempt, started: 
 impl EmailSendService for crate::domain::ports::NoOpEmailService {
     async fn pending_email_sends(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Option<crate::domain::send_attempt::SendAttemptCursor>,
     ) -> Result<crate::domain::send_attempt::SendAttemptPage, EmailErr> {
         Err(EmailErr::Unauthorized)
     }
     async fn send_email(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
         _: SendAttemptId,
         _: SendSnapshot,
@@ -311,7 +311,7 @@ impl EmailSendService for crate::domain::ports::NoOpEmailService {
     }
     async fn cancel_email_send(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
         _: SendAttemptId,
     ) -> Result<SendAttempt, EmailErr> {
@@ -319,7 +319,7 @@ impl EmailSendService for crate::domain::ports::NoOpEmailService {
     }
     async fn email_send_status(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
         _: SendAttemptId,
     ) -> Result<Option<SendAttempt>, EmailErr> {

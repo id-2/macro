@@ -2,8 +2,8 @@ use super::*;
 
 #[test]
 fn order_does_not_change_approved_attachments() {
-    let first = macro_uuid::generate_uuid_v7();
-    let second = macro_uuid::generate_uuid_v7();
+    let first = rox_uuid::generate_uuid_v7();
+    let second = rox_uuid::generate_uuid_v7();
     let approved = ApprovedAttachments {
         uploaded: vec![first, second],
         forwarded: vec![second, first],
@@ -16,9 +16,9 @@ fn order_does_not_change_approved_attachments() {
 
 #[test]
 fn missing_added_and_duplicated_attachments_are_rejected() {
-    let upload = macro_uuid::generate_uuid_v7();
-    let forwarded = macro_uuid::generate_uuid_v7();
-    let extra = macro_uuid::generate_uuid_v7();
+    let upload = rox_uuid::generate_uuid_v7();
+    let forwarded = rox_uuid::generate_uuid_v7();
+    let extra = rox_uuid::generate_uuid_v7();
     let approved = ApprovedAttachments {
         uploaded: vec![upload],
         forwarded: vec![forwarded],
@@ -39,7 +39,7 @@ fn missing_added_and_duplicated_attachments_are_rejected() {
 
 #[test]
 fn uploads_and_forwarded_attachments_are_not_interchangeable() {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let approved = ApprovedAttachments {
         uploaded: vec![id],
         forwarded: vec![],

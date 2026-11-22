@@ -1,12 +1,12 @@
 //! The document id namespace, which surfaces share in sync-service, read
-//! through macro_db_client's helper for the documents table.
+//! through rox_db_client's helper for the documents table.
 
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::domain::ports::DocumentIds;
 
-/// [`DocumentIds`] over macro_db_client's `does_document_exist`.
+/// [`DocumentIds`] over rox_db_client's `does_document_exist`.
 #[derive(Debug, Clone)]
 pub struct PgDocumentIds {
     pool: PgPool,
@@ -25,7 +25,7 @@ impl DocumentIds for PgDocumentIds {
         // Document ids are canonical lowercase text, and the sync-service
         // session key is that exact spelling. Soft-deleted documents keep their
         // session, so the helper deliberately counts them.
-        macro_db_client::dcs::does_document_exist::does_document_exist(
+        rox_db_client::dcs::does_document_exist::does_document_exist(
             self.pool.clone(),
             &id.to_string(),
         )

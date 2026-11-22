@@ -2,12 +2,12 @@ mod config;
 mod process;
 
 use anyhow::Context;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::postgres::PgPoolOptions;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     println!("Loading configuration...");
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = config::Config::from_env().context("Failed to load configuration")?;
 
     println!("Connecting to the database...");
@@ -18,37 +18,37 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("Could not connect to db")?;
 
-    let macro_ids: Vec<String> = config
-        .macro_ids
+    let rox_ids: Vec<String> = config
+        .rox_ids
         .split(',')
         .map(|id| id.trim().to_string())
         .collect();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
 
     let contacts_ingress = contacts::domain::service::SqsContactsIngress {
         queue: contacts::outbound::ingress::SqsContactsQueue::new(
             aws_sdk_sqs::Client::new(&aws_config),
-            macro_queues::ContactsQueue::new().to_string(),
+            rox_queues::ContactsQueue::new().to_string(),
         ),
     };
 
-    println!("Processing {} macro IDs: {:?}", macro_ids.len(), macro_ids);
+    println!("Processing {} macro IDs: {:?}", rox_ids.len(), rox_ids);
 
-    for (index, macro_id) in macro_ids.iter().enumerate() {
+    for (index, rox_id) in rox_ids.iter().enumerate() {
         println!(
             "\n=== Processing macro ID {} ({}/{}) ===",
-            macro_id,
+            rox_id,
             index + 1,
-            macro_ids.len()
+            rox_ids.len()
         );
 
-        match process::process_macro_id(&db_pool, &contacts_ingress, macro_id).await {
+        match process::process_rox_id(&db_pool, &contacts_ingress, rox_id).await {
             Ok(()) => {
-                println!("Completed processing for {}.", macro_id);
+                println!("Completed processing for {}.", rox_id);
             }
             Err(e) => {
-                panic!("Failed to process macro ID {}: {:?}", macro_id, e);
+                panic!("Failed to process macro ID {}: {:?}", rox_id, e);
             }
         }
     }

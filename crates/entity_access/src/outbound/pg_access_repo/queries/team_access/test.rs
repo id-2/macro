@@ -2,20 +2,20 @@
 use super::*;
 use crate::domain::models::TeamRole;
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 const TEAM_ALPHA: &str = "00000000-0000-0000-0000-0000000ea001";
 const TEAM_BETA: &str = "00000000-0000-0000-0000-0000000ea002";
 
-fn user(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).unwrap()
+fn user(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).unwrap()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_none_when_user_has_no_team_membership(pool: PgPool) -> Result<()> {
@@ -28,7 +28,7 @@ async fn returns_none_when_user_has_no_team_membership(pool: PgPool) -> Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_none_when_user_does_not_exist(pool: PgPool) -> Result<()> {
@@ -41,7 +41,7 @@ async fn returns_none_when_user_does_not_exist(pool: PgPool) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_member_role_for_member(pool: PgPool) -> Result<()> {
@@ -55,7 +55,7 @@ async fn returns_member_role_for_member(pool: PgPool) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_admin_role_for_admin(pool: PgPool) -> Result<()> {
@@ -69,7 +69,7 @@ async fn returns_admin_role_for_admin(pool: PgPool) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_owner_role_for_owner(pool: PgPool) -> Result<()> {
@@ -83,7 +83,7 @@ async fn returns_owner_role_for_owner(pool: PgPool) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn returns_team_id_of_the_users_actual_team(pool: PgPool) -> Result<()> {
@@ -100,7 +100,7 @@ async fn returns_team_id_of_the_users_actual_team(pool: PgPool) -> Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("user_team"))
 )]
 async fn does_not_leak_other_users_team_memberships(pool: PgPool) -> Result<()> {

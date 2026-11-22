@@ -1,8 +1,8 @@
 use super::*;
 use crate::outbound::postgres::test::{another_team, folder_fixture};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subtree_delete_unfiles_items_and_rejects_stale_folder_and_revision(pool: PgPool) {
     let (repository, _, mut record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -66,7 +66,7 @@ async fn subtree_delete_unfiles_items_and_rejects_stale_folder_and_revision(pool
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn depth_eight_allowed_nine_rejected_and_moves_preserve_rename(pool: PgPool) {
     let (repository, _, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -144,7 +144,7 @@ async fn depth_eight_allowed_nine_rejected_and_moves_preserve_rename(pool: PgPoo
     assert!(repository.folders(team).await.expect("empty").is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn opposite_moves_cannot_create_cycle_and_folder_cap_is_enforced(pool: PgPool) {
     let (repository, _, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -182,7 +182,7 @@ async fn opposite_moves_cannot_create_cycle_and_folder_cap_is_enforced(pool: PgP
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_commit_barrier_prevents_stale_rename_and_save_resurrection(pool: PgPool) {
     let (repository, _, mut record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -226,7 +226,7 @@ async fn delete_commit_barrier_prevents_stale_rename_and_save_resurrection(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cross_team_parent_and_contended_tree_lock_are_rejected(pool: PgPool) {
     let (repository, _, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;

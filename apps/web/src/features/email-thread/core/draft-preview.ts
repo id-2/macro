@@ -18,7 +18,7 @@ export function draftPreviewText(
 
 function htmlText(html: string) {
   const { body } = new DOMParser().parseFromString(html, 'text/html');
-  for (const quote of body.querySelectorAll('.macro_quote, .gmail_quote'))
+  for (const quote of body.querySelectorAll('.rox_quote, .gmail_quote'))
     quote.remove();
   // Paragraphs are adjacent elements; keep their words apart.
   for (const block of body.querySelectorAll('p, div, li, br, h1, h2, h3'))

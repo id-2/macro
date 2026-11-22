@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use email::domain::{models::EmailErr, ports::EmailService};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -58,14 +58,14 @@ pub struct ArchiveThreadRequest {
 #[tracing::instrument(skip(ctx, authorization, body), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id), err(Debug))]
 pub async fn archived_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(thread_id): Path<Uuid>,
     Json(body): Json<ArchiveThreadRequest>,
 ) -> Result<Response, ArchiveThreadError> {
     ctx.email_service
         .service()
         .set_thread_archived(
-            authorization.authorization.user.macro_user_id.clone(),
+            authorization.authorization.user.rox_user_id.clone(),
             thread_id,
             body.value,
         )
@@ -106,14 +106,14 @@ pub struct ArchiveThreadsResponse {
 #[tracing::instrument(skip(ctx, authorization, body), fields(user_id=authorization.authorization.user.user_context.user_id, thread_count=body.thread_ids.len()), err(Debug))]
 pub async fn archived_batch_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(body): Json<ArchiveThreadsRequest>,
 ) -> Result<Response, ArchiveThreadError> {
     let result = ctx
         .email_service
         .service()
         .set_threads_archived(
-            authorization.authorization.user.macro_user_id.clone(),
+            authorization.authorization.user.rox_user_id.clone(),
             body.thread_ids,
             body.value,
         )

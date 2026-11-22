@@ -5,7 +5,7 @@ fn read_description_uses_bound_tables_not_sql_text() {
     let catalog = catalog();
     let read = describe_read(
         &catalog,
-        "SELECT d.name FROM crm.deals d WHERE d.name = 'macro.people'",
+        "SELECT d.name FROM crm.deals d WHERE d.name = 'rox.people'",
     )
     .expect("read");
     assert_eq!(read.read_tables, [DEALS]);

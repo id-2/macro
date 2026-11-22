@@ -13,7 +13,7 @@ import {
 import { EcrImage } from '../../packages/service';
 import {
   BASE_DOMAIN,
-  MACRO_SUBDOMAIN_CERT,
+  ROX_SUBDOMAIN_CERT,
   DopplerEcsEnvironment,
 } from '../../packages/shared';
 import { StaticFileCloudFront } from './distribution';
@@ -275,7 +275,7 @@ export class StaticFileService extends pulumi.ComponentResource {
         stackName: stack,
         customDomain: {
           aliases: [`${SERVICE_DOMAIN_NAME}.rox.one`],
-          certificateArn: MACRO_SUBDOMAIN_CERT,
+          certificateArn: ROX_SUBDOMAIN_CERT,
         },
         notFoundPage: notFound,
         tags: this.tags,

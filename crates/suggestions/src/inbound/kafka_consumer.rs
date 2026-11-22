@@ -18,9 +18,9 @@ use channels::domain::broker_events::{ChannelMacroEvent, ChannelTopicEvent};
 use documents::domain::events::{DocumentMacroEvent, DocumentTopicEvent};
 use email::domain::events::{EmailMacroEvent, EmailTopicEvent};
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    EventConsumer, KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _,
-    MacroEventConsumerService, MessageWrapper,
+use rox_event_broker::{
+    EventConsumer, KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _,
+    RoxEventConsumerService, MessageWrapper,
 };
 use messages::domain::models::MessageParent;
 use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
@@ -34,7 +34,7 @@ use tracing::Instrument as _;
 use crate::domain::ports::ResolveSuggestions;
 use crate::domain::resolution::{Item, ResolutionEvent};
 
-macro_event_broker::declare_topics!(
+rox_event_broker::declare_topics!(
     SuggestionEvent: DocumentMacroEvent,
     ChannelMacroEvent,
     MessageMacroEvent,
@@ -207,7 +207,7 @@ where
     C: CommittingConsumer,
     for<'a> C::MessageType<'a>: Message,
 {
-    let consumer = MacroEventConsumerService::new(consumer);
+    let consumer = RoxEventConsumerService::new(consumer);
     let mut shutdown = std::pin::pin!(shutdown);
     loop {
         let message = tokio::select! {

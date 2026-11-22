@@ -9,8 +9,8 @@ use github::domain::{
     models::{GithubError, GithubLinkStatus},
     ports::GithubLinkService,
 };
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
-use macro_middleware::tracking::ClientIp;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
+use rox_middleware::tracking::ClientIp;
 use model::response::{EmptyResponse, ErrorResponse};
 use serde_utils::urlencode::UrlEncoded;
 use upstream_error::{UpstreamError, UpstreamErrorResponse};
@@ -136,13 +136,13 @@ impl IntoResponse for GithubLinkStatusError {
             (status = 503, body=UpstreamErrorResponse),
         )
     )]
-#[tracing::instrument(skip(ctx, ip_context, authorization), fields(client_ip=%ip_context, user_id=%authorization.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(ctx, ip_context, authorization), fields(client_ip=%ip_context, user_id=%authorization.authorization.user.rox_user_id), err)]
 pub async fn check_github_link_status_handler(
     State(ctx): State<ApiContext>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Response, GithubLinkStatusError> {
-    let user_id = &authorization.authorization.user.macro_user_id;
+    let user_id = &authorization.authorization.user.rox_user_id;
     let status = ctx
         .github_link_service
         .get_user_link_status(user_id)
@@ -198,16 +198,16 @@ pub async fn init_github_link_handler(
     State(ctx): State<ApiContext>,
     query: Query<InitGithubLinkQueryParams>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<InitGithubLinkResponse>, InitGithubLinkError> {
     let Query(InitGithubLinkQueryParams { original_url }) = query;
     let fusion_user_id = &authorization.authorization.user.user_context.fusion_user_id;
     let initiator =
-        macro_uuid::string_to_uuid(fusion_user_id).context("fusion user id must be a uuid")?;
+        rox_uuid::string_to_uuid(fusion_user_id).context("fusion user id must be a uuid")?;
     // TODO: this should probably be a middleware or extractor
     // Check count of in-progress links
     let count =
-        macro_db_client::in_progress_user_link::count_existing_in_progress_user_links_for_user(
+        rox_db_client::in_progress_user_link::count_existing_in_progress_user_links_for_user(
             &ctx.db,
             fusion_user_id,
         )
@@ -218,7 +218,7 @@ pub async fn init_github_link_handler(
     }
 
     // Create in-progress link
-    let link_id = macro_db_client::in_progress_user_link::create_in_progress_user_link(
+    let link_id = rox_db_client::in_progress_user_link::create_in_progress_user_link(
         &ctx.db,
         fusion_user_id,
     )
@@ -310,14 +310,14 @@ impl IntoResponse for DeleteGithubLinkError {
             (status = 503, body=UpstreamErrorResponse),
         )
     )]
-#[tracing::instrument(skip(ctx, ip_context, authorization), fields(client_ip=%ip_context, user_id=%authorization.authorization.user.macro_user_id), err)]
+#[tracing::instrument(skip(ctx, ip_context, authorization), fields(client_ip=%ip_context, user_id=%authorization.authorization.user.rox_user_id), err)]
 pub async fn delete_github_link_handler(
     State(ctx): State<ApiContext>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<EmptyResponse>, DeleteGithubLinkError> {
     ctx.github_link_service
-        .delete_user_link(&authorization.authorization.user.macro_user_id)
+        .delete_user_link(&authorization.authorization.user.rox_user_id)
         .await?;
 
     Ok(Json(EmptyResponse::default()))

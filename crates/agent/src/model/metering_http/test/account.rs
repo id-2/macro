@@ -64,7 +64,7 @@ impl<S: tracing::Subscriber> tracing_subscriber::Layer<S> for Events {
 }
 
 #[tokio::test]
-async fn suspended_macro_account_is_logged_on_every_send() {
+async fn suspended_rox_account_is_logged_on_every_send() {
     let events = Events::default();
     let _guard =
         tracing::subscriber::set_default(tracing_subscriber::registry().with(events.clone()));

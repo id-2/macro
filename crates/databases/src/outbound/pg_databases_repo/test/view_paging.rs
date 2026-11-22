@@ -20,7 +20,7 @@ async fn page_fixture(pool: &PgPool) -> (QueryTable, Vec<RowId>) {
         if let Some(value) = value {
             sqlx::query!(
                 "INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values) VALUES ($1, $2, 'DATABASE_ROW', $3, $4)",
-                macro_uuid::generate_uuid_v7(), row.id.to_string(), definition,
+                rox_uuid::generate_uuid_v7(), row.id.to_string(), definition,
                 serde_json::to_value(PropertyValue::Num(value)).unwrap(),
             ).execute(pool).await.unwrap();
         }
@@ -77,7 +77,7 @@ async fn pages(pool: &PgPool, table: &QueryTable, view: &ViewQuery) -> Vec<RowId
     all
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn filters_and_sorting_precede_every_page_with_stable_ties_and_nulls_last(pool: PgPool) {
     let (table, rows) = page_fixture(&pool).await;
     assert_eq!(pages(&pool, &table, &ViewQuery::default()).await, rows);
@@ -113,7 +113,7 @@ async fn filters_and_sorting_precede_every_page_with_stable_ties_and_nulls_last(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn changed_versions_cannot_continue_an_old_page(pool: PgPool) {
     let (table, _) = page_fixture(&pool).await;
     let query = database_sql::compile_table_query(
@@ -144,7 +144,7 @@ async fn formula_fixture(pool: &PgPool) -> (QueryTable, Vec<RowId>) {
     use models_properties::DataType;
     let (repo, table, _) = fixture(pool).await;
     let [price, qty, due, total, double, ratio, follow_up] =
-        [(); 7].map(|_| macro_uuid::generate_uuid_v7());
+        [(); 7].map(|_| rox_uuid::generate_uuid_v7());
     let column = |id: Uuid| {
         Box::new(Formula::Column {
             column: ColumnId::from_uuid(id),
@@ -280,7 +280,7 @@ async fn formula_fixture(pool: &PgPool) -> (QueryTable, Vec<RowId>) {
     (query_table, rows.into_iter().map(|row| row.id).collect())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn formulas_filter_and_sort_with_the_engine_rules(pool: PgPool) {
     let (table, rows) = formula_fixture(&pool).await;
     let sorted = |column: usize, direction: SortDirection| ViewQuery {
@@ -344,7 +344,7 @@ async fn values(
     for (row, value) in rows.iter().zip(values) {
         sqlx::query!(
             "INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values) VALUES ($1, $2, 'DATABASE_ROW', $3, $4) ON CONFLICT (entity_id, entity_type, property_definition_id) DO UPDATE SET values = EXCLUDED.values",
-            macro_uuid::generate_uuid_v7(), row.to_string(), table.columns[0].id,
+            rox_uuid::generate_uuid_v7(), row.to_string(), table.columns[0].id,
             value.map(|value| serde_json::to_value(value).unwrap()),
         ).execute(pool).await.unwrap();
     }
@@ -373,7 +373,7 @@ fn ascending(table: &QueryTable) -> ViewQuery {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn text_filters_escape_wildcards_and_text_sorts_ignore_case(pool: PgPool) {
     use models_databases::views::{PresenceOperator, TextOperator};
     let (mut table, rows) = page_fixture(&pool).await;
@@ -474,7 +474,7 @@ async fn text_filters_escape_wildcards_and_text_sorts_ignore_case(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn checkbox_dates_and_links_keep_the_existing_cell_semantics(pool: PgPool) {
     use models_databases::views::{DateOperator, PresenceOperator, TextOperator};
     let (mut table, rows) = page_fixture(&pool).await;
@@ -586,7 +586,7 @@ async fn checkbox_dates_and_links_keep_the_existing_cell_semantics(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn select_and_entity_pages_preserve_option_rank_membership_and_empty_sets(pool: PgPool) {
     use database_sql::catalog::{EntityKind, SelectOption};
     use models_databases::{OptionId, views::SetOperator};
@@ -806,7 +806,7 @@ async fn select_and_entity_pages_preserve_option_rank_membership_and_empty_sets(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unicode_case_mapping_matches_the_view_engine(pool: PgPool) {
     use models_databases::views::TextOperator;
     let (mut table, rows) = page_fixture(&pool).await;
@@ -848,7 +848,7 @@ async fn unicode_case_mapping_matches_the_view_engine(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn date_comparisons_preserve_sub_microsecond_precision(pool: PgPool) {
     use models_databases::views::DateOperator;
     let (mut table, rows) = page_fixture(&pool).await;
@@ -890,7 +890,7 @@ async fn date_comparisons_preserve_sub_microsecond_precision(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn date_ranges_sort_by_start_then_end_and_filter_by_day_like_the_engine(pool: PgPool) {
     use models_databases::views::DateRangeOperator;
     use models_properties::shared::DateRange;

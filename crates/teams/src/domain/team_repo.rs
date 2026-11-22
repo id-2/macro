@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use entity_access::domain::models::{
     AdminTeamRole, EntityAccessReceipt, MemberTeamRole, OwnerTeamRole,
 };
-use macro_user_id::{email::Email, lowercased::Lowercase, user_id::MacroUserIdStr};
+use rox_user_id::{email::Email, lowercased::Lowercase, user_id::RoxUserIdStr};
 
 use crate::domain::model::{
     AcceptedTeamInvite, CreateTeamError, DeleteTeamError, DueInviteReminder,
@@ -26,19 +26,19 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     fn is_seat_included(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, TeamError>> + Send;
 
     /// Gets the stripe customer id for a user
     fn get_stripe_customer_id(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<stripe::CustomerId>, TeamError>> + Send;
 
     /// Checks if a user has already used a trial.
     fn has_user_trialed(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, TeamError>> + Send;
 
     /// Gets the subscription id for a team
@@ -65,14 +65,14 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     fn get_team_owner(
         &self,
         team_id: &uuid::Uuid,
-    ) -> impl Future<Output = Result<MacroUserIdStr<'static>, TeamError>> + Send;
+    ) -> impl Future<Output = Result<RoxUserIdStr<'static>, TeamError>> + Send;
 
     /// Creates a new team with the provided normalized slug. `subscription_id` is `None` for
     /// free teams. Membership is not capped by team size. `owner_plan` is the plan the owner's
     /// own seat is already billed at. `auto_join_domain` is stored as the team's auto-join domain.
     fn create_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_name: &str,
         team_slug: &str,
         subscription_id: Option<&stripe::SubscriptionId>,
@@ -83,7 +83,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     /// Moves any user-owned GitHub App installation rows to the given team.
     fn move_github_app_installation_to_team_if_exists(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_id: &uuid::Uuid,
     ) -> impl Future<Output = Result<(), CreateTeamError>> + Send;
 
@@ -93,7 +93,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     fn invite_users_to_team(
         &self,
         team_id: &uuid::Uuid,
-        invited_by: &MacroUserIdStr<'_>,
+        invited_by: &RoxUserIdStr<'_>,
         invites: non_empty::NonEmpty<&[Email<Lowercase<'_>>]>,
         is_agent: bool,
     ) -> impl Future<Output = Result<Vec<TeamInvite<'_>>, InviteUsersToTeamError>> + Send;
@@ -123,7 +123,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     fn remove_user_from_team(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<TeamMember<'static>, RemoveUserFromTeamError>> + Send;
 
     ///Gets a team invite by id
@@ -173,7 +173,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     fn accept_team_invite(
         &self,
         team_invite_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<AcceptedTeamInvite<'static>, TeamError>> + Send;
 
     /// Rolls back a previously accepted team invite.
@@ -193,7 +193,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     /// Checks if a user is a member (not owner) of any team
     fn is_user_member_of_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, TeamError>> + Send;
 
     /// Gets the members of the team.
@@ -205,12 +205,12 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
 
     /// Checks if a list of users are members of any team that is not in the
     /// provided list of ignore_team_ids.
-    /// Returns a list of MacroUserId for all users that are members of another team.
+    /// Returns a list of RoxUserId for all users that are members of another team.
     fn bulk_is_member_of_other_team(
         &self,
         ignore_team_ids: non_empty::NonEmpty<&[uuid::Uuid]>,
-        users: non_empty::NonEmpty<&[MacroUserIdStr<'_>]>,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'_>>, TeamError>> + Send;
+        users: non_empty::NonEmpty<&[RoxUserIdStr<'_>]>,
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'_>>, TeamError>> + Send;
 
     /// Gets a team by id with all its members
     fn get_team_by_id(
@@ -221,13 +221,13 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     /// Gets all teams for a user
     fn get_user_teams(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Team>, TeamError>> + Send;
 
     /// Gets all team invites for a user (by email)
     fn get_user_team_invites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<TeamInviteDetails>, TeamError>> + Send;
 
     /// Gets all invites for a team
@@ -245,7 +245,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     /// Gets a user's display name (first and last name). `None` when they have not set one.
     fn get_user_display_name(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<String>, TeamError>> + Send;
 
     /// Updates a team
@@ -259,21 +259,21 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     fn get_team_role(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<TeamRole>, TeamError>> + Send;
 
     /// Gets the team member for the team
     fn get_team_member(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<TeamMember<'_>, TeamError>> + Send;
 
     /// Patches the role of the provided user id for the team
     fn patch_team_user_role(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_role: TeamRole,
     ) -> impl Future<Output = Result<(), TeamError>> + Send;
 
@@ -281,7 +281,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     fn patch_team_member_plan(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         plan: SeatPlan,
     ) -> impl Future<Output = Result<(), TeamError>> + Send;
 
@@ -337,7 +337,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     /// domain of the provided user id, if any.
     fn get_team_id_by_domain(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<uuid::Uuid>, TeamError>> + Send;
 
     /// Adds the user directly to the team as a member without requiring an
@@ -353,7 +353,7 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
     fn add_user_to_team(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         seat_included: bool,
     ) -> impl Future<Output = Result<Option<TeamMember<'static>>, TeamError>> + Send;
 
@@ -376,14 +376,14 @@ pub trait TeamRepository: Clone + Send + Sync + 'static {
         &self,
         team_id: &uuid::Uuid,
         token: &TeamInviteLinkToken,
-        created_by: &MacroUserIdStr<'_>,
+        created_by: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), TeamError>> + Send;
 
     /// Who created the invite link with `token`, if it exists and is known.
     fn get_team_invite_link_creator(
         &self,
         token: &TeamInviteLinkToken,
-    ) -> impl Future<Output = Result<Option<MacroUserIdStr<'static>>, TeamError>> + Send;
+    ) -> impl Future<Output = Result<Option<RoxUserIdStr<'static>>, TeamError>> + Send;
 
     /// Removes the team's invite link. A no-op when the team has none.
     fn delete_team_invite_link(
@@ -415,7 +415,7 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     /// auto-join domain.
     fn create_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_name: &str,
         subscription_id: Option<&stripe::SubscriptionId>,
         allow_domain_join: bool,
@@ -424,7 +424,7 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     /// Returns the user's active or trialing Stripe subscription id, if any.
     fn is_user_premium(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<stripe::SubscriptionId>, TeamError>> + Send;
 
     /// Invites users to a team
@@ -446,13 +446,13 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     fn remove_user_from_team(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), RemoveUserFromTeamError>> + Send;
 
     /// Rejects an invitation to join a team.
     fn reject_invitation(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_invite_id: &uuid::Uuid,
     ) -> impl Future<Output = Result<(), RemoveTeamInviteError>> + Send;
 
@@ -481,14 +481,14 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     /// NOTE: this is not exposed via axum and is meant for account deletion only.
     fn remove_user_from_all_teams(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), RemoveUserFromAllTeamsError>> + Send;
 
     /// Accepts a team invite for a user
     fn join_team(
         &self,
         team_invite_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<TeamMember<'_>, JoinTeamError>> + Send;
 
     /// Revokes team permissions for all team members, and the owner's personal
@@ -517,7 +517,7 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     fn set_team_member_plan(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         plan: SeatPlan,
     ) -> impl Future<Output = Result<TeamMember<'static>, SetTeamMemberPlanError>> + Send;
 
@@ -561,13 +561,13 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     /// Gets all teams for a user
     fn get_user_teams(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Team>, TeamError>> + Send;
 
     /// Gets all team invites for the authenticated user
     fn get_user_invites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<TeamInviteDetails>, TeamError>> + Send;
 
     /// Gets all invites for a team
@@ -586,7 +586,7 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     /// Gets the team users permissions
     fn get_team_user_permissions(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<
         Output = Result<HashSet<roles_and_permissions::domain::model::PermissionId>, TeamError>,
     > + Send;
@@ -632,7 +632,7 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     /// user is already on a team. Membership is not capped by plan or team size.
     fn try_join_team_by_domain(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<TeamMember<'static>>, JoinTeamDirectlyError>> + Send;
 
     /// Adds a team agent's account to the receipt's team with the same roles,
@@ -642,7 +642,7 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     fn add_team_agent(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<TeamMember<'static>, JoinTeamDirectlyError>> + Send;
 
     /// Takes back an [`Self::add_team_agent`] membership, for when creating the
@@ -651,7 +651,7 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     fn undo_team_agent_join(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), RemoveUserFromTeamError>> + Send;
 
     /// Removes an agent teammate from the team, as [`Self::remove_user_from_team`]
@@ -660,7 +660,7 @@ pub trait TeamService: Clone + Send + Sync + 'static {
     fn remove_team_agent(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), RemoveUserFromTeamError>> + Send;
 }
 
@@ -701,6 +701,6 @@ pub trait TeamInviteLinkService: Clone + Send + Sync + 'static {
     fn join_team_by_invite_link(
         &self,
         token: &TeamInviteLinkToken,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<JoinTeamByInviteLinkOutcome, JoinTeamByInviteLinkError>> + Send;
 }

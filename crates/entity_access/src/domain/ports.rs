@@ -10,7 +10,7 @@ use crate::domain::models::{
 };
 #[cfg(feature = "explain_binary")]
 use crate::domain::models::{AccessExplanation, AccessGrant};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId, user_id::MacroUserIdStr};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId, user_id::RoxUserIdStr};
 use std::{collections::HashMap, future::Future};
 use uuid::Uuid;
 
@@ -23,7 +23,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_document_access(
         &self,
         document_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// The highest access level a signed-in user has on each requested
@@ -32,63 +32,63 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_documents_access(
         &self,
         document_ids: &[String],
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<HashMap<String, AccessLevel>, AccessError>> + Send;
 
     /// Get the highest access level a user has for a chat.
     fn get_chat_access(
         &self,
         chat_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Get the highest access level a user has for a project.
     fn get_project_access(
         &self,
         project_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Get the highest access level a user has for an email thread.
     fn get_thread_access(
         &self,
         thread_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Get owner or explicitly delegated-inbox access to a calendar event.
     fn get_calendar_event_access(
         &self,
         event_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Return the requested email threads owned by, or inbox-delegated to, a user.
     fn get_owned_email_thread_ids(
         &self,
         thread_ids: &[Uuid],
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<Uuid>, AccessError>> + Send;
 
     /// Get the highest access level a user has for a call.
     fn get_call_access(
         &self,
         call_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Get the highest access level a user has for an agent session.
     fn get_agent_session_access(
         &self,
         agent_session_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Get the highest access level a user has for an initiative.
     fn get_initiative_access(
         &self,
         initiative_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Highest grant the caller's sources hold on one scheduled action.
@@ -97,13 +97,13 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_scheduled_action_access(
         &self,
         scheduled_action_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Live scheduled action ids the caller's sources can manage.
     fn accessible_scheduled_action_ids(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<Uuid>, AccessError>> + Send;
 
     /// Supported parent owning an agent session's still-live originating message thread.
@@ -129,13 +129,13 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_pipeline_access(
         &self,
         id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// All pipeline grants for the caller's current sharing sources.
     fn list_pipeline_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<(Uuid, AccessLevel)>, AccessError>> + Send;
 
     /// Highest grant on each of `ids` for the caller's current sharing
@@ -144,21 +144,21 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_pipelines_access(
         &self,
         ids: &[Uuid],
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<HashMap<Uuid, AccessLevel>, AccessError>> + Send;
 
     /// Get the highest access level a user has for a database.
     fn get_database_access(
         &self,
         database_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// The highest access level a user has on every database they can reach,
     /// ordered by database id.
     fn list_database_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<(Uuid, AccessLevel)>, AccessError>> + Send;
 
     /// Get the highest access level a user has for a database row, which is
@@ -166,14 +166,14 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_database_row_access(
         &self,
         row_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Highest grant on each requested row's database. Rows without grants are omitted.
     fn get_database_rows_access(
         &self,
         row_ids: &[Uuid],
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<HashMap<Uuid, AccessLevel>, AccessError>> + Send;
 
     /// Get the highest access level a user has for a form: their grants, plus
@@ -182,21 +182,21 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_form_access(
         &self,
         form_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Resolve who may use a runtime.
     fn get_harness_access(
         &self,
         harness_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Resolve ordinary shares on an external chat.
     fn get_external_chat_access(
         &self,
         form_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// The highest access level a user's grants hold on every live form they
@@ -204,7 +204,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     /// and trashed forms are left out.
     fn list_form_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<(Uuid, AccessLevel)>, AccessError>> + Send;
 
     /// Get the access level a user has for a reminder.
@@ -215,7 +215,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_reminder_access(
         &self,
         reminder_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
 
     /// Get the highest access level available to a bot in its owning team's
@@ -277,7 +277,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn has_foreign_entity_access(
         &self,
         foreign_entity_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<bool, AccessError>> + Send;
 
     /// Get the access level a user has for a CRM company, with the company's
@@ -292,7 +292,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_crm_company_access(
         &self,
         company_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<CrmEntityAccess>, AccessError>> + Send;
 
     /// Get the access level a user has for a CRM contact, with the contact's
@@ -305,7 +305,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_crm_contact_access(
         &self,
         contact_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> impl Future<Output = Result<Option<CrmEntityAccess>, AccessError>> + Send;
 
     /// Check if a user is a member of the specified channels.
@@ -313,7 +313,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     /// Returns the subset of channel_ids that the user is a participant of.
     fn check_user_channel_membership(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         channel_ids: &[Uuid],
     ) -> impl Future<Output = Result<Vec<Uuid>, AccessError>> + Send;
 
@@ -327,7 +327,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     fn get_channel_role(
         &self,
         channel_id: &Uuid,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         user_org_id: Option<i64>,
     ) -> impl Future<Output = Result<ChannelRoleResult, AccessError>> + Send;
 
@@ -336,7 +336,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
         &self,
         entity_id: &uuid::Uuid,
         entity_type: EntityType,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, AccessError>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, AccessError>> + Send;
 
     /// Gets the users each entity's `entity_access` grants reach (direct users, team
     /// members, and active channel participants), the same users
@@ -354,13 +354,13 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
         &self,
         entity_id: &Uuid,
         entity_type: EntityType,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, AccessError>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, AccessError>> + Send;
 
     /// Get all active participant user IDs in a channel.
     fn get_channel_users(
         &self,
         channel_id: &Uuid,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, AccessError>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, AccessError>> + Send;
 
     /// Resolve a call ID to its channel ID and share permission ID.
     ///
@@ -394,7 +394,7 @@ pub trait AccessRepository: Clone + Send + Sync + 'static {
     /// is returned.
     fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Option<UserTeamInfo>, AccessError>> + Send;
 }
 
@@ -404,7 +404,7 @@ pub trait ScheduledActionGrants: Send + Sync + 'static {
     /// Ids of live scheduled actions `user_id` can manage.
     fn accessible_scheduled_action_ids(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<Uuid>, AccessError>> + Send;
 }
 
@@ -417,7 +417,7 @@ pub trait ExplainAccessRepository: Clone + Send + Sync + 'static {
     /// types are rejected by [`ExplainAccessService`], not here.
     fn list_access_grants(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> impl Future<Output = Result<Vec<AccessGrant>, AccessError>> + Send;
@@ -433,7 +433,7 @@ pub trait ExplainAccessService: Clone + Send + Sync + 'static {
     /// malformed ids.
     fn explain_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> impl Future<Output = Result<AccessExplanation, AccessError>> + Send;
@@ -449,7 +449,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// Returns an error if the user does not satisfy that requirement.
     fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -462,7 +462,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// adapters by delegating to the single-entity API.
     fn generate_email_thread_view_access_receipts<'a>(
         &'a self,
-        user_id: &'a MacroUserId<Lowercase<'_>>,
+        user_id: &'a RoxUserId<Lowercase<'_>>,
         user_org_id: Option<i64>,
         thread_ids: &'a [String],
     ) -> impl Future<
@@ -495,7 +495,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// document at a time.
     fn generate_document_view_access_receipts<'a>(
         &'a self,
-        user_id: &'a MacroUserId<Lowercase<'_>>,
+        user_id: &'a RoxUserId<Lowercase<'_>>,
         document_ids: &'a [String],
     ) -> impl Future<
         Output = Result<HashMap<String, EntityAccessReceipt<ViewAccessLevel>>, AccessError>,
@@ -533,7 +533,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// lookups; the default delegates to the single-entity authorization path.
     fn generate_database_row_view_access_receipts<'a>(
         &'a self,
-        user_id: &'a MacroUserId<Lowercase<'_>>,
+        user_id: &'a RoxUserId<Lowercase<'_>>,
         row_ids: &'a [String],
     ) -> impl Future<
         Output = HashMap<String, Result<EntityAccessReceipt<ViewAccessLevel>, AccessError>>,
@@ -579,7 +579,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// Returns `None` if the user has no access to the entity.
     fn get_access_level(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> impl Future<Output = Result<Option<AccessLevel>, AccessError>> + Send;
@@ -590,7 +590,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// Returns an error if the user does not have sufficient access.
     fn check_access(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         required_level: AccessLevel,
@@ -616,7 +616,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// Returns `AccessError::Unauthorized` if the user has no access.
     fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         user_org_id: Option<i64>,
@@ -637,7 +637,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// can't be silently weakened by inheriting a fallback.
     fn get_crm_entity_permission_with_team(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> impl Future<Output = Result<(EntityPermission, Uuid, TeamRole), AccessError>> + Send;
@@ -658,7 +658,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
         &self,
         entity_id: &str,
         entity_type: EntityType,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, AccessError>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, AccessError>> + Send;
 
     /// Resolve a call ID to its channel ID and share permission ID.
     ///
@@ -681,7 +681,7 @@ pub trait EntityAccessService: Clone + Send + Sync + 'static {
     /// Returns `None` if the user has no team membership.
     fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Option<UserTeamInfo>, AccessError>> + Send;
 }
 
@@ -693,7 +693,7 @@ pub trait AccessibleDatabases: Clone + Send + Sync + 'static {
     /// reach, ordered by database id. Trashed databases are still listed.
     fn accessible_databases(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<(Uuid, AccessLevel)>, AccessError>> + Send;
 }
 
@@ -706,7 +706,7 @@ pub trait AccessibleForms: Clone + Send + Sync + 'static {
     /// listed, and neither are trashed forms.
     fn accessible_forms(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<(Uuid, AccessLevel)>, AccessError>> + Send;
 }
 
@@ -719,7 +719,7 @@ pub struct NoOpEntityAccessService;
 impl EntityAccessService for NoOpEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -743,7 +743,7 @@ impl EntityAccessService for NoOpEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -754,7 +754,7 @@ impl EntityAccessService for NoOpEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -777,7 +777,7 @@ impl EntityAccessService for NoOpEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -789,7 +789,7 @@ impl EntityAccessService for NoOpEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -802,7 +802,7 @@ impl EntityAccessService for NoOpEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(AccessError::internal(
             "entity access service not configured",
         ))
@@ -828,7 +828,7 @@ impl EntityAccessService for NoOpEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(None)
     }
@@ -839,13 +839,13 @@ pub trait AccessiblePipelines: Clone + Send + Sync + 'static {
     /// Highest effective grant on each accessible pipeline.
     fn accessible_pipelines(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> impl Future<Output = Result<Vec<(Uuid, AccessLevel)>, AccessError>> + Send;
     /// Highest effective grant on each of `ids` the user can access, without
     /// reading their other pipelines.
     fn pipelines_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         ids: &[Uuid],
     ) -> impl Future<Output = Result<HashMap<Uuid, AccessLevel>, AccessError>> + Send;
 }

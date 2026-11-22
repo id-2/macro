@@ -163,7 +163,7 @@ fn notarize_dmg() -> Step<Run> {
 fn prepare_cloudkit_tcp() -> Step<Run> {
     Step::new("Prepare CloudKit TCP fallback")
         .run(format!(
-            "set -euo pipefail\ncat > \"$RUNNER_TEMP/macro-cloudkit-tcp.sh\" <<'MACRO_CLOUDKIT_TCP'\n{}\nMACRO_CLOUDKIT_TCP\n",
+            "set -euo pipefail\ncat > \"$RUNNER_TEMP/macro-cloudkit-tcp.sh\" <<'ROX_CLOUDKIT_TCP'\n{}\nROX_CLOUDKIT_TCP\n",
             include_str!("scripts/cloudkit_tcp.sh")
         ))
         .shell("bash")

@@ -2,7 +2,7 @@ use super::*;
 use crate::outbound::customer_repo::test::{
     form, item, mount, repo, subscription, subscription_update,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use std::str::FromStr;
 use wiremock::MockServer;
@@ -16,7 +16,7 @@ fn items_page(data: Vec<stripe::SubscriptionItem>) -> stripe::List<stripe::Subsc
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_computer_item_bills_its_own_price_with_the_computer_id(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -61,7 +61,7 @@ async fn a_computer_item_bills_its_own_price_with_the_computer_id(pool: sqlx::Pg
                 "error_if_incomplete".to_string()
             ),
             (
-                "metadata[macro_item_change]".to_string(),
+                "metadata[rox_item_change]".to_string(),
                 "computer-add:computer-1".to_string()
             ),
         ])
@@ -72,7 +72,7 @@ async fn a_computer_item_bills_its_own_price_with_the_computer_id(pool: sqlx::Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_computer_price_copies_the_catalog_price_with_the_computer_id(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let base = stripe::Price {
@@ -131,7 +131,7 @@ async fn a_computer_price_copies_the_catalog_price_with_the_computer_id(pool: sq
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_a_computer_item_deletes_it_without_proration(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -184,7 +184,7 @@ async fn removing_a_computer_item_deletes_it_without_proration(pool: sqlx::PgPoo
 
 /// Edge case (e): an item, or a whole subscription, that is already gone
 /// counts as removed instead of failing forever.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn removing_an_item_that_is_already_gone_succeeds_without_an_update(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -237,7 +237,7 @@ async fn removing_an_item_that_is_already_gone_succeeds_without_an_update(pool: 
     assert!(subscription_update(&requests).is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subscription_items_name_their_computer_from_item_or_price_metadata(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut tagged = item("si_c1", "price_c1", 1);
@@ -279,7 +279,7 @@ async fn subscription_items_name_their_computer_from_item_or_price_metadata(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_empty_page_that_claims_more_items_is_an_error(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut empty = items_page(vec![]);
@@ -297,7 +297,7 @@ async fn an_empty_page_that_claims_more_items_is_an_error(pool: sqlx::PgPool) {
 
 /// A change whose outcome stayed unknown is applied when its marker landed,
 /// and abandoned otherwise, so no later replay can charge it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn settling_an_unknown_change_abandons_it_unless_its_marker_landed(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -313,7 +313,7 @@ async fn settling_an_unknown_change_abandons_it_unless_its_marker_landed(pool: s
         sqlx::query!(
             "INSERT INTO subscription_item_change (idempotency_key, subscription_id, path, request) VALUES ($1, 'sub_team', '/subscriptions/sub_team', $2)",
             key,
-            json!({"items": [{"price": "price_c1", "quantity": 1}], "metadata": {"macro_item_change": key}}),
+            json!({"items": [{"price": "price_c1", "quantity": 1}], "metadata": {"rox_item_change": key}}),
         )
         .execute(&pool)
         .await
@@ -341,7 +341,7 @@ async fn settling_an_unknown_change_abandons_it_unless_its_marker_landed(pool: s
 
 /// Computers are for paying teams: a trialing subscription never gains a
 /// computer item, so nothing is sent to Stripe.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_trialing_subscription_refuses_a_computer_item(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();

@@ -2,7 +2,7 @@ use agent_session::domain::work_registration::WorkRegistration;
 use async_graphql::{Context, ID};
 use futures::future::join_all;
 use graphql_soup::{AgentSessionEntityLoader, SoupEntityEdges, load_soup_agent_session};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::{
     context::{RegisteredWorkGraphqlContext, to_graphql_error},
@@ -14,7 +14,7 @@ use crate::{
 /// see the session, it is archived, or it failed to load: one bad row never fails a read.
 pub(crate) async fn load_entry<E: SoupEntityEdges>(
     loader: &AgentSessionEntityLoader,
-    viewer: &MacroUserIdStr<'static>,
+    viewer: &RoxUserIdStr<'static>,
     registration: WorkRegistration,
 ) -> Option<GraphqlRegisteredWork<E>> {
     let session =
@@ -38,7 +38,7 @@ pub(crate) async fn load_entry<E: SoupEntityEdges>(
 /// Resolve the registered work of `account_ids` that `viewer` can see, newest first.
 pub async fn resolve_registered_work<E: SoupEntityEdges>(
     ctx: &Context<'_>,
-    viewer: MacroUserIdStr<'static>,
+    viewer: RoxUserIdStr<'static>,
     account_ids: Vec<ID>,
 ) -> async_graphql::Result<Vec<GraphqlRegisteredWork<E>>> {
     let context = ctx.data::<RegisteredWorkGraphqlContext>()?;

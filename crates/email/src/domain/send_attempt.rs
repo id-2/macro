@@ -1,7 +1,7 @@
 //! Replay-safe admission and cancellation of an approved email snapshot.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -47,7 +47,7 @@ pub struct SendSnapshot {
     /// Original editor text; omitted values use the approved body.
     pub restore_body_text: Option<String>,
     /// Original editor document; omitted values use the approved body.
-    pub restore_body_macro: Option<String>,
+    pub restore_body_rox: Option<String>,
 }
 
 /// Authoritative state of an admitted or cancelled send attempt.
@@ -149,7 +149,7 @@ pub trait EmailSendRepo: Send + Sync {
     /// Return at most 51 unresolved attempts for authorized inboxes, newest first.
     fn pending_send_attempts(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link_ids: &[Uuid],
         after: Option<&SendAttemptCursor>,
     ) -> impl Future<Output = Result<Vec<(SendAttemptCursor, SendAttempt)>, EmailErr>> + Send;
@@ -168,7 +168,7 @@ pub trait EmailSendRepo: Send + Sync {
     /// Read an attempt, optionally verifying that its approved content matches.
     fn read_send_attempt(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
         snapshot: Option<&SendSnapshot>,
@@ -178,7 +178,7 @@ pub trait EmailSendRepo: Send + Sync {
     /// attempts so their delayed cancellations cannot affect this send.
     fn admit_send(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
         prepared: PreparedSend,
@@ -188,7 +188,7 @@ pub trait EmailSendRepo: Send + Sync {
     /// boundary. Submitted or ambiguous legacy claims must remain locked.
     fn cancel_send(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
     ) -> impl Future<Output = Result<SendAttempt, EmailErr>> + Send;
@@ -199,13 +199,13 @@ pub trait EmailSendService: Send + Sync {
     /// List the actor's unresolved sends across currently accessible inboxes.
     fn pending_email_sends(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         after: Option<SendAttemptCursor>,
     ) -> impl Future<Output = Result<SendAttemptPage, EmailErr>> + Send;
     /// Authorize the selected inbox and durably admit the approved snapshot.
     fn send_email(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
         snapshot: SendSnapshot,
@@ -213,14 +213,14 @@ pub trait EmailSendService: Send + Sync {
     /// Cancel this attempt or report that delivery already started.
     fn cancel_email_send(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
     ) -> impl Future<Output = Result<SendAttempt, EmailErr>> + Send;
     /// Read status after navigation/restart without reissuing a send.
     fn email_send_status(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         attempt_id: SendAttemptId,
     ) -> impl Future<Output = Result<Option<SendAttempt>, EmailErr>> + Send;

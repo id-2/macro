@@ -4,7 +4,7 @@ use axum::{Json, extract::State};
 use entity_access::domain::models::EditAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::InitiativeAccessExtractor;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 
 use super::{InitiativeIdParams, InitiativeRouterState};
@@ -40,7 +40,7 @@ pub async fn update_initiative_handler<S, Eas, Auth>(
 where
     S: InitiativeService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     // A scoped session shares nothing; this route's path can't say whether
     // its body does. The link share is a column the grant writers never see;

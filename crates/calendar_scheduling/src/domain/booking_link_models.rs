@@ -25,7 +25,7 @@ pub struct BookingLinkEvent {
     /// the link should use Google Meet or no video. False is omitted so drafts
     /// saved before this field still round-trip unchanged.
     #[serde(default, skip_serializing_if = "is_false")]
-    pub macro_call: bool,
+    pub rox_call: bool,
     /// Generate a Google Meet conference. Mutually exclusive with `macroCall`.
     pub google_meet: bool,
     /// Whether new bookings are accepted.
@@ -132,7 +132,7 @@ impl BookingLinkDraft {
                 description: event.description.clone(),
                 duration_minutes: event.duration_minutes,
                 location: event.location.clone(),
-                macro_call: event.macro_call,
+                rox_call: event.rox_call,
                 google_meet: event.google_meet,
                 enabled: event.enabled,
                 mode: event.mode,
@@ -164,7 +164,7 @@ impl BookingLinkDraft {
                 description: self.event.description,
                 duration_minutes: self.event.duration_minutes,
                 location: self.event.location,
-                macro_call: self.event.macro_call,
+                rox_call: self.event.rox_call,
                 google_meet: self.event.google_meet,
                 enabled: self.event.enabled,
                 mode: self.event.mode,

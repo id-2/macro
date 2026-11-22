@@ -115,7 +115,7 @@ and the Rust handler share one trace ID.
 
 - Snapshot-first: `take_snapshot` after every navigation or pane change; act
   only on uids from the latest snapshot (uid prefixes bump on re-render).
-  Macro snapshots are huge — split panes duplicate the doc text — so save
+  Rox snapshots are huge — split panes duplicate the doc text — so save
   big ones to a file (`filePath` param) and grep them.
 - `navigate_page` can time out while the SPA actually loaded (cold Vite
   compile); follow with `wait_for` on expected text instead of re-navigating.
@@ -135,7 +135,7 @@ and the Rust handler share one trace ID.
   `[contenteditable] strong` to confirm an AI edit) — cheaper and more
   precise than screenshots.
 
-### Driving the Macro app
+### Driving the Rox app
 
 The condensed version is below; the full field-tested guide (routes, every
 surface, keyboard model, crash recovery, trace correlation from a network
@@ -156,7 +156,7 @@ request's `traceparent`) is `docs/agent-guide/`.
   text, so snapshots double as content verification.
 - AI edit: "Edit with AI" button under the editor → type the instruction →
   Enter. Edits apply in place; done when the "Stop" button disappears.
-  AI chat: "Ask Macro" in the doc's Actions panel (doc pre-attached), Enter
+  AI chat: "Ask Rox" in the doc's Actions panel (doc pre-attached), Enter
   sends, "Stop generating" disappears when the response is complete.
 - Channels: "Create" → Channel → name it, tokenize invitees in the "To:"
   combobox, "Create Channel". Verify membership in the Participants tab.

@@ -1,7 +1,7 @@
-use macro_db_client::user::organization::{
+use rox_db_client::user::organization::{
     get_organization_roles_for_user, match_user_to_organization,
 };
-use macro_env_var::optional_read_env_var;
+use rox_env_var::optional_read_env_var;
 
 #[cfg(test)]
 mod test;
@@ -75,7 +75,7 @@ pub async fn create_user(
     tracing::info!(organization_id=?organization_id, roles=?roles, "resolved organization and roles for new user");
 
     // Create user in macrodb
-    let user_id = macro_db_client::user::create_user::create_user(
+    let user_id = rox_db_client::user::create_user::create_user(
         db,
         fusionauth_user_id,
         username,
@@ -92,7 +92,7 @@ pub async fn create_user(
     tracing::info!(user_id, "created macro user and user profile in macrodb");
 
     if organization_id.is_some() {
-        macro_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
+        rox_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
         tracing::info!(organization_id=?organization_id, "deleted pending organization invitation");
     }
 
@@ -139,7 +139,7 @@ pub async fn create_user_profile(
     tracing::trace!(roles=?roles, "got roles for user");
 
     // Create user in macrodb
-    macro_db_client::user::create_user::create_user_profile(
+    rox_db_client::user::create_user::create_user_profile(
         db,
         fusionauth_user_id,
         email,
@@ -149,7 +149,7 @@ pub async fn create_user_profile(
     .await?;
 
     if organization_id.is_some() {
-        macro_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
+        rox_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
     }
 
     tracing::trace!("created user in macrodb");

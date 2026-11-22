@@ -9,7 +9,7 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 
 use crate::domain::models::{
@@ -38,14 +38,14 @@ pub trait FavoritesRepo: Send + Sync + 'static {
     /// that returns the existing record.
     fn add_favorite(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> impl Future<Output = Result<Favorite, Self::Err>> + Send;
 
     /// Count the favorites currently in the user's collection.
     fn count_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<i64, Self::Err>> + Send;
 
     /// List the user's favorites matching `filter`, in manual order, hydrated
@@ -53,7 +53,7 @@ pub trait FavoritesRepo: Send + Sync + 'static {
     /// omitted.
     fn list_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         filter: &FavoriteFilter,
     ) -> impl Future<Output = Result<Vec<Favorite>, Self::Err>> + Send;
 
@@ -62,7 +62,7 @@ pub trait FavoritesRepo: Send + Sync + 'static {
     /// Returns `true` when a row was removed.
     fn remove_favorite_by_entity(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -71,14 +71,14 @@ pub trait FavoritesRepo: Send + Sync + 'static {
     /// entities the user has not favorited are ignored.
     fn reorder_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         ordered: &[Entity<'_>],
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Of the given entities, return the subset favorited by the user.
     fn favorited_entities(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
     ) -> impl Future<Output = Result<HashSet<Entity<'static>>, Self::Err>> + Send;
 }
@@ -135,7 +135,7 @@ pub trait FavoritesMutationService: Send + Sync + 'static {
     /// Persist a complete manual order and return the authoritative collection.
     fn reorder_favorites(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         ordered: Vec<Entity<'static>>,
     ) -> impl Future<Output = Result<Vec<Favorite>, FavoritesError>> + Send;
 }
@@ -156,35 +156,35 @@ pub trait FavoritesService: Send + Sync + 'static {
     /// at the driving boundary.
     fn add_favorite_with_established_access(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> impl Future<Output = Result<Favorite, FavoritesError>> + Send;
 
     /// List the user's favorites in manual order, restricted by `filter`.
     fn list_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         filter: &FavoriteFilter,
     ) -> impl Future<Output = Result<Vec<Favorite>, FavoritesError>> + Send;
 
     /// Remove the favorite for the given entity from the user's collection.
     fn remove_favorite_by_entity(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> impl Future<Output = Result<(), FavoritesError>> + Send;
 
     /// Persist a manual ordering for the user's favorites.
     fn reorder_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         ordered: &[Entity<'_>],
     ) -> impl Future<Output = Result<(), FavoritesError>> + Send;
 
     /// Of the given entities, return the subset favorited by the user.
     fn favorited_entities(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
     ) -> impl Future<Output = Result<HashSet<Entity<'static>>, FavoritesError>> + Send;
 }

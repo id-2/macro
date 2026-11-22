@@ -6,9 +6,9 @@ use agent::types::{ChatMessageContent, Role};
 use chrono::Utc;
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::chat::NewChatMessage;
 use model_owner::Owner;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -25,7 +25,7 @@ use crate::domain::ports::ChatRepo;
 async fn migrate_for_test(pool: &Pool<Postgres>) {
     // Keep both colliding migration bodies in the isolated test database,
     // remapping only the mailbox migration's in-memory version.
-    let migrations = MACRO_DB_MIGRATIONS
+    let migrations = ROX_DB_MIGRATIONS
         .iter()
         .map(|migration| {
             let mut migration = migration.clone();
@@ -52,7 +52,7 @@ pub(super) struct SponsoredByOwner;
 impl BotFacts for SponsoredByOwner {
     async fn sponsor(&self, _bot: bot_id::BotId) -> EntityRegistryResult<Option<Owner>> {
         Ok(Some(Owner::User(
-            MacroUserIdStr::parse_from_str("macro|test@example.com")
+            RoxUserIdStr::parse_from_str("macro|test@example.com")
                 .unwrap()
                 .into_owned(),
         )))
@@ -79,25 +79,25 @@ const TEAM_OWNER: &str = "00000000-0000-0000-0000-00000000a2a2";
 
 /// Registers a non-user principal in `"User"` so the `Chat."userId"` foreign
 /// key accepts it as an owner.
-async fn insert_owner_principal(pool: &Pool<Postgres>, principal: &str, macro_user_id: &str) {
-    let macro_user_id = uuid::Uuid::parse_str(macro_user_id).unwrap();
+async fn insert_owner_principal(pool: &Pool<Postgres>, principal: &str, rox_user_id: &str) {
+    let rox_user_id = uuid::Uuid::parse_str(rox_user_id).unwrap();
     sqlx::query(
         r#"
         INSERT INTO "macro_user" ("id", "username", "email", "stripe_customer_id")
         VALUES ($1, $2, $3, $4)
         "#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(principal)
-    .bind(format!("{macro_user_id}@example.com"))
-    .bind(format!("stripe_{macro_user_id}"))
+    .bind(format!("{rox_user_id}@example.com"))
+    .bind(format!("stripe_{rox_user_id}"))
     .execute(pool)
     .await
     .unwrap();
-    sqlx::query(r#"INSERT INTO "User" ("id", "email", "macro_user_id") VALUES ($1, $2, $3)"#)
+    sqlx::query(r#"INSERT INTO "User" ("id", "email", "rox_user_id") VALUES ($1, $2, $3)"#)
         .bind(principal)
-        .bind(format!("{macro_user_id}@example.com"))
-        .bind(macro_user_id)
+        .bind(format!("{rox_user_id}@example.com"))
+        .bind(rox_user_id)
         .execute(pool)
         .await
         .unwrap();
@@ -158,7 +158,7 @@ async fn get_stored_share_permission(
 }
 
 async fn create_test_chat(repo: &TestRepo, name: &str) -> String {
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
     repo.create(
@@ -178,7 +178,7 @@ async fn patch_share_permission(
     chat_id: &str,
     share_permission: UpdateSharePermissionRequestV2,
 ) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
     repo.patch(
@@ -196,7 +196,7 @@ async fn patch_share_permission(
 }
 
 async fn create_chat_with_message(repo: &TestRepo) -> (String, String) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
     let chat_id = repo
@@ -240,7 +240,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
         .await
         .unwrap();
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
     let mut private_permission = default_share_permission();
@@ -285,12 +285,12 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn create_chat_returns_id(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -320,12 +320,12 @@ async fn create_chat_returns_id(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn create_message_updates_chat_timestamp_and_selected_model(pool: Pool<Postgres>) {
     let repo = test_repo(pool);
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -403,7 +403,7 @@ async fn create_message_updates_chat_timestamp_and_selected_model(pool: Pool<Pos
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn delete_message_returns_parent_chat_id_and_removes_message(pool: Pool<Postgres>) {
@@ -422,7 +422,7 @@ async fn delete_message_returns_parent_chat_id_and_removes_message(pool: Pool<Po
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn update_message_content_bumps_chat_updated_at(pool: Pool<Postgres>) {
@@ -454,7 +454,7 @@ async fn update_message_content_bumps_chat_updated_at(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn update_interim_message_content_does_not_bump_chat(pool: Pool<Postgres>) {
@@ -486,7 +486,7 @@ async fn update_interim_message_content_does_not_bump_chat(pool: Pool<Postgres>)
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn nonexistent_message_does_not_bump_chat(pool: Pool<Postgres>) {
@@ -518,7 +518,7 @@ async fn nonexistent_message_does_not_bump_chat(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn create_chat_creates_public_view_permission(pool: Pool<Postgres>) {
@@ -532,12 +532,12 @@ async fn create_chat_creates_public_view_permission(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn create_chat_creates_user_item_access(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -561,7 +561,7 @@ async fn create_chat_creates_user_item_access(pool: Pool<Postgres>) {
         "#,
     )
     .bind("macro|test@example.com")
-    .bind(macro_uuid::string_to_uuid(&chat_id).unwrap())
+    .bind(rox_uuid::string_to_uuid(&chat_id).unwrap())
     .fetch_one(&pool)
     .await
     .unwrap();
@@ -584,19 +584,19 @@ async fn fetch_entity_row(pool: &Pool<Postgres>, chat_id: &str) -> PgRow {
         WHERE id = $1
         "#,
     )
-    .bind(macro_uuid::string_to_uuid(chat_id).unwrap())
+    .bind(rox_uuid::string_to_uuid(chat_id).unwrap())
     .fetch_one(pool)
     .await
     .unwrap()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn create_chat_registers_entity_row(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -623,7 +623,7 @@ async fn create_chat_registers_entity_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn delete_chat_marks_entity_deleted(pool: Pool<Postgres>) {
@@ -640,7 +640,7 @@ async fn delete_chat_marks_entity_deleted(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn revert_delete_clears_entity_deleted_at(pool: Pool<Postgres>) {
@@ -658,7 +658,7 @@ async fn revert_delete_clears_entity_deleted_at(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn permanently_delete_chat_removes_entity_row(pool: Pool<Postgres>) {
@@ -668,7 +668,7 @@ async fn permanently_delete_chat_removes_entity_row(pool: Pool<Postgres>) {
     repo.permanently_delete(&chat_id).await.unwrap();
 
     let count: (i64,) = sqlx::query_as(r#"SELECT COUNT(*) FROM entity WHERE id = $1"#)
-        .bind(macro_uuid::string_to_uuid(&chat_id).unwrap())
+        .bind(rox_uuid::string_to_uuid(&chat_id).unwrap())
         .fetch_one(&pool)
         .await
         .unwrap();
@@ -677,12 +677,12 @@ async fn permanently_delete_chat_removes_entity_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn copy_chat_registers_entity_row_for_source_and_copy(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -730,13 +730,13 @@ async fn copy_chat_registers_entity_row_for_source_and_copy(pool: Pool<Postgres>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn delete_restore_and_purge_succeed_without_entity_row(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
     let chat_id = create_test_chat(&repo, "Legacy Chat").await;
-    let chat_uuid = macro_uuid::string_to_uuid(&chat_id).unwrap();
+    let chat_uuid = rox_uuid::string_to_uuid(&chat_id).unwrap();
 
     sqlx::query(r#"DELETE FROM entity WHERE id = $1"#)
         .bind(chat_uuid)
@@ -764,12 +764,12 @@ async fn delete_restore_and_purge_succeed_without_entity_row(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn create_chat_creates_user_history(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -801,12 +801,12 @@ async fn create_chat_creates_user_history(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn create_chat_with_project_id(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -835,12 +835,12 @@ async fn create_chat_with_project_id(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn get_chat_returns_chat(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -870,7 +870,7 @@ async fn get_chat_returns_chat(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn get_chat_decodes_bot_and_team_owners(pool: Pool<Postgres>) {
@@ -891,7 +891,7 @@ async fn get_chat_decodes_bot_and_team_owners(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn get_chat_not_found(pool: Pool<Postgres>) {
@@ -902,12 +902,12 @@ async fn get_chat_not_found(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn soft_delete_chat_sets_deleted_at(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -936,12 +936,12 @@ async fn soft_delete_chat_sets_deleted_at(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn soft_delete_chat_removes_history(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -971,12 +971,12 @@ async fn soft_delete_chat_removes_history(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn permanently_delete_chat_removes_row(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1004,12 +1004,12 @@ async fn permanently_delete_chat_removes_row(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn permanently_delete_chat_removes_permissions(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1038,12 +1038,12 @@ async fn permanently_delete_chat_removes_permissions(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn permanently_delete_chat_removes_user_item_access(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1063,7 +1063,7 @@ async fn permanently_delete_chat_removes_user_item_access(pool: Pool<Postgres>) 
 
     let count: i64 = sqlx::query!(
         r#"SELECT COUNT(id) AS result FROM "entity_access" WHERE "entity_id" = $1"#,
-        &macro_uuid::string_to_uuid(&chat_id).unwrap(),
+        &rox_uuid::string_to_uuid(&chat_id).unwrap(),
     )
     .map(|r| r.result.unwrap_or(0))
     .fetch_one(&pool)
@@ -1074,12 +1074,12 @@ async fn permanently_delete_chat_removes_user_item_access(pool: Pool<Postgres>) 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn patch_chat_updates_name(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1095,7 +1095,7 @@ async fn patch_chat_updates_name(pool: Pool<Postgres>) {
         .await
         .unwrap();
 
-    let patch_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let patch_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
     repo.patch(
@@ -1116,12 +1116,12 @@ async fn patch_chat_updates_name(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn patch_chat_updates_project(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1137,7 +1137,7 @@ async fn patch_chat_updates_project(pool: Pool<Postgres>) {
         .await
         .unwrap();
 
-    let patch_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let patch_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
     repo.patch(
@@ -1166,12 +1166,12 @@ async fn patch_chat_updates_project(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn patch_chat_clears_project(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1187,7 +1187,7 @@ async fn patch_chat_clears_project(pool: Pool<Postgres>) {
         .await
         .unwrap();
 
-    let patch_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let patch_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
     repo.patch(
@@ -1213,12 +1213,12 @@ async fn patch_chat_clears_project(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn get_chat_returns_full_response(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1247,7 +1247,7 @@ async fn get_chat_returns_full_response(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn get_chat_not_found_returns_error(pool: Pool<Postgres>) {
@@ -1258,12 +1258,12 @@ async fn get_chat_not_found_returns_error(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn copy_chat_creates_new_chat_with_same_messages(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1322,12 +1322,12 @@ async fn copy_chat_creates_new_chat_with_same_messages(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn revert_delete_restores_chat(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
 
@@ -1368,7 +1368,7 @@ async fn revert_delete_restores_chat(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn revert_delete_skips_user_history_for_non_user_owner(pool: Pool<Postgres>) {
@@ -1394,7 +1394,7 @@ async fn revert_delete_skips_user_history_for_non_user_owner(pool: Pool<Postgres
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn patch_chat_sets_team_share_and_defaults_explicit_null_level_to_view(pool: Pool<Postgres>) {
@@ -1419,7 +1419,7 @@ async fn patch_chat_sets_team_share_and_defaults_explicit_null_level_to_view(poo
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn patch_chat_defaults_explicit_null_level_for_existing_link_share(pool: Pool<Postgres>) {
@@ -1455,7 +1455,7 @@ async fn patch_chat_defaults_explicit_null_level_for_existing_link_share(pool: P
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn patch_chat_disables_link_sharing_and_clears_both_levels(pool: Pool<Postgres>) {
@@ -1480,7 +1480,7 @@ async fn patch_chat_disables_link_sharing_and_clears_both_levels(pool: Pool<Post
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn get_permissions_reads_link_share_columns(pool: Pool<Postgres>) {
@@ -1528,7 +1528,7 @@ fn assert_refused<T: std::fmt::Debug>(outcome: Result<T, ChatErr>) {
 /// Under a scope that may not share, a chat can't be created in or moved
 /// into a folder shared with a team, and a refused write leaves nothing.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("users"))
 )]
 async fn a_scoped_session_cant_file_a_chat_in_a_shared_folder(pool: Pool<Postgres>) {
@@ -1554,7 +1554,7 @@ async fn a_scoped_session_cant_file_a_chat_in_a_shared_folder(pool: Pool<Postgre
     .unwrap();
     let repo = test_repo(pool.clone());
     let chat_id = create_test_chat(&repo, "Unfiled").await;
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com")
         .unwrap()
         .into_owned();
     let no_send = Attribution {

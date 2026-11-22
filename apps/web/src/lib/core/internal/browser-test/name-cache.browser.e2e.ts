@@ -3,10 +3,10 @@ import { expect, test } from '@playwright/test';
 const person = 'macro|person@example.com';
 test.beforeEach(async ({ page }) => {
   await page.route('https://**', (route) => route.abort());
-  await page.route('**/jwt/macro_api_token', (route) =>
+  await page.route('**/jwt/rox_api_token', (route) =>
     route.fulfill({
       json: {
-        macro_api_token: `fixture.${btoa(JSON.stringify({ exp: 4102444800 }))}.fixture`,
+        rox_api_token: `fixture.${btoa(JSON.stringify({ exp: 4102444800 }))}.fixture`,
       },
     })
   );

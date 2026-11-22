@@ -17,7 +17,7 @@ use crate::domain::{
         GithubInstallationAccessToken, GithubInstallationSetupAction, GithubKey,
         GithubPullRequestDetails, GithubPullRequestLabel, GithubPullRequestReview,
         GithubPullRequestReviewState, GithubPullRequestStatus, GithubPullRequestUser,
-        GithubWebhookEventType, GithubWebhookReceived, InstallationState, MacroTaskId,
+        GithubWebhookEventType, GithubWebhookReceived, InstallationState, RoxTaskId,
         ResolvedTeamTaskReference, TeamTaskReference, ValidatedGithubWebhookEvent, latest_reviews,
         sign_installation_state, verify_installation_state,
     },
@@ -33,7 +33,7 @@ use github_pull_requests::domain::{
     models::UpsertGithubPullRequest, ports::GithubPullRequestService,
 };
 use hmac::{Hmac, Mac};
-use macro_env_var::maybe_env_vars;
+use rox_env_var::maybe_env_vars;
 use notification::domain::service::NotificationIngress;
 use sha2::Sha256;
 use std::{
@@ -155,7 +155,7 @@ struct ResolvedTasks {
     /// Markdown links for resolved tasks (used for PR comments).
     task_links: Vec<String>,
     /// Task IDs that were validated as actual task documents.
-    validated_task_ids: Vec<MacroTaskId>,
+    validated_task_ids: Vec<RoxTaskId>,
 }
 
 /// Result of creating or refreshing one source-scoped PR foreign entity row.
@@ -669,8 +669,8 @@ impl<
         &self,
         event: &ValidatedGithubWebhookEvent,
         text: &str,
-    ) -> Vec<MacroTaskId> {
-        let mut task_ids = MacroTaskId::extract_from_text(text);
+    ) -> Vec<RoxTaskId> {
+        let mut task_ids = RoxTaskId::extract_from_text(text);
         let legacy_task_id_count = task_ids.len();
         let team_task_refs = TeamTaskReference::extract_from_text(text);
 
@@ -753,7 +753,7 @@ impl<
     /// Resolve task IDs to documents, returning doc IDs and markdown links
     /// for all tasks that are actually task-type documents.
     #[tracing::instrument(skip(self, task_ids))]
-    async fn resolve_tasks(&self, task_ids: &[MacroTaskId]) -> ResolvedTasks {
+    async fn resolve_tasks(&self, task_ids: &[RoxTaskId]) -> ResolvedTasks {
         tracing::trace!(
             task_id_count = task_ids.len(),
             "resolving task IDs to documents"
@@ -797,7 +797,7 @@ impl<
                         tracing::trace!(task_id=%uuid, doc_id, doc_name, "resolved task document");
 
                         doc_ids.push(doc_id.clone());
-                        task_links.push(create_macro_task_comment_link(doc_name, doc_id));
+                        task_links.push(create_rox_task_comment_link(doc_name, doc_id));
                         validated_task_ids.push(task_id.clone());
                     } else {
                         tracing::trace!(task_id=%uuid, "document found but is not a task, skipping");
@@ -1046,16 +1046,16 @@ impl<
         synced.and(published)
     }
 
-    #[tracing::instrument(skip(self), fields(macro_user_id = %macro_user_id), err)]
+    #[tracing::instrument(skip(self), fields(rox_user_id = %rox_user_id), err)]
     async fn begin_installation_setup(
         &self,
-        macro_user_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        rox_user_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
         team_id: Option<uuid::Uuid>,
     ) -> Result<String, GithubError> {
         if let Some(team_id) = team_id {
             let team_ids = self
                 .repo
-                .get_user_team_ids(macro_user_id.as_ref())
+                .get_user_team_ids(rox_user_id.as_ref())
                 .await
                 .map_err(|error| GithubError::Internal(error.into()))?;
             if !team_ids.contains(&team_id) {
@@ -1064,8 +1064,8 @@ impl<
         }
 
         let state = InstallationState {
-            macro_user_id: macro_user_id::user_id::MacroUserIdStr::try_from(
-                macro_user_id.as_ref().to_string(),
+            rox_user_id: rox_user_id::user_id::RoxUserIdStr::try_from(
+                rox_user_id.as_ref().to_string(),
             )
             .map_err(|error| GithubError::Internal(error.into()))?,
             team_id,
@@ -1138,13 +1138,13 @@ impl<
             .to_string();
         let links = self
             .repo
-            .get_macro_ids_by_github_user_ids(std::slice::from_ref(&github_user_id))
+            .get_rox_ids_by_github_user_ids(std::slice::from_ref(&github_user_id))
             .await
             .map_err(|error| GithubError::Internal(error.into()))?;
-        let completer_is_state_user = links.get(&github_user_id).is_some_and(|macro_ids| {
-            macro_ids
+        let completer_is_state_user = links.get(&github_user_id).is_some_and(|rox_ids| {
+            rox_ids
                 .iter()
-                .any(|id| id == state.macro_user_id.as_ref())
+                .any(|id| id == state.rox_user_id.as_ref())
         });
         if !completer_is_state_user {
             return Err(GithubError::SetupUserNotLinked);
@@ -1152,7 +1152,7 @@ impl<
 
         let source = match state.team_id {
             Some(team_id) => GithubAppInstallationSource::Team(team_id),
-            None => GithubAppInstallationSource::User(state.macro_user_id.into()),
+            None => GithubAppInstallationSource::User(state.rox_user_id.into()),
         };
 
         let Some(installation_id) = installation_id else {
@@ -1201,7 +1201,7 @@ impl<
     }
 }
 
-fn dedupe_task_ids(task_ids: Vec<MacroTaskId>) -> Vec<MacroTaskId> {
+fn dedupe_task_ids(task_ids: Vec<RoxTaskId>) -> Vec<RoxTaskId> {
     let mut seen = HashSet::new();
     let mut deduped = Vec::new();
 
@@ -1215,11 +1215,11 @@ fn dedupe_task_ids(task_ids: Vec<MacroTaskId>) -> Vec<MacroTaskId> {
 }
 
 /// Creates a macro task comment given the document name and id
-fn create_macro_task_comment_link(name: &str, id: &str) -> String {
-    let url = match macro_env::Environment::new_or_prod() {
-        macro_env::Environment::Production => "https://rox.one/app/task",
-        macro_env::Environment::Develop => "https://dev.rox.one/app/task",
-        macro_env::Environment::Local => {
+fn create_rox_task_comment_link(name: &str, id: &str) -> String {
+    let url = match rox_env::Environment::new_or_prod() {
+        rox_env::Environment::Production => "https://rox.one/app/task",
+        rox_env::Environment::Develop => "https://dev.rox.one/app/task",
+        rox_env::Environment::Local => {
             let port = FrontendPort::new()
                 .map(|port| port.to_string())
                 .unwrap_or_else(|| "3000".to_string());

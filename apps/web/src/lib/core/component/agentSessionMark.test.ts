@@ -1,6 +1,6 @@
 import { CODEX_BOT_ID } from '@core/constant/codexAgent';
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
-import { MACRO_AGENT_BOT_ID } from '@core/constant/macroAgent';
+import { ROX_AGENT_BOT_ID } from '@core/constant/macroAgent';
 import { describe, expect, it } from 'vitest';
 import { agentSessionMark } from './agentSessionMark';
 
@@ -37,7 +37,7 @@ describe('agentSessionMark', () => {
     expect(agentSessionMark({ harness: 'macro-inmem' }).class).toBe(
       'text-accent'
     );
-    expect(agentSessionMark({ botId: MACRO_AGENT_BOT_ID }).class).toBe(
+    expect(agentSessionMark({ botId: ROX_AGENT_BOT_ID }).class).toBe(
       'text-accent'
     );
   });

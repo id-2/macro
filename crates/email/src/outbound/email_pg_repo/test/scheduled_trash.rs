@@ -42,7 +42,7 @@ async fn preserve_submission(pool: Pool<Postgres>, unconfirmed: bool) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn trash_preserves_submitted_delivery(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -50,7 +50,7 @@ async fn trash_preserves_submitted_delivery(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn trash_preserves_unconfirmed_delivery(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -58,7 +58,7 @@ async fn trash_preserves_unconfirmed_delivery(pool: Pool<Postgres>) -> anyhow::R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn trash_revokes_preparation_before_submission(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -75,7 +75,7 @@ async fn trash_revokes_preparation_before_submission(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn trash_revokes_backed_off_preparation(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -93,7 +93,7 @@ async fn trash_revokes_backed_off_preparation(pool: Pool<Postgres>) -> anyhow::R
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn trash_preserves_ambiguous_legacy_claim(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -114,7 +114,7 @@ async fn trash_preserves_ambiguous_legacy_claim(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn trash_cancels_definitively_failed_delivery(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -132,7 +132,7 @@ async fn trash_cancels_definitively_failed_delivery(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_message"))
 )]
 async fn trash_racing_submission_has_one_winner(pool: Pool<Postgres>) -> anyhow::Result<()> {

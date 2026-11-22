@@ -12,7 +12,7 @@ const tags = {
 
 const DATABASE_URL = aws.secretsmanager
   .getSecretVersionOutput({
-    secretId: config.require(`macro_db_proxy_secret_key`),
+    secretId: config.require(`rox_db_proxy_secret_key`),
   })
   .apply((secret) => secret.secretString);
 
@@ -51,7 +51,7 @@ const deletedItemPoller = new DeleteItemPoller('deleted-item-poller', {
     DATABASE_URL: pulumi.interpolate`${DATABASE_URL}`,
     ENVIRONMENT: stack,
     KAFKA_BROKERS: kafkaBrokers,
-    RUST_LOG: 'deleted_item_poller=info,macro_http_request=info',
+    RUST_LOG: 'deleted_item_poller=info,rox_http_request=info',
   },
   tags,
 });

@@ -46,7 +46,7 @@ import {
   enableCalendarUi,
   enableGraphqlSoup,
   isFeatureEnabled,
-  USE_MACRO_PR_SUMMARY_BLOCK,
+  USE_ROX_PR_SUMMARY_BLOCK,
 } from '@core/constant/featureFlags';
 import {
   ENTITY_ID_DATA_ATTRIBUTE,
@@ -665,7 +665,7 @@ const openEntity = async (
   }
 
   if (isGithubPrEntity(entity)) {
-    if (USE_MACRO_PR_SUMMARY_BLOCK) {
+    if (USE_ROX_PR_SUMMARY_BLOCK) {
       const content = { type: 'pr' as const, id: entity.id };
       const result = splitManager.openWithSplit(
         reviewsHostedContent(content) ?? content,

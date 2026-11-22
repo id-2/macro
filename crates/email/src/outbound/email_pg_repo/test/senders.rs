@@ -26,8 +26,8 @@ impl EmailSenderProvider for Provider {
 fn inbox_id() -> Uuid {
     Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa").unwrap()
 }
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 
 fn draft() -> CreateDraftInput {
@@ -35,11 +35,11 @@ fn draft() -> CreateDraftInput {
         frozen_signature_html: None,
         draft_generation: 0,
         sender_email: Some(EmailStr::try_from("resident@test.com".to_owned()).unwrap()),
-        db_id: Some(macro_uuid::generate_uuid_v7()),
+        db_id: Some(rox_uuid::generate_uuid_v7()),
         provider_id: None,
         replying_to_id: None,
         provider_thread_id: None,
-        thread_db_id: Some(macro_uuid::generate_uuid_v7()),
+        thread_db_id: Some(rox_uuid::generate_uuid_v7()),
         subject: "Alias delivery".to_owned(),
         to: vec![ContactInfo {
             email: "alice@example.com".to_owned(),
@@ -50,7 +50,7 @@ fn draft() -> CreateDraftInput {
         bcc: vec![],
         body_text: Some("Hello".to_owned()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: Some(false),
@@ -61,7 +61,7 @@ fn draft() -> CreateDraftInput {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn sender_survives_save_reopen_and_delivery_and_cannot_leak_to_another_inbox(
@@ -114,12 +114,12 @@ async fn sender_survives_save_reopen_and_delivery_and_cannot_leak_to_another_inb
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn send_rejects_an_inaccessible_inbox(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let service = super::thread_unread::service(pool).with_sender_provider(Provider);
-    let stranger = MacroUserIdStr::try_from_email("stranger@example.com")?;
+    let stranger = RoxUserIdStr::try_from_email("stranger@example.com")?;
     assert!(matches!(
         service
             .send_message_for_user_impl(stranger, Some(inbox_id()), draft())

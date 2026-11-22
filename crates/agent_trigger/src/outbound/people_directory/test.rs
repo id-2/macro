@@ -1,6 +1,6 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_uuid::Uuid;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_uuid::Uuid;
 
 /// One stored bot with a profile; every other bot has none.
 struct ProfiledBot;
@@ -15,7 +15,7 @@ impl BotNames for ProfiledBot {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "fixtures", scripts("people"))
 )]
 async fn names_each_id_in_order(pool: PgPool) {

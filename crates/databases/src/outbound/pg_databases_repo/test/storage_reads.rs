@@ -50,7 +50,7 @@ async fn insert_named(
         .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn named_rows_are_read_only_from_the_table_each_read_names(pool: PgPool) {
     let guests = guests(&pool).await;
     let repo = PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool.clone()));

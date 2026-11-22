@@ -13,7 +13,7 @@ async fn here_includes_active_humans_and_excludes_departed_users_and_bots() {
                 Ok([
                     ("macro|active@example.com".to_string(), false),
                     ("macro|left@example.com".to_string(), true),
-                    (bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string(), false),
+                    (bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(), false),
                 ]
                 .into_iter()
                 .map(|(user_id, left)| ChannelParticipant {

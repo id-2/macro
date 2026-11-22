@@ -8,7 +8,7 @@ use crate::{
     engine::HydrationScope,
     value::{CacheValue, EntityKey, Record},
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use subsequence_match::normalize_text;
@@ -50,7 +50,7 @@ pub struct PeopleReferenceRequest {
 pub struct PersonReference {
     /// Canonical target identity, never the viewer-scoped record id.
     #[cfg_attr(any(test, feature = "schema"), schemars(with = "String"))]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The contact's address.
     pub email: String,
     /// The stored private name; absence must not invent a first-name match from an email local part.
@@ -150,7 +150,7 @@ impl<'a> ReferenceCollector<'a> {
         let Some(CacheValue::String(raw_user)) = record.fields.get("userId") else {
             return;
         };
-        let Ok(user) = MacroUserIdStr::parse_from_str(raw_user) else {
+        let Ok(user) = RoxUserIdStr::parse_from_str(raw_user) else {
             return;
         };
         let Some(CacheValue::String(email)) = record.fields.get("email") else {

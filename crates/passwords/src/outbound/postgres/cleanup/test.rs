@@ -1,8 +1,8 @@
 use super::*;
 use crate::outbound::postgres::test::{another_team, folder_fixture};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn empty_active_pages_advance_and_full_batches_retain_orphan_candidates(pool: PgPool) {
     let (repository, _, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -127,7 +127,7 @@ async fn empty_active_pages_advance_and_full_batches_retain_orphan_candidates(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn repair_insert_and_cursor_roll_back_together_on_database_failure(pool: PgPool) {
     let (repository, _, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -178,7 +178,7 @@ async fn repair_insert_and_cursor_roll_back_together_on_database_failure(pool: P
     assert_eq!(retry[0].key_id, key);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn replica_repairs_and_stale_candidates_keep_live_active_pointer_safe(pool: PgPool) {
     let (repository, _, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -228,7 +228,7 @@ async fn replica_repairs_and_stale_candidates_keep_live_active_pointer_safe(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_or_busy_item_batch_does_not_starve_the_next_team(pool: PgPool) {
     let (repository, actor, record) = folder_fixture(pool).await;
     let bad = record.metadata.team_id;
@@ -253,7 +253,7 @@ async fn failed_or_busy_item_batch_does_not_starve_the_next_team(pool: PgPool) {
         .fetch_one(&repository.pool).await.expect("retry identities retained"),Some(100));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_totp_batches_rotate_without_shortening_quarantine_or_losing_candidates(
     pool: PgPool,
 ) {
@@ -323,7 +323,7 @@ async fn failed_totp_batches_rotate_without_shortening_quarantine_or_losing_cand
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn old_failed_first_erasures_cannot_starve_new_quarantine_or_repair_work(pool: PgPool) {
     let (repository, _, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
@@ -384,7 +384,7 @@ async fn old_failed_first_erasures_cannot_starve_new_quarantine_or_repair_work(p
         .fetch_one(&repository.pool).await.expect("unacknowledged journals remain"),Some(300));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn item_claim_skips_a_locked_row_and_keeps_it_due_for_retry(pool: PgPool) {
     let (repository, _, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;

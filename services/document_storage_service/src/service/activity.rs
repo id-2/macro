@@ -15,7 +15,7 @@ use documents_hex::domain::events::DocumentMacroEvent;
 use email::domain::events::EmailMacroEvent;
 use forms::domain::events::FormMacroEvent;
 use initiative::domain::events::InitiativeMacroEvent;
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 use messages::outbound::broker::MessageMacroEvent;
 use projects_hex::domain::events::ProjectMacroEvent;
 use properties::domain::events::PropertyMacroEvent;
@@ -24,7 +24,7 @@ use properties::domain::events::PropertyMacroEvent;
 mod source {
     use super::*;
 
-    macro_event_broker::declare_topics!(
+    rox_event_broker::declare_topics!(
         ActivitySourceEvent:
             DocumentMacroEvent,
             ChannelMacroEvent,
@@ -52,7 +52,7 @@ pub(crate) async fn ingest(
     event: ActivitySourceEvent,
     editing_activity: &impl documents_hex::domain::ports::EditingActivityStore,
 ) -> Ingest {
-    fn arm<E: activity::ActivitySource>(envelope: &macro_event_broker::Event<E>) -> Ingest {
+    fn arm<E: activity::ActivitySource>(envelope: &rox_event_broker::Event<E>) -> Ingest {
         envelope.event.ingest(envelope.event_id)
     }
 
@@ -110,7 +110,7 @@ where
         &self,
         entity_type: activity::EntityType,
         entity_id: &str,
-        viewer: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        viewer: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<bool, Self::Err> {
         use entity_access::domain::models::{AccessError, ViewAccessLevel};
         match self
@@ -133,7 +133,7 @@ where
         &self,
         entity_type: activity::EntityType,
         entity_id: &str,
-    ) -> Result<Vec<macro_user_id::user_id::MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<rox_user_id::user_id::RoxUserIdStr<'static>>, Self::Err> {
         match self
             .service
             .get_users_by_entity(entity_id, entity_type)

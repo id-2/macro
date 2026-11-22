@@ -21,7 +21,7 @@ use axum::{
 };
 use calendar_events::inbound::toolset::{CreateConfirmedCalendarEvent, ToolCalendarEvent};
 use email::inbound::toolset::{SendConfirmedEmail, SendEmailResponse};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::GenericErrorResponse;
 use serde::de::DeserializeOwned;
 
@@ -52,7 +52,7 @@ impl IntoResponse for ConfirmedActionError {
 /// itself refuses a blank confirmation.
 async fn run_confirmed<Tool, Context>(
     context: Context,
-    user: &MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: &RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     body: &[u8],
 ) -> Result<Json<Tool::Output>, ConfirmedActionError>
 where
@@ -65,7 +65,7 @@ where
     })?;
     tool.call(
         ServiceContext(context),
-        RequestContext::new(user.authorization.user.macro_user_id.clone()),
+        RequestContext::new(user.authorization.user.rox_user_id.clone()),
     )
     .await
     .map(Json)
@@ -86,10 +86,10 @@ where
         (status = 401, description = "Unauthorized"),
         (status = 422, body = GenericErrorResponse, description = "Not sent: a blank confirmation, an inbox or attachment the user cannot use, or a delivery failure")))]
 /// Send an email the user approved in conversation, quoting their approval.
-#[tracing::instrument(skip_all, fields(user_id = %user.authorization.user.macro_user_id), err(Debug))]
+#[tracing::instrument(skip_all, fields(user_id = %user.authorization.user.rox_user_id), err(Debug))]
 pub async fn send_confirmed_email(
     State(state): State<ApiContext>,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     body: Bytes,
 ) -> Result<Json<SendEmailResponse>, ConfirmedActionError> {
     run_confirmed::<SendConfirmedEmail, _>(
@@ -108,10 +108,10 @@ pub async fn send_confirmed_email(
         (status = 401, description = "Unauthorized"),
         (status = 422, body = GenericErrorResponse, description = "Not created: a blank confirmation, a calendar the user cannot write, or a provider failure")))]
 /// Create a calendar event the user approved in conversation, quoting their approval.
-#[tracing::instrument(skip_all, fields(user_id = %user.authorization.user.macro_user_id), err(Debug))]
+#[tracing::instrument(skip_all, fields(user_id = %user.authorization.user.rox_user_id), err(Debug))]
 pub async fn create_confirmed_calendar_event(
     State(state): State<ApiContext>,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     body: Bytes,
 ) -> Result<Json<ToolCalendarEvent>, ConfirmedActionError> {
     run_confirmed::<CreateConfirmedCalendarEvent, _>(

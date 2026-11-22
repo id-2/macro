@@ -78,7 +78,7 @@ run_smokes() {
   trust_root="$PWD/fedora-trust-root"
   mkdir -p "$trust_root/etc/pki/ca-trust/extracted/pem"
   cp "$ca_bundle" "$trust_root/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
-  test "$(macro_find_ca_bundle "$trust_root")" = "$trust_root/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
+  test "$(rox_find_ca_bundle "$trust_root")" = "$trust_root/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
 )
 
 # Normal AppImage startup supplies APPDIR; no caller workaround is necessary.

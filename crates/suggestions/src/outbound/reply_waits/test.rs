@@ -1,6 +1,6 @@
 use chrono::{DateTime, TimeZone, Utc};
 use email::outbound::EmailPgRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 use crate::outbound::pg_suggestion_repo::test::insert_user;
@@ -8,8 +8,8 @@ use crate::outbound::pg_suggestion_repo::test::insert_user;
 const OWNER: &str = "macro|waits-owner@example.com";
 const SENDER: &str = "macro|waits-sender@example.com";
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap()
 }
 
 fn at(hour: u32) -> DateTime<Utc> {
@@ -35,7 +35,7 @@ fn target(entity_type: EntityType, entity_id: Uuid, part: Option<Uuid>) -> Targe
 async fn thread(pool: &PgPool) -> (Uuid, Uuid) {
     let (inbox, thread) = (Uuid::now_v7(), Uuid::now_v7());
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $2, $3, 'GMAIL')"#,
         inbox,
         OWNER,
@@ -92,7 +92,7 @@ async fn email(
     .unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_email_thread_waits_on_its_newest_message_unless_the_person_sent_it(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let waits = waits(&pool);
@@ -140,14 +140,14 @@ async fn an_email_thread_waits_on_its_newest_message_unless_the_person_sent_it(p
     assert_eq!(waiting(Uuid::now_v7()).await, None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_channel_message_waits_unless_the_person_sent_it(pool: PgPool) {
     for id in [OWNER, SENDER] {
         insert_user(&pool, id).await;
     }
     sqlx::query!(
-        r#"INSERT INTO macro_user_info (macro_user_id, first_name, last_name)
-           SELECT macro_user_id, 'Grace', 'Hopper' FROM "User" WHERE id = $1"#,
+        r#"INSERT INTO rox_user_info (rox_user_id, first_name, last_name)
+           SELECT rox_user_id, 'Grace', 'Hopper' FROM "User" WHERE id = $1"#,
         SENDER,
     )
     .execute(&pool)

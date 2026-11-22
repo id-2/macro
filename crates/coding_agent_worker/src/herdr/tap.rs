@@ -5,7 +5,7 @@
 use std::collections::HashMap;
 
 use agent_client_protocol::LineDirection;
-use agent_session::domain::model::{AgentSessionId, MACRO_AGENT_SESSION_META_KEY};
+use agent_session::domain::model::{AgentSessionId, ROX_AGENT_SESSION_META_KEY};
 use serde_json::Value;
 
 use super::wire::PermissionChoice;
@@ -22,7 +22,7 @@ pub(crate) enum TapEvent {
         /// The ACP session id.
         session: String,
         /// The Rox session, when the service named it in `_meta`.
-        macro_session: Option<AgentSessionId>,
+        rox_session: Option<AgentSessionId>,
     },
     /// A prompt went to the agent.
     Prompted {
@@ -117,7 +117,7 @@ impl WireTap {
         match method {
             "session/new" => {
                 if let Some(id) = id {
-                    self.opening.insert(id, macro_session(params));
+                    self.opening.insert(id, rox_session(params));
                 }
                 Vec::new()
             }
@@ -125,7 +125,7 @@ impl WireTap {
                 .map(|session| {
                     vec![TapEvent::Opened {
                         session,
-                        macro_session: macro_session(params),
+                        rox_session: rox_session(params),
                     }]
                 })
                 .unwrap_or_default(),
@@ -196,14 +196,14 @@ impl WireTap {
     }
 
     fn agent_answered(&mut self, id: &str, message: &Value) -> Vec<TapEvent> {
-        if let Some(macro_session) = self.opening.remove(id) {
+        if let Some(rox_session) = self.opening.remove(id) {
             return message
                 .pointer("/result/sessionId")
                 .and_then(Value::as_str)
                 .map(|session| {
                     vec![TapEvent::Opened {
                         session: session.to_owned(),
-                        macro_session,
+                        rox_session,
                     }]
                 })
                 .unwrap_or_default();
@@ -227,10 +227,10 @@ fn session_id(params: Option<&Value>) -> Option<String> {
     params?.get("sessionId")?.as_str().map(str::to_owned)
 }
 
-fn macro_session(params: Option<&Value>) -> Option<AgentSessionId> {
+fn rox_session(params: Option<&Value>) -> Option<AgentSessionId> {
     let raw = params?
         .get("_meta")?
-        .get(MACRO_AGENT_SESSION_META_KEY)?
+        .get(ROX_AGENT_SESSION_META_KEY)?
         .as_str()?;
     uuid::Uuid::parse_str(raw)
         .ok()

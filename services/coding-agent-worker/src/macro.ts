@@ -7,8 +7,8 @@ import { ensureWebhook } from './webhook';
 const webhookSecret = await ensureWebhook(`${env.PUBLIC_URL}/macro-events`);
 
 /** The one Rox SDK client, shared by everything in this worker. The SDK
- * resolves service hosts itself (MACRO_ENV, plus the local-stack portmap
+ * resolves service hosts itself (ROX_ENV, plus the local-stack portmap
  * when it's `local`). */
 export const macro = new Macro({ webhookSecret }).requestedAs(
-  env.MACRO_USER_ID
+  env.ROX_USER_ID
 );

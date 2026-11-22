@@ -5,8 +5,8 @@ use crate::domain::event_runs::{
 use crate::domain::event_trigger::{EventName, EventReference};
 use crate::domain::models::{ActionKind, ExecutionResourceType, RunVisibility};
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model_entity::EntityType;
 use model_owner::Owner;
 use serde_json::json;
@@ -25,7 +25,7 @@ struct Admission {
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> ai_billing::AdmissionFuture<'a> {
         self.calls.lock().unwrap().push((user.to_string(), feature));
@@ -45,7 +45,7 @@ struct StalledAdmission;
 impl AiAdmissionService for StalledAdmission {
     fn admit<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
         _: AiFeature,
     ) -> ai_billing::AdmissionFuture<'a> {
         Box::pin(std::future::pending())
@@ -277,7 +277,7 @@ impl ScheduledActionRepo for Repo {
     async fn create_action(&self, _: ScheduledAction) -> Result<ScheduledAction> {
         unimplemented!()
     }
-    async fn get_owned_actions(&self, _: &MacroUserIdStr<'static>) -> Result<Vec<ScheduledAction>> {
+    async fn get_owned_actions(&self, _: &RoxUserIdStr<'static>) -> Result<Vec<ScheduledAction>> {
         unimplemented!()
     }
     async fn get_actions_by_ids(&self, _: &[Uuid]) -> Result<Vec<ScheduledAction>> {
@@ -412,7 +412,7 @@ impl ScheduledActionLiveUpdate for Live {
 fn action() -> ScheduledAction {
     ScheduledAction {
         id: Some(generate_uuid_v7()),
-        owner: Owner::User(MacroUserIdStr::parse_from_str(USER).unwrap()),
+        owner: Owner::User(RoxUserIdStr::parse_from_str(USER).unwrap()),
         name: "routine".into(),
         trigger: serde_json::from_value(
             json!({"type":"cron", "schedule":"0 0 * * * *", "timezone":"UTC"}),
@@ -464,7 +464,7 @@ fn event_run() -> ClaimedEventRun {
         run: AuthorizedEventRun {
             access: crate::domain::event_runs::EventAccessCapability::Document(
                 EntityAccessReceipt::<ViewAccessLevel>::dangerously_assert_authenticated_user(
-                    MacroUserIdStr::parse_from_str(USER).unwrap(),
+                    RoxUserIdStr::parse_from_str(USER).unwrap(),
                     &entity.to_string(),
                     EntityType::Document,
                 ),

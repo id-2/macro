@@ -6,7 +6,7 @@ use std::{
 };
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -116,8 +116,8 @@ fn time(value: &str) -> DateTime<Utc> {
         .with_timezone(&Utc)
 }
 
-fn user(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn record() -> ActivityRecord {
@@ -141,7 +141,7 @@ struct FakeMetadata;
 impl ActivityMetadataResolver for FakeMetadata {
     async fn resolve_properties(
         &self,
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
         property_ids: &[String],
     ) -> HashMap<String, ActivityPropertyMetadata> {
         property_ids

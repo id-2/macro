@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model::document::FileType;
 use model::folder::{FileSystemNode, FileSystemNodeWithIds, FolderItem};
 use model::item::Item;
@@ -24,7 +24,7 @@ use crate::domain::ports::ProjectRepo;
 async fn migrate_for_test(pool: &Pool<Postgres>) {
     // Keep both colliding migration bodies in the isolated test database,
     // remapping only the mailbox migration's in-memory version.
-    let migrations = MACRO_DB_MIGRATIONS
+    let migrations = ROX_DB_MIGRATIONS
         .iter()
         .map(|migration| {
             let mut migration = migration.clone();
@@ -81,7 +81,7 @@ const CHAT_ID: &str = "30000000-0000-0000-0000-000000000001";
 const DELETED_CHAT_ID: &str = "30000000-0000-0000-0000-000000000002";
 
 fn project_owner() -> Owner {
-    Owner::User(MacroUserIdStr::try_from("macro|owner@test.com").unwrap())
+    Owner::User(RoxUserIdStr::try_from("macro|owner@test.com").unwrap())
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -187,7 +187,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
         .await
         .unwrap();
     let enable_link = || EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: project.id.clone(),
         name: None,
         update_parent: false,
@@ -240,7 +240,7 @@ async fn concurrent_first_enable_writes_only_one_audit(pool: Pool<Postgres>) {
         .await
         .unwrap();
     let enable_link = || EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: project.id.clone(),
         name: None,
         update_parent: false,
@@ -278,7 +278,7 @@ async fn concurrent_first_enable_writes_only_one_audit(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn history_listing_differs_from_owner_pending_listing(
@@ -320,7 +320,7 @@ async fn history_listing_differs_from_owner_pending_listing(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn accessible_listing_uses_entity_access_not_history(
@@ -367,7 +367,7 @@ async fn accessible_listing_uses_entity_access_not_history(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn basic_lookup_includes_deleted_but_full_lookup_excludes_it(
@@ -387,7 +387,7 @@ async fn basic_lookup_includes_deleted_but_full_lookup_excludes_it(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn children_are_depth_one_filtered_and_type_ordered(
@@ -419,7 +419,7 @@ async fn children_are_depth_one_filtered_and_type_ordered(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn preview_preserves_found_and_missing_input_entries(
@@ -446,7 +446,7 @@ async fn preview_preserves_found_and_missing_input_entries(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn reads_share_permissions_and_bumps_modified_timestamp(
@@ -479,7 +479,7 @@ async fn reads_share_permissions_and_bumps_modified_timestamp(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn create_keeps_the_last_edit_time_it_is_given(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -505,7 +505,7 @@ async fn create_keeps_the_last_edit_time_it_is_given(pool: Pool<Postgres>) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn create_is_atomic_and_inserts_all_metadata(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -610,7 +610,7 @@ async fn ownership_row_counts(pool: &Pool<Postgres>) -> OwnershipRowCounts {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn unsponsored_bot_owner_leaves_no_project_rows(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -646,7 +646,7 @@ async fn unsponsored_bot_owner_leaves_no_project_rows(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn create_defaults_enabled_link_share_to_view(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -678,14 +678,14 @@ async fn create_defaults_enabled_link_share_to_view(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = test_repo(pool.clone());
     let unchanged = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
             project_id: CHILD_ID.to_owned(),
             name: Some("Renamed".to_owned()),
             update_parent: false,
@@ -698,7 +698,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
 
     let moved = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
             project_id: CHILD_ID.to_owned(),
             name: None,
             update_parent: true,
@@ -714,7 +714,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
 
     let updated = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
             project_id: ROOT_ID.to_owned(),
             name: None,
             update_parent: true,
@@ -738,7 +738,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -761,7 +761,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -785,7 +785,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -805,7 +805,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -837,7 +837,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn recursive_detection_and_soft_delete_output(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -889,7 +889,7 @@ async fn recursive_detection_and_soft_delete_output(pool: Pool<Postgres>) -> any
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn revert_restores_subtree_and_handles_parent_state(
@@ -933,7 +933,7 @@ async fn revert_restores_subtree_and_handles_parent_state(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn purge_returns_outputs_and_removes_access_and_permissions(
@@ -993,7 +993,7 @@ async fn purge_returns_outputs_and_removes_access_and_permissions(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn purge_rolls_back_all_deletions(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -1045,7 +1045,7 @@ fn nested_upload_args() -> anyhow::Result<UploadFolderRepoArgs> {
     let mut share_permission = SharePermissionV2::new_project_share_permission(None);
     share_permission.link_share = Some(LinkShare::Team);
     Ok(UploadFolderRepoArgs {
-        user_id: MacroUserIdStr::parse_from_str("macro|owner@test.com")?.into_owned(),
+        user_id: RoxUserIdStr::parse_from_str("macro|owner@test.com")?.into_owned(),
         share_permission,
         root_folder,
         root_folder_name: "Upload".to_owned(),
@@ -1100,7 +1100,7 @@ async fn uploader_rows(pool: &Pool<Postgres>) -> UploaderRows {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn upload_folder_preserves_tree_metadata_and_compensates(
@@ -1206,7 +1206,7 @@ async fn upload_folder_preserves_tree_metadata_and_compensates(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn upload_folder_rolls_back_the_whole_tree_when_a_registration_fails(
@@ -1245,7 +1245,7 @@ async fn upload_folder_rolls_back_the_whole_tree_when_a_registration_fails(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn mark_uploaded_is_recursive_and_rejects_missing_root(
@@ -1292,7 +1292,7 @@ async fn mark_uploaded_is_recursive_and_rejects_missing_root(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn project_tree_lists_live_descendants_parents_first(
@@ -1367,7 +1367,7 @@ async fn parent_of(pool: &Pool<Postgres>, id: &str) -> Option<String> {
 /// scope that may not share would give the viewer the folder: nothing is
 /// written. A folder only its owner can open takes new folders as before.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("projects_test_data"))
 )]
 async fn a_scoped_session_cant_file_a_folder_in_a_shared_one(

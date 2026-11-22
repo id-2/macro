@@ -1,7 +1,7 @@
 use super::*;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
 }
 
 fn row_bot() -> NonSystemBotId {

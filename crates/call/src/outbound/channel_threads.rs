@@ -3,7 +3,7 @@
 use std::sync::{Arc, OnceLock};
 
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::api::CallRootPoster;
 use uuid::Uuid;
 
@@ -31,7 +31,7 @@ impl<F> FlaggedChannelThreads<F> {
 
 #[async_trait::async_trait]
 impl<F: FeatureFlags + 'static> ChannelThreads for FlaggedChannelThreads<F> {
-    async fn enabled_for(&self, caller: MacroUserIdStr<'_>) -> bool {
+    async fn enabled_for(&self, caller: RoxUserIdStr<'_>) -> bool {
         match self.flags.load(&caller).await {
             Ok(flags) => flags.is_enabled(ENABLE_CALL_CHANNEL_THREAD),
             Err(error) => {

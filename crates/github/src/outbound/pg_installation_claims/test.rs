@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 
 use super::PgGithubInstallationClaims;
@@ -36,14 +36,14 @@ async fn installed_by(pool: &Pool<Postgres>, installation_id: &str, github_user_
 
 /// Disconnects `user`'s GitHub, then optionally links another account.
 async fn relink(pool: &Pool<Postgres>, user: &str, github_user_id: Option<&str>) {
-    sqlx::query!("DELETE FROM github_links WHERE macro_id = $1", user)
+    sqlx::query!("DELETE FROM github_links WHERE rox_id = $1", user)
         .execute(pool)
         .await
         .unwrap();
     if let Some(github_user_id) = github_user_id {
         sqlx::query!(
             r#"
-            INSERT INTO github_links (id, macro_id, fusionauth_user_id, github_username, github_user_id)
+            INSERT INTO github_links (id, rox_id, fusionauth_user_id, github_username, github_user_id)
             VALUES (gen_random_uuid(), $1, gen_random_uuid(), 'other', $2)
             "#,
             user,
@@ -55,12 +55,12 @@ async fn relink(pool: &Pool<Postgres>, user: &str, github_user_id: Option<&str>)
     }
 }
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn a_claim_comes_from_installing_or_from_a_team(pool: Pool<Postgres>) {
@@ -80,7 +80,7 @@ async fn a_claim_comes_from_installing_or_from_a_team(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn linking_is_per_user(pool: Pool<Postgres>) {
@@ -96,7 +96,7 @@ async fn linking_is_per_user(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn nothing_is_claimed_while_github_is_disconnected(pool: Pool<Postgres>) {
@@ -117,7 +117,7 @@ async fn nothing_is_claimed_while_github_is_disconnected(pool: Pool<Postgres>) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("github_installation_test_data"))
 )]
 async fn a_personal_installation_follows_the_linked_account(pool: Pool<Postgres>) {

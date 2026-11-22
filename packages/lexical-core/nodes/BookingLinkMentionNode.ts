@@ -28,19 +28,19 @@ export type BookingLinkMentionInfo = {
 };
 
 /** Pattern to match Rox booking URLs: /app/book/:profile/:slug? */
-const MACRO_BOOKING_URL_PATTERN =
+const ROX_BOOKING_URL_PATTERN =
   /^https?:\/\/(?:www\.)?(?:rox\.one|localhost:\d+|dev\.rox\.one|staging\.rox\.one)\/app\/book\/([^/?#]+)(?:\/([^/?#]+))?(?:[?#].*)?$/;
 
 /** Check whether a URL is a valid Rox booking link. */
 export function isMacroBookingUrl(url: string): boolean {
-  return MACRO_BOOKING_URL_PATTERN.test(url);
+  return ROX_BOOKING_URL_PATTERN.test(url);
 }
 
 /** Parse a booking URL into its parts. */
 export function parseBookingUrl(
   url: string
 ): { profileId: string; slug?: string } | null {
-  const match = url.match(MACRO_BOOKING_URL_PATTERN);
+  const match = url.match(ROX_BOOKING_URL_PATTERN);
   if (!match) return null;
   const profileId = decodeURIComponent(match[1]);
   const slug = match[2] ? decodeURIComponent(match[2]) : undefined;

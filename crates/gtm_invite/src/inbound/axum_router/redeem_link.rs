@@ -1,7 +1,7 @@
 //! Handler for `POST /gtm-invite/redeem`.
 
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 
 use super::GtmInviteRouterState;
 use super::dto::{GtmInviteOffer, RedeemGtmInviteLinkRequest};
@@ -27,13 +27,13 @@ use crate::domain::ports::GtmInviteService;
     )
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: GtmInviteService, R, Auth: MacroAuthorizationService>(
+pub async fn handler<T: GtmInviteService, R, Auth: RoxAuthorizationService>(
     State(state): State<GtmInviteRouterState<T, R, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<RedeemGtmInviteLinkRequest>,
 ) -> Result<Json<GtmInviteOffer>, GtmInviteError> {
     let token: InviteToken = request.token.parse()?;
-    let user = &authorization.authorization.user.macro_user_id;
+    let user = &authorization.authorization.user.rox_user_id;
     let link = state.service.redeem_link(&token, user).await?;
     let free_months = state.service.config().free_months;
 

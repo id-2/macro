@@ -1,9 +1,9 @@
 use anyhow::Context;
 use entity_registry::NonUserOwners;
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::{env_vars, maybe_env_vars};
-use macro_service_urls::AiEditingWorkerUrl;
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::{env_vars, maybe_env_vars};
+use rox_service_urls::AiEditingWorkerUrl;
 use secretsmanager_client::LocalOrRemoteSecret;
 
 use crate::cognition::core::constants::DEFAULT_DOCUMENT_BATCH_LIMIT;
@@ -74,16 +74,16 @@ maybe_env_vars!(
 );
 
 /// The configuration parameters for the application.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Default-off quota admission and prospective usage counting.
-    #[macro_config_default(ai_usage::AiUsageEnforcement::Disabled)]
+    #[rox_config_default(ai_usage::AiUsageEnforcement::Disabled)]
     pub enable_ai_usage_enforcement: ai_usage::AiUsageEnforcement,
     /// Default-off settlement of usage past allowances. When enabled, counted
     /// usage recorded here asks the authentication service to settle; that
     /// service's own policy decides whether it does.
-    #[macro_config_default(ai_billing::AiUsageBilling::Disabled)]
+    #[rox_config_default(ai_billing::AiUsageBilling::Disabled)]
     pub enable_ai_usage_billing: ai_billing::AiUsageBilling,
     /// Optional TypeSafe credential for named decisions.
     /// Without it, these endpoints respond with 503.
@@ -103,13 +103,13 @@ pub struct Config {
     /// The connection URL for the Postgres database this application should use.
     pub database_url: DatabaseUrl,
     /// The port to listen for HTTP requests on.
-    #[macro_config_default(8080)]
+    #[rox_config_default(8080)]
     pub port: usize,
     /// The environment we are in
-    #[macro_config_default(Environment::new_or_prod())]
+    #[rox_config_default(Environment::new_or_prod())]
     pub environment: Environment,
     /// The maximum number of results in a document query
-    #[macro_config_default(DEFAULT_DOCUMENT_BATCH_LIMIT)]
+    #[rox_config_default(DEFAULT_DOCUMENT_BATCH_LIMIT)]
     pub document_batch_limit: i64,
     /// document storage bucket
     pub document_storage_bucket: DocumentStorageBucket,
@@ -161,7 +161,7 @@ pub struct Config {
     /// The internal api key
     pub internal_api_key: InternalApiKey,
     /// AI editing worker URL
-    #[macro_config_default(AiEditingWorkerUrl::unwrap_new().to_string())]
+    #[rox_config_default(AiEditingWorkerUrl::unwrap_new().to_string())]
     pub ai_editing_worker_url: String,
     /// JWT secret for minting document permission tokens for the editing worker.
     pub document_permission_jwt: DocumentPermissionJwt,
@@ -192,7 +192,7 @@ impl Config {
         let billing = ai_billing::config::load_ai_usage_billing()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let mut config =
-            macro_config::ConfigLoader::load::<Config>().context("failed to load config")?;
+            rox_config::ConfigLoader::load::<Config>().context("failed to load config")?;
         config.enable_ai_usage_enforcement = enforcement;
         config.enable_ai_usage_billing = billing;
         Ok(config)

@@ -1,4 +1,4 @@
-INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
 ('00000000-0000-4000-8000-000000000001', 'viewer', 'viewer@example.com', 'cus_people_viewer'),
 ('00000000-0000-4000-8000-000000000002', 'teammate', 'teammate@example.com', 'cus_people_teammate'),
 ('00000000-0000-4000-8000-000000000003', 'contact', 'contact@example.com', 'cus_people_contact'),
@@ -7,7 +7,7 @@ INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
 ('00000000-0000-4000-8000-000000000006', 'ossam', 'ossam@example.com', 'cus_people_ossam');
 
 -- "ossam" is an agent principal; everyone else is a person.
-INSERT INTO "User" (id, email, macro_user_id, "isAgent") VALUES
+INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES
 ('macro|viewer@example.com', 'viewer@example.com', '00000000-0000-4000-8000-000000000001', false),
 ('macro|teammate@example.com', 'teammate@example.com', '00000000-0000-4000-8000-000000000002', false),
 ('macro|contact@example.com', 'contact@example.com', '00000000-0000-4000-8000-000000000003', false),
@@ -15,7 +15,7 @@ INSERT INTO "User" (id, email, macro_user_id, "isAgent") VALUES
 ('macro|other@example.com', 'other@example.com', '00000000-0000-4000-8000-000000000005', false),
 ('macro|ossam@example.com', 'ossam@example.com', '00000000-0000-4000-8000-000000000006', true);
 
-INSERT INTO macro_user_info (macro_user_id, first_name, last_name) VALUES
+INSERT INTO rox_user_info (rox_user_id, first_name, last_name) VALUES
 ('00000000-0000-4000-8000-000000000001', 'Viewer', 'Person'),
 ('00000000-0000-4000-8000-000000000002', 'Sam', 'Rivers'),
 ('00000000-0000-4000-8000-000000000003', 'Sam', 'Rivera'),
@@ -34,7 +34,7 @@ INSERT INTO team_user (user_id, team_id, team_role) VALUES
 ('macro|stranger@example.com', '00000000-0000-4000-9000-000000000002', 'owner'),
 ('macro|other@example.com', '00000000-0000-4000-9000-000000000002', 'member');
 
-INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active) VALUES
+INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active) VALUES
 ('00000000-0000-4000-a000-000000000001', 'macro|viewer@example.com', 'people-viewer', 'viewer@example.com', 'GMAIL', true),
 ('00000000-0000-4000-a000-000000000002', 'macro|stranger@example.com', 'people-stranger', 'stranger@example.com', 'GMAIL', true);
 

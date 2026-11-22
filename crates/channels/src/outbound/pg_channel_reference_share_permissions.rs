@@ -9,7 +9,7 @@ use crate::domain::{
 };
 use anyhow::Context;
 use entity_access::domain::{models::EntityType, ports::EntityAccessService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_file_type::FileType;
 use models_permissions::share_permission::{
     access_level::AccessLevel,
@@ -48,7 +48,7 @@ where
 
     async fn update_channel_share_permissions_for_referenced_items(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         channel_id: Uuid,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<ReferenceShareResult>, Self::Err> {
@@ -101,7 +101,7 @@ async fn share_referenced_item_with_channel(
 }
 
 async fn is_direct_conversation_session(db: &PgPool, session_id: &str) -> anyhow::Result<bool> {
-    let session_id = macro_uuid::string_to_uuid(session_id)?;
+    let session_id = rox_uuid::string_to_uuid(session_id)?;
     sqlx::query_scalar!(
         r#"SELECT EXISTS (
                SELECT 1
@@ -140,7 +140,7 @@ async fn ensure_referenced_item_visible_to_channel(
     item: &ReferencedShareItem,
     level: AccessLevel,
 ) -> anyhow::Result<()> {
-    let entity_id = macro_uuid::string_to_uuid(item.entity_id())?;
+    let entity_id = rox_uuid::string_to_uuid(item.entity_id())?;
 
     if item.entity_type() == ReferencedShareItemType::EmailThread {
         share_permission_db_utils::ensure_thread_share_permission(db, item.entity_id())

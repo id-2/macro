@@ -13,7 +13,7 @@ struct AdmissionMock {
 impl AiAdmissionService for AdmissionMock {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         self.calls.lock().unwrap().push((user.to_string(), feature));
@@ -108,7 +108,7 @@ async fn denied_or_unavailable_trigger_open_has_no_side_effects() {
     for failure in [denied(), AiAdmissionError::Unavailable] {
         for (bot, kind, harness) in [
             (
-                bot_id::MACRO_CODER_BOT_ID,
+                bot_id::ROX_CODER_BOT_ID,
                 AgentKind::SandboxedCoder,
                 "opencode",
             ),
@@ -125,7 +125,7 @@ async fn denied_or_unavailable_trigger_open_has_no_side_effects() {
                 SessionOrigin::TaskAssignment(crate::domain::model::TaskAssignmentOrigin {
                     trigger_origin: trigger_context::TriggerOrigin::Unknown,
                     parent: MessageParent::parse("document", "assigned-task").unwrap(),
-                    discussion_id: macro_uuid::generate_uuid_v7(),
+                    discussion_id: rox_uuid::generate_uuid_v7(),
                     actor: staff_sender(),
                     prompt: "Work on this task".to_owned(),
                     context: None,
@@ -153,7 +153,7 @@ async fn denied_or_unavailable_trigger_open_has_no_side_effects() {
 async fn unauthorized_open_never_consults_billing() {
     let (service, _, admission) = bench(Some(denied()));
     let mut open = open_command();
-    open.bot_id = bot_id::MACRO_CODER_BOT_ID;
+    open.bot_id = bot_id::ROX_CODER_BOT_ID;
     assert!(matches!(
         service
             .execute_here(AgentSessionId::new(), HarnessCommand::Open(open.clone()))
@@ -190,7 +190,7 @@ async fn managed_open_checks_quota_before_provisioning_without_an_initial_prompt
                 model: None,
                 prompt: None,
                 profile: Some(SelectedManagedPersona {
-                    bot_id: bot_id::MACRO_CODER_BOT_ID,
+                    bot_id: bot_id::ROX_CODER_BOT_ID,
                     profile: None,
                 }),
                 source: agent_session::domain::model::SessionSource::User,
@@ -207,7 +207,7 @@ async fn managed_open_checks_quota_before_provisioning_without_an_initial_prompt
 async fn spending_actions_charge_the_persisted_owner_not_the_actor() {
     for failure in [denied(), AiAdmissionError::Unavailable] {
         for (bot, harness) in [
-            (bot_id::MACRO_CODER_BOT_ID, "opencode"),
+            (bot_id::ROX_CODER_BOT_ID, "opencode"),
             (BotId::TEST_A, "macro-inmem"),
         ] {
             for action in [AgentAction::prompt("hello"), AgentAction::Compact] {
@@ -300,7 +300,7 @@ async fn staff_and_non_user_owner_restrictions_precede_quota() {
     let (service, repo, admission) = bench(Some(denied()));
     let id = session(
         &repo,
-        bot_id::MACRO_CODER_BOT_ID,
+        bot_id::ROX_CODER_BOT_ID,
         "opencode",
         Owner::User(sender()),
     )
@@ -729,7 +729,7 @@ async fn rejection_persistence_failure_keeps_work_and_defers_reply_resolution() 
             action: command.action,
             actor: command.actor,
             announce: command.announce,
-            announced: Some(macro_uuid::generate_uuid_v7()),
+            announced: Some(rox_uuid::generate_uuid_v7()),
             created_at: chrono::Utc::now(),
             context: None,
             client: None,

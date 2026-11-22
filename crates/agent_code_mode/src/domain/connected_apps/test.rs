@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::ExecutionRecord;
 use ai_toolset::actor::ToolActor;
 use entity_access::domain::models::EntityType;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use std::sync::Mutex;
 
 struct Store(Mutex<Option<ExecutionRecord>>);
@@ -31,11 +31,11 @@ impl ExecutionStore for Store {
     }
 }
 
-struct Turns(Option<macro_uuid::Uuid>);
+struct Turns(Option<rox_uuid::Uuid>);
 
 #[async_trait]
 impl ExecutionTurns for Turns {
-    async fn active(&self, _: AgentSessionId) -> Result<Option<macro_uuid::Uuid>, CodeModeError> {
+    async fn active(&self, _: AgentSessionId) -> Result<Option<rox_uuid::Uuid>, CodeModeError> {
         Ok(self.0)
     }
 }
@@ -49,11 +49,11 @@ struct Apps(Mutex<Vec<(AgentSessionId, String)>>);
 impl ConnectedAppTools for Apps {
     async fn accounts(&self, _: AgentSessionId) -> Result<SessionAccounts, CodeModeError> {
         Ok(SessionAccounts {
-            owner: MacroUserIdStr::parse_from_str("macro|owner@example.com")
+            owner: RoxUserIdStr::parse_from_str("macro|owner@example.com")
                 .unwrap()
                 .into_owned(),
             requester: Some(
-                MacroUserIdStr::parse_from_str("macro|asker@example.com")
+                RoxUserIdStr::parse_from_str("macro|asker@example.com")
                     .unwrap()
                     .into_owned(),
             ),
@@ -140,9 +140,9 @@ impl ConnectedAppTools for Apps {
 
 #[tokio::test]
 async fn a_running_execution_of_the_active_turn_calls_as_its_approved_account() {
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(7));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     let execution = ExecutionId::mint();
-    let caller = MacroUserIdStr::parse_from_str("macro|owner@example.com")
+    let caller = RoxUserIdStr::parse_from_str("macro|owner@example.com")
         .unwrap()
         .into_owned();
     let apps = Arc::new(Apps::default());
@@ -150,7 +150,7 @@ async fn a_running_execution_of_the_active_turn_calls_as_its_approved_account() 
         Arc::new(Store(Mutex::new(Some(ExecutionRecord {
             execution_id: execution,
             acting_as: Some(ToolActor::Owner),
-            turn_id: Some(macro_uuid::Uuid::from_u128(1)),
+            turn_id: Some(rox_uuid::Uuid::from_u128(1)),
             source: "export async function main() {}".into(),
             status: ExecutionStatus::Running,
             result: None,
@@ -159,7 +159,7 @@ async fn a_running_execution_of_the_active_turn_calls_as_its_approved_account() 
             activity: Vec::new(),
             activity_truncated: false,
         })))),
-        Arc::new(Turns(Some(macro_uuid::Uuid::from_u128(1)))),
+        Arc::new(Turns(Some(rox_uuid::Uuid::from_u128(1)))),
         apps.clone(),
     );
     let access = EntityAccessReceipt::<EditAccessLevel>::dangerously_assert_authenticated_user(
@@ -200,9 +200,9 @@ async fn a_running_execution_of_the_active_turn_calls_as_its_approved_account() 
 
 #[tokio::test]
 async fn a_finished_execution_or_an_ended_turn_reaches_no_app() {
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(7));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     let execution = ExecutionId::mint();
-    let caller = MacroUserIdStr::parse_from_str("macro|owner@example.com")
+    let caller = RoxUserIdStr::parse_from_str("macro|owner@example.com")
         .unwrap()
         .into_owned();
     let access = EntityAccessReceipt::<EditAccessLevel>::dangerously_assert_authenticated_user(
@@ -213,7 +213,7 @@ async fn a_finished_execution_or_an_ended_turn_reaches_no_app() {
     let record = ExecutionRecord {
         execution_id: execution,
         acting_as: Some(ToolActor::Requester),
-        turn_id: Some(macro_uuid::Uuid::from_u128(1)),
+        turn_id: Some(rox_uuid::Uuid::from_u128(1)),
         source: "export async function main() {}".into(),
         status: ExecutionStatus::Succeeded,
         result: None,
@@ -226,7 +226,7 @@ async fn a_finished_execution_or_an_ended_turn_reaches_no_app() {
 
     let finished = ConnectedAppService::new(
         Arc::new(Store(Mutex::new(Some(record.clone())))),
-        Arc::new(Turns(Some(macro_uuid::Uuid::from_u128(1)))),
+        Arc::new(Turns(Some(rox_uuid::Uuid::from_u128(1)))),
         apps.clone(),
     )
     .apps(&access, &caller, execution)
@@ -236,7 +236,7 @@ async fn a_finished_execution_or_an_ended_turn_reaches_no_app() {
             status: ExecutionStatus::Running,
             ..record
         })))),
-        Arc::new(Turns(Some(macro_uuid::Uuid::from_u128(2)))),
+        Arc::new(Turns(Some(rox_uuid::Uuid::from_u128(2)))),
         apps.clone(),
     )
     .apps(&access, &caller, execution)
@@ -249,9 +249,9 @@ async fn a_finished_execution_or_an_ended_turn_reaches_no_app() {
 
 #[tokio::test]
 async fn a_caller_holding_another_account_than_the_execution_spends_nothing() {
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(7));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     let execution = ExecutionId::mint();
-    let owner = MacroUserIdStr::parse_from_str("macro|owner@example.com")
+    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.com")
         .unwrap()
         .into_owned();
     let apps = Arc::new(Apps::default());
@@ -259,7 +259,7 @@ async fn a_caller_holding_another_account_than_the_execution_spends_nothing() {
         Arc::new(Store(Mutex::new(Some(ExecutionRecord {
             execution_id: execution,
             acting_as: Some(ToolActor::Requester),
-            turn_id: Some(macro_uuid::Uuid::from_u128(1)),
+            turn_id: Some(rox_uuid::Uuid::from_u128(1)),
             source: "export async function main() {}".into(),
             status: ExecutionStatus::Running,
             result: None,
@@ -268,7 +268,7 @@ async fn a_caller_holding_another_account_than_the_execution_spends_nothing() {
             activity: Vec::new(),
             activity_truncated: false,
         })))),
-        Arc::new(Turns(Some(macro_uuid::Uuid::from_u128(1)))),
+        Arc::new(Turns(Some(rox_uuid::Uuid::from_u128(1)))),
         apps.clone(),
     );
     let access = EntityAccessReceipt::<EditAccessLevel>::dangerously_assert_authenticated_user(
@@ -285,16 +285,16 @@ async fn a_caller_holding_another_account_than_the_execution_spends_nothing() {
 
 #[tokio::test]
 async fn a_search_ranks_tools_across_apps_and_reports_apps_it_could_not_read() {
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(7));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     let execution = ExecutionId::mint();
-    let caller = MacroUserIdStr::parse_from_str("macro|owner@example.com")
+    let caller = RoxUserIdStr::parse_from_str("macro|owner@example.com")
         .unwrap()
         .into_owned();
     let service = ConnectedAppService::new(
         Arc::new(Store(Mutex::new(Some(ExecutionRecord {
             execution_id: execution,
             acting_as: Some(ToolActor::Owner),
-            turn_id: Some(macro_uuid::Uuid::from_u128(1)),
+            turn_id: Some(rox_uuid::Uuid::from_u128(1)),
             source: "export async function main() {}".into(),
             status: ExecutionStatus::Running,
             result: None,
@@ -303,7 +303,7 @@ async fn a_search_ranks_tools_across_apps_and_reports_apps_it_could_not_read() {
             activity: Vec::new(),
             activity_truncated: false,
         })))),
-        Arc::new(Turns(Some(macro_uuid::Uuid::from_u128(1)))),
+        Arc::new(Turns(Some(rox_uuid::Uuid::from_u128(1)))),
         Arc::new(Apps::default()),
     );
     let access = EntityAccessReceipt::<EditAccessLevel>::dangerously_assert_authenticated_user(

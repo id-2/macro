@@ -10,7 +10,7 @@ use std::sync::{
 };
 
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813b";
-fn user() -> MacroUserIdStr<'static> {
+fn user() -> RoxUserIdStr<'static> {
     "macro|editor@example.com".to_owned().try_into().unwrap()
 }
 fn receipt() -> EntityAccessReceipt<EditAccessLevel> {
@@ -42,7 +42,7 @@ struct Admission(Result<(), AiAdmissionError>);
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        caller: &'a MacroUserIdStr<'_>,
+        caller: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {

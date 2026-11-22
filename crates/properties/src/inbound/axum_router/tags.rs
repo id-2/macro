@@ -7,7 +7,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use models_properties::api::{PropertyDefinitionDetailResponse, PropertyOptionResponse};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -148,13 +148,13 @@ impl IntoResponse for TagsError {
 pub async fn list_tags<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: PropertyTeamExtractor<A, Auth>,
 ) -> Result<Json<Vec<TagSetResponse>>, TagsError> {
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     let sets = state
         .properties_service
         .list_tag_sets(&user, team.entity_access_receipt.as_ref())
@@ -180,14 +180,14 @@ pub async fn list_tags<
 pub async fn ensure_tag_set<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: PropertyTeamExtractor<A, Auth>,
     Json(request): Json<EnsureTagSetRequest>,
 ) -> Result<Json<TagSetResponse>, TagsError> {
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     let set = state
         .properties_service
         .ensure_tag_set(
@@ -224,14 +224,14 @@ pub async fn ensure_tag_set<
 pub async fn promote_tag<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: PropertyTeamExtractor<A, Auth>,
     Json(request): Json<PromoteTagRequest>,
 ) -> Result<Json<PropertyOptionResponse>, TagsError> {
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     let option = state
         .properties_service
         .promote_tag_option(
@@ -271,14 +271,14 @@ pub async fn promote_tag<
 pub async fn merge_tag<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: PropertyTeamExtractor<A, Auth>,
     Json(request): Json<MergeTagRequest>,
 ) -> Result<Json<PropertyOptionResponse>, TagsError> {
-    let user = user.authorization.user.macro_user_id;
+    let user = user.authorization.user.rox_user_id;
     let option = state
         .properties_service
         .merge_tag_option(

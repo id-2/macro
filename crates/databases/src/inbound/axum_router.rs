@@ -41,8 +41,8 @@ use axum::{
 use entity_access::domain::models::{EditAccessLevel, ViewAccessLevel};
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::DatabaseAccessLevelExtractor;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use models_properties::shared::DataType;
@@ -63,7 +63,7 @@ const MAX_IMPORT_BODY_BYTES: usize = 16 * 1024 * 1024;
 pub struct DatabasesRouterState<Service, EntityAccess, Authorization> {
     service: Arc<Service>,
     entity_access_service: Arc<EntityAccess>,
-    authorization_state: MacroAuthorizationState<Authorization>,
+    authorization_state: RoxAuthorizationState<Authorization>,
 }
 
 impl<Service, EntityAccess, Authorization> Clone
@@ -88,7 +88,7 @@ where
     pub fn new(
         service: Arc<Service>,
         entity_access_service: Arc<EntityAccess>,
-        authorization_state: MacroAuthorizationState<Authorization>,
+        authorization_state: RoxAuthorizationState<Authorization>,
     ) -> Self {
         Self {
             service,
@@ -108,7 +108,7 @@ impl<Service, EntityAccess, Authorization>
 
 impl<Service, EntityAccess, Authorization>
     FromRef<DatabasesRouterState<Service, EntityAccess, Authorization>>
-    for MacroAuthorizationState<Authorization>
+    for RoxAuthorizationState<Authorization>
 {
     fn from_ref(state: &DatabasesRouterState<Service, EntityAccess, Authorization>) -> Self {
         state.authorization_state.clone()
@@ -125,7 +125,7 @@ where
         + DatabaseTransferService
         + DatabaseDuplicateService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
     RouterState: Send + Sync + 'static,
 {
     Router::new()
@@ -205,10 +205,10 @@ where
 }
 
 pub(crate) fn viewer_of<Authorization>(
-    user: &MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: &RoxAuthorizationExtractor<Authorization, UserOrInternal>,
 ) -> Viewer {
     Viewer {
-        user_id: user.authorization.user.macro_user_id.clone(),
+        user_id: user.authorization.user.rox_user_id.clone(),
         acting_bot: None,
     }
 }
@@ -218,7 +218,7 @@ pub(crate) fn viewer_of<Authorization>(
 /// so channel delivery can share what the agent made for the request; access
 /// checks still run as the plain user ([`viewer_of`]).
 pub(crate) fn agent_attribution<Authorization>(
-    user: &MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: &RoxAuthorizationExtractor<Authorization, UserOrInternal>,
 ) -> Option<bot_id::BotId> {
     let acting_bot = user.authorization.user.agent_id;
     tracing::Span::current().record(
@@ -269,12 +269,12 @@ pub struct ColumnPath {
 #[tracing::instrument(err, skip_all)]
 pub async fn list_databases_handler<Service, EntityAccess, Authorization>(
     State(state): State<DatabasesRouterState<Service, EntityAccess, Authorization>>,
-    user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
 ) -> Result<Json<Vec<ListedDatabase>>, DatabaseError>
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let databases = state.service.list_databases(viewer_of(&user)).await?;
     Ok(Json(databases))
@@ -298,13 +298,13 @@ where
 #[tracing::instrument(err, skip_all, fields(acting_bot = tracing::field::Empty))]
 pub async fn create_database_handler<Service, EntityAccess, Authorization>(
     State(state): State<DatabasesRouterState<Service, EntityAccess, Authorization>>,
-    user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     Json(request): Json<CreateDatabaseRequest>,
 ) -> Result<(StatusCode, Json<Database>), DatabaseError>
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let acting_bot = agent_attribution(&user);
     let database = state
@@ -342,7 +342,7 @@ pub async fn get_database_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let detail = state
         .service
@@ -368,7 +368,7 @@ pub async fn set_database_appearance<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -397,13 +397,13 @@ where
 pub async fn awareness_handler<Service, EntityAccess, Authorization>(
     access: DatabaseAccessLevelExtractor<ViewAccessLevel, EntityAccess, Authorization>,
     State(state): State<DatabasesRouterState<Service, EntityAccess, Authorization>>,
-    user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     Json(awareness): Json<Awareness>,
 ) -> Result<StatusCode, DatabaseError>
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service
@@ -455,7 +455,7 @@ pub async fn infer_column_type_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service

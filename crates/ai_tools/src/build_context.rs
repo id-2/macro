@@ -40,9 +40,9 @@ use github_pull_requests::{
 use image_generation::domain::ports::{ImageGenerator, UnconfiguredImageGenerator};
 use image_generation::outbound::gemini::GeminiImageGenerator;
 use lexical_client::LexicalClient;
-use macro_env::Environment;
-use macro_env_var::{env_var, maybe_env_var};
-use macro_service_urls::{
+use rox_env::Environment;
+use rox_env_var::{env_var, maybe_env_var};
+use rox_service_urls::{
     AiEditingWorkerUrl, AppServiceUrl, CalendarServiceUrl, ConnectionGatewayUrl,
     DocumentStorageServiceUrl, EmailServiceUrl, LexicalServiceUrl, SyncServiceUrl,
 };
@@ -109,8 +109,8 @@ pub fn build_image_generator_from_env() -> Arc<dyn ImageGenerator> {
 /// The cognition service owns admission, model access, and usage recording.
 pub fn build_cognition_tool_context() -> anyhow::Result<crate::ToolCognitionToolContext> {
     let client = cognition::outbound::CognitionClient::new(
-        macro_service_urls::DocumentCognitionServiceUrl::new()?.as_ref(),
-        &macro_auth::InternalApiKey::new()?,
+        rox_service_urls::DocumentCognitionServiceUrl::new()?.as_ref(),
+        &rox_auth::InternalApiKey::new()?,
         chat::domain::models::FREE_MODEL,
     )
     .map_err(rootcause::Report::into_anyhow)?;
@@ -139,12 +139,12 @@ pub fn build_cognition_tool_context() -> anyhow::Result<crate::ToolCognitionTool
 /// `MCP_CREDENTIALS_KEY_SECRET_NAME` enables import tools on hosts with access
 /// to the shared connector encryption key; hosts without it remain unwired.
 ///
-/// Service URLs are resolved through the `macro_service_urls` crate, and queue
-/// names through the `macro_queues` crate (both using optional `OVERRIDE_*` env
+/// Service URLs are resolved through the `rox_service_urls` crate, and queue
+/// names through the `rox_queues` crate (both using optional `OVERRIDE_*` env
 /// vars before environment defaults).
 ///
 /// Queue wiring is opt-in via boolean flags (default `false`); the queue name
-/// itself comes from `macro_queues` when enabled:
+/// itself comes from `rox_queues` when enabled:
 /// - `ENABLE_EMAIL_SCHEDULED_QUEUE`
 /// - `ENABLE_GMAIL_OPS_QUEUE` (if disabled, thread-label updates can't enqueue Gmail sync ops)
 /// - `ENABLE_NOTIFICATION_QUEUE` (if disabled, notification status updates skip push clearing)
@@ -214,7 +214,7 @@ pub async fn build_tool_service_context_from_env(
     let ai_editing_worker_url = AiEditingWorkerUrl::new()?.to_string();
     let connection_gateway_url = ConnectionGatewayUrl::new()?.to_string();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
     let aws_sqs_client = aws_sdk_sqs::Client::new(&aws_config);
     let enable_email_scheduled_queue = maybe_env
         .enable_email_scheduled_queue
@@ -237,15 +237,15 @@ pub async fn build_tool_service_context_from_env(
 
     let mut sqs_client = sqs_client::SQS::new(aws_sqs_client.clone());
     if enable_email_scheduled_queue {
-        let email_scheduled_queue = macro_queues::EmailScheduledQueue::new();
+        let email_scheduled_queue = rox_queues::EmailScheduledQueue::new();
         sqs_client = sqs_client.email_scheduled_queue(email_scheduled_queue.as_ref());
     }
     if enable_gmail_ops_queue {
-        let gmail_ops_queue = macro_queues::GmailOpsQueue::new();
+        let gmail_ops_queue = rox_queues::GmailOpsQueue::new();
         sqs_client = sqs_client.gmail_ops_queue(gmail_ops_queue.as_ref());
     }
     let notification_queue = if enable_notification_queue {
-        let notification_queue = macro_queues::NotificationIngressQueue::new();
+        let notification_queue = rox_queues::NotificationIngressQueue::new();
         ToolNotificationQueue::Sqs(SqsQueue::new(
             aws_sqs_client.clone(),
             notification_queue.to_string(),
@@ -329,7 +329,7 @@ pub async fn build_tool_service_context_from_env(
         .with_favorites(favorites_service.clone()),
     );
 
-    let s3_client = macro_aws_config::s3_client().await;
+    let s3_client = rox_aws_config::s3_client().await;
     let document_files = documents::outbound::s3_document_files::S3DocumentFiles::new(
         pool.clone(),
         s3_client.clone(),
@@ -357,15 +357,15 @@ pub async fn build_tool_service_context_from_env(
     let entity_access_service = Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
         pool.clone(),
     )));
-    let macro_event_broker = macro_event_broker::MacroEventBrokerService::new(
-        macro_event_broker::KafkaEventPublisher::new(env.kafka_brokers.as_ref())
+    let rox_event_broker = rox_event_broker::RoxEventBrokerService::new(
+        rox_event_broker::KafkaEventPublisher::new(env.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_task_tracker,
     );
     let properties_service = crate::tool_context::build_properties_service_with_broker(
         pool.clone(),
         entity_access_service.clone(),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
     );
     let task_properties_service = crate::tool_context::build_task_properties_adapter(
         pool.clone(),
@@ -383,7 +383,7 @@ pub async fn build_tool_service_context_from_env(
             connection_gateway_url,
         )),
         sqs: aws_sqs_client,
-        macro_event_broker: macro_event_broker.clone(),
+        rox_event_broker: rox_event_broker.clone(),
     };
     let databases_gateway = side_effect_clients.connection_gateway.as_ref().clone();
     let channel_tool_context = crate::tool_context::build_channel_tool_context_with_side_effects(
@@ -405,7 +405,7 @@ pub async fn build_tool_service_context_from_env(
         foreign_entity_service: ForeignEntityServiceImpl::new(PgForeignEntityRepo::new(
             pool.clone(),
         )),
-        macro_event_broker: macro_event_broker.clone(),
+        rox_event_broker: rox_event_broker.clone(),
     };
 
     let document_tool_context = DocumentToolContext::new(
@@ -451,7 +451,7 @@ pub async fn build_tool_service_context_from_env(
             0,
         )
         .with_sender_provider(sender_provider)
-        .with_macro_event_broker(macro_event_broker.clone()),
+        .with_rox_event_broker(rox_event_broker.clone()),
     );
     let email_tool_context = email::inbound::toolset::EmailToolContext::new(
         user_email_service.clone(),
@@ -490,7 +490,7 @@ pub async fn build_tool_service_context_from_env(
         env.internal_api_key.to_string(),
         call_tool_context.service.clone(),
         AppServiceUrl::new()?,
-        macro_env_var::maybe_read_env("ENABLE_CALENDAR_ADD_SHARED_EVENT")
+        rox_env_var::maybe_read_env("ENABLE_CALENDAR_ADD_SHARED_EVENT")
             .and_then(|value| value.parse::<bool>().ok())
             .unwrap_or(false),
     );
@@ -536,7 +536,7 @@ pub async fn build_tool_service_context_from_env(
         &document_tool_context,
         properties_service.clone(),
         entity_access_service.clone(),
-        side_effect_clients.macro_event_broker,
+        side_effect_clients.rox_event_broker,
     );
 
     let databases_tool_context = crate::tool_context::build_databases_tool_context(
@@ -547,11 +547,11 @@ pub async fn build_tool_service_context_from_env(
                 databases_gateway,
             ),
         ),
-        crate::tool_context::MaybeToolEventBroker::Real(macro_event_broker.clone()),
+        crate::tool_context::MaybeToolEventBroker::Real(rox_event_broker.clone()),
     );
     let project_tool_context = crate::tool_context::build_project_tool_context(
         pool.clone(),
-        macro_event_broker.clone(),
+        rox_event_broker.clone(),
         entity_access_service.clone(),
         document_tool_context.service.clone(),
         user_email_service.clone(),
@@ -580,13 +580,13 @@ pub async fn build_tool_service_context_from_env(
         &databases_tool_context,
         &calendar_tool_context,
         Some(side_effect_clients.connection_gateway.as_ref().clone()),
-        crate::tool_context::MaybeToolEventBroker::Real(macro_event_broker.clone()),
+        crate::tool_context::MaybeToolEventBroker::Real(rox_event_broker.clone()),
         crate::tool_context::FormsToolConfig {
-            app_origin: macro_service_urls::AppServiceUrl::new()?.to_string(),
+            app_origin: rox_service_urls::AppServiceUrl::new()?.to_string(),
             editing_worker_url: ai_editing_worker_url,
             static_files: static_file_service_client::StaticFileServiceClient::new(
-                macro_auth::InternalApiKey::new()?.to_string(),
-                macro_service_urls::StaticFileServiceUrl::new()?.to_string(),
+                rox_auth::InternalApiKey::new()?.to_string(),
+                rox_service_urls::StaticFileServiceUrl::new()?.to_string(),
             ),
         },
     );
@@ -728,7 +728,7 @@ pub async fn build_tool_service_context_from_env(
         calendar_tool_context,
         team_calendar_tool_context: crate::tool_context::build_team_calendar_tool_context(
             pool.clone(),
-            macro_env_var::maybe_read_env("CALENDAR_TEAM_SHARING_ENABLED")
+            rox_env_var::maybe_read_env("CALENDAR_TEAM_SHARING_ENABLED")
                 .and_then(|value| value.parse::<bool>().ok())
                 .unwrap_or(false),
         ),
@@ -754,7 +754,7 @@ pub async fn build_tool_service_context_from_env(
         channel_media_upload_tool_context: crate::build_channel_media_upload_tool_context()?,
         bot_tool_context: crate::tool_context::build_bot_tool_context(
             pool.clone(),
-            crate::tool_context::MaybeToolEventBroker::Real(macro_event_broker.clone()),
+            crate::tool_context::MaybeToolEventBroker::Real(rox_event_broker.clone()),
             entity_access_service.clone(),
             document_storage_service_url,
             pipedream_client
@@ -766,7 +766,7 @@ pub async fn build_tool_service_context_from_env(
             entity_access_service.clone(),
         ),
         coding_agent_tool_context: crate::build_coding_agent_tool_context(
-            macro_service_urls::AgentHarnessServiceUrl::new()?,
+            rox_service_urls::AgentHarnessServiceUrl::new()?,
             env.internal_api_key.to_string(),
         )?,
         project_tool_context,

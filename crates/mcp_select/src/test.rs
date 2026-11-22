@@ -10,8 +10,8 @@ const SLACK: ConnectorRef<'static> = ConnectorRef {
     native_server_url: "https://mcp.slack.com/mcp",
 };
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap()
 }
 
 #[derive(Default)]
@@ -29,19 +29,19 @@ impl ConnectionStore for FakeStore {
 
     async fn load(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
     ) -> Result<Option<PipedreamConnection>, Self::Err> {
         panic!("selection must list connections")
     }
 
-    async fn delete(&self, _: &MacroUserIdStr<'static>, _: &str) -> Result<(), Self::Err> {
+    async fn delete(&self, _: &RoxUserIdStr<'static>, _: &str) -> Result<(), Self::Err> {
         panic!("selection must not delete connections")
     }
 
     async fn list(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Vec<PipedreamConnection>, Self::Err> {
         assert_eq!(user, &self::user());
         Ok(self.connections.clone())
@@ -57,17 +57,17 @@ impl McpServerStore for FakeStore {
 
     async fn load(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         panic!("selection must list native servers")
     }
 
-    async fn delete(&self, _: &MacroUserIdStr<'static>, _: &str) -> Result<(), Self::Err> {
+    async fn delete(&self, _: &RoxUserIdStr<'static>, _: &str) -> Result<(), Self::Err> {
         panic!("selection must not delete native servers")
     }
 
-    async fn list(&self, _: &MacroUserIdStr<'static>) -> Result<Vec<McpServerRecord>, Self::Err> {
+    async fn list(&self, _: &RoxUserIdStr<'static>) -> Result<Vec<McpServerRecord>, Self::Err> {
         Ok(self.native_records.clone())
     }
 }

@@ -14,7 +14,7 @@ use crate::domain::mcp::CODE_MODE_MCP_TOOLS;
 /// works, with no conversation to write for.
 pub(super) const PROMPT: &str = include_str!("unseen.md");
 
-const EXECUTE_CODE: &str = "mcp__macro_internal__ExecuteCode";
+const EXECUTE_CODE: &str = "mcp__rox_internal__ExecuteCode";
 
 /// Code mode's tools out of a session's MCP servers, and nothing else.
 /// `ExecuteCode` goes out without its reviews, views and the PresentView

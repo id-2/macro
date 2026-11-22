@@ -82,7 +82,7 @@ fn prompt_body(text: &str, images: &[CursorPromptImage]) -> PromptBody {
 /// choose between.
 pub const CURSOR_API_BASE_URL: &str = "https://api.cursor.com";
 
-macro_env_var::maybe_env_vars! {
+rox_env_var::maybe_env_vars! {
     /// Overrides [`CURSOR_API_BASE_URL`] when set. Only a local stack sets
     /// it, to point every Cursor call at a stand-in server; deployed
     /// environments leave it unset and talk to Cursor.

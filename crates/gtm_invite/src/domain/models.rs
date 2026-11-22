@@ -3,7 +3,7 @@
 use std::{fmt, str::FromStr};
 
 use chrono::{DateTime, Duration, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rand::{Rng, distr::Alphanumeric};
 use rate_limit::RateLimitExceeded;
 use uuid::Uuid;
@@ -158,7 +158,7 @@ pub struct CreateInviteLink {
 #[derive(Clone, Debug)]
 pub struct ListInviteLinks {
     /// Restrict to links created by this user.
-    pub created_by: Option<MacroUserIdStr<'static>>,
+    pub created_by: Option<RoxUserIdStr<'static>>,
     /// Maximum number of links to return, newest first.
     pub limit: i64,
 }
@@ -176,7 +176,7 @@ pub struct InviteConversion {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct InviteRedemption {
     /// The user who redeemed the link.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// When the link was redeemed.
     pub redeemed_at: DateTime<Utc>,
     /// The paid subscription the redemption turned into, once it did.
@@ -199,7 +199,7 @@ pub struct InviteLink {
     /// The promotion applied when the recipient checks out.
     pub promo_code: PromoCode,
     /// The staff member who created the link.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// When the link was created.
     pub created_at: DateTime<Utc>,
     /// When the link stops being openable and redeemable.
@@ -284,7 +284,7 @@ impl InviteLink {
     }
 
     /// Whether this link was redeemed by `user`.
-    pub fn is_redeemed_by(&self, user: &MacroUserIdStr<'_>) -> bool {
+    pub fn is_redeemed_by(&self, user: &RoxUserIdStr<'_>) -> bool {
         self.redemption
             .as_ref()
             .is_some_and(|redemption| redemption.user_id.as_ref() == user.as_ref())

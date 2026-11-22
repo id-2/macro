@@ -4,7 +4,7 @@ import type {
   WebSearchTopic,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 export type { WebFetchResponse, WebSearchResult, WebSearchTopic };
 
@@ -34,7 +34,7 @@ export interface WebFetchOptions {
  * Search the public web and read web pages, charged to the acting user's AI
  * allowance.
  *
- * @routing Use when finding or reading information on the public internet; not searching the user's Macro workspace (`macro.search`) or reading a URL's preview card (`macro.unfurls`).
+ * @routing Use when finding or reading information on the public internet; not searching the user's Rox workspace (`macro.search`) or reading a URL's preview card (`macro.unfurls`).
  *
  * @agent Search returns snippets, which often answer the question on their
  * own; fetch a result's URL only when you need the whole page. Cite the URL of
@@ -42,7 +42,7 @@ export interface WebFetchOptions {
  * JavaScript, may fail to fetch with `fetch_failed`.
  */
 export class WebNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Search the public web; returns title, URL and a query-relevant snippet per

@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::cowlike::CowLike as _;
+use rox_user_id::cowlike::CowLike as _;
 use models_search::SearchHighlight;
 use models_search::channel::{ChannelNameSearchResponse, ChannelNameSearchResponseItem};
 use models_search::document::{
@@ -23,8 +23,8 @@ const OWNER: &str = "macro|owner@example.com";
 const KEY_HEADER: &str = "x-document-storage-service-auth-key";
 const USER_HEADER: &str = "x-document-storage-service-user-id";
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap().into_owned()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap().into_owned()
 }
 
 fn names(server: &MockServer) -> SearchNames {
@@ -194,8 +194,8 @@ async fn names_are_searched_as_the_owner_and_compared_exactly() {
         &server,
         "design",
         vec![
-            channel(1, "<macro_em>design</macro_em>-feedback"),
-            channel(2, "<macro_em>Design</macro_em>"),
+            channel(1, "<rox_em>design</rox_em>-feedback"),
+            channel(2, "<rox_em>Design</rox_em>"),
         ],
     )
     .await;
@@ -342,8 +342,8 @@ async fn a_name_with_more_hits_than_a_page_is_unavailable_unless_two_have_it() {
         &server,
         "ops",
         vec![
-            channel(2, "<macro_em>ops</macro_em>"),
-            channel(3, "<macro_em>Ops</macro_em>"),
+            channel(2, "<rox_em>ops</rox_em>"),
+            channel(3, "<rox_em>Ops</rox_em>"),
         ],
         true,
     )

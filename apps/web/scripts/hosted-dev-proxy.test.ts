@@ -19,14 +19,14 @@ it('maps dev HTTP and WebSocket URLs while preserving production and OAuth hosts
   vi.stubEnv('VITE_DEV_PROXY', 'true');
   vi.stubGlobal('location', { origin: 'https://coworker:5122' });
   expect(developmentProxyUrl('https://dev-gateway.rox.one/auth')).toBe(
-    'https://coworker:5122/__macro_dev/gateway/auth'
+    'https://coworker:5122/__rox_dev/gateway/auth'
   );
   expect(
     developmentProxyUrl('wss://services-dev.rox.one?token=fixture')
-  ).toBe('wss://coworker:5122/__macro_dev/websocket?token=fixture');
+  ).toBe('wss://coworker:5122/__rox_dev/websocket?token=fixture');
   expect(
     developmentProxyUrl('https://sync-service-dev3.macroverse.workers.dev/doc')
-  ).toBe('https://coworker:5122/__macro_dev/sync/doc');
+  ).toBe('https://coworker:5122/__rox_dev/sync/doc');
   for (const url of [
     'https://gateway.rox.one/auth',
     'https://fusionauth-dev.rox.one/oauth2/logout',
@@ -142,7 +142,7 @@ it('forwards authenticated HTTP and WS over HTTPS, rewrites cookies, and rejects
         ).on('error', reject);
       });
     const response = await fetchPage(
-      '/__macro_dev/gateway/auth/user/me?check=1'
+      '/__rox_dev/gateway/auth/user/me?check=1'
     );
     expect(response.status).toBe(200);
     expect(JSON.parse(response.body)).toEqual({
@@ -154,14 +154,14 @@ it('forwards authenticated HTTP and WS over HTTPS, rewrites cookies, and rejects
     expect(response.cookies).toEqual([
       `${cookie}; Path=/; Secure; HttpOnly; SameSite=None`,
     ]);
-    expect((await fetchPage('/__macro_dev/gatewayish/auth')).body).toBe(
+    expect((await fetchPage('/__rox_dev/gatewayish/auth')).body).toBe(
       'frontend'
     );
     const before = requests;
     expect(
       (
         await fetchPage(
-          '/__macro_dev/gateway/auth',
+          '/__rox_dev/gateway/auth',
           'https://unrelated.example'
         )
       ).status
@@ -172,7 +172,7 @@ it('forwards authenticated HTTP and WS over HTTPS, rewrites cookies, and rejects
       new Promise<void>((resolve, reject) => {
         const req = request({
           ...options,
-          path: '/__macro_dev/gateway/connection-gateway?check=1',
+          path: '/__rox_dev/gateway/connection-gateway?check=1',
           headers: {
             host: new URL(origin).host,
             origin: requestOrigin,
@@ -247,7 +247,7 @@ it('keeps HTTP/2 for remote browsers while proxying', async () => {
         body: string;
       }>((resolve, reject) => {
         const stream = session.request({
-          ':path': '/__macro_dev/gateway/auth/user/me',
+          ':path': '/__rox_dev/gateway/auth/user/me',
           origin: `https://localhost:${address.port}`,
         });
         let status: number | undefined;
@@ -282,8 +282,8 @@ it('keeps HTTP/2 for remote browsers while proxying', async () => {
 
 it.each([
   { TAURI_ENV_PLATFORM: 'linux' },
-  { MACRO_LOCAL_BACKEND_PROXY: 'https://localhost:8090' },
-  { MACRO_DEV_PROXY: 'false' },
+  { ROX_LOCAL_BACKEND_PROXY: 'https://localhost:8090' },
+  { ROX_DEV_PROXY: 'false' },
 ])('keeps the existing backend selection for %j', async (env) => {
   const config = await resolveConfig(
     { configFile: false, plugins: [hostedDevProxy(env)] },

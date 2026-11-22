@@ -3,7 +3,7 @@ use crate::domain::search::{
     AgentSessionSearchMetadataService as _, AgentSessionSearchMetadataServiceImpl,
 };
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_snapshot_folds_persisted_acp_instead_of_indexing_protocol_frames(pool: PgPool) {
     use crate::domain::search::indexing::{SearchSnapshotService, SearchSnapshotServiceImpl};
     use crate::outbound::postgres::search::PgSearchIndexingRepo;
@@ -56,7 +56,7 @@ async fn search_snapshot_folds_persisted_acp_instead_of_indexing_protocol_frames
     assert!(service.snapshot(session.id).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn indexing_pages_current_sessions_and_serializes_snapshot_leases(pool: PgPool) {
     use crate::domain::search::indexing::SearchIndexingRepo;
     use crate::outbound::postgres::search::PgSearchIndexingRepo;
@@ -103,7 +103,7 @@ async fn indexing_pages_current_sessions_and_serializes_snapshot_leases(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_metadata_is_scoped_current_and_omits_deleted_sessions(pool: PgPool) {
     let repo = test_repo(&pool);
     let search_metadata = AgentSessionSearchMetadataServiceImpl::new(repo.clone());

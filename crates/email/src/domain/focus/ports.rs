@@ -3,7 +3,7 @@
 use std::{collections::HashMap, future::Future};
 
 use chrono::{DateTime, NaiveDate, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::Value;
 use uuid::Uuid;
@@ -47,7 +47,7 @@ pub trait FocusStore: Send + Sync + 'static {
     /// as do threads a calendar change still holds at `now`.
     fn focus_thread_ids(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         since: DateTime<Utc>,
         waiting_before: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -61,7 +61,7 @@ pub trait FocusStore: Send + Sync + 'static {
     /// at its stored rate since the classified message, until newer mail stops it.
     fn focus_for_threads(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_ids: &[Uuid],
         waiting_before: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -75,13 +75,13 @@ pub trait ProfileSource: Send + Sync + 'static {
     /// generates a profile.
     fn profile(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<String>, Report>> + Send;
 
     /// The IANA name of the owner's time zone, or `None` when none is stored.
     fn time_zone(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<String>, Report>> + Send;
 }
 
@@ -90,7 +90,7 @@ pub trait FocusNotifier: Send + Sync + 'static {
     /// A classification was stored for a thread in `link_id`, an inbox `owner`
     /// holds. Returns at once: delivery is best effort and never holds up or
     /// fails a classification.
-    fn focus_changed(&self, owner: &MacroUserIdStr<'static>, link_id: Uuid);
+    fn focus_changed(&self, owner: &RoxUserIdStr<'static>, link_id: Uuid);
 }
 
 /// Why the classifier gave no answers.
@@ -109,7 +109,7 @@ pub trait FocusClassifier: Send + Sync + 'static {
     /// The probability of "yes" for each question, in question order.
     fn answer(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_id: Uuid,
         input: &Value,
         questions: &[&'static str],
@@ -125,7 +125,7 @@ pub trait DueDateExtractor: Send + Sync + 'static {
     /// Errors carry no mail text.
     fn due_on(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_id: Uuid,
         input: &DueDateInput,
     ) -> impl Future<Output = Result<Option<NaiveDate>, Report>> + Send;

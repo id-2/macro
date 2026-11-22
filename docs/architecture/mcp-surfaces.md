@@ -37,7 +37,7 @@ server exposes the SDK as generated tools instead of code mode:
   broker answers `resource=<McpChatgptServiceUrl>/mcp` with a Rox API token
   minted for the Rox bot with `agent_via` set to the client's name, so
   Rox's APIs attribute writes without the harness in the path. The Worker
-  passes the bearer unchanged to `new Macro({ token })`.
+  passes the bearer unchanged to `new Rox({ token })`.
 - Results are the SDK method's JSON-safe return value plus the entity's web
   URL; SDK errors become `invalid`, `not_found`, `forbidden`, `conflict` or
   `rate_limited` tool errors.

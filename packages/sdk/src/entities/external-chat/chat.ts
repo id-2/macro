@@ -5,7 +5,7 @@ import type {
   UpdateSharePermissionRequestV2,
 } from '../../../generated/storage/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Channel } from '../channels/channel';
 import { shareWithChannel } from '../channels/share';
 import { FavoritableEntity } from '../entity';
@@ -53,7 +53,7 @@ export class ExternalChat extends FavoritableEntity<ExternalChatDetail> {
   }
 
   /** Reference an added chat; access is checked on each request. */
-  static byId(client: MacroClient, id: string): ExternalChat {
+  static byId(client: RoxClient, id: string): ExternalChat {
     return new ExternalChat(client, id);
   }
 

@@ -6,8 +6,8 @@ use crate::domain::{CodeModeError, ExecutionId};
 use agent_session::domain::model::AgentSessionId;
 use dynamic_ui::View;
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use utoipa::ToSchema;
@@ -44,7 +44,7 @@ impl ReviewService {
     pub async fn present_view(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         input: PresentView,
     ) -> Result<(), CodeModeError> {
         let session = self.authorize(access, actor).await?;
@@ -96,7 +96,7 @@ impl ReviewService {
                 &owner,
                 session,
                 &PresentedView {
-                    id: macro_uuid::generate_uuid_v7(),
+                    id: rox_uuid::generate_uuid_v7(),
                     view,
                 },
             )

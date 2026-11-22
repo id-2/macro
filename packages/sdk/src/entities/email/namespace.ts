@@ -5,7 +5,7 @@ import type {
 } from '../../../generated/email/types.gen';
 import type { ListEmailRemindersData } from '../../../generated/storage/types.gen';
 import { paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { SearchOpts } from '../search/options';
 import { EmailAttachment } from './attachment';
 import { type DraftOptions, draftBody, EmailDraft } from './draft';
@@ -176,7 +176,7 @@ export class EmailNamespace {
     });
   }
 
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to an email thread by id. */
   byId(id: string): EmailThread {

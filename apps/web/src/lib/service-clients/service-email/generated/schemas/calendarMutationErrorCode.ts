@@ -31,7 +31,7 @@ export const CalendarMutationErrorCode = {
   provider_rejected: 'provider_rejected',
   retryable: 'retryable',
   persist_failed: 'persist_failed',
-  macro_call_failed: 'macro_call_failed',
+  rox_call_failed: 'rox_call_failed',
   copy_choice_required: 'copy_choice_required',
   confirmation_required: 'confirmation_required',
 } as const;

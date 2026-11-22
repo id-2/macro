@@ -2,7 +2,7 @@ use super::*;
 use item_filters::NotificationState::{Done, Seen, Unseen};
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../../fixtures", scripts("email_dynamic_query"))
 )]
 async fn exact_states_are_viewer_scoped_and_independent_of_read(

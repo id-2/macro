@@ -105,7 +105,7 @@ impl ImportStorage for S3ImportStorage {
             .collect();
         Ok(UploadGrant {
             descriptor: upload.descriptor.clone(),
-            url: macro_aws_config::transform_aws_url(signed.uri()),
+            url: rox_aws_config::transform_aws_url(signed.uri()),
             required_headers,
             expires_at: DateTime::<Utc>::from(start + GRANT_LIFETIME),
         })

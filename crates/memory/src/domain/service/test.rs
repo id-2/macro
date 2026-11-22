@@ -1,5 +1,5 @@
 use super::*;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use std::sync::Mutex;
 
 #[derive(Clone, Default)]
@@ -12,18 +12,18 @@ struct Data {
     writes: usize,
 }
 impl MemoryRepo for Repo {
-    async fn save_memory(&self, _: &Memory, _: MacroUserIdStr<'_>) -> Result<Uuid> {
+    async fn save_memory(&self, _: &Memory, _: RoxUserIdStr<'_>) -> Result<Uuid> {
         panic!("legacy generation must never write")
     }
-    async fn get_latest_memory(&self, _: MacroUserIdStr<'_>) -> Result<Option<MemoryRecord>> {
+    async fn get_latest_memory(&self, _: RoxUserIdStr<'_>) -> Result<Option<MemoryRecord>> {
         panic!("legacy text must not be shared")
     }
-    async fn get_memory_by_id(&self, _: MacroUserIdStr<'_>, _: Uuid) -> Result<Memory> {
+    async fn get_memory_by_id(&self, _: RoxUserIdStr<'_>, _: Uuid) -> Result<Memory> {
         panic!("unused legacy lookup")
     }
 }
 impl ComposedMemoryRepo for Repo {
-    async fn enroll(&self, _: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn enroll(&self, _: &RoxUserIdStr<'_>) -> Result<()> {
         Ok(())
     }
     async fn claim_refresh(&self, _: NaiveDate) -> Result<Option<RefreshClaim>> {
@@ -32,15 +32,15 @@ impl ComposedMemoryRepo for Repo {
     async fn release_refresh(&self, _: &RefreshClaim) -> Result<()> {
         Ok(())
     }
-    async fn latest_activity(&self, _: &MacroUserIdStr<'_>) -> Result<Vec<Activity>> {
+    async fn latest_activity(&self, _: &RoxUserIdStr<'_>) -> Result<Vec<Activity>> {
         Ok(self.0.lock().unwrap().snapshot.activity.clone())
     }
-    async fn explicit(&self, _: &MacroUserIdStr<'_>) -> Result<ExplicitMemory> {
+    async fn explicit(&self, _: &RoxUserIdStr<'_>) -> Result<ExplicitMemory> {
         Ok(self.0.lock().unwrap().explicit.clone())
     }
     async fn save_explicit(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         expected: i64,
         content: &str,
     ) -> Result<ExplicitMemory> {
@@ -55,12 +55,12 @@ impl ComposedMemoryRepo for Repo {
         data.writes += 1;
         Ok(data.explicit.clone())
     }
-    async fn snapshot(&self, _: &MacroUserIdStr<'_>, _: NaiveDate) -> Result<MemorySnapshot> {
+    async fn snapshot(&self, _: &RoxUserIdStr<'_>, _: NaiveDate) -> Result<MemorySnapshot> {
         Ok(self.0.lock().unwrap().snapshot.clone())
     }
     async fn save_generation(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         expected: i64,
         date: NaiveDate,
         profile: &str,
@@ -94,7 +94,7 @@ impl ComposedMemoryRepo for Repo {
     }
     async fn activity(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: NaiveDate,
         _: NaiveDate,
     ) -> Result<Vec<Activity>> {
@@ -109,7 +109,7 @@ struct Generator {
 }
 #[async_trait::async_trait]
 impl MemoryGenerator for Generator {
-    async fn research(&self, _: MacroUserIdStr<'static>, instructions: &str) -> Result<String> {
+    async fn research(&self, _: RoxUserIdStr<'static>, instructions: &str) -> Result<String> {
         self.inputs
             .lock()
             .unwrap()
@@ -118,7 +118,7 @@ impl MemoryGenerator for Generator {
     }
     async fn summarize(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         instructions: &str,
         sources: &str,
     ) -> Result<String> {
@@ -128,7 +128,7 @@ impl MemoryGenerator for Generator {
             .push((instructions.into(), sources.into()));
         Ok("Project progress".into())
     }
-    async fn judge(&self, _: MacroUserIdStr<'static>, _: &str) -> Result<()> {
+    async fn judge(&self, _: RoxUserIdStr<'static>, _: &str) -> Result<()> {
         if self.reject {
             Err(MemoryError::Rejected("private".into()))
         } else {
@@ -139,7 +139,7 @@ impl MemoryGenerator for Generator {
 struct Teams(Mutex<Vec<(Uuid, Vec<String>)>>);
 #[async_trait::async_trait]
 impl MemoryTeams for Teams {
-    async fn members(&self, _: &MacroUserIdStr<'_>) -> Result<Vec<(Uuid, Vec<String>)>> {
+    async fn members(&self, _: &RoxUserIdStr<'_>) -> Result<Vec<(Uuid, Vec<String>)>> {
         Ok(self.0.lock().unwrap().clone())
     }
 }
@@ -159,7 +159,7 @@ async fn rejected_preferences_never_write_but_forgetting_is_allowed() {
         }),
         Arc::new(Teams(Mutex::new(vec![]))),
     );
-    let user = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     assert!(matches!(
         service
             .update_memory(
@@ -207,8 +207,8 @@ async fn current_membership_controls_profiles_and_activity() {
     )])));
     let generator = Arc::new(Generator::default());
     let service = MemoryServiceImpl::new(repo, generator.clone(), teams.clone());
-    let owner = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
-    let teammate = MacroUserIdStr::parse_from_str("macro|teammate@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let teammate = RoxUserIdStr::parse_from_str("macro|teammate@example.com").unwrap();
     let date = NaiveDate::from_ymd_opt(2026, 6, 17).unwrap();
     let memory = service.get_memory(owner.clone()).await.unwrap().unwrap();
     assert!(memory.contains("Teammate profile"));
@@ -240,7 +240,7 @@ async fn failed_day_is_retried_before_later_days_and_completed_day_is_noop() {
         generator.clone(),
         Arc::new(Teams(Mutex::new(vec![]))),
     );
-    let user = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     assert!(matches!(
         service
             .refresh(user.clone(), date + Duration::days(1))
@@ -265,7 +265,7 @@ async fn refresh_through_fills_every_missing_day_and_rejections_write_nothing() 
     let repo = Repo::default();
     let date = NaiveDate::from_ymd_opt(2026, 6, 17).unwrap();
     repo.0.lock().unwrap().snapshot.through_date = Some(date - Duration::days(3));
-    let user = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     let rejected = MemoryServiceImpl::new(
         repo.clone(),
         Arc::new(Generator {
@@ -301,7 +301,7 @@ async fn first_failed_generation_catches_up_from_enrollment() {
         Arc::new(Generator::default()),
         Arc::new(Teams(Mutex::new(vec![]))),
     );
-    let user = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     assert!(matches!(
         service.refresh(user.clone(), date).await,
         Err(MemoryError::InvalidDate)

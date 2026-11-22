@@ -1,6 +1,6 @@
 use super::*;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pre_migration_sources_force_a_full_refresh_before_team_readiness(pool: PgPool) {
     let owner = "macro|snapshot-upgrade@example.com";
     let link = insert_link(&pool, owner).await;
@@ -58,7 +58,7 @@ async fn pre_migration_sources_force_a_full_refresh_before_team_readiness(pool: 
     assert_eq!(role.as_deref(), Some("owner"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn role_change_requires_a_new_snapshot_without_changing_event_identity(pool: PgPool) {
     let owner = "macro|role-change@example.com";
     let link = insert_link(&pool, owner).await;
@@ -117,7 +117,7 @@ async fn role_change_requires_a_new_snapshot_without_changing_event_identity(poo
     assert_eq!(verified.as_deref(), Some("reader"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn provider_redaction_replaces_details_even_without_a_sequence_change(pool: PgPool) {
     let owner = "macro|role-redaction@example.com";
     let link = insert_link(&pool, owner).await;
@@ -156,7 +156,7 @@ async fn provider_redaction_replaces_details_even_without_a_sequence_change(pool
     assert_eq!(redacted.provider_access_role.as_deref(), Some("reader"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delayed_mutation_echo_cannot_verify_content_under_a_new_role(pool: PgPool) {
     let owner = "macro|delayed-mutation@example.com";
     let link = insert_link(&pool, owner).await;
@@ -226,7 +226,7 @@ async fn delayed_mutation_echo_cannot_verify_content_under_a_new_role(pool: PgPo
     assert_eq!(verified.provider_access_role.as_deref(), Some("reader"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unchanged_mutation_preserves_but_never_elevates_source_verification(pool: PgPool) {
     let owner = "macro|unchanged-mutation@example.com";
     let link = insert_link(&pool, owner).await;
@@ -266,7 +266,7 @@ async fn unchanged_mutation_preserves_but_never_elevates_source_verification(poo
     assert_eq!(role.as_deref(), Some("owner"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn ordinary_mutation_preserves_incremental_sync_and_verified_access(pool: PgPool) {
     let owner = "macro|ordinary-mutation@example.com";
     let link = insert_link(&pool, owner).await;

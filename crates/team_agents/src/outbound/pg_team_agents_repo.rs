@@ -1,8 +1,8 @@
 //! Postgres adapter for agent teammate accounts.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -40,9 +40,9 @@ impl PgTeamAgentsRepo {
     }
 }
 
-fn user_id(raw: String) -> Result<MacroUserIdStr<'static>, PgTeamAgentsError> {
-    MacroUserIdStr::parse_from_str(&raw)
-        .map(MacroUserIdStr::into_owned)
+fn user_id(raw: String) -> Result<RoxUserIdStr<'static>, PgTeamAgentsError> {
+    RoxUserIdStr::parse_from_str(&raw)
+        .map(RoxUserIdStr::into_owned)
         .map_err(|_| PgTeamAgentsError::MalformedUserId)
 }
 
@@ -73,9 +73,9 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
 
     #[tracing::instrument(skip_all, fields(agent_user_id = %agent_credentials::telemetry_id(account.user_id.as_ref())), err)]
     async fn create_account(&self, account: &NewAgentAccount) -> Result<(), Self::Err> {
-        let macro_user_id = Uuid::now_v7();
+        let rox_user_id = Uuid::now_v7();
         // Agents never pay or sign in; the placeholder keeps the column unique.
-        let stripe_customer_id = format!("cus_agent_{macro_user_id}");
+        let stripe_customer_id = format!("cus_agent_{rox_user_id}");
         let mut transaction = self.pool.begin().await?;
 
         sqlx::query!(
@@ -83,7 +83,7 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
             INSERT INTO macro_user (id, username, email, stripe_customer_id)
             VALUES ($1, $2, $3, $4)
             "#,
-            macro_user_id,
+            rox_user_id,
             account.user_id.as_ref(),
             account.email,
             stripe_customer_id,
@@ -93,10 +93,10 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
 
         sqlx::query!(
             r#"
-            INSERT INTO macro_user_email_verification (macro_user_id, email, is_verified)
+            INSERT INTO rox_user_email_verification (rox_user_id, email, is_verified)
             VALUES ($1, $2, true)
             "#,
-            macro_user_id,
+            rox_user_id,
             account.email,
         )
         .execute(&mut *transaction)
@@ -104,10 +104,10 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
 
         sqlx::query!(
             r#"
-            INSERT INTO macro_user_info (macro_user_id, first_name, profile_picture)
+            INSERT INTO rox_user_info (rox_user_id, first_name, profile_picture)
             VALUES ($1, $2, $3)
             "#,
-            macro_user_id,
+            rox_user_id,
             account.name,
             account.avatar_url,
         )
@@ -116,14 +116,14 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
 
         sqlx::query!(
             r#"
-            INSERT INTO "User" (id, email, name, "firstName", macro_user_id, "isAgent")
+            INSERT INTO "User" (id, email, name, "firstName", rox_user_id, "isAgent")
             VALUES ($1, $2, $3, $4, $5, TRUE)
             "#,
             account.user_id.as_ref(),
             account.email,
             account.name,
             account.name,
-            macro_user_id,
+            rox_user_id,
         )
         .execute(&mut *transaction)
         .await?;
@@ -158,13 +158,13 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn delete_account(&self, user_id: &MacroUserIdStr<'_>) -> Result<(), Self::Err> {
+    async fn delete_account(&self, user_id: &RoxUserIdStr<'_>) -> Result<(), Self::Err> {
         // Deleting macro_user cascades to "User" and everything keyed on it,
         // including the team membership, the team_agents row and agent_repos.
         sqlx::query!(
             r#"
             DELETE FROM macro_user
-            WHERE id = (SELECT macro_user_id FROM "User" WHERE id = $1)
+            WHERE id = (SELECT rox_user_id FROM "User" WHERE id = $1)
             "#,
             user_id.as_ref(),
         )
@@ -175,7 +175,7 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn remove_seat(&self, user_id: &MacroUserIdStr<'_>) -> Result<(), Self::Err> {
+    async fn remove_seat(&self, user_id: &RoxUserIdStr<'_>) -> Result<(), Self::Err> {
         sqlx::query!(
             "DELETE FROM team_agents WHERE user_id = $1",
             user_id.as_ref()
@@ -189,7 +189,7 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
     #[tracing::instrument(skip_all, err)]
     async fn get(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<TeamAgentRecord>, Self::Err> {
         let row = sqlx::query_as!(
             AgentRow,
@@ -235,7 +235,7 @@ impl AgentAccounts for PgTeamAgentsRepo {
     #[tracing::instrument(skip_all, err)]
     async fn account_facts(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Option<AgentAccountFacts>, Self::Err> {
         let row = sqlx::query!(
             r#"

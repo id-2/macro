@@ -32,14 +32,14 @@ use gtm_invite::{
     domain::service::GtmInviteServiceImpl, outbound::pg_gtm_invite_repo::PgGtmInviteRepo,
 };
 use loops_client::LoopsClient;
-use macro_auth::{InternalApiKey, middleware::decode_jwt::JwtValidationArgs};
-use macro_authorization::{
-    MacroAuthJwtValidator, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_auth::{InternalApiKey, middleware::decode_jwt::JwtValidationArgs};
+use rox_authorization::{
+    RoxAuthJwtValidator, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
-use macro_cache_client::MacroCache;
-use macro_env::Environment;
-use macro_env_var::env_var;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_cache_client::RoxCache;
+use rox_env::Environment;
+use rox_env_var::env_var;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use native_app_service::{domain::service::NativeAppServiceImpl, outbound::DefaultBundleFetcher};
 use notification::outbound::queue::SqsQueue;
 use notification::{
@@ -71,7 +71,7 @@ use cursor_api_key::cipher::CursorApiKeyCipher;
 
 pub(crate) type NotificationIngressType = SqsNotificationIngress<SqsQueue>;
 pub(crate) type AuthenticationEventBroker =
-    MacroEventBrokerService<KafkaEventPublisher, TaskTracker>;
+    RoxEventBrokerService<KafkaEventPublisher, TaskTracker>;
 
 pub(crate) type ChannelServiceType = ChannelServiceImpl<
     PgChannelsRepo,
@@ -227,7 +227,7 @@ pub(crate) type FavoritesServiceType = favorites::domain::service::FavoritesServ
     favorites::outbound::pg_favorites_repo::PgFavoritesRepo,
 >;
 
-pub(crate) type AuthorizationService = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+pub(crate) type AuthorizationService = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 
 pub(crate) type AgentApiKeysType = agent_api_keys::domain::AgentKeyService<
     agent_api_keys::outbound::PgAgentKeyRepo,
@@ -265,7 +265,7 @@ pub(crate) struct ApiContext {
     pub bots: Arc<BotsServiceType>,
     /// Owner-bound Codex OAuth lifecycle and cloud target settings.
     pub codex_connection: Option<Arc<dyn codex_connection::domain::ConnectionService>>,
-    pub macro_cache_client: Arc<MacroCache>,
+    pub rox_cache_client: Arc<RoxCache>,
     pub stripe_client: Arc<stripe::Client>,
     pub subscription_status: Arc<SubscriptionStatusServiceType>,
     pub subscription_plan:
@@ -293,8 +293,8 @@ pub(crate) struct ApiContext {
     pub environment: Environment,
     pub signup_policy: Arc<SignupPolicy>,
     pub jwt_args: JwtValidationArgs,
-    pub authorization_state: MacroAuthorizationState<AuthorizationService>,
-    pub token_context: MacroApiTokenContext,
+    pub authorization_state: RoxAuthorizationState<AuthorizationService>,
+    pub token_context: RoxApiTokenContext,
     pub internal_api_key: InternalApiKey,
     pub stripe_webhook_secret: LocalOrRemoteSecret<StripeWebhookSecretKey>,
     pub user_roles_and_permissions_service: Arc<UserRolesAndPermissionsServiceImpl<RoxDB>>, // Note: since FromRef doesn't support generics we have to specify the concrete types here
@@ -343,24 +343,24 @@ env_var! {
 
 env_var! {
     #[derive(Clone)]
-    pub struct MacroApiTokenIssuer;
+    pub struct RoxApiTokenIssuer;
 }
 env_var! {
     #[derive(Clone)]
-    pub struct MacroApiTokenPrivateSecretKey;
+    pub struct RoxApiTokenPrivateSecretKey;
 }
 
 env_var! {
     #[derive(Clone)]
-    pub struct MacroApiTokenExpirySeconds;
+    pub struct RoxApiTokenExpirySeconds;
 }
 
 #[derive(Clone)]
-pub struct MacroApiTokenContext {
+pub struct RoxApiTokenContext {
     /// The issuer of the macro-api-token
-    pub issuer: MacroApiTokenIssuer,
+    pub issuer: RoxApiTokenIssuer,
     /// The macro api token private key used to sign macro-api tokens
-    pub macro_api_token_private_key: LocalOrRemoteSecret<MacroApiTokenPrivateSecretKey>,
+    pub rox_api_token_private_key: LocalOrRemoteSecret<RoxApiTokenPrivateSecretKey>,
     /// The token expiry duration in seconds
     pub expiry_seconds: usize,
 }

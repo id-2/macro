@@ -57,7 +57,7 @@ impl<T: PropertiesService, A: EntityAccessService> PropertiesToolContext<T, A> {
         Self {
             service: Arc::new(service),
             entity_access_service: Arc::new(entity_access_service),
-            actor: bot_id::MACRO_AI_BOT_ID,
+            actor: bot_id::ROX_AI_BOT_ID,
         }
     }
 

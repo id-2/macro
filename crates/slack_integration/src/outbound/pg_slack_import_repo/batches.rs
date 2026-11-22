@@ -2,7 +2,7 @@
 //! No helper writes comms tables. The caller must roll back the entire transaction
 //! on any error, including a failed final fence check, and commit only after finish.
 
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use sqlx::{Postgres, Transaction};
 
 use super::{
@@ -18,7 +18,7 @@ pub struct WriteContext {
     /// Namespace owning the job.
     pub team: TeamId,
     /// Persisted administrator, never supplied by a queue message.
-    pub requester: MacroUserIdStr<'static>,
+    pub requester: RoxUserIdStr<'static>,
     /// Persisted source kind.
     pub kind: ConversationKind,
     /// Previously authorized target, if bound.
@@ -45,7 +45,7 @@ pub async fn write_context(
     .map_err(internal)?;
     Ok(WriteContext {
         team,
-        requester: MacroUserIdStr::parse_from_str(&row.user_id)
+        requester: RoxUserIdStr::parse_from_str(&row.user_id)
             .map_err(internal)?
             .into_owned(),
         kind: parse_enum(&row.kind)?,
@@ -459,7 +459,7 @@ impl PgSlackImportRepo {
         &self,
         team: TeamId,
         job: JobId,
-    ) -> PortResult<Option<(MacroUserIdStr<'static>, SourceIdentity)>> {
+    ) -> PortResult<Option<(RoxUserIdStr<'static>, SourceIdentity)>> {
         let row = sqlx::query!(
             "SELECT user_id, source_workspace_id, confirmed_unknown FROM slack_import_job WHERE team_id = $1 AND id = $2",
             Uuid::from(team), Uuid::from(job),
@@ -473,7 +473,7 @@ impl PgSlackImportRepo {
                 None => return Err(ImportError::Unavailable.into()),
             };
             Ok((
-                MacroUserIdStr::parse_from_str(&row.user_id)
+                RoxUserIdStr::parse_from_str(&row.user_id)
                     .map_err(internal)?
                     .into_owned(),
                 source,

@@ -7,7 +7,7 @@ use axum::{
 use axum_extra::extract::Cached;
 use email::inbound::axum::api_types::DraftEditPrecondition;
 use email::inbound::axum::axum_impls::EmailLinkExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use uuid::Uuid;
 
 /// Confirm an uploaded attachment before it becomes part of a sendable draft.
@@ -17,13 +17,13 @@ use uuid::Uuid;
 pub async fn handler(
     Query(precondition): Query<DraftEditPrecondition>,
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<EmailSvc, AuthorizationService>>,
     Path((draft, attachment)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, AttachmentApiError> {
     ctx.draft_attachments
         .complete_upload(
-            &authorization.authorization.user.macro_user_id,
+            &authorization.authorization.user.rox_user_id,
             link.id,
             draft,
             attachment,

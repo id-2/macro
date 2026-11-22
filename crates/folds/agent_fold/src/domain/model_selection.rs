@@ -72,7 +72,7 @@ fn project_option(
         supports_images: option
             .meta
             .as_ref()
-            .and_then(|meta| meta.get("macro.supportsImages"))
+            .and_then(|meta| meta.get("rox.supportsImages"))
             .and_then(serde_json::Value::as_bool),
         group: group.map(str::to_owned),
     }

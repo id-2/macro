@@ -1,4 +1,4 @@
-// The Stripe event inbox: billing events Macro failed to apply, applies late,
+// The Stripe event inbox: billing events Rox failed to apply, applies late,
 // or disagrees with Stripe about.
 //
 // New monitors, not adopted. Each reads a log event with a fixed message
@@ -16,7 +16,7 @@
 //   cursor is replayed. Fields: `consumer`, `dead`.
 // - `stripe inbox backlog` (warn): an event applied more than five minutes
 //   after the webhook stored it. Field: `consumer`.
-// - `stripe audit mismatch` (warn): the daily audit found Stripe and Macro
+// - `stripe audit mismatch` (warn): the daily audit found Stripe and Rox
 //   disagreeing. Fields: `kind`, `object_id`.
 import * as datadog from '@pulumi/datadog';
 import { goalertWebhooks } from '../goalert';

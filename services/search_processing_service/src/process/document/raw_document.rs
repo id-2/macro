@@ -4,7 +4,7 @@ use anyhow::Context;
 use chrono::Utc;
 use document_sub_type::DocumentSubType;
 use lexical_client::types::MarkdownParseResult;
-use macro_db_client::document::get_document_version_id;
+use rox_db_client::document::get_document_version_id;
 use model::document::{DocumentMetadata, FileType};
 use model_owner::Owner;
 use models_properties::EntityType;
@@ -386,7 +386,7 @@ pub async fn update_search_with_raw_document(
     tracing::trace!("got raw file content");
 
     let updated_at_millis = EpochMillis::new(Utc::now().timestamp_millis())?;
-    let uuid = macro_uuid::generate_uuid_v7().to_string();
+    let uuid = rox_uuid::generate_uuid_v7().to_string();
 
     let mut upserts: Vec<UpsertDocumentArgs> = match file_type {
         FileType::Pdf | FileType::Docx => {
@@ -593,7 +593,7 @@ pub async fn update_search_with_sync_document(
     lexical_client: &lexical_client::LexicalClient,
     search_extractor_message: &SearchExtractorMessage,
 ) -> anyhow::Result<()> {
-    match search_extractor_message.file_type.macro_app_path() {
+    match search_extractor_message.file_type.rox_app_path() {
         model_file_type::FileAssociation::Md(_) => {}
         _ => {
             tracing::warn!("unsupported file type");

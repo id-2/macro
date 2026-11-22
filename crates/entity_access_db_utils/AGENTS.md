@@ -37,12 +37,12 @@ top of it.
 
 ## Boundaries
 
-- Depends on: `agent_correlation`, `macro_user_id`, `model-entity`,
+- Depends on: `agent_correlation`, `rox_user_id`, `model-entity`,
   `model_owner`, `models_entity_access_management`, `models_permissions`.
 - Used by: `crates/entity_access_management`, `crates/entity_registry/entity_registry_db_utils`,
   and most domain crates that grant access as part of a write
   (`channels`, `projects`, `teams`, `crm`, `call`, `chat`, `documents`,
-  `databases`, `email`, `forms`, `macro_db_client`, `crates/scheduled_action`).
+  `databases`, `email`, `forms`, `rox_db_client`, `crates/scheduled_action`).
 
 ## Recipes
 

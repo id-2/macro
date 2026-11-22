@@ -15,7 +15,7 @@ pub enum NativeToolVerdict {
     /// Run without an account override: identity-free tools and ungated test hosts.
     Run,
     /// Run with this verified user's access, preserving the session's billing identity.
-    RunAs(macro_user_id::user_id::MacroUserIdStr<'static>),
+    RunAs(rox_user_id::user_id::RoxUserIdStr<'static>),
     /// Do not; this is what the model is told instead.
     Refuse(String),
 }

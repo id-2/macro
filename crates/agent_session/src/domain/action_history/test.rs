@@ -11,7 +11,7 @@ fn an_empty_prompt_still_proves_delivery() {
     let entries = agent_fold::testing::parse_log_as(session, &log)
         .into_iter()
         .map(|entry| StoredAgentSessionLog {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             created_at: chrono::Utc::now(),
             entry,
         })
@@ -21,7 +21,7 @@ fn an_empty_prompt_still_proves_delivery() {
         Some(RecordedAction::Running {
             turn: TurnId(0),
             actor: Some(
-                macro_user_id::user_id::MacroUserIdStr::try_from_email("eric@example.com").unwrap(),
+                rox_user_id::user_id::RoxUserIdStr::try_from_email("eric@example.com").unwrap(),
             ),
         })
     );
@@ -37,7 +37,7 @@ fn an_empty_prompt_recovers_its_completed_answer() {
     let entries = agent_fold::testing::parse_log_as(session, &log)
         .into_iter()
         .map(|entry| StoredAgentSessionLog {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             created_at: chrono::Utc::now(),
             entry,
         })

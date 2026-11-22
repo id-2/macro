@@ -40,13 +40,13 @@ pub fn build_router(state: ApiContext) -> Router {
     }
     let routes = api_router(state)
         .merge(health::router())
-        .layer(macro_cors::cors_layer())
+        .layer(rox_cors::cors_layer())
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(1024 * 1024 * 1024))
         .layer(
             ServiceBuilder::new()
                 .layer(
-                    macro_tower_layers::MacroRequestIdAndTracingLayer::new(
+                    rox_tower_layers::RoxRequestIdAndTracingLayer::new(
                         std::time::Duration::from_millis(200),
                     )
                     .into_inner(),

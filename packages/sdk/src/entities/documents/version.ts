@@ -1,6 +1,6 @@
 import type { GetDocumentResponseData } from '../../../generated/storage/types.gen';
 import { Lazy, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Document } from './document';
 
 /** An immutable document version, scoped to its document. */
@@ -8,7 +8,7 @@ export class DocumentVersion {
   private readonly detail: Lazy<GetDocumentResponseData>;
 
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Parent document. */
     readonly document: Document,
     /** Version number. */
@@ -26,7 +26,7 @@ export class DocumentVersion {
 
   /** Construct a version handle. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     document: Document,
     id: number,
   ): DocumentVersion {

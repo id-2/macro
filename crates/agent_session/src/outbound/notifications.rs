@@ -1,7 +1,7 @@
 //! PostgreSQL outbox. Only this adapter touches agent_session_notification.
 use crate::domain::{error::AgentSessionError, model::AgentSessionId, notifications::*};
 use agent_runtime_protocol::domain::{action::AgentActionId, notification::Notification};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use sqlx::{PgConnection, PgPool, types::Json};
 
 /// Shared pool-backed outbox; clones share no delivery state.
@@ -81,7 +81,7 @@ impl NotificationStore for PgNotificationStore {
             }
             let retry_action = sqlx::query_scalar!("SELECT action_id FROM agent_session_notification WHERE session_id = $1 AND delivered_at IS NULL AND (lease_until IS NULL OR lease_until < now()) AND ($2 OR wake OR action_id IS NOT NULL) ORDER BY (action_id IS NULL), created_at, id LIMIT 1", session.as_uuid(), real_prompt)
                 .fetch_optional(&mut *transaction).await.map_err(storage)?.flatten();
-            let lease = macro_uuid::generate_uuid_v7();
+            let lease = rox_uuid::generate_uuid_v7();
             let action = AgentActionId::mint();
             let rows = sqlx::query!(
                 r#"

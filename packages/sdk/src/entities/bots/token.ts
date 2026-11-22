@@ -1,13 +1,13 @@
 import type { BotToken as BotTokenRecord } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { Bot } from './bot';
 
 /** A bot bearer token's metadata. The secret is returned only by `Bot.createToken`. */
-export class BotToken extends MacroEntity<BotTokenRecord> {
+export class BotToken extends RoxEntity<BotTokenRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** The bot this token authenticates. */
     readonly bot: Bot,
     id: string,
@@ -17,12 +17,12 @@ export class BotToken extends MacroEntity<BotTokenRecord> {
   }
 
   /** A handle to one of a bot's tokens by id. */
-  static byId(client: MacroClient, bot: Bot, id: string): BotToken {
+  static byId(client: RoxClient, bot: Bot, id: string): BotToken {
     return new BotToken(client, bot, id);
   }
 
   /** Seed from a listed or created token. */
-  static from(client: MacroClient, bot: Bot, record: BotTokenRecord): BotToken {
+  static from(client: RoxClient, bot: Bot, record: BotTokenRecord): BotToken {
     return new BotToken(client, bot, record.id, record);
   }
 
@@ -32,7 +32,7 @@ export class BotToken extends MacroEntity<BotTokenRecord> {
         path: { bot_id: this.bot.id },
       }),
     ).find((token) => token.id === this.id);
-    if (!record) throw new MacroNotFoundError(`bot token ${this.id} not found`);
+    if (!record) throw new RoxNotFoundError(`bot token ${this.id} not found`);
     return record;
   }
 

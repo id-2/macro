@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        UPDATE macro_user\n        SET has_trialed = $2\n        WHERE email = $1\n        ",
+  "query": "\n        UPDATE rox_user\n        SET has_trialed = $2\n        WHERE email = $1\n        ",
   "describe": {
     "columns": [],
     "parameters": {

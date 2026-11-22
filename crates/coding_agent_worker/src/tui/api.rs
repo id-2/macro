@@ -12,7 +12,7 @@ use rootcause::prelude::ResultExt as _;
 use crate::config::Config;
 use crate::config::HarnessCredentials;
 
-const HARNESS_TOKEN_HEADER: &str = "x-macro-harness-token";
+const HARNESS_TOKEN_HEADER: &str = "x-rox-harness-token";
 
 /// A dashboard read that takes longer than this is not worth waiting on: the
 /// next refresh asks again.
@@ -67,7 +67,7 @@ impl HarnessSelfApi {
         Self {
             http,
             base: config
-                .macro_api
+                .rox_api
                 .storage_url
                 .trim_end_matches('/')
                 .to_owned(),

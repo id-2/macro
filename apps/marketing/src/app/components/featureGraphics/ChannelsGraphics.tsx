@@ -36,7 +36,7 @@ import { PreviewWindow } from '../graphics/PreviewWindow';
 import { SsgDesktop, SsgMobile } from '../utils/SsgGate';
 
 const _HERO_DEMO_VIDEO_ID = '1gDOXUxHo0U'; // "What Rox learned from Slack/Superhuman"
-const MACRO_REPO_URL = 'https://github.com/macro-inc/macro';
+const ROX_REPO_URL = 'https://github.com/macro-inc/macro';
 
 // ---------------------------------------------------------------------------
 // Shared style fragments (matching the homepage / email / docs bento language)
@@ -151,7 +151,7 @@ function _GithubStarButton() {
   });
   return (
     <a
-      href={MACRO_REPO_URL}
+      href={ROX_REPO_URL}
       target="_blank"
       rel="noreferrer"
       class="channels-cta-button"
@@ -262,7 +262,7 @@ function navIconStyle(props: {
   };
 }
 
-function MacroNavIcon(props: {
+function RoxNavIcon(props: {
   name: string;
   active?: boolean;
   accent?: boolean;
@@ -1738,7 +1738,7 @@ function ChatHeroEmailCard(props: { compact: boolean }) {
             width: '32px',
           }}
         >
-          <MacroNavIcon name="email" size={16} accent />
+          <RoxNavIcon name="email" size={16} accent />
         </span>
         <div style={{ display: 'grid', gap: '2px', 'min-width': 0 }}>
           <span
@@ -3034,7 +3034,7 @@ export function InboxGraphic() {
   const compact = () => mobile();
   const iconFor = (kind: string) => {
     if (kind === 'channel') return <HashGlyph size={15} />;
-    if (kind === 'email') return <MacroNavIcon name="email" size={15} />;
+    if (kind === 'email') return <RoxNavIcon name="email" size={15} />;
     if (kind === 'task') return <TaskListGlyph size={15} />;
     return <span style={{ color: 'var(--a0)', 'font-weight': '500' }}>@</span>;
   };
@@ -3069,7 +3069,7 @@ export function InboxGraphic() {
             padding: '11px 14px',
           }}
         >
-          <MacroNavIcon name="inbox" active size={15} />
+          <RoxNavIcon name="inbox" active size={15} />
           <span
             style={{
               color: 'var(--c1)',

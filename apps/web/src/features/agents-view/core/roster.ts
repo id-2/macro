@@ -5,9 +5,9 @@ import {
 } from '@core/constant/cursorAgent';
 import {
   isMacroAgentId,
-  MACRO_AGENT_HANDLE,
-  MACRO_AGENT_NAME,
-  MACRO_HARNESS_NAME,
+  ROX_AGENT_HANDLE,
+  ROX_AGENT_NAME,
+  ROX_HARNESS_NAME,
 } from '@core/constant/macroAgent';
 import { type AgentKind, kindForHarness, systemBotKind } from './agent-kind';
 
@@ -15,7 +15,7 @@ import { type AgentKind, kindForHarness, systemBotKind } from './agent-kind';
  * Rox's own chat agent: the deployment's managed default. Started without a
  * `botId`, so the server picks the runtime it is configured to run it on.
  */
-export const MACRO_PERSONA_ID = 'macro';
+export const ROX_PERSONA_ID = 'macro';
 
 /** The fields of a persisted agent the roster reads. Structural, so the wire
  *  type satisfies it without the core importing the client. */
@@ -53,7 +53,7 @@ type RosterShare = 'system' | 'team' | 'private';
 
 /** One agent or coder as the composer, carousel, and roster page show it. */
 export type RosterAgent = {
-  /** Persona id: the bot id, or `MACRO_PERSONA_ID` for Rox's default. */
+  /** Persona id: the bot id, or `ROX_PERSONA_ID` for Rox's default. */
   id: string;
   /** Bot to start sessions for; absent for Rox's default persona. */
   botId?: string;
@@ -106,7 +106,7 @@ export function runtimeLabel(
   switch (harness) {
     case 'in-memory':
     case 'macro-inmem':
-      return MACRO_HARNESS_NAME;
+      return ROX_HARNESS_NAME;
     case 'cursor':
       return 'Cursor';
     case 'roxd':
@@ -237,14 +237,14 @@ function persistedAgent(
 export function buildAgentRoster(input: RosterInput): RosterAgent[] {
   return [
     {
-      id: MACRO_PERSONA_ID,
+      id: ROX_PERSONA_ID,
       kind: 'agent',
-      name: MACRO_AGENT_NAME,
-      handle: MACRO_AGENT_HANDLE,
+      name: ROX_AGENT_NAME,
+      handle: ROX_AGENT_HANDLE,
       harness: 'in-memory',
       defaultModel: input.macroDefaultModel,
       share: 'system',
-      runtime: { label: MACRO_HARNESS_NAME, connected: true },
+      runtime: { label: ROX_HARNESS_NAME, connected: true },
     },
     {
       id: CURSOR_BOT_ID,
@@ -272,7 +272,7 @@ export function rosterForAgentPicker(
 ): RosterAgent[] {
   return roster.filter(
     (agent) =>
-      agent.id !== MACRO_PERSONA_ID && !isMacroAgentId(agent.botId ?? agent.id)
+      agent.id !== ROX_PERSONA_ID && !isMacroAgentId(agent.botId ?? agent.id)
   );
 }
 

@@ -23,7 +23,7 @@ import { DEVELOPMENT_PROXY_PREFIX } from '../../lib/core/constant/developmentPro
 import { desktopAuthCallbackUrl } from './core/post-auth-target';
 
 /**
- * Run the hosted flow in the system browser and return through the `macro://`
+ * Run the hosted flow in the system browser and return through the `rox://`
  * deep link.
  *
  * The callback is pinned rather than derived from the current page by the

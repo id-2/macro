@@ -74,7 +74,7 @@ Add a new port to the chat crate (or a standalone trait):
 trait AttachmentResolver: Send + Sync + 'static {
     fn resolve(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         message_text: &str,
         attachments: Vec<AttachmentReference>,
     ) -> impl Future<Output = Result<Vec<UserMessageContent>>> + Send;

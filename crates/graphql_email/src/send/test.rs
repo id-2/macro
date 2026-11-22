@@ -23,7 +23,7 @@ fn attempt(id: SendAttemptId, status: SendAttemptStatus) -> SendAttempt {
 impl EmailSendService for Service {
     async fn pending_email_sends(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         _after: Option<email::domain::send_attempt::SendAttemptCursor>,
     ) -> Result<email::domain::send_attempt::SendAttemptPage, EmailErr> {
         self.calls.lock().unwrap().push((
@@ -39,7 +39,7 @@ impl EmailSendService for Service {
     }
     async fn send_email(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link: Uuid,
         id: SendAttemptId,
         snapshot: SendSnapshot,
@@ -52,7 +52,7 @@ impl EmailSendService for Service {
     }
     async fn cancel_email_send(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link: Uuid,
         id: SendAttemptId,
     ) -> Result<SendAttempt, EmailErr> {
@@ -64,7 +64,7 @@ impl EmailSendService for Service {
     }
     async fn email_send_status(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link: Uuid,
         id: SendAttemptId,
     ) -> Result<Option<SendAttempt>, EmailErr> {
@@ -112,7 +112,7 @@ impl EmailThreadMutationOutput for ThreadOutput {
     type Thread = Thread;
     fn load_email_thread<'ctx>(
         ctx: &'ctx Context<'_>,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Pin<Box<dyn Future<Output = async_graphql::Result<Option<Thread>>> + Send + 'ctx>> {
         Box::pin(async move {
@@ -137,7 +137,7 @@ fn schema(
     .data(service);
     if authenticated {
         builder
-            .data(MacroUserIdStr::try_from_email("viewer@example.com").unwrap())
+            .data(RoxUserIdStr::try_from_email("viewer@example.com").unwrap())
             .finish()
     } else {
         builder.finish()

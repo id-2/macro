@@ -33,7 +33,7 @@ from the runtime `SLACK_IMPORT_ENABLED` intake flag.
    | `SLACK_IMPORT_CONCURRENCY` | `1` |
 
    ECS selects these JSON keys individually using the shared Doppler execution
-   role. It intentionally does **not** inject `APP_SECRETS_JSON`: MacroConfig
+   role. It intentionally does **not** inject `APP_SECRETS_JSON`: RoxConfig
    prioritizes that JSON over plain env vars and would shadow infrastructure
    wiring. Updating Doppler alone does not update a running task's environment;
    restart/deploy the worker to pick up changes.
@@ -73,7 +73,7 @@ instead, so maintenance and DLQ reconciliation continue.
 - Worker stop timeout: **120 seconds**. SIGTERM stops intake and drains work.
 - Main queue: `slack-import-queue-<env>`; visibility: **900 seconds**; redrive
   after **5 receives** to `slack-import-dlq-<env>`; DLQ retention: **14 days**.
-  These match `macro_queues::SlackImportQueue` / `SlackImportDlq`.
+  These match `rox_queues::SlackImportQueue` / `SlackImportDlq`.
 - Keep UI/import admission gated while verifying permissions, search publication,
   a small synthetic import, cancellation, worker restart and DLQ reconciliation.
   Then set `SLACK_IMPORT_ENABLED=true` and redeploy the worker before opening
@@ -97,11 +97,11 @@ For the default `macro` instance, put `SLACK_IMPORT_ENABLED=true` and
 from the repository root in another terminal:
 
 ```sh
-export MACRO_ENV_FILE="$PWD/infra/local/generated/macro/local.generated.env"
+export ROX_ENV_FILE="$PWD/infra/local/generated/macro/local.generated.env"
 docker compose --project-directory . -p macro \
   -f docker/docker-compose.yml \
   -f infra/local/generated/macro/docker-compose.override.yml \
-  --env-file "$MACRO_ENV_FILE" --profile slack-import \
+  --env-file "$ROX_ENV_FILE" --profile slack-import \
   up -d --build --no-deps slack_import_worker
 ```
 

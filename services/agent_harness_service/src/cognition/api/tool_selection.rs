@@ -1,6 +1,6 @@
 use crate::cognition::model::stream::ToolSet;
 use ai_tools::{AiToolSet, ToolMcpSelector, ToolServiceContext};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::ConnectorSelect;
 use std::sync::{Arc, LazyLock};
 
@@ -74,7 +74,7 @@ pub(crate) async fn service_tools(
     selection: &ToolSet,
     static_tools: Arc<AiToolSet>,
     mcp_selector: &ToolMcpSelector,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
 ) -> SelectedTools<ToolServiceContext> {
     select_tools(
         selection,

@@ -8,8 +8,8 @@ use ::crm::domain::{
 };
 use email_api_client::domain::models::{EmailApiError, MessageWithCalendarParts};
 use futures::future::BoxFuture;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::{Link, UserProvider};
 use std::{
     collections::HashSet,
@@ -41,7 +41,7 @@ pub(super) struct State {
     pub sent_contacts: Vec<CrmContactRecipient>,
     pub received_contacts: Vec<CrmContactRecipient>,
     pub sent: Vec<(BackfillPubsubMessage, Option<(i32, u32)>)>,
-    pub connections: Vec<HashSet<MacroUserIdStr<'static>>>,
+    pub connections: Vec<HashSet<RoxUserIdStr<'static>>>,
 }
 impl Default for State {
     fn default() -> Self {
@@ -128,7 +128,7 @@ pub(super) fn setup() -> (BackfillService<Fake, Fake, Fake, Fake, Fake>, Fake) {
 pub(super) fn link() -> Link {
     Link {
         id: LINK,
-        macro_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        rox_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
         fusionauth_user_id: "owner".into(),
         email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
         provider: UserProvider::Gmail,
@@ -203,14 +203,14 @@ pub(super) fn seed() -> BackfillPubsubMessage {
 pub(super) fn population() -> BackfillPubsubMessage {
     input(BackfillOperation::PopulateCrmForUser(
         PopulateCrmForUserPayload {
-            macro_id: link().macro_id,
+            rox_id: link().rox_id,
         },
     ))
 }
 pub(super) fn depopulation() -> BackfillPubsubMessage {
     input(BackfillOperation::DepopulateCrmForUser(
         DepopulateCrmForUserPayload {
-            macro_id: link().macro_id,
+            rox_id: link().rox_id,
             team_id: TEAM,
         },
     ))
@@ -469,8 +469,8 @@ impl BackfillQueue for Fake {
         Ok(())
     }
 }
-impl MacroEventBroker for Fake {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for Fake {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         _: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -503,7 +503,7 @@ impl BackfillEffects for Fake {
     }
     async fn connect(
         &self,
-        users: HashSet<MacroUserIdStr<'static>>,
+        users: HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), rootcause::Report> {
         self.call("connect").map_err(rootcause::Report::new)?;
         self.0.lock().unwrap().connections.push(users);
@@ -616,7 +616,7 @@ pub(super) fn provider_message(
         labels: vec![],
         body_text: Some("body".to_string()),
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         attachments: vec![],
         attachments_draft: vec![],
         attachments_forwarded: vec![],

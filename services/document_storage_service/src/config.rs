@@ -1,9 +1,9 @@
 use anyhow::Context;
 pub use dictation::outbound::OpenaiApiKey;
 use entity_registry::NonUserOwners;
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::{env_vars, maybe_env_vars};
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::{env_vars, maybe_env_vars};
 use secretsmanager_client::LocalOrRemoteSecret;
 
 #[cfg(test)]
@@ -99,7 +99,7 @@ maybe_env_vars! {
 }
 
 /// The configuration parameters for the application.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     pub openbao_address: OpenbaoAddress,
@@ -110,7 +110,7 @@ pub struct Config {
     /// PostHog host (optional)
     pub posthog_host: PosthogHost,
     /// Default-off quota admission and prospective usage counting.
-    #[macro_config_default(ai_usage::AiUsageEnforcement::Disabled)]
+    #[rox_config_default(ai_usage::AiUsageEnforcement::Disabled)]
     pub enable_ai_usage_enforcement: ai_usage::AiUsageEnforcement,
     /// The free plan's hard monthly AI cap, in cents at provider cost.
     /// Mandatory; set in Doppler.
@@ -140,7 +140,7 @@ pub struct Config {
     /// Credential for resolving the selected inbox's Google grant.
     pub authentication_service_secret_key: LocalOrRemoteSecret<AuthenticationServiceSecretKey>,
     /// Match email-service's undo-send window for GraphQL delivery.
-    #[macro_config_default(10)]
+    #[rox_config_default(10)]
     pub sent_undo_delay_secs: u32,
     pub opensearch_url: OpensearchUrl,
     pub opensearch_username: OpensearchUsername,
@@ -167,68 +167,68 @@ pub struct Config {
     pub internal_api_key: InternalApiKey,
 
     /// The port to listen for HTTP requests on.
-    #[macro_config_default(8080)]
+    #[rox_config_default(8080)]
     pub port: usize,
 
     /// The environment we are in
-    #[macro_config_default(Environment::new_or_prod())]
+    #[rox_config_default(Environment::new_or_prod())]
     pub environment: Environment,
 
     /// Whether calendar events participate in search. Off by default so a
     /// deployed environment can carry the code before its calendar index has
     /// been created and backfilled — with this false, calendar events are
     /// dropped from the searched set no matter what a request asks for.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub calendar_search_enabled: bool,
 
     /// Enable read-only calendar projections shared with current teammates.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub calendar_team_sharing_enabled: bool,
 
     /// Enable Slack import creation and uploads. Existing receipts remain
     /// readable, finalizable and cancellable when this switch is off.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub slack_import_enabled: bool,
 
     /// Send Gmail label writes as `ModifyMessageLabelsBatch` queue messages.
     /// Enable only after every email-service pubsub worker runs a release that
     /// decodes them; older workers delete the batch form. Off, each message is
     /// its own `ModifyMessageLabels`.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub gmail_label_write_batches_enabled: bool,
 
     /// Maximum number of SQS messages to receive per poll for the delete document worker
-    #[macro_config_default(10)]
+    #[rox_config_default(10)]
     pub queue_max_messages: i32,
     /// SQS long-poll wait time in seconds for the delete document worker
-    #[macro_config_default(4)]
+    #[rox_config_default(4)]
     pub queue_wait_time_seconds: i32,
 
     /// Maximum number of SQS messages to receive per webhook worker poll
-    #[macro_config_default(10)]
+    #[rox_config_default(10)]
     pub webhook_queue_max_messages: i32,
     /// SQS long-poll wait time in seconds for the webhook worker
-    #[macro_config_default(20)]
+    #[rox_config_default(20)]
     pub webhook_queue_wait_time_seconds: i32,
 
     /// The document limit for free users
-    #[macro_config_default(20)]
+    #[rox_config_default(20)]
     pub document_limit: u64,
 
     /// Master switch for calendar event reminder dispatch. When `false`
     /// (the default) the worker drains its queue without delivering, so
     /// synced reminder schedules produce no notifications until enabled.
-    #[macro_config_default(false)]
+    #[rox_config_default(false)]
     pub calendar_reminder_dispatch_enabled: bool,
 
     /// Lets a team-scoped bot with no acting user own the documents it creates.
     pub enable_non_user_owners: EnableNonUserOwners,
 
     /// The number of seconds a signed document or call recording URL is valid for.
-    #[macro_config_default(DEFAULT_PRESIGNED_URL_EXPIRY_SECONDS)]
+    #[rox_config_default(DEFAULT_PRESIGNED_URL_EXPIRY_SECONDS)]
     pub document_storage_service_presigned_url_expiry_seconds: u64,
     /// The number of seconds a browser cache for a presigned url is valid for
-    #[macro_config_default(DEFAULT_PRESIGNED_URL_BROWSER_CACHE_EXPIRY_SECONDS)]
+    #[rox_config_default(DEFAULT_PRESIGNED_URL_BROWSER_CACHE_EXPIRY_SECONDS)]
     pub document_storage_service_presigned_url_browser_cache_expiry_seconds: u64,
 
     /// The CloudFront private key shared by document content and call recording URL signing.
@@ -265,7 +265,7 @@ impl Config {
         let enforcement = ai_usage::config::load_ai_usage_enforcement()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let mut config =
-            macro_config::ConfigLoader::load::<Config>().context("failed to load config")?;
+            rox_config::ConfigLoader::load::<Config>().context("failed to load config")?;
         config.enable_ai_usage_enforcement = enforcement;
         Ok(config)
     }

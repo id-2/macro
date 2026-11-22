@@ -49,7 +49,7 @@ const link = (id: string, overrides: Partial<EmailLink> = {}): EmailLink =>
   ({
     id,
     provider: 'GMAIL',
-    macro_id: 'macro|self',
+    rox_id: 'macro|self',
     email_address: `${id}@example.com`,
     needs_calendar_permission: true,
     needs_reauth: false,
@@ -85,7 +85,7 @@ describe('CalendarPermissionPrompt', () => {
     const user = userEvent.setup();
     setLinks([
       link('own'),
-      link('delegated', { macro_id: 'macro|someone-else' }),
+      link('delegated', { rox_id: 'macro|someone-else' }),
     ]);
     renderPrompt();
 
@@ -110,7 +110,7 @@ describe('CalendarPermissionPrompt', () => {
   it('stays quiet when the only inbox missing calendar is delegated', () => {
     setLinks([
       link('own', { needs_calendar_permission: false }),
-      link('delegated', { macro_id: 'macro|someone-else' }),
+      link('delegated', { rox_id: 'macro|someone-else' }),
     ]);
     renderPrompt();
 

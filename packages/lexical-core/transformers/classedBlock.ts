@@ -28,14 +28,14 @@ import {
   UnknownMentionNode,
 } from './unknownFallback';
 
-const TAG_MACRO_QUOTE = 'm-email-thread-embed';
-const REG_EXP_XML_MACRO_QUOTE = xmlMatcher(TAG_MACRO_QUOTE, '');
+const TAG_ROX_QUOTE = 'm-email-thread-embed';
+const REG_EXP_XML_ROX_QUOTE = xmlMatcher(TAG_ROX_QUOTE, '');
 const REG_EXP_HTML_BLOCKQUOTE_START = /^\s*<blockquote\b[^>]*>\s*(.*)$/i;
 const REG_EXP_HTML_BLOCKQUOTE_END = /^(.*?)\s*<\/blockquote>\s*$/i;
 const REG_EXP_HTML_BLOCKQUOTE_TAG = /<\/?blockquote\b[^>]*>/gi;
 
-// Transformers used inside macro_quote blocks
-const MACRO_QUOTE_TRANSFORMERS = [
+// Transformers used inside rox_quote blocks
+const ROX_QUOTE_TRANSFORMERS = [
   I_HTML_RENDER,
   ...CUSTOM_TRANSFORMERS,
   I_EQUATION_NODE,
@@ -194,17 +194,17 @@ export const HTML_BLOCKQUOTE: MultilineElementTransformer = {
   },
 };
 
-export const I_MACRO_QUOTE: ElementTransformer = {
+export const I_ROX_QUOTE: ElementTransformer = {
   dependencies: [ClassedBlockNode, UnknownMentionNode],
   type: 'element',
-  regExp: REG_EXP_XML_MACRO_QUOTE,
+  regExp: REG_EXP_XML_ROX_QUOTE,
 
   export: (node: LexicalNode) => {
     if (!$isClassedBlockNode(node)) {
       return null;
     }
 
-    if (!node.__classes.includes('macro_quote')) {
+    if (!node.__classes.includes('rox_quote')) {
       return null;
     }
 
@@ -213,17 +213,17 @@ export const I_MACRO_QUOTE: ElementTransformer = {
       classes: node.__classes,
     });
 
-    let output = `<${TAG_MACRO_QUOTE}>${metadata}`;
+    let output = `<${TAG_ROX_QUOTE}>${metadata}`;
 
     // Serialize children by passing the node itself
     const childrenMarkdown = $convertToMarkdownString(
-      MACRO_QUOTE_TRANSFORMERS,
+      ROX_QUOTE_TRANSFORMERS,
       node
     );
 
     // Escape newlines in the content
     output += childrenMarkdown.replace(/\n/g, '\\n');
-    output += `</${TAG_MACRO_QUOTE}>`;
+    output += `</${TAG_ROX_QUOTE}>`;
 
     return output;
   },
@@ -234,7 +234,7 @@ export const I_MACRO_QUOTE: ElementTransformer = {
 
       // Extract the metadata and content
       const metadataMatch = xmlContent.match(
-        new RegExp(`<${TAG_MACRO_QUOTE}>({.*?})`)
+        new RegExp(`<${TAG_ROX_QUOTE}>({.*?})`)
       );
 
       if (!metadataMatch || !metadataMatch[1]) {
@@ -253,7 +253,7 @@ export const I_MACRO_QUOTE: ElementTransformer = {
 
       // Extract content after metadata
       const contentStart = metadataMatch[0].length;
-      const contentEnd = xmlContent.lastIndexOf(`</${TAG_MACRO_QUOTE}>`);
+      const contentEnd = xmlContent.lastIndexOf(`</${TAG_ROX_QUOTE}>`);
       const content = xmlContent.substring(contentStart, contentEnd);
 
       // Create the ClassedBlockNode
@@ -265,7 +265,7 @@ export const I_MACRO_QUOTE: ElementTransformer = {
       // Parse and append children
       $convertFromMarkdownString(
         content.replace(/\\n/g, '\n'),
-        MACRO_QUOTE_TRANSFORMERS,
+        ROX_QUOTE_TRANSFORMERS,
         classedBlockNode
       );
 

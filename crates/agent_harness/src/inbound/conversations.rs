@@ -10,10 +10,10 @@ use axum::{
     routing::{get, post},
 };
 use bot_id::BotId;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use utoipa::ToSchema;
@@ -119,12 +119,12 @@ impl From<ConversationOverview> for AgentConversationDto {
 /// Independently authenticated conversation router state.
 pub struct AgentConversationRouterState<S, A> {
     service: Arc<S>,
-    authorization: MacroAuthorizationState<A>,
+    authorization: RoxAuthorizationState<A>,
 }
 
 impl<S, A> AgentConversationRouterState<S, A> {
     /// Compose the domain service and user authentication.
-    pub fn new(service: Arc<S>, authorization: MacroAuthorizationState<A>) -> Self {
+    pub fn new(service: Arc<S>, authorization: RoxAuthorizationState<A>) -> Self {
         Self {
             service,
             authorization,
@@ -141,14 +141,14 @@ impl<S, A> Clone for AgentConversationRouterState<S, A> {
     }
 }
 
-impl<S, A> FromRef<AgentConversationRouterState<S, A>> for MacroAuthorizationState<A> {
+impl<S, A> FromRef<AgentConversationRouterState<S, A>> for RoxAuthorizationState<A> {
     fn from_ref(state: &AgentConversationRouterState<S, A>) -> Self {
         state.authorization.clone()
     }
 }
 
 /// Read and control a channel's agent conversations, without allocating a runtime.
-pub fn agent_conversation_router<S: AgentConversations, A: MacroAuthorizationService>(
+pub fn agent_conversation_router<S: AgentConversations, A: RoxAuthorizationService>(
     state: AgentConversationRouterState<S, A>,
 ) -> Router {
     Router::new()
@@ -185,16 +185,16 @@ pub struct StartFreshAgentConversationRequest {
     request_body = StartFreshAgentConversationRequest,
     responses((status = 204, description = "New context reserved"), (status = 404, description = "Conversation not found"), (status = 409, description = "Context is busy, stale or unavailable"), (status = 503, description = "Temporarily unavailable"))
 )]
-pub async fn start_fresh_agent_conversation<S: AgentConversations, A: MacroAuthorizationService>(
+pub async fn start_fresh_agent_conversation<S: AgentConversations, A: RoxAuthorizationService>(
     State(state): State<AgentConversationRouterState<S, A>>,
-    authorization: MacroAuthorizationExtractor<A, UserOnly>,
+    authorization: RoxAuthorizationExtractor<A, UserOnly>,
     Path((channel_id, bot_id)): Path<(Uuid, Uuid)>,
     Json(request): Json<StartFreshAgentConversationRequest>,
 ) -> Response {
     match state
         .service
         .start_fresh(
-            authorization.authorization.macro_user_id.clone(),
+            authorization.authorization.rox_user_id.clone(),
             AgentConversation {
                 channel_id,
                 bot_id: BotId::new_from_uuid(bot_id),
@@ -233,16 +233,16 @@ pub struct RetryAgentConversationTurnRequest {
     request_body = RetryAgentConversationTurnRequest,
     responses((status = 204, description = "Retry queued"), (status = 404, description = "Conversation or turn not found"), (status = 409, description = "Attempt cannot be retried"), (status = 503, description = "Temporarily unavailable"))
 )]
-pub async fn retry_agent_conversation_turn<S: AgentConversations, A: MacroAuthorizationService>(
+pub async fn retry_agent_conversation_turn<S: AgentConversations, A: RoxAuthorizationService>(
     State(state): State<AgentConversationRouterState<S, A>>,
-    authorization: MacroAuthorizationExtractor<A, UserOnly>,
+    authorization: RoxAuthorizationExtractor<A, UserOnly>,
     Path((channel_id, bot_id, source)): Path<(Uuid, Uuid, Uuid)>,
     Json(request): Json<RetryAgentConversationTurnRequest>,
 ) -> Response {
     match state
         .service
         .retry(
-            authorization.authorization.macro_user_id.clone(),
+            authorization.authorization.rox_user_id.clone(),
             AgentConversation {
                 channel_id,
                 bot_id: BotId::new_from_uuid(bot_id),
@@ -275,15 +275,15 @@ pub async fn retry_agent_conversation_turn<S: AgentConversations, A: MacroAuthor
         (status = 503, description = "Conversations temporarily unavailable"),
     )
 )]
-pub async fn list_agent_conversations<S: AgentConversations, A: MacroAuthorizationService>(
+pub async fn list_agent_conversations<S: AgentConversations, A: RoxAuthorizationService>(
     State(state): State<AgentConversationRouterState<S, A>>,
-    authorization: MacroAuthorizationExtractor<A, UserOnly>,
+    authorization: RoxAuthorizationExtractor<A, UserOnly>,
     Path(channel_id): Path<Uuid>,
 ) -> Response {
     match state
         .service
         .list(
-            authorization.authorization.macro_user_id.clone(),
+            authorization.authorization.rox_user_id.clone(),
             channel_id,
         )
         .await

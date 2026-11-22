@@ -286,7 +286,7 @@ fn limit_and_offset_apply_after_ordering() {
 }
 
 #[test]
-fn residual_predicates_follow_sql_null_rules_and_macro_matching() {
+fn residual_predicates_follow_sql_null_rules_and_rox_matching() {
     let cases: &[(&str, &[RowId])] = &[
         // number comparisons; an empty cell never compares true
         ("amount > 5000", &[ACME, INITECH]),

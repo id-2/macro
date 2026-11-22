@@ -5175,7 +5175,7 @@ export const editCallTranscriptBody = zod
               ),
           })
           .describe(
-            'One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(macro_user_id)` sets it. The string is\nexpected to parse as a `MacroUserId` (e.g. `macro|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.'
+            'One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].\n\n`custom_speaker = None` clears any existing override for this\n`diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is\nexpected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);\nthe service layer rejects malformed values with `400 Bad Request`.'
           )
       )
       .describe('The set of per-diarized-speaker overrides to apply.'),
@@ -5329,7 +5329,7 @@ export const checkActiveCallResponse = zod
 
 /**
  * Receives transcript segments from the transcription agent.
-Authenticated via the `x-macro-internal-call` shared secret.
+Authenticated via the `x-rox-internal-call` shared secret.
 Duplicate segments (same `segment_id`) are ignored.
  * @summary Handler for `POST /call/{channel_id}/transcript`.
  */
@@ -7053,11 +7053,11 @@ export const postChannelBotWebhookParams = zod.object({
 });
 
 export const postChannelBotWebhookHeader = zod.object({
-  'x-macro-bot-token': zod
+  'x-rox-bot-token': zod
     .string()
     .nullish()
     .describe('Preferred bot authentication token'),
-  'x-macro-channel-bot-token': zod
+  'x-rox-channel-bot-token': zod
     .string()
     .nullish()
     .describe('Legacy channel-scoped bot authentication token'),
@@ -47913,7 +47913,7 @@ export const approveHarnessPairingResponse = zod
         'Whether agents may bypass ACP permission requests on this harness.'
       ),
     claude_mode: zod
-      .enum(['macro_credits', 'own_account'])
+      .enum(['rox_credits', 'own_account'])
       .optional()
       .describe(
         'How Claude Code on a Rox computer is paid for: its own Claude account\nwhen it has an active Claude login, otherwise Rox credits.'
@@ -47988,7 +47988,7 @@ export const claimHarnessPairingResponse = zod
             'Whether agents may bypass ACP permission requests on this harness.'
           ),
         claude_mode: zod
-          .enum(['macro_credits', 'own_account'])
+          .enum(['rox_credits', 'own_account'])
           .optional()
           .describe(
             'How Claude Code on a Rox computer is paid for: its own Claude account\nwhen it has an active Claude login, otherwise Rox credits.'
@@ -48051,7 +48051,7 @@ export const listHarnessesResponseItem = zod
         'Whether agents may bypass ACP permission requests on this harness.'
       ),
     claude_mode: zod
-      .enum(['macro_credits', 'own_account'])
+      .enum(['rox_credits', 'own_account'])
       .optional()
       .describe(
         'How Claude Code on a Rox computer is paid for: its own Claude account\nwhen it has an active Claude login, otherwise Rox credits.'
@@ -48108,7 +48108,7 @@ export const listHarnessDirectoryResponseItem = zod
         'Whether agents may bypass ACP permission requests on this harness.'
       ),
     claude_mode: zod
-      .enum(['macro_credits', 'own_account'])
+      .enum(['rox_credits', 'own_account'])
       .optional()
       .describe(
         'How Claude Code on a Rox computer is paid for: its own Claude account\nwhen it has an active Claude login, otherwise Rox credits.'
@@ -48167,7 +48167,7 @@ export const getSelfHarnessResponse = zod
         'Whether agents may bypass ACP permission requests on this harness.'
       ),
     claude_mode: zod
-      .enum(['macro_credits', 'own_account'])
+      .enum(['rox_credits', 'own_account'])
       .optional()
       .describe(
         'How Claude Code on a Rox computer is paid for: its own Claude account\nwhen it has an active Claude login, otherwise Rox credits.'
@@ -48287,7 +48287,7 @@ export const patchHarnessResponse = zod
         'Whether agents may bypass ACP permission requests on this harness.'
       ),
     claude_mode: zod
-      .enum(['macro_credits', 'own_account'])
+      .enum(['rox_credits', 'own_account'])
       .optional()
       .describe(
         'How Claude Code on a Rox computer is paid for: its own Claude account\nwhen it has an active Claude login, otherwise Rox credits.'

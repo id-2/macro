@@ -121,7 +121,7 @@ async fn session_for_token(
 
 #[tokio::test]
 async fn recognizes_a_database_backed_in_memory_agent() {
-    let agent = BotId::new_from_uuid(macro_uuid::Uuid::from_u128(0x0000_5678));
+    let agent = BotId::new_from_uuid(rox_uuid::Uuid::from_u128(0x0000_5678));
     let (id, sessions) = sessions_with_harness(agent, "in-memory");
     let containers = RoutedContainers::new(unreachable_sandbox(), None, sessions);
 
@@ -140,7 +140,7 @@ async fn recognizes_a_database_backed_in_memory_agent() {
 /// bill a sandbox for one.
 #[tokio::test]
 async fn refuses_the_in_process_bot_when_no_in_memory_runtime_is_configured() {
-    let (id, sessions) = sessions_with(bot_id::MACRO_NEW_BOT_ID);
+    let (id, sessions) = sessions_with(bot_id::ROX_NEW_BOT_ID);
     let containers = RoutedContainers::new(unreachable_sandbox(), None, sessions);
 
     let error = containers
@@ -157,7 +157,7 @@ async fn refuses_the_in_process_bot_when_no_in_memory_runtime_is_configured() {
 /// The sandboxed bot is unaffected by the refusal above.
 #[tokio::test]
 async fn routes_the_sandboxed_bot_to_the_sandbox() {
-    let (id, sessions) = sessions_with(bot_id::MACRO_CODER_BOT_ID);
+    let (id, sessions) = sessions_with(bot_id::ROX_CODER_BOT_ID);
     let containers = RoutedContainers::new(unreachable_sandbox(), None, sessions);
 
     assert!(matches!(
@@ -169,7 +169,7 @@ async fn routes_the_sandboxed_bot_to_the_sandbox() {
 /// So is a user-owned bot, which is what an `@claude` deployment serves.
 #[tokio::test]
 async fn routes_an_owned_bot_to_the_sandbox() {
-    let owned = BotId::new_from_uuid(macro_uuid::Uuid::from_u128(0x0000_1234));
+    let owned = BotId::new_from_uuid(rox_uuid::Uuid::from_u128(0x0000_1234));
     let (id, sessions) = sessions_with(owned);
     let containers = RoutedContainers::new(unreachable_sandbox(), None, sessions);
 
@@ -185,7 +185,7 @@ async fn routes_an_owned_bot_to_the_sandbox() {
 /// and the token that died with the old process no longer is.
 #[tokio::test]
 async fn resuming_an_in_process_session_held_elsewhere_rotates_its_credential() {
-    let (id, repo) = repo_with_session(bot_id::MACRO_NEW_BOT_ID, "opencode");
+    let (id, repo) = repo_with_session(bot_id::ROX_NEW_BOT_ID, "opencode");
     let lost = SessionToken::new("held by the replaced replica");
     repo.set_egress_token_hash(id, &lost.hash())
         .await
@@ -211,7 +211,7 @@ async fn resuming_an_in_process_session_held_elsewhere_rotates_its_credential() 
 /// resuming on the first again must not reuse it.
 #[tokio::test]
 async fn resuming_where_a_revoked_token_is_still_held_does_not_reuse_it() {
-    let (id, repo) = repo_with_session(bot_id::MACRO_NEW_BOT_ID, "opencode");
+    let (id, repo) = repo_with_session(bot_id::ROX_NEW_BOT_ID, "opencode");
     let spawned = SessionToken::new("held by the first replica");
     repo.set_egress_token_hash(id, &spawned.hash())
         .await
@@ -250,7 +250,7 @@ async fn resuming_where_a_revoked_token_is_still_held_does_not_reuse_it() {
 /// would revoke the credential that replica's agent is using.
 #[tokio::test]
 async fn resuming_a_session_a_live_peer_manages_is_refused_without_rotating() {
-    let (id, repo) = repo_with_session(bot_id::MACRO_NEW_BOT_ID, "opencode");
+    let (id, repo) = repo_with_session(bot_id::ROX_NEW_BOT_ID, "opencode");
     let current = SessionToken::new("held by the managing replica");
     repo.set_egress_token_hash(id, &current.hash())
         .await
@@ -283,8 +283,8 @@ async fn resuming_a_session_a_live_peer_manages_is_refused_without_rotating() {
 #[test]
 fn the_in_process_runtime_and_the_harness_agree_on_macros_server_name() {
     assert_eq!(
-        agent_inmem::domain::mcp::MACRO_MCP_NAME,
-        agent_harness::domain::model::MACRO_MCP_NAME
+        agent_inmem::domain::mcp::ROX_MCP_NAME,
+        agent_harness::domain::model::ROX_MCP_NAME
     );
 }
 
@@ -294,7 +294,7 @@ fn the_in_process_runtime_and_the_harness_agree_on_macros_server_name() {
 /// it holds may not, and once released it holds nothing again.
 #[tokio::test]
 async fn an_in_process_session_releases_only_while_its_log_rebuilds_it() {
-    let (id, repo) = repo_with_session(bot_id::MACRO_NEW_BOT_ID, "opencode");
+    let (id, repo) = repo_with_session(bot_id::ROX_NEW_BOT_ID, "opencode");
     let containers = in_process_containers(&repo);
     assert!(
         containers
@@ -361,7 +361,7 @@ async fn an_in_process_session_releases_only_while_its_log_rebuilds_it() {
 /// try.
 #[tokio::test]
 async fn an_in_process_session_whose_row_is_gone_releases() {
-    let (id, repo) = repo_with_session(bot_id::MACRO_NEW_BOT_ID, "opencode");
+    let (id, repo) = repo_with_session(bot_id::ROX_NEW_BOT_ID, "opencode");
     let containers = in_process_containers(&repo);
     let _attachment = containers.resume(id).await.expect("resumes");
 
@@ -383,7 +383,7 @@ async fn an_in_process_session_whose_row_is_gone_releases() {
 /// open, still streams its reply.
 #[test]
 fn only_a_background_session_with_instructions_goes_unread() {
-    let owner = macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|someone@example.com")
+    let owner = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|someone@example.com")
         .expect("a user id");
     let mut session = test_agent_session(AgentSessionId::new());
     session.owner_id = model_owner::Owner::User(owner.clone());

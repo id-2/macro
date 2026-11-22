@@ -3,7 +3,7 @@
 
 use chrono::{DateTime, Utc};
 use databases::domain::models::DatabaseError;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 pub use models_databases::{CellValue, ColumnId, DatabaseId, OptionId, RowId, TableId};
 pub use models_forms::{
@@ -40,7 +40,7 @@ pub struct StoredImageFile {
 pub enum Respondent {
     /// A signed-in person: one response, editable, named in the Respondent
     /// column.
-    Member(MacroUserIdStr<'static>),
+    Member(RoxUserIdStr<'static>),
     /// An anonymous visitor of a public form.
     Anonymous,
 }

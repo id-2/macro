@@ -1,5 +1,5 @@
 use async_graphql::Context;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::context::ScheduledActionGraphqlContext;
 use super::objects::{GraphqlScheduledAction, scheduled_action};
@@ -11,7 +11,7 @@ mod test;
 /// List routines `user_id` can access.
 pub async fn resolve_scheduled_actions(
     ctx: &Context<'_>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 ) -> async_graphql::Result<Vec<GraphqlScheduledAction>> {
     let actions = ctx
         .data::<ScheduledActionGraphqlContext>()?

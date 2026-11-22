@@ -78,17 +78,17 @@ where
     tracing::info!(
         "Populating {} contacts for macro email {}",
         length,
-        link.macro_id
+        link.rox_id
     );
 
     let connections = build_contact_connections(
-        &link.macro_id,
+        &link.rox_id,
         link.id,
         email_addresses.iter().map(String::as_str),
     );
 
     ctx.effects
-        .connect_contacts(&link.macro_id, connections)
+        .connect_contacts(&link.rox_id, connections)
         .await
         .map_err(|e| {
             ProcessingError::NonRetryable(DetailedError {
@@ -103,7 +103,7 @@ where
     tracing::info!(
         "Successfully populated {} contacts for macro email {}",
         length,
-        link.macro_id
+        link.rox_id
     );
 
     Ok(())

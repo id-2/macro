@@ -8,7 +8,7 @@ import type {
   TableDetail,
 } from '../generated/storage/types.gen';
 import { DraftAttachment, Macro, PipelineView } from '../src/macro';
-import { MacroApiError } from '../src/utils';
+import { RoxApiError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -279,7 +279,7 @@ test('API key metadata serialization excludes creation secrets and deletion erro
   expect(await created.key.name()).toBe('Automation');
   expect(JSON.stringify(created.key)).not.toContain('mak_secret');
   expect(JSON.stringify(created.key)).not.toContain('caller-token');
-  await expect(created.key.delete()).rejects.toBeInstanceOf(MacroApiError);
+  await expect(created.key.delete()).rejects.toBeInstanceOf(RoxApiError);
 });
 
 test('pairing claims distinguish pending responses and expose credentials separately from handles', async () => {
@@ -520,7 +520,7 @@ test('chat send receipts expose a scoped response message and cancellation never
     toolset: { type: 'none' },
     attachments: [{ entity_id: 'doc-1', entity_type: 'document' }],
   });
-  await expect(generation.stop()).rejects.toBeInstanceOf(MacroApiError);
+  await expect(generation.stop()).rejects.toBeInstanceOf(RoxApiError);
   expect(requests).toHaveLength(3);
   expect(await requests[2].json()).toEqual({
     chat_id: 'chat-1',

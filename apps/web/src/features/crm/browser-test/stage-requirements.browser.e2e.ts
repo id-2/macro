@@ -16,7 +16,7 @@ for (const viewport of [
       const activate = viewport.width === 390 ? 'tap' : 'click';
       await page.routeWebSocket('**', (socket) => socket.close());
       await page.route('https://**', (route) => route.abort());
-      await page.route('**/__macro_dev/**', (route) => route.abort());
+      await page.route('**/__rox_dev/**', (route) => route.abort());
       await page.goto(
         '/src/features/crm/browser-test/stage-requirements.html',
         {
@@ -76,7 +76,7 @@ for (const viewport of [
       const activate = viewport.width === 390 ? 'tap' : 'click';
       await page.routeWebSocket('**', (socket) => socket.close());
       await page.route('https://**', (route) => route.abort());
-      await page.route('**/__macro_dev/**', (route) => route.abort());
+      await page.route('**/__rox_dev/**', (route) => route.abort());
       await page.goto('/src/features/crm/browser-test/stage-requirements.html');
       await page.getByRole('button', { name: 'Open timeline' })[activate]();
       const row = page

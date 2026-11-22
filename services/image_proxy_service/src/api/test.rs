@@ -6,12 +6,12 @@ use axum::http::header::{AUTHORIZATION, COOKIE};
 use axum::http::{Request, StatusCode};
 use http_body_util::BodyExt;
 use jsonwebtoken::{Algorithm, EncodingKey, Header};
-use macro_auth::middleware::decode_jwt::{JwtValidationArgs, MacroAccessToken};
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::{JwtValidationArgs, RoxAccessToken};
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState,
 };
-use macro_env::Environment;
+use rox_env::Environment;
 use serde_json::{Value, json};
 use tower::ServiceExt;
 
@@ -23,37 +23,37 @@ const TEST_INTERNAL_API_KEY: &str = "test-internal-key";
 const TEST_USER_ID: &str = "macro|image-proxy-test@example.com";
 
 fn test_context() -> ApiContext {
-    let authorization_service = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(JwtValidationArgs::new_testing()),
+    let authorization_service = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(JwtValidationArgs::new_testing()),
         InternalAuthConfig {
             api_key: TEST_INTERNAL_API_KEY.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
 
     ApiContext {
         logo_service: crate::domain::LogoService::new(crate::outbound::FaviconProvider(
             crate::outbound::remote_image::build_http_client().expect("test favicon client"),
         )),
-        authorization_state: MacroAuthorizationState::new(Arc::new(authorization_service)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(authorization_service)),
         environment: Environment::Production,
         http_client: proxy::build_http_client().expect("test HTTP client should build"),
     }
 }
 
 fn access_token(expiration: usize) -> String {
-    let claims = MacroAccessToken {
+    let claims = RoxAccessToken {
         aud: String::new(),
         exp: expiration,
         tid: "test-tenant".to_string(),
         iss: String::new(),
         email: "image-proxy-test@example.com".to_string(),
         fusion_user_id: "test-fusion-user".to_string(),
-        macro_user_id: TEST_USER_ID.to_string(),
-        macro_organization_id: None,
-        root_macro_id: None,
+        rox_user_id: TEST_USER_ID.to_string(),
+        rox_organization_id: None,
+        root_rox_id: None,
     };
     let mut header = Header::new(Algorithm::HS256);
     header.kid = Some("test-access-token".to_string());
@@ -435,7 +435,7 @@ async fn generic_proxy_http_success_and_ua_retries_preserve_deployed_contract() 
                 if attempt == 0 {
                     assert_eq!(
                         headers[USER_AGENT],
-                        "Mozilla/5.0 (compatible; MacroImageProxy/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+                        "Mozilla/5.0 (compatible; RoxImageProxy/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
                     );
                 } else {
                     assert!(!headers.contains_key(USER_AGENT));

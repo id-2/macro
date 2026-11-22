@@ -61,7 +61,7 @@ impl DraftAttachmentRepository for EmailPgRepo {
         // Serialize attachment edits without blocking the schedule foreign key's
         // key-share lock while its transaction holds the message lock.
         let mailbox=sqlx::query!(r#"SELECT provider::text AS "provider!",sync_generation,
-            (macro_id = $2 OR EXISTS (SELECT 1 FROM macro_user_links u WHERE u.link_id = l.id AND u.primary_macro_id = $2)) AS "authorized!"
+            (rox_id = $2 OR EXISTS (SELECT 1 FROM rox_user_links u WHERE u.link_id = l.id AND u.primary_rox_id = $2)) AS "authorized!"
             FROM email_links l WHERE id = $1 FOR NO KEY UPDATE"#,link,actor).fetch_optional(&mut *tx).await.map_err(db_error)?.ok_or(AttachmentError::NotFound)?;
         let message=sqlx::query!(r#"SELECT thread_id,draft_generation,is_draft,is_sent,
             (EXISTS (SELECT 1 FROM email_mailbox_drafts d WHERE d.message_id = m.id AND d.delete_requested) OR EXISTS(SELECT 1 FROM email_draft_transfers t WHERE t.source_id=m.id AND t.state<>'preparing')) AS "deleted!"
@@ -212,7 +212,7 @@ impl DraftAttachmentRepository for EmailPgRepo {
                     let id = native
                         .provider_attachment_id
                         .ok_or(AttachmentError::NotFound)?;
-                    sqlx::query!("INSERT INTO email_draft_attachment_removals (id,message_id,provider_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",macro_uuid::generate_uuid_v7(),draft,id).execute(&mut *tx).await.map_err(db_error)?;
+                    sqlx::query!("INSERT INTO email_draft_attachment_removals (id,message_id,provider_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",rox_uuid::generate_uuid_v7(),draft,id).execute(&mut *tx).await.map_err(db_error)?;
                 }
             }
         }
@@ -229,7 +229,7 @@ impl DraftAttachmentRepository for EmailPgRepo {
             .map_err(db_error)?;
         if provider == UserProvider::Outlook {
             let payload = serde_json::json!({"kind":"organization","thread_id":message.thread_id});
-            sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),link,mailbox.sync_generation,payload).execute(&mut *tx).await.map_err(db_error)?;
+            sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),link,mailbox.sync_generation,payload).execute(&mut *tx).await.map_err(db_error)?;
         }
         tx.commit().await.map_err(db_error)
     }
@@ -241,6 +241,6 @@ async fn content_removal(
     cid: &str,
 ) -> Result<(), AttachmentError> {
     let cid = cid.trim_matches(['<', '>']);
-    sqlx::query!("INSERT INTO email_draft_attachment_removals (id,message_id,content_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",macro_uuid::generate_uuid_v7(),draft,cid).execute(&mut **tx).await.map_err(db_error)?;
+    sqlx::query!("INSERT INTO email_draft_attachment_removals (id,message_id,content_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",rox_uuid::generate_uuid_v7(),draft,cid).execute(&mut **tx).await.map_err(db_error)?;
     Ok(())
 }

@@ -14,10 +14,10 @@ export const stack = pulumi.getStack();
 
 export const config = new pulumi.Config();
 
-export const MACRO_ORG_NAME = 'macro-inc';
+export const ROX_ORG_NAME = 'macro-inc';
 export const BASE_DOMAIN = 'rox.one';
 
-export const MACRO_SUBDOMAIN_CERT =
+export const ROX_SUBDOMAIN_CERT =
   'arn:aws:acm:us-east-1:569036502058:certificate/a75b1b07-534c-44e1-b59b-fa5f74fd8069';
 
 export const CLOUD_TRAIL_SNS_TOPIC_ARN =

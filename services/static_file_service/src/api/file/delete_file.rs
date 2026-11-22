@@ -6,7 +6,7 @@ use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::response::Response;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal, UserOrInternalCaller};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal, UserOrInternalCaller};
 use std::sync::Arc;
 
 #[derive(serde::Deserialize)]
@@ -35,7 +35,7 @@ pub struct Params {
 pub async fn handle_delete_file(
     State(metadata_client): State<DynamodbClient>,
     State(storage_client): State<Arc<S3Client>>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(Params { file_id }): Path<Params>,
 ) -> Result<Response, Response> {
     let metadata = metadata_client
@@ -49,7 +49,7 @@ pub async fn handle_delete_file(
 
     // Skip owner check for internal requests
     let is_internal = user.authorization.caller == UserOrInternalCaller::Internal;
-    if !is_internal && metadata.owner_id != user.authorization.user.macro_user_id.as_ref() {
+    if !is_internal && metadata.owner_id != user.authorization.user.rox_user_id.as_ref() {
         tracing::warn!("delete requested by non-owner");
         return Err((StatusCode::FORBIDDEN, "access denied").into_response());
     }

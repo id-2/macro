@@ -270,7 +270,7 @@ const STAYED: RunsReconciled = RunsReconciled {
     failed: 0,
 };
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn accepting_a_background_prompt_suggestion_runs_it_and_its_turn_ending_finishes_it(
     pool: PgPool,
 ) {
@@ -350,7 +350,7 @@ async fn accepting_a_background_prompt_suggestion_runs_it_and_its_turn_ending_fi
     assert_eq!(h.reconcile().await, RunsReconciled::default());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_run_is_retried_by_accepting_again(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -382,7 +382,7 @@ async fn a_failed_run_is_retried_by_accepting_again(pool: PgPool) {
     assert_eq!(runs.started().len(), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn accepting_any_other_suggestion_starts_no_run(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -406,7 +406,7 @@ async fn accepting_any_other_suggestion_starts_no_run(pool: PgPool) {
 
 /// Someone acting for the person (an agent of theirs) takes a background
 /// suggestion on but never starts its run; the person starts it in the app.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn only_the_person_starts_a_background_run(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -447,7 +447,7 @@ async fn only_the_person_starts_a_background_run(pool: PgPool) {
 
 /// What runs is what the person saw: a card read before the suggestion was
 /// rewritten is refused, and runs once read again.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_background_suggestion_runs_only_as_the_person_saw_it(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -515,7 +515,7 @@ async fn a_background_suggestion_runs_only_as_the_person_saw_it(pool: PgPool) {
 /// A run waiting for an approval or an answer gets none: ten minutes after
 /// it began waiting it is stopped, and once its turn ends it fails, so the
 /// suggestion may run again.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_left_waiting_is_stopped_and_runs_again(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let approval = h.background("quotes:approval").await;
@@ -565,7 +565,7 @@ async fn a_run_left_waiting_is_stopped_and_runs_again(pool: PgPool) {
 
 /// A run that goes on past its time is stopped, and its session deleted when
 /// it doesn't stop within its grace.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_over_its_time_is_stopped_then_deleted(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -592,7 +592,7 @@ async fn a_run_over_its_time_is_stopped_then_deleted(pool: PgPool) {
 /// A run whose runtime went away mid-run (a harness restart) waits for
 /// nothing: it is stopped after its wait window, deleted after its grace,
 /// and the suggestion may run again.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_cut_off_by_a_restart_is_given_up_and_runs_again(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -613,7 +613,7 @@ async fn a_run_cut_off_by_a_restart_is_given_up_and_runs_again(pool: PgPool) {
 
 /// A prompt whose answer was lost may be running: the run stays starting, no
 /// second session starts, and its session settles it.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_whose_prompt_may_have_arrived_is_never_started_twice(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -642,7 +642,7 @@ async fn a_run_whose_prompt_may_have_arrived_is_never_started_twice(pool: PgPool
 
 /// A run whose session is confirmed missing before it confirmed starting may
 /// still be opening: it is given up only after its start window.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_starting_run_whose_session_is_missing_is_given_up_after_its_start_window(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -659,7 +659,7 @@ async fn a_starting_run_whose_session_is_missing_is_given_up_after_its_start_win
 }
 
 /// A run whose session is deleted under it fails at once.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_whose_session_is_deleted_fails(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -674,7 +674,7 @@ async fn a_run_whose_session_is_deleted_fails(pool: PgPool) {
 /// A session that never took its prompt is deleted after the start window,
 /// and the suggestion may run again; while it can't be deleted, the run
 /// stays.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_whose_prompt_never_arrived_is_deleted_and_runs_again(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -701,7 +701,7 @@ async fn a_run_whose_prompt_never_arrived_is_deleted_and_runs_again(pool: PgPool
 /// A run whose session can't be read is given up only past its time, and
 /// then only once its session is deleted: it may be running, and a retry
 /// would start a second session.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_whose_session_cant_be_read_is_deleted_only_past_its_time(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -723,7 +723,7 @@ async fn a_run_whose_session_cant_be_read_is_deleted_only_past_its_time(pool: Pg
 
 /// Dismissing a suggestion stops its run at once and settles it cancelled;
 /// the sweep finishes what the dismissal couldn't.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn dismissing_a_suggestion_cancels_its_run(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -746,7 +746,7 @@ async fn dismissing_a_suggestion_cancels_its_run(pool: PgPool) {
 
 /// A run that finishes as its suggestion is dismissed records what it made,
 /// but leaves the suggestion dismissed.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_cancelled_run_that_finishes_keeps_its_suggestion_closed(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -768,7 +768,7 @@ async fn a_cancelled_run_that_finishes_keeps_its_suggestion_closed(pool: PgPool)
 
 /// A suggestion retired while its run waits stops the run; suggested again,
 /// it can't start a second run until the first one settles.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retiring_a_suggestion_cancels_its_run_and_a_restored_one_waits_for_it(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -825,7 +825,7 @@ async fn retiring_a_suggestion_cancels_its_run_and_a_restored_one_waits_for_it(p
 
 /// While a run is going, its prompt and what it may send stay as the person
 /// ran them; other words may change.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_running_suggestions_prompt_and_sends_stay_as_run(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -899,7 +899,7 @@ async fn a_running_suggestions_prompt_and_sends_stay_as_run(pool: PgPool) {
     assert!(outcome.ok, "{:?}", outcome.problems);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_background_suggestion_says_what_it_sends_and_running_it_approves_that(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let session = h.session(OWNER, "suggestions").await;
@@ -942,7 +942,7 @@ async fn a_background_suggestion_says_what_it_sends_and_running_it_approves_that
 
 /// Whoever holds a run acts on it alone: an event arriving meanwhile is
 /// told to come back, and applies once the run is let go.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_held_run_is_left_to_its_holder(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -970,7 +970,7 @@ async fn a_held_run_is_left_to_its_holder(pool: PgPool) {
 }
 
 /// One run that can't be written never stops the sweep checking the others.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_failing_run_never_stops_the_sweep(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let mut sessions = Vec::new();
@@ -1019,7 +1019,7 @@ async fn one_failing_run_never_stops_the_sweep(pool: PgPool) {
 /// A dismissal while a run's session is still opening cancels the run, and
 /// the start, which holds the run, stops the session it opened: nothing
 /// settles the run before its session exists, so none runs unwatched.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_dismissed_while_starting_is_stopped_by_its_start(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -1057,7 +1057,7 @@ async fn a_run_dismissed_while_starting_is_stopped_by_its_start(pool: PgPool) {
 
 /// A dismissal while a start's answer is lost is acted on by the start
 /// itself: it reads the session and stops it then, not at the next sweep.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_uncertain_start_stops_a_run_dismissed_meanwhile(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -1088,7 +1088,7 @@ async fn an_uncertain_start_stops_a_run_dismissed_meanwhile(pool: PgPool) {
 
 /// A run its dismissal cancelled never makes its suggestion done, even when
 /// the suggestion was restored and taken on again before the run finished.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_cancelled_run_never_makes_its_restored_suggestion_done(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -1133,7 +1133,7 @@ async fn a_cancelled_run_never_makes_its_restored_suggestion_done(pool: PgPool) 
 
 /// Accepting a closed suggestion whose run is still being cancelled finds
 /// nothing to accept, as for any closed suggestion.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn accepting_a_dismissed_suggestion_whose_run_is_cancelling_finds_nothing(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -1155,7 +1155,7 @@ async fn accepting_a_dismissed_suggestion_whose_run_is_cancelling_finds_nothing(
 /// A start that outlives its hold and its start window may find its run
 /// settled when its session opens: that session is deleted, so none runs
 /// unwatched.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_session_opened_after_its_run_settled_is_deleted(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -1190,7 +1190,7 @@ async fn a_session_opened_after_its_run_settled_is_deleted(pool: PgPool) {
 
 /// A missing session settles no run that was cancelled while starting
 /// until its start window is over: one may still open and take its prompt.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_cancelled_while_starting_waits_for_its_session(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -1216,7 +1216,7 @@ async fn a_run_cancelled_while_starting_waits_for_its_session(pool: PgPool) {
 /// Restoring a suggestion whose dismissal stopped its run brings the
 /// suggestion back as proposed, shown running while the run is cancelled;
 /// the run stays cancelled, and a new one starts once it has settled.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_restored_suggestion_keeps_its_cancelled_run(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -1279,7 +1279,7 @@ async fn a_restored_suggestion_keeps_its_cancelled_run(pool: PgPool) {
 
 /// A run its dismissal cancelled may still finish; restored, its suggestion
 /// stays open, shows no result and runs again.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_restored_suggestion_whose_old_run_finishes_stays_open(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let suggestion = h.background("quotes:compare").await;
@@ -1311,7 +1311,7 @@ async fn a_restored_suggestion_whose_old_run_finishes_stays_open(pool: PgPool) {
 }
 
 /// A settled run's card opens what it made, or its session when it failed.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_settled_run_gives_its_suggestion_a_result(pool: PgPool) {
     let (h, runs) = run_harness(pool).await;
     let finished = h.background("quotes:compare").await;

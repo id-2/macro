@@ -11,7 +11,7 @@ fn config() -> DockerFleetConfig {
             regular: GuestImage::try_new("macro-box:latest").unwrap(),
             agent: GuestImage::try_new("macro-box-agent:latest").unwrap(),
         },
-        network: "macro_services".to_owned(),
+        network: "rox_services".to_owned(),
         enrollment_dir: PathBuf::from("/var/lib/macro/enrollments"),
         host_name: "docker-local".to_owned(),
         memory_gb: 64,
@@ -28,7 +28,7 @@ fn create_runs_systemd_with_the_enrollment_directory_mounted_read_only() {
         control_plane_id: ControlPlaneId::parse("test-a".to_owned()).unwrap(),
         created_at: "2026-11-05T10:00:00Z".parse().unwrap(),
         image: GuestImage::try_new("macro-box:latest").unwrap(),
-        network: "macro_services".to_owned(),
+        network: "rox_services".to_owned(),
         computer_id: COMPUTER_ID,
         memory_gb: 8,
         vcpus: 4,
@@ -46,19 +46,19 @@ fn create_runs_systemd_with_the_enrollment_directory_mounted_read_only() {
             "--hostname",
             "macro-computer-01900000-0000-7000-8000-000000000001",
             "--label",
-            "macro.computer_id=01900000-0000-7000-8000-000000000001",
+            "rox.computer_id=01900000-0000-7000-8000-000000000001",
             "--label",
-            "macro.control_plane=test-a",
+            "rox.control_plane=test-a",
             "--label",
-            "macro.created_at=2026-11-05T10:00:00+00:00",
+            "rox.created_at=2026-11-05T10:00:00+00:00",
             "--label",
-            "macro.enrollment_generation=1",
+            "rox.enrollment_generation=1",
             "--label",
-            "macro.pairing_id=00000000-0000-0000-0000-000000000001",
+            "rox.pairing_id=00000000-0000-0000-0000-000000000001",
             "--label",
-            "macro.image=macro-box:latest",
+            "rox.image=macro-box:latest",
             "--network",
-            "macro_services",
+            "rox_services",
             "--memory",
             "8g",
             "--cpus=4",
@@ -160,7 +160,7 @@ fn state_lookup_includes_stopped_containers() {
 fn listing_prints_the_computer_id_label_and_state() {
     assert_eq!(
         list_args(
-            "macro_services",
+            "rox_services",
             &ControlPlaneId::parse("test-a".to_owned()).unwrap()
         ),
         [
@@ -169,11 +169,11 @@ fn listing_prints_the_computer_id_label_and_state() {
             "--filter",
             "label=macro.computer_id",
             "--filter",
-            "network=macro_services",
+            "network=rox_services",
             "--filter",
             "label=macro.control_plane=test-a",
             "--format",
-            "{{.Label \"macro.computer_id\"}}\t{{.State}}\t{{.Label \"macro.control_plane\"}}\t{{.Label \"macro.created_at\"}}",
+            "{{.Label \"rox.computer_id\"}}\t{{.State}}\t{{.Label \"rox.control_plane\"}}\t{{.Label \"rox.created_at\"}}",
         ]
     );
 }
@@ -213,7 +213,7 @@ async fn listing_cannot_expose_another_fleets_containers_to_reconciliation() {
                 "--label".to_owned(),
                 format!("{COMPUTER_ID_LABEL}={id}"),
                 "--label".to_owned(),
-                "macro.control_plane=test-a".to_owned(),
+                "rox.control_plane=test-a".to_owned(),
                 "macro-box:latest".to_owned(),
             ],
         )

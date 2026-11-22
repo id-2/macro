@@ -3,7 +3,7 @@ import * as pulumi from '@pulumi/pulumi';
 import * as tls from '@pulumi/tls';
 import {
   BASE_DOMAIN,
-  MACRO_SUBDOMAIN_CERT,
+  ROX_SUBDOMAIN_CERT,
   stack,
 } from '../../packages/shared';
 import type { GetStorageBucketResult } from './file-storage-bucket';
@@ -194,7 +194,7 @@ export const getCloudfrontDistribution = ({
       aliases: [alias],
       viewerCertificate: {
         cloudfrontDefaultCertificate: false,
-        acmCertificateArn: MACRO_SUBDOMAIN_CERT,
+        acmCertificateArn: ROX_SUBDOMAIN_CERT,
         sslSupportMethod: 'sni-only',
         minimumProtocolVersion: 'TLSv1.2_2021',
       },

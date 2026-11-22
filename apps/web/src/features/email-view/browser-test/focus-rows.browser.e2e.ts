@@ -48,7 +48,7 @@ async function open(page: Page) {
     // The dev server proxies this prefix to the hosted dev backend.
     if (
       url.hostname !== 'localhost' ||
-      url.pathname.startsWith('/__macro_dev/')
+      url.pathname.startsWith('/__rox_dev/')
     ) {
       await route.abort();
       return;

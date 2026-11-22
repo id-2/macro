@@ -5,15 +5,15 @@ import type {
   Surface,
 } from '../../../generated/scheduled-action/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import type { MacroEntityType } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import type { RoxEntityType } from '../entity';
 import { Routine, type RoutineOptions, routineBody } from './routine';
 import { RoutineSuggestion } from './suggestion';
 
 /** Something created for a routine to use: any handle with an entity type, such as a `Database`. */
 export interface CreatedEntity {
   readonly id: string;
-  readonly entityType: MacroEntityType;
+  readonly entityType: RoxEntityType;
 }
 
 /**
@@ -54,7 +54,7 @@ export interface CreatedEntity {
  * - `call.ended`: a call you joined ends. The routine gets the call's participants and transcript.
  */
 export class RoutineNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a lazy routine handle. */
   byId(id: string): Routine {
@@ -73,7 +73,7 @@ export class RoutineNamespace {
    * 7-field schedule that names one date runs once. A code step's `source`
    * exports `async function main({ macro, run, trigger, steps, knobs })` and
    * is type-checked against this SDK when saved. A rejected routine throws a
-   * `MacroApiError` whose message says what the server refused, including
+   * `RoxApiError` whose message says what the server refused, including
    * type-check errors.
    *
    * Inside a routine's run, the new routine is that routine's sub-routine

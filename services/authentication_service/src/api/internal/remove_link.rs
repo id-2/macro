@@ -9,7 +9,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::{EmptyResponse, ErrorResponse};
 
 #[cfg(test)]
@@ -26,7 +26,7 @@ pub struct RemoveLinkQueryParams {
 ///
 /// A FusionAuth user can hold several links to the same identity provider, one per email
 /// address (e.g. a primary inbox plus delegated/secondary inboxes), so the link must be
-/// selected by the linked email rather than derived from the owner's macro_id.
+/// selected by the linked email rather than derived from the owner's rox_id.
 fn find_idp_link(links: Vec<Link>, linked_email: &str) -> Option<Link> {
     links
         .into_iter()
@@ -47,7 +47,7 @@ fn find_idp_link(links: Vec<Link>, linked_email: &str) -> Option<Link> {
 #[tracing::instrument(skip(ctx, _internal_authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Query(RemoveLinkQueryParams {
         fusionauth_user_id,
         linked_email,

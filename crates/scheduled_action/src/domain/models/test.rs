@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model_owner::{Owner, OwnerType};
 use serde_json::json;
 

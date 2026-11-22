@@ -1,8 +1,8 @@
 use super::*;
 use crate::domain::mailbox::credentials::{CredentialHealth, MailboxCredentialHealthRepository};
 use email_api_client::domain::models::{MailboxAccess, TokenError};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::{
     Arc,
     atomic::{AtomicUsize, Ordering},
@@ -69,12 +69,12 @@ impl InboxLifecycleRepository for CountingRemovals {
 }
 fn actor(name: &str) -> InboxActor {
     InboxActor {
-        macro_id: MacroUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap(),
+        rox_id: RoxUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap(),
         credential_owner: format!("{name}-owner"),
     }
 }
 async fn user(db: &PgPool, name: &str) {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let actor = actor(name);
     sqlx::query!(
         "INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
@@ -87,8 +87,8 @@ async fn user(db: &PgPool, name: &str) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User"(id,email,macro_user_id) VALUES ($1,$2,$3)"#,
-        actor.macro_id.as_ref(),
+        r#"INSERT INTO "User"(id,email,rox_user_id) VALUES ($1,$2,$3)"#,
+        actor.rox_id.as_ref(),
         format!("{name}@example.com"),
         id
     )
@@ -101,19 +101,19 @@ async fn shared(db: &PgPool) -> (PgMailboxSync, Uuid, Uuid) {
     for name in ["shared", "leaving", "remaining"] {
         user(db, name).await;
     }
-    let old = macro_uuid::generate_uuid_v7();
-    let replacement = macro_uuid::generate_uuid_v7();
-    sqlx::query!("UPDATE email_links SET macro_id = 'macro|shared@example.com',fusionauth_user_id = 'leaving-owner',grant_id = $2 WHERE id = $1",link,old).execute(db).await.unwrap();
+    let old = rox_uuid::generate_uuid_v7();
+    let replacement = rox_uuid::generate_uuid_v7();
+    sqlx::query!("UPDATE email_links SET rox_id = 'macro|shared@example.com',fusionauth_user_id = 'leaving-owner',grant_id = $2 WHERE id = $1",link,old).execute(db).await.unwrap();
     sqlx::query!(
-        "INSERT INTO promoted_shared_mailboxes(macro_id) VALUES ('macro|shared@example.com')"
+        "INSERT INTO promoted_shared_mailboxes(rox_id) VALUES ('macro|shared@example.com')"
     )
     .execute(db)
     .await
     .unwrap();
     for (name, grant) in [("leaving", old), ("remaining", replacement)] {
         let actor = actor(name);
-        sqlx::query!("INSERT INTO macro_user_links(primary_macro_id,child_macro_id,link_id) VALUES ($1,'macro|shared@example.com',$2)",actor.macro_id.as_ref(),link).execute(db).await.unwrap();
-        sqlx::query!("INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES ($1,$2,$3,$4,1,'{User.Read,Mail.ReadWrite,Mail.Send}')",link,actor.macro_id.as_ref(),actor.credential_owner,grant).execute(db).await.unwrap();
+        sqlx::query!("INSERT INTO rox_user_links(primary_rox_id,child_rox_id,link_id) VALUES ($1,'macro|shared@example.com',$2)",actor.rox_id.as_ref(),link).execute(db).await.unwrap();
+        sqlx::query!("INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES ($1,$2,$3,$4,1,'{User.Read,Mail.ReadWrite,Mail.Send}')",link,actor.rox_id.as_ref(),actor.credential_owner,grant).execute(db).await.unwrap();
     }
     (repo, link, replacement)
 }
@@ -121,7 +121,7 @@ async fn shared(db: &PgPool) -> (PgMailboxSync, Uuid, Uuid) {
 async fn double_match(db: &PgPool) -> (PgMailboxSync, Uuid, Uuid) {
     let fixture = shared(db).await;
     sqlx::query!(
-        "DELETE FROM promoted_shared_mailboxes WHERE macro_id = 'macro|shared@example.com'"
+        "DELETE FROM promoted_shared_mailboxes WHERE rox_id = 'macro|shared@example.com'"
     )
     .execute(db)
     .await
@@ -129,7 +129,7 @@ async fn double_match(db: &PgPool) -> (PgMailboxSync, Uuid, Uuid) {
     fixture
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleted_user_bindings_identify_custodian_and_owner_on_the_same_link(db: PgPool) {
     let (repo, link, _) = double_match(&db).await;
 
@@ -146,13 +146,13 @@ async fn deleted_user_bindings_identify_custodian_and_owner_on_the_same_link(db:
         bindings
             .iter()
             .any(|binding| binding.kind == DeletedUserBindingKind::Custodian
-                && binding.actor.macro_id.as_ref() == "macro|leaving@example.com")
+                && binding.actor.rox_id.as_ref() == "macro|leaving@example.com")
     );
     assert!(
         bindings
             .iter()
             .any(|binding| binding.kind == DeletedUserBindingKind::Owner
-                && binding.actor.macro_id.as_ref() == "macro|shared@example.com")
+                && binding.actor.rox_id.as_ref() == "macro|shared@example.com")
     );
 }
 
@@ -174,10 +174,10 @@ async fn assert_double_match_deleted_user(db: &PgPool, with_replacement: bool) {
         .unwrap();
 
     let row = sqlx::query!(
-        "SELECT macro_id,is_sync_active,disconnect_requested_at,needs_reauth,grant_id,grant_generation,sync_generation,fusionauth_user_id FROM email_links WHERE id = $1",
+        "SELECT rox_id,is_sync_active,disconnect_requested_at,needs_reauth,grant_id,grant_generation,sync_generation,fusionauth_user_id FROM email_links WHERE id = $1",
         link
     ).fetch_one(db).await.unwrap();
-    assert_eq!(row.macro_id, "macro|shared@example.com");
+    assert_eq!(row.rox_id, "macro|shared@example.com");
     assert!(!row.is_sync_active);
     assert!(row.disconnect_requested_at.is_some());
     assert_eq!(row.needs_reauth, !with_replacement);
@@ -204,7 +204,7 @@ async fn assert_double_match_deleted_user(db: &PgPool, with_replacement: bool) {
     );
     assert_eq!(
         sqlx::query_scalar!(
-            "SELECT primary_macro_id FROM macro_user_links WHERE link_id = $1",
+            "SELECT primary_rox_id FROM rox_user_links WHERE link_id = $1",
             link
         )
         .fetch_all(db)
@@ -263,23 +263,23 @@ async fn assert_double_match_deleted_user(db: &PgPool, with_replacement: bool) {
     assert_eq!(effects.iter().filter(|effect| matches!(effect, InboxLifecycleEffect::RevokeMicrosoftGrant { grant_id, generation: 1, owner } if *grant_id == replacement && owner == "remaining-owner")).count(), usize::from(with_replacement));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleted_user_double_match_rebinds_before_owner_disconnect(db: PgPool) {
     assert_double_match_deleted_user(&db, true).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleted_user_double_match_marks_reauthentication_before_owner_disconnect(db: PgPool) {
     assert_double_match_deleted_user(&db, false).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleted_user_self_custodian_is_removed_once_with_unchanged_state(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     user(&db, "self").await;
     let grant = Uuid::now_v7();
     sqlx::query!(
-        "UPDATE email_links SET macro_id = 'macro|self@example.com',fusionauth_user_id = 'self-owner',grant_id = $2 WHERE id = $1",
+        "UPDATE email_links SET rox_id = 'macro|self@example.com',fusionauth_user_id = 'self-owner',grant_id = $2 WHERE id = $1",
         link,
         grant
     ).execute(&db).await.unwrap();
@@ -291,7 +291,7 @@ async fn deleted_user_self_custodian_is_removed_once_with_unchanged_state(db: Pg
     let bindings = repo.bindings_for_deleted_user("self-owner").await.unwrap();
     assert_eq!(bindings.len(), 2);
     assert!(bindings.iter().all(|binding| binding.link_id == link
-        && binding.actor.macro_id.as_ref() == "macro|self@example.com"));
+        && binding.actor.rox_id.as_ref() == "macro|self@example.com"));
     let mut kinds: Vec<_> = bindings.iter().map(|binding| binding.kind).collect();
     kinds.sort();
     assert_eq!(
@@ -365,7 +365,7 @@ async fn deleted_user_self_custodian_is_removed_once_with_unchanged_state(db: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn leaving_shared_custodian_rebinds_work_and_rejects_old_health_even_with_equal_grant_numbers(
     db: PgPool,
 ) {
@@ -377,7 +377,7 @@ async fn leaving_shared_custodian_rebinds_work_and_rejects_old_health_even_with_
     .execute(&db)
     .await
     .unwrap();
-    let command = macro_uuid::generate_uuid_v7();
+    let command = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO email_mailbox_commands(id,link_id,generation,actor_id,intent,status)
         VALUES ($1,$2,1,'macro|shared@example.com','{"kind":"read","value":true}','confirming')"#,
@@ -389,8 +389,8 @@ async fn leaving_shared_custodian_rebinds_work_and_rejects_old_health_even_with_
     .unwrap();
     let service = InboxLifecycleService::new(repo.clone(), Effects);
     service.remove(&actor("leaving"), link).await.unwrap();
-    let row=sqlx::query!("SELECT macro_id,is_sync_active,needs_reauth,grant_id,grant_generation,sync_generation,fusionauth_user_id FROM email_links WHERE id = $1",link).fetch_one(&db).await.unwrap();
-    assert_eq!(row.macro_id, "macro|shared@example.com");
+    let row=sqlx::query!("SELECT rox_id,is_sync_active,needs_reauth,grant_id,grant_generation,sync_generation,fusionauth_user_id FROM email_links WHERE id = $1",link).fetch_one(&db).await.unwrap();
+    assert_eq!(row.rox_id, "macro|shared@example.com");
     assert!(row.is_sync_active);
     assert!(!row.needs_reauth);
     assert_eq!(row.grant_id, Some(replacement));
@@ -441,7 +441,7 @@ async fn leaving_shared_custodian_rebinds_work_and_rejects_old_health_even_with_
     );
     assert_eq!(
         sqlx::query_scalar!(
-            "SELECT primary_macro_id FROM macro_user_links WHERE link_id = $1",
+            "SELECT primary_rox_id FROM rox_user_links WHERE link_id = $1",
             link
         )
         .fetch_one(&db)
@@ -470,7 +470,7 @@ async fn sync_work_generations(db: &PgPool, link: Uuid) -> (Vec<i64>, Vec<i64>) 
     (streams, messages)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn generation_bumps_delete_superseded_sync_work(db: PgPool) {
     let (repo, link, _) = shared(&db).await;
     sqlx::query!(
@@ -489,7 +489,7 @@ async fn generation_bumps_delete_superseded_sync_work(db: PgPool) {
         "rebinding carries the work into the new generation and drops the old copy"
     );
     assert!(
-        repo.claim_stream(macro_uuid::generate_uuid_v7())
+        repo.claim_stream(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .is_some()
@@ -508,7 +508,7 @@ async fn generation_bumps_delete_superseded_sync_work(db: PgPool) {
     assert_eq!(sync_work_generations(&db, link).await, (vec![], vec![]));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn no_replacement_preserves_the_inbox_and_notifies_remaining_viewers_to_reconnect(
     db: PgPool,
 ) {
@@ -530,7 +530,7 @@ async fn no_replacement_preserves_the_inbox_and_notifies_remaining_viewers_to_re
     assert_eq!(sqlx::query_scalar!("SELECT count(*) FROM email_projection_outbox WHERE link_id = $1 AND payload->>'kind' = 'reauthorization_required'",link).fetch_one(&db).await.unwrap(),Some(1));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn final_shared_disconnect_freezes_ingestion_and_keeps_revocation_after_cascade(db: PgPool) {
     let (repo, link, _) = shared(&db).await;
     let service = InboxLifecycleService::new(repo.clone(), Effects);
@@ -546,7 +546,7 @@ async fn final_shared_disconnect_freezes_ingestion_and_keeps_revocation_after_ca
     assert!(!row.is_sync_active);
     assert!(row.disconnect_requested_at.is_some());
     assert!(
-        repo.claim_stream(macro_uuid::generate_uuid_v7())
+        repo.claim_stream(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .is_none()
@@ -558,8 +558,8 @@ async fn final_shared_disconnect_freezes_ingestion_and_keeps_revocation_after_ca
     assert_eq!(sqlx::query_scalar!("SELECT count(*) FROM email_mailbox_lifecycle_outbox WHERE link_id = $1 AND payload->>'kind' = 'revoke_microsoft_grant'",link).fetch_one(&db).await.unwrap(),Some(2));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn deleting_a_macro_account_releases_only_its_shared_participation(db: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn deleting_a_rox_account_releases_only_its_shared_participation(db: PgPool) {
     let (repo, link, replacement) = shared(&db).await;
     // The authentication account deletion may already have cascaded its edge.
     sqlx::query!(r#"DELETE FROM "User" WHERE id = 'macro|leaving@example.com'"#)
@@ -579,7 +579,7 @@ async fn deleting_a_macro_account_releases_only_its_shared_participation(db: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inaccessible_mailbox_cannot_be_removed_or_resynced(db: PgPool) {
     let (repo, link, _) = shared(&db).await;
     let service = InboxLifecycleService::new(repo, Effects);
@@ -603,11 +603,11 @@ async fn inaccessible_mailbox_cannot_be_removed_or_resynced(db: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outlook_resync_fences_page_workers_and_never_creates_a_gmail_backfill(db: PgPool) {
     let (repo, link, _) = shared(&db).await;
     let old = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -650,7 +650,7 @@ async fn outlook_resync_fences_page_workers_and_never_creates_a_gmail_backfill(d
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outlook_resync_starts_a_new_import_run_once(db: PgPool) {
     let telemetry = crate::telemetry_capture::Telemetry::default();
     let _guard = telemetry.install();
@@ -658,7 +658,7 @@ async fn outlook_resync_starts_a_new_import_run_once(db: PgPool) {
     sqlx::query!(
         r#"INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id,initial_complete,import_started_at,import_completed_at)
         VALUES ($1,$2,1,'folder_catalog','mail',true,now() - interval '1 day',now() - interval '23 hours')"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link
     )
     .execute(&db)
@@ -696,7 +696,7 @@ async fn outlook_resync_starts_a_new_import_run_once(db: PgPool) {
     assert!(run.import_completed_at.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn gmail_resync_commits_the_backfill_with_durable_publication(db: PgPool) {
     let (repo, link, _) = shared(&db).await;
     sqlx::query!(
@@ -715,7 +715,7 @@ async fn gmail_resync_commits_the_backfill_with_durable_publication(db: PgPool) 
     assert_eq!(sqlx::query_scalar!("SELECT count(*) FROM email_mailbox_lifecycle_outbox WHERE link_id = $1 AND payload->>'kind' = 'gmail_backfill'",link).fetch_one(&db).await.unwrap(),Some(1));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subscription_cleanup_precedes_revoke_and_delete_even_with_parallel_publishers(db: PgPool) {
     let (repo, link, _) = shared(&db).await;
     sqlx::query!("INSERT INTO email_provider_subscriptions(link_id,generation,provider_id,client_state_hash,expires_at) VALUES($1,1,'watch',decode('1234','hex'),now()+interval '3 days')",link).execute(&db).await.unwrap();
@@ -761,7 +761,7 @@ async fn subscription_cleanup_precedes_revoke_and_delete_even_with_parallel_publ
     panic!("disconnect must eventually publish deletion");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn effect_claims_take_due_mailbox_effects_before_gmail_history_and_skip_backed_off_rows(
     db: PgPool,
 ) {

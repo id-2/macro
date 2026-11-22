@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -44,7 +44,7 @@ const LINK_ACCESS_CASES: [LinkAccessCase; 3] = [
 ];
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::new_v4();
+    let rox_user_id = Uuid::new_v4();
     let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
 
     sqlx::query!(
@@ -52,7 +52,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $2)
         "#,
-        macro_user_id,
+        rox_user_id,
         user_id,
         email,
     )
@@ -60,10 +60,10 @@ async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
     .await?;
 
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await?;
@@ -188,7 +188,7 @@ async fn insert_team_access(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn enforces_complete_link_access_matrix(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITH_TEAM).await?;
     add_owner_to_team(&pool, OWNER_WITH_TEAM, OWNER_TEAM).await?;
@@ -229,7 +229,7 @@ async fn enforces_complete_link_access_matrix(pool: PgPool) -> anyhow::Result<()
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_link_denies_access_when_owner_has_no_team(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITHOUT_TEAM).await?;
     let chat_id = insert_chat(&pool, OWNER_WITHOUT_TEAM, Some("TEAM"), Some("view")).await?;
@@ -241,7 +241,7 @@ async fn team_link_denies_access_when_owner_has_no_team(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn takes_maximum_of_link_and_explicit_access(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITH_TEAM).await?;
     add_owner_to_team(&pool, OWNER_WITH_TEAM, OWNER_TEAM).await?;
@@ -265,7 +265,7 @@ async fn takes_maximum_of_link_and_explicit_access(pool: PgPool) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn explicit_team_grant_allows_team_members_only(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITH_TEAM).await?;
     add_owner_to_team(&pool, OWNER_WITH_TEAM, OWNER_TEAM).await?;
@@ -285,7 +285,7 @@ async fn explicit_team_grant_allows_team_members_only(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn takes_maximum_of_explicit_team_grant_and_link(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER_WITH_TEAM).await?;
     add_owner_to_team(&pool, OWNER_WITH_TEAM, OWNER_TEAM).await?;

@@ -2,7 +2,7 @@
 
 ## What it is
 
-Agent skills: Macro's built-in skills, available to every user. Each is
+Agent skills: Rox's built-in skills, available to every user. Each is
 static text composed with the `prompt` crate, not a document, so no one can
 open or edit it; its id is derived from its slug.
 

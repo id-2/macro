@@ -933,7 +933,7 @@ async fn a_formula_column_is_copied_with_its_values_computed_in_the_copy() {
 async fn a_copy_an_agent_makes_is_announced_as_the_agents_creation() {
     let seeded = seeded().await;
     seeded.world.lock().unwrap().broker_events.clear();
-    let agent = bot_id::MACRO_AI_BOT_ID;
+    let agent = bot_id::ROX_AI_BOT_ID;
 
     seeded
         .service

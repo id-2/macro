@@ -34,7 +34,7 @@ export interface Message {
   attachments_forwarded: AttachmentForwarded[];
   bcc: ContactInfo[];
   body_html_sanitized?: MessageBodyHtmlSanitized;
-  body_macro?: MessageBodyMacro;
+  body_rox?: MessageBodyMacro;
   body_text?: MessageBodyText;
   cc: ContactInfo[];
   created_at: string;

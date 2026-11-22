@@ -1,6 +1,6 @@
 use chrono::{Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -12,7 +12,7 @@ fn update(status: SystemStatus, minutes_ago: i64) -> StatusUpdate {
     StatusUpdate {
         id: Uuid::now_v7(),
         status,
-        user_id: MacroUserIdStr::parse_from_str("macro|oncall@rox.one").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|oncall@rox.one").unwrap(),
         created_at: Utc::now() - Duration::minutes(minutes_ago),
     }
 }
@@ -21,7 +21,7 @@ fn message(text: &str) -> StatusMessage {
     StatusMessage::try_from(text.to_owned()).unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn latest_is_none_without_updates(pool: PgPool) {
     let repo = PgSystemStatusRepo::new(pool);
 
@@ -29,7 +29,7 @@ async fn latest_is_none_without_updates(pool: PgPool) {
     assert!(repo.list_updates(10).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn updates_round_trip_newest_first(pool: PgPool) {
     let repo = PgSystemStatusRepo::new(pool);
     let outage = update(
@@ -67,7 +67,7 @@ async fn updates_round_trip_newest_first(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn schema_rejects_operational_with_message_and_outage_without(pool: PgPool) {
     let insert = |status: &'static str, message: Option<&'static str>| {
         sqlx::query!(

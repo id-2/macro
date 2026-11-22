@@ -51,8 +51,8 @@ use agent_session::domain::service::AgentSessionServiceImpl;
 use agent_session::domain::session::StopReason;
 use agent_session::testing::{InMemoryAgentSessionRepo, RecordingLifecyclePublisher};
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use tokio::sync::mpsc;
 use trigger_context::{
     ChannelType, ContextPerson, DiscussionContext, DiscussionSurface, ReplyTarget, TriggerContext,
@@ -83,8 +83,8 @@ use agent_session::domain::ports::{
     OpenExternalAgentSession, OpenManagedSession, SessionOpener as _,
 };
 
-fn sender() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("asker@example.com").expect("a valid user id")
+fn sender() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("asker@example.com").expect("a valid user id")
 }
 
 #[test]
@@ -95,16 +95,16 @@ fn disconnected_harness_errors_keep_the_session_error_classification() {
     ));
 }
 
-/// A sender whose email domain is `is_macro_staff` - the identity the
+/// A sender whose email domain is `is_rox_staff` - the identity the
 /// Daytona staff gate admits.
-fn staff_sender() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("staff@rox.one").expect("a valid user id")
+fn staff_sender() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("staff@rox.one").expect("a valid user id")
 }
 
 fn open_command() -> OpenSession {
-    let thread_id = macro_uuid::generate_uuid_v7();
+    let thread_id = rox_uuid::generate_uuid_v7();
     OpenSession {
-        bot_id: BotId::new_from_uuid(macro_uuid::generate_uuid_v7()),
+        bot_id: BotId::new_from_uuid(rox_uuid::generate_uuid_v7()),
         runtime: AgentRuntimeConfig {
             kind: AgentKind::SandboxedCoder,
             model: "agent-model".to_owned(),
@@ -115,7 +115,7 @@ fn open_command() -> OpenSession {
         origin: SessionOrigin::Mention(MentionOrigin {
             trigger_origin: trigger_context::TriggerOrigin::Unknown,
             reply_placement: Default::default(),
-            parent: MessageParent::Channel(macro_uuid::generate_uuid_v7()),
+            parent: MessageParent::Channel(rox_uuid::generate_uuid_v7()),
             thread_id,
             message_id: thread_id,
             sender: sender(),
@@ -174,9 +174,9 @@ fn forward_message(content: &str) -> DeliverAction {
             Some(AnnounceOrigin {
                 reply_placement: Default::default(),
                 reuse_origin_message: false,
-                parent: MessageParent::Channel(macro_uuid::Uuid::from_u128(0xf0)),
-                thread_id: macro_uuid::Uuid::from_u128(0xf1),
-                message_id: macro_uuid::Uuid::from_u128(0xf2),
+                parent: MessageParent::Channel(rox_uuid::Uuid::from_u128(0xf0)),
+                thread_id: rox_uuid::Uuid::from_u128(0xf1),
+                message_id: rox_uuid::Uuid::from_u128(0xf2),
             }),
         )
     }
@@ -185,9 +185,9 @@ fn forward_message(content: &str) -> DeliverAction {
 #[derive(Clone, Default)]
 struct PromptContextMock {
     unauthorized: Arc<Mutex<Option<String>>>,
-    authorized: Arc<Mutex<Vec<(MacroUserIdStr<'static>, AnnounceOrigin)>>>,
+    authorized: Arc<Mutex<Vec<(RoxUserIdStr<'static>, AnnounceOrigin)>>>,
     /// Messages deleted since they were posted.
-    deleted: Arc<Mutex<Vec<macro_uuid::Uuid>>>,
+    deleted: Arc<Mutex<Vec<rox_uuid::Uuid>>>,
 }
 
 impl PromptContextMock {
@@ -198,12 +198,12 @@ impl PromptContextMock {
         }
     }
 
-    fn authorized(&self) -> Vec<(MacroUserIdStr<'static>, AnnounceOrigin)> {
+    fn authorized(&self) -> Vec<(RoxUserIdStr<'static>, AnnounceOrigin)> {
         self.authorized.lock().unwrap().clone()
     }
 
     /// Delete a posted message: an origin naming it is no longer valid.
-    fn delete(&self, message_id: macro_uuid::Uuid) {
+    fn delete(&self, message_id: rox_uuid::Uuid) {
         self.deleted.lock().unwrap().push(message_id);
     }
 }
@@ -211,7 +211,7 @@ impl PromptContextMock {
 impl MessagePromptContext for PromptContextMock {
     async fn authorize_origin(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         origin: &AnnounceOrigin,
     ) -> crate::domain::error::Result<()> {
         if let Some(message) = self.unauthorized.lock().unwrap().clone() {
@@ -317,7 +317,7 @@ impl crate::domain::ports::HarnessBindings for MirrorBindings {
     async fn access_facts(
         &self,
         _bot: BotId,
-        _actor: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _actor: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) -> anyhow::Result<Option<crate::domain::model::RuntimeAccessFacts>> {
         Ok(self.facts.lock().unwrap().clone())
     }
@@ -817,7 +817,7 @@ async fn disconnected_session_owned_by(
         repo,
         containers,
         owner,
-        bot_id::MACRO_CODER_BOT_ID,
+        bot_id::ROX_CODER_BOT_ID,
         AgentKind::SandboxedCoder,
     )
     .await
@@ -834,7 +834,7 @@ async fn disconnected_in_memory_session(
         repo,
         containers,
         model_owner::Owner::User(origin.sender.clone()),
-        bot_id::MACRO_NEW_BOT_ID,
+        bot_id::ROX_NEW_BOT_ID,
         AgentKind::InMemory,
     )
     .await
@@ -1849,7 +1849,7 @@ async fn live_sandboxed_coder_session(
     id: AgentSessionId,
 ) -> ContainerMock {
     let mut command = open_command();
-    command.bot_id = bot_id::MACRO_CODER_BOT_ID;
+    command.bot_id = bot_id::ROX_CODER_BOT_ID;
     mention_origin_mut(&mut command).sender = staff_sender();
     let open = service.execute(id, HarnessCommand::Open(command));
     let drive = async {
@@ -1879,7 +1879,7 @@ async fn an_app_connected_mid_session_reaches_the_agent_before_the_next_prompt()
         harness_with_egress(egress.clone());
     let id = AgentSessionId::new();
     let mut command = open_command();
-    command.bot_id = bot_id::MACRO_CODER_BOT_ID;
+    command.bot_id = bot_id::ROX_CODER_BOT_ID;
     mention_origin_mut(&mut command).sender = staff_sender();
     let open = service.execute(id, HarnessCommand::Open(command));
     let drive = async {
@@ -1919,7 +1919,7 @@ async fn an_app_connected_mid_session_reaches_the_agent_before_the_next_prompt()
     };
     assert_eq!(
         names(&opened.mcp_servers),
-        ["macro", "macro_internal", "macro-preview"]
+        ["macro", "rox_internal", "macro-preview"]
     );
 
     egress.connect("linear");
@@ -1935,7 +1935,7 @@ async fn an_app_connected_mid_session_reaches_the_agent_before_the_next_prompt()
         assert_eq!(resumed.session_id.to_string(), "acp-test");
         assert_eq!(
             names(&resumed.mcp_servers),
-            ["macro", "macro_internal", "macro-preview", "linear"]
+            ["macro", "rox_internal", "macro-preview", "linear"]
         );
         agent.resumes_session(ResumeSessionResponse::new());
         agent.completes_prompt().await;
@@ -3072,7 +3072,7 @@ fn open_external_request(workspace: &str) -> OpenExternalAgentSession {
         id: None,
         profile: None,
         instructions: None,
-        bot_id: BotId::new_from_uuid(macro_uuid::generate_uuid_v7()),
+        bot_id: BotId::new_from_uuid(rox_uuid::generate_uuid_v7()),
         workspace: workspace.to_owned(),
         repo_url: None,
         owner: model_owner::Owner::User(sender()),
@@ -3478,9 +3478,9 @@ async fn an_external_open_with_a_mention_announces_as_the_sessions_bot() {
     let bot = request.bot_id;
     request.thread = Some(agent_session::domain::ports::SessionThread {
         reuse_origin_message: false,
-        parent: MessageParent::Channel(macro_uuid::Uuid::from_u128(0xC1)),
-        thread_id: macro_uuid::Uuid::from_u128(0xC2),
-        message_id: macro_uuid::Uuid::from_u128(0xC2),
+        parent: MessageParent::Channel(rox_uuid::Uuid::from_u128(0xC1)),
+        thread_id: rox_uuid::Uuid::from_u128(0xC2),
+        message_id: rox_uuid::Uuid::from_u128(0xC2),
         content: "@opencode fix the flaky test".to_owned(),
     });
 
@@ -3497,7 +3497,7 @@ async fn an_external_open_with_a_mention_announces_as_the_sessions_bot() {
     assert_eq!(announced[0].bot_id, bot);
     assert_eq!(
         announced[0].origin_parent,
-        MessageParent::Channel(macro_uuid::Uuid::from_u128(0xC1))
+        MessageParent::Channel(rox_uuid::Uuid::from_u128(0xC1))
     );
     assert_eq!(
         announced[0].prompted_content,
@@ -3525,9 +3525,9 @@ async fn an_external_prompt_announce_posts_into_the_observed_origin() {
                 origin: AnnounceOrigin {
                     reply_placement: Default::default(),
                     reuse_origin_message: false,
-                    parent: MessageParent::Channel(macro_uuid::Uuid::from_u128(0xAA)),
-                    thread_id: macro_uuid::Uuid::from_u128(0xAB),
-                    message_id: macro_uuid::Uuid::from_u128(0xAC),
+                    parent: MessageParent::Channel(rox_uuid::Uuid::from_u128(0xAA)),
+                    thread_id: rox_uuid::Uuid::from_u128(0xAB),
+                    message_id: rox_uuid::Uuid::from_u128(0xAC),
                 },
                 content: "follow-up from the channel".to_owned(),
                 sender: sender(),
@@ -3542,11 +3542,11 @@ async fn an_external_prompt_announce_posts_into_the_observed_origin() {
     assert_eq!(announced[0].bot_id, bot);
     assert_eq!(
         announced[0].origin_parent,
-        MessageParent::Channel(macro_uuid::Uuid::from_u128(0xAA))
+        MessageParent::Channel(rox_uuid::Uuid::from_u128(0xAA))
     );
     assert_eq!(
         announced[0].origin_thread_id,
-        macro_uuid::Uuid::from_u128(0xAB)
+        rox_uuid::Uuid::from_u128(0xAB)
     );
     assert_eq!(announced[0].prompted_content, "follow-up from the channel");
 }
@@ -3563,13 +3563,13 @@ async fn an_announce_whose_bot_does_not_own_the_session_is_dropped() {
         .announce_external_prompt(
             session.id,
             crate::domain::model::AnnouncePrompt {
-                bot_id: BotId::new_from_uuid(macro_uuid::generate_uuid_v7()),
+                bot_id: BotId::new_from_uuid(rox_uuid::generate_uuid_v7()),
                 origin: AnnounceOrigin {
                     reply_placement: Default::default(),
                     reuse_origin_message: false,
-                    parent: MessageParent::Channel(macro_uuid::Uuid::from_u128(0xAA)),
-                    thread_id: macro_uuid::Uuid::from_u128(0xAB),
-                    message_id: macro_uuid::Uuid::from_u128(0xAC),
+                    parent: MessageParent::Channel(rox_uuid::Uuid::from_u128(0xAA)),
+                    thread_id: rox_uuid::Uuid::from_u128(0xAB),
+                    message_id: rox_uuid::Uuid::from_u128(0xAC),
                 },
                 content: "not yours".to_owned(),
                 sender: sender(),
@@ -4139,7 +4139,7 @@ mod lifecycle_events {
     #[tokio::test]
     async fn a_prompt_naming_others_publishes_mentioned_without_its_author() {
         let mentions = PromptMentionsMock::new();
-        let reviewer = MacroUserIdStr::try_from_email("reviewer@rox.one").unwrap();
+        let reviewer = RoxUserIdStr::try_from_email("reviewer@rox.one").unwrap();
         let ((service, _, containers, _, _), turns) = harness_with_mentions(
             PromptContextMock::default(),
             PromptComposerMock::default(),
@@ -4193,7 +4193,7 @@ mod lifecycle_events {
     #[tokio::test]
     async fn a_prompt_from_the_session_view_notifies_the_people_it_names() {
         let mentions = PromptMentionsMock::new();
-        let reviewer = MacroUserIdStr::try_from_email("reviewer@rox.one").unwrap();
+        let reviewer = RoxUserIdStr::try_from_email("reviewer@rox.one").unwrap();
         let ((service, _, containers, _, _), turns) = harness_with_mentions(
             PromptContextMock::default(),
             PromptComposerMock::default(),
@@ -4722,7 +4722,7 @@ impl SelectedRepositories {
 impl crate::domain::ports::ReachableRepositories for SelectedRepositories {
     async fn for_user(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> crate::domain::error::Result<Vec<crate::domain::model::ReachableRepository>> {
         Ok(self.0.clone())
     }

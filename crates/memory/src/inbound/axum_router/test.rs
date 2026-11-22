@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::{Memory, Result, models::Activity};
 use axum::{body::Body, http::Request};
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
 use model_user::UserContext;
 use rootcause::Report;
 use std::sync::Mutex;
@@ -12,13 +12,13 @@ const CALLER: &str = "macro|caller@example.com";
 #[derive(Clone)]
 struct FakeAuthorization;
 
-impl MacroAuthorizationService for FakeAuthorization {
+impl RoxAuthorizationService for FakeAuthorization {
     async fn authorize(
         &self,
         jwt: &str,
-    ) -> std::result::Result<UserContext, Report<MacroAuthorizationError>> {
+    ) -> std::result::Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: CALLER.to_string(),
@@ -32,20 +32,20 @@ impl MacroAuthorizationService for FakeAuthorization {
         &self,
         jwt: &str,
     ) -> std::result::Result<
-        macro_authorization::ValidatedCredential,
-        Report<MacroAuthorizationError>,
+        rox_authorization::ValidatedCredential,
+        Report<RoxAuthorizationError>,
     > {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> std::result::Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> std::result::Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -57,11 +57,11 @@ struct FakeMemoryService {
 }
 
 impl MemoryService for FakeMemoryService {
-    async fn get_memory(&self, _user: MacroUserIdStr<'static>) -> Result<Option<Memory>> {
+    async fn get_memory(&self, _user: RoxUserIdStr<'static>) -> Result<Option<Memory>> {
         unimplemented!("not routed in these tests")
     }
 
-    async fn explicit(&self, user: &MacroUserIdStr<'_>) -> Result<ExplicitMemory> {
+    async fn explicit(&self, user: &RoxUserIdStr<'_>) -> Result<ExplicitMemory> {
         self.calls.lock().unwrap().push(format!("explicit {user}"));
         Ok(ExplicitMemory {
             content: "Prefers metric units".to_string(),
@@ -71,7 +71,7 @@ impl MemoryService for FakeMemoryService {
 
     async fn update_memory(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         revision: i64,
         _edit: &MemoryEdit,
     ) -> Result<ExplicitMemory> {
@@ -90,8 +90,8 @@ impl MemoryService for FakeMemoryService {
 
     async fn get_user_activity(
         &self,
-        caller: MacroUserIdStr<'static>,
-        user: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         start: NaiveDate,
         end: NaiveDate,
     ) -> Result<Vec<Activity>> {
@@ -109,7 +109,7 @@ impl MemoryService for FakeMemoryService {
 async fn send(service: &Arc<FakeMemoryService>, request: Request<Body>) -> (StatusCode, String) {
     let router: Router = memory_router(MemoryRouterState {
         service: service.clone(),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorization)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorization)),
     });
     let response = router.oneshot(request).await.unwrap();
     let status = response.status();

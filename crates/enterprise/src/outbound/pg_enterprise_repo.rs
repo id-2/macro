@@ -3,7 +3,7 @@ use crate::domain::{
     EnterpriseError, EnterpriseRepository, Result, RuntimePreset, RuntimePresetAllowlist,
     VerifiedRoxIdentity,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -31,18 +31,18 @@ fn storage(error: sqlx::Error) -> EnterpriseError {
 impl EnterpriseRepository for PgEnterpriseRepository {
     async fn bind_verified(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        rox_user_id: &RoxUserIdStr<'_>,
         identity: VerifiedRoxIdentity,
     ) -> Result<()> {
         let written = sqlx::query!(
             r#"
-            INSERT INTO rox_identity_binding (macro_user_id, rox_account_id, handle)
+            INSERT INTO rox_identity_binding (rox_user_id, rox_account_id, handle)
             VALUES ($1, $2, $3)
-            ON CONFLICT (macro_user_id) DO UPDATE SET bound_at = NOW()
+            ON CONFLICT (rox_user_id) DO UPDATE SET bound_at = NOW()
             WHERE rox_identity_binding.rox_account_id = EXCLUDED.rox_account_id
               AND rox_identity_binding.handle = EXCLUDED.handle
             "#,
-            macro_user_id.as_ref(),
+            rox_user_id.as_ref(),
             identity.account_id(),
             identity.handle(),
         )
@@ -57,8 +57,8 @@ impl EnterpriseRepository for PgEnterpriseRepository {
 
     async fn commit_member_state(
         &self,
-        actor: &MacroUserIdStr<'_>,
-        member: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
         disabled: bool,
         result: AuditResult,
     ) -> Result<()> {
@@ -66,9 +66,9 @@ impl EnterpriseRepository for PgEnterpriseRepository {
         if disabled {
             sqlx::query!(
                 r#"
-                INSERT INTO enterprise_member_state (macro_user_id, disabled_at)
+                INSERT INTO enterprise_member_state (rox_user_id, disabled_at)
                 VALUES ($1, NOW())
-                ON CONFLICT (macro_user_id) DO UPDATE SET disabled_at = NOW()
+                ON CONFLICT (rox_user_id) DO UPDATE SET disabled_at = NOW()
                 "#,
                 member.as_ref(),
             )
@@ -78,9 +78,9 @@ impl EnterpriseRepository for PgEnterpriseRepository {
         } else {
             sqlx::query!(
                 r#"
-                INSERT INTO enterprise_member_state (macro_user_id, disabled_at)
+                INSERT INTO enterprise_member_state (rox_user_id, disabled_at)
                 VALUES ($1, NULL)
-                ON CONFLICT (macro_user_id) DO UPDATE SET disabled_at = NULL
+                ON CONFLICT (rox_user_id) DO UPDATE SET disabled_at = NULL
                 "#,
                 member.as_ref(),
             )
@@ -103,12 +103,12 @@ impl EnterpriseRepository for PgEnterpriseRepository {
         transaction.commit().await.map_err(storage)
     }
 
-    async fn member_disabled(&self, member: &MacroUserIdStr<'_>) -> Result<bool> {
+    async fn member_disabled(&self, member: &RoxUserIdStr<'_>) -> Result<bool> {
         sqlx::query_scalar!(
             r#"
             SELECT EXISTS (
                 SELECT 1 FROM enterprise_member_state
-                WHERE macro_user_id = $1 AND disabled_at IS NOT NULL
+                WHERE rox_user_id = $1 AND disabled_at IS NOT NULL
             ) AS "disabled!"
             "#,
             member.as_ref(),

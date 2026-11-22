@@ -82,7 +82,7 @@ fn every_surface_has_a_template() {
 }
 
 #[test]
-fn every_surface_has_a_routine_macro_suggests_unpicked() {
+fn every_surface_has_a_routine_rox_suggests_unpicked() {
     let surfaces: HashSet<_> = CATALOG
         .iter()
         .filter(|routine| routine.suggest)

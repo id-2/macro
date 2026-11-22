@@ -10,11 +10,11 @@ use crate::outbound::{
     companies_repo::CompaniesRepositoryImpl, no_op_resolver::NoOpCompanyMetadataResolver,
 };
 use entity_access::domain::models::{EditAccessLevel, TeamRole};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn edits_preserve_contact_identity_history_archive_and_sources(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -93,7 +93,7 @@ async fn edits_preserve_contact_identity_history_archive_and_sources(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn edits_reject_duplicate_addresses_without_merging(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|owner@example.com").await?;
@@ -135,7 +135,7 @@ async fn edits_reject_duplicate_addresses_without_merging(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn edits_enforce_team_visibility_without_requiring_consent(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -208,7 +208,7 @@ async fn edits_enforce_team_visibility_without_requiring_consent(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn moving_cannot_reveal_a_contact_below_an_archived_company(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -242,7 +242,7 @@ async fn moving_cannot_reveal_a_contact_below_an_archived_company(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn single_and_bulk_teardown_keep_company_before_source_lock_order(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -292,7 +292,7 @@ async fn single_and_bulk_teardown_keep_company_before_source_lock_order(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn company_edits_require_known_personal_providers(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|owner@example.com").await?;
@@ -340,7 +340,7 @@ async fn company_edits_require_known_personal_providers(pool: PgPool) -> anyhow:
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_additions_reject_duplicates_and_apply_each_edit_whole(
     pool: PgPool,
 ) -> anyhow::Result<()> {

@@ -1,5 +1,5 @@
 use chrono::{TimeZone, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::super::test::{USER_A, insert_user, sample_action, test_repo, user_owner};
@@ -50,7 +50,7 @@ fn policy(error: &anyhow::Error) -> Option<&ActionPolicyError> {
     error.downcast_ref::<ActionPolicyError>()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_cap_counts_active_sub_routines_and_not_finished_one_time_ones(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -85,7 +85,7 @@ async fn the_cap_counts_active_sub_routines_and_not_finished_one_time_ones(pool:
     assert_eq!(repo.children(&parent.id.unwrap()).await.unwrap().len(), 53);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_parent_has_one_sub_routine_per_key(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -125,7 +125,7 @@ async fn a_parent_has_one_sub_routine_per_key(pool: PgPool) {
     assert_eq!(found.sub_routine, first.sub_routine);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_parent_removes_its_sub_routines_and_their_registrations(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -208,7 +208,7 @@ async fn deleting_a_parent_removes_its_sub_routines_and_their_registrations(pool
     assert!(registered(&pool, kept.id.unwrap()).await);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_in_progress_is_found_by_its_routine_and_by_its_session(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());
@@ -285,7 +285,7 @@ async fn a_run_in_progress_is_found_by_its_routine_and_by_its_session(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sub_routine_created_off_with_its_parent_keeps_that_mark(pool: PgPool) {
     insert_user(&pool, USER_A).await;
     let repo = test_repo(pool.clone());

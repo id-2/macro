@@ -88,8 +88,8 @@ jobs:
         #
         # Carry the real developer dir in under a name nix has no opinion about, and
         # restore DEVELOPER_DIR once inside the shell.
-        MACRO_DEVELOPER_DIR="$(xcode-select -p)"
-        export MACRO_DEVELOPER_DIR
+        ROX_DEVELOPER_DIR="$(xcode-select -p)"
+        export ROX_DEVELOPER_DIR
 
         # cargo-tauri, bun, just, wasm-pack and the pinned toolchain (which carries
         # aarch64-apple-ios-sim, see rust-toolchain.toml) all come from the dev shell.
@@ -113,7 +113,7 @@ jobs:
         nix develop --command bash -euo pipefail -c '
           echo "before: DEVELOPER_DIR=$(xcode-select -p 2>&1), xcodebuild=$(command -v xcodebuild || echo none)"
 
-          export DEVELOPER_DIR="$MACRO_DEVELOPER_DIR"
+          export DEVELOPER_DIR="$ROX_DEVELOPER_DIR"
           APPLE_TOOLS="$(mktemp -d)"
           for tool in xcodebuild xcrun xcode-select simctl actool ibtool plutil ditto \
                       clang clang++ cc c++ ld ar ranlib libtool lipo strip nm \
@@ -264,7 +264,7 @@ jobs:
 
         # Session caps, not access restrictions, are what keep a leaked link cheap: a
         # 3-minute idle timeout, a 30-minute ceiling and two concurrent sessions, on an
-        # app that still needs a Macro login to show anything. `run=authenticated`
+        # app that still needs a Rox login to show anything. `run=authenticated`
         # would demand an Appetize account and `referrerHostnamesRestricted` would
         # reject the click outright (GitHub sends no referrer on external links), so
         # both would lock out the reviewer this exists for.
@@ -380,7 +380,7 @@ jobs:
 
         # Session caps, not access restrictions, are what keep a leaked link cheap: a
         # 3-minute idle timeout, a 30-minute ceiling and two concurrent sessions, on an
-        # app that still needs a Macro login to show anything. `run=authenticated`
+        # app that still needs a Rox login to show anything. `run=authenticated`
         # would demand an Appetize account and `referrerHostnamesRestricted` would
         # reject the click outright (GitHub sends no referrer on external links), so
         # both would lock out the reviewer this exists for.

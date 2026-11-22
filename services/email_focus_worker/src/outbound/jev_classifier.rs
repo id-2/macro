@@ -3,7 +3,7 @@
 use ai_usage::{AiFeature, UsageContext};
 use email::domain::focus::{FocusClassifier, FocusClassifierError};
 use jev::domain::{JevClassifier, JevProvider, Probability, YesNoClassifier, YesNoQuestion};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -25,7 +25,7 @@ impl<P> JevFocusClassifier<P> {
 impl<P: JevProvider> FocusClassifier for JevFocusClassifier<P> {
     async fn answer(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_id: Uuid,
         input: &Value,
         questions: &[&'static str],

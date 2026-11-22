@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 use whatsmeow::proto::wa_adv::AdvSignedDeviceIdentity;
@@ -7,7 +7,7 @@ use whatsmeow::types::{HIDDEN_USER_SERVER, new_ad_jid, new_jid};
 
 use crate::store::test::{FixedSignatures, open_new_store};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_device_is_unpaired_and_needs_a_jid_to_save(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let device = store.load_device(&FixedSignatures).await.unwrap();
@@ -24,7 +24,7 @@ async fn a_new_device_is_unpaired_and_needs_a_jid_to_save(pool: Pool<Postgres>) 
     assert_ne!(again.noise_key, device.noise_key);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_saved_device_loads_back(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let mut device = store.load_device(&FixedSignatures).await.unwrap();
@@ -62,7 +62,7 @@ async fn a_saved_device_loads_back(pool: Pool<Postgres>) {
     assert_eq!(loaded.facebook_uuid, device.facebook_uuid);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_the_device_deletes_every_key(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let mut device = store.load_device(&FixedSignatures).await.unwrap();

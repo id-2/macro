@@ -3,7 +3,7 @@
 
 use agent_session::domain::model::AgentSessionId;
 use import_notion::domain::{model::ImportScope, ports::NotionConnections};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::ConnectorSelect;
 use std::time::Duration;
 use uuid::Uuid;
@@ -25,7 +25,7 @@ pub trait WorkspaceImporter: NotionWorkspaceImporter {
     /// created until the owner approves the resulting review.
     fn prepare_workspace_import(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         sharing: Option<NotionSharing>,
         wait: Duration,
@@ -33,13 +33,13 @@ pub trait WorkspaceImporter: NotionWorkspaceImporter {
     /// Read the current plan and resume an abandoned lease when needed.
     fn workspace_import_report(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> impl Future<Output = Result<NotionImportReport>> + Send;
     /// Tie the selected source's plan and future progress to its review.
     fn attach_workspace_review(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         review: Uuid,
         session: AgentSessionId,
@@ -47,7 +47,7 @@ pub trait WorkspaceImporter: NotionWorkspaceImporter {
     /// Start writing precisely the review the owner approved.
     fn start_workspace_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         review: Uuid,
         choices: NotionWriteChoices,
@@ -55,7 +55,7 @@ pub trait WorkspaceImporter: NotionWorkspaceImporter {
     /// Cancel this source only; imported entities remain.
     fn cancel_workspace_import(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> impl Future<Output = Result<bool>> + Send;
 }
@@ -66,14 +66,14 @@ pub(super) trait Importer {
     type Scope;
     fn plan(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         scope: Self::Scope,
         sharing: NotionSharing,
         control: &run::JobControl,
     ) -> impl Future<Output = Result<()>> + Send;
     fn write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review: Uuid,
         control: &run::JobControl,
     ) -> impl Future<Output = Result<usize>> + Send;
@@ -114,7 +114,7 @@ where
 {
     async fn prepare_workspace_import(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         sharing: Option<NotionSharing>,
         wait: Duration,
@@ -126,7 +126,7 @@ where
     }
     async fn workspace_import_report(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> Result<NotionImportReport> {
         workspace_source(source)?;
@@ -134,7 +134,7 @@ where
     }
     async fn attach_workspace_review(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         review: Uuid,
         session: AgentSessionId,
@@ -146,7 +146,7 @@ where
     }
     async fn start_workspace_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         review: Uuid,
         choices: NotionWriteChoices,
@@ -158,7 +158,7 @@ where
     }
     async fn cancel_workspace_import(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> Result<bool> {
         workspace_source(source)?;
@@ -177,7 +177,7 @@ where
     type Scope = ImportScope;
     async fn plan(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         scope: ImportScope,
         sharing: NotionSharing,
         control: &run::JobControl,
@@ -192,7 +192,7 @@ where
     }
     async fn write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review: Uuid,
         control: &run::JobControl,
     ) -> Result<usize> {

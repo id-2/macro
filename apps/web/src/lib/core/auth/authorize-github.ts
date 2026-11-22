@@ -19,13 +19,13 @@ import {
  * consumes it without changing the active route.
  */
 export const GITHUB_LINK_CALLBACK_PATH = '/github-link-callback';
-const DESKTOP_GITHUB_LINK_CALLBACK_URL = `macro://${GITHUB_LINK_CALLBACK_PATH}`;
+const DESKTOP_GITHUB_LINK_CALLBACK_URL = `rox://${GITHUB_LINK_CALLBACK_PATH}`;
 
 /**
  * Run a GitHub OAuth grant. On the web the browser navigates to GitHub and the
  * callback returns to this page, so nothing after the call runs. The desktop
  * app opens consent in the system browser and learns the outcome from the
- * `macro://` callback, so it resolves to false once the browser opens. On
+ * `rox://` callback, so it resolves to false once the browser opens. On
  * native mobile the grant completes in the system browser and the link status
  * query is refreshed; resolves to whether that grant succeeded. Rejects when
  * the authorization URL cannot be obtained.

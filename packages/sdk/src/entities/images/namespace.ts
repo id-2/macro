@@ -3,7 +3,7 @@ import type {
   GenerateImageReference,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
 import { GeneratedImage, StaticImage } from './image';
 
@@ -36,7 +36,7 @@ export interface GenerateImageOptions {
  * @routing Use when generating an image; not structured output or classification (`macro.ai`).
  */
 export class ImagesNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * A handle to an image already in static file storage, such as a profile

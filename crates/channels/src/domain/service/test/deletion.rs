@@ -191,7 +191,7 @@ async fn permanent_delete_checks_team_authority_after_view_access() {
             entity_type: EntityType::Channel,
         };
         let receipt = EntityAccessReceipt::<ViewOnly>::try_new_authenticated_user(
-            macro_id(actor),
+            rox_id(actor),
             entity.clone(),
             EntityPermission::ChannelViewOnly,
         )

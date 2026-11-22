@@ -32,11 +32,11 @@ use crate::domain::session::MAX_CLEANUP_ATTEMPTS;
 /// The people the tests' flags are set for.
 const PEOPLE: usize = 32;
 
-fn person(n: usize) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|generation-{n}@rox.one")).unwrap()
+fn person(n: usize) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|generation-{n}@rox.one")).unwrap()
 }
 
-fn user() -> MacroUserIdStr<'static> {
+fn user() -> RoxUserIdStr<'static> {
     person(0)
 }
 
@@ -221,7 +221,7 @@ struct FakeRoutines {
 impl RoutineSuggestionApi for FakeRoutines {
     async fn suggestions(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Option<Surface>,
     ) -> anyhow::Result<RoutineSuggestions> {
         anyhow::bail!("generations never read suggestions")
@@ -229,7 +229,7 @@ impl RoutineSuggestionApi for FakeRoutines {
 
     async fn brief(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         surfaces: &[Surface],
         trigger: GenerationTrigger,
         _: Tz,
@@ -239,18 +239,18 @@ impl RoutineSuggestionApi for FakeRoutines {
 
     async fn texts(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &[Uuid],
         _: chrono_tz::Tz,
     ) -> anyhow::Result<Vec<(Uuid, suggestions::domain::model::RoutineText)>> {
         Ok(Vec::new())
     }
 
-    async fn suggested(&self, _: &MacroUserIdStr<'static>, session: Uuid) -> anyhow::Result<u32> {
+    async fn suggested(&self, _: &RoxUserIdStr<'static>, session: Uuid) -> anyhow::Result<u32> {
         Ok(self.counts.count(&self.repo, session))
     }
 
-    async fn record(&self, _: &MacroUserIdStr<'static>, report: RoutineGenerationReport) {
+    async fn record(&self, _: &RoxUserIdStr<'static>, report: RoutineGenerationReport) {
         self.reports.lock().unwrap().push(report);
     }
 
@@ -272,7 +272,7 @@ impl RoutineSuggestionApi for FakeRoutines {
         anyhow::bail!("generations never retire")
     }
 
-    async fn dismiss(&self, _: &MacroUserIdStr<'static>, _: Uuid) -> anyhow::Result<()> {
+    async fn dismiss(&self, _: &RoxUserIdStr<'static>, _: Uuid) -> anyhow::Result<()> {
         anyhow::bail!("generations never dismiss")
     }
 
@@ -299,7 +299,7 @@ fn unused<T>() -> Result<T, SuggestionError> {
 impl SuggestionApi for FakeSuggestions {
     async fn feed(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: SuggestionCaller,
         _: Option<Tz>,
         _: Option<usize>,
@@ -309,7 +309,7 @@ impl SuggestionApi for FakeSuggestions {
 
     async fn viewed(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: SuggestionCaller,
     ) -> Result<(), SuggestionError> {
         unused()
@@ -317,7 +317,7 @@ impl SuggestionApi for FakeSuggestions {
 
     async fn accept(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: SuggestionCaller,
         _: Uuid,
         _: suggestions::domain::model::Accept,
@@ -327,7 +327,7 @@ impl SuggestionApi for FakeSuggestions {
 
     async fn dismiss(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: SuggestionCaller,
         _: Uuid,
     ) -> Result<(), SuggestionError> {
@@ -336,7 +336,7 @@ impl SuggestionApi for FakeSuggestions {
 
     async fn restore(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: SuggestionCaller,
         _: Uuid,
     ) -> Result<(), SuggestionError> {
@@ -402,7 +402,7 @@ impl SuggestionApi for FakeSuggestions {
 #[derive(Debug, Clone)]
 struct Generation {
     id: Uuid,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     trigger: GenerationTrigger,
     status: GenerationStatus,
     attempt: u8,
@@ -425,7 +425,7 @@ impl Generation {
 struct Session {
     id: Uuid,
     generation: Uuid,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     agent: BotId,
     kind: SessionKind,
     surfaces: Vec<String>,
@@ -438,7 +438,7 @@ struct Session {
 
 /// A nightly outcome as recorded: whose, what, and their next run.
 type Recorded = (
-    MacroUserIdStr<'static>,
+    RoxUserIdStr<'static>,
     NightlyOutcome,
     Option<DateTime<Utc>>,
 );
@@ -470,7 +470,7 @@ struct FakeRepo {
 impl FakeRepo {
     fn seed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         trigger: GenerationTrigger,
         status: GenerationStatus,
         attempt: u8,
@@ -491,13 +491,13 @@ impl FakeRepo {
         id
     }
 
-    fn seed_session(&self, generation: Uuid, user: &MacroUserIdStr<'static>) -> Uuid {
+    fn seed_session(&self, generation: Uuid, user: &RoxUserIdStr<'static>) -> Uuid {
         let id = Uuid::now_v7();
         self.sessions.lock().unwrap().push(Session {
             id,
             generation,
             user: user.clone(),
-            agent: bot_id::MACRO_NEW_BOT_ID,
+            agent: bot_id::ROX_NEW_BOT_ID,
             kind: SessionKind::Suggestions,
             surfaces: Vec::new(),
             opened_at: Utc::now(),
@@ -595,7 +595,7 @@ impl GenerationRepo for FakeRepo {
 
     async fn admission(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         trigger: GenerationTrigger,
     ) -> Result<AdmissionFacts, Self::Err> {
         let generations = self.generations.lock().unwrap();
@@ -704,7 +704,7 @@ impl GenerationRepo for FakeRepo {
         &self,
         session: Uuid,
         generation: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         agent: BotId,
         kind: SessionKind,
         surfaces: &[String],
@@ -716,7 +716,7 @@ impl GenerationRepo for FakeRepo {
         self.sessions.lock().unwrap().push(Session {
             id: session,
             generation,
-            user: MacroUserIdStr::try_from(user.as_ref().to_owned()).unwrap(),
+            user: RoxUserIdStr::try_from(user.as_ref().to_owned()).unwrap(),
             agent,
             kind,
             surfaces: surfaces.to_vec(),
@@ -818,14 +818,14 @@ impl GenerationRepo for FakeRepo {
 
     async fn last_routines_ok(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<Option<DateTime<Utc>>, Self::Err> {
         Ok(*self.last_routines_ok.lock().unwrap())
     }
 
     async fn routines_ok(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: &str,
         now: DateTime<Utc>,
     ) -> Result<(), Self::Err> {
@@ -836,12 +836,12 @@ impl GenerationRepo for FakeRepo {
 
     async fn record_nightly(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         outcome: NightlyOutcome,
         next_run: Option<DateTime<Utc>>,
         _: DateTime<Utc>,
     ) -> Result<(), Self::Err> {
-        let user = MacroUserIdStr::try_from(user.as_ref().to_owned()).unwrap();
+        let user = RoxUserIdStr::try_from(user.as_ref().to_owned()).unwrap();
         // Recorded, they leave the due set until their next run: the first
         // of theirs, as tests may list one person more than once.
         let mut due = self.due.lock().unwrap();
@@ -854,7 +854,7 @@ impl GenerationRepo for FakeRepo {
 
     async fn see(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         timezone: &str,
         _: DateTime<Utc>,
         _: DateTime<Utc>,
@@ -863,7 +863,7 @@ impl GenerationRepo for FakeRepo {
         Ok(())
     }
 
-    async fn account(&self, _: &MacroUserIdStr<'_>) -> Result<Option<Uuid>, Self::Err> {
+    async fn account(&self, _: &RoxUserIdStr<'_>) -> Result<Option<Uuid>, Self::Err> {
         Ok(None)
     }
 
@@ -880,7 +880,7 @@ impl GenerationRepo for FakeRepo {
         Ok(due.iter().take(usize::from(limit)).cloned().collect())
     }
 
-    async fn overview(&self, user: &MacroUserIdStr<'_>) -> Result<OverviewFacts, Self::Err> {
+    async fn overview(&self, user: &RoxUserIdStr<'_>) -> Result<OverviewFacts, Self::Err> {
         let generations = self.generations.lock().unwrap();
         let mine: Vec<&Generation> = generations.iter().filter(|row| row.user == *user).collect();
         Ok(OverviewFacts {
@@ -915,7 +915,7 @@ enum Answer {
 struct FakePlans(Mutex<HashMap<String, Answer>>);
 
 impl FakePlans {
-    fn set(&self, user: &MacroUserIdStr<'_>, answer: Answer) {
+    fn set(&self, user: &RoxUserIdStr<'_>, answer: Answer) {
         self.0
             .lock()
             .unwrap()
@@ -925,7 +925,7 @@ impl FakePlans {
 
 #[async_trait::async_trait]
 impl Plans for FakePlans {
-    async fn paid(&self, user: &MacroUserIdStr<'static>) -> Result<bool, rootcause::Report> {
+    async fn paid(&self, user: &RoxUserIdStr<'static>) -> Result<bool, rootcause::Report> {
         let answer = self
             .0
             .lock()
@@ -1011,7 +1011,7 @@ fn build(suggestions: bool, routines: bool, script: Script, stored: Option<bool>
         }),
         Some(flags),
         GenerationAgent {
-            bot: bot_id::MACRO_NEW_BOT_ID,
+            bot: bot_id::ROX_NEW_BOT_ID,
             model: "test-model".to_owned(),
         },
         TaskTracker::new(),
@@ -1110,7 +1110,7 @@ fn zone_out_of_its_night() -> Tz {
         .unwrap()
 }
 
-fn member(user: MacroUserIdStr<'static>, timezone: Tz) -> AudienceMember {
+fn member(user: RoxUserIdStr<'static>, timezone: Tz) -> AudienceMember {
     AudienceMember {
         user,
         timezone,
@@ -1495,7 +1495,7 @@ async fn a_nightly_tick_records_what_became_of_each_person_due() {
     assert_eq!(h.service.nightly().await.unwrap(), 1);
     h.service.wait().await;
     let recorded = h.repo.nightly();
-    let outcomes: Vec<(MacroUserIdStr<'static>, NightlyOutcome)> = recorded
+    let outcomes: Vec<(RoxUserIdStr<'static>, NightlyOutcome)> = recorded
         .iter()
         .map(|(user, outcome, _)| (user.clone(), *outcome))
         .collect();

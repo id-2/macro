@@ -14,13 +14,13 @@ section below is one place, in order; past misses are called out inline.
 
 | Adding | Copy | Why |
 | --- | --- | --- |
-| A topic | The `macro.messages` registration: `crates/macro_event_topics/src/lib.rs`, its `test.rs`, `.github/kafka-cluster-topics.json` | Three files, shipped as its own PR ahead of the producer |
+| A topic | The `macro.messages` registration: `crates/rox_event_topics/src/lib.rs`, its `test.rs`, `.github/kafka-cluster-topics.json` | Three files, shipped as its own PR ahead of the producer |
 | Events on a topic | `crates/github_pull_requests/src/broker.rs` (one variant), `crates/messages/src/outbound/broker.rs` (several) | Topic enum, keyed envelope, broker-backed adapter for a domain port |
 | A durable consumer | `crates/crm/src/inbound/call_archived.rs` | Smallest grouped consumer: poison commit, bounded retry, commit after work, cancel-safe |
 | An at-least-once consumer that must not skip | `crates/webhook/src/inbound/kafka_consumer.rs` | Transient vs permanent errors; exits uncommitted so a restart redelivers |
 | A per-process fan-out (GraphQL subscription, SSE) | `crates/agent_session_realtime/src/outbound/log_topic_consumer.rs` | Ungrouped, starts at `Latest`, commits nothing |
 
-Background: `crates/macro_event_broker/AGENTS.md` maps the broker crate;
+Background: `crates/rox_event_broker/AGENTS.md` maps the broker crate;
 `crates/properties/README.md` ("Delivery semantics and compatibility") states the
 delivery contract every producer has.
 
@@ -29,8 +29,8 @@ delivery contract every producer has.
 Add a variant to an existing topic when the event is about the same entity as
 the topic's other events; add a topic only for a new entity stream.
 
-- Add `MacroXTopic => "macro.<snake_plural>"` with a doc comment to `topics!` in
-  `crates/macro_event_topics/src/lib.rs`, and an assertion to
+- Add `RoxXTopic => "rox.<snake_plural>"` with a doc comment to `topics!` in
+  `crates/rox_event_topics/src/lib.rs`, and an assertion to
   `all_topic_names_includes_declared_topics` in `src/test.rs`.
 - Run `cargo x kafka-topics` and commit `.github/kafka-cluster-topics.json`. Never
   hand-edit it. CI (`check_generated`) fails when it is stale, and the
@@ -50,7 +50,7 @@ Put the types next to the domain that owns the fact
 - A topic enum with `#[serde(tag = "event_type", content = "metadata")]` and
   `#[serde(rename = "<entity>.<past_tense>")]` per variant, implementing
   `TopicEvent { type Topic; const SCHEMA_VERSION: u8 }`.
-- A `XMacroEvent { key, event: Event<XTopicEvent> }` implementing `MacroEvent`,
+- A `XMacroEvent { key, event: Event<XTopicEvent> }` implementing `RoxEvent`,
   with one constructor per variant. Build envelopes with `Event::new` (UUIDv7
   `event_id`).
 - **The key is the ordering unit.** Kafka orders per partition, so key by the
@@ -60,24 +60,24 @@ Put the types next to the domain that owns the fact
 - Metadata carries ids and the committed state consumers need; consumers should
   not have to read back the database to act. Never put secrets or header values
   in metadata (see the webhook README's management events).
-- Domain crates depend on `macro_event_broker` with `default-features = false`.
+- Domain crates depend on `rox_event_broker` with `default-features = false`.
   Only composition roots pull in the Kafka adapters; event types consumed by the
   self-hosted daemon once dragged `rdkafka` into its build.
 
 ## 3. Publish after the commit
 
 - Define a publisher port in the domain and implement it in an adapter over
-  `MacroEventBroker` (`GithubPullRequestEventPublisher` +
+  `RoxEventBroker` (`GithubPullRequestEventPublisher` +
   `BrokerGithubPullRequestPublisher`, `MessageEventPublisher` +
   `BrokerMessagePublisher`). Small domains such as `crates/forms` take
-  `B: MacroEventBroker` directly; either keeps Kafka types out of
+  `B: RoxEventBroker` directly; either keeps Kafka types out of
   `src/domain/**` ([CS-51](../../.agents/rules/rust/architecture.md)).
 - Publish only after the transaction commits, from committed state (see
   `PropertiesServiceImpl` building update events "from committed persistence
   state"). A publish inside the transaction announces changes that may roll back.
 - A failed publish is logged, never surfaced: the change already committed.
   There is no outbox; delivery is at most once relative to the write.
-- Tests: a recording `MacroEventBroker` that captures topic, key, and
+- Tests: a recording `RoxEventBroker` that captures topic, key, and
   `serde_json::to_value(event.event())`, asserting the full JSON literal
   (`crates/messages/src/outbound/broker/test.rs`). That literal is the wire
   contract.
@@ -91,7 +91,7 @@ that forgets it compiles and silently publishes nothing.
   `crates/ai_tools/src/tool_context.rs` (AI tools and MCP; use
   `MaybeToolEventBroker`), and any other host. A write path left on the no-op
   broker is a write that never produces an event.
-- Build the broker as `MacroEventBrokerService::new(KafkaEventPublisher::new(..)?,
+- Build the broker as `RoxEventBrokerService::new(KafkaEventPublisher::new(..)?,
   tracker)` with a `TaskTracker`, and on shutdown close the tracker and wait with
   a timeout so in-flight publishes drain. Copy `services/calendar_service/src/main.rs`
   (`EVENT_BROKER_DRAIN_TIMEOUT`).
@@ -203,7 +203,7 @@ Variants on `macro.documents`, `macro.channels`, `macro.messages`, and
 
 ```sh
 cargo x kafka-topics --check
-cargo test -p macro_event_topics -p <producer> -p <each consumer you touched>   # SQLX_OFFLINE unset
+cargo test -p rox_event_topics -p <producer> -p <each consumer you touched>   # SQLX_OFFLINE unset
 just rust-check && just clippy
 just run_local
 ```

@@ -1,5 +1,5 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 /**
  * A built-in system skill: static, code-defined AI instructions that surface
@@ -11,7 +11,7 @@ import type { MacroClient } from '../../utils/client';
  */
 export class SystemSkill {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The well-known id the skill is referenced by in mentions and AI tools. */
     readonly id: string,
     /** The skill's display name. */
@@ -36,14 +36,14 @@ export class SystemSkill {
   }
 
   /** The built-in system skills, in display order. */
-  static async list(client: MacroClient): Promise<SystemSkill[]> {
+  static async list(client: RoxClient): Promise<SystemSkill[]> {
     const { skills } = unwrap(await client.storage.getSystemSkillsHandler());
     return skills.map((skill) => new SystemSkill(client, skill.id, skill.name));
   }
 
   /** Wrap a built-in skill from a record already in hand, such as a skill listing. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     record: { id: string; name: string },
   ): SystemSkill {
     return new SystemSkill(client, record.id, record.name);

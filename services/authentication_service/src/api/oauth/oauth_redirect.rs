@@ -17,7 +17,7 @@ use axum::{
     http::{HeaderValue, StatusCode},
     response::{IntoResponse, Response},
 };
-use macro_auth::middleware::decode_jwt::decode_macro_access_token_allow_expired;
+use rox_auth::middleware::decode_jwt::decode_rox_access_token_allow_expired;
 use maud::{DOCTYPE, Markup, html};
 use model::response::ErrorResponse;
 use referral::domain::{models::ReferralCode, ports::ReferralService};
@@ -119,7 +119,7 @@ pub async fn handler(
     };
 
     let write_db = async |code: &SessionCode| {
-        ctx.macro_cache_client
+        ctx.rox_cache_client
             .set_mobile_login_session(code.0.as_str(), &refresh_token)
             .await
             .inspect_err(|e| {
@@ -129,7 +129,7 @@ pub async fn handler(
                     "unable to store mobile session code"
                 );
             })
-            .map_err(InnerErr::MacroCacheErr)
+            .map_err(InnerErr::RoxCacheErr)
     };
 
     let state: Option<SsoState> = if let Some(state) = params.state {
@@ -153,12 +153,12 @@ pub async fn handler(
         .await
         .map_err(IntoResponse::into_response)?;
 
-    let decoded_user_id = decode_macro_access_token_allow_expired(&access_token, &ctx.jwt_args);
+    let decoded_user_id = decode_rox_access_token_allow_expired(&access_token, &ctx.jwt_args);
 
     let just_signed_up = match decoded_user_id.as_ref() {
         Ok(user_id) => {
             append_signed_up_param_if_new_user(
-                &ctx.macro_cache_client,
+                &ctx.rox_cache_client,
                 user_id.email_str(),
                 &mut redirect_url,
             )
@@ -207,7 +207,7 @@ enum InnerErr {
     #[error("{0}")]
     Serde(#[from] serde_json::Error),
     #[error("Rox Cache Err {0}")]
-    MacroCacheErr(anyhow::Error),
+    RoxCacheErr(anyhow::Error),
     #[error("Failed to parse url {0}")]
     ParseErr(#[from] url::ParseError),
     #[error("original_url is not allowed")]
@@ -224,7 +224,7 @@ impl IntoResponse for InnerErr {
                 }),
             )
                 .into_response(),
-            InnerErr::MacroCacheErr(_e) => (
+            InnerErr::RoxCacheErr(_e) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(ErrorResponse {
                     message: "unable to store session code".into(),
@@ -278,7 +278,7 @@ async fn get_redirect_url(
     let Some(state) = state else {
         // A mobile login cannot complete from here: without state there is no
         // is_mobile flag, so no session code is minted and the app's
-        // macro:// callback never fires.
+        // rox:// callback never fires.
         tracing::warn!(
             auth_handoff_failure = "state_missing",
             "oauth redirect received without state; redirecting to default app url"

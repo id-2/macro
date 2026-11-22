@@ -10,7 +10,7 @@ use crate::domain::ports::{
     CanonicalImportRepo, EntityCreator, ImportRepo, SlackSourceError, SlackWorkspaceSession,
     SlackWorkspaceSource,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::ConnectorSelect;
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
@@ -38,7 +38,7 @@ pub enum NoSlackSession {}
 impl SlackWorkspaceSource for NoSlackSource {
     type Session = NoSlackSession;
 
-    async fn open(&self, _: &MacroUserIdStr<'static>) -> Result<Self::Session, SlackSourceError> {
+    async fn open(&self, _: &RoxUserIdStr<'static>) -> Result<Self::Session, SlackSourceError> {
         Err(SlackSourceError::NotConnected)
     }
 }
@@ -105,7 +105,7 @@ impl SlackDirectory {
 
 /// Live membership context shared by the accepted Slack rows in one batch.
 pub(super) struct SlackBatch<Sess> {
-    state: Option<Option<(Sess, SlackDirectory, Vec<MacroUserIdStr<'static>>)>>,
+    state: Option<Option<(Sess, SlackDirectory, Vec<RoxUserIdStr<'static>>)>>,
 }
 
 impl<Sess> Default for SlackBatch<Sess> {
@@ -118,7 +118,7 @@ impl<Sess: SlackWorkspaceSession> SlackBatch<Sess> {
     pub(super) async fn resolve_emails<R, S, C, W, N: Send + Sync + 'static>(
         &mut self,
         service: &ImportServiceImpl<R, S, C, W, N>,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         team_id: Uuid,
         meta: &SlackChannelMeta,
     ) -> Vec<String>
@@ -181,7 +181,7 @@ pub(super) async fn resolve_members(
     session: &impl SlackWorkspaceSession,
     directory: &SlackDirectory,
     channel: &SlackConversationId,
-    roster: &[MacroUserIdStr<'static>],
+    roster: &[RoxUserIdStr<'static>],
 ) -> Result<ResolvedMembers, SlackSourceError> {
     let mut resolved = ResolvedMembers {
         participants: Vec::new(),
@@ -227,7 +227,7 @@ pub(super) async fn resolve_members(
 /// enrich staged rows with matched members until the deadline.
 pub(super) async fn discover_slack<R, S, C, W, N: Send + Sync + 'static>(
     service: &ImportServiceImpl<R, S, C, W, N>,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
 ) -> Result<usize, SlackSourceError>
 where
     R: ImportRepo + CanonicalImportRepo + Clone,
@@ -328,9 +328,9 @@ where
 
 async fn enrich_slack<R, S, C, W, N: Send + Sync + 'static>(
     service: &ImportServiceImpl<R, S, C, W, N>,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     session: &W::Session,
-    roster: &[MacroUserIdStr<'static>],
+    roster: &[RoxUserIdStr<'static>],
     mut staged: Vec<(SlackConversationId, SlackChannelMeta)>,
 ) -> Result<(), SlackSourceError>
 where

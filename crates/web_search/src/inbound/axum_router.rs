@@ -12,8 +12,8 @@ use axum::{
     routing::post,
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 use rate_limit::{
     RateLimitConfig, RateLimitKey, RateLimitResult, RateLimitService,
@@ -39,7 +39,7 @@ const PER_USER_REQUESTS_PER_HOUR: u64 = 600;
 pub struct WebRouterState<R, Auth> {
     service: Arc<WebSearchService>,
     rate_limiter: R,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<R: Clone, Auth> Clone for WebRouterState<R, Auth> {
@@ -57,7 +57,7 @@ impl<R, Auth> WebRouterState<R, Auth> {
     pub fn new(
         service: Arc<WebSearchService>,
         rate_limiter: R,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -67,7 +67,7 @@ impl<R, Auth> WebRouterState<R, Auth> {
     }
 }
 
-impl<R, Auth> FromRef<WebRouterState<R, Auth>> for MacroAuthorizationState<Auth> {
+impl<R, Auth> FromRef<WebRouterState<R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &WebRouterState<R, Auth>) -> Self {
         state.authorization.clone()
     }
@@ -76,7 +76,7 @@ impl<R, Auth> FromRef<WebRouterState<R, Auth>> for MacroAuthorizationState<Auth>
 impl<R, Auth> RateLimitService for WebRouterState<R, Auth>
 where
     R: RateLimitService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     async fn check_rate_limit(
         &self,
@@ -96,13 +96,13 @@ where
 }
 
 /// Per-user web request limit, keyed by the verified acting user.
-pub struct PerUserWebRateLimit<Auth>(MacroAuthorizationExtractor<Auth, ActingUser>);
+pub struct PerUserWebRateLimit<Auth>(RoxAuthorizationExtractor<Auth, ActingUser>);
 
 impl<S, Auth> RateLimitExtractable<S> for PerUserWebRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     fn config() -> RateLimitConfig {
         RateLimitConfig::new(PER_USER_REQUESTS_PER_HOUR, Duration::from_secs(3600))
@@ -110,7 +110,7 @@ where
 
     fn key(&self) -> RateLimitKey {
         RateLimitKey::builder(&"per-user-web-search")
-            .append(&self.0.authorization.user.macro_user_id.as_ref())
+            .append(&self.0.authorization.user.rox_user_id.as_ref())
             .finish()
     }
 }
@@ -118,8 +118,8 @@ where
 impl<S, Auth> FromRequestParts<S> for PerUserWebRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     type Rejection = Response;
 
@@ -127,7 +127,7 @@ where
         parts: &mut axum::http::request::Parts,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, ActingUser>> = parts
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, ActingUser>> = parts
             .extract_with_state(state)
             .await
             .map_err(IntoResponse::into_response)?;
@@ -139,7 +139,7 @@ where
 pub fn web_router<R, Auth, S>(state: WebRouterState<R, Auth>) -> Router<S>
 where
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -228,20 +228,20 @@ fn invalid_body(rejection: JsonRejection) -> WebFailure {
     )
 )]
 pub async fn search_handler<R, Auth>(
-    Cached(caller): Cached<MacroAuthorizationExtractor<Auth, ActingUser>>,
+    Cached(caller): Cached<RoxAuthorizationExtractor<Auth, ActingUser>>,
     _limit: RateLimitExtractor<PerUserWebRateLimit<Auth>, WebRouterState<R, Auth>>,
     State(state): State<WebRouterState<R, Auth>>,
     request: Result<Json<WebSearch>, JsonRejection>,
 ) -> Result<Json<WebSearchResponse>, WebFailure>
 where
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = request.map_err(invalid_body)?;
     let response = state
         .service
         .search(
-            WebCaller::user(caller.authorization.user.macro_user_id),
+            WebCaller::user(caller.authorization.user.rox_user_id),
             request,
         )
         .await?;
@@ -268,20 +268,20 @@ where
     )
 )]
 pub async fn fetch_handler<R, Auth>(
-    Cached(caller): Cached<MacroAuthorizationExtractor<Auth, ActingUser>>,
+    Cached(caller): Cached<RoxAuthorizationExtractor<Auth, ActingUser>>,
     _limit: RateLimitExtractor<PerUserWebRateLimit<Auth>, WebRouterState<R, Auth>>,
     State(state): State<WebRouterState<R, Auth>>,
     request: Result<Json<WebFetch>, JsonRejection>,
 ) -> Result<Json<WebFetchResponse>, WebFailure>
 where
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = request.map_err(invalid_body)?;
     let response = state
         .service
         .fetch(
-            WebCaller::user(caller.authorization.user.macro_user_id),
+            WebCaller::user(caller.authorization.user.rox_user_id),
             request,
         )
         .await?;

@@ -18,12 +18,12 @@ use crate::domain::{
 };
 use anyhow::Context as _;
 use kafka_util::{GroupName, KafkaEventConsumer};
-use macro_event_broker::{
-    Event, KafkaConsumerAdapter, MacroEvent, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    Event, KafkaConsumerAdapter, RoxEvent, RoxEventCollection as _, RoxEventConsumerService,
     TopicEvent,
 };
-use macro_event_topics::MacroTeamsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_topics::RoxTeamsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message};
 use serde::{Deserialize, Serialize};
@@ -40,9 +40,9 @@ impl GroupName for TeammateDmsConsumerGroup {
 
 type TeammateDmsKafkaAdapter = KafkaConsumerAdapter<TeammateDmsConsumerGroup, DeclaredMacroEvent>;
 type TeammateDmsKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, TeammateDmsKafkaAdapter>;
+    RoxEventConsumerService<DeclaredMacroEvent, TeammateDmsKafkaAdapter>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: TeamsMacroEventForDms);
+rox_event_broker::declare_topics!(DeclaredMacroEvent: TeamsMacroEventForDms);
 
 /// Maximum in-process attempts per event before the consumer bails out.
 const MAX_ATTEMPTS: u32 = 5;
@@ -60,10 +60,10 @@ fn retry_strategy() -> impl Iterator<Item = Duration> {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub(crate) struct TeammateDmsJoinedMetadata {
     /// User who joined the team.
-    pub member_id: MacroUserIdStr<'static>,
+    pub member_id: RoxUserIdStr<'static>,
     /// Other current teammates the joining member should have a DM with.
     #[serde(default)]
-    pub teammate_ids: Vec<MacroUserIdStr<'static>>,
+    pub teammate_ids: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Tagged envelope around a `team.member_joined` payload.
@@ -92,7 +92,7 @@ pub(crate) enum TeamsTopicForDms {
 }
 
 impl TopicEvent for TeamsTopicForDms {
-    type Topic = MacroTeamsTopic;
+    type Topic = RoxTeamsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
@@ -103,7 +103,7 @@ pub(crate) struct TeamsMacroEventForDms {
     event: Event<TeamsTopicForDms>,
 }
 
-impl MacroEvent for TeamsMacroEventForDms {
+impl RoxEvent for TeamsMacroEventForDms {
     type EventPayload = TeamsTopicForDms;
 
     fn key(&self) -> &str {

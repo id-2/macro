@@ -5,14 +5,14 @@
  *
  * This file imports nothing, so that `packages/observability` can import it:
  * `src/muppet.test.ts` there fails to type-check when its `Telemetry` class
- * stops fitting `MacroTelemetry`. Change the two together.
+ * stops fitting `RoxTelemetry`. Change the two together.
  */
 
 export type Attribute = string | number | boolean | string[];
 export type Attributes = Readonly<Record<string, Attribute | undefined>>;
 
 /** The part of a span of `@macro-inc/observability` this uses. */
-export type MacroSpan = {
+export type RoxSpan = {
 	readonly run: <T>(operation: () => T) => T;
 	readonly setAttr: (name: string, value: Attribute) => void;
 	readonly error: (error: unknown) => void;
@@ -22,12 +22,12 @@ export type MacroSpan = {
 };
 
 /** The part of `Telemetry` from `@macro-inc/observability` this uses. The class itself fits. */
-export type MacroTelemetry = {
+export type RoxTelemetry = {
 	/** `startTime` is Unix time in milliseconds. */
 	readonly span: (
 		name: string,
 		options?: { readonly startTime?: number },
-	) => MacroSpan;
+	) => RoxSpan;
 	readonly remoteContext: (traceparent: string) => {
 		readonly run: <T>(operation: () => T) => T;
 	};

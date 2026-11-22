@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 
@@ -30,7 +30,7 @@ async fn stored(pool: &PgPool, action: &ScheduledAction) -> ScheduledAction {
         .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn checked_code_records_its_new_sdk_without_a_new_revision(pool: PgPool) {
     let upgrades = PgCodeUpgrades::new(pool.clone());
     let action = routine(&pool).await;
@@ -49,7 +49,7 @@ async fn checked_code_records_its_new_sdk_without_a_new_revision(pool: PgPool) {
     assert_eq!(history[0].previous_task, action.task);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn one_run_claims_the_rewrite_for_an_sdk(pool: PgPool) {
     let upgrades = PgCodeUpgrades::new(pool.clone());
     let action = routine(&pool).await;
@@ -87,7 +87,7 @@ async fn one_run_claims_the_rewrite_for_an_sdk(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_saved_rewrite_replaces_the_task_unless_the_owner_changed_it(pool: PgPool) {
     let upgrades = PgCodeUpgrades::new(pool.clone());
     let action = routine(&pool).await;
@@ -122,7 +122,7 @@ async fn a_saved_rewrite_replaces_the_task_unless_the_owner_changed_it(pool: PgP
     assert_eq!(stored(&pool, &action).await.task, edited.task);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn needing_an_update_pauses_the_routine_with_the_reason(pool: PgPool) {
     let upgrades = PgCodeUpgrades::new(pool.clone());
     let action = routine(&pool).await;
@@ -168,14 +168,14 @@ impl crate::domain::ports::RoutineCode for Checks {
 
     async fn owner_time_zone(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> Option<String> {
         None
     }
 
     async fn run(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
         _: crate::domain::ports::CodeRun<'_>,
     ) -> crate::domain::ports::CodeOutcome {
         unreachable!("checked code isn't run by a sweep")
@@ -183,7 +183,7 @@ impl crate::domain::ports::RoutineCode for Checks {
 
     async fn reference(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
         _: &str,
     ) -> std::result::Result<String, crate::domain::ports::CodeUnavailable> {
         Ok(String::new())
@@ -195,7 +195,7 @@ impl crate::domain::ports::RoutineCode for Checks {
 
     async fn rewrite(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
         _: &routine_program::CodeStep,
         _: &str,
         _: &[String],
@@ -204,7 +204,7 @@ impl crate::domain::ports::RoutineCode for Checks {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_sweep_brings_enabled_routines_with_code_to_the_current_sdk(pool: PgPool) {
     let repo = test_repo(pool.clone());
     let upgrades = PgCodeUpgrades::new(pool.clone());

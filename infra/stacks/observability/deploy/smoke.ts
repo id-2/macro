@@ -258,8 +258,8 @@ export function smokeSecret(): Record<string, string> {
     goalert_encryption_key: random(),
     goalert_admin_password: random(),
     // Unroutable: GoAlert's channel relay has nowhere to post.
-    macro_alerts_webhook_url: 'https://observability-smoke.invalid/hook',
-    macro_alerts_bot_token: random(),
+    rox_alerts_webhook_url: 'https://observability-smoke.invalid/hook',
+    rox_alerts_bot_token: random(),
   };
 }
 

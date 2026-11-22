@@ -1,7 +1,7 @@
 //! Internal search projection reads. ACP remains the source of every message.
 
 use agent_fold::domain::{model::FoldedMessage, ports::FoldedMessageRepo};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use rootcause::Report;
 
 use super::{AgentSessionSearchMetadata, AgentSessionSearchMetadataRepo};

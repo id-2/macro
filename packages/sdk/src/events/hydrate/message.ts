@@ -8,12 +8,12 @@ import { Thread } from '../../entities/channels/thread';
 import { Comment } from '../../entities/documents/comment';
 import { Document } from '../../entities/documents/document';
 import type { SimpleMention } from '../../mentions';
-import type { MacroClient } from '../../utils/client';
-import type { MacroEvent } from '../types';
+import type { RoxClient } from '../../utils/client';
+import type { RoxEvent } from '../types';
 import { userFromPrincipal } from './channel';
 
 export type MessageEvent = Extract<
-  MacroEvent,
+  RoxEvent,
   { event_type: `message.${string}` }
 >;
 
@@ -48,7 +48,7 @@ export type MessageEventTarget =
     };
 
 function target(
-  client: MacroClient,
+  client: RoxClient,
   metadata: {
     parent: MessageParent;
     message_id: string;
@@ -85,7 +85,7 @@ function target(
 }
 
 /** Attach SDK entity handles to a message webhook event. */
-export function hydrateMessageEvent(client: MacroClient, event: MessageEvent) {
+export function hydrateMessageEvent(client: RoxClient, event: MessageEvent) {
   return match(event)
     .with({ event_type: 'message.posted' }, ({ metadata }) => ({
       event_type: 'message.posted' as const,

@@ -309,11 +309,11 @@ export function tableEditChanges(
   const steps = [
     ...renames.map((rename, index) => ({
       ...rename,
-      to: `__macro_column_${index}__`,
+      to: `__rox_column_${index}__`,
     })),
     ...renames.map((rename, index) => ({
       ...rename,
-      from: `__macro_column_${index}__`,
+      from: `__rox_column_${index}__`,
     })),
   ];
   const formulas = renames.length

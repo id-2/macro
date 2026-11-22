@@ -4,8 +4,8 @@
    FusionAuth feature that silently fails without a Reactor license. Local runs
    unlicensed, so derive the claims instead: every user gets `macro|<email>`
    regardless of signup method (production's webhook path lands on the same
-   convention, MacroUserIdStr::try_from_email). root_macro_id and
-   macro_organization_id are never populated: org-scoped JWT flows need the
+   convention, RoxUserIdStr::try_from_email). root_rox_id and
+   rox_organization_id are never populated: org-scoped JWT flows need the
    licensed lambda.
 
    BLOCK comments only in this file: FusionAuth's KickstartRunner flattens the
@@ -15,5 +15,5 @@
 function populate(jwt, user, _registration) {
   jwt.fusion_user_id = user.id;
   jwt.email = user.email;
-  jwt.macro_user_id = 'macro|' + user.email;
+  jwt.rox_user_id = 'macro|' + user.email;
 }

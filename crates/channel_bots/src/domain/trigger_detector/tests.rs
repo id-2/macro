@@ -11,7 +11,7 @@ struct Classifier {
 impl InferredTriggerClassifier for Classifier {
     async fn expects_response(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
         thread: &[TranscriptMessage],
     ) -> anyhow::Result<bool> {
         self.calls.lock().unwrap().push(thread.to_vec());
@@ -28,7 +28,7 @@ fn classifier(answer: Result<bool, &'static str>) -> Arc<Classifier> {
 async fn admission_failure_suppresses_inference_without_fallback() {
     for failure in admission_failures() {
         let mut root = message(1, None, "previous answer");
-        root.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+        root.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID);
         let trigger = message(2, Some(root.id), "continue");
         let mut api = MockMessageServiceApi::new();
         configure_reads(&mut api, &trigger, thread(root, vec![trigger.clone()]));
@@ -51,7 +51,7 @@ async fn document_mention_triggers_each_canonical_bot_once_without_classificatio
     let mut trigger = message(1, None, "@macro help");
     let mention = SimpleMention {
         entity_type: "user".into(),
-        entity_id: bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string(),
+        entity_id: bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(),
     };
     trigger.mentions = vec![mention.clone(), mention];
     let classifier = classifier(Ok(false));
@@ -65,7 +65,7 @@ async fn document_mention_triggers_each_canonical_bot_once_without_classificatio
     assert_eq!(
         detector.detect(&event(&trigger)).await,
         vec![BotInvocation {
-            bot_id: bot_id::MACRO_AI_BOT_ID,
+            bot_id: bot_id::ROX_AI_BOT_ID,
             trigger: BotTrigger::Mention
         }]
     );
@@ -75,10 +75,10 @@ async fn document_mention_triggers_each_canonical_bot_once_without_classificatio
 #[tokio::test]
 async fn unattributed_bot_messages_never_trigger_another_response() {
     let mut trigger = message(1, None, "@macro help");
-    trigger.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+    trigger.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID);
     trigger.mentions = vec![SimpleMention {
         entity_type: "bot".into(),
-        entity_id: bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string(),
+        entity_id: bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(),
     }];
     let access = Arc::new(Access::default());
     access.revoke();
@@ -119,7 +119,7 @@ async fn inferred_document_follow_up_requires_prior_agent_participation_and_clas
         let mut previous = message(2, Some(root.id), "previous answer");
         if prior_agent {
             previous.sender_id =
-                channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+                channel_sender::ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID);
         }
         let trigger = message(3, Some(root.id), "can you expand on that?");
         let mut api = MockMessageServiceApi::new();
@@ -156,7 +156,7 @@ async fn access_revocation_suppresses_explicit_and_inferred_document_triggers() 
     assert!(detector.detect(&event(&trigger)).await.is_empty());
     trigger.mentions.push(SimpleMention {
         entity_type: "bot".into(),
-        entity_id: bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string(),
+        entity_id: bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(),
     });
     assert!(detector.detect(&event(&trigger)).await.is_empty());
     assert!(classifier.calls.lock().unwrap().is_empty());
@@ -186,7 +186,7 @@ async fn unavailable_history_cannot_be_replaced_by_an_unverified_event_transcrip
 async fn attributed_bots_require_an_explicit_other_bot_mention_and_current_access() {
     for (source, mention, revoked, expected) in [
         (bot_id::CURSOR_BOT_ID, true, false, true),
-        (bot_id::MACRO_AI_BOT_ID, true, false, false),
+        (bot_id::ROX_AI_BOT_ID, true, false, false),
         (bot_id::CURSOR_BOT_ID, false, false, false),
         (bot_id::CURSOR_BOT_ID, true, true, false),
     ] {
@@ -196,7 +196,7 @@ async fn attributed_bots_require_an_explicit_other_bot_mention_and_current_acces
         if mention {
             trigger.mentions = vec![SimpleMention {
                 entity_type: "bot".into(),
-                entity_id: bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string(),
+                entity_id: bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(),
             }];
         }
         let access = Arc::new(Access::default());
@@ -227,7 +227,7 @@ async fn agents_handing_a_thread_back_and_forth_stop_at_the_hop_limit() {
         reply.triggered_by = Some(user().to_string());
         reply.mentions = vec![SimpleMention {
             entity_type: "bot".into(),
-            entity_id: bot_id::MACRO_AI_BOT_ID.into_storage_id().to_string(),
+            entity_id: bot_id::ROX_AI_BOT_ID.into_storage_id().to_string(),
         }];
         reply
     };
@@ -241,7 +241,7 @@ async fn agents_handing_a_thread_back_and_forth_stop_at_the_hop_limit() {
                 let bot = if (hop - n) % 2 == 0 {
                     bot_id::CURSOR_BOT_ID
                 } else {
-                    bot_id::MACRO_AI_BOT_ID
+                    bot_id::ROX_AI_BOT_ID
                 };
                 by(1 + n as u128, bot)
             })
@@ -268,10 +268,10 @@ async fn agents_handing_a_thread_back_and_forth_stop_at_the_hop_limit() {
 }
 
 #[tokio::test]
-async fn an_agents_follow_up_is_inferred_for_macro_and_labelled_by_its_name() {
+async fn an_agents_follow_up_is_inferred_for_rox_and_labelled_by_its_name() {
     let root = message(1, None, "question");
     let mut answer = message(2, Some(root.id), "previous answer");
-    answer.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+    answer.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID);
     let mut trigger = message(3, Some(root.id), "Macro, can you double-check this?");
     trigger.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::CURSOR_BOT_ID);
     trigger.triggered_by = Some(user().to_string());
@@ -295,7 +295,7 @@ async fn an_agents_follow_up_is_inferred_for_macro_and_labelled_by_its_name() {
     assert_eq!(
         detector.detect(&event(&trigger)).await,
         vec![BotInvocation {
-            bot_id: bot_id::MACRO_AI_BOT_ID,
+            bot_id: bot_id::ROX_AI_BOT_ID,
             trigger: BotTrigger::Inferred,
         }]
     );
@@ -306,12 +306,12 @@ async fn an_agents_follow_up_is_inferred_for_macro_and_labelled_by_its_name() {
 }
 
 #[tokio::test]
-async fn macro_never_infers_a_reply_to_its_own_message() {
+async fn rox_never_infers_a_reply_to_its_own_message() {
     let root = message(1, None, "question");
     let mut answer = message(2, Some(root.id), "previous answer");
-    answer.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+    answer.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID);
     let mut trigger = message(3, Some(root.id), "anything else?");
-    trigger.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::MACRO_AI_BOT_ID);
+    trigger.sender_id = channel_sender::ChannelSender::new_from_bot(bot_id::ROX_AI_BOT_ID);
     trigger.triggered_by = Some(user().to_string());
     let mut api = MockMessageServiceApi::new();
     configure_reads(
@@ -360,7 +360,7 @@ async fn an_inferred_agent_chain_stops_at_the_hop_limit_before_classifying() {
             let bot = if (hop - n) % 2 == 0 {
                 bot_id::CURSOR_BOT_ID
             } else {
-                bot_id::MACRO_AI_BOT_ID
+                bot_id::ROX_AI_BOT_ID
             };
             by(1 + n as u128, bot)
         })

@@ -12,7 +12,7 @@ use std::collections::HashSet;
 
 use documents::domain::ports::DocumentService;
 use github_pull_requests::domain::ports::GithubPullRequestService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_notifications::{
     GithubPrComment, GithubPrCommentKind, GithubPrMention, GithubPrMentionLocation,
     GithubPrNotificationCommon, GithubPrReview, GithubPrReviewState, GithubReviewRequested,
@@ -378,7 +378,7 @@ impl<
     async fn pull_request_author_macro_users(
         &self,
         event: &ValidatedGithubWebhookEvent,
-    ) -> HashSet<MacroUserIdStr<'static>> {
+    ) -> HashSet<RoxUserIdStr<'static>> {
         let Some(author_github_user_id) = event
             .payload
             .get("pull_request")
@@ -409,10 +409,10 @@ impl<
     async fn macro_users_for_github_user_id(
         &self,
         github_user_id: &str,
-    ) -> HashSet<MacroUserIdStr<'static>> {
+    ) -> HashSet<RoxUserIdStr<'static>> {
         let links = match self
             .repo
-            .get_macro_ids_by_github_user_ids(std::slice::from_ref(&github_user_id.to_string()))
+            .get_rox_ids_by_github_user_ids(std::slice::from_ref(&github_user_id.to_string()))
             .await
         {
             Ok(links) => links,
@@ -426,19 +426,19 @@ impl<
             }
         };
 
-        let Some(macro_ids) = links.get(github_user_id) else {
+        let Some(rox_ids) = links.get(github_user_id) else {
             return HashSet::new();
         };
 
-        macro_ids
+        rox_ids
             .iter()
             .filter_map(
-                |macro_id| match MacroUserIdStr::try_from(macro_id.clone()) {
+                |rox_id| match RoxUserIdStr::try_from(rox_id.clone()) {
                     Ok(user_id) => Some(user_id),
                     Err(error) => {
                         tracing::warn!(
                             error=?error,
-                            macro_id=%macro_id,
+                            rox_id=%rox_id,
                             github_user_id=%github_user_id,
                             "GitHub user mapping is not a valid Rox user ID"
                         );
@@ -451,19 +451,19 @@ impl<
 
     /// Resolve the Rox users @mentioned in `text` via their `github_links`
     /// login mappings. Unmapped logins and invalid Rox IDs are skipped.
-    async fn mentioned_macro_users(&self, text: &str) -> HashSet<MacroUserIdStr<'static>> {
+    async fn mentioned_macro_users(&self, text: &str) -> HashSet<RoxUserIdStr<'static>> {
         self.macro_users_for_logins(&extract_github_mentions(text))
             .await
     }
 
     /// Resolve GitHub logins to Rox users via their `github_links` login
     /// mappings. Unmapped logins and invalid Rox IDs are skipped.
-    async fn macro_users_for_logins(&self, logins: &[String]) -> HashSet<MacroUserIdStr<'static>> {
+    async fn macro_users_for_logins(&self, logins: &[String]) -> HashSet<RoxUserIdStr<'static>> {
         if logins.is_empty() {
             return HashSet::new();
         }
 
-        let links = match self.repo.get_macro_ids_by_github_logins(logins).await {
+        let links = match self.repo.get_rox_ids_by_github_logins(logins).await {
             Ok(links) => links,
             Err(error) => {
                 tracing::warn!(
@@ -478,12 +478,12 @@ impl<
             .into_values()
             .flatten()
             .filter_map(
-                |macro_id| match MacroUserIdStr::try_from(macro_id.clone()) {
+                |rox_id| match RoxUserIdStr::try_from(rox_id.clone()) {
                     Ok(user_id) => Some(user_id),
                     Err(error) => {
                         tracing::warn!(
                             error=?error,
-                            macro_id=%macro_id,
+                            rox_id=%rox_id,
                             "GitHub mention mapping is not a valid Rox user ID"
                         );
                         None

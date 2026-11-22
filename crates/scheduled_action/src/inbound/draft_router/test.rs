@@ -3,8 +3,8 @@ use std::sync::Arc;
 use anyhow::Result;
 use axum::Router;
 use axum::http::StatusCode;
-use macro_authorization::MacroAuthorizationState;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::RoxAuthorizationState;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 
 use super::{RoutineDraftRouterState, routine_draft_router};
@@ -18,7 +18,7 @@ struct Drafts;
 impl RoutineDraftService for Drafts {
     async fn draft(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: DraftRequest,
         _: DraftContext,
     ) -> Result<Draft> {
@@ -37,7 +37,7 @@ impl RoutineDraftService for Drafts {
 fn router() -> Router {
     routine_draft_router(RoutineDraftRouterState {
         service: Arc::new(Drafts),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuth)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuth)),
     })
 }
 

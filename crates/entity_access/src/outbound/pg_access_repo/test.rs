@@ -6,8 +6,8 @@ use crate::domain::{
     },
     ports::AccessRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -25,8 +25,8 @@ mod documents_access;
 mod pipelines_access;
 mod telemetry;
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).unwrap()
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).unwrap()
 }
 
 async fn insert_foreign_entity(
@@ -60,7 +60,7 @@ async fn insert_foreign_entity(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn grants_direct_user_access(pool: PgPool) -> anyhow::Result<()> {
@@ -79,7 +79,7 @@ async fn grants_direct_user_access(pool: PgPool) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn grants_team_access(pool: PgPool) -> anyhow::Result<()> {
@@ -98,7 +98,7 @@ async fn grants_team_access(pool: PgPool) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn denies_unrelated_user_and_team_access(pool: PgPool) -> anyhow::Result<()> {
@@ -124,7 +124,7 @@ async fn denies_unrelated_user_and_team_access(pool: PgPool) -> anyhow::Result<(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn denies_unauthenticated_access(pool: PgPool) -> anyhow::Result<()> {
@@ -142,7 +142,7 @@ async fn denies_unauthenticated_access(pool: PgPool) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn denies_auth_namespace_mismatch(pool: PgPool) -> anyhow::Result<()> {
@@ -161,7 +161,7 @@ async fn denies_auth_namespace_mismatch(pool: PgPool) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn rejects_invalid_uuid(pool: PgPool) -> anyhow::Result<()> {
@@ -218,7 +218,7 @@ async fn insert_crm_contact(pool: &PgPool, company_id: Uuid, hidden: bool) -> an
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_company_access_maps_team_role_to_access_level(pool: PgPool) -> anyhow::Result<()> {
@@ -263,7 +263,7 @@ async fn crm_company_access_maps_team_role_to_access_level(pool: PgPool) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_company_access_hides_from_member_when_hidden(pool: PgPool) -> anyhow::Result<()> {
@@ -298,7 +298,7 @@ async fn crm_company_access_hides_from_member_when_hidden(pool: PgPool) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_company_access_denies_other_team(pool: PgPool) -> anyhow::Result<()> {
@@ -314,7 +314,7 @@ async fn crm_company_access_denies_other_team(pool: PgPool) -> anyhow::Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_company_access_denies_anonymous(pool: PgPool) -> anyhow::Result<()> {
@@ -329,7 +329,7 @@ async fn crm_company_access_denies_anonymous(pool: PgPool) -> anyhow::Result<()>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_company_access_rejects_invalid_uuid(pool: PgPool) -> anyhow::Result<()> {
@@ -346,7 +346,7 @@ async fn crm_company_access_rejects_invalid_uuid(pool: PgPool) -> anyhow::Result
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_contact_access_maps_team_role_to_access_level(pool: PgPool) -> anyhow::Result<()> {
@@ -392,7 +392,7 @@ async fn crm_contact_access_maps_team_role_to_access_level(pool: PgPool) -> anyh
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_contact_access_hidden_contact_blocks_member(pool: PgPool) -> anyhow::Result<()> {
@@ -419,7 +419,7 @@ async fn crm_contact_access_hidden_contact_blocks_member(pool: PgPool) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_contact_access_hidden_company_cascades_to_contact(pool: PgPool) -> anyhow::Result<()> {
@@ -436,7 +436,7 @@ async fn crm_contact_access_hidden_company_cascades_to_contact(pool: PgPool) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_contact_access_denies_other_team(pool: PgPool) -> anyhow::Result<()> {
@@ -452,7 +452,7 @@ async fn crm_contact_access_denies_other_team(pool: PgPool) -> anyhow::Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("user_team"))
 )]
 async fn crm_contact_access_rejects_invalid_uuid(pool: PgPool) -> anyhow::Result<()> {
@@ -472,13 +472,13 @@ const PG_BOT_OWNER: &str = "macro|pg-bot-owner@example.com";
 const PG_OTHER_DOCUMENT_OWNER: &str = "macro|other-document-owner@example.com";
 
 async fn insert_pg_user(pool: &PgPool, user_id: &str, email: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::new_v4();
+    let rox_user_id = Uuid::new_v4();
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $2)
         "#,
-        macro_user_id,
+        rox_user_id,
         user_id,
         email,
     )
@@ -487,12 +487,12 @@ async fn insert_pg_user(pool: &PgPool, user_id: &str, email: &str) -> anyhow::Re
 
     sqlx::query!(
         r#"
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ($1, $2, $3)
         "#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await?;
@@ -678,7 +678,7 @@ async fn insert_pg_link_shared_document(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_item_access_includes_team_channels_and_bot_grants(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -726,7 +726,7 @@ async fn team_item_access_includes_team_channels_and_bot_grants(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_item_access_resolves_bot_typed_grant(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::new_v4();
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
@@ -758,7 +758,7 @@ async fn team_item_access_resolves_bot_typed_grant(pool: PgPool) -> anyhow::Resu
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_item_access_allows_public_link_sharing(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::new_v4();
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
@@ -787,7 +787,7 @@ async fn team_item_access_allows_public_link_sharing(pool: PgPool) -> anyhow::Re
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_item_access_allows_team_link_for_document_owner_team(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -812,7 +812,7 @@ async fn team_item_access_allows_team_link_for_document_owner_team(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_item_access_denies_team_link_for_another_document_owner_team(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -857,7 +857,7 @@ async fn team_item_access_denies_team_link_for_another_document_owner_team(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_item_access_rejects_another_team(pool: PgPool) -> anyhow::Result<()> {
     let owning_team_id = Uuid::new_v4();
     let other_team_id = Uuid::new_v4();
@@ -888,7 +888,7 @@ async fn team_item_access_rejects_another_team(pool: PgPool) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_thread_access_does_not_inherit_inbox_ownership(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::new_v4();
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
@@ -898,7 +898,7 @@ async fn team_thread_access_does_not_inherit_inbox_ownership(pool: PgPool) -> an
     insert_pg_bot(&pool, bot_id, None, Some(team_id)).await?;
     sqlx::query!(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, 'pg-bot-owner@example.com', 'GMAIL')
         "#,
         link_id,
@@ -927,7 +927,7 @@ async fn team_thread_access_does_not_inherit_inbox_ownership(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_channel_role_uses_scoped_channel_rules(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::new_v4();
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
@@ -998,7 +998,7 @@ async fn insert_pg_direct_agent_conversation(
 /// conversation one teammate has with the persona must stay out of it: its
 /// channel, and everything shared there, including the conversation's
 /// sessions.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_scope_does_not_reach_a_direct_agent_conversation(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::new_v4();
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
@@ -1072,7 +1072,7 @@ async fn team_scope_does_not_reach_a_direct_agent_conversation(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_foreign_entity_access_uses_only_team_and_bot_pairs(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1115,7 +1115,7 @@ async fn team_foreign_entity_access_uses_only_team_and_bot_pairs(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_crm_access_is_view_only_for_visible_owned_rows(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::new_v4();
     insert_pg_bot_team(&pool, team_id).await?;
@@ -1153,7 +1153,7 @@ async fn team_crm_access_is_view_only_for_visible_owned_rows(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_scoped_repository_methods_reject_malformed_ids(pool: PgPool) -> anyhow::Result<()> {
     let repo = PgAccessRepository::new(pool);
     let bot_id = BotId::new_from_uuid(Uuid::new_v4());
@@ -1180,7 +1180,7 @@ async fn team_scoped_repository_methods_reject_malformed_ids(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_item_access_rejects_unsupported_entity_type(pool: PgPool) -> anyhow::Result<()> {
     let error = PgAccessRepository::new(pool)
         .get_team_entity_access(
@@ -1203,19 +1203,19 @@ const REMINDER_OWNER: &str = "macro|reminder-owner@example.com";
 const REMINDER_STRANGER: &str = "macro|reminder-stranger@example.com";
 
 async fn insert_reminder_user(pool: &PgPool, id: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::new_v4();
+    let rox_user_id = Uuid::new_v4();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         id,
     )
     .execute(pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await?;
@@ -1237,7 +1237,7 @@ async fn insert_reminder(pool: &PgPool, owner: &str) -> anyhow::Result<Uuid> {
 
 /// Reminder access is ownership and nothing else — the boundary
 /// `ReminderAccessExtractor` relies on to gate every reminder item route.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reminder_access_is_owner_for_the_owner_and_nothing_for_anyone_else(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1281,7 +1281,7 @@ async fn insert_calendar_event(pool: &PgPool, owner_id: &str, visibility: &str) 
     let link_id = Uuid::now_v7();
     sqlx::query(
         r#"
-        INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
         VALUES ($1, $2, $2, $1::text || '@example.com', 'GMAIL')
         "#,
     )
@@ -1310,7 +1310,7 @@ async fn insert_calendar_event(pool: &PgPool, owner_id: &str, visibility: &str) 
     event_id
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn calendar_event_channel_share_grants_current_participants_view(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1383,7 +1383,7 @@ async fn calendar_event_channel_share_grants_current_participants_view(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn direct_recipients_exclude_inherited_grants(pool: PgPool) -> anyhow::Result<()> {
     let entity_id = Uuid::now_v7();
     for (source, kind) in [

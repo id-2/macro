@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use async_recursion::async_recursion;
 use entity_registry::BotFacts;
 use entity_registry_db_utils::{OwnedEntityRegistrar, RegisteredEntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::{DocumentMetadata, FileType, FileTypeExt};
 use model::folder::{FileSystemNode, FileSystemNodeWithIds, UploadFolderWithIdsResponse};
 use model::project::Project;
@@ -75,7 +75,7 @@ async fn traverse_with_ids<B>(
     transaction: &mut Transaction<'_, Postgres>,
     registrar: &OwnedEntityRegistrar<B>,
     node: &FileSystemNode,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     share_permission: &SharePermissionV2,
     name: &str,
     parent_project: &Project,
@@ -145,7 +145,7 @@ where
 async fn create_pending_project<B: BotFacts>(
     transaction: &mut Transaction<'_, Postgres>,
     registrar: &OwnedEntityRegistrar<B>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     share_permission: &SharePermissionV2,
     name: &str,
     parent_id: Option<&str>,
@@ -197,7 +197,7 @@ async fn create_pending_project<B: BotFacts>(
 async fn create_empty_document<B: BotFacts>(
     transaction: &mut Transaction<'_, Postgres>,
     registrar: &OwnedEntityRegistrar<B>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     share_permission: &SharePermissionV2,
     item: &model::folder::FolderItem,
     project: &Project,
@@ -403,7 +403,7 @@ pub(super) async fn mark_projects_uploaded(
         .ok_or_else(|| {
             sqlx::Error::Protocol("updated project tree did not include its root".to_owned())
         })?;
-    let user_id = MacroUserIdStr::try_from(root.user_id.clone())
+    let user_id = RoxUserIdStr::try_from(root.user_id.clone())
         .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
 
     Ok(MarkedUploadedTree {

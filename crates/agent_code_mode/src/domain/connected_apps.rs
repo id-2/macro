@@ -10,7 +10,7 @@ use agent_session::domain::model::AgentSessionId;
 use ai_toolset::actor::ToolActor;
 use async_trait::async_trait;
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::inbound::toolset::{ConnectMcpServer, ConnectMcpServerResponse};
 use pipedream_mcp::domain::service::discovery::DiscoveryRequest;
 use pipedream_mcp::inbound::toolset::DiscoverConnectorsResponse;
@@ -122,9 +122,9 @@ pub struct ConnectedToolResult {
 #[derive(Clone, Debug)]
 pub struct SessionAccounts {
     /// The session owner.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The person behind the running turn; `None` for a system turn.
-    pub requester: Option<MacroUserIdStr<'static>>,
+    pub requester: Option<RoxUserIdStr<'static>>,
 }
 
 /// A running execution's admitted use: the account its calls spend.
@@ -135,7 +135,7 @@ pub struct ConnectedAppUse {
     /// The account choice the execution was approved for.
     pub acting_as: ToolActor,
     /// That choice resolved against the current turn.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
 }
 
 /// The session agent's connected apps, reached through the harness egress.
@@ -205,7 +205,7 @@ impl ConnectedAppService {
     async fn admit(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         execution: ExecutionId,
     ) -> Result<ConnectedAppUse, CodeModeError> {
         let session =
@@ -240,7 +240,7 @@ impl ConnectedAppService {
     pub async fn apps(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         execution: ExecutionId,
     ) -> Result<Vec<ConnectedApp>, CodeModeError> {
         let usage = self.admit(access, caller, execution).await?;
@@ -251,7 +251,7 @@ impl ConnectedAppService {
     pub async fn tools(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         execution: ExecutionId,
         app: ConnectedAppRef,
     ) -> Result<Vec<ConnectedTool>, CodeModeError> {
@@ -263,7 +263,7 @@ impl ConnectedAppService {
     pub async fn call(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         execution: ExecutionId,
         app: ConnectedAppRef,
         call: CallConnectedTool,
@@ -276,7 +276,7 @@ impl ConnectedAppService {
     pub async fn discover(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         execution: ExecutionId,
         request: DiscoveryRequest,
     ) -> Result<DiscoverConnectorsResponse, CodeModeError> {
@@ -288,7 +288,7 @@ impl ConnectedAppService {
     pub async fn add_server(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         execution: ExecutionId,
         server: ConnectMcpServer,
     ) -> Result<ConnectMcpServerResponse, CodeModeError> {
@@ -303,7 +303,7 @@ impl ConnectedAppService {
     pub async fn search_tools(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         execution: ExecutionId,
         query: &str,
     ) -> Result<ConnectedToolSearch, CodeModeError> {

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_graphql::Object;
 use email::domain::ports::EmailUserService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::user_objects::{GraphqlEmailLabel, GraphqlEmailLink};
 
@@ -14,7 +14,7 @@ pub struct GraphqlEmailQuery<S> {
     /// Email domain service supplied by the composition root.
     service: Arc<S>,
     /// Authenticated user whose catalogs may be loaded.
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 }
 
 impl<S> Clone for GraphqlEmailQuery<S> {
@@ -29,7 +29,7 @@ impl<S> Clone for GraphqlEmailQuery<S> {
 impl<S> GraphqlEmailQuery<S> {
     /// Create user-scoped email query fields from the authenticated identity and
     /// the application's email domain service.
-    pub fn new(service: Arc<S>, user_id: MacroUserIdStr<'static>) -> Self {
+    pub fn new(service: Arc<S>, user_id: RoxUserIdStr<'static>) -> Self {
         Self { service, user_id }
     }
 }

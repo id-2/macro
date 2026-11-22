@@ -1,6 +1,6 @@
 #[allow(unused_imports)]
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[test]
 fn test_init() {
@@ -96,8 +96,8 @@ fn test_edge_dedup_in_hashset() {
 
 #[test]
 fn test_complete_graph_pairwise_count() {
-    let users: Vec<MacroUserIdStr<'static>> = (0..12)
-        .map(|i| MacroUserIdStr::try_from(format!("macro|user{i}@test.com")).unwrap())
+    let users: Vec<RoxUserIdStr<'static>> = (0..12)
+        .map(|i| RoxUserIdStr::try_from(format!("macro|user{i}@test.com")).unwrap())
         .collect();
     let n = users.len();
     let graph = UndirectedGraph::new(users.iter().map(Vertex::new)).complete();
@@ -108,7 +108,7 @@ fn test_complete_graph_pairwise_count() {
 
 #[test]
 fn test_same_pointer_no_self_edge() {
-    let id = MacroUserIdStr::try_from("macro|dup@test.com".to_owned()).unwrap();
+    let id = RoxUserIdStr::try_from("macro|dup@test.com".to_owned()).unwrap();
     let graph = UndirectedGraph::new([Vertex::new(&id), Vertex::new(&id)]).complete();
     let edges: Vec<_> = graph.inner().edges().collect();
     assert!(edges.is_empty());

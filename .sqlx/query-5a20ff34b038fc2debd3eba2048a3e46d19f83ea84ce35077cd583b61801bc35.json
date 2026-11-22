@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id,macro_id,fusionauth_user_id,email_address,provider::text AS \"provider!\",\n            is_sync_active,is_primary,needs_reauth,last_sync_error_at,created_at,updated_at,sync_generation,grant_generation\n            FROM email_links WHERE id=$1",
+  "query": "SELECT id,rox_id,fusionauth_user_id,email_address,provider::text AS \"provider!\",\n            is_sync_active,is_primary,needs_reauth,last_sync_error_at,created_at,updated_at,sync_generation,grant_generation\n            FROM email_links WHERE id=$1",
   "describe": {
     "columns": [
       {
@@ -10,7 +10,7 @@
       },
       {
         "ordinal": 1,
-        "name": "macro_id",
+        "name": "rox_id",
         "type_info": "Text"
       },
       {

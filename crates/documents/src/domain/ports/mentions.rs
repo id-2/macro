@@ -2,7 +2,7 @@
 
 use std::future::Future;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Records the entity mentions embedded in a document's markdown, so a
 /// mentioned entity can surface the mentioning document in its references.
@@ -12,7 +12,7 @@ pub trait DocumentMentionTrackingPort: Send + Sync {
     fn track_document_mentions(
         &self,
         document_id: &str,
-        user_id: Option<&MacroUserIdStr<'static>>,
+        user_id: Option<&RoxUserIdStr<'static>>,
         markdown: &str,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
 }
@@ -25,7 +25,7 @@ impl DocumentMentionTrackingPort for NoOpDocumentMentionTracker {
     async fn track_document_mentions(
         &self,
         _document_id: &str,
-        _user_id: Option<&MacroUserIdStr<'static>>,
+        _user_id: Option<&RoxUserIdStr<'static>>,
         _markdown: &str,
     ) -> anyhow::Result<()> {
         Ok(())

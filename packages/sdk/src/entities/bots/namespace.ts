@@ -2,8 +2,8 @@ import type {
   BotChannel,
   Bot as BotRecord,
 } from '../../../generated/storage/types.gen';
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Bot, type CreateBotOptions } from './bot';
 
 /**
@@ -14,7 +14,7 @@ import { Bot, type CreateBotOptions } from './bot';
  * @routing Use when inspecting or managing bots and their channel access; not an agent's instructions, which are agents.
  */
 export class BotsNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to a bot by id. */
   byId(id: string): Bot {
@@ -48,7 +48,7 @@ export class BotsNamespace {
    */
   async me(): Promise<BotRecord> {
     if (this.client.authConfig.type !== 'bot') {
-      throw new MacroError(
+      throw new RoxError(
         'bots.me() requires bot auth — a user API key has no bot identity',
       );
     }
@@ -62,7 +62,7 @@ export class BotsNamespace {
    */
   async channels(): Promise<BotChannel[]> {
     if (this.client.authConfig.type !== 'bot') {
-      throw new MacroError(
+      throw new RoxError(
         'bots.channels() requires bot auth — a user API key has no bot identity',
       );
     }
@@ -77,13 +77,13 @@ export class BotsNamespace {
   /**
    * The authenticated bot's canonical principal id (`bot|<uuid>`) — the form
    * used for bot mentions, senders, and webhook `ids` filters. Cached on the
-   * client; see {@link MacroClient.myPrincipalId}.
+   * client; see {@link RoxClient.myPrincipalId}.
    *
    * @readonly
    */
   async myPrincipalId(): Promise<string> {
     if (this.client.authConfig.type !== 'bot') {
-      throw new MacroError(
+      throw new RoxError(
         'bots.myPrincipalId() requires bot auth — a user API key has no bot identity',
       );
     }

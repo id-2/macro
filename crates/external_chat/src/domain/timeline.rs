@@ -2,7 +2,7 @@
 use super::{models::*, ports::ExternalChatResult, rich::RichContent};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::{SharePermissionV2, UpdateSharePermissionRequestV2};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -432,7 +432,7 @@ pub trait TimelineRepository: Send + Sync {
     /// Candidate list already filtered by generic sharing.
     async fn visible_chats(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ExternalChatResult<Vec<VisibleChat>>;
     /// Facts for an authorized chat, for a viewer principal (a person or a
     /// bot, whose id is not a Rox user id).
@@ -456,7 +456,7 @@ pub trait TimelineRepository: Send + Sync {
     async fn mark_read(
         &self,
         chat: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         message: Uuid,
     ) -> ExternalChatResult<()>;
     /// Standard permission object.
@@ -470,7 +470,7 @@ pub trait TimelineRepository: Send + Sync {
     async fn update_permissions(
         &self,
         chat: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         update: &UpdateSharePermissionRequestV2,
         command: Option<
             &models_permissions::share_permission::team_share::AuthorizedTeamShareCommand,

@@ -210,7 +210,7 @@ describe('mapGraphqlEmailThreadPage', () => {
     expect(mapped.messages).toHaveLength(1);
     expect(mapped.messages[0]).toMatchObject({
       db_id: 'message-1',
-      body_macro: 'Rox',
+      body_rox: 'Rox',
       scheduled_send_time: '2026-08-07T12:00:00Z',
       scheduled_send_status: 'unconfirmed',
     });

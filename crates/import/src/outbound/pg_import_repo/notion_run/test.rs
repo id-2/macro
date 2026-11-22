@@ -1,16 +1,16 @@
 use std::time::Duration;
 
 use import_notion::domain::model::{ImportScope, NotionId};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use sqlx::PgPool;
 
 use super::*;
 use crate::domain::models::{ImportKind, ImportSource, ImportStatus};
 use crate::domain::ports::{ImportRepo, NotionPlanRepo, PlanRow};
 
-fn user(label: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|{label}@example.com"))
+fn user(label: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|{label}@example.com"))
         .unwrap()
         .into_owned()
 }
@@ -18,7 +18,7 @@ fn user(label: &str) -> MacroUserIdStr<'static> {
 const LEASE: Duration = Duration::from_secs(90);
 const STALE: Duration = Duration::from_secs(270);
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_is_held_renewed_and_released_by_its_owner_only(pool: PgPool) {
     let repo = PgImportRepo::new(pool);
     let alice = user("lease-owner");
@@ -74,7 +74,7 @@ async fn a_run_is_held_renewed_and_released_by_its_owner_only(pool: PgPool) {
     assert!(repo.renew_lease(&alice, other, LEASE).await.unwrap());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_expired_lease_is_adopted_once_and_a_finished_run_never(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let alice = user("lease-expired");
@@ -145,11 +145,11 @@ async fn an_expired_lease_is_adopted_once_and_a_finished_run_never(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_adopters_split_stalled_runs_without_overlap(pool: PgPool) {
     let repo = PgImportRepo::new(pool);
     let dead = Uuid::now_v7();
-    let users: Vec<MacroUserIdStr<'static>> = (0..6)
+    let users: Vec<RoxUserIdStr<'static>> = (0..6)
         .map(|index| user(&format!("lease-many-{index}")))
         .collect();
     for owner in &users {
@@ -189,7 +189,7 @@ async fn concurrent_adopters_split_stalled_runs_without_overlap(pool: PgPool) {
     assert_eq!(adopted, expected, "every run adopted exactly once");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_unleased_run_from_older_code_is_adopted_only_once_it_goes_quiet(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let alice = user("lease-legacy");
@@ -218,7 +218,7 @@ async fn an_unleased_run_from_older_code_is_adopted_only_once_it_goes_quiet(pool
     assert_eq!(adopted[0].job, None, "no job was recorded");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn written_objects_keep_their_first_record_and_stay_with_their_owner(pool: PgPool) {
     let repo = PgImportRepo::new(pool);
     let alice = user("written-owner");
@@ -286,7 +286,7 @@ async fn written_objects_keep_their_first_record_and_stay_with_their_owner(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rows_a_stopped_write_left_claimed_are_settled_only_once_no_write_runs(pool: PgPool) {
     let repo = PgImportRepo::new(pool);
     let alice = user("settle-owner");
@@ -336,7 +336,7 @@ async fn rows_a_stopped_write_left_claimed_are_settled_only_once_no_write_runs(p
     assert_eq!(row.last_error.as_deref(), Some("stopped"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_root_folder_outlives_the_run_that_made_it(pool: PgPool) {
     let repo = PgImportRepo::new(pool);
     let alice = user("root-folder");
@@ -361,7 +361,7 @@ async fn the_root_folder_outlives_the_run_that_made_it(pool: PgPool) {
     assert_eq!(repo.root_folder(&alice).await.unwrap(), Some(folder));
 }
 
-async fn review(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> Uuid {
+async fn review(pool: &PgPool, owner: &RoxUserIdStr<'static>) -> Uuid {
     let session = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO agent_session (id, owner_id, bot_id, harness, model, workspace, for_warming) VALUES ($1, $2, '00000000-0000-0000-0000-00000000a2a2', 'macro-inmem', 'test-model', '/workspace', false)"#,
@@ -383,7 +383,7 @@ async fn review(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> Uuid {
     review
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_reviewed_run_reports_its_review_and_a_cancel_survives_the_write_ending(pool: PgPool) {
     let repo = PgImportRepo::new(pool.clone());
     let alice = user("reviewed-run");
@@ -489,7 +489,7 @@ async fn a_reviewed_run_reports_its_review_and_a_cancel_survives_the_write_endin
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn workspace_sources_have_independent_leases_roots_and_adoption(pool: PgPool) {
     let repo = PgImportRepo::new(pool);
     let owner = user("multi-source");

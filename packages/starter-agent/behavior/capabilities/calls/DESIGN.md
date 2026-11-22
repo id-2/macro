@@ -14,7 +14,7 @@ options in `voices.ts`.
 
 ## What a call needs
 
-Only the agent's `MACRO_API_KEY`, and a call's process never holds it: it is
+Only the agent's `ROX_API_KEY`, and a call's process never holds it: it is
 started with the relay's environment (`base.relayed()`), and everything,
 speech included, goes through the agent's relay, which adds the key. On a
 computer it also runs under the agent's sandbox (`base.sandbox`), so neither

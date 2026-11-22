@@ -42,7 +42,7 @@ to read or render document content.
   and only trusts it when the URL is `localhost`/`127.0.0.1` over HTTPS —
   don't point this client at a real HTTPS host expecting that cert to help.
 - The internal-access header name (`x-internal-auth-key`) must match what
-  `lexical_service` expects; it's not read from `macro_auth`'s header
+  `lexical_service` expects; it's not read from `rox_auth`'s header
   constants.
 
 ## Related

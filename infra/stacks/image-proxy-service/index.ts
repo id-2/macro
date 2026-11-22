@@ -35,11 +35,11 @@ const jwtSecretKeyArn: pulumi.Output<string> = aws.secretsmanager
   .getSecretVersionOutput({ secretId: JWT_SECRET_KEY })
   .apply((secret) => secret.arn);
 
-const MACRO_API_TOKENS = getMacroApiToken();
+const ROX_API_TOKENS = getMacroApiToken();
 
 const secretKeyArns = [
   pulumi.interpolate`${jwtSecretKeyArn}`,
-  pulumi.interpolate`${MACRO_API_TOKENS.macroApiTokenPublicKeyArn}`,
+  pulumi.interpolate`${ROX_API_TOKENS.macroApiTokenPublicKeyArn}`,
 ];
 
 const imageProxyService = new ImageProxyService(

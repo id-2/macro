@@ -1,7 +1,7 @@
 #![recursion_limit = "256"]
 use anyhow::Context;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_entrypoint::MacroEntrypoint;
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_entrypoint::RoxEntrypoint;
 
 mod api;
 mod config;
@@ -10,9 +10,9 @@ mod service;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_rox_aws_config().await;
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
     );

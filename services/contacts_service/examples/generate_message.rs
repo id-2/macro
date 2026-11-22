@@ -1,9 +1,9 @@
 // Small utility to generate a sample connections message to send to the SQS service
 use contacts::domain::models::messages::ContactsNodes;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{collections::HashSet, env};
 
-fn print_contacts_message(users: HashSet<MacroUserIdStr<'static>>) {
+fn print_contacts_message(users: HashSet<RoxUserIdStr<'static>>) {
     println!(
         "{}",
         serde_json::to_string(&ContactsNodes { users }).unwrap()
@@ -11,7 +11,7 @@ fn print_contacts_message(users: HashSet<MacroUserIdStr<'static>>) {
 }
 
 async fn genmsg_add_user_to_group() {
-    let mut users: HashSet<MacroUserIdStr<'static>> = [
+    let mut users: HashSet<RoxUserIdStr<'static>> = [
         "macro|alice@rox.one",
         "macro|bob@rox.one",
         "macro|carol@rox.one",
@@ -21,14 +21,14 @@ async fn genmsg_add_user_to_group() {
         "macro|grace@rox.one",
     ]
     .iter()
-    .map(|s| MacroUserIdStr::try_from(s.to_string()).unwrap())
+    .map(|s| RoxUserIdStr::try_from(s.to_string()).unwrap())
     .collect();
-    users.insert(MacroUserIdStr::try_from("macro|henry@rox.one".to_string()).unwrap());
+    users.insert(RoxUserIdStr::try_from("macro|henry@rox.one".to_string()).unwrap());
     print_contacts_message(users);
 }
 
 async fn genmsg_add_paul() {
-    let mut users: HashSet<MacroUserIdStr<'static>> = [
+    let mut users: HashSet<RoxUserIdStr<'static>> = [
         "macro|zeus@olympus.mountain",
         "macro|athena@olympus.mountain",
         "macro|apollo@olympus.mountain",
@@ -36,14 +36,14 @@ async fn genmsg_add_paul() {
         "macro|poseidon@olympus.mountain",
     ]
     .iter()
-    .map(|s| MacroUserIdStr::try_from(s.to_string()).unwrap())
+    .map(|s| RoxUserIdStr::try_from(s.to_string()).unwrap())
     .collect();
-    users.insert(MacroUserIdStr::try_from("macro|paul@rox.one".to_string()).unwrap());
+    users.insert(RoxUserIdStr::try_from("macro|paul@rox.one".to_string()).unwrap());
     print_contacts_message(users);
 }
 
 async fn genmsg_create_group() {
-    let users: HashSet<MacroUserIdStr<'static>> = [
+    let users: HashSet<RoxUserIdStr<'static>> = [
         "macro|jupiter@olympus.mountain",
         "macro|athena@olympus.mountain",
         "macro|mercury@olympus.mountain",
@@ -51,13 +51,13 @@ async fn genmsg_create_group() {
         "macro|paul@rox.one",
     ]
     .iter()
-    .map(|s| MacroUserIdStr::try_from(s.to_string()).unwrap())
+    .map(|s| RoxUserIdStr::try_from(s.to_string()).unwrap())
     .collect();
     print_contacts_message(users);
 }
 
 async fn genmsg_add_participants() {
-    let users: HashSet<MacroUserIdStr<'static>> = [
+    let users: HashSet<RoxUserIdStr<'static>> = [
         "macro|an@uruk.place",
         "macro|enlil@nippur.place",
         "macro|enki@eridu.place",
@@ -66,7 +66,7 @@ async fn genmsg_add_participants() {
         "macro|poseidon@olympus.mountain",
     ]
     .iter()
-    .map(|s| MacroUserIdStr::try_from(s.to_string()).unwrap())
+    .map(|s| RoxUserIdStr::try_from(s.to_string()).unwrap())
     .collect();
     print_contacts_message(users);
 }

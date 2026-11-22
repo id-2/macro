@@ -1,7 +1,7 @@
 use super::*;
 
 mod seat_requests;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use serde::{Serialize, de::DeserializeOwned};
 use serde_json::{Value, json};
 use std::str::FromStr;
@@ -117,7 +117,7 @@ fn response<T: Serialize + DeserializeOwned>(value: &T) -> Value {
     panic!("invalid stripe fixture")
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pending_status_reads_only_the_callers_seat_from_an_active_owned_schedule(
     pool: sqlx::PgPool,
 ) {
@@ -135,7 +135,7 @@ async fn pending_status_reads_only_the_callers_seat_from_an_active_owned_schedul
     )
     .await;
     let repo = repo(&server, pool);
-    let user = MacroUserIdStr::try_from("macro|max@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("macro|max@example.com").unwrap();
     repo.schedule_seat_plan(&sub.id, &user, Some(SeatPlan::Premium))
         .await
         .unwrap();
@@ -152,7 +152,7 @@ async fn pending_status_reads_only_the_callers_seat_from_an_active_owned_schedul
     sched.status = stripe::SubscriptionScheduleStatus::Active;
     sched.metadata.as_mut().unwrap().insert(
         PENDING_KEY.into(),
-        update["metadata[macro_pending_seats]"].clone(),
+        update["metadata[rox_pending_seats]"].clone(),
     );
     mount(
         &server,
@@ -184,7 +184,7 @@ async fn pending_status_reads_only_the_callers_seat_from_an_active_owned_schedul
             .unwrap()
             .is_none()
     );
-    let other = MacroUserIdStr::try_from("macro|other@example.com").unwrap();
+    let other = RoxUserIdStr::try_from("macro|other@example.com").unwrap();
     assert!(
         repo.scheduled_seat_plan(&sub.id, &sched.id, &other)
             .await
@@ -224,14 +224,14 @@ async fn pending_status_reads_only_the_callers_seat_from_an_active_owned_schedul
             .is_none()
     );
 }
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pending_seat_plans_reads_all_members_once_and_excludes_applied_or_untrusted_changes(
     pool: sqlx::PgPool,
 ) {
     let server = MockServer::start().await;
     let mut sub = subscription();
     let mut sched = schedule();
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
     let members = json!({"macro|one@example.com": "premium", "macro|two@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
@@ -344,7 +344,7 @@ pub(super) fn form(request: &wiremock::Request) -> HashMap<String, String> {
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn downgrade_preserves_current_prices_and_terms_then_keep_max_releases_schedule(
     pool: sqlx::PgPool,
 ) {
@@ -362,7 +362,7 @@ async fn downgrade_preserves_current_prices_and_terms_then_keep_max_releases_sch
     )
     .await;
     let repo = repo(&server, pool.clone());
-    let user = MacroUserIdStr::try_from("macro|max@example.com").unwrap();
+    let user = RoxUserIdStr::try_from("macro|max@example.com").unwrap();
     repo.schedule_seat_plan(&sub.id, &user, Some(SeatPlan::Premium))
         .await
         .unwrap();
@@ -431,14 +431,14 @@ async fn downgrade_preserves_current_prices_and_terms_then_keep_max_releases_sch
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unrelated_upgrade_keeps_other_seats_pending_and_prorates_only_current_phase(
     pool: sqlx::PgPool,
 ) {
     let server = MockServer::start().await;
     let mut sub = subscription();
     let mut sched = schedule();
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
     let members = json!({"macro|one@example.com": "premium", "macro|two@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
@@ -487,11 +487,11 @@ async fn unrelated_upgrade_keeps_other_seats_pending_and_prorates_only_current_p
     assert_eq!(update["phases[1][proration_behavior]"], "none");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn scheduled_members_are_returned_only_after_the_provider_renews(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
     let members = json!({"macro|max@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
@@ -507,7 +507,7 @@ async fn scheduled_members_are_returned_only_after_the_provider_renews(pool: sql
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn personal_upgrade_replaces_the_existing_item_and_invoices_proration(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -560,11 +560,11 @@ async fn personal_upgrade_replaces_the_existing_item_and_invoices_proration(pool
         .unwrap();
     assert!(release < upgrade);
     assert!(
-        chrono::DateTime::parse_from_rfc3339(&update["metadata[macro_plan_change_at]"]).is_ok()
+        chrono::DateTime::parse_from_rfc3339(&update["metadata[rox_plan_change_at]"]).is_ok()
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pro_trial_upgrade_to_max_ends_the_trial_and_bills_now(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -589,7 +589,7 @@ async fn pro_trial_upgrade_to_max_ends_the_trial_and_bills_now(pool: sqlx::PgPoo
     assert_eq!(update["proration_behavior"], "always_invoice");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn moving_a_trial_seat_to_max_ends_the_trial(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -612,7 +612,7 @@ async fn moving_a_trial_seat_to_max_ends_the_trial(pool: sqlx::PgPool) {
     assert_eq!(update["billing_cycle_anchor"], "now");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn adding_a_pro_seat_during_a_trial_keeps_the_trial(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -635,7 +635,7 @@ async fn adding_a_pro_seat_during_a_trial_keeps_the_trial(pool: sqlx::PgPool) {
     assert!(update.get("billing_cycle_anchor").is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn seat_changes_on_a_max_trial_keep_the_trial(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -670,13 +670,13 @@ async fn seat_changes_on_a_max_trial_keep_the_trial(pool: sqlx::PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_max_trial_seat_change_keeps_scheduled_downgrades(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
     sub.status = stripe::SubscriptionStatus::Trialing;
     let mut sched = schedule();
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let at = chrono::DateTime::from_timestamp(sub.current_period_end, 0).unwrap();
     let members = json!({"macro|one@example.com": "premium"});
     sqlx::query!("INSERT INTO subscription_plan_schedule (id, subscription_id, effective_at, member_plans) VALUES ($1, 'sub_team', $2, $3)", id, at, members).execute(&pool).await.unwrap();
@@ -728,7 +728,7 @@ async fn a_max_trial_seat_change_keeps_scheduled_downgrades(pool: sqlx::PgPool) 
     assert_eq!(update["phases[1][items][1][quantity]"], "3");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_instances_preserve_all_scheduled_members_and_seat_additions(
     pool: sqlx::PgPool,
 ) {
@@ -763,7 +763,7 @@ async fn concurrent_instances_preserve_all_scheduled_members_and_seat_additions(
             let mut state = write.lock().unwrap();
             state.1.metadata.as_mut().unwrap().insert(
                 PENDING_KEY.into(),
-                fields["metadata[macro_pending_seats]"].clone(),
+                fields["metadata[rox_pending_seats]"].clone(),
             );
             let original = state.1.phases[0].clone();
             state.1.phases = (0..2)
@@ -812,8 +812,8 @@ async fn concurrent_instances_preserve_all_scheduled_members_and_seat_additions(
     let two = repo(&server, pool.clone());
     let seats = repo(&server, pool);
     let subscription = "sub_team".parse().unwrap();
-    let first = MacroUserIdStr::try_from("macro|one@example.com").unwrap();
-    let second = MacroUserIdStr::try_from("macro|two@example.com").unwrap();
+    let first = RoxUserIdStr::try_from("macro|one@example.com").unwrap();
+    let second = RoxUserIdStr::try_from("macro|two@example.com").unwrap();
     let (a, b, c) = tokio::join!(
         one.schedule_seat_plan(&subscription, &first, Some(SeatPlan::Premium)),
         two.schedule_seat_plan(&subscription, &second, Some(SeatPlan::Premium)),
@@ -844,7 +844,7 @@ async fn concurrent_instances_preserve_all_scheduled_members_and_seat_additions(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cancelling_a_guard_holder_releases_the_subscription_for_another_instance(
     pool: sqlx::PgPool,
 ) {
@@ -915,7 +915,7 @@ async fn subscription_for_customer(
     found
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_trialing_subscription_is_linked_when_none_is_active(pool: sqlx::PgPool) {
     let found = subscription_for_customer(
         pool,
@@ -929,7 +929,7 @@ async fn a_trialing_subscription_is_linked_when_none_is_active(pool: sqlx::PgPoo
     assert_eq!(found.as_ref().map(|id| id.as_str()), Some("sub_trial"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_active_subscription_wins_over_a_trial(pool: sqlx::PgPool) {
     let found = subscription_for_customer(
         pool,
@@ -943,7 +943,7 @@ async fn an_active_subscription_wins_over_a_trial(pool: sqlx::PgPool) {
     assert_eq!(found.as_ref().map(|id| id.as_str()), Some("sub_active"));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unpaid_or_incomplete_subscriptions_are_not_linked(pool: sqlx::PgPool) {
     let found = subscription_for_customer(
         pool,
@@ -956,7 +956,7 @@ async fn unpaid_or_incomplete_subscriptions_are_not_linked(pool: sqlx::PgPool) {
     assert!(matches!(found, Ok(None)));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_subscription_listing_is_an_error_not_a_free_customer(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     Mock::given(method("GET"))
@@ -988,7 +988,7 @@ pub(super) fn computer(delta: i64) -> ItemQuantityChange {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_absent_item_price_is_added_idempotently_and_must_be_paid(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -1023,7 +1023,7 @@ async fn an_absent_item_price_is_added_idempotently_and_must_be_paid(pool: sqlx:
                 "error_if_incomplete".to_string()
             ),
             (
-                "metadata[macro_item_change]".to_string(),
+                "metadata[rox_item_change]".to_string(),
                 "purchase-1".to_string()
             ),
         ])
@@ -1034,7 +1034,7 @@ async fn an_absent_item_price_is_added_idempotently_and_must_be_paid(pool: sqlx:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_existing_item_price_gains_the_delta(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -1061,7 +1061,7 @@ async fn an_existing_item_price_gains_the_delta(pool: sqlx::PgPool) {
     assert!(update.get("items[0][price]").is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn seat_and_computer_changes_join_one_update(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -1094,7 +1094,7 @@ async fn seat_and_computer_changes_join_one_update(pool: sqlx::PgPool) {
     assert_eq!(update["items[1][quantity]"], "3");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_item_reaching_zero_is_deleted_without_crediting_unused_time(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -1122,7 +1122,7 @@ async fn an_item_reaching_zero_is_deleted_without_crediting_unused_time(pool: sq
     assert_eq!(update["proration_behavior"], "none");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_change_below_zero_is_rejected_before_stripe(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -1148,7 +1148,7 @@ async fn a_change_below_zero_is_rejected_before_stripe(pool: sqlx::PgPool) {
     assert!(subscription_update(&requests).is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_retried_item_change_is_not_applied_twice(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();
@@ -1170,7 +1170,7 @@ async fn a_retried_item_change_is_not_applied_twice(pool: sqlx::PgPool) {
     assert!(subscription_update(&requests).is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_declined_item_change_is_a_payment_failure(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let sub = subscription();
@@ -1202,7 +1202,7 @@ async fn a_declined_item_change_is_a_payment_failure(pool: sqlx::PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn subscription_terms_and_prices_are_read_from_stripe(pool: sqlx::PgPool) {
     let server = MockServer::start().await;
     let mut sub = subscription();

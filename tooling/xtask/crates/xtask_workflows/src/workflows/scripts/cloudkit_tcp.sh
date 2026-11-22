@@ -12,7 +12,7 @@ fi
 # https://developer.apple.com/documentation/security/customizing-the-notarization-workflow
 pf_dir=$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/macro-cloudkit-pf.XXXXXX")
 pf_rules="$pf_dir/rules"
-anchor="com.apple/macro_cloudkit_${GITHUB_RUN_ID:-0}_${GITHUB_RUN_ATTEMPT:-0}_${pf_dir##*.}"
+anchor="com.apple/rox_cloudkit_${GITHUB_RUN_ID:-0}_${GITHUB_RUN_ATTEMPT:-0}_${pf_dir##*.}"
 pf_token=''
 pf_loaded=0
 

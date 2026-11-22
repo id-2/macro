@@ -33,7 +33,7 @@ const theme: CallKitDrawerTheme = {
 
 describe('native drawer theme bridge', () => {
   beforeEach(() => {
-    window.__MACRO_ANDROID_CALL_KIT__ = true;
+    window.__ROX_ANDROID_CALL_KIT__ = true;
     bridge.platform = 'android';
     bridge.native = true;
     bridge.invoke.mockClear();

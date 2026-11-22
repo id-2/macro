@@ -32,7 +32,7 @@ impl StreamableHttpClient for TracedClient {
             }
         }
         let mut trace = http::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut trace);
+        rox_tower_layers::inject_trace_headers(&mut trace);
         for (name, value) in &trace {
             headers.entry(name.clone()).or_insert_with(|| value.clone());
         }

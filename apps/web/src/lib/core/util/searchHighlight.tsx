@@ -1,13 +1,13 @@
 /**
  * Utilities for extracting information from search highlight content
- * that contains <macro_em> tags marking matched terms.
+ * that contains <rox_em> tags marking matched terms.
  */
 import { For } from 'solid-js';
 
 const INVISIBLE_CHARS_RE =
   /(?:[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u00AD\u2800-\u28FF]|\u034F)+/g;
-const MACRO_EM_SPLIT_RE = /(<macro_em>.*?<\/macro_em>)/gs;
-const MACRO_EM_UNWRAP_RE = /^<macro_em>(.*)<\/macro_em>$/s;
+const ROX_EM_SPLIT_RE = /(<rox_em>.*?<\/rox_em>)/gs;
+const ROX_EM_UNWRAP_RE = /^<rox_em>(.*)<\/rox_em>$/s;
 
 /** Collapses newlines, extra whitespace, and invisible Unicode characters into a clean single line. */
 function stripInvisibleChars(text: string): string {
@@ -18,27 +18,27 @@ function stripInvisibleChars(text: string): string {
     .trim();
 }
 
-/** Returns the visible character count after stripping invisible chars and `<macro_em>` tags. */
+/** Returns the visible character count after stripping invisible chars and `<rox_em>` tags. */
 export function visibleLength(content: string): number {
   return stripInvisibleChars(content)
-    .replace(/<\/?macro_em>/g, '')
+    .replace(/<\/?rox_em>/g, '')
     .trim().length;
 }
 
 /**
- * Extracts terms from macro_em tags in the highlighted content.
+ * Extracts terms from rox_em tags in the highlighted content.
  * Returns array of text strings that should be highlighted, preserving order and duplicates.
  *
- * @param highlightedContent - Content with <macro_em> tags marking matches
+ * @param highlightedContent - Content with <rox_em> tags marking matches
  * @returns Array of matched terms
  *
  * @example
- * extractSearchTerms("The <macro_em>quick</macro_em> brown <macro_em>fox</macro_em>")
+ * extractSearchTerms("The <rox_em>quick</rox_em> brown <rox_em>fox</rox_em>")
  * // Returns: ["quick", "fox"]
  */
 export function extractSearchTerms(highlightedContent: string): string[] {
   const terms: string[] = [];
-  const macroEmRegex = /<macro_em>(.*?)<\/macro_em>/gs;
+  const macroEmRegex = /<rox_em>(.*?)<\/rox_em>/gs;
   const matches = Array.from(highlightedContent.matchAll(macroEmRegex));
 
   for (const match of matches) {
@@ -49,40 +49,40 @@ export function extractSearchTerms(highlightedContent: string): string[] {
 }
 
 /**
- * Extracts the full snippet from highlighted content by removing macro_em tags.
+ * Extracts the full snippet from highlighted content by removing rox_em tags.
  * Whitespace is normalized and trimmed.
  * This provides context for the search result.
  *
- * @param highlightedContent - Content with <macro_em> tags marking matches
+ * @param highlightedContent - Content with <rox_em> tags marking matches
  * @returns Clean text snippet with normalized whitespace
  *
  * @example
- * extractSearchSnippet("The <macro_em>quick</macro_em>\n  brown   fox")
+ * extractSearchSnippet("The <rox_em>quick</rox_em>\n  brown   fox")
  * // Returns: "The quick brown fox"
  */
 export function extractSearchSnippet(highlightedContent: string): string {
-  const rawContent = highlightedContent.replace(/<\/?macro_em>/g, '');
+  const rawContent = highlightedContent.replace(/<\/?rox_em>/g, '');
   return rawContent.replace(/\s+/g, ' ').trim();
 }
 
 /**
- * Merges adjacent macro_em tags in highlighted content.
- * When multiple macro_em tags appear consecutively (with only whitespace between them),
- * they are merged into a single macro_em tag.
+ * Merges adjacent rox_em tags in highlighted content.
+ * When multiple rox_em tags appear consecutively (with only whitespace between them),
+ * they are merged into a single rox_em tag.
  *
- * @param highlightedContent - Content with <macro_em> tags marking matches
- * @returns Content with adjacent macro_em tags merged
- *
- * @example
- * mergeAdjacentMacroEmTags("The <macro_em>quick</macro_em> <macro_em>brown</macro_em> fox")
- * // Returns: "The <macro_em>quick brown</macro_em> fox"
+ * @param highlightedContent - Content with <rox_em> tags marking matches
+ * @returns Content with adjacent rox_em tags merged
  *
  * @example
- * mergeAdjacentMacroEmTags("<macro_em>Hello</macro_em> <macro_em>world</macro_em>, <macro_em>goodbye</macro_em>")
- * // Returns: "<macro_em>Hello world</macro_em>, <macro_em>goodbye</macro_em>"
+ * mergeAdjacentMacroEmTags("The <rox_em>quick</rox_em> <rox_em>brown</rox_em> fox")
+ * // Returns: "The <rox_em>quick brown</rox_em> fox"
+ *
+ * @example
+ * mergeAdjacentMacroEmTags("<rox_em>Hello</rox_em> <rox_em>world</rox_em>, <rox_em>goodbye</rox_em>")
+ * // Returns: "<rox_em>Hello world</rox_em>, <rox_em>goodbye</rox_em>"
  */
 export function mergeAdjacentMacroEmTags(highlightedContent: string): string {
-  return highlightedContent.replace(/<\/macro_em>(\s+)<macro_em>/g, '$1');
+  return highlightedContent.replace(/<\/rox_em>(\s+)<rox_em>/g, '$1');
 }
 
 /** Escapes regex special characters in a string. */
@@ -99,11 +99,11 @@ function buildTermsPattern(terms: readonly string[]): RegExp | undefined {
   return new RegExp(`(${terms.map(escapeRegex).join('|')})`, 'gi');
 }
 
-/** Wraps each occurrence of the given terms in `<macro_em>` tags (case-insensitive). */
+/** Wraps each occurrence of the given terms in `<rox_em>` tags (case-insensitive). */
 export function highlightTermsInText(text: string, terms: string[]): string {
   const pattern = buildTermsPattern(terms);
   if (!pattern) return text;
-  return text.replace(pattern, '<macro_em>$1</macro_em>');
+  return text.replace(pattern, '<rox_em>$1</rox_em>');
 }
 
 /**
@@ -207,20 +207,20 @@ export function applyDomHighlights(
 }
 
 /**
- * Creates a single-line window around the first <macro_em> highlight.
+ * Creates a single-line window around the first <rox_em> highlight.
  * - Collapses newlines and invisible chars into a clean single line
  * - If the highlight is within `chars` of the start, keeps the start
  * - Otherwise, trims the front to show context before the highlight
  * - Trims the end to keep total visible length reasonable
  *
- * @param text - Content with <macro_em> tags
+ * @param text - Content with <rox_em> tags
  * @param chars - Max visible characters to show on each side of the highlight
  */
 export function windowSearchMatch(text: string, chars: number): string {
   let line = stripInvisibleChars(text);
 
-  const macroOpen = '<macro_em>';
-  const macroClose = '</macro_em>';
+  const macroOpen = '<rox_em>';
+  const macroClose = '</rox_em>';
   const tagIndex = line.indexOf(macroOpen);
   if (tagIndex === -1) return line;
 
@@ -228,19 +228,19 @@ export function windowSearchMatch(text: string, chars: number): string {
 
   const visibleBefore = line
     .slice(0, tagIndex)
-    .replace(/<\/?macro_em>/g, '').length;
+    .replace(/<\/?rox_em>/g, '').length;
   const visibleAfter =
     lastCloseIndex === -1
       ? 0
       : line
           .slice(lastCloseIndex + macroClose.length)
-          .replace(/<\/?macro_em>/g, '').length;
+          .replace(/<\/?rox_em>/g, '').length;
   const visibleMatch =
     lastCloseIndex === -1
       ? 0
       : line
           .slice(tagIndex, lastCloseIndex + macroClose.length)
-          .replace(/<\/?macro_em>/g, '').length;
+          .replace(/<\/?rox_em>/g, '').length;
 
   const totalBudget = Math.max(0, chars * 2 - visibleMatch);
   const frontKeep = Math.max(chars, totalBudget - visibleAfter);
@@ -265,7 +265,7 @@ export function windowSearchMatch(text: string, chars: number): string {
     const afterLastTag = finalCloseIndex + macroClose.length;
     const remainingVisible = line
       .slice(afterLastTag)
-      .replace(/<\/?macro_em>/g, '').length;
+      .replace(/<\/?rox_em>/g, '').length;
     if (remainingVisible > backKeep) {
       let endCut = afterLastTag + backKeep;
       for (let i = endCut; i < line.length; i++) {
@@ -282,17 +282,17 @@ export function windowSearchMatch(text: string, chars: number): string {
 }
 
 /**
- * Parses text containing `<macro_em>` tags into an array of segments.
+ * Parses text containing `<rox_em>` tags into an array of segments.
  * Each segment is either plain text or a highlighted match.
  */
 export function parseSearchHighlightSegments(
   text: string
 ): Array<{ text: string; highlight: boolean }> {
-  const parts = text.split(MACRO_EM_SPLIT_RE);
+  const parts = text.split(ROX_EM_SPLIT_RE);
   const segments: Array<{ text: string; highlight: boolean }> = [];
   for (const part of parts) {
     if (!part) continue;
-    const match = MACRO_EM_UNWRAP_RE.exec(part);
+    const match = ROX_EM_UNWRAP_RE.exec(part);
     if (match) {
       segments.push({ text: match[1], highlight: true });
     } else {

@@ -11,10 +11,10 @@ import type {
   StorageRowsQuery,
   TableDetail,
 } from '../../../generated/storage/types.gen';
-import { Lazy, MacroNotFoundError, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { Lazy, RoxNotFoundError, paginate, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { PropertyOption } from '../properties/property-option';
 import {
   type SharePermissionOptions,
@@ -46,7 +46,7 @@ export type PipelineStageRequirement = {
 };
 
 /** A CRM pipeline with its own sharing boundary and backing table. */
-export class CrmPipeline extends MacroEntity<AccessiblePipeline> {
+export class CrmPipeline extends RoxEntity<AccessiblePipeline> {
   private readonly tableDetail = new Lazy(async () =>
     unwrap(
       await this.client.storage.getCrmPipelineTable({ path: { id: this.id } }),
@@ -54,12 +54,12 @@ export class CrmPipeline extends MacroEntity<AccessiblePipeline> {
   );
 
   /** Construct a lazy pipeline handle. */
-  static byId(client: MacroClient, id: string): CrmPipeline {
+  static byId(client: RoxClient, id: string): CrmPipeline {
     return new CrmPipeline(client, id);
   }
 
   /** Seed from a server record. */
-  static from(client: MacroClient, record: AccessiblePipeline): CrmPipeline {
+  static from(client: RoxClient, record: AccessiblePipeline): CrmPipeline {
     return new CrmPipeline(client, record.id, record);
   }
 
@@ -174,7 +174,7 @@ export class CrmPipeline extends MacroEntity<AccessiblePipeline> {
     const column = (id: string) => {
       const record = detail.columns.find((entry) => entry.column.id === id);
       if (!record)
-        throw new MacroNotFoundError(
+        throw new RoxNotFoundError(
           'A required field was deleted; reload the pipeline',
         );
       return PipelineColumn.from(this.client, table, record);
@@ -187,7 +187,7 @@ export class CrmPipeline extends MacroEntity<AccessiblePipeline> {
         (entry) => entry.id === rule.stageId,
       );
       if (!record || !option)
-        throw new MacroNotFoundError(
+        throw new RoxNotFoundError(
           'A required stage was deleted; reload the pipeline',
         );
       return {
@@ -650,14 +650,14 @@ function entryTarget(
  *
  * @mcp-exclude Built from a listing record; no id-only reference an MCP call can pass.
  */
-export class PipelineTable extends MacroEntity<TableDetail> {
+export class PipelineTable extends RoxEntity<TableDetail> {
   /** Serialize identity within its pipeline. */
   override toJSON() {
     return { ...super.toJSON(), pipelineId: this.pipeline.id };
   }
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** Parent pipeline. */
     readonly pipeline: CrmPipeline,
     record: TableDetail,
@@ -667,7 +667,7 @@ export class PipelineTable extends MacroEntity<TableDetail> {
 
   /** Seed a table from a pipeline table response. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     pipeline: CrmPipeline,
     record: TableDetail,
   ): PipelineTable {
@@ -756,7 +756,7 @@ export class PipelineView {
       (view) => view.id === this.id,
     );
     if (!found)
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `view ${this.id} is not on table ${this.table.id}`,
       );
     return found;
@@ -784,14 +784,14 @@ export class PipelineView {
 }
 
 /** One pipeline row. */
-export class PipelineRow extends MacroEntity<StorageRow> {
+export class PipelineRow extends RoxEntity<StorageRow> {
   /** Serialize identity within its pipeline. */
   override toJSON() {
     return { ...super.toJSON(), pipelineId: this.pipeline.id };
   }
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** Parent pipeline. */
     readonly pipeline: CrmPipeline,
     id: string,
@@ -802,7 +802,7 @@ export class PipelineRow extends MacroEntity<StorageRow> {
 
   /** Construct a scoped row handle. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     pipeline: CrmPipeline,
     id: string,
   ): PipelineRow {
@@ -811,7 +811,7 @@ export class PipelineRow extends MacroEntity<StorageRow> {
 
   /** Seed a listed row. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     pipeline: CrmPipeline,
     record: StorageRow,
   ): PipelineRow {
@@ -821,7 +821,7 @@ export class PipelineRow extends MacroEntity<StorageRow> {
   protected async fetch(): Promise<StorageRow> {
     for await (const row of this.pipeline.queryRows({ rows: [this] }))
       if (row.id === this.id) return row.detail.get();
-    throw new MacroNotFoundError(`Pipeline row ${this.id} is unavailable`);
+    throw new RoxNotFoundError(`Pipeline row ${this.id} is unavailable`);
   }
 
   /** Values keyed by property definition. */
@@ -843,7 +843,7 @@ export class PipelineRow extends MacroEntity<StorageRow> {
  *
  * @mcp-exclude Built from a listing record; no id-only reference an MCP call can pass.
  */
-export class PipelineColumn extends MacroEntity<ColumnDetail> {
+export class PipelineColumn extends RoxEntity<ColumnDetail> {
   /** Serialize identity within its pipeline. */
   override toJSON() {
     return {
@@ -854,7 +854,7 @@ export class PipelineColumn extends MacroEntity<ColumnDetail> {
   }
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** Parent table. */
     readonly table: PipelineTable,
     record: ColumnDetail,
@@ -864,7 +864,7 @@ export class PipelineColumn extends MacroEntity<ColumnDetail> {
 
   /** Seed a column handle. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     table: PipelineTable,
     record: ColumnDetail,
   ): PipelineColumn {
@@ -876,7 +876,7 @@ export class PipelineColumn extends MacroEntity<ColumnDetail> {
       (c) => c.column.id === this.id,
     );
     if (!record)
-      throw new MacroNotFoundError(`Pipeline column ${this.id} is unavailable`);
+      throw new RoxNotFoundError(`Pipeline column ${this.id} is unavailable`);
     return record;
   }
 

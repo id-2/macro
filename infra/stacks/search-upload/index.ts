@@ -27,7 +27,7 @@ const searchUploadHandler = new SearchUploadHandler(
   {
     envVars: {
       ENVIRONMENT: pulumi.interpolate`${stack}`,
-      RUST_LOG: 'search_upload_handler=info,macro_http_request=info',
+      RUST_LOG: 'search_upload_handler=info,rox_http_request=info',
       DOCUMENT_STORAGE_SERVICE_URL: getServiceUrl(
         ServiceUrl.DOCUMENT_STORAGE_SERVICE_URL
       ),

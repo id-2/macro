@@ -15,15 +15,15 @@ use entity_access::{
         models::{AdminTeamRole, MemberTeamRole},
         ports::EntityAccessService,
     },
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
 use hosted_runtimes::domain::{agent::AgentEnrollmentError, enrollment::EnrollmentGeneration};
-use macro_authorization::{
-    AccountHolderOrInternal, InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    AccountHolderOrInternal, InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -39,7 +39,7 @@ pub struct TeamAgentsRouterState<S, Eas, Auth> {
     /// The entity access service, for team role checks.
     pub entity_access_service: Arc<Eas>,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Eas, Auth> Clone for TeamAgentsRouterState<S, Eas, Auth> {
@@ -58,7 +58,7 @@ impl<S, Eas, Auth> FromRef<TeamAgentsRouterState<S, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<S, Eas, Auth> FromRef<TeamAgentsRouterState<S, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Eas, Auth> FromRef<TeamAgentsRouterState<S, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &TeamAgentsRouterState<S, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -115,7 +115,7 @@ pub fn team_agents_router<S, Eas, Auth, T>(state: TeamAgentsRouterState<S, Eas, 
 where
     S: TeamAgentService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -156,15 +156,15 @@ where
 )]
 #[tracing::instrument(err, skip_all)]
 pub async fn create_team_agent_handler<S, Eas, Auth>(
-    _authorization: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    _authorization: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<TeamAgentsRouterState<S, Eas, Auth>>,
     Json(body): Json<CreateTeamAgent>,
 ) -> Result<(StatusCode, Json<TeamAgent>), TeamAgentError>
 where
     S: TeamAgentService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let agent = state
         .service
@@ -188,13 +188,13 @@ where
 )]
 #[tracing::instrument(err, skip_all)]
 pub async fn list_team_agents_handler<S, Eas, Auth>(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<TeamAgentsRouterState<S, Eas, Auth>>,
 ) -> Result<Json<TeamAgents>, TeamAgentError>
 where
     S: TeamAgentService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state.service.list(access.entity_access_receipt).await?,
@@ -229,17 +229,17 @@ pub struct AgentPath {
 )]
 #[tracing::instrument(err, skip_all)]
 pub async fn delete_team_agent_handler<S, Eas, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<TeamAgentsRouterState<S, Eas, Auth>>,
     Path(path): Path<AgentPath>,
 ) -> Result<StatusCode, TeamAgentError>
 where
     S: TeamAgentService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
-    let agent = MacroUserIdStr::parse_from_str(&path.agent_user_id)
-        .map(MacroUserIdStr::into_owned)
+    let agent = RoxUserIdStr::parse_from_str(&path.agent_user_id)
+        .map(RoxUserIdStr::into_owned)
         .map_err(|_| TeamAgentError::InvalidAgentId)?;
     state
         .service
@@ -268,17 +268,17 @@ where
 )]
 #[tracing::instrument(err, skip_all)]
 pub async fn get_team_agent_voice_handler<S, Eas, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<TeamAgentsRouterState<S, Eas, Auth>>,
     Path(path): Path<AgentPath>,
 ) -> Result<Json<AgentVoice>, TeamAgentError>
 where
     S: TeamAgentService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
-    let agent = MacroUserIdStr::parse_from_str(&path.agent_user_id)
-        .map(MacroUserIdStr::into_owned)
+    let agent = RoxUserIdStr::parse_from_str(&path.agent_user_id)
+        .map(RoxUserIdStr::into_owned)
         .map_err(|_| TeamAgentError::InvalidAgentId)?;
     Ok(Json(
         state
@@ -309,7 +309,7 @@ where
 )]
 #[tracing::instrument(err, skip_all)]
 pub async fn set_team_agent_voice_handler<S, Eas, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<TeamAgentsRouterState<S, Eas, Auth>>,
     Path(path): Path<AgentPath>,
     Json(voice): Json<AgentVoice>,
@@ -317,10 +317,10 @@ pub async fn set_team_agent_voice_handler<S, Eas, Auth>(
 where
     S: TeamAgentService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
-    let agent = MacroUserIdStr::parse_from_str(&path.agent_user_id)
-        .map(MacroUserIdStr::into_owned)
+    let agent = RoxUserIdStr::parse_from_str(&path.agent_user_id)
+        .map(RoxUserIdStr::into_owned)
         .map_err(|_| TeamAgentError::InvalidAgentId)?;
     Ok(Json(
         state
@@ -335,7 +335,7 @@ pub struct AgentEnrollmentRouterState<S, Auth> {
     /// The team agent service.
     pub service: Arc<S>,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for AgentEnrollmentRouterState<S, Auth> {
@@ -347,7 +347,7 @@ impl<S, Auth> Clone for AgentEnrollmentRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<AgentEnrollmentRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<AgentEnrollmentRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AgentEnrollmentRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -358,7 +358,7 @@ impl<S, Auth> FromRef<AgentEnrollmentRouterState<S, Auth>> for MacroAuthorizatio
 pub fn agent_enrollment_router<S, Auth, T>(state: AgentEnrollmentRouterState<S, Auth>) -> Router<T>
 where
     S: TeamAgentService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -373,13 +373,13 @@ where
 /// the enrollment, 204 when the computer runs no agent. Never cached.
 #[tracing::instrument(skip_all, fields(%computer_id, generation), err)]
 pub async fn issue_agent_enrollment_handler<S, Auth>(
-    _authorization: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _authorization: RoxAuthorizationExtractor<Auth, InternalOnly>,
     State(state): State<AgentEnrollmentRouterState<S, Auth>>,
     Path((computer_id, generation)): Path<(Uuid, u32)>,
 ) -> Result<Response, StatusCode>
 where
     S: TeamAgentService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let issued = state
         .service

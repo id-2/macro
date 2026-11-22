@@ -1,6 +1,6 @@
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 
 use super::*;
@@ -40,7 +40,7 @@ async fn action_with_id(pool: &PgPool, id: Uuid, filters: Value) {
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id)
+        r#"INSERT INTO "User" (id, email, rox_user_id)
            SELECT $1, $1, id FROM macro_user WHERE email = $1 ON CONFLICT DO NOTHING"#,
         USER,
     )
@@ -84,7 +84,7 @@ async fn admit(repo: &PgEventRunRepo, action_id: Uuid, event: &EventReference) {
 
 fn authorized(pending: PendingEventRun) -> AuthorizedEventRun {
     let access = EntityAccessReceipt::<ViewAccessLevel>::dangerously_assert_authenticated_user(
-        MacroUserIdStr::parse_from_str(USER).unwrap(),
+        RoxUserIdStr::parse_from_str(USER).unwrap(),
         &pending.event.entity_id().unwrap().to_string(),
         EntityType::Document,
     );
@@ -139,7 +139,7 @@ async fn state(pool: &PgPool, key: EventRunKey) -> (String, Option<Value>, Optio
     (row.state, row.outcome, row.execution_record_id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_duplicate_admission_and_cascade_cleanup(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     let (a, b) = tokio::join!(
@@ -187,7 +187,7 @@ async fn concurrent_duplicate_admission_and_cascade_cleanup(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn candidates_exact_recheck_activation_and_keyset_pages(pool: PgPool) {
     let entity_id = generate_uuid_v7();
     let event = new_event(entity_id);
@@ -270,7 +270,7 @@ struct AllowAccess;
 impl crate::domain::event_runs::CurrentOwnerAccess for AllowAccess {
     async fn authorize(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         event: &EventReference,
     ) -> Result<Option<crate::domain::event_runs::EventAccessCapability>, Report> {
         Ok(Some(
@@ -285,7 +285,7 @@ impl crate::domain::event_runs::CurrentOwnerAccess for AllowAccess {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_skips_invalid_first_and_middle_pages_without_truncating_fanout(pool: PgPool) {
     use crate::domain::event_runs::{
         EventIngestion, EventIngestionResult, admission::EventAdmissionService,
@@ -310,7 +310,7 @@ async fn admission_skips_invalid_first_and_middle_pages_without_truncating_fanou
     let valid = json!([{"events": ["document.updated"]}]);
     action_with_id(&pool, malformed_owner, valid.clone()).await;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id)
+        r#"INSERT INTO "User" (id, email, rox_user_id)
            SELECT $1, $1, id FROM macro_user WHERE email = $2"#,
         "invalid private owner",
         USER,
@@ -420,7 +420,7 @@ fn invalid_configuration_classifications_do_not_include_persisted_content() {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_workers_fifo_and_independent_actions(pool: PgPool) {
     let (repo, id, earlier_event) = setup(&pool).await;
     let later_event = new_event(earlier_event.entity_id().unwrap());
@@ -452,7 +452,7 @@ async fn two_workers_fifo_and_independent_actions(pool: PgPool) {
     assert!(claim(&repo, next[0].clone()).await.is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn manual_claim_blocks_events_and_foreign_tokens_cannot_finalize(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -506,7 +506,7 @@ async fn manual_claim_blocks_events_and_foreign_tokens_cannot_finalize(pool: PgP
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn expired_started_is_interrupted_and_never_requeued(pool: PgPool) {
     let (repo, id, first) = setup(&pool).await;
     let second = new_event(first.entity_id().unwrap());
@@ -542,7 +542,7 @@ async fn expired_started_is_interrupted_and_never_requeued(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconcile_does_not_release_a_replaced_token(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -573,7 +573,7 @@ async fn reconcile_does_not_release_a_replaced_token(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cancellation_claim_race_has_one_terminal_direction(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -601,7 +601,7 @@ async fn cancellation_claim_race_has_one_terminal_direction(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn revision_disable_and_cancellation_rechecks(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -654,7 +654,7 @@ async fn revision_disable_and_cancellation_rechecks(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rejected_claims_release_locks_for_immediate_retry(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -685,7 +685,7 @@ async fn rejected_claims_release_locks_for_immediate_retry(pool: PgPool) {
     observer.rollback().await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn locked_actions_do_not_block_independent_dispatch(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -707,7 +707,7 @@ async fn locked_actions_do_not_block_independent_dispatch(pool: PgPool) {
     tx.rollback().await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_bookkeeping_rolls_back_history_and_claim(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -740,7 +740,7 @@ async fn failed_bookkeeping_rolls_back_history_and_claim(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn expired_manual_claim_can_be_replaced_without_stale_release(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -770,7 +770,7 @@ async fn expired_manual_claim_can_be_replaced_without_stale_release(pool: PgPool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_waits_for_configuration_lock_and_rechecks_disable(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     let mut tx = pool.begin().await.unwrap();
@@ -800,7 +800,7 @@ async fn admission_waits_for_configuration_lock_and_rechecks_disable(pool: PgPoo
     assert!(repo.pending_runs(page(1)).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reconcile_is_bounded_and_stale_configuration_does_not_cancel_started(pool: PgPool) {
     let (repo, id, first) = setup(&pool).await;
     let second = new_event(first.entity_id().unwrap());
@@ -829,7 +829,7 @@ async fn reconcile_is_bounded_and_stale_configuration_does_not_cancel_started(po
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn invalid_deadlines_leave_the_run_pending(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -868,7 +868,7 @@ async fn invalid_deadlines_leave_the_run_pending(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delayed_bookkeeping_can_finish_before_reconciliation(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -900,7 +900,7 @@ async fn delayed_bookkeeping_can_finish_before_reconciliation(pool: PgPool) {
     assert!(finished.2.is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_mixed_routine_admits_events_without_consuming_its_schedule(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     let filters = json!([{"events":["document.updated"]}]);
@@ -927,7 +927,7 @@ async fn a_mixed_routine_admits_events_without_consuming_its_schedule(pool: PgPo
     assert_eq!(actual.unwrap().timestamp_micros(), next.timestamp_micros());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn property_changes_match_general_selectors_without_duplicate_runs(pool: PgPool) {
     let entity_id = generate_uuid_v7();
     let general = action(
@@ -997,7 +997,7 @@ fn skipped_record(action_id: Uuid) -> ActionExecutionRecord {
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn skipping_finishes_pending_run_and_links_its_history(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -1035,7 +1035,7 @@ async fn skipping_finishes_pending_run_and_links_its_history(pool: PgPool) {
     assert!(repo.pending_runs(page(1)).await.unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn skipping_leaves_started_or_superseded_runs_without_history(pool: PgPool) {
     let (repo, id, event) = setup(&pool).await;
     admit(&repo, id, &event).await;
@@ -1073,7 +1073,7 @@ async fn skipping_leaves_started_or_superseded_runs_without_history(pool: PgPool
     assert_eq!(records, Some(0));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn conditions_do_not_change_candidate_matching(pool: PgPool) {
     let id = action(
         &pool,
@@ -1099,7 +1099,7 @@ async fn conditions_do_not_change_candidate_matching(pool: PgPool) {
     admit(&repo, id, &event).await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_run_keeps_its_change_source_and_writes_the_key_only_when_set(pool: PgPool) {
     let sourced_action = action(&pool, json!([{"events":["task.status_changed"]}])).await;
     let plain_action = action(&pool, json!([{"events":["task.status_changed"]}])).await;
@@ -1159,7 +1159,7 @@ fn github_event(event: &str) -> EventReference {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn github_candidates_narrow_on_the_event_and_keep_the_payload(pool: PgPool) {
     let workflow_runs = action(
         &pool,
@@ -1196,7 +1196,7 @@ async fn github_candidates_narrow_on_the_event_and_keep_the_payload(pool: PgPool
     assert_eq!(pending[0].event, event);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_finished_github_run_keeps_no_payload(pool: PgPool) {
     let id = action(&pool, json!([{"events": ["github"], "github": {}}])).await;
     let repo = PgEventRunRepo::new(pool.clone());

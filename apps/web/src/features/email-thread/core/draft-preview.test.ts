@@ -12,7 +12,7 @@ it('previews what the reply says, not the thread it quotes', () => {
     draftPreviewText(
       html(
         '<div><span>Sounds good,</span></div><div><span>see you then</span></div>' +
-          '<div class="macro_quote gmail_quote">On Oct 11, Jonas wrote: the old message</div>'
+          '<div class="rox_quote gmail_quote">On Oct 11, Jonas wrote: the old message</div>'
       )
     )
   ).toBe('Sounds good, see you then');

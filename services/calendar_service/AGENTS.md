@@ -24,7 +24,7 @@ gateway `/calendar` prefix.
 
 - Depends on: `calendar_events`, `calendar_scheduling` (domain crates owning
   the Postgres/Google adapters), `connection_gateway_client`,
-  `authentication_service_client`, `macro_authorization`, `macro_service_urls`.
+  `authentication_service_client`, `rox_authorization`, `rox_service_urls`.
 - Used by: the web app and SDK calendar clients, through the gateway.
 
 ## Recipes
@@ -47,7 +47,7 @@ gateway `/calendar` prefix.
 
 ## Gotchas
 
-- The API's server spans come from `macro_tower_layers` (`api::traced`).
+- The API's server spans come from `rox_tower_layers` (`api::traced`).
   tower-http's default `TraceLayer` span is DEBUG, below the exporter's INFO
   filter, so an API wrapped in it sends no server spans.
 

@@ -4,7 +4,7 @@ use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::domain::model::{CrmCompanyContactsQuery, CrmError};
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -116,7 +116,7 @@ async fn seed_company(pool: &PgPool) -> anyhow::Result<(Uuid, Uuid, Vec<Uuid>)> 
     Ok((team_id, company_id, hidden))
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pages_hold_the_full_list_in_its_order(pool: PgPool) -> anyhow::Result<()> {
     let (team_id, company_id, hidden) = seed_company(&pool).await?;
     let repo = CompaniesRepositoryImpl::new(pool);
@@ -169,7 +169,7 @@ async fn pages_hold_the_full_list_in_its_order(pool: PgPool) -> anyhow::Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn last_page_has_no_cursor(pool: PgPool) -> anyhow::Result<()> {
     let (team_id, company_id, _) = seed_company(&pool).await?;
     let repo = CompaniesRepositoryImpl::new(pool);
@@ -189,7 +189,7 @@ async fn last_page_has_no_cursor(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_matches_name_or_primary_email_ignoring_case(pool: PgPool) -> anyhow::Result<()> {
     let (team_id, company_id, _) = seed_company(&pool).await?;
     let repo = CompaniesRepositoryImpl::new(pool);
@@ -233,7 +233,7 @@ async fn search_matches_name_or_primary_email_ignoring_case(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn archived_company_lists_every_contact_as_archived(pool: PgPool) -> anyhow::Result<()> {
     let (team_id, company_id, _) = seed_company(&pool).await?;
     sqlx::query!(
@@ -269,7 +269,7 @@ async fn archived_company_lists_every_contact_as_archived(pool: PgPool) -> anyho
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn empty_company_returns_empty_page(pool: PgPool) -> anyhow::Result<()> {
     let team_id = Uuid::now_v7();
     seed_team(&pool, team_id, "macro|owner@owner.test").await?;
@@ -284,7 +284,7 @@ async fn empty_company_returns_empty_page(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn other_team_and_unknown_company_are_not_found(pool: PgPool) -> anyhow::Result<()> {
     let (team_a, company_a, _) = seed_company(&pool).await?;
     let team_b = Uuid::now_v7();
@@ -303,7 +303,7 @@ async fn other_team_and_unknown_company_are_not_found(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn search_pages_follow_their_cursor_to_the_filtered_list(pool: PgPool) -> anyhow::Result<()> {
     let (team_id, company_id, hidden) = seed_company(&pool).await?;
     let repo = CompaniesRepositoryImpl::new(pool);
@@ -345,7 +345,7 @@ async fn search_pages_follow_their_cursor_to_the_filtered_list(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn cursor_names_the_list_it_continues(pool: PgPool) -> anyhow::Result<()> {
     let (team_id, company_id, _) = seed_company(&pool).await?;
     let repo = CompaniesRepositoryImpl::new(pool);
@@ -391,7 +391,7 @@ async fn add_address(
 /// The page path builds each contact exactly as the full read does: every
 /// field, the address order, and which addresses are on a domain of the
 /// contact's own company in its own team.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn page_contacts_equal_the_full_read(pool: PgPool) -> anyhow::Result<()> {
     let (team_id, company_id, _) = seed_company(&pool).await?;
     // Another company of the team, and another team, each with a domain the

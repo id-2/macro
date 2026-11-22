@@ -1,4 +1,4 @@
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES
     ('b1111111-1111-1111-1111-111111111111', 'paid-owner@example.com', 'paid-owner@example.com', 'cus_paid_owner'),
     ('b2222222-2222-2222-2222-222222222222', 'paid-member@example.com', 'paid-member@example.com', 'cus_paid_member'),
@@ -7,7 +7,7 @@ VALUES
     ('b5555555-5555-5555-5555-555555555555', 'enterprise-owner@example.com', 'enterprise-owner@example.com', 'cus_enterprise_owner'),
     ('b6666666-6666-6666-6666-666666666666', 'enterprise-member@example.com', 'enterprise-member@example.com', 'cus_enterprise_member');
 
-INSERT INTO "User" ("id", "email", "name", "stripeCustomerId", "macro_user_id")
+INSERT INTO "User" ("id", "email", "name", "stripeCustomerId", "rox_user_id")
 VALUES
     ('macro|paid-owner@example.com', 'paid-owner@example.com', 'Paid Owner', NULL, 'b1111111-1111-1111-1111-111111111111'),
     ('macro|paid-member@example.com', 'paid-member@example.com', 'Paid Member', NULL, 'b2222222-2222-2222-2222-222222222222'),

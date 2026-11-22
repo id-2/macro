@@ -9,14 +9,14 @@ use entity_access::domain::models::{
 };
 use entity_access::domain::ports::EntityAccessService;
 use http_body_util::BodyExt;
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::{
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_user::UserContext;
 use models_permissions::share_permission::SharePermissionV2;
@@ -50,8 +50,8 @@ fn now() -> DateTime<Utc> {
         .expect("unambiguous instant")
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER_ID)
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER_ID)
         .expect("valid user id")
         .into_owned()
 }
@@ -126,10 +126,10 @@ fn sample_page() -> crate::domain::reads::InitiativePage {
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != VALID_JWT {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(user_context())
     }
@@ -137,18 +137,18 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -176,7 +176,7 @@ impl Default for FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -185,7 +185,7 @@ impl EntityAccessService for FakeEntityAccessService {
             return Err(AccessError::internal("test access failure"));
         }
         EntityAccessReceipt::try_new_authenticated_user(
-            MacroUserIdStr::parse_from_str(USER_ID)
+            RoxUserIdStr::parse_from_str(USER_ID)
                 .expect("valid user id")
                 .clone(),
             Entity {
@@ -211,7 +211,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -223,7 +223,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -242,7 +242,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -252,7 +252,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -263,7 +263,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
 
@@ -283,7 +283,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
@@ -356,7 +356,7 @@ impl InitiativeService for FakeInitiativeService {
 
     async fn create_attributed(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: CreateInitiativeRequest,
         _attribution: ::activity::Attribution,
     ) -> Result<InitiativeDetail, InitiativeError> {
@@ -364,7 +364,7 @@ impl InitiativeService for FakeInitiativeService {
     }
     async fn page(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         request: crate::domain::reads::InitiativePageRequest,
     ) -> Result<crate::domain::reads::InitiativePage, InitiativeError> {
         self.record(ServiceCall::Page(request));
@@ -385,7 +385,7 @@ impl InitiativeService for FakeInitiativeService {
 
     async fn create(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         request: CreateInitiativeRequest,
     ) -> Result<InitiativeDetail, InitiativeError> {
         reject_name(&request.name)?;
@@ -413,7 +413,7 @@ impl InitiativeService for FakeInitiativeService {
         Ok(sample_detail())
     }
 
-    async fn list(&self, _user_id: &MacroUserIdStr<'_>) -> Result<InitiativeList, InitiativeError> {
+    async fn list(&self, _user_id: &RoxUserIdStr<'_>) -> Result<InitiativeList, InitiativeError> {
         self.record(ServiceCall::List);
         Ok(sample_list())
     }
@@ -448,7 +448,7 @@ impl InitiativeService for FakeInitiativeService {
     async fn grant_assignees(
         &self,
         _receipt: EntityAccessReceipt<EditAccessLevel>,
-        _user_ids: Vec<MacroUserIdStr<'static>>,
+        _user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> Result<(), InitiativeError> {
         Ok(())
     }
@@ -466,7 +466,7 @@ fn build_router(service: FakeInitiativeService, access: FakeEntityAccessService)
     initiative_router(InitiativeRouterState::new(
         Arc::new(service),
         Arc::new(access),
-        MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     ))
 }
 
@@ -986,7 +986,7 @@ fn build_activity_router() -> axum::Router {
             access.clone(),
         )),
         access,
-        MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     ))
 }
 

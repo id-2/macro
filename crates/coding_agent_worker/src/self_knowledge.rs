@@ -6,7 +6,7 @@
 
 use std::collections::HashMap;
 
-use agent_session::domain::model::MACRO_PERMISSION_POLICY_META_KEY;
+use agent_session::domain::model::ROX_PERMISSION_POLICY_META_KEY;
 use serde_json::Value;
 
 #[cfg(test)]
@@ -109,7 +109,7 @@ fn session_facts(params: &Value) -> SessionFacts {
             .collect(),
         permission_bypass: params
             .pointer("/_meta")
-            .and_then(|meta| meta.get(MACRO_PERMISSION_POLICY_META_KEY))
+            .and_then(|meta| meta.get(ROX_PERMISSION_POLICY_META_KEY))
             .and_then(Value::as_str)
             == Some("autoAccept"),
     }

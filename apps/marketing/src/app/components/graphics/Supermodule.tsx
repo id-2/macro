@@ -7,7 +7,7 @@ const BOB_KEYFRAMES: Keyframe[] = [
   { transform: 'translateY(4px)' },
 ];
 
-const FRONT_CAP_MACRO_TRANSFORM = createOrthoPerspectiveTransform({
+const FRONT_CAP_ROX_TRANSFORM = createOrthoPerspectiveTransform({
   scale: 0.42,
   translateX: 428.5,
   translateY: 408.4,
@@ -168,7 +168,7 @@ export function Supermodule(props: {
           <path d="M528.7,389.6c0,33.7-29.1,72.7-65,87.1-35.9,14.4-65-1.3-65-35.1s29.1-72.7,65-87.1c35.9-14.4,65,1.3,65,35.1Z" />
           <g
             class="supermodule-macro-logo"
-            transform={FRONT_CAP_MACRO_TRANSFORM}
+            transform={FRONT_CAP_ROX_TRANSFORM}
           >
             <image
               href="/macro-favicon.svg"

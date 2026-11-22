@@ -1,6 +1,6 @@
 import { type RichMessage, toBody } from '../../mentions';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Document } from '../documents/document';
 import type { StaticImage } from '../images/image';
 import { Channel } from './channel';
@@ -13,14 +13,14 @@ import { postToChannel } from './post';
  */
 export class Thread {
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     readonly channelId: string,
     /** The id of the message this thread hangs off. */
     readonly rootId: string,
   ) {}
 
   /** A handle to the thread under the message `rootId` in `channel`. */
-  static byId(client: MacroClient, channel: Channel, rootId: string): Thread {
+  static byId(client: RoxClient, channel: Channel, rootId: string): Thread {
     return new Thread(client, channel.id, rootId);
   }
 

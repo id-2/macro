@@ -6,7 +6,7 @@ use agent::{AgentLoop, StreamPart, to_rig_messages};
 use ai_tools::{AiToolSet, ToolServiceContext, ToolSetWithPrompt};
 use async_trait::async_trait;
 use futures::StreamExt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::ports::AgentResponder;
 
@@ -36,7 +36,7 @@ impl AgentLoopResponder {
 impl AgentResponder for AgentLoopResponder {
     #[tracing::instrument(skip(self, prompt, user_id), err)]
     async fn respond(&self, user_id: &str, prompt: String) -> anyhow::Result<String> {
-        let user_id = MacroUserIdStr::try_from(user_id.to_string())?;
+        let user_id = RoxUserIdStr::try_from(user_id.to_string())?;
         let toolset: Arc<dyn ai_toolset::ToolSet<ToolServiceContext> + Send + Sync> =
             self.toolset.clone();
 

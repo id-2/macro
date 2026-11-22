@@ -16,7 +16,7 @@ use axum::{
     routing::post,
 };
 use entity_registry::{CreationPrincipalExtractor, NonUserOwners};
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use utoipa::ToSchema;
@@ -203,7 +203,7 @@ pub struct ImageGenerationRouterState<Svc, Auth> {
     /// Image generation, admitted against the caller's AI allowance.
     pub service: Arc<Svc>,
     /// Authenticates callers.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
     /// Whether a team bot with no acting user may create.
     pub non_user_owners: NonUserOwners,
 }
@@ -218,7 +218,7 @@ impl<Svc, Auth> Clone for ImageGenerationRouterState<Svc, Auth> {
     }
 }
 
-impl<Svc, Auth> FromRef<ImageGenerationRouterState<Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<Svc, Auth> FromRef<ImageGenerationRouterState<Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ImageGenerationRouterState<Svc, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -236,7 +236,7 @@ pub fn image_generation_router<Svc, Auth, S>(
 ) -> Router<S>
 where
     Svc: ImageGenerationService + 'static,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -277,7 +277,7 @@ where
 )]
 pub async fn generate_image_handler<
     Svc: ImageGenerationService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ImageGenerationRouterState<Svc, Auth>>,
     CreationPrincipalExtractor { principal, .. }: CreationPrincipalExtractor<Auth>,

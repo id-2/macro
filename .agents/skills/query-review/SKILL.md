@@ -12,7 +12,7 @@ pages. Such a query usually looks harmless in the diff: one extra predicate,
 one helper function, a scope widened from a user to a team.
 
 This review finds each changed query, works out how many rows it touches at
-production size, and records the evidence. It reviews cost only. Macro usage,
+production size, and records the evidence. It reviews cost only. Rox usage,
 the `.sqlx` cache, and injection are the
 [`sqlx-query-validator`](../sqlx-query-validator/SKILL.md)'s job. How to write
 a query so it passes is the [`query-writing`](../query-writing/SKILL.md)

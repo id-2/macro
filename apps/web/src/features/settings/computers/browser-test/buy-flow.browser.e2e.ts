@@ -93,7 +93,7 @@ const harness: RegisteredHarness = {
   last_connected_at: null,
   allow_permission_bypass: true,
   computer_id: 'computer-1',
-  claude_mode: 'macro_credits',
+  claude_mode: 'rox_credits',
 };
 
 const json = (route: Route, status: number, body: unknown) =>

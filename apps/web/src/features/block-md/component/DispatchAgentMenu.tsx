@@ -1,4 +1,4 @@
-import { openMacroMcpSetupModal } from '@app/features/integrations/mcp-setup/MacroMcpSetupModal';
+import { openMacroMcpSetupModal } from '@app/features/integrations/mcp-setup/RoxMcpSetupModal';
 import type { CustomFileOperation } from '@components/app/split-layout/components/SplitFileMenu';
 import type { SplitFileMenuAction } from '@components/app/split-layout/context';
 import { editorStateAsMarkdown } from '@core/component/LexicalMarkdown/utils';

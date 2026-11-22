@@ -345,24 +345,24 @@ impl calendar_events::domain::ports::CalendarMutationService for RecordingCalend
 }
 
 impl calendar_events::domain::ports::CalendarMacroCallService for RecordingCalendarMutations {
-    async fn create_event_with_macro_call(
+    async fn create_event_with_rox_call(
         &self,
         _requester_id: &str,
         _email_link_id: Option<Uuid>,
         _calendar_id: Option<Uuid>,
         _draft: calendar_events::domain::models::CalendarEventDraft,
-    ) -> Result<CalendarEvent, calendar_events::domain::meeting_links::MacroCallEventError> {
+    ) -> Result<CalendarEvent, calendar_events::domain::meeting_links::RoxCallEventError> {
         unreachable!("only deletion is exercised")
     }
 
-    async fn update_event_with_macro_call(
+    async fn update_event_with_rox_call(
         &self,
         _requester_id: &str,
         _event_id: uuid::Uuid,
         _calendar_id: Option<uuid::Uuid>,
         _patch: calendar_events::domain::models::CalendarEventPatch,
         _scope: calendar_events::domain::ports::CalendarUpdateScope,
-    ) -> Result<CalendarEvent, calendar_events::domain::meeting_links::MacroCallEventError> {
+    ) -> Result<CalendarEvent, calendar_events::domain::meeting_links::RoxCallEventError> {
         unreachable!("only deletion is exercised")
     }
 }
@@ -385,7 +385,7 @@ async fn calendar_mutations_run_for_the_authenticated_viewer() {
                     ),
                     authenticated_parts(),
                 )
-                .data(MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap())
+                .data(RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap())
                 .data(context),
         )
         .await;

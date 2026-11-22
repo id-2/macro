@@ -5,8 +5,8 @@ use super::*;
 use crate::domain::models::{PreviewView, PreviewViewStandardLabel};
 use filter_ast::Expr;
 use item_filters::ast::email::{Email, EmailLiteral};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::email::EmailStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::email::EmailStr;
 use uuid::Uuid;
 
 /// The inbox the single-inbox tests' contacts belong to.
@@ -46,7 +46,7 @@ fn build_thread_email_filter(ast: &Expr<EmailLiteral>, sort_ts_field: &str) -> S
     super::filters::build_thread_email_filter(ast, sort_ts_field, &ResolvedFilters::empty())
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::ROX_DB_MIGRATIONS")]
 async fn date_literals_match_nothing_and_preserve_negation(pool: sqlx::PgPool) {
     use item_filters::ast::properties::{DateRange, PropertiesLiteral, PropertyMatchValue};
 

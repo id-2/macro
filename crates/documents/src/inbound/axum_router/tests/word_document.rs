@@ -63,7 +63,7 @@ async fn word_router(
 }
 
 fn claims(body: &Value) -> Value {
-    macro_sync_service_jwt::decode(body["documentToken"].as_str().unwrap(), SECRET).unwrap()
+    rox_sync_service_jwt::decode(body["documentToken"].as_str().unwrap(), SECRET).unwrap()
 }
 
 fn edit_request(authenticate: Authenticate, body: Value) -> Request<Body> {

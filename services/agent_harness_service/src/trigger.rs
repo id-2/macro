@@ -23,11 +23,11 @@ use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer, consumer_span, record_span_error};
 use lexical_client::LexicalClient;
-use macro_event_broker::{
-    KafkaConsumerAdapter, KafkaEventPublisher, MacroEventBrokerService, MacroEventCollection,
-    MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, KafkaEventPublisher, RoxEventBrokerService, RoxEventCollection,
+    RoxEventConsumerService,
 };
-use macro_service_urls::{DocumentStorageServiceUrl, LexicalServiceUrl, StaticFileServiceUrl};
+use rox_service_urls::{DocumentStorageServiceUrl, LexicalServiceUrl, StaticFileServiceUrl};
 use messages::domain::api::MessageServiceApi;
 use messages::outbound::pg_message_repo::PgMessageRepository;
 use properties::{
@@ -66,11 +66,11 @@ type Trigger = AgentTriggerService<
         >,
     >,
 >;
-type Publisher = MacroEventBrokerService<KafkaEventPublisher, macro_event_broker::GlobalSpawner>;
+type Publisher = RoxEventBrokerService<KafkaEventPublisher, rox_event_broker::GlobalSpawner>;
 type ChannelTypes = ChannelRepoTypeLookup<PgChannelsRepo>;
 
 type TriggerKafkaAdapter<M> = KafkaConsumerAdapter<AgentTriggerConsumerGroup, M>;
-type TriggerConsumer<M> = MacroEventConsumerService<M, TriggerKafkaAdapter<M>>;
+type TriggerConsumer<M> = RoxEventConsumerService<M, TriggerKafkaAdapter<M>>;
 
 // Project inheritance adds agents only, which do not receive human notifications.
 struct SilentAssignmentNotifications;
@@ -86,7 +86,7 @@ impl properties::NotificationService for SilentAssignmentNotifications {
     }
 }
 
-fn commit_message<M: MacroEventCollection + 'static>(
+fn commit_message<M: RoxEventCollection + 'static>(
     consumer: &TriggerConsumer<M>,
     message: &BorrowedMessage<'_>,
 ) -> anyhow::Result<()> {
@@ -226,7 +226,7 @@ async fn run(
             PgChannelsRepo::new(pool.clone()),
             bots::domain::service::BotServiceImpl::new(
                 PgBotsRepo::new(pool.clone()),
-                macro_event_broker::NoopMacroEventBroker,
+                rox_event_broker::NoopMacroEventBroker,
                 crate::computers::harness_service(&pool),
             ),
             PgAgentSessionRepo::new(
@@ -237,9 +237,9 @@ async fn run(
     ))
     .with_admission(admission);
     let channel_types = ChannelRepoTypeLookup::new(PgChannelsRepo::new(pool.clone()));
-    let publisher = MacroEventBrokerService::new(
+    let publisher = RoxEventBrokerService::new(
         KafkaEventPublisher::new(&kafka_brokers)?,
-        macro_event_broker::GlobalSpawner,
+        rox_event_broker::GlobalSpawner,
     );
     let project_assignments = ProjectAssignmentService::new(
         PropertiesServiceImpl::new(
@@ -333,8 +333,8 @@ async fn consume<Events: TriggerEvents>(
                 }
             };
             tracing::Span::current()
-                .record("macro.event.id", tracing::field::display(decoded.event_id));
-            tracing::Span::current().record("macro.event.type", decoded.event_type);
+                .record("rox.event.id", tracing::field::display(decoded.event_id));
+            tracing::Span::current().record("rox.event.type", decoded.event_type);
 
             if let Some(posted) = &decoded.posted {
                 process_message_event(

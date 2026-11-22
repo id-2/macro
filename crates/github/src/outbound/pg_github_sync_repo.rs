@@ -5,12 +5,12 @@ mod test;
 
 use std::collections::HashSet;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use crate::domain::{
     models::{
-        GithubAppInstallationSource, GithubKey, MacroTaskId, ResolvedTeamTaskReference,
+        GithubAppInstallationSource, GithubKey, RoxTaskId, ResolvedTeamTaskReference,
         TeamTaskReference,
     },
     ports::{GithubInstallationLister, GithubSyncRepo},
@@ -58,7 +58,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
     type Err = sqlx::Error;
 
     #[tracing::instrument(skip(self), err)]
-    async fn get_task_ids(&self, github_key: GithubKey) -> Result<Vec<MacroTaskId>, Self::Err> {
+    async fn get_task_ids(&self, github_key: GithubKey) -> Result<Vec<RoxTaskId>, Self::Err> {
         let task_ids: Vec<String> = sqlx::query!(
             r#"
             SELECT task_id FROM github_pr_tasks
@@ -72,7 +72,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
 
         Ok(task_ids
             .into_iter()
-            .filter_map(|t| MacroTaskId::from_short_uuid(&t))
+            .filter_map(|t| RoxTaskId::from_short_uuid(&t))
             .collect())
     }
 
@@ -80,12 +80,12 @@ impl GithubSyncRepo for PgGithubSyncRepo {
     async fn upsert_task_ids(
         &self,
         github_key: GithubKey,
-        task_ids: &[MacroTaskId],
+        task_ids: &[RoxTaskId],
     ) -> Result<(), Self::Err> {
         let short_ids: Vec<String> = task_ids.iter().map(|t| t.short_uuid.clone()).collect();
         let ids: Vec<uuid::Uuid> = short_ids
             .iter()
-            .map(|_| macro_uuid::generate_uuid_v7())
+            .map(|_| rox_uuid::generate_uuid_v7())
             .collect();
         // Full-UUID document ids used to look up each task's owning team;
         // an unconvertible short UUID simply matches no team_task row.
@@ -121,8 +121,8 @@ impl GithubSyncRepo for PgGithubSyncRepo {
     async fn filter_duplicate_tasks(
         &self,
         github_key: GithubKey,
-        task_ids: &[MacroTaskId],
-    ) -> Result<Vec<MacroTaskId>, Self::Err> {
+        task_ids: &[RoxTaskId],
+    ) -> Result<Vec<RoxTaskId>, Self::Err> {
         let short_ids: Vec<String> = task_ids.iter().map(|t| t.short_uuid.clone()).collect();
 
         let existing: Vec<String> = sqlx::query_scalar!(
@@ -191,7 +191,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
                     Ok(uuid) => Some(ResolvedTeamTaskReference {
                         reference,
                         team_id: row.team_id,
-                        task_id: MacroTaskId::from_uuid(&uuid),
+                        task_id: RoxTaskId::from_uuid(&uuid),
                     }),
                     Err(e) => {
                         tracing::warn!(
@@ -207,7 +207,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn get_macro_ids_by_github_user_ids(
+    async fn get_rox_ids_by_github_user_ids(
         &self,
         github_user_ids: &[String],
     ) -> Result<std::collections::HashMap<String, Vec<String>>, Self::Err> {
@@ -217,7 +217,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
 
         let rows = sqlx::query!(
             r#"
-            SELECT github_user_id, macro_id
+            SELECT github_user_id, rox_id
             FROM github_links
             WHERE github_user_id = ANY($1::text[])
             "#,
@@ -232,14 +232,14 @@ impl GithubSyncRepo for PgGithubSyncRepo {
             links
                 .entry(row.github_user_id)
                 .or_default()
-                .push(row.macro_id);
+                .push(row.rox_id);
         }
 
         Ok(links)
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn get_macro_ids_by_github_logins(
+    async fn get_rox_ids_by_github_logins(
         &self,
         github_logins: &[String],
     ) -> Result<std::collections::HashMap<String, Vec<String>>, Self::Err> {
@@ -253,7 +253,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
             .collect();
         let rows = sqlx::query!(
             r#"
-            SELECT LOWER(github_username) AS "login!", macro_id
+            SELECT LOWER(github_username) AS "login!", rox_id
             FROM github_links
             WHERE LOWER(github_username) = ANY($1::text[])
             "#,
@@ -265,21 +265,21 @@ impl GithubSyncRepo for PgGithubSyncRepo {
         let mut links: std::collections::HashMap<String, Vec<String>> =
             std::collections::HashMap::new();
         for row in rows {
-            links.entry(row.login).or_default().push(row.macro_id);
+            links.entry(row.login).or_default().push(row.rox_id);
         }
 
         Ok(links)
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn get_user_team_ids(&self, macro_id: &str) -> Result<Vec<uuid::Uuid>, Self::Err> {
+    async fn get_user_team_ids(&self, rox_id: &str) -> Result<Vec<uuid::Uuid>, Self::Err> {
         let team_ids = sqlx::query_scalar!(
             r#"
             SELECT team_id
             FROM team_user
             WHERE user_id = $1
             "#,
-            macro_id,
+            rox_id,
         )
         .fetch_all(&self.pool)
         .await?;
@@ -291,7 +291,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
     async fn get_team_member_ids(
         &self,
         team_id: uuid::Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         let user_ids: Vec<String> = sqlx::query_scalar!(
             r#"
             SELECT user_id
@@ -306,7 +306,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
 
         Ok(user_ids
             .into_iter()
-            .filter_map(|user_id| match MacroUserIdStr::try_from(user_id.clone()) {
+            .filter_map(|user_id| match RoxUserIdStr::try_from(user_id.clone()) {
                 Ok(user_id) => Some(user_id),
                 Err(error) => {
                     tracing::warn!(
@@ -368,7 +368,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
     #[tracing::instrument(skip(self), err)]
     async fn get_installation_ids_for_sources(
         &self,
-        macro_id: &str,
+        rox_id: &str,
         team_ids: &[uuid::Uuid],
     ) -> Result<Vec<String>, Self::Err> {
         // `source_id` is text for both source types, so team ids are compared
@@ -384,7 +384,7 @@ impl GithubSyncRepo for PgGithubSyncRepo {
                    AND source_id = ANY($2::text[]))
             ORDER BY id
             "#,
-            macro_id,
+            rox_id,
             &team_source_ids,
         )
         .fetch_all(&self.pool)

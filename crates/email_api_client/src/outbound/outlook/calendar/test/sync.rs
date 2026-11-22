@@ -1,7 +1,7 @@
 use super::mutations::{IssuedToken, NoOpenClients, OWNER, connected_mailbox, linked_mailbox};
 use super::*;
 use calendar_events::outbound::pg::PgCalendarRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use wiremock::matchers::query_param_is_missing;
 
@@ -153,8 +153,8 @@ fn the_unreadable_series_is_rejected_at_its_decline_policy() {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn an_event_macro_cannot_read_is_skipped_and_the_rest_of_the_calendar_syncs(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn an_event_rox_cannot_read_is_skipped_and_the_rest_of_the_calendar_syncs(pool: PgPool) {
     let (server, sync) = connected(&pool).await;
     // The unreadable series sorts first, so it is refreshed first.
     serve_delta(
@@ -180,7 +180,7 @@ async fn an_event_macro_cannot_read_is_skipped_and_the_rest_of_the_calendar_sync
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_stored_event_that_turns_unreadable_leaves_the_calendar(pool: PgPool) {
     let (server, sync) = connected(&pool).await;
     serve_delta(
@@ -222,8 +222,8 @@ async fn a_stored_event_that_turns_unreadable_leaves_the_calendar(pool: PgPool) 
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn a_mailbox_in_a_time_zone_macro_cannot_map_still_discovers_and_syncs(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn a_mailbox_in_a_time_zone_rox_cannot_map_still_discovers_and_syncs(pool: PgPool) {
     let (server, api) = setup().await;
     let repo = linked_mailbox(
         &pool,
@@ -295,7 +295,7 @@ fn unreadable(mut master: Value) -> Value {
     master
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_series_with_a_moved_meeting_is_imported_with_it(pool: PgPool) {
     let (server, sync) = connected(&pool).await;
     serve_delta(&server, None, &[occurrence("AAMkDaily")], "complete").await;
@@ -328,7 +328,7 @@ async fn a_series_with_a_moved_meeting_is_imported_with_it(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_series_an_older_build_skipped_is_read_again_once_on_the_next_delta_round(pool: PgPool) {
     let (server, sync) = connected(&pool).await;
     let (master, instances) = upcoming_series("AAMkDaily", "ada@example.com", false);

@@ -1,5 +1,5 @@
 use anyhow::Context;
-use macro_env_var::env_vars;
+use rox_env_var::env_vars;
 
 env_vars! {
     pub struct DatabaseUrl;

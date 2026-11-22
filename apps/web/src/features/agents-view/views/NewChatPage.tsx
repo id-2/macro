@@ -54,7 +54,7 @@ import {
   type ComposerMode,
 } from '../core/mode';
 import { defaultBranchFor, sameRepository } from '../core/repository';
-import { MACRO_PERSONA_ID, type RosterAgent } from '../core/roster';
+import { ROX_PERSONA_ID, type RosterAgent } from '../core/roster';
 import {
   createPersistedComposerAttachments,
   createPersistedComposerDraft,
@@ -184,7 +184,7 @@ export function NewChatPage(props: {
           (agent) => agent.id === id && (settling || !agent.unavailableReason)
         )
       );
-    for (const wanted of [picked, recent, MACRO_PERSONA_ID]) {
+    for (const wanted of [picked, recent, ROX_PERSONA_ID]) {
       const agent = options.find((option) => option.id === wanted);
       if (agent) return agent;
     }
@@ -199,7 +199,7 @@ export function NewChatPage(props: {
       return modelOverride();
     const preferred =
       modelOverride() ??
-      (agent.id === MACRO_PERSONA_ID
+      (agent.id === ROX_PERSONA_ID
         ? preferredInmem.model()
         : agent.defaultModel);
     return selectedCatalog.models().some((option) => option.id === preferred)
@@ -440,7 +440,7 @@ export function NewChatPage(props: {
     selection?: EffortChoice
   ) => {
     setAgentId(agent.id);
-    if (agent.id === MACRO_PERSONA_ID) {
+    if (agent.id === ROX_PERSONA_ID) {
       if (model) preferredInmem.remember(model);
       // Still set the override so the trigger updates when Rox was
       // already selected (agent id unchanged would otherwise skip a render).

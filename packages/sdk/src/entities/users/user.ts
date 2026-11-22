@@ -1,8 +1,8 @@
 import type { UserName } from '../../../generated/auth/types.gen';
 import type { Activity } from '../../../generated/cognition/types.gen';
 import { type Mentionable, type MentionPart, wrapXml } from '../../mentions';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
 import { PropertiedEntity } from '../entity';
 import { type ProfilePicture, toProfilePicture } from './profile-picture';
@@ -29,22 +29,22 @@ export class User extends PropertiedEntity<UserName> implements Mentionable {
       }),
     );
     const entry = names.find((n: UserName) => n.id === this.id);
-    if (!entry) throw new MacroNotFoundError(`user ${this.id} not found`);
+    if (!entry) throw new RoxNotFoundError(`user ${this.id} not found`);
     return entry;
   }
 
   /** A handle to a user by id. */
-  static byId(client: MacroClient, id: string): User {
+  static byId(client: RoxClient, id: string): User {
     return new User(client, id);
   }
 
   /** A user handle seeded with an already loaded auth-service name. */
-  static fromName(client: MacroClient, name: UserName): User {
+  static fromName(client: RoxClient, name: UserName): User {
     return new User(client, name.id, name);
   }
 
   /** A handle to the current authenticated user. */
-  static async me(client: MacroClient): Promise<User> {
+  static async me(client: RoxClient): Promise<User> {
     const { user_id } = unwrap(await client.auth.getUserInfo());
     return new User(client, user_id);
   }
@@ -100,7 +100,7 @@ export class User extends PropertiedEntity<UserName> implements Mentionable {
   }
 
   /**
-   * This user's email address. Macro user ids encode it as `macro|<email>`,
+   * This user's email address. Rox user ids encode it as `macro|<email>`,
    * so this reads straight off the id — no auth-service endpoint returns
    * emails for arbitrary users.
    *

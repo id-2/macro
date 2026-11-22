@@ -3,7 +3,7 @@ use crate::domain::authoring::{AuthoringError, ports::FormsAuthoringService};
 use ai_toolset::{AsyncToolCollection, ToolCallError};
 use bot_id::BotId;
 use databases::domain::models::Viewer;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 mod create_form;
@@ -36,7 +36,7 @@ impl<Service> Clone for FormsToolContext<Service> {
     }
 }
 impl<Service> FormsToolContext<Service> {
-    fn viewer(&self, user_id: MacroUserIdStr<'static>) -> Viewer {
+    fn viewer(&self, user_id: RoxUserIdStr<'static>) -> Viewer {
         Viewer {
             user_id,
             acting_bot: Some(self.actor),

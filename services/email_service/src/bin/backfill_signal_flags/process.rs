@@ -7,18 +7,18 @@ use sqlx::types::Uuid;
 /// `FullRecompute` also clears stale true flags (clear + re-set in one
 /// transaction per link); `Verify` is read-only and counts disagreements.
 /// Returns the number of threads flagged (or mismatched, for `Verify`).
-pub async fn process_macro_id(
+pub async fn process_rox_id(
     pool: &sqlx::PgPool,
-    macro_id: &str,
+    rox_id: &str,
     mode: BackfillMode,
 ) -> anyhow::Result<u64> {
     let link_ids: Vec<Uuid> =
-        sqlx::query_scalar!("SELECT id FROM email_links WHERE macro_id = $1", macro_id)
+        sqlx::query_scalar!("SELECT id FROM email_links WHERE rox_id = $1", rox_id)
             .fetch_all(pool)
             .await?;
 
     if link_ids.is_empty() {
-        println!("No email links found for {macro_id}.");
+        println!("No email links found for {rox_id}.");
         return Ok(0);
     }
 
@@ -26,7 +26,7 @@ pub async fn process_macro_id(
     for link_id in link_ids {
         if mode == BackfillMode::Verify {
             let mismatched = verify_link(pool, link_id).await?;
-            println!("[{macro_id}] link {link_id}: {mismatched} threads mismatched");
+            println!("[{rox_id}] link {link_id}: {mismatched} threads mismatched");
             total += mismatched;
             continue;
         }
@@ -48,7 +48,7 @@ pub async fn process_macro_id(
             .execute(&mut *tx)
             .await?
             .rows_affected();
-            println!("[{macro_id}] link {link_id}: cleared {cleared} flags for recompute");
+            println!("[{rox_id}] link {link_id}: cleared {cleared} flags for recompute");
         }
 
         // Mirrors sync_thread_signal_flag (email_db_client/threads/update.rs)
@@ -154,7 +154,7 @@ pub async fn process_macro_id(
               AND NOT t.is_signal
             "#,
             link_id,
-            email_utils::MACRO_NOTIFICATION_SENDER_DOMAIN,
+            email_utils::ROX_NOTIFICATION_SENDER_DOMAIN,
         )
         .execute(&mut *tx)
         .await?
@@ -166,9 +166,9 @@ pub async fn process_macro_id(
         // FullRecompute clears first, so its count is "threads that ended
         // true", not rows changed.
         if mode == BackfillMode::FullRecompute {
-            println!("[{macro_id}] link {link_id}: computed {flagged} signal threads");
+            println!("[{rox_id}] link {link_id}: computed {flagged} signal threads");
         } else {
-            println!("[{macro_id}] link {link_id}: flagged {flagged} threads");
+            println!("[{rox_id}] link {link_id}: flagged {flagged} threads");
         }
         total += flagged;
     }
@@ -279,7 +279,7 @@ async fn verify_link(pool: &sqlx::PgPool, link_id: Uuid) -> anyhow::Result<u64> 
           )
         "#,
         link_id,
-        email_utils::MACRO_NOTIFICATION_SENDER_DOMAIN,
+        email_utils::ROX_NOTIFICATION_SENDER_DOMAIN,
     )
     .fetch_one(pool)
     .await?;
@@ -288,11 +288,11 @@ async fn verify_link(pool: &sqlx::PgPool, link_id: Uuid) -> anyhow::Result<u64> 
 }
 
 /// Every macro ID that owns at least one email link. Connected secondary
-/// mailboxes carry their own macro_id row in email_links, so iterating these
+/// mailboxes carry their own rox_id row in email_links, so iterating these
 /// covers every link exactly once.
-pub async fn fetch_all_macro_ids(pool: &sqlx::PgPool) -> anyhow::Result<Vec<String>> {
+pub async fn fetch_all_rox_ids(pool: &sqlx::PgPool) -> anyhow::Result<Vec<String>> {
     Ok(
-        sqlx::query_scalar!("SELECT DISTINCT macro_id FROM email_links ORDER BY macro_id")
+        sqlx::query_scalar!("SELECT DISTINCT rox_id FROM email_links ORDER BY rox_id")
             .fetch_all(pool)
             .await?,
     )

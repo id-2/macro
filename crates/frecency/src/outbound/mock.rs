@@ -1,6 +1,6 @@
 //! This module provides an [mockall::mock] concrete struct [MockFrecencyStorage] which can be used for testing
 use crate::domain::{models::FrecencyPageRequest, ports::AggregateFrecencyStorage};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mockall::mock;
 use model_entity::Entity;
 use std::convert::Infallible;
@@ -17,7 +17,7 @@ mock! {
 
         fn get_aggregate_for_user_entities<'a>(
             &self,
-            user_id: MacroUserIdStr<'a>,
+            user_id: RoxUserIdStr<'a>,
             entities: &'a [Entity<'a>],
         ) -> impl Future<Output = Result<Vec<crate::domain::models::AggregateFrecency>, Infallible>> + Send;
     }

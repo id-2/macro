@@ -7,8 +7,8 @@ use axum::{Extension, Json, extract};
 use entity_access::domain::models::EntityPermission;
 use entity_access::inbound::axum_extractors::ProjectBodyAccessLevelExtractorV2;
 use entity_access::inbound::axum_extractors::ThreadAccessLevelExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::share_permission::edit::edit_thread_permission;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::share_permission::edit::edit_thread_permission;
 use model::response::{
     ErrorResponse, GenericErrorResponse, GenericSuccessResponse, SuccessResponse,
 };
@@ -48,7 +48,7 @@ pub struct PatchThreadRequestV2 {
             (status = 500, body=GenericErrorResponse),
     )
 )]
-#[tracing::instrument(skip(ctx, user, project, thread_access), fields(user_id=?user.authorization.user.macro_user_id))]
+#[tracing::instrument(skip(ctx, user, project, thread_access), fields(user_id=?user.authorization.user.rox_user_id))]
 pub async fn edit_thread_handler(
     thread_access: ThreadAccessLevelExtractor<
         OwnerAccessLevel,
@@ -56,7 +56,7 @@ pub async fn edit_thread_handler(
         AuthorizationService,
     >,
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     thread_context: Extension<EmailThreadPermission>,
     extract::Path(ThreadParams { thread_id }): extract::Path<ThreadParams>,
     project: ProjectBodyAccessLevelExtractorV2<
@@ -112,7 +112,7 @@ pub async fn edit_thread_handler(
             &thread_id,
             &thread_context.share_permission_id,
             &share_permission,
-            &user.authorization.user.macro_user_id,
+            &user.authorization.user.rox_user_id,
         )
         .await?;
     }
@@ -132,7 +132,7 @@ async fn edit_thread_share_permission(
     thread_id: &str,
     share_permission_id: &str,
     share_permission: &models_permissions::share_permission::UpdateSharePermissionRequestV2,
-    actor: &macro_user_id::user_id::MacroUserIdStr<'_>,
+    actor: &rox_user_id::user_id::RoxUserIdStr<'_>,
 ) -> Result<(), Response> {
     let mut tx = db.begin().await.map_err(|e| {
         tracing::error!(error=?e, "unable to edit thread");
@@ -147,7 +147,7 @@ async fn edit_thread_share_permission(
 
     edit_thread_permission(
         &mut tx,
-        &macro_uuid::string_to_uuid(thread_id).unwrap(),
+        &rox_uuid::string_to_uuid(thread_id).unwrap(),
         share_permission_id,
         share_permission,
         actor,
@@ -180,11 +180,11 @@ async fn edit_thread_share_permission(
 #[cfg(test)]
 mod test {
     use super::*;
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_user_id::user_id::RoxUserIdStr;
     use models_permissions::share_permission::{LinkShare, access_level::AccessLevel};
 
     async fn migrate_for_test(pool: &sqlx::PgPool) {
-        let migrations = macro_db_migrator::MACRO_DB_MIGRATIONS
+        let migrations = rox_db_migrator::ROX_DB_MIGRATIONS
             .iter()
             .map(|migration| {
                 let mut migration = migration.clone();
@@ -216,7 +216,7 @@ mod test {
             .bind(&permission_id)
             .execute(&pool)
             .await?;
-        let actor = MacroUserIdStr::parse_from_str("macro|rest-thread@example.com")?;
+        let actor = RoxUserIdStr::parse_from_str("macro|rest-thread@example.com")?;
 
         edit_thread_share_permission(
             &pool,

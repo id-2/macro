@@ -6,7 +6,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use macro_env::Environment;
+use rox_env::Environment;
 use opentelemetry::{
     KeyValue,
     metrics::{Gauge, Histogram},

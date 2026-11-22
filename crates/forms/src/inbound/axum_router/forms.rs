@@ -7,7 +7,7 @@ use databases::domain::models::Viewer;
 use databases::domain::receipt::database_receipt;
 use entity_access::domain::models::{EditAccessLevel, OwnerAccessLevel, ViewAccessLevel};
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use models_databases::DatabaseId;
 use models_forms::{
     CreateForm, Form, FormCollaboration, FormDetail, FormErrorResponse, FormLayout, FormSource,
@@ -47,7 +47,7 @@ pub async fn create_form_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let creator = viewer_of(&user);
     // An agent's SDK token (code mode) creates as its user, attributed to the
@@ -113,7 +113,7 @@ pub async fn list_forms_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let receipt = database_receipt::<ViewAccessLevel, _>(
         state.entity_access_service.as_ref(),
@@ -138,7 +138,7 @@ pub async fn list_accessible_forms_handler<Service, EntityAccess, Authorization>
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(
         state.service.accessible_forms(viewer_of(&user)).await?,
@@ -159,7 +159,7 @@ pub async fn get_form_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(state.service.get_form(access.receipt).await?))
 }
@@ -181,7 +181,7 @@ pub async fn update_form_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(
         state.service.update_form(access.receipt, update).await?,
@@ -205,7 +205,7 @@ pub async fn put_form_layout_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(
         state.service.put_layout(access.receipt, layout).await?,
@@ -227,7 +227,7 @@ pub async fn collaborate_form_handler<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(state.service.collaborate_form(access.receipt).await?))
 }
@@ -248,7 +248,7 @@ pub async fn set_form_appearance<Service, EntityAccess, Authorization>(
 where
     Service: FormsService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     Ok(Json(
         state

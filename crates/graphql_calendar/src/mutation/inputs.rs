@@ -279,7 +279,7 @@ pub struct CreateCalendarEventInput {
     /// location before creating the event, so the invitation carries it.
     /// Cannot be combined with `conference`.
     #[graphql(default)]
-    pub macro_call: bool,
+    pub rox_call: bool,
     /// Present to create an out-of-office status event (primary calendar
     /// only, timed, no attendees).
     pub out_of_office: Option<CalendarOutOfOfficeInput>,
@@ -290,7 +290,7 @@ pub struct CreateCalendarEventInput {
 pub(crate) struct CreateRequest {
     pub(crate) email_link_id: Option<Uuid>,
     pub(crate) calendar_id: Option<Uuid>,
-    pub(crate) macro_call: bool,
+    pub(crate) rox_call: bool,
     pub(crate) draft: CalendarEventDraft,
 }
 
@@ -299,7 +299,7 @@ impl CreateCalendarEventInput {
         Ok(CreateRequest {
             email_link_id: optional_id(self.email_link_id, "emailLinkId")?,
             calendar_id: optional_id(self.calendar_id, "calendarId")?,
-            macro_call: self.macro_call,
+            rox_call: self.rox_call,
             draft: CalendarEventDraft {
                 idempotency_key: optional_id(self.idempotency_key, "idempotencyKey")?,
                 title: self.title,

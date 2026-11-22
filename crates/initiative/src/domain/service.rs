@@ -19,8 +19,8 @@ use entity_access::domain::models::{
     EntityType, OwnerAccessLevel, ViewAccessLevel,
 };
 use entity_access::domain::telemetry::{SOURCE_ID_COUNT_FIELD, observe_source_ids, span_count};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::SharePermissionV2;
 use models_permissions::share_permission::team_share::{
     AuthorizedTeamShareCommand, TeamShareCreation, TeamShareLevel, TeamSharePolicyError,
@@ -80,7 +80,7 @@ where
     #[tracing::instrument(skip_all, fields(%id), err)]
     pub async fn create_imported(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: CreateInitiativeRequest,
         attribution: activity::Attribution,
         id: InitiativeId,
@@ -91,7 +91,7 @@ where
 
     async fn imported_existing(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: InitiativeId,
     ) -> Result<Option<InitiativeDetail>, InitiativeError> {
         let detail = self.repo.get_detail(id).await.map_err(Into::into)?;
@@ -107,7 +107,7 @@ where
 
     async fn create_with_id(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: CreateInitiativeRequest,
         attribution: activity::Attribution,
         id: InitiativeId,
@@ -334,7 +334,7 @@ where
 
     async fn page(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: crate::domain::reads::InitiativePageRequest,
     ) -> Result<crate::domain::reads::InitiativePage, InitiativeError> {
         self.read_page(user_id, request).await
@@ -353,7 +353,7 @@ where
     #[tracing::instrument(err, skip_all)]
     async fn create(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: CreateInitiativeRequest,
     ) -> Result<InitiativeDetail, InitiativeError> {
         self.create_attributed(
@@ -369,7 +369,7 @@ where
     #[tracing::instrument(err, skip_all)]
     async fn create_attributed(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: CreateInitiativeRequest,
         attribution: activity::Attribution,
     ) -> Result<InitiativeDetail, InitiativeError> {
@@ -423,7 +423,7 @@ where
     }
 
     #[tracing::instrument(err, skip_all)]
-    async fn list(&self, user_id: &MacroUserIdStr<'_>) -> Result<InitiativeList, InitiativeError> {
+    async fn list(&self, user_id: &RoxUserIdStr<'_>) -> Result<InitiativeList, InitiativeError> {
         let user_id = user_id.clone().into_owned();
         self.repo
             .list_accessible(&user_id)
@@ -550,7 +550,7 @@ where
     async fn grant_assignees(
         &self,
         receipt: EntityAccessReceipt<EditAccessLevel>,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> Result<(), InitiativeError> {
         super::assignees::grant(&self.repo, &receipt, user_ids).await
     }
@@ -658,12 +658,12 @@ fn normalize_description(description: Option<String>) -> Result<String, Initiati
 
 fn parse_member_ids(
     member_ids: Vec<String>,
-    owner: &MacroUserIdStr<'_>,
-) -> Result<Vec<MacroUserIdStr<'static>>, InitiativeError> {
+    owner: &RoxUserIdStr<'_>,
+) -> Result<Vec<RoxUserIdStr<'static>>, InitiativeError> {
     let mut seen = HashSet::new();
     let mut parsed = Vec::new();
     for raw in member_ids {
-        let member = MacroUserIdStr::parse_from_str(&raw)
+        let member = RoxUserIdStr::parse_from_str(&raw)
             .map_err(|error| InitiativeError::BadRequest(error.to_string()))?
             .into_owned();
         if member.as_ref() == owner.as_ref() {
@@ -705,7 +705,7 @@ fn validate_initial_properties(
 /// failing fails the create, which then deletes the initiative.
 async fn initialize_properties(
     resources: &dyn InitiativeResources,
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     id: InitiativeId,
     values: Vec<crate::domain::models::InitialPropertyValue>,
 ) -> Result<(), InitiativeError> {
@@ -714,9 +714,9 @@ async fn initialize_properties(
 }
 
 fn member_diff(
-    current: &[MacroUserIdStr<'static>],
-    requested: &[MacroUserIdStr<'static>],
-) -> (Vec<MacroUserIdStr<'static>>, Vec<MacroUserIdStr<'static>>) {
+    current: &[RoxUserIdStr<'static>],
+    requested: &[RoxUserIdStr<'static>],
+) -> (Vec<RoxUserIdStr<'static>>, Vec<RoxUserIdStr<'static>>) {
     let current_set: HashSet<&str> = current.iter().map(|id| id.as_ref()).collect();
     let requested_set: HashSet<&str> = requested.iter().map(|id| id.as_ref()).collect();
     let added = requested

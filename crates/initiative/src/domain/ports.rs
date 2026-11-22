@@ -7,7 +7,7 @@ use super::reads::{
 use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, OwnerAccessLevel, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::team_share::{TeamShareCreation, TeamShareFacts};
 use models_permissions::share_permission::{SharePermissionV2, TeamLinkShareDefault};
 
@@ -81,7 +81,7 @@ pub trait InitiativeRepo: Send + Sync + 'static {
     /// List initiatives the user can view.
     fn list_accessible(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<InitiativeList, Self::Err>> + Send;
 
     /// Apply an update, including member add/remove sets, share patch, and optional team
@@ -100,7 +100,7 @@ pub trait InitiativeRepo: Send + Sync + 'static {
     /// Load the owner's team default link-share preference, if any.
     fn get_team_default_link_share(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<TeamLinkShareDefault>, Self::Err>> + Send;
 
     /// Grant assignees edit access to the initiative in one transaction,
@@ -109,7 +109,7 @@ pub trait InitiativeRepo: Send + Sync + 'static {
     fn grant_assignees(
         &self,
         id: InitiativeId,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Delete the initiative and clean up its own rows in one transaction.
@@ -145,7 +145,7 @@ pub trait InitiativeService: Send + Sync + 'static {
     /// Filter, order and page the caller's discoverable initiatives.
     fn page(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: InitiativePageRequest,
     ) -> impl Future<Output = Result<InitiativePage, InitiativeError>> + Send;
 
@@ -159,7 +159,7 @@ pub trait InitiativeService: Send + Sync + 'static {
     /// Create an initiative owned by `user_id`.
     fn create(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: CreateInitiativeRequest,
     ) -> impl Future<Output = Result<InitiativeDetail, InitiativeError>> + Send;
 
@@ -167,7 +167,7 @@ pub trait InitiativeService: Send + Sync + 'static {
     /// bots must act for that owner. HTTP bodies and tool inputs never provide attribution.
     fn create_attributed(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: CreateInitiativeRequest,
         attribution: activity::Attribution,
     ) -> impl Future<Output = Result<InitiativeDetail, InitiativeError>> + Send;
@@ -201,7 +201,7 @@ pub trait InitiativeService: Send + Sync + 'static {
     /// List initiatives the user can view.
     fn list(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<InitiativeList, InitiativeError>> + Send;
 
     /// Update fields the receipt already authorized for edit.
@@ -216,7 +216,7 @@ pub trait InitiativeService: Send + Sync + 'static {
     fn grant_assignees(
         &self,
         receipt: EntityAccessReceipt<EditAccessLevel>,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), InitiativeError>> + Send;
 
     /// Delete the initiative the receipt already authorized as owner.

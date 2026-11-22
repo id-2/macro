@@ -429,7 +429,7 @@ fn presented_view(
     let ToolName::Mcp { server, tool } = name else {
         return None;
     };
-    if server != "macro_internal"
+    if server != "rox_internal"
         || tool != "PresentView"
         || !id.starts_with("view_")
         || status != ActivityStatus::Completed

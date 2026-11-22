@@ -1,9 +1,9 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn exact_direct_levels_and_attributable_deletion(pool: PgPool) -> Result<(), sqlx::Error> {
@@ -44,7 +44,7 @@ async fn exact_direct_levels_and_attributable_deletion(pool: PgPool) -> Result<(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn guard_uses_documented_key_and_transaction_lifetime(
     pool: PgPool,
 ) -> Result<(), sqlx::Error> {
@@ -69,7 +69,7 @@ async fn guard_uses_documented_key_and_transaction_lifetime(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("team_share"))
 )]
 async fn same_team_refresh_drops_inherited_rows_outside_the_tree(
@@ -141,7 +141,7 @@ async fn same_team_refresh_drops_inherited_rows_outside_the_tree(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn guard_rejects_stale_snapshot_isolation(pool: PgPool) -> Result<(), sqlx::Error> {
     let mut tx = pool.begin().await?;
     sqlx::query!("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")

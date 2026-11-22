@@ -10,7 +10,7 @@ members = [
   "input_accessory_plugin",
   "ios_push_plugin",
   "logger",
-  "macro_bundle_updater_plugin",
+  "rox_bundle_updater_plugin",
   "navigation_plugin",
   "network_status_plugin",
   "pasteboard_plugin",

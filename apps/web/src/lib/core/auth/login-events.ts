@@ -13,7 +13,7 @@ type LoginSuccessMessage = {
 
 const authBus = createCrossTabBus<LoginSuccessMessage>({
   channelName: 'auth',
-  storageKey: 'macro.auth-login-success',
+  storageKey: 'rox.auth-login-success',
   parse: (value) =>
     match(value)
       .with({ type: 'login-success' }, ({ type }) => ({ type }))

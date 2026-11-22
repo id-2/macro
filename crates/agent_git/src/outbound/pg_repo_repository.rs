@@ -1,6 +1,6 @@
 //! `agent_repos` rows in RoxDB.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -52,7 +52,7 @@ impl RepoRepository for PgRepoRepository {
     #[tracing::instrument(name = "agent_git.lock_repo", skip_all, fields(repo_id = %agent_credentials::telemetry_id(agent_user_id.as_ref())), err)]
     async fn lock_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<PgRepoLock, PgRepoRepositoryError> {
         let mut session = self.pool.acquire().await?;
         session.close_on_drop();
@@ -68,7 +68,7 @@ impl RepoRepository for PgRepoRepository {
     #[tracing::instrument(name = "agent_git.try_lock_repo", skip_all, fields(repo_id = %agent_credentials::telemetry_id(agent_user_id.as_ref()), locked = tracing::field::Empty), err)]
     async fn try_lock_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<PgRepoLock>, PgRepoRepositoryError> {
         let mut session = self.pool.acquire().await?;
         let locked = sqlx::query_scalar!(
@@ -89,7 +89,7 @@ impl RepoRepository for PgRepoRepository {
     #[tracing::instrument(skip_all, err)]
     async fn find_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<AgentRepo>, PgRepoRepositoryError> {
         let row = sqlx::query!(
             r#"
@@ -106,7 +106,7 @@ impl RepoRepository for PgRepoRepository {
             return Ok(None);
         };
 
-        let stored_user_id = MacroUserIdStr::try_from(row.agent_user_id.clone())
+        let stored_user_id = RoxUserIdStr::try_from(row.agent_user_id.clone())
             .map_err(|_| PgRepoRepositoryError::MalformedUserId(row.agent_user_id))?;
 
         Ok(Some(AgentRepo {
@@ -122,7 +122,7 @@ impl RepoRepository for PgRepoRepository {
     #[tracing::instrument(skip_all, err)]
     async fn upsert_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
         token_hash: &RepoTokenHash,
     ) -> Result<bool, PgRepoRepositoryError> {
@@ -148,7 +148,7 @@ impl RepoRepository for PgRepoRepository {
     #[tracing::instrument(skip_all, err)]
     async fn insert_repo_if_missing(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
         token_hash: &RepoTokenHash,
     ) -> Result<(), PgRepoRepositoryError> {
@@ -167,7 +167,7 @@ impl RepoRepository for PgRepoRepository {
     #[tracing::instrument(skip_all, err)]
     async fn record_push(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         size_bytes: u64,
     ) -> Result<(), PgRepoRepositoryError> {
         let size = i64::try_from(size_bytes)
@@ -191,7 +191,7 @@ impl RepoRepository for PgRepoRepository {
     #[tracing::instrument(skip_all, err)]
     async fn delete_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), PgRepoRepositoryError> {
         sqlx::query!(
             "DELETE FROM agent_repos WHERE agent_user_id = $1",

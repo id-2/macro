@@ -79,7 +79,7 @@ async function answerDiscussion(page: Page, baseURL: string | undefined) {
       });
     } else if (
       url.origin === devServer &&
-      !url.pathname.startsWith('/__macro_dev/')
+      !url.pathname.startsWith('/__rox_dev/')
     ) {
       await route.continue();
     } else {

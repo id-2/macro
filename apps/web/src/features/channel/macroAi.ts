@@ -7,19 +7,19 @@ import {
   CURSOR_BOT_PRINCIPAL_ID,
 } from '@core/constant/cursorAgent';
 import {
-  MACRO_AGENT_NAME,
-  MACRO_AGENT_PRINCIPAL_ID,
+  ROX_AGENT_NAME,
+  ROX_AGENT_PRINCIPAL_ID,
 } from '@core/constant/macroAgent';
-import { MACRO_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
+import { ROX_NEW_PRINCIPAL_ID } from '@core/constant/macroNew';
 import type { IUser } from '@core/user/types';
 
 // Re-export the shared Rox identity under the names used in this package.
 export {
   isMacroAgentId as isMacroAiId,
-  MACRO_AGENT_BOT_ID as MACRO_AI_BOT_ID,
-  MACRO_AGENT_HANDLE as MACRO_AI_HANDLE,
-  MACRO_AGENT_NAME as MACRO_AI_NAME,
-  MACRO_AGENT_PRINCIPAL_ID as MACRO_AI_PRINCIPAL_ID,
+  ROX_AGENT_BOT_ID as ROX_AI_BOT_ID,
+  ROX_AGENT_HANDLE as ROX_AI_HANDLE,
+  ROX_AGENT_NAME as ROX_AI_NAME,
+  ROX_AGENT_PRINCIPAL_ID as ROX_AI_PRINCIPAL_ID,
 } from '@core/constant/macroAgent';
 export { isMacroCoderId } from '@core/constant/macroCoder';
 export { isMacroNewId } from '@core/constant/macroNew';
@@ -38,9 +38,9 @@ export { isMacroNewId } from '@core/constant/macroNew';
  */
 export function macroMentionUser(agentSessions: boolean): IUser {
   return {
-    id: agentSessions ? MACRO_NEW_PRINCIPAL_ID : MACRO_AGENT_PRINCIPAL_ID,
-    name: MACRO_AGENT_NAME,
-    email: MACRO_AGENT_NAME,
+    id: agentSessions ? ROX_NEW_PRINCIPAL_ID : ROX_AGENT_PRINCIPAL_ID,
+    name: ROX_AGENT_NAME,
+    email: ROX_AGENT_NAME,
   };
 }
 

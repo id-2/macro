@@ -64,7 +64,7 @@ impl SessionTasks for FixedTasks {
     fn link_task<'a>(
         &'a self,
         session: AgentSessionId,
-        _owner: &'a macro_user_id::user_id::MacroUserIdStr<'static>,
+        _owner: &'a rox_user_id::user_id::RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<LinkedTask, SessionTaskError>> {
         self.linked.lock().unwrap().push((session, task.to_owned()));
@@ -84,7 +84,7 @@ impl SessionTasks for FixedTasks {
 
     fn task_pull_requests<'a>(
         &'a self,
-        _owner: &'a macro_user_id::user_id::MacroUserIdStr<'static>,
+        _owner: &'a rox_user_id::user_id::RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<TaskPullRequests, SessionTaskError>> {
         Box::pin(async move {
@@ -102,7 +102,7 @@ impl SessionTasks for FixedTasks {
     fn link_session_pull_request<'a>(
         &'a self,
         _session: AgentSessionId,
-        _owner: &'a macro_user_id::user_id::MacroUserIdStr<'static>,
+        _owner: &'a rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> BoxFuture<'a, Result<(), SessionTaskError>> {
         Box::pin(async { Ok(()) })
     }
@@ -233,10 +233,10 @@ async fn each_harness_gets_only_internal_tools_and_writes_only_its_session() {
         .await;
         assert_eq!(status, StatusCode::OK, "{initialized}");
         let instructions = initialized["result"]["instructions"].as_str().unwrap();
-        assert!(instructions.contains("macro_internal.set_pull_request"));
+        assert!(instructions.contains("rox_internal.set_pull_request"));
         assert!(instructions.contains("register its URL"));
         assert!(instructions.contains(prompt::pull_requests::READY_PULL_REQUEST));
-        assert!(instructions.contains("submit it with macro_internal.DecideReview"));
+        assert!(instructions.contains("submit it with rox_internal.DecideReview"));
         assert!(instructions.contains("Should I kick it off?"));
         let (status, listed) = rpc(
             app.clone(),

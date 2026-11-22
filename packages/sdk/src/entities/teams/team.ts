@@ -5,9 +5,9 @@ import type {
   TeamRole,
   TeamWithMembers,
 } from '../../../generated/auth/types.gen';
-import { MacroError, MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxError, RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 import { TeamInvite } from './invite';
 
@@ -23,29 +23,29 @@ export interface TeamMembership {
  * A Rox team. A free-to-construct handle; the record loads lazily on first
  * field access, resolved from the caller's team memberships.
  */
-export class Team extends MacroEntity<TeamRecord> {
+export class Team extends RoxEntity<TeamRecord> {
   protected async fetch(): Promise<TeamRecord> {
     const teams = unwrap(await this.client.auth.getUserTeams());
     const team = teams.find((t) => t.id === this.id);
-    if (!team) throw new MacroNotFoundError(`team ${this.id} not found`);
+    if (!team) throw new RoxNotFoundError(`team ${this.id} not found`);
     return team;
   }
 
   /** A handle to a team by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Team {
+  static byId(client: RoxClient, id: string): Team {
     return new Team(client, id);
   }
 
   /** The caller's current team. */
-  static async current(client: MacroClient): Promise<Team> {
+  static async current(client: RoxClient): Promise<Team> {
     const res = unwrap(await client.auth.getTeam());
     // A caller without a team gets a 204, which parses as an empty object.
-    if (!res?.team) throw new MacroNotFoundError('caller has no current team');
+    if (!res?.team) throw new RoxNotFoundError('caller has no current team');
     return new Team(client, res.team.id, res.team);
   }
 
   /** The teams the caller belongs to. */
-  static async list(client: MacroClient): Promise<Team[]> {
+  static async list(client: RoxClient): Promise<Team[]> {
     const teams = unwrap(await client.auth.getUserTeams());
     return teams.map((t) => new Team(client, t.id, t));
   }
@@ -126,7 +126,7 @@ export class Team extends MacroEntity<TeamRecord> {
       }
     }
     if (addresses.length === 0)
-      throw new MacroError('invite needs at least one email address');
+      throw new RoxError('invite needs at least one email address');
     const res = await this.client.auth.inviteToTeam({
       body: {
         invites: addresses.map((email) => ({ email })),
@@ -222,7 +222,7 @@ export class Team extends MacroEntity<TeamRecord> {
     const res = unwrap(await this.client.auth.getTeam());
     // A caller without a team gets a 204, which parses as an empty object.
     if (!res?.team || res.team.id !== this.id)
-      throw new MacroError(
+      throw new RoxError(
         `${what} are only available for the current team (see Team.current)`,
       );
     return res;

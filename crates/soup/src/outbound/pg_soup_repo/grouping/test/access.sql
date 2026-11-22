@@ -5,7 +5,7 @@ INSERT INTO comms_channels (id, channel_type, name, owner_id) VALUES
 INSERT INTO comms_channel_participants (channel_id, role, user_id, left_at) VALUES
 ('ac000000-0000-0000-0000-000000000001', 'member', 'macro|user-1@test.com', NULL),
 ('ac000000-0000-0000-0000-000000000002', 'member', 'macro|user-1@test.com', now());
-INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|other@test.com', 'other@test.com', 'a1111111-1111-1111-1111-111111111111') ON CONFLICT DO NOTHING;
+INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|other@test.com', 'other@test.com', 'a1111111-1111-1111-1111-111111111111') ON CONFLICT DO NOTHING;
 INSERT INTO team (id, name, owner_id) VALUES
 ('ac000000-0000-0000-0000-000000000003', 'member', 'macro|user-1@test.com'),
 ('ac000000-0000-0000-0000-000000000004', 'nonmember', 'macro|other@test.com');

@@ -6,7 +6,7 @@ mod tests;
 use std::collections::HashSet;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use sqlx::PgPool;
 
@@ -73,7 +73,7 @@ impl FavoritesRepo for PgFavoritesRepo {
     #[tracing::instrument(err, skip(self))]
     async fn add_favorite(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> Result<Favorite, Self::Err> {
         let entity_type: &str = entity.entity_type.into();
@@ -107,7 +107,7 @@ impl FavoritesRepo for PgFavoritesRepo {
     }
 
     #[tracing::instrument(err, skip(self))]
-    async fn count_favorites(&self, user_id: &MacroUserIdStr<'_>) -> Result<i64, Self::Err> {
+    async fn count_favorites(&self, user_id: &RoxUserIdStr<'_>) -> Result<i64, Self::Err> {
         let count = sqlx::query_scalar!(
             r#"SELECT COUNT(*) as "count!" FROM favorite WHERE user_id = $1"#,
             user_id.as_ref(),
@@ -120,7 +120,7 @@ impl FavoritesRepo for PgFavoritesRepo {
     #[tracing::instrument(err, skip(self))]
     async fn list_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         filter: &FavoriteFilter,
     ) -> Result<Vec<Favorite>, Self::Err> {
         // An empty dimension means no constraint, so it binds NULL rather than
@@ -193,7 +193,7 @@ impl FavoritesRepo for PgFavoritesRepo {
     #[tracing::instrument(err, skip(self))]
     async fn remove_favorite_by_entity(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> Result<bool, Self::Err> {
         let entity_type: &str = entity.entity_type.into();
@@ -214,7 +214,7 @@ impl FavoritesRepo for PgFavoritesRepo {
     #[tracing::instrument(err, skip(self, ordered))]
     async fn reorder_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         ordered: &[Entity<'_>],
     ) -> Result<(), Self::Err> {
         let (entity_types, entity_ids): (Vec<String>, Vec<String>) = ordered
@@ -247,7 +247,7 @@ impl FavoritesRepo for PgFavoritesRepo {
     #[tracing::instrument(err, skip(self, user_id, entities))]
     async fn favorited_entities(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
     ) -> Result<HashSet<Entity<'static>>, Self::Err> {
         let (entity_types, entity_ids): (Vec<String>, Vec<String>) = entities

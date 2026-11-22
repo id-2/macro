@@ -90,7 +90,7 @@ tools — hexagonal, heavily feature-gated.
 ## Boundaries
 
 - Depends on: `entity_access`, `entity_access_management`, `email_utils`,
-  `crm`, `frecency`, `item_filters`, `lexical_client`, `macro_event_broker`,
+  `crm`, `frecency`, `item_filters`, `lexical_client`, `rox_event_broker`,
   `entity_access_db_utils` (optional, feature `outbound`), `calendar_events`
   (optional, feature `calendar_invitations`), `sqs_client` (optional, feature
   `sqs`; it must not depend back on this crate).

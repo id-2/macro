@@ -3,7 +3,7 @@
 use std::{future::Future, pin::Pin, sync::Arc};
 
 use email::domain::ports::EmailThreadPreviewService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_soup::email_thread::SoupEnrichedEmailThreadPreview;
 use uuid::Uuid;
 
@@ -13,7 +13,7 @@ pub trait EmailMutationThreadReader: Send + Sync + 'static {
     /// Reload the thread after its mutation has committed.
     fn read(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> impl Future<Output = async_graphql::Result<Option<SoupEnrichedEmailThreadPreview<()>>>> + Send;
 }
@@ -26,7 +26,7 @@ type ReadFuture = Pin<
     >,
 >;
 /// Type-erased request-scoped reader function.
-type ReadThread = dyn Fn(MacroUserIdStr<'static>, Uuid) -> ReadFuture + Send + Sync;
+type ReadThread = dyn Fn(RoxUserIdStr<'static>, Uuid) -> ReadFuture + Send + Sync;
 
 /// Mutation-only reader stored in request data; deliberately never caches.
 #[derive(Clone)]
@@ -45,7 +45,7 @@ impl EmailMutationThreadLoader {
     /// Load a fresh snapshot on every call, including sequential mutations.
     pub async fn read(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> async_graphql::Result<Option<SoupEnrichedEmailThreadPreview<()>>> {
         (self.0)(user_id, thread_id).await
@@ -58,7 +58,7 @@ struct PrimaryEmailReader<E>(Arc<E>);
 impl<E: EmailThreadPreviewService> EmailMutationThreadReader for PrimaryEmailReader<E> {
     async fn read(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> async_graphql::Result<Option<SoupEnrichedEmailThreadPreview<()>>> {
         // Ownership/delegation remains the email service's policy. Never load

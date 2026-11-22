@@ -5,7 +5,7 @@ use std::future::Future;
 use std::pin::Pin;
 
 use agent_session::domain::model::AgentSession;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use super::error::ExtractError;
 use super::model::{

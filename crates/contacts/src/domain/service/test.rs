@@ -4,20 +4,20 @@ use std::sync::Mutex;
 
 #[derive(Default)]
 struct RecordingRepository {
-    connections: Mutex<Vec<(MacroUserIdStr<'static>, MacroUserIdStr<'static>)>>,
+    connections: Mutex<Vec<(RoxUserIdStr<'static>, RoxUserIdStr<'static>)>>,
 }
 
 impl ContactsRepository for RecordingRepository {
     async fn get_contacts(
         &self,
-        _user_id: MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, rootcause::Report> {
+        _user_id: RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, rootcause::Report> {
         Ok(Vec::new())
     }
 
     async fn create_connections(
         &self,
-        connections: Vec<(MacroUserIdStr<'_>, MacroUserIdStr<'_>)>,
+        connections: Vec<(RoxUserIdStr<'_>, RoxUserIdStr<'_>)>,
     ) -> Result<(), rootcause::Report> {
         self.connections.lock().unwrap().extend(
             connections
@@ -33,14 +33,14 @@ struct NoopNotifier;
 impl ContactsNotifier for NoopNotifier {
     async fn invalidate_contacts_for_users(
         &self,
-        _user_ids: Vec<MacroUserIdStr<'_>>,
+        _user_ids: Vec<RoxUserIdStr<'_>>,
     ) -> Result<(), rootcause::Report> {
         Ok(())
     }
 }
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 #[test]

@@ -19,7 +19,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
 use entity_mutation::{DuplicateEntity, EntityMutationEffect, EntityMutationErrorCode};
 use futures::stream::{self, StreamExt};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::project::request::CreateProjectRequest;
 use model_entity::{Entity, EntityType};
 use model_owner::{CreationPrincipal, Owner};
@@ -201,7 +201,7 @@ where
 
     /// Permanently delete a partial copy and everything filed in it.
     #[tracing::instrument(name = "project.duplicate.discard", skip(self, owner))]
-    async fn discard(&self, copy_id: &str, owner: MacroUserIdStr<'static>) {
+    async fn discard(&self, copy_id: &str, owner: RoxUserIdStr<'static>) {
         let copy = match Uuid::parse_str(copy_id) {
             Ok(copy) => copy,
             Err(error) => {
@@ -245,7 +245,7 @@ where
         &self,
         entity: Entity<'static>,
         receipt: EntityAccessReceipt<Self::Receipt>,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         display_name: Option<String>,
     ) -> Result<Vec<EntityMutationEffect>, EntityMutationErrorCode> {
         let source = self

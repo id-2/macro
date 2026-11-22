@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import type { CalendarEvent as CalendarEventRecord } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { User } from '../users/user';
 import { CalendarNamespace } from './namespace';
 
@@ -96,7 +96,7 @@ async function listed(
       }),
     },
     calendar: { listCalendars: async () => ({ data: { calendars } }) },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   const items = [];
   for await (const item of new CalendarNamespace(client).occurrences({
     start: '2026-01-01T00:00:00Z',
@@ -163,7 +163,7 @@ describe('calendar occurrences', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const items = [];
     for await (const item of new CalendarNamespace(client).occurrences({
@@ -454,7 +454,7 @@ describe('team availability', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const availability = await new CalendarNamespace(client).teamAvailability({
       start: '2026-10-07T09:00:00Z',
@@ -503,7 +503,7 @@ describe('team availability', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const availability = await new CalendarNamespace(client).teamAvailability({
       start: '2026-10-07T00:00:00Z',

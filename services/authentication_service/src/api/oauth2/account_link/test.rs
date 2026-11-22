@@ -114,7 +114,7 @@ fn callback_redirect_appends_link_identifiers_and_preserves_query_parameters() {
 #[test]
 fn return_redirect_replaces_a_previous_outcome_and_keeps_the_rest() {
     let original_url = urlencoding::encode(
-        "macro:///inbox-link-callback?email_link_error=cancelled&provider=gmail&token=stale&view=all",
+        "rox:///inbox-link-callback?email_link_error=cancelled&provider=gmail&token=stale&view=all",
     );
 
     let response = build_return_redirect(

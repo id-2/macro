@@ -8,7 +8,7 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use chrono::Utc;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::document::FileType;
 use uuid::Uuid;
 
@@ -26,7 +26,7 @@ use uuid::Uuid;
 #[tracing::instrument(skip(ctx, user), fields(actor = %user.acting_entity()))]
 pub async fn put_presigned_url(
     State(ctx): State<AppState>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(request): Json<PutFileRequest>,
 ) -> Result<Response, Response> {
     // Checked before any metadata is written, so a rejected request leaves no row.
@@ -63,7 +63,7 @@ pub async fn put_presigned_url(
     let s3_key = static_file_key.to_key();
     let permalink = format!("{}/{}", ctx.public_url, s3_key);
 
-    let owner_id = user.authorization.user.macro_user_id.as_ref().to_string();
+    let owner_id = user.authorization.user.rox_user_id.as_ref().to_string();
 
     let metadata = MetadataObject {
         file_id: id.clone(),

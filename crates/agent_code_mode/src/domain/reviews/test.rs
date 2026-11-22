@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::{ExecutionRecord, ExecutionStatus};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use serde_json::{Value, json};
 use std::{
     collections::HashMap,
@@ -117,7 +117,7 @@ impl ExecutionStore for Executions {
     }
 }
 struct Actions {
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     archived: AtomicBool,
     prompter: Mutex<Option<TurnPrompter>>,
     calls: Mutex<Vec<String>>,
@@ -134,7 +134,7 @@ struct Actions {
     fail_import: AtomicBool,
 }
 impl Actions {
-    async fn act(&self, account_holder: &MacroUserIdStr<'static>, call: String) {
+    async fn act(&self, account_holder: &RoxUserIdStr<'static>, call: String) {
         self.actors.lock().unwrap().push(account_holder.to_string());
         self.calls.lock().unwrap().push(call);
         self.action_started.notify_one();
@@ -154,7 +154,7 @@ impl ReviewActions for Actions {
     }
     async fn approvable(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         record: &ReviewRecord,
     ) -> Result<bool, CodeModeError> {
         assert_eq!(account_holder, &record.acting_user);
@@ -162,7 +162,7 @@ impl ReviewActions for Actions {
     }
     async fn send_email(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         draft: &EmailDraft,
     ) -> Result<EmailResult, CodeModeError> {
         self.act(account_holder, draft.subject.clone()).await;
@@ -170,20 +170,20 @@ impl ReviewActions for Actions {
             return Err(invalid());
         }
         Ok(EmailResult::Sent {
-            message_id: macro_uuid::generate_uuid_v7(),
-            thread_id: macro_uuid::generate_uuid_v7(),
+            message_id: rox_uuid::generate_uuid_v7(),
+            thread_id: rox_uuid::generate_uuid_v7(),
         })
     }
     async fn create_calendar_event(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &CalendarDraft,
     ) -> Result<CalendarResult, CodeModeError> {
         unreachable!("these tests present email and import reviews")
     }
     async fn start_import(
         &self,
-        account_holder: &MacroUserIdStr<'static>,
+        account_holder: &RoxUserIdStr<'static>,
         _: &ReviewRecord,
         _: &ImportDraft,
     ) -> Result<ImportResult, CodeModeError> {
@@ -195,7 +195,7 @@ impl ReviewActions for Actions {
     }
     async fn present(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         record: &ReviewRecord,
     ) -> Result<(), CodeModeError> {
         assert_eq!(owner, &self.owner);
@@ -215,7 +215,7 @@ impl ReviewActions for Actions {
     }
     async fn present_view(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: AgentSessionId,
         view: &PresentedView,
     ) -> Result<(), CodeModeError> {
@@ -233,9 +233,9 @@ struct Fixture {
 }
 impl Fixture {
     fn new() -> Self {
-        let session = AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7());
+        let session = AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7());
         let execution = ExecutionId::mint();
-        let owner = MacroUserIdStr::parse_from_str("macro|reviews@macro.local")
+        let owner = RoxUserIdStr::parse_from_str("macro|reviews@macro.local")
             .unwrap()
             .into_owned();
         let store = Arc::new(Store::default());
@@ -327,7 +327,7 @@ impl Fixture {
 #[tokio::test]
 async fn owner_receipt_execution_and_archive_are_enforced_before_creation() {
     let f = Fixture::new();
-    let stranger = MacroUserIdStr::parse_from_str("macro|other@macro.local")
+    let stranger = RoxUserIdStr::parse_from_str("macro|other@macro.local")
         .unwrap()
         .into_owned();
     assert!(matches!(
@@ -672,7 +672,7 @@ async fn read_and_list_never_cross_session_scope_and_creation_is_bounded() {
         .await;
     let other = EntityAccessReceipt::dangerously_assert_authenticated_user(
         f.actions.owner.clone(),
-        &macro_uuid::generate_uuid_v7().to_string(),
+        &rox_uuid::generate_uuid_v7().to_string(),
         EntityType::AgentSession,
     );
     assert!(matches!(
@@ -1120,7 +1120,7 @@ async fn dismissing_an_import_wakes_the_session() {
 #[tokio::test]
 async fn requester_reviews_are_decided_and_executed_only_with_their_account() {
     let f = Fixture::new();
-    let requester = MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+    let requester = RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     let access = EntityAccessReceipt::dangerously_assert_authenticated_user(
         requester.clone(),
         &f.session.to_string(),
@@ -1290,7 +1290,7 @@ async fn an_oversized_view_is_turned_back() {
 #[tokio::test]
 async fn a_view_is_presented_only_by_its_session_and_execution() {
     let f = Fixture::new();
-    let stranger = MacroUserIdStr::parse_from_str("macro|other@macro.local")
+    let stranger = RoxUserIdStr::parse_from_str("macro|other@macro.local")
         .unwrap()
         .into_owned();
     let input = |execution_id| PresentView {

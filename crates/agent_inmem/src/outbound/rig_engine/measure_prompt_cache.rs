@@ -122,7 +122,7 @@ async fn send(
         native.for_turn(false),
         Arc::clone(&native.deferred),
     ));
-    let user = MacroUserIdStr::try_from_email("cache-measure@rox.one").unwrap();
+    let user = RoxUserIdStr::try_from_email("cache-measure@rox.one").unwrap();
     let usage = UsageContext::new(AiFeature::AgentSession, user);
     let recorded = Arc::new(RecordedUsage::default());
     let metering = agent::MeteringContext::tracking_only(recorded.clone(), usage.clone());
@@ -245,7 +245,7 @@ async fn measure_prompt_cache_turns() {
         // Stands in for `select_documentation`, which picks different SDK
         // references for each request.
         let sdk_docs = format!(
-            "\n<macro_sdk>\nTurn {index} reference.\n{}</macro_sdk>",
+            "\n<rox_sdk>\nTurn {index} reference.\n{}</rox_sdk>",
             "documents.search(query) returns an async iterator of documents.\n"
                 .repeat(60 * (index + 1))
         );

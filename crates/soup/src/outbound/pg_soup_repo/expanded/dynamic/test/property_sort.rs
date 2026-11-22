@@ -108,7 +108,7 @@ async fn flat(
     Ok(expanded_dynamic_cursor_soup_with_projection(
         pool,
         ExpandedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str(&user_id)?,
+            user_id: RoxUserIdStr::parse_from_str(&user_id)?,
             limit,
             cursor,
             exclude_frecency: false,
@@ -133,7 +133,7 @@ async fn grouped(
     Ok(expanded_dynamic_cursor_soup_grouped(
         pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str(&user_id)?,
+            user_id: RoxUserIdStr::parse_from_str(&user_id)?,
             limit,
             cursor,
             exclude_frecency: false,
@@ -150,10 +150,10 @@ async fn grouped(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn property_sort_flat_and_grouped_pages_preserve_keys_and_missing_values(
     pool: PgPool,
@@ -380,10 +380,10 @@ async fn check_pages(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn property_date_ranges_keep_full_totals_and_missing_bucket(
     pool: PgPool,
@@ -484,10 +484,10 @@ async fn property_date_ranges_keep_full_totals_and_missing_bucket(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn grouped_property_pages_cross_missing_values_in_both_directions(
     pool: PgPool,
@@ -530,10 +530,10 @@ async fn grouped_property_pages_cross_missing_values_in_both_directions(
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn deleted_options_use_the_empty_group_and_live_options_follow_display_order(
     pool: PgPool,
@@ -603,10 +603,10 @@ async fn deleted_options_use_the_empty_group_and_live_options_follow_display_ord
 
 #[sqlx::test(
     fixtures(
-        path = "../../../../../../../macro_db_client/fixtures",
+        path = "../../../../../../../rox_db_client/fixtures",
         scripts("mixed_items_expanded")
     ),
-    migrator = "MACRO_DB_MIGRATIONS"
+    migrator = "ROX_DB_MIGRATIONS"
 )]
 async fn mixed_task_and_document_filters_use_canonical_property_assignments(
     pool: PgPool,

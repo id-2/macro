@@ -1,13 +1,13 @@
 import type { Harness as HarnessRecord } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Agent } from '../agents/agent';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { type AccessRequest, EntityAccess } from '../sharing/access';
 import { User } from '../users/user';
 
 /** A registered host for agents: a teammate's computer running roxd. */
-export class Harness extends MacroEntity<HarnessRecord> {
+export class Harness extends RoxEntity<HarnessRecord> {
   /**
    * Access requests for this host. Asking for access works from any credential;
    * deciding who gets it takes the owner's own session, in the app.
@@ -15,12 +15,12 @@ export class Harness extends MacroEntity<HarnessRecord> {
   readonly access = new EntityAccess(this.client, 'harness', this);
 
   /** Construct a lazy host handle. */
-  static byId(client: MacroClient, id: string): Harness {
+  static byId(client: RoxClient, id: string): Harness {
     return new Harness(client, id);
   }
 
   /** Seed from a listed host. */
-  static from(client: MacroClient, record: HarnessRecord): Harness {
+  static from(client: RoxClient, record: HarnessRecord): Harness {
     return new Harness(client, record.id, record);
   }
 
@@ -29,7 +29,7 @@ export class Harness extends MacroEntity<HarnessRecord> {
       await this.client.storage.listHarnessDirectory(),
     ).find((h) => h.id === this.id);
     if (!record)
-      throw new MacroNotFoundError(`Harness ${this.id} is unavailable`);
+      throw new RoxNotFoundError(`Harness ${this.id} is unavailable`);
     return record;
   }
 

@@ -65,19 +65,19 @@ pub(crate) fn herdr_agent(harness: &Harness) -> Option<acp_agent::TuiAgent> {
 }
 
 mod environment {
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Home;
     }
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct HerdrEnv;
     }
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct HerdrBinPath;
     }
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct HerdrWorkspaceId;
     }
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct HcTerminalId;
     }
 }

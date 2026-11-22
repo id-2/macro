@@ -1,18 +1,18 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sha_cleanup_worker::{config::Config, process::process, service};
 use sqlx::postgres::PgPoolOptions;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     let config = Config::from_env().context("all necessary env vars should be available")?;
 
     let s3_client = service::s3::S3::new(
-        macro_aws_config::s3_client().await,
+        rox_aws_config::s3_client().await,
         &config.document_storage_bucket,
     );
 

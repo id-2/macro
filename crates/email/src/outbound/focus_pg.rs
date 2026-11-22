@@ -3,7 +3,7 @@
 use std::{collections::HashMap, str::FromStr};
 
 use chrono::{DateTime, Duration, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -200,7 +200,7 @@ impl FocusStore for FocusPgRepository {
     async fn thread_inbox(&self, thread_id: Uuid) -> Result<Option<FocusInbox>, Report> {
         let Some(row) = sqlx::query!(
             r#"
-            SELECT t.id, t.link_id, t.is_signal, t.inbox_visible, el.macro_id, el.email_address,
+            SELECT t.id, t.link_id, t.is_signal, t.inbox_visible, el.rox_id, el.email_address,
                    f.classified_message_id AS "classified_message_id?",
                    f.rule_version AS "rule_version?",
                    f.scores AS "scores?",
@@ -244,7 +244,7 @@ impl FocusStore for FocusPgRepository {
         Ok(Some(FocusInbox {
             thread_id: row.id,
             link_id: row.link_id,
-            owner: MacroUserIdStr::try_from(row.macro_id)?,
+            owner: RoxUserIdStr::try_from(row.rox_id)?,
             owner_email: row.email_address.to_lowercase(),
             is_signal: row.is_signal,
             inbox_visible: row.inbox_visible,
@@ -428,7 +428,7 @@ impl FocusStore for FocusPgRepository {
     #[tracing::instrument(skip(self), fields(threads = tracing::field::Empty), err)]
     async fn focus_thread_ids(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         since: DateTime<Utc>,
         waiting_before: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -457,9 +457,9 @@ impl FocusStore for FocusPgRepository {
             ) latest
             WHERE f.link_id IN (
                     -- The owner's inboxes, as Soup lists them: their own and linked ones.
-                    SELECT el.id FROM email_links el WHERE el.macro_id = $1
+                    SELECT el.id FROM email_links el WHERE el.rox_id = $1
                     UNION
-                    SELECT mul.link_id FROM macro_user_links mul WHERE mul.primary_macro_id = $1
+                    SELECT mul.link_id FROM rox_user_links mul WHERE mul.primary_rox_id = $1
                 )
               -- Every way in, indexed by email_thread_focus_list_idx and
               -- email_thread_focus_read_time_idx.
@@ -510,7 +510,7 @@ impl FocusStore for FocusPgRepository {
     )]
     async fn focus_for_threads(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_ids: &[Uuid],
         waiting_before: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -568,9 +568,9 @@ impl FocusStore for FocusPgRepository {
             ) now_state
             WHERE f.thread_id = ANY($1)
               AND f.link_id IN (
-                  SELECT el.id FROM email_links el WHERE el.macro_id = $2
+                  SELECT el.id FROM email_links el WHERE el.rox_id = $2
                   UNION
-                  SELECT mul.link_id FROM macro_user_links mul WHERE mul.primary_macro_id = $2
+                  SELECT mul.link_id FROM rox_user_links mul WHERE mul.primary_rox_id = $2
               )
             "#,
             thread_ids,

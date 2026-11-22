@@ -3,7 +3,7 @@
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
 use harness_id::HarnessId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::PgComputerRepo;
@@ -123,7 +123,7 @@ impl TryFrom<ComputerRow> for Computer {
             state: serde_json::from_value(row.state)
                 .map_err(|_| invalid_row("state must satisfy lifecycle field rules"))?,
             harness_id: row.harness_id.map(HarnessId::new_from_uuid),
-            created_by: MacroUserIdStr::try_from(row.created_by)
+            created_by: RoxUserIdStr::try_from(row.created_by)
                 .map_err(|_| invalid_row("created_by must be a valid Rox user identifier"))?,
             created_at: row.created_at,
             enrolled_at: row.enrolled_at,
@@ -160,7 +160,7 @@ impl TryFrom<ReservationRow> for Reservation {
             catalog_entry: CatalogEntryId::try_new(row.catalog_entry)
                 .map_err(|_| invalid_row("catalog_entry must be a versioned catalog identifier"))?,
             funding: funding(row.price_id, row.comp_reason)?,
-            created_by: MacroUserIdStr::try_from(row.created_by)
+            created_by: RoxUserIdStr::try_from(row.created_by)
                 .map_err(|_| invalid_row("created_by must be a valid Rox user identifier"))?,
             extra_items: serde_json::from_value(row.extra_items)
                 .map_err(|_| invalid_row("extra_items must be subscription items"))?,
@@ -169,7 +169,7 @@ impl TryFrom<ReservationRow> for Reservation {
             created_at: row.created_at,
             agent: row
                 .agent_user_id
-                .map(MacroUserIdStr::try_from)
+                .map(RoxUserIdStr::try_from)
                 .transpose()
                 .map_err(|_| invalid_row("agent_user_id must be a valid Rox user identifier"))?,
         })

@@ -162,7 +162,7 @@ export type ApiDraftInput = {
     /**
      * Rox body format.
      */
-    body_macro?: string | null;
+    body_rox?: string | null;
     /**
      * Plain text body.
      */
@@ -233,7 +233,7 @@ export type ApiDraftOutput = {
     /**
      * Rox body.
      */
-    body_macro?: string | null;
+    body_rox?: string | null;
     /**
      * Plain text body.
      */
@@ -320,7 +320,7 @@ export type ApiMessage = {
     attachments_forwarded: Array<ApiAttachmentForwarded>;
     bcc: Array<ApiContactInfo>;
     body_html_sanitized?: string | null;
-    body_macro?: string | null;
+    body_rox?: string | null;
     body_replyless?: string | null;
     body_text?: string | null;
     calendar_invitations?: Array<CalendarInvitation>;
@@ -942,7 +942,7 @@ export type CalendarMutationApiError = {
 /**
  * Machine-readable failure category for calendar mutations.
  */
-export type CalendarMutationErrorCode = 'not_found' | 'occurrence_not_found' | 'read_only' | 'no_writable_calendar' | 'not_attendee' | 'not_organizer' | 'guests_cannot_invite' | 'guest_list_hidden' | 'guests_cannot_modify' | 'already_on_calendar' | 'join_request_open' | 'copy_refused' | 'snapshot' | 'invalid_input' | 'reauth_required' | 'provider_rejected' | 'retryable' | 'persist_failed' | 'macro_call_failed' | 'copy_choice_required' | 'confirmation_required';
+export type CalendarMutationErrorCode = 'not_found' | 'occurrence_not_found' | 'read_only' | 'no_writable_calendar' | 'not_attendee' | 'not_organizer' | 'guests_cannot_invite' | 'guest_list_hidden' | 'guests_cannot_modify' | 'already_on_calendar' | 'join_request_open' | 'copy_refused' | 'snapshot' | 'invalid_input' | 'reauth_required' | 'provider_rejected' | 'retryable' | 'persist_failed' | 'rox_call_failed' | 'copy_choice_required' | 'confirmation_required';
 
 /**
  * A materialized recurrence instance optimized for range queries.
@@ -1085,7 +1085,7 @@ export type ErrorResponse = {
  */
 export type EventReminderOverride = {
     /**
-     * Provider method, stored verbatim; only `popup` fires Macro
+     * Provider method, stored verbatim; only `popup` fires Rox
      * notifications.
      */
     method: string;
@@ -1317,7 +1317,7 @@ export type InitErrorCodeResponse = {
 export type InitResponse = {
     /**
      * Present when init enqueued a backfill job. Absent for cross-user delegation,
-     * where the child link's backfill already ran under its own macro_id; present for
+     * where the child link's backfill already ran under its own rox_id; present for
      * the self-link bootstrap, where a fresh link is provisioned and backfilled.
      */
     backfill_job_id?: string | null;
@@ -1468,7 +1468,7 @@ export type Link = {
     id: string;
     is_primary: boolean;
     is_sync_active: boolean;
-    macro_id: string;
+    rox_id: string;
     /**
      * Whether the link's Google grant is missing the calendar scope. True for
      * inboxes connected before the calendar capability existed (and for
@@ -1622,7 +1622,7 @@ export type Message = {
     attachments_forwarded: Array<AttachmentForwarded>;
     bcc: Array<ContactInfo>;
     body_html_sanitized?: string | null;
-    body_macro?: string | null;
+    body_rox?: string | null;
     body_text?: string | null;
     cc: Array<ContactInfo>;
     created_at: string;

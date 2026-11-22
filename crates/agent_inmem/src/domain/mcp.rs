@@ -16,12 +16,12 @@ mod test;
 
 /// The name the harness gives Rox's own MCP server in the ACP list.
 ///
-/// Restated from `agent_harness::MACRO_MCP_NAME` rather than imported - this
+/// Restated from `agent_harness::ROX_MCP_NAME` rather than imported - this
 /// crate is a runtime the harness drives, not a dependant of it - and pinned
 /// equal by a test in the composition root, which sees both. Rox's tools are
 /// native here (see [`ai_tools::all_tools`]), so the entry is skipped: dialing
 /// it would give the model every Rox tool twice.
-pub const MACRO_MCP_NAME: &str = "macro";
+pub const ROX_MCP_NAME: &str = "macro";
 
 /// The servers this runtime should dial out of an ACP server list: HTTP
 /// entries other than Rox's own. SSE and stdio entries are not something an
@@ -30,7 +30,7 @@ pub fn dialable_servers(servers: Vec<AcpMcpServer>) -> Vec<McpServerHttp> {
     servers
         .into_iter()
         .filter_map(|server| match server {
-            AcpMcpServer::Http(http) if http.name == MACRO_MCP_NAME => None,
+            AcpMcpServer::Http(http) if http.name == ROX_MCP_NAME => None,
             AcpMcpServer::Http(http) => Some(http),
             other => {
                 tracing::warn!(
@@ -104,9 +104,9 @@ impl McpToolConnector for NoMcpServers {
 
 /// The internal MCP tools every code-mode turn needs.
 pub const CODE_MODE_MCP_TOOLS: &[&str] = &[
-    "mcp__macro_internal__ExecuteCode",
-    "mcp__macro_internal__DescribeCodeTools",
-    "mcp__macro_internal__ReadCodeDocs",
+    "mcp__rox_internal__ExecuteCode",
+    "mcp__rox_internal__DescribeCodeTools",
+    "mcp__rox_internal__ReadCodeDocs",
 ];
 
 /// Whether `tools` list every one of [`CODE_MODE_MCP_TOOLS`].

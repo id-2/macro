@@ -2,22 +2,22 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 pub(crate) async fn seed_team(pool: &PgPool, team_id: Uuid, owner_id: &str) -> sqlx::Result<()> {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
 
     sqlx::query(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)"#,
     )
-    .bind(macro_user_id)
+    .bind(rox_user_id)
     .bind(owner_id)
     .bind(owner_id)
-    .bind(format!("stripe_{macro_user_id}"))
+    .bind(format!("stripe_{rox_user_id}"))
     .execute(pool)
     .await?;
 
-    sqlx::query(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#)
+    sqlx::query(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#)
         .bind(owner_id)
         .bind(owner_id)
-        .bind(macro_user_id)
+        .bind(rox_user_id)
         .execute(pool)
         .await?;
 
@@ -68,7 +68,7 @@ pub(super) async fn insert_email_link(
 ) -> sqlx::Result<Uuid> {
     let link_id = Uuid::now_v7();
     sqlx::query(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $3, $4, 'GMAIL')"#,
     )
     .bind(link_id)
@@ -86,7 +86,7 @@ pub(super) async fn consent_to_mailbox(
     link: Uuid,
 ) -> anyhow::Result<()> {
     use crate::domain::email_privacy::{EmailPrivacyChange, EmailPrivacyRepository};
-    let user = sqlx::query_scalar!("SELECT macro_id FROM email_links WHERE id = $1", link)
+    let user = sqlx::query_scalar!("SELECT rox_id FROM email_links WHERE id = $1", link)
         .fetch_one(pool)
         .await?;
     sqlx::query!("INSERT INTO team_user (team_id, user_id, team_role) VALUES ($1, $2, 'member') ON CONFLICT DO NOTHING", team, user).execute(pool).await?;

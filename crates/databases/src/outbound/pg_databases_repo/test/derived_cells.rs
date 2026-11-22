@@ -160,7 +160,7 @@ async fn stored(
         .collect()
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn inserted_rows_store_their_formula_cells(pool: PgPool) {
     let orders = orders(&pool).await;
 
@@ -189,7 +189,7 @@ async fn inserted_rows_store_their_formula_cells(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn updating_an_input_updates_the_formula_cells_reading_it(pool: PgPool) {
     let orders = orders(&pool).await;
     let rows = insert(
@@ -274,7 +274,7 @@ async fn updating_an_input_updates_the_formula_cells_reading_it(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_formula_column_added_to_a_table_with_rows_computes_every_row(pool: PgPool) {
     let orders = orders(&pool).await;
     let rows = insert(
@@ -308,7 +308,7 @@ async fn a_formula_column_added_to_a_table_with_rows_computes_every_row(pool: Pg
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn changing_a_formula_recomputes_it_and_the_formulas_reading_it(pool: PgPool) {
     let orders = orders(&pool).await;
     let rows = insert(
@@ -352,7 +352,7 @@ async fn changing_a_formula_recomputes_it_and_the_formulas_reading_it(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn an_input_retyped_away_from_numbers_empties_the_formulas_reading_it(pool: PgPool) {
     let orders = orders(&pool).await;
     let rows = insert(
@@ -405,7 +405,7 @@ async fn an_input_retyped_away_from_numbers_empties_the_formulas_reading_it(pool
     assert_eq!(stored(&pool, table, orders.double, &rows).await, vec![None]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn formula_cells_are_not_writable(pool: PgPool) {
     let orders = orders(&pool).await;
     let rows = insert(
@@ -444,7 +444,7 @@ async fn formula_cells_are_not_writable(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undoing_an_input_edit_or_a_removal_derives_the_formula_again(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (maria, omar) = insert_guests(&pool, &wedding).await;
@@ -551,7 +551,7 @@ async fn undoing_an_input_edit_or_a_removal_derives_the_formula_again(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_batch_of_only_derivations_backfills_every_row_and_bumps_the_table(pool: PgPool) {
     use database_sql::catalog::{Column as QueryColumn, ColumnKind as QueryKind, TableSource};
 
@@ -649,7 +649,7 @@ async fn a_batch_of_only_derivations_backfills_every_row_and_bumps_the_table(poo
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_backfill_stores_missing_formula_cells_and_a_second_run_changes_nothing(pool: PgPool) {
     use crate::backfill::{TableBackfill, backfill_table, tables_with_formulas};
     let orders = orders(&pool).await;

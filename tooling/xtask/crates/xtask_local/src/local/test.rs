@@ -14,7 +14,7 @@ fn full_teardown_removes_vault_storage_without_crossing_instance_boundaries() {
     assert_eq!(default_volumes.len(), 7);
     assert_eq!(named_volumes.len(), 7);
     assert!(default_volumes.is_disjoint(&named_volumes));
-    assert!(default_volumes.contains("macro_openbao_data"));
+    assert!(default_volumes.contains("rox_openbao_data"));
     assert!(named_volumes.contains("macro-passwords-isolation_openbao_data"));
     assert!(external_volumes(&named).into_iter().all(|volume| {
         named_volumes.contains(&volume) && volume != "macro-passwords-isolation_openbao_data"

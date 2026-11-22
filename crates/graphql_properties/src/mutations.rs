@@ -2,7 +2,7 @@ use async_graphql::{Context, ID, Object};
 use entity_access::domain::models::{EditAccessLevel, ViewAccessLevel};
 use entity_access::domain::ports::EntityAccessService;
 use graphql_common::{GraphqlCacheDeletion, GraphqlPropertyEntityType, parse_id};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::api::requests::SetPropertyValue;
 use models_properties::service::entity_property_with_definition::EntityPropertyWithDefinition;
 use models_properties::shared::{DateRange, EntityReference};
@@ -111,7 +111,7 @@ pub struct PropertiesEntityPropertyWriter<P, A> {
     /// Access service used to authorize writes.
     entity_access_service: Arc<A>,
     /// Authenticated user performing the write.
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 }
 
 impl<P, A> PropertiesEntityPropertyWriter<P, A> {
@@ -119,7 +119,7 @@ impl<P, A> PropertiesEntityPropertyWriter<P, A> {
     pub fn new(
         properties_service: Arc<P>,
         entity_access_service: Arc<A>,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Self {
         Self {
             properties_service,

@@ -38,12 +38,12 @@ use documents::domain::events::{
     DocumentSyncContentUpdatedMetadata, DocumentTopicEvent, DocumentUpdatedMetadata,
     InteractionReason,
 };
-use macro_event_broker::{Event, EventBrokerError, MacroEvent as _, MessageParts};
-use macro_event_topics::{
-    MacroCalendarTopic, MacroCallsTopic, MacroChannelsTopic, MacroChatsTopic, RoxDocumentsTopic,
-    MacroEmailTopic, MacroProjectsTopic, MacroPropertiesTopic, Topic as _,
+use rox_event_broker::{Event, EventBrokerError, RoxEvent as _, MessageParts};
+use rox_event_topics::{
+    RoxCalendarTopic, RoxCallsTopic, RoxChannelsTopic, RoxChatsTopic, RoxDocumentsTopic,
+    RoxEmailTopic, RoxProjectsTopic, RoxPropertiesTopic, Topic as _,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use model_owner::Owner;
 use models_properties::{
@@ -145,8 +145,8 @@ fn received_thread_backfilled_event(thread_id: Uuid, offset: i64) -> ReceivedEve
     }
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
 }
 
 fn started_event() -> CallTopicEvent {
@@ -1324,16 +1324,16 @@ fn subscribes_to_declared_search_processing_topics_with_durable_group() {
         "search-processing-service"
     );
     let topics = DeclaredMacroEvent::topics();
-    assert!(topics.contains(&macro_event_topics::MacroAgentSessionLifecycleTopic::TOPIC_STR));
-    assert_eq!(MacroChatsTopic::TOPIC_STR, "macro.chats");
-    assert!(topics.contains(&MacroCallsTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroChannelsTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroChatsTopic::TOPIC_STR));
+    assert!(topics.contains(&rox_event_topics::RoxAgentSessionLifecycleTopic::TOPIC_STR));
+    assert_eq!(RoxChatsTopic::TOPIC_STR, "rox.chats");
+    assert!(topics.contains(&RoxCallsTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxChannelsTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxChatsTopic::TOPIC_STR));
     assert!(topics.contains(&RoxDocumentsTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroEmailTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroProjectsTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroPropertiesTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroCalendarTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxEmailTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxProjectsTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxPropertiesTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxCalendarTopic::TOPIC_STR));
 }
 
 #[test]
@@ -1608,7 +1608,7 @@ fn project_id_collection_is_stable_and_drops_missing_or_empty_ids() {
 fn email_envelope_decodes_round_trip() {
     let event = draft_email_event(false);
     let message = encoded_message(
-        MacroEmailTopic::TOPIC_STR,
+        RoxEmailTopic::TOPIC_STR,
         EMAIL_LINK_ID,
         Event::new(event.clone()),
     );
@@ -1627,7 +1627,7 @@ fn agent_session_lifecycle_decodes_and_routes_by_session() {
         events::*,
         model::{AgentSessionId, SessionSource},
     };
-    use macro_event_topics::MacroAgentSessionLifecycleTopic;
+    use rox_event_topics::RoxAgentSessionLifecycleTopic;
 
     let id = AgentSessionId::new_from_uuid(Uuid::from_u128(10));
     let identity = SessionIdentity {
@@ -1647,7 +1647,7 @@ fn agent_session_lifecycle_decodes_and_routes_by_session() {
         AgentSessionLifecycleEvent::Deleted(SessionDeletedMetadata { identity }),
     ] {
         let message = encoded_message(
-            MacroAgentSessionLifecycleTopic::TOPIC_STR,
+            RoxAgentSessionLifecycleTopic::TOPIC_STR,
             id,
             Event::new(event.clone()),
         );
@@ -1671,7 +1671,7 @@ fn chat_envelope_decodes_round_trip() {
         attachment_count: 0,
     });
     let message = encoded_message(
-        MacroChatsTopic::TOPIC_STR,
+        RoxChatsTopic::TOPIC_STR,
         CHAT_ID,
         Event::new(event.clone()),
     );
@@ -1691,7 +1691,7 @@ fn channel_envelope_decodes_round_trip() {
         actor: channel_sender(),
     });
     let message = encoded_message(
-        MacroChannelsTopic::TOPIC_STR,
+        RoxChannelsTopic::TOPIC_STR,
         CHANNEL_ID,
         Event::new(event.clone()),
     );
@@ -1712,7 +1712,7 @@ fn calendar_envelope_decodes_round_trip_keyed_by_event_id() {
         owner_id: "macro|user".to_string(),
     });
     let message = encoded_message(
-        MacroCalendarTopic::TOPIC_STR,
+        RoxCalendarTopic::TOPIC_STR,
         &event_id.to_string(),
         Event::new(event.clone()),
     );
@@ -1779,7 +1779,7 @@ fn project_envelope_decodes_round_trip_with_string_key() {
         restored_project_ids: vec![PROJECT_ID.to_string(), CHILD_PROJECT_ID.to_string()],
     });
     let message = encoded_message(
-        MacroProjectsTopic::TOPIC_STR,
+        RoxProjectsTopic::TOPIC_STR,
         PROJECT_ID,
         Event::new(event.clone()),
     );
@@ -1802,7 +1802,7 @@ fn property_envelope_decodes_round_trip_with_entity_key() {
         on_behalf_of: None,
     });
     let message = encoded_message(
-        MacroPropertiesTopic::TOPIC_STR,
+        RoxPropertiesTopic::TOPIC_STR,
         PROPERTY_ENTITY_ID,
         Event::new(event.clone()),
     );
@@ -1816,7 +1816,7 @@ fn property_envelope_decodes_round_trip_with_entity_key() {
 }
 
 #[test]
-fn exact_macro_documents_envelopes_decode_into_document_events() {
+fn exact_rox_documents_envelopes_decode_into_document_events() {
     let cases: Vec<(&[u8], Event<DocumentTopicEvent>)> = vec![
         (
             br#"{
@@ -1898,17 +1898,17 @@ fn exact_macro_documents_envelopes_decode_into_document_events() {
 #[tokio::test]
 async fn malformed_missing_key_and_unsupported_email_messages_are_commit_safe() {
     let malformed = TestMessage {
-        topic: MacroEmailTopic::TOPIC_STR,
+        topic: RoxEmailTopic::TOPIC_STR,
         key: Some(EMAIL_LINK_ID.to_string()),
         payload: Some(b"not json".to_vec()),
     };
     let malformed = attach_event_coordinates(DeclaredMacroEvent::decode(&malformed), 7, 60);
 
     let missing_key = TestMessage {
-        topic: MacroEmailTopic::TOPIC_STR,
+        topic: RoxEmailTopic::TOPIC_STR,
         key: None,
         payload: encoded_message(
-            MacroEmailTopic::TOPIC_STR,
+            RoxEmailTopic::TOPIC_STR,
             EMAIL_LINK_ID,
             Event::new(draft_email_event(false)),
         )
@@ -1917,7 +1917,7 @@ async fn malformed_missing_key_and_unsupported_email_messages_are_commit_safe() 
     let missing_key = attach_event_coordinates(DeclaredMacroEvent::decode(&missing_key), 7, 61);
 
     let unsupported = encoded_message(
-        MacroEmailTopic::TOPIC_STR,
+        RoxEmailTopic::TOPIC_STR,
         EMAIL_LINK_ID,
         Event::with_schema_version(draft_email_event(false), 2),
     );
@@ -1938,7 +1938,7 @@ async fn malformed_missing_key_and_unsupported_email_messages_are_commit_safe() 
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroEmailTopic::TOPIC_STR);
+            assert_eq!(topic, RoxEmailTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -1953,7 +1953,7 @@ async fn malformed_missing_key_and_unsupported_email_messages_are_commit_safe() 
 #[tokio::test]
 async fn malformed_and_unsupported_chat_messages_are_commit_safe() {
     let malformed = TestMessage {
-        topic: MacroChatsTopic::TOPIC_STR,
+        topic: RoxChatsTopic::TOPIC_STR,
         key: Some(CHAT_ID.to_string()),
         payload: Some(b"not json".to_vec()),
     };
@@ -1970,7 +1970,7 @@ async fn malformed_and_unsupported_chat_messages_are_commit_safe() {
         message_id: CHAT_MESSAGE_ID.to_string(),
     });
     let unsupported = encoded_message(
-        MacroChatsTopic::TOPIC_STR,
+        RoxChatsTopic::TOPIC_STR,
         CHAT_ID,
         Event::with_schema_version(unsupported_event, 2),
     );
@@ -1981,7 +1981,7 @@ async fn malformed_and_unsupported_chat_messages_are_commit_safe() {
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroChatsTopic::TOPIC_STR);
+            assert_eq!(topic, RoxChatsTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2004,7 +2004,7 @@ async fn unsupported_project_schema_message_is_commit_safe() {
         restored_project_ids: vec![PROJECT_ID.to_string()],
     });
     let message = encoded_message(
-        MacroProjectsTopic::TOPIC_STR,
+        RoxProjectsTopic::TOPIC_STR,
         PROJECT_ID,
         Event::with_schema_version(event, 2),
     );
@@ -2017,7 +2017,7 @@ async fn unsupported_project_schema_message_is_commit_safe() {
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroProjectsTopic::TOPIC_STR);
+            assert_eq!(topic, RoxProjectsTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2039,7 +2039,7 @@ async fn unsupported_property_schema_message_is_commit_safe() {
         on_behalf_of: None,
     });
     let message = encoded_message(
-        MacroPropertiesTopic::TOPIC_STR,
+        RoxPropertiesTopic::TOPIC_STR,
         PROPERTY_ENTITY_ID,
         Event::with_schema_version(event, 2),
     );
@@ -2052,7 +2052,7 @@ async fn unsupported_property_schema_message_is_commit_safe() {
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroPropertiesTopic::TOPIC_STR);
+            assert_eq!(topic, RoxPropertiesTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2071,7 +2071,7 @@ async fn unsupported_channel_schema_message_is_commit_safe() {
         actor: channel_sender(),
     });
     let message = encoded_message(
-        MacroChannelsTopic::TOPIC_STR,
+        RoxChannelsTopic::TOPIC_STR,
         CHANNEL_ID,
         Event::with_schema_version(event, 2),
     );
@@ -2084,7 +2084,7 @@ async fn unsupported_channel_schema_message_is_commit_safe() {
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroChannelsTopic::TOPIC_STR);
+            assert_eq!(topic, RoxChannelsTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2099,7 +2099,7 @@ async fn unsupported_channel_schema_message_is_commit_safe() {
 #[tokio::test]
 async fn malformed_missing_key_and_unsupported_schema_messages_are_commit_safe() {
     let malformed = TestMessage {
-        topic: MacroCallsTopic::TOPIC_STR,
+        topic: RoxCallsTopic::TOPIC_STR,
         key: Some(CALL_ID.to_string()),
         payload: Some(b"not json".to_vec()),
     };
@@ -2107,10 +2107,10 @@ async fn malformed_missing_key_and_unsupported_schema_messages_are_commit_safe()
     assert!(matches!(malformed, Err(EventBrokerError::Serialization(_))));
 
     let missing_key = TestMessage {
-        topic: MacroCallsTopic::TOPIC_STR,
+        topic: RoxCallsTopic::TOPIC_STR,
         key: None,
         payload: encoded_message(
-            MacroCallsTopic::TOPIC_STR,
+            RoxCallsTopic::TOPIC_STR,
             CALL_ID,
             Event::new(archived_event()),
         )
@@ -2123,7 +2123,7 @@ async fn malformed_missing_key_and_unsupported_schema_messages_are_commit_safe()
     ));
 
     let unsupported = encoded_message(
-        MacroCallsTopic::TOPIC_STR,
+        RoxCallsTopic::TOPIC_STR,
         CALL_ID,
         Event::with_schema_version(archived_event(), 2),
     );
@@ -2154,7 +2154,7 @@ async fn malformed_missing_key_and_unsupported_schema_messages_are_commit_safe()
 async fn successful_handoff_carries_event_partition_and_offset() {
     let event = archived_event();
     let message = encoded_message(
-        MacroCallsTopic::TOPIC_STR,
+        RoxCallsTopic::TOPIC_STR,
         CALL_ID,
         Event::new(event.clone()),
     );
@@ -2178,7 +2178,7 @@ async fn successful_handoff_carries_event_partition_and_offset() {
 #[tokio::test]
 async fn closed_worker_channel_leaves_the_current_message_uncommitted() {
     let message = encoded_message(
-        MacroCallsTopic::TOPIC_STR,
+        RoxCallsTopic::TOPIC_STR,
         CALL_ID,
         Event::new(archived_event()),
     );
@@ -2304,7 +2304,7 @@ fn email_events_shard_by_thread_and_link_scoped_events_by_producer_key() {
 #[test]
 fn non_email_events_shard_by_their_producer_key() {
     let message = encoded_message(
-        MacroCallsTopic::TOPIC_STR,
+        RoxCallsTopic::TOPIC_STR,
         CALL_ID,
         Event::new(archived_event()),
     );

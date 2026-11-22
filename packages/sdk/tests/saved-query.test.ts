@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from 'bun:test';
 import { DatabaseTable } from '../src/entities/databases/table';
 import { Macro } from '../src/macro';
-import { MacroApiError, MacroError } from '../src/utils';
+import { RoxApiError, RoxError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
 
@@ -190,7 +190,7 @@ test('an invalid presentation is refused before anything is saved', async () => 
   ];
   for (const [options, message] of refusals) {
     const error = await database.saveQuery(options).catch((e: unknown) => e);
-    expect(error).toBeInstanceOf(MacroError);
+    expect(error).toBeInstanceOf(RoxError);
     expect((error as Error).message).toBe(message);
   }
   expect(requests).toHaveLength(0);
@@ -211,8 +211,8 @@ test('the server refusing the SQL surfaces as an API error', async () => {
       display: { mode: 'table' },
     })
     .catch((e: unknown) => e);
-  expect(error).toBeInstanceOf(MacroApiError);
-  expect((error as MacroApiError).status).toBe(400);
+  expect(error).toBeInstanceOf(RoxApiError);
+  expect((error as RoxApiError).status).toBe(400);
 });
 
 test('withView restyles the same question and keeps it immutable', async () => {
@@ -303,6 +303,6 @@ test('a table from another database is refused', async () => {
       table: elsewhere,
     })
     .catch((e: unknown) => e);
-  expect(error).toBeInstanceOf(MacroError);
+  expect(error).toBeInstanceOf(RoxError);
   expect(requests).toHaveLength(0);
 });

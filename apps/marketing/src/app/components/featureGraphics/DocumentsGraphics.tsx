@@ -39,7 +39,7 @@ import { LiveDocEditor, TryMePointer } from '../utils/UtilLiveEditor';
 import { PhoneFrame, PhoneScreenContent } from '../utils/UtilPhoneFrame';
 
 const _HERO_DEMO_VIDEO_ID = 'hyU1XYmxkYM'; // "What We Learned from Notion"
-const MACRO_REPO_URL = 'https://github.com/macro-inc/macro';
+const ROX_REPO_URL = 'https://github.com/macro-inc/macro';
 
 // ---------------------------------------------------------------------------
 // Shared style fragments (matching the homepage / email / tasks bento language)
@@ -146,7 +146,7 @@ export function GithubStarButton() {
   });
   return (
     <a
-      href={MACRO_REPO_URL}
+      href={ROX_REPO_URL}
       target="_blank"
       rel="noreferrer"
       class="docs-cta-button"
@@ -257,7 +257,7 @@ function navIconStyle(props: {
   };
 }
 
-function MacroNavIcon(props: {
+function RoxNavIcon(props: {
   name: string;
   active?: boolean;
   accent?: boolean;
@@ -4360,7 +4360,7 @@ function _ImportGraphic() {
                 padding: '10px 14px',
               }}
             >
-              <MacroNavIcon name="files" size={14} />
+              <RoxNavIcon name="files" size={14} />
               <span
                 style={{
                   color: 'var(--c1)',

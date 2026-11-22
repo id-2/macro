@@ -28,7 +28,7 @@ for bot mutations that channel bots, agent triggers, and memory build on.
 ## Boundaries
 
 - Depends on: `harnesses` (ports), `channels` (inbound, optional), `entity_access`, `entity_registry`,
-  `messages`, `macro_event_broker`/`macro_event_topics`, `macro_authorization`.
+  `messages`, `rox_event_broker`/`rox_event_topics`, `rox_authorization`.
 - Used by: `memory`, `ai_tools`, `agent_trigger`, `complete_graph`, `agent_session`.
 
 ## Recipes

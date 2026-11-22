@@ -8,7 +8,7 @@ import {
   githubStars,
 } from '../../utils/utilGithubStars';
 
-const MACRO_REPO_URL = 'https://github.com/macro-inc/macro';
+const ROX_REPO_URL = 'https://github.com/macro-inc/macro';
 
 /** Full-bleed trust band: capital and open source. */
 export function HomeIntroProof() {
@@ -118,7 +118,7 @@ export function HomeIntroProof() {
       <span aria-hidden="true" class="home-proof-divider" />
 
       <a
-        href={MACRO_REPO_URL}
+        href={ROX_REPO_URL}
         target="_blank"
         rel="noreferrer"
         aria-label="Rox on GitHub"

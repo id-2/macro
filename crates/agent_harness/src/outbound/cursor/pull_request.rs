@@ -6,12 +6,12 @@ use std::sync::Arc;
 use agent_session::domain::model::AgentSessionId;
 use agent_session::domain::pull_request::SessionPullRequests;
 use cursor_cloud_agents::inbound::acp::PullRequestReporter;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 pub(super) struct CursorPullRequestReporter {
     pub service: Arc<dyn SessionPullRequests>,
     pub session: AgentSessionId,
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
 }
 
 impl PullRequestReporter for CursorPullRequestReporter {

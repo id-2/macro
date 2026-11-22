@@ -3,12 +3,12 @@
 use super::*;
 use crate::domain::ports::AgentDmEligibility;
 
-impl<R: BotRepo, B: MacroEventBroker, T: HarnessTeamAgents, C: McpAppCatalog> AgentDmEligibility
+impl<R: BotRepo, B: RoxEventBroker, T: HarnessTeamAgents, C: McpAppCatalog> AgentDmEligibility
     for BotServiceImpl<R, B, T, C>
 {
     async fn authorize_agent_dm(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<(), BotError> {
         if let Some(bot) = bot_id::system_bot(bot_id) {

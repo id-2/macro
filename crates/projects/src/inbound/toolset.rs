@@ -126,7 +126,7 @@ where
             document_move_service,
             email_move_service,
             database_duplicate_service,
-            actor: bot_id::MACRO_AI_BOT_ID,
+            actor: bot_id::ROX_AI_BOT_ID,
         }
     }
 

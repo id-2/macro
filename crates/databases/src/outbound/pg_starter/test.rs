@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::views::LaneKey;
 use models_databases::views::{Lane, ViewLayout, ViewQuery};
 use properties::outbound::properties_pg_repo::PropertiesPgRepo;
@@ -17,17 +17,17 @@ const USER: &str = "macro|starter-database@rox.one";
 
 fn viewer() -> Viewer {
     Viewer {
-        user_id: MacroUserIdStr::parse_from_str(USER).unwrap().into_owned(),
+        user_id: RoxUserIdStr::parse_from_str(USER).unwrap().into_owned(),
         acting_bot: None,
     }
 }
 
 async fn insert_user(pool: &PgPool) {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#, id, USER)
         .execute(pool).await.unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         USER,
         id
     )
@@ -40,7 +40,7 @@ fn repo(pool: &PgPool) -> PgDatabaseStarterRepo<PropertiesPgRepo> {
     PgDatabaseStarterRepo::new(pool.clone(), PropertiesPgRepo::new(pool.clone()))
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_starter_records_initial_values_in_history(pool: PgPool) {
     insert_user(&pool).await;
     let blueprint = StarterBlueprint::default();
@@ -88,7 +88,7 @@ async fn the_starter_records_initial_values_in_history(pool: PgPool) {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_starter_requests_create_one_complete_editable_example(pool: PgPool) {
     insert_user(&pool).await;
     let repo = repo(&pool);
@@ -201,7 +201,7 @@ async fn concurrent_starter_requests_create_one_complete_editable_example(pool: 
     assert_eq!(data.row_refs(table).await.unwrap().len(), 3);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_starter_stages_are_coloured_in_palette_order(pool: PgPool) {
     insert_user(&pool).await;
     let created = repo(&pool)
@@ -228,7 +228,7 @@ async fn the_starter_stages_are_coloured_in_palette_order(pool: PgPool) {
     assert_eq!(colors, [Some("#0091FF"), Some("#46A758"), Some("#8E4EC6")]);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn starter_never_resurrects_trashed_or_deleted_content(pool: PgPool) {
     insert_user(&pool).await;
     let repo = repo(&pool);
@@ -256,7 +256,7 @@ async fn starter_never_resurrects_trashed_or_deleted_content(pool: PgPool) {
     assert!(data.get_database(id).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn existing_database_skips_seed_even_after_it_is_deleted(pool: PgPool) {
     insert_user(&pool).await;
     let data = PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool.clone()));
@@ -292,7 +292,7 @@ async fn existing_database_skips_seed_even_after_it_is_deleted(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_dependency_rolls_back_content_and_marker_then_retry_succeeds(pool: PgPool) {
     insert_user(&pool).await;
     // The views are the seed's last write before the marker, so failing them
@@ -340,7 +340,7 @@ async fn failed_dependency_rolls_back_content_and_marker_then_retry_succeeds(poo
     assert_eq!(success.database_id, Some(blueprint.database_id));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_failed_cell_rolls_back_the_whole_seed(pool: PgPool) {
     insert_user(&pool).await;
     sqlx::raw_sql(

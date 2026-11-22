@@ -8,7 +8,7 @@ use axum::{
 use axum_extra::extract::Cached;
 use email::inbound::axum::api_types::DraftEditPrecondition;
 use email::inbound::axum::axum_impls::EmailLinkExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
@@ -55,12 +55,12 @@ pub struct AddForwardedAttachmentResponse {
 pub async fn handler(
     Query(precondition): Query<DraftEditPrecondition>,
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<EmailSvc, AuthorizationService>>,
     Path(PathParams { id: draft_id }): Path<PathParams>,
     Json(req): Json<AddForwardedAttachmentRequest>,
 ) -> Result<(StatusCode, Json<AddForwardedAttachmentResponse>), AttachmentApiError> {
-    let actor = &authorization.authorization.user.macro_user_id;
+    let actor = &authorization.authorization.user.rox_user_id;
     let attachment = ctx
         .draft_attachments
         .forward(

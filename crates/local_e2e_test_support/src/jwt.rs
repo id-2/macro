@@ -1,5 +1,5 @@
 use anyhow::Context;
-use macro_auth::macro_api_token::{EncodeMacroApiTokenArgs, encode_macro_api_token};
+use rox_auth::rox_api_token::{EncodeMacroApiTokenArgs, encode_rox_api_token};
 
 use crate::{LocalE2eConfig, SeedUser};
 
@@ -40,7 +40,7 @@ pub struct LocalJwtClaims<'a> {
     /// FusionAuth user id claim.
     pub fusion_user_id: &'a str,
     /// Rox auth user id claim.
-    pub macro_user_id: &'a str,
+    pub rox_user_id: &'a str,
     /// Optional organization id claim.
     pub organization_id: Option<i32>,
     /// Optional issuer claim. Falls back to env, then `local`.
@@ -64,7 +64,7 @@ pub fn encode_local_jwt_with(
         config,
         LocalJwtClaims {
             fusion_user_id: &options.user.fusion_user_id,
-            macro_user_id: &options.user.user_id,
+            rox_user_id: &options.user.user_id,
             organization_id: options.organization_id,
             expiry_seconds: options.expiry_seconds,
             issuer: None,
@@ -79,21 +79,21 @@ pub fn encode_local_jwt_claims_with(
 ) -> anyhow::Result<String> {
     let issuer = claims
         .issuer
-        .or_else(|| config.get("MACRO_API_TOKEN_ISSUER"))
+        .or_else(|| config.get("ROX_API_TOKEN_ISSUER"))
         .unwrap_or("local")
         .to_owned();
-    let private_key = normalize_pem(config.required("MACRO_API_TOKEN_PRIVATE_SECRET_KEY")?);
+    let private_key = normalize_pem(config.required("ROX_API_TOKEN_PRIVATE_SECRET_KEY")?);
     let expiry_seconds = match claims.expiry_seconds {
         Some(expiry_seconds) => expiry_seconds,
         None => config
-            .get("MACRO_API_TOKEN_EXPIRY_SECONDS")
+            .get("ROX_API_TOKEN_EXPIRY_SECONDS")
             .map(str::parse::<usize>)
             .transpose()
-            .context("MACRO_API_TOKEN_EXPIRY_SECONDS must be an integer")?
+            .context("ROX_API_TOKEN_EXPIRY_SECONDS must be an integer")?
             .unwrap_or(DEFAULT_EXPIRY_SECONDS),
     };
 
-    encode_macro_api_token(EncodeMacroApiTokenArgs {
+    encode_rox_api_token(EncodeMacroApiTokenArgs {
         agent_correlation_id: None,
         agent_session_id: None,
         agent_id: None,
@@ -101,7 +101,7 @@ pub fn encode_local_jwt_claims_with(
         routine_id: None,
         agent_scope: None,
         fusionauth_id: claims.fusion_user_id.to_owned(),
-        macro_user_id: claims.macro_user_id.to_owned(),
+        rox_user_id: claims.rox_user_id.to_owned(),
         organization_id: claims.organization_id,
         issuer,
         private_key,

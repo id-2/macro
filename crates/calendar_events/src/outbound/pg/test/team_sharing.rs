@@ -4,7 +4,7 @@ use crate::domain::team::{
 };
 use crate::outbound::pg_team::PgCalendarTeamRepository;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn routine_sync_keeps_verified_coverage_without_admitting_failed_or_stale_snapshots(
     pool: PgPool,
 ) {
@@ -257,7 +257,7 @@ async fn routine_sync_keeps_verified_coverage_without_admitting_failed_or_stale_
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_sources_require_current_membership_and_verified_source_entitlement(pool: PgPool) {
     let viewer = "macro|team-viewer@example.com";
     let owner = "macro|team-owner@example.com";
@@ -534,7 +534,7 @@ async fn team_sources_require_current_membership_and_verified_source_entitlement
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_sources_follow_direct_delegation_without_recursive_resharing(pool: PgPool) {
     let viewer = "macro|delegation-viewer@example.com";
     let sharer = "macro|delegation-sharer@example.com";
@@ -582,7 +582,7 @@ async fn team_sources_follow_direct_delegation_without_recursive_resharing(pool:
         "team membership alone does not create access to another user's sources"
     );
     sqlx::query!(
-        "INSERT INTO macro_user_links(primary_macro_id,child_macro_id,link_id) VALUES($1,$2,$3)",
+        "INSERT INTO rox_user_links(primary_rox_id,child_rox_id,link_id) VALUES($1,$2,$3)",
         sharer,
         account_owner,
         link
@@ -615,7 +615,7 @@ async fn team_sources_follow_direct_delegation_without_recursive_resharing(pool:
         "a directly linked source does not add its owner to the viewer's team"
     );
     sqlx::query!(
-        "DELETE FROM macro_user_links WHERE primary_macro_id=$1 AND link_id=$2",
+        "DELETE FROM rox_user_links WHERE primary_rox_id=$1 AND link_id=$2",
         sharer,
         link
     )

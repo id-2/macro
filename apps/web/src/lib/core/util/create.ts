@@ -470,7 +470,7 @@ export async function createCanvasFileFromJsonString(args: {
     presignedUrl: canvas.presignedUrl,
     buffer,
     sha,
-    type: 'application/x-macro-canvas',
+    type: 'application/x-rox-canvas',
   });
 
   if (uploadResult.isErr()) return { error: 'Failed to upload file.' };

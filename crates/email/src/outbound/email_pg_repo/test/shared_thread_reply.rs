@@ -7,7 +7,7 @@ use crate::domain::shared_thread_replies::{
 };
 use crm::domain::service::NoOpCrmService;
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
-use macro_event_broker::NoopMacroEventBroker;
+use rox_event_broker::NoopMacroEventBroker;
 
 /// Grants a reply into `inbox` for any message, as an edit share would.
 struct GrantsInbox(Uuid);
@@ -15,7 +15,7 @@ struct GrantsInbox(Uuid);
 impl SharedThreadReplyAccess for GrantsInbox {
     fn reply_target_inbox<'a>(
         &'a self,
-        _actor: &'a MacroUserIdStr<'static>,
+        _actor: &'a RoxUserIdStr<'static>,
         _message_id: Uuid,
     ) -> ReplyTargetInboxFuture<'a> {
         let inbox = self.0;
@@ -41,7 +41,7 @@ fn service(
         enqueuer: NoOpEnqueuer,
         crm_service: NoOpCrmService,
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        rox_event_broker: NoopMacroEventBroker,
         sent_undo_delay_secs: 5,
     }
 }
@@ -50,7 +50,7 @@ fn service(
 async fn insert_recipient_inbox(pool: &Pool<Postgres>) -> anyhow::Result<Uuid> {
     let inbox = Uuid::parse_str("dddddddd-dddd-dddd-dddd-dddddddddddd")?;
     sqlx::query!(
-        "INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+        "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
          VALUES ($1, 'macro|user2@example.com', 'fa-user-2', 'user2@example.com', 'GMAIL', true, NOW(), NOW())",
         inbox
     )
@@ -59,8 +59,8 @@ async fn insert_recipient_inbox(pool: &Pool<Postgres>) -> anyhow::Result<Uuid> {
     Ok(inbox)
 }
 
-fn recipient() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user2@example.com").unwrap()
+fn recipient() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user2@example.com").unwrap()
 }
 
 fn reply_to(message: Uuid) -> CreateDraftInput {
@@ -79,7 +79,7 @@ fn reply_to(message: Uuid) -> CreateDraftInput {
         bcc: vec![],
         body_text: Some("Replying from my own inbox".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: None,
@@ -90,7 +90,7 @@ fn reply_to(message: Uuid) -> CreateDraftInput {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn shared_thread_reply_starts_a_thread_in_the_recipients_inbox(
@@ -136,7 +136,7 @@ async fn shared_thread_reply_starts_a_thread_in_the_recipients_inbox(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn reply_to_an_unshared_thread_is_not_found(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -153,7 +153,7 @@ async fn reply_to_an_unshared_thread_is_not_found(pool: Pool<Postgres>) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn reply_cannot_adopt_a_draft_planted_for_an_unshared_message(
@@ -180,7 +180,7 @@ async fn reply_cannot_adopt_a_draft_planted_for_an_unshared_message(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_draft"))
 )]
 async fn revoked_share_keeps_the_reply_draft_when_switching_inboxes(
@@ -191,7 +191,7 @@ async fn revoked_share_keeps_the_reply_draft_when_switching_inboxes(
     let recipient_inbox = insert_recipient_inbox(&pool).await?;
     let other_inbox = Uuid::parse_str("dddddddd-0000-0000-0000-00000000000e")?;
     sqlx::query!(
-        "INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
+        "INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider, is_sync_active, created_at, updated_at)
          VALUES ($1, 'macro|user2@example.com', 'fa-user-2', 'user2-alt@example.com', 'GMAIL', true, NOW(), NOW())",
         other_inbox
     )

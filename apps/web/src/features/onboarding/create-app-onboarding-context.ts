@@ -243,7 +243,7 @@ export function createAppOnboardingContext(): OnboardingContext {
               address: link.email_address,
               provider: link.provider,
               isPrimary: link.is_primary,
-              ownerId: link.macro_id,
+              ownerId: link.rox_id,
             }))
           ),
         refresh: async () => invalidateEmailLinks(),

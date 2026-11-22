@@ -38,7 +38,7 @@ fn going_public() -> UpdateForm {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_layout_needing_members_is_refused_once_the_stored_form_is_public(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool);
@@ -77,7 +77,7 @@ async fn a_layout_needing_members_is_refused_once_the_stored_form_is_public(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_facts_change_forbidding_a_widget_is_refused_while_a_question_uses_it(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool);
@@ -117,7 +117,7 @@ async fn a_facts_change_forbidding_a_widget_is_refused_while_a_question_uses_it(
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_layout_write_started_while_a_switch_to_public_holds_the_form_is_refused(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -167,7 +167,7 @@ async fn a_layout_write_started_while_a_switch_to_public_holds_the_form_is_refus
     assert_eq!(repo.layout(form.id).await.unwrap(), layout);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_switch_to_public_started_while_a_file_question_is_put_is_refused(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool.clone());
@@ -217,7 +217,7 @@ async fn a_switch_to_public_started_while_a_file_question_is_put_is_refused(pool
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_layout_reusing_another_forms_ids_is_refused_by_id_and_both_layouts_stay(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool);
@@ -292,7 +292,7 @@ async fn a_layout_reusing_another_forms_ids_is_refused_by_id_and_both_layouts_st
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn two_forms_putting_one_new_id_at_once_leave_it_with_exactly_one(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool);
@@ -341,7 +341,7 @@ async fn two_forms_putting_one_new_id_at_once_leave_it_with_exactly_one(pool: Pg
     assert_eq!(owners, 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_widget_left_on_a_column_it_no_longer_applies_to_does_not_block_the_change(pool: PgPool) {
     let table = insert_table(&pool).await;
     let repo = PgFormsRepo::new(pool);

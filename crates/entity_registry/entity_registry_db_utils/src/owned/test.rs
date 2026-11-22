@@ -1,7 +1,7 @@
 use super::*;
-use bot_id::{BotId, MACRO_AI_BOT_ID};
+use bot_id::{BotId, ROX_AI_BOT_ID};
 use entity_registry::{Owner, RegisteredEntityType};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -68,7 +68,7 @@ fn expected(sources: &[Owner]) -> Vec<(String, String, String)> {
     rows
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn registers_all_owner_kinds_and_entity_kinds_idempotently(pool: PgPool) {
     let team = Owner::Team(Uuid::from_u128(1));
     let cases = [
@@ -85,9 +85,9 @@ async fn registers_all_owner_kinds_and_entity_kinds_idempotently(pool: PgPool) {
             vec![Owner::Bot(OWNED_BOT), team],
         ),
         (
-            Owner::Bot(MACRO_AI_BOT_ID),
+            Owner::Bot(ROX_AI_BOT_ID),
             None,
-            vec![Owner::Bot(MACRO_AI_BOT_ID)],
+            vec![Owner::Bot(ROX_AI_BOT_ID)],
         ),
     ];
     let mut tx = pool.begin().await.unwrap();
@@ -116,7 +116,7 @@ async fn registers_all_owner_kinds_and_entity_kinds_idempotently(pool: PgPool) {
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn conflicting_registration_never_grants_access(pool: PgPool) {
     let registrar = registrar(None);
     let record = NewEntityRecord::new(Uuid::now_v7(), RegisteredEntityType::Document, user());
@@ -148,7 +148,7 @@ async fn conflicting_registration_never_grants_access(pool: PgPool) {
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn retry_repairs_missing_grants_and_outer_rollback_removes_both(pool: PgPool) {
     let record = NewEntityRecord::new(
         Uuid::now_v7(),
@@ -174,7 +174,7 @@ async fn retry_repairs_missing_grants_and_outer_rollback_removes_both(pool: PgPo
     assert!(grants(&mut tx, record.id).await.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn missing_sponsor_writes_nothing(pool: PgPool) {
     let record = NewEntityRecord::new(
         Uuid::now_v7(),
@@ -195,7 +195,7 @@ async fn missing_sponsor_writes_nothing(pool: PgPool) {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../fixtures", scripts("fail_sponsor_grant"))
 )]
 async fn second_grant_failure_rolls_back_registration_even_if_caller_commits(pool: PgPool) {

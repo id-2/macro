@@ -17,13 +17,13 @@ export function queuedDraftSaveArgs({
   draft: EmailDraft;
   handles: DraftClientHandles & { threadId: string };
   senderLinkId: string;
-  senderAccount?: { macro_id: string; draft_is_signal?: boolean };
+  senderAccount?: { rox_id: string; draft_is_signal?: boolean };
   senderEmail: string;
 }): GraphqlSaveEmailDraftArgs {
   const isNewThread = !draft.thread_db_id && !draft.replying_to_id;
   // The inbox owns its threads, including delegated inboxes. Its cached owner
   // is available independently of the viewer's user-info request.
-  const newThreadOwnerId = isNewThread ? senderAccount?.macro_id : undefined;
+  const newThreadOwnerId = isNewThread ? senderAccount?.rox_id : undefined;
   if (isNewThread && !newThreadOwnerId) {
     throw new Error(
       'Unable to save draft until the sending account is available.'
@@ -46,7 +46,7 @@ export function queuedDraftSaveArgs({
     bcc: (draft.bcc ?? []).map(draftContactInput),
     bodyHtml: draft.body_html ?? undefined,
     bodyText: draft.body_text ?? undefined,
-    bodyMacro: draft.body_macro ?? undefined,
+    bodyMacro: draft.body_rox ?? undefined,
     senderLinkId,
     senderEmail: draft.sender_email ?? senderEmail,
     // Responses carry the body unencoded; mutation input retains base64.

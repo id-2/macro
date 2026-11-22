@@ -10,9 +10,9 @@ use entity_access::domain::{
     },
     ports::NoOpEntityAccessService,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use uuid::Uuid;
 
@@ -33,7 +33,7 @@ struct FakeAccess {
 impl EntityAccessService for FakeAccess {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -45,7 +45,7 @@ impl EntityAccessService for FakeAccess {
             return Err(AccessError::internal("access store unavailable"));
         }
         EntityAccessReceipt::try_new_authenticated_user(
-            MacroUserIdStr::try_from(USER.to_string()).unwrap(),
+            RoxUserIdStr::try_from(USER.to_string()).unwrap(),
             AccessEntity {
                 entity_id: entity_id.to_string(),
                 entity_type,
@@ -70,7 +70,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_access_level(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -81,7 +81,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn check_access(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         required_level: AccessLevel,
@@ -104,7 +104,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         user_org_id: Option<i64>,
@@ -116,7 +116,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -129,7 +129,7 @@ impl EntityAccessService for FakeAccess {
         &self,
         entity_id: &str,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         NoOpEntityAccessService
             .get_users_by_entity(entity_id, entity_type)
             .await
@@ -153,7 +153,7 @@ impl EntityAccessService for FakeAccess {
 
     async fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         NoOpEntityAccessService.get_user_team(user_id).await
     }
@@ -175,7 +175,7 @@ impl DuplicateEntity for FakeDomain {
         &self,
         entity: Entity<'static>,
         _receipt: EntityAccessReceipt<Self::Receipt>,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         _display_name: Option<String>,
     ) -> Result<Vec<EntityMutationEffect>, EntityMutationErrorCode> {
         Ok(vec![EntityMutationEffect::updated(
@@ -280,7 +280,7 @@ fn contents(moves_fail: bool, access: FakeAccess) -> TestContents {
         access: Arc::new(access),
         lifecycle: Arc::new(FakeLifecycle::default()),
         actor: EntityMutationActor {
-            user_id: MacroUserIdStr::try_from(USER.to_string()).unwrap(),
+            user_id: RoxUserIdStr::try_from(USER.to_string()).unwrap(),
             organization_id: None,
         },
     }
@@ -288,7 +288,7 @@ fn contents(moves_fail: bool, access: FakeAccess) -> TestContents {
 
 fn view_receipt(entity_id: &str, entity_type: EntityType) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::try_from(USER.to_string()).unwrap(),
+        RoxUserIdStr::try_from(USER.to_string()).unwrap(),
         entity_id,
         entity_type,
     )

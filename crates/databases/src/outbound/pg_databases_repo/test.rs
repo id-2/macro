@@ -1,7 +1,7 @@
 use activity::domain::ports::EntityActivityReads;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use properties::outbound::properties_pg_repo::PropertiesPgRepo;
 use sqlx::PgPool;
 
@@ -103,8 +103,8 @@ impl<Properties> PgDatabasesRepo<Properties> {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER)
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER)
         .expect("valid user id")
         .into_owned()
 }
@@ -117,19 +117,19 @@ fn viewer() -> Viewer {
 }
 
 async fn insert_user(pool: &PgPool) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let rox_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         USER,
     )
     .execute(pool)
     .await
     .expect("macro_user should insert");
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         USER,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -140,7 +140,7 @@ async fn insert_user(pool: &PgPool) {
 /// column. The definition store port is a separate adapter, so the test mints
 /// one directly.
 async fn insert_definition(pool: &PgPool, display_name: &str) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO property_definitions (id, user_id, display_name, data_type, is_multi_select)
@@ -247,7 +247,7 @@ async fn fixture(pool: &PgPool) -> (PgDatabasesRepo<PropertiesPgRepo>, Table, Uu
     (repo, table, definition_id)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_new_database_starts_with_a_title_column_that_infers_its_type(pool: PgPool) {
     insert_user(&pool).await;
     let repo = PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool.clone()));
@@ -297,7 +297,7 @@ async fn a_new_database_starts_with_a_title_column_that_infers_its_type(pool: Pg
     assert!(definitions[0].property_options.is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn database_table_and_column_round_trip(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
 
@@ -319,7 +319,7 @@ async fn database_table_and_column_round_trip(pool: PgPool) {
     assert_eq!(tables[0].version, TableVersion(0));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rename_trash_and_restore_round_trip(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     let database_id = table.database_id;
@@ -368,7 +368,7 @@ async fn rename_trash_and_restore_round_trip(pool: PgPool) {
     assert_eq!(tables.len(), 2);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn renaming_trashing_or_restoring_a_missing_database_says_it_is_gone(pool: PgPool) {
     let repo = PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool));
     let missing = Uuid::nil();
@@ -393,7 +393,7 @@ async fn renaming_trashing_or_restoring_a_missing_database_says_it_is_gone(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_database_cascades_and_purges_access_rows(pool: PgPool) {
     let (repo, table, definition_id) = fixture(&pool).await;
     let database_id = table.database_id;
@@ -476,7 +476,7 @@ async fn delete_database_cascades_and_purges_access_rows(pool: PgPool) {
     assert_eq!(definitions, Some(1));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_database_is_none_when_missing(pool: PgPool) {
     insert_user(&pool).await;
     let repo = PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool));
@@ -489,7 +489,7 @@ async fn get_database_is_none_when_missing(pool: PgPool) {
     assert!(missing.is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn rows_are_minted_in_order_and_deleted_by_their_table(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     let first = repo
@@ -513,7 +513,7 @@ async fn rows_are_minted_in_order_and_deleted_by_their_table(pool: PgPool) {
     );
     assert_eq!(repo.row_table(first[0].id).await.unwrap(), Some(table.id));
 
-    let other = macro_uuid::generate_uuid_v7();
+    let other = rox_uuid::generate_uuid_v7();
     assert!(
         !repo
             .delete_row(TableId::from_uuid(other), first[0].id)
@@ -530,7 +530,7 @@ async fn rows_are_minted_in_order_and_deleted_by_their_table(pool: PgPool) {
     assert!(repo.insert_rows(table.id, USER, 1).await.unwrap().is_none());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn appearance_persists_without_changing_content_dates(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     let id = table.database_id;
@@ -550,7 +550,7 @@ async fn appearance_persists_without_changing_content_dates(pool: PgPool) {
     let update = activity::AppearanceUpdate {
         appearance: appearance.clone(),
         attribution: Some(activity::Attribution::direct(
-            activity::Actor::new_from_user(MacroUserIdStr::parse_from_str(USER).unwrap()),
+            activity::Actor::new_from_user(RoxUserIdStr::parse_from_str(USER).unwrap()),
         )),
         event_id: Uuid::now_v7(),
         occurred_at: chrono::Utc::now(),
@@ -611,7 +611,7 @@ async fn appearance_persists_without_changing_content_dates(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn history_failure_rolls_back_appearance(pool: PgPool) {
     let (repo, table, _) = fixture(&pool).await;
     let id = table.database_id;
@@ -627,7 +627,7 @@ async fn history_failure_rolls_back_appearance(pool: PgPool) {
                     color: Some(model_entity::AppearanceColor::Blue),
                 },
                 attribution: Some(activity::Attribution::direct(
-                    activity::Actor::new_from_user(MacroUserIdStr::parse_from_str(USER).unwrap())
+                    activity::Actor::new_from_user(RoxUserIdStr::parse_from_str(USER).unwrap())
                 )),
                 event_id: Uuid::now_v7(),
                 occurred_at: chrono::Utc::now(),

@@ -27,7 +27,7 @@ adapters, and lifecycle events. See `README.md` for the Kafka event schema.
 ## Boundaries
 
 - Depends on: `attachment` (feature `attachment`), `entity_access_db_utils`,
-  `share_permission_db_utils`, `macro_uuid`.
+  `share_permission_db_utils`, `rox_uuid`.
 - Used by: `ai_tools`, `agent_inmem`, `soup_realtime`.
 
 ## Recipes

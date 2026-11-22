@@ -46,7 +46,7 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { parseLocalDate } from '@core/util/local-date';
 import { matches } from '@core/util/match';
 import { buildSimpleEntityUrl, openExternalUrl } from '@core/util/url';
-import MacroEmbed from '@icon/macro-embed.svg';
+import RoxEmbed from '@icon/macro-embed.svg';
 import ArrowSquareOutIcon from '@icon/system/regular/arrow-square-out.svg';
 import CollapseInlinePreview from '@icon/system/regular/arrows-in-line-horizontal.svg';
 import ExpandInlinePreview from '@icon/system/regular/arrows-out-line-horizontal.svg';
@@ -884,7 +884,7 @@ export function DocumentPreviewContent(props: DocumentPreviewContentProps) {
               <Dropdown.Item
                 onSelect={() => props.previewInfo?.handlePreviewToggle()}
               >
-                <MacroEmbed class="size-4" />
+                <RoxEmbed class="size-4" />
                 {props.previewInfo?.isPreviewable
                   ? 'Convert to Embed'
                   : 'Convert to Card View'}

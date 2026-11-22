@@ -3,7 +3,7 @@
 use std::{future::Future, pin::Pin, sync::Arc};
 
 use crm::domain::pipelines::{PipelineEntry, PipelineError, PipelineRecordType, PipelineService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Object-safe forwarding future for the request's concrete domain service.
@@ -13,7 +13,7 @@ type ApiFuture<'a, T> = Pin<Box<dyn Future<Output = Result<T, PipelineError>> + 
 pub(crate) trait CrmPipelineApi: Send + Sync {
     fn entries<'a>(
         &'a self,
-        viewer: &'a MacroUserIdStr<'static>,
+        viewer: &'a RoxUserIdStr<'static>,
         record_type: PipelineRecordType,
         records: &'a [Uuid],
     ) -> ApiFuture<'a, Vec<PipelineEntry>>;
@@ -38,7 +38,7 @@ struct PipelineApiAdapter<P>(Arc<P>);
 impl<P: PipelineService> CrmPipelineApi for PipelineApiAdapter<P> {
     fn entries<'a>(
         &'a self,
-        viewer: &'a MacroUserIdStr<'static>,
+        viewer: &'a RoxUserIdStr<'static>,
         record_type: PipelineRecordType,
         records: &'a [Uuid],
     ) -> ApiFuture<'a, Vec<PipelineEntry>> {

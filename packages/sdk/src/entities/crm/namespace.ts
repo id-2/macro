@@ -8,7 +8,7 @@ import type {
   UpdateCrmTeamSettingsRequest,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Document } from '../documents/document';
 import { Company } from './company';
 import { Contact } from './contact';
@@ -32,7 +32,7 @@ export class CrmNamespace {
   /** Pipelines, their records and sharing settings. */
   readonly pipelines: PipelineNamespace;
 
-  constructor(private readonly client: MacroClient) {
+  constructor(private readonly client: RoxClient) {
     this.pipelines = new PipelineNamespace(client);
   }
 

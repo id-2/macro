@@ -1,5 +1,5 @@
 use chrono::{TimeZone, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use whatsmeow::store::{
     EventBuffer, LidStore, MessageSecretInsert, MsgSecretStore, NctSaltStore, PrivacyToken,
@@ -11,7 +11,7 @@ use whatsmeow::types::{
 
 use crate::store::test::open_new_store;
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn message_secrets_keep_the_first_and_are_found_by_either_identity(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let group = new_jid("123-456", GROUP_SERVER);
@@ -83,7 +83,7 @@ async fn message_secrets_keep_the_first_and_are_found_by_either_identity(pool: P
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn privacy_tokens_only_move_forward_in_time(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let alice = new_jid("111", DEFAULT_USER_SERVER);
@@ -167,7 +167,7 @@ async fn privacy_tokens_only_move_forward_in_time(pool: Pool<Postgres>) {
     assert!(store.get_privacy_token(&alice).await.unwrap().is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn the_nct_salt_round_trips(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     assert_eq!(store.get_nct_salt().await.unwrap(), None);
@@ -178,7 +178,7 @@ async fn the_nct_salt_round_trips(pool: Pool<Postgres>) {
     assert_eq!(store.get_nct_salt().await.unwrap(), None);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn buffered_events_are_cleared_and_expire(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let server_time = Utc.timestamp_opt(1_700_000_000, 0).unwrap();
@@ -228,7 +228,7 @@ async fn buffered_events_are_cleared_and_expire(pool: Pool<Postgres>) {
     assert!(store.get_buffered_event([1; 32]).await.unwrap().is_some());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn outgoing_events_are_found_by_either_chat_and_expire(pool: Pool<Postgres>) {
     let store = open_new_store(&pool).await;
     let chat = new_jid("111", DEFAULT_USER_SERVER);

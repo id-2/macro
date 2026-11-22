@@ -205,7 +205,7 @@ impl fmt::Display for StepId {
 )]
 pub struct InvalidStepId(String);
 
-/// Hand the run to a model running as Macro, or to an agent.
+/// Hand the run to a model running as Rox, or to an agent.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(utoipa::ToSchema))]
 #[serde(deny_unknown_fields)]

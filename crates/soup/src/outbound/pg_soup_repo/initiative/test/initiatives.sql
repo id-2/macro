@@ -1,4 +1,4 @@
-INSERT INTO "User" (id, email, macro_user_id) VALUES
+INSERT INTO "User" (id, email, rox_user_id) VALUES
 ('macro|initiative-owner@test.com', 'initiative-owner@test.com', 'a1111111-1111-1111-1111-111111111111');
 INSERT INTO team (id, name, owner_id) VALUES ('ae000000-0000-0000-0000-000000000001', 'initiative team', 'macro|initiative-owner@test.com');
 INSERT INTO team_user (team_id, user_id, team_role) VALUES

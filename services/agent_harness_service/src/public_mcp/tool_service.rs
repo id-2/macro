@@ -9,7 +9,7 @@ use ai_toolset::ToolCaller;
 use ai_toolset::{AsyncToolCollection, RequestContext, ToolSet};
 use bot_id::PRODUCT_DISPLAY_NAME;
 use cognition::domain::Cognition;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rmcp::{
     handler::server::ServerHandler,
     model::{
@@ -145,10 +145,10 @@ impl<Context> AuthenticatedToolService<Context> {
 
     fn authenticated_user_id(
         extensions: &rmcp::model::Extensions,
-    ) -> Result<MacroUserIdStr<'static>, rmcp::ErrorData> {
+    ) -> Result<RoxUserIdStr<'static>, rmcp::ErrorData> {
         extensions
             .get::<http::request::Parts>()
-            .and_then(|parts| parts.extensions.get::<MacroUserIdStr<'static>>().cloned())
+            .and_then(|parts| parts.extensions.get::<RoxUserIdStr<'static>>().cloned())
             .ok_or_else(|| {
                 rmcp::ErrorData::internal_error("missing user identity — is auth configured?", None)
             })
@@ -327,7 +327,7 @@ where
     /// Runs one tool call and classifies how it ended, for analytics.
     async fn run_tool(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         request: rmcp::model::CallToolRequestParams,
         context: &rmcp::service::RequestContext<rmcp::RoleServer>,
     ) -> (

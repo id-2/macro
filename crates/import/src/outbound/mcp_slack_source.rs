@@ -5,7 +5,7 @@ use std::sync::{Arc, LazyLock};
 use std::time::Duration;
 
 use ai_toolset::{RequestContext, ToolSet};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::{ConnectorSelect, UserMcpTools};
 use serde_json::{Value, json};
 
@@ -35,7 +35,7 @@ impl<S: ConnectorSelect> SlackWorkspaceSource for McpSlackSource<S> {
 
     async fn open(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Self::Session, SlackSourceError> {
         let tools = self
             .select
@@ -61,7 +61,7 @@ impl<S: ConnectorSelect> SlackWorkspaceSource for McpSlackSource<S> {
 /// Connector tools and schemas loaded once for a discovery or import batch.
 pub struct McpSlackSession {
     tools: Arc<UserMcpTools>,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     channels_tool: String,
     members_tool: Option<String>,
     users_tool: Option<String>,
@@ -232,7 +232,7 @@ fn listing_arguments(
 
 async fn call_channels(
     tools: &impl ToolSet<()>,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     name: &str,
     arguments: &Value,
     first_page: bool,
@@ -249,7 +249,7 @@ async fn call_channels(
 
 async fn call_tool(
     tools: &impl ToolSet<()>,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     name: &str,
     arguments: &Value,
 ) -> Result<Value, SlackSourceError> {

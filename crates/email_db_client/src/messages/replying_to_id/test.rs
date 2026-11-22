@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::{PgPool, Pool, Postgres};
 
 const LINK_ID: &str = "00000000-0000-0000-0000-000000000001";
@@ -32,7 +32,7 @@ async fn row_version(pool: &PgPool, id: Uuid) -> anyhow::Result<String> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn unchanged_replying_to_id_is_found_without_a_rewrite(
@@ -51,7 +51,7 @@ async fn unchanged_replying_to_id_is_found_without_a_rewrite(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn changed_replying_to_id_is_written(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -73,7 +73,7 @@ async fn changed_replying_to_id_is_written(pool: Pool<Postgres>) -> anyhow::Resu
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("links", "threads"))
 )]
 async fn missing_message_is_not_found(pool: Pool<Postgres>) -> anyhow::Result<()> {

@@ -2,7 +2,7 @@ use super::drain;
 use axum::{Json, Router, extract::State, http::StatusCode};
 use crm::domain::email_privacy::{EmailPrivacyChange, EmailPrivacyRepository};
 use crm::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use models_email::email::service::backfill::{BackfillOperation, BackfillPubsubMessage};
 use serde_json::{Value, json};
 use sqlx::PgPool;
@@ -40,7 +40,7 @@ impl TestQueue {
         let server = tokio::spawn(async move {
             axum::serve(listener, app).await.unwrap();
         });
-        let config = macro_aws_config::local_aws_config(&endpoint).await;
+        let config = rox_aws_config::local_aws_config(&endpoint).await;
         let config = aws_sdk_sqs::config::Builder::from(&config)
             .retry_config(aws_sdk_sqs::config::retry::RetryConfig::disabled())
             .build();
@@ -101,7 +101,7 @@ async fn consent(pool: &PgPool) -> anyhow::Result<(CompaniesRepositoryImpl, Uuid
     .execute(pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         USER,
         macro_user
     )
@@ -122,7 +122,7 @@ async fn consent(pool: &PgPool) -> anyhow::Result<(CompaniesRepositoryImpl, Uuid
     .execute(pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO email_links (id, macro_id, fusionauth_user_id, email_address, provider)
+        r#"INSERT INTO email_links (id, rox_id, fusionauth_user_id, email_address, provider)
            VALUES ($1, $2, $3, 'outbox@example.com', 'GMAIL')"#,
         link,
         USER,
@@ -151,7 +151,7 @@ async fn pending(pool: &PgPool) -> anyhow::Result<i64> {
     )
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn publishes_committed_consent_and_removes_request(pool: PgPool) -> anyhow::Result<()> {
     consent(&pool).await?;
     let queue = TestQueue::start().await?;
@@ -162,14 +162,14 @@ async fn publishes_committed_consent_and_removes_request(pool: PgPool) -> anyhow
     let BackfillOperation::PopulateCrmForUser(payload) = &messages[0].backfill_operation else {
         panic!("expected a CRM user backfill");
     };
-    assert_eq!(payload.macro_id.as_ref(), USER);
+    assert_eq!(payload.rox_id.as_ref(), USER);
 
     drain(&pool, &queue.sqs).await?;
     assert_eq!(queue.messages().len(), 1);
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn failed_publish_remains_pending_and_retries(pool: PgPool) -> anyhow::Result<()> {
     consent(&pool).await?;
     let queue = TestQueue::start().await?;
@@ -189,7 +189,7 @@ async fn failed_publish_remains_pending_and_retries(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn withdrawn_consent_discards_pending_request(pool: PgPool) -> anyhow::Result<()> {
     let (repo, team, _) = consent(&pool).await?;
     repo.change_email_privacy(
@@ -209,7 +209,7 @@ async fn withdrawn_consent_discards_pending_request(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn disconnected_mailbox_discards_pending_request(pool: PgPool) -> anyhow::Result<()> {
     let (_, _, link) = consent(&pool).await?;
     sqlx::query!("DELETE FROM email_links WHERE id = $1", link)
@@ -222,7 +222,7 @@ async fn disconnected_mailbox_discards_pending_request(pool: PgPool) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn another_publisher_skips_locked_request(pool: PgPool) -> anyhow::Result<()> {
     let (_, team, _) = consent(&pool).await?;
     let queue = TestQueue::start().await?;
@@ -244,7 +244,7 @@ async fn another_publisher_skips_locked_request(pool: PgPool) -> anyhow::Result<
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn withdrawal_does_not_wait_for_publisher_row_lock(pool: PgPool) -> anyhow::Result<()> {
     let (repo, team, _) = consent(&pool).await?;
     let mut publisher = pool.begin().await?;
@@ -276,7 +276,7 @@ async fn withdrawal_does_not_wait_for_publisher_row_lock(pool: PgPool) -> anyhow
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn consent_trace_survives_outbox_queue_and_deferral_without_payload_fields(
     pool: PgPool,
 ) -> anyhow::Result<()> {

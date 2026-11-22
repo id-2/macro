@@ -5,8 +5,8 @@ use models_permissions::share_permission::access_level::AccessLevel;
 
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813b";
 const SECRET: &str = "local-spreadsheet-test-secret";
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|sheets@rox.one".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|sheets@rox.one".to_owned()).unwrap()
 }
 fn receipt<T: RequiredPermission>(access_level: AccessLevel) -> EntityAccessReceipt<T> {
     EntityAccessReceipt::try_new_authenticated_user(
@@ -58,7 +58,7 @@ async fn reads_mint_only_view_access_and_preserve_delegated_actor() {
             assert_eq!(id, DOCUMENT);
             assert!(matches!(request, SpreadsheetRequest::Read { .. }));
             let claims: serde_json::Value =
-                macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+                rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
             assert_eq!(claims["document_id"], DOCUMENT);
             assert_eq!(claims["access_level"], "view");
             assert_eq!(claims["user_id"], "macro|sheets@rox.one");
@@ -87,7 +87,7 @@ async fn reads_mint_only_view_access_and_preserve_delegated_actor() {
 async fn edits_forward_exact_revision_with_edit_token() {
     let mut worker = MockEditingWorkerService::new();
     worker.expect_spreadsheet().times(1).returning(|_, token, request| {
-        let claims: serde_json::Value = macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+        let claims: serde_json::Value = rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
         assert_eq!(claims["access_level"], "edit");
         assert!(matches!(request, SpreadsheetRequest::Edit { expected_revision, operations } if expected_revision == "seen" && operations.len() == 1));
         Box::pin(async { Ok(response()) })
@@ -451,7 +451,7 @@ fn indented_cells_read_back_with_their_level() {
 #[tokio::test]
 async fn sdk_edits_name_the_receipts_user_and_bot() {
     let receipt = EntityAccessReceipt::<EditAccessLevel>::try_new_bot(
-        bot_id::MACRO_AI_BOT_ID.into_storage_id(),
+        bot_id::ROX_AI_BOT_ID.into_storage_id(),
         entity_access::domain::models::BotReceiptScope::User {
             acting_user: user(),
         },
@@ -470,7 +470,7 @@ async fn sdk_edits_name_the_receipts_user_and_bot() {
         .times(1)
         .returning(|_, token, _| {
             let claims: serde_json::Value =
-                macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+                rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
             assert_eq!(claims["access_level"], "edit");
             assert_eq!(claims["user_id"], "macro|sheets@rox.one");
             assert_eq!(claims["actor"], "bot|00000000-0000-0000-0000-00000000a1a1");
@@ -503,7 +503,7 @@ async fn sdk_reads_by_a_user_carry_no_actor() {
         .times(1)
         .returning(|_, token, _| {
             let claims: serde_json::Value =
-                macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+                rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
             assert_eq!(claims["access_level"], "view");
             assert_eq!(claims["user_id"], "macro|sheets@rox.one");
             assert!(claims.get("actor").is_none());

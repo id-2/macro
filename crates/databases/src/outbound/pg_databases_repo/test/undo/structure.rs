@@ -32,7 +32,7 @@ async fn board(pool: &PgPool, wedding: &Wedding) -> ViewId {
     view
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn repeated_column_renames_including_a_final_noop_undo_the_net_change(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let change = change_as(
@@ -72,7 +72,7 @@ async fn repeated_column_renames_including_a_final_noop_undo_the_net_change(pool
     .await;
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn repeated_reorders_undo_the_final_order(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let before = table_state(&pool, wedding.table_id).await;
@@ -103,7 +103,7 @@ async fn repeated_reorders_undo_the_final_order(pool: PgPool) {
     assert_eq!(table_state(&pool, wedding.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undoing_column_creation_preserves_a_collaborators_rename(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let column = ColumnId::from_uuid(Uuid::now_v7());
@@ -151,7 +151,7 @@ async fn undoing_column_creation_preserves_a_collaborators_rename(pool: PgPool) 
     assert_eq!(table_state(&pool, wedding.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_two_selected_options_restores_them_before_the_cell(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (row, _) = insert_guests(&pool, &wedding).await;
@@ -239,7 +239,7 @@ async fn deleting_two_selected_options_restores_them_before_the_cell(pool: PgPoo
     assert_eq!(table_state(&pool, wedding.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_deleted_relation_keeps_its_target_when_restored(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let column = ColumnId::from_uuid(Uuid::now_v7());
@@ -299,7 +299,7 @@ async fn a_deleted_relation_keeps_its_target_when_restored(pool: PgPool) {
     assert_eq!(after.infer_type, before.infer_type);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_later_relation_protects_an_inserted_row_from_undo(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (source, _) = insert_guests(&pool, &wedding).await;
@@ -383,7 +383,7 @@ async fn a_later_relation_protects_an_inserted_row_from_undo(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_filter_only_dependency_protects_a_new_option(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let option = OptionId::from_uuid(Uuid::now_v7());
@@ -441,7 +441,7 @@ async fn a_filter_only_dependency_protects_a_new_option(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn move_then_delete_restores_the_row_before_moving_it_back(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (row, _) = insert_guests(&pool, &wedding).await;
@@ -476,7 +476,7 @@ async fn move_then_delete_restores_the_row_before_moving_it_back(pool: PgPool) {
     assert_eq!(table_state(&pool, wedding.table_id).await, before);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_positioned_card_does_not_claim_to_restore_its_position(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (row, _) = insert_guests(&pool, &wedding).await;
@@ -516,7 +516,7 @@ async fn deleting_a_positioned_card_does_not_claim_to_restore_its_position(pool:
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_lane_with_card_positions_does_not_claim_complete_restoration(pool: PgPool) {
     let wedding = wedding(&pool).await;
     let (row, _) = insert_guests(&pool, &wedding).await;
@@ -557,7 +557,7 @@ async fn deleting_a_lane_with_card_positions_does_not_claim_complete_restoration
     );
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn undo_restores_required_column_metadata_and_its_cells(pool: PgPool) {
     let wedding = wedding(&pool).await;
     change_as(

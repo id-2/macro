@@ -1,4 +1,4 @@
-import type { MacroOpts } from './config';
+import type { RoxOpts } from './config';
 import { AccountManagerNamespace } from './entities/account-managers/namespace';
 import { ActivityNamespace } from './entities/activity/namespace';
 import { AgentSessionNamespace } from './entities/agent-sessions/namespace';
@@ -47,15 +47,15 @@ import { WebNamespace } from './entities/web/namespace';
 import { WebhooksNamespace } from './entities/webhooks/namespace';
 import { WhatsAppNamespace } from './entities/whatsapp/namespace';
 import { WorkspaceNamespace } from './entities/workspace/namespace';
-import type { MacroEvents } from './events/receiver';
-import { MacroClient } from './utils/client';
+import type { RoxEvents } from './events/receiver';
+import { RoxClient } from './utils/client';
 
 export type {
   AppearanceColor,
   AppearanceIcon,
   EntityAppearance,
 } from '../generated/storage/types.gen';
-export type { MacroOpts } from './config';
+export type { RoxOpts } from './config';
 export type {
   ActivityAction,
   ActivityEvent,
@@ -91,7 +91,7 @@ export {
   type ColumnType,
   type ConvertIntoNewColumnOptions,
   type CreateDatabaseOptions,
-  MacroOpRefusedError,
+  RoxOpRefusedError,
   type OpResultOf,
 } from './entities/databases/database';
 export {
@@ -124,7 +124,7 @@ export {
   type UiOpenResult,
   type UiTarget,
 } from './entities/ui/namespace';
-export type { ListenOptions, MacroEvents } from './events/receiver';
+export type { ListenOptions, RoxEvents } from './events/receiver';
 export {
   here,
   type Interpolation,
@@ -142,7 +142,7 @@ export type { RequestActivity } from './utils/activity';
  *
  * @routing Use when a request is only about the Rox SDK client itself or its shared plumbing, such as live events or an item's access requests; not any request about the user's content, people or settings.
  */
-export class Rox<T extends MacroOpts = MacroOpts> {
+export class Rox<T extends RoxOpts = RoxOpts> {
   /** routines resources and operations. */
   readonly routines: RoutineNamespace;
 
@@ -260,19 +260,19 @@ export class Rox<T extends MacroOpts = MacroOpts> {
   /** Browse workspace activity with type, task, time, tag and inbox filters. */
   readonly workspace: WorkspaceNamespace;
 
-  readonly events: MacroEvents;
+  readonly events: RoxEvents;
 
   /** Base URL of the Rox web app, used to build entity URLs. */
   readonly webAppUrl: string;
 
   /** Direct access to the underlying hey-api service clients. */
-  readonly _client: MacroClient;
+  readonly _client: RoxClient;
 
   private readonly opts: T;
 
   constructor(opts: T) {
     this.opts = opts;
-    const client = new MacroClient(opts);
+    const client = new RoxClient(opts);
     this._client = client;
     this.routines = new RoutineNamespace(client);
     this.suggestions = new SuggestionNamespace(client);
@@ -336,7 +336,7 @@ export class Rox<T extends MacroOpts = MacroOpts> {
   }
 
   /** Clone of this SDK acting on behalf of `user` (sent as
-   * `x-macro-bot-for-macro-user-id`). Bot auth only — throws for user auth,
+   * `x-rox-bot-for-macro-user-id`). Bot auth only — throws for user auth,
    * since a user token always acts as its own user.
    *
    * @readonly
@@ -625,7 +625,7 @@ export type {
 } from './entities/workspace/types';
 /**
  * @deprecated The client class is now `Rox`. This alias keeps existing
- * `import { Macro }` code working and will be removed in a future major
+ * `import { Rox }` code working and will be removed in a future major
  * version.
  */
 export { Rox as Macro };

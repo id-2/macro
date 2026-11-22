@@ -5,7 +5,7 @@ import type {
 } from '../generated/notification/types.gen';
 import { Channel } from '../src/entities/channels/channel';
 import { Document } from '../src/entities/documents/document';
-import type { MacroClient } from '../src/utils/client';
+import type { RoxClient } from '../src/utils/client';
 
 function notificationClient() {
   const muted: Pick<UnsubscribeItemData, 'path' | 'query'>[] = [];
@@ -25,7 +25,7 @@ function notificationClient() {
         return { data: {} };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, muted, unmuted };
 }
 

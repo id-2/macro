@@ -1,5 +1,5 @@
 import { wrapXml } from '../../mentions';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 /** The box Rox's editors fit a message image into, as the composer does. */
 const MESSAGE_IMAGE_BOX = 400;
@@ -30,7 +30,7 @@ export class StaticImage {
    * before it loads.
    */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     id: string,
     size?: { width: number; height: number },
   ): StaticImage {

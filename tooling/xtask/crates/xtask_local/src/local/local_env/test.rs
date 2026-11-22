@@ -13,29 +13,29 @@ fn local_env() -> BTreeMap<String, String> {
 }
 
 #[test]
-fn local_macro_api_tokens_can_be_signed_and_verified() {
+fn local_rox_api_tokens_can_be_signed_and_verified() {
     use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
     use std::time::{SystemTime, UNIX_EPOCH};
 
     let env = local_env();
     let claims = serde_json::json!({
-        "iss": env["MACRO_API_TOKEN_ISSUER"],
+        "iss": env["ROX_API_TOKEN_ISSUER"],
         "exp": SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() + 60,
-        "macro_user_id": "macro|local@example.test",
+        "rox_user_id": "macro|local@example.test",
     });
     let mut header = Header::new(Algorithm::RS256);
     header.kid = Some("macro".into());
     let token = jsonwebtoken::encode(
         &header,
         &claims,
-        &EncodingKey::from_rsa_pem(env["MACRO_API_TOKEN_PRIVATE_SECRET_KEY"].as_bytes()).unwrap(),
+        &EncodingKey::from_rsa_pem(env["ROX_API_TOKEN_PRIVATE_SECRET_KEY"].as_bytes()).unwrap(),
     )
     .unwrap();
     let mut validation = Validation::new(Algorithm::RS256);
-    validation.set_issuer(&[&env["MACRO_API_TOKEN_ISSUER"]]);
+    validation.set_issuer(&[&env["ROX_API_TOKEN_ISSUER"]]);
     let decoded = jsonwebtoken::decode::<serde_json::Value>(
         &token,
-        &DecodingKey::from_rsa_pem(env["MACRO_API_TOKEN_PUBLIC_KEY"].as_bytes()).unwrap(),
+        &DecodingKey::from_rsa_pem(env["ROX_API_TOKEN_PUBLIC_KEY"].as_bytes()).unwrap(),
         &validation,
     )
     .unwrap();
@@ -49,11 +49,11 @@ fn slack_import_worker_uses_local_resources_and_starts_paused() {
     let env = local_env();
     assert_eq!(
         env["OVERRIDE_SLACK_IMPORT_QUEUE"],
-        resources::queue_url(macro_queues::SlackImportQueue::LOCAL)
+        resources::queue_url(rox_queues::SlackImportQueue::LOCAL)
     );
     assert_eq!(
         env["OVERRIDE_SLACK_IMPORT_DLQ"],
-        resources::queue_url(macro_queues::SlackImportDlq::LOCAL)
+        resources::queue_url(rox_queues::SlackImportDlq::LOCAL)
     );
     assert_eq!(env["UPLOAD_STAGING_BUCKET"], "bulk-upload-staging");
     assert_eq!(
@@ -99,7 +99,7 @@ fn emits_required_keys() {
         // no-doppler stack (see `BootStubEnv`).
         "POSTHOG_API_KEY",
         "REDIS_HOST",
-        "MACRO_DB_URL",
+        "ROX_DB_URL",
         "INTERNAL_API_KEY",
         "PIPEDREAM_CLIENT_ID",
         "PIPEDREAM_CLIENT_SECRET",
@@ -120,10 +120,10 @@ fn emits_required_keys() {
         "STRIPE_SECRET_KEY",
         "STRIPE_PRICE_ID",
         "STRIPE_WEBHOOK_SECRET_KEY",
-        "MACRO_API_TOKEN_ISSUER",
-        "MACRO_API_TOKEN_PUBLIC_KEY",
-        "MACRO_API_TOKEN_PRIVATE_SECRET_KEY",
-        "MACRO_API_TOKEN_EXPIRY_SECONDS",
+        "ROX_API_TOKEN_ISSUER",
+        "ROX_API_TOKEN_PUBLIC_KEY",
+        "ROX_API_TOKEN_PRIVATE_SECRET_KEY",
+        "ROX_API_TOKEN_EXPIRY_SECONDS",
         "GMAIL_GCP_QUEUE",
         "EMAIL_SERVICE_CLOUDFRONT_DISTRIBUTION_URL",
         "EMAIL_SERVICE_CLOUDFRONT_SIGNER_PRIVATE_KEY",
@@ -195,7 +195,7 @@ fn boot_stubs_are_local_only() {
         Some("redis://redis:6379")
     );
     assert_eq!(
-        env.get("MACRO_DB_URL").map(String::as_str),
+        env.get("ROX_DB_URL").map(String::as_str),
         Some("postgres://user:password@postgres:5432/macrodb")
     );
     // INTERNAL_API_KEY must agree with the internal-auth key other services
@@ -253,7 +253,7 @@ fn values_are_local_only() {
 fn emits_webhook_fifo_queue_override_url() {
     let env = local_env();
     assert_eq!(
-        env.get(macro_queues::WebhookEventQueue::OVERRIDE_ENV_VAR_NAME)
+        env.get(rox_queues::WebhookEventQueue::OVERRIDE_ENV_VAR_NAME)
             .map(String::as_str),
         Some("http://localstack:4566/000000000000/webhook-event-queue.fifo")
     );
@@ -485,7 +485,7 @@ fn local_sandboxes_join_the_instances_compose_network() {
         default_env
             .get("LOCAL_CONTAINER_NETWORK")
             .map(String::as_str),
-        Some("macro_services")
+        Some("rox_services")
     );
     assert_eq!(
         named_env.get("LOCAL_CONTAINER_NETWORK").map(String::as_str),
@@ -585,7 +585,7 @@ fn the_mcp_service_override_is_an_in_network_base_url() {
         env.get("OVERRIDE_MCP_SERVICE_URL").map(String::as_str),
         Some("http://agent-harness-service:8080")
     );
-    assert!(!env.contains_key("MACRO_MCP_URL"));
+    assert!(!env.contains_key("ROX_MCP_URL"));
 }
 
 #[test]

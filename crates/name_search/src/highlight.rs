@@ -3,10 +3,10 @@
 
 use crate::escape_regex;
 
-const OPEN_TAG: &str = "<macro_em>";
-const CLOSE_TAG: &str = "</macro_em>";
+const OPEN_TAG: &str = "<rox_em>";
+const CLOSE_TAG: &str = "</rox_em>";
 
-/// Applies the same `<macro_em>` name-highlight replacement that the Postgres
+/// Applies the same `<rox_em>` name-highlight replacement that the Postgres
 /// name-search queries apply via `regexp_replace(..., 'gi')`, but against an
 /// in-memory name string. Returns `None` when the term is empty or the name
 /// does not contain the term (case-insensitive).
@@ -15,7 +15,7 @@ pub fn highlight_name(name: &str, term: &str) -> Option<String> {
 }
 
 /// Wraps every case-insensitive occurrence of each of `terms` in `name` in
-/// `<macro_em>` tags. Overlapping and adjacent matches merge into one span so
+/// `<rox_em>` tags. Overlapping and adjacent matches merge into one span so
 /// tags never nest. Returns `None` when the terms are blank or none of them
 /// occurs in the name.
 pub(crate) fn highlight_name_terms(name: &str, terms: &[&str]) -> Option<String> {

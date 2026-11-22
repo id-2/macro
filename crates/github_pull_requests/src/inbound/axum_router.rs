@@ -19,8 +19,8 @@ use entity_access::{
     },
 };
 use foreign_entity::domain::models::ForeignEntityError;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 
@@ -33,7 +33,7 @@ use crate::domain::{
 pub struct GithubPullRequestRouterState<S, AccessSvc, Auth> {
     service: Arc<S>,
     access_service: Arc<AccessSvc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, AccessSvc, Auth> Clone for GithubPullRequestRouterState<S, AccessSvc, Auth> {
@@ -55,7 +55,7 @@ where
     pub fn new(
         service: Arc<S>,
         access_service: Arc<AccessSvc>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -74,7 +74,7 @@ impl<S, AccessSvc, Auth> FromRef<GithubPullRequestRouterState<S, AccessSvc, Auth
 }
 
 impl<S, AccessSvc, Auth> FromRef<GithubPullRequestRouterState<S, AccessSvc, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &GithubPullRequestRouterState<S, AccessSvc, Auth>) -> Self {
         state.authorization_state.clone()
@@ -94,7 +94,7 @@ pub fn github_pull_requests_router<S, AccessSvc, Auth, T>(
 where
     S: GithubPullRequestFacetService + GithubPullRequestService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -134,7 +134,7 @@ pub async fn get_github_pull_request_handler<S, AccessSvc, Auth>(
 where
     S: GithubPullRequestService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let pull_request = state
         .service
@@ -160,18 +160,18 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn get_github_pull_request_facets_handler<S, AccessSvc, Auth>(
     State(state): State<GithubPullRequestRouterState<S, AccessSvc, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: OptionalMacroUserTeamExtractorV2<MemberTeamRole, AccessSvc, Auth>,
 ) -> Result<Json<GithubPullRequestFacets>, GithubPullRequestError>
 where
     S: GithubPullRequestFacetService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let facets = state
         .service
         .github_pull_request_facets(
-            authorization.authorization.user.macro_user_id,
+            authorization.authorization.user.rox_user_id,
             team.entity_access_receipt,
         )
         .await?;

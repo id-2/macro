@@ -3,7 +3,7 @@ import type {
   WebhookScope,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Webhook } from './webhook';
 
 /**
@@ -12,7 +12,7 @@ import { Webhook } from './webhook';
  * @routing Use when managing API webhook subscriptions; not database webhooks.
  */
 export class WebhooksNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Register a webhook. `namespace` must be unique among the owning

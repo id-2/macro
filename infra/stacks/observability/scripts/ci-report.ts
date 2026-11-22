@@ -1,11 +1,11 @@
 // Daily CI report from the exporter's Loki events: wall time by PR type, what held
-// pushes up, slowest jobs and steps, queues, cache volumes and CI hours. The Macro CI
+// pushes up, slowest jobs and steps, queues, cache volumes and CI hours. The Rox CI
 // dashboard reads the same queries from nixos/ci-report.json.
 //
 // GRAFANA_TOKEN=$(cat <token file>) bun infra/stacks/observability/scripts/ci-report.ts [--range 24h] [--days 7]
 // Pass --loki <url> to query another Loki API root, such as a local one, and
 // --spec local for run_local's opt-in events (nixos/local-report.json, the
-// Macro run_local dashboard) instead of CI's.
+// Rox run_local dashboard) instead of CI's.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

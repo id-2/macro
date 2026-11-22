@@ -3,9 +3,9 @@ use std::collections::BTreeMap;
 use axum::{Json, extract::State};
 use entity_access::{
     domain::{models::MemberTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
@@ -127,9 +127,9 @@ pub async fn get_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
 ) -> Result<Json<CrmTeamSettingsResponse>, CrmError> {
     let receipt = CrmTeamReceipt::from_team_receipt(access.entity_access_receipt)?;
@@ -161,9 +161,9 @@ pub async fn update_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
     Json(req): Json<UpdateCrmTeamSettingsRequest>,
 ) -> Result<Json<CrmTeamSettingsResponse>, CrmError> {

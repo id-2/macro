@@ -5,7 +5,7 @@ use lexical_client::LexicalClient;
 use lexical_client::parse_markdown::{
     AgentContextCurrentTime, AgentContextPeople, AgentContextPerson,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use trigger_context::TriggerContext;
 
 use crate::domain::error::{HarnessError, Result};
@@ -74,7 +74,7 @@ impl<TimeZones: UserTimeZones> AgentPromptComposer for LexicalAgentPromptCompose
 }
 
 /// A user as the context names them: by email, the way message authors are.
-fn person<'a>(user: &'a MacroUserIdStr<'static>) -> AgentContextPerson<'a> {
+fn person<'a>(user: &'a RoxUserIdStr<'static>) -> AgentContextPerson<'a> {
     AgentContextPerson {
         id: user.as_ref(),
         name: user.email_str(),

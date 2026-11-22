@@ -35,7 +35,7 @@ import {
   AnimatedStarIcon,
   AnimatedTaskIcon,
 } from '../graphics/CreateMenuIcons';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 
 // The homepage "app preview" — a clickable Rox window. The left rail mirrors
 // the real product nav; selecting a section swaps the main panel to that
@@ -891,7 +891,7 @@ export function SceneAppPreview(props: {
                       'margin-top': '-5px',
                     }}
                   >
-                    <MacroMarkIcon
+                    <RoxMarkIcon
                       style={{
                         color: 'currentColor',
                         display: 'block',

@@ -7,8 +7,8 @@ use jev::domain::{
     Probability, YesNoClassifier, YesNoQuestion,
     decisions::{DecisionService, DecisionServiceImpl},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use std::sync::{Arc, Mutex};
 use tower::ServiceExt;
@@ -24,7 +24,7 @@ struct Decisions(Mutex<Vec<(String, Value)>>);
 impl DecisionService for Decisions {
     async fn decide(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, DecisionError> {
         self.0
@@ -50,7 +50,7 @@ impl YesNoClassifier for NoProvider {
     }
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn authenticated_route_preserves_the_exact_owner_and_named_contract(pool: sqlx::PgPool) {
     let mut state = (*test_api_context(pool).await).clone();
     let decisions = Arc::new(Decisions::default());
@@ -98,7 +98,7 @@ async fn authenticated_route_preserves_the_exact_owner_and_named_contract(pool: 
     assert_eq!(decisions.0.lock().unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn unauthorized_and_missing_user_requests_never_reach_the_domain(pool: sqlx::PgPool) {
     let mut state = (*test_api_context(pool).await).clone();
     let decisions = Arc::new(Decisions::default());
@@ -127,7 +127,7 @@ async fn unauthorized_and_missing_user_requests_never_reach_the_domain(pool: sql
     assert!(decisions.0.lock().unwrap().is_empty());
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn admission_errors_use_the_shared_status_and_machine_code(pool: sqlx::PgPool) {
     let ctx = test_api_context(pool).await;
     for error in admission_errors() {

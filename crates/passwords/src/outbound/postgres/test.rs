@@ -1,19 +1,19 @@
 use super::*;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn metadata_grants_intents_folders_and_deletion_are_team_isolated(pool: PgPool) {
     let first = TeamId(Uuid::now_v7());
     let second = TeamId(Uuid::now_v7());
     let owner = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
             .expect("fixture")
             .into_owned(),
     };
     let viewer = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|viewer@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|viewer@example.test")
             .expect("fixture")
             .into_owned(),
     };
@@ -23,21 +23,21 @@ async fn metadata_grants_intents_folders_and_deletion_are_team_isolated(pool: Pg
             .as_ref()
             .strip_prefix("macro|")
             .expect("fixture prefix");
-        let macro_user_id = Uuid::now_v7();
+        let rox_user_id = Uuid::now_v7();
         sqlx::query!(
             "INSERT INTO macro_user (id,username,email,stripe_customer_id) VALUES ($1,$2,$2,$3)",
-            macro_user_id,
+            rox_user_id,
             email,
-            format!("fixture-{macro_user_id}")
+            format!("fixture-{rox_user_id}")
         )
         .execute(&pool)
         .await
         .expect("fixture account");
         sqlx::query!(
-            r#"INSERT INTO "User" (id,email,macro_user_id) VALUES ($1,$2,$3)"#,
+            r#"INSERT INTO "User" (id,email,rox_user_id) VALUES ($1,$2,$3)"#,
             actor.user_id.as_ref(),
             email,
-            macro_user_id
+            rox_user_id
         )
         .execute(&pool)
         .await
@@ -590,7 +590,7 @@ async fn metadata_grants_intents_folders_and_deletion_are_team_isolated(pool: Pg
     ));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn contended_team_lock_returns_busy_without_holding_a_waiting_connection(pool: PgPool) {
     let repository = PgRepository::new(pool).expect("repository capacity");
     let team = TeamId(Uuid::now_v7());
@@ -621,7 +621,7 @@ async fn contended_team_lock_returns_busy_without_holding_a_waiting_connection(p
         .expect("released lease");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn distinct_team_leases_share_admission_and_reserve_database_query_capacity(pool: PgPool) {
     let bounded_pool = sqlx::postgres::PgPoolOptions::new()
         .max_connections(4)
@@ -673,19 +673,19 @@ async fn distinct_team_leases_share_admission_and_reserve_database_query_capacit
     assert!(matches!(PgRepository::new(too_small), Err(Error::Invalid)));
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn stale_totp_setup_and_removal_cannot_override_a_newer_enrollment_or_removal(pool: PgPool) {
     let team = TeamId(Uuid::now_v7());
     let item = ItemId(Uuid::now_v7());
-    let owner = MacroUserIdStr::parse_from_str("macro|revision@example.test")
+    let owner = RoxUserIdStr::parse_from_str("macro|revision@example.test")
         .expect("identity")
         .into_owned();
-    let macro_user_id = Uuid::now_v7();
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'revision@example.test','revision@example.test',$2)",macro_user_id,format!("fixture-{macro_user_id}")).execute(&pool).await.expect("account");
+    let rox_user_id = Uuid::now_v7();
+    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'revision@example.test','revision@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}")).execute(&pool).await.expect("account");
     sqlx::query!(
-        r#"INSERT INTO "User"(id,email,macro_user_id) VALUES($1,'revision@example.test',$2)"#,
+        r#"INSERT INTO "User"(id,email,rox_user_id) VALUES($1,'revision@example.test',$2)"#,
         owner.as_ref(),
-        macro_user_id
+        rox_user_id
     )
     .execute(&pool)
     .await
@@ -797,14 +797,14 @@ async fn stale_totp_setup_and_removal_cannot_override_a_newer_enrollment_or_remo
     assert!(removed.revision > active.revision);
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn first_erasure_and_quarantine_are_not_starved_by_repeat_tombstones(pool: PgPool) {
     let team = TeamId(Uuid::now_v7());
     let item = ItemId(Uuid::now_v7());
     let account = Uuid::now_v7();
     sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'queue@example.test','queue@example.test',$2)", account, format!("fixture-{account}"))
         .execute(&pool).await.expect("account");
-    sqlx::query!(r#"INSERT INTO "User"(id,email,macro_user_id) VALUES('macro|queue@example.test','queue@example.test',$1)"#, account)
+    sqlx::query!(r#"INSERT INTO "User"(id,email,rox_user_id) VALUES('macro|queue@example.test','queue@example.test',$1)"#, account)
         .execute(&pool).await.expect("user");
     sqlx::query!(
         "INSERT INTO team(id,name,owner_id) VALUES($1,'Fixture','macro|queue@example.test')",

@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use entity_access::domain::models::{AccessError, AccessLevel};
 use entity_access::domain::ports::AccessibleForms;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::FormId;
 use crate::domain::ports::FormAccessDirectory;
@@ -38,7 +38,7 @@ where
     #[tracing::instrument(err, skip(self, user))]
     async fn accessible_forms(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Vec<(FormId, AccessLevel)>, Self::Error> {
         Ok(self
             .access

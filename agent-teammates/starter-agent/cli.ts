@@ -61,7 +61,7 @@ const run = async (): Promise<void> => {
 	stayOnline({
 		open: () => {
 			const socket = new WebSocket(base.config.gateway, {
-				headers: { "x-macro-user-api-key": apiKey },
+				headers: { "x-rox-user-api-key": apiKey },
 			});
 			return {
 				send: (data) => socket.send(data),

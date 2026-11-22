@@ -40,7 +40,7 @@ impl EmailServiceClient {
         }
 
         let mut trace_headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut trace_headers);
+        rox_tower_layers::inject_trace_headers(&mut trace_headers);
 
         let response = self
             .client

@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use chrono::Utc;
 use entity_access::domain::models::EntityAccessReceipt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 
 use super::{FavoritesServiceImpl, MAX_FAVORITES_PER_COLLECTION};
@@ -56,7 +56,7 @@ impl FavoritesRepo for FakeFavoritesRepo {
 
     async fn add_favorite(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> Result<Favorite, Self::Err> {
         self.record(RepoCall::Add {
@@ -77,7 +77,7 @@ impl FavoritesRepo for FakeFavoritesRepo {
         })
     }
 
-    async fn count_favorites(&self, user_id: &MacroUserIdStr<'_>) -> Result<i64, Self::Err> {
+    async fn count_favorites(&self, user_id: &RoxUserIdStr<'_>) -> Result<i64, Self::Err> {
         self.record(RepoCall::Count {
             user_id: user_id.as_ref().to_string(),
         });
@@ -86,7 +86,7 @@ impl FavoritesRepo for FakeFavoritesRepo {
 
     async fn list_favorites(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _filter: &FavoriteFilter,
     ) -> Result<Vec<Favorite>, Self::Err> {
         Ok(Vec::new())
@@ -94,7 +94,7 @@ impl FavoritesRepo for FakeFavoritesRepo {
 
     async fn remove_favorite_by_entity(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _entity: &Entity<'_>,
     ) -> Result<bool, Self::Err> {
         Ok(false)
@@ -102,7 +102,7 @@ impl FavoritesRepo for FakeFavoritesRepo {
 
     async fn reorder_favorites(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _ordered: &[Entity<'_>],
     ) -> Result<(), Self::Err> {
         Ok(())
@@ -110,15 +110,15 @@ impl FavoritesRepo for FakeFavoritesRepo {
 
     async fn favorited_entities(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _entities: &[Entity<'_>],
     ) -> Result<HashSet<Entity<'static>>, Self::Err> {
         Ok(HashSet::new())
     }
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER_ID).expect("valid user id")
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER_ID).expect("valid user id")
 }
 
 fn authenticated_receipt(

@@ -1,6 +1,6 @@
 use super::*;
 use crate::auth::AccessLevel;
-use macro_sync_service_jwt::session::SessionKind;
+use rox_sync_service_jwt::session::SessionKind;
 use std::collections::BTreeSet;
 
 #[test]

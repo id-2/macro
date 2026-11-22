@@ -27,7 +27,7 @@ impl MockUserRolesAndPermissionsRepository {
 impl UserRolesAndPermissionsRepository for MockUserRolesAndPermissionsRepository {
     async fn get_user_roles(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<HashSet<RoleId>, UserRolesAndPermissionsError> {
         Ok(HashSet::from([
             RoleId::SelfServe,
@@ -37,14 +37,14 @@ impl UserRolesAndPermissionsRepository for MockUserRolesAndPermissionsRepository
 
     async fn get_user_permissions(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<HashSet<Permission>, UserRolesAndPermissionsError> {
         Ok(HashSet::new())
     }
 
     async fn add_roles_to_user(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _role_ids: &[RoleId],
     ) -> Result<(), UserRolesAndPermissionsError> {
         *self.add_roles_to_user_calls.lock().unwrap() += 1;
@@ -53,7 +53,7 @@ impl UserRolesAndPermissionsRepository for MockUserRolesAndPermissionsRepository
 
     async fn remove_roles_from_user(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         role_ids: &[RoleId],
     ) -> Result<(), UserRolesAndPermissionsError> {
         self.removed_roles_from_user_calls
@@ -75,7 +75,7 @@ async fn assert_payment_failure_status_removes_subscription_roles(
 
     user_service
         .update_user_roles_and_permissions_for_subscription(
-            &MacroUserIdStr::parse_from_str("macro|user@example.com")?,
+            &RoxUserIdStr::parse_from_str("macro|user@example.com")?,
             subscription_status,
             ProductTier::Opus,
         )
@@ -110,7 +110,7 @@ async fn active_then_paused_adds_then_removes_roles() -> anyhow::Result<()> {
 
     user_service
         .update_user_roles_and_permissions_for_subscription(
-            &MacroUserIdStr::parse_from_str("macro|user@example.com")?,
+            &RoxUserIdStr::parse_from_str("macro|user@example.com")?,
             SubscriptionStatus::Active,
             ProductTier::Haiku,
         )
@@ -123,7 +123,7 @@ async fn active_then_paused_adds_then_removes_roles() -> anyhow::Result<()> {
 
     user_service
         .update_user_roles_and_permissions_for_subscription(
-            &MacroUserIdStr::parse_from_str("macro|user@example.com")?,
+            &RoxUserIdStr::parse_from_str("macro|user@example.com")?,
             SubscriptionStatus::Paused,
             ProductTier::Haiku,
         )
@@ -147,7 +147,7 @@ async fn activating_a_tier_removes_the_other_tier_roles() -> anyhow::Result<()> 
 
     user_service
         .update_user_roles_and_permissions_for_subscription(
-            &MacroUserIdStr::parse_from_str("macro|user@example.com")?,
+            &RoxUserIdStr::parse_from_str("macro|user@example.com")?,
             SubscriptionStatus::Active,
             ProductTier::Max,
         )
@@ -176,7 +176,7 @@ async fn test_get_user_roles() -> anyhow::Result<()> {
         UserRolesAndPermissionsServiceImpl::new(mock_user_roles_and_permissions_repository);
 
     let roles = user_service
-        .get_user_roles(&MacroUserIdStr::parse_from_str("macro|user@example.com")?)
+        .get_user_roles(&RoxUserIdStr::parse_from_str("macro|user@example.com")?)
         .await?;
 
     assert_eq!(roles.len(), 2);
@@ -195,7 +195,7 @@ async fn test_get_user_roles_delegates_to_repository() -> anyhow::Result<()> {
         UserRolesAndPermissionsServiceImpl::new(mock_user_roles_and_permissions_repository);
 
     let roles = user_service
-        .get_user_roles(&MacroUserIdStr::parse_from_str("macro|other@user.com")?)
+        .get_user_roles(&RoxUserIdStr::parse_from_str("macro|other@user.com")?)
         .await?;
 
     // Mock returns the same roles regardless of user_id

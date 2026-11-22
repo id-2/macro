@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use agent_session::domain::routines::ConnectedApps;
 use email_service_client::EmailServiceClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use scheduled_action::domain::suggestions::ports::{InboxMessage, SuggestionSources};
 
 use crate::routine_sessions::PipedreamConnectedApps;
@@ -26,7 +26,7 @@ where
 {
     async fn inbox(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         limit: u16,
     ) -> anyhow::Result<Vec<InboxMessage>> {
         let response = self
@@ -50,7 +50,7 @@ where
             .collect())
     }
 
-    async fn apps(&self, user: &MacroUserIdStr<'static>) -> anyhow::Result<Vec<String>> {
+    async fn apps(&self, user: &RoxUserIdStr<'static>) -> anyhow::Result<Vec<String>> {
         self.apps.connected_app_slugs(user).await
     }
 }

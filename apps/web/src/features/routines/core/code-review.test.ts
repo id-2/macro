@@ -18,26 +18,26 @@ const needsUpdate = (proposal?: RoutineTask): CodeUpgradeRecord => ({
   toSdk: '0.3.0+new',
   outcome: 'needs_update',
   reason: '“File invoices” failed a dry run.',
-  previousTask: task('macro.tasks.create(x)', '0.2.0+old'),
+  previousTask: task('rox.tasks.create(x)', '0.2.0+old'),
   task: proposal,
 });
 
 describe('code review', () => {
   it('shows the newest upgrade that paused the routine, with what changed', () => {
     const review = pendingCodeReview(
-      [needsUpdate(task('macro.tasks.add(x)', '0.3.0+new'))],
+      [needsUpdate(task('rox.tasks.add(x)', '0.3.0+new'))],
       '0.2.0+old'
     );
     expect(review).toEqual({
       reason: '“File invoices” failed a dry run.',
       sdk: '0.3.0+new',
       proposal: {
-        task: task('macro.tasks.add(x)', '0.3.0+new'),
+        task: task('rox.tasks.add(x)', '0.3.0+new'),
         changes: [
           {
             title: 'File invoices',
-            before: 'macro.tasks.create(x)',
-            after: 'macro.tasks.add(x)',
+            before: 'rox.tasks.create(x)',
+            after: 'rox.tasks.add(x)',
           },
         ],
       },

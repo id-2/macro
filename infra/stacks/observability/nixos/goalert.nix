@@ -129,8 +129,8 @@ in
       serviceConfig = {
         DynamicUser = true;
         LoadCredential = map credential [
-          "macro_alerts_webhook_url"
-          "macro_alerts_bot_token"
+          "rox_alerts_webhook_url"
+          "rox_alerts_bot_token"
         ];
         ExecStart = "${pkgs.python3}/bin/python3 ${./goalert/macro-alerts-relay.py}";
         MemoryMax = "128M";

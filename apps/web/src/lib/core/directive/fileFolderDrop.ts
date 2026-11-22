@@ -56,7 +56,7 @@ export function fileFolderDrop(
     // Upgrade an internal drag to active once the 20px threshold is exceeded.
     if (
       !internalDragActivated &&
-      e.dataTransfer?.types.includes('application/x-macro-internal') &&
+      e.dataTransfer?.types.includes('application/x-rox-internal') &&
       internalDragExceedsThreshold()
     ) {
       internalDragActivated = true;
@@ -83,7 +83,7 @@ export function fileFolderDrop(
         const types = e.dataTransfer?.types || [];
         // For internal image drags, wait for the 20px threshold before activating.
         // handleDragOver will upgrade to valid once the threshold is exceeded.
-        if (types.includes('application/x-macro-internal')) {
+        if (types.includes('application/x-rox-internal')) {
           internalDragActivated = false;
           options?.onDragStart?.(false);
           return;
@@ -160,7 +160,7 @@ export function fileFolderDrop(
 
     // If no files but we have HTML data, try to extract image URLs.
     // For internal drags, only proceed if the drag exceeded the 20px threshold.
-    if (dataTransfer.types.includes('application/x-macro-internal')) {
+    if (dataTransfer.types.includes('application/x-rox-internal')) {
       if (!internalDragExceedsThreshold()) {
         return;
       }

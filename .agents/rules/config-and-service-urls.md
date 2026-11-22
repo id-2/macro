@@ -12,10 +12,10 @@ startup loudly.
 
 ## Rust services
 
-- **CS-14** Read config only through `macro_config::MacroConfig` fields and the
-  `macro_env_var` macros: `env_vars!` for required, `maybe_env_vars!` for
-  optional. `std::env::var` is banned by clippy. Use `macro_aws_config` and
-  `macro_entrypoint` for AWS and tracing setup.
+- **CS-14** Read config only through `rox_config::RoxConfig` fields and the
+  `rox_env_var` macros: `env_vars!` for required, `maybe_env_vars!` for
+  optional. `std::env::var` is banned by clippy. Use `rox_aws_config` and
+  `rox_entrypoint` for AWS and tracing setup.
 - **CS-15** Load config once at startup (`ConfigLoader::load`), never inside
   handlers.
 - **CS-16** Don't add `.context()` to env-var macro errors; they already name
@@ -26,17 +26,17 @@ startup loudly.
   `local/lcl_personal`, plus a `BootStubEnv` placeholder in `xtask_local` so
   `--no-doppler` still boots.
 - In ECS the whole Doppler config arrives as `APP_SECRETS_JSON`, and
-  `MacroConfig` reads **only** that JSON when it is present. A Pulumi container
-  `environment:` entry is invisible to `MacroConfig`; a value that comes from
+  `RoxConfig` reads **only** that JSON when it is present. A Pulumi container
+  `environment:` entry is invisible to `RoxConfig`; a value that comes from
   infra must be written into Doppler (see `infra/stacks/agent-harness-service`).
 
 ## Service URLs
 
 - Stable service URLs and public OAuth/callback/app origins are typed in
-  `crates/macro_service_urls` (`service_url!` with `local`/`dev`/`prod`), chosen by `ENVIRONMENT`. Call
+  `crates/rox_service_urls` (`service_url!` with `local`/`dev`/`prod`), chosen by `ENVIRONMENT`. Call
   `XServiceUrl::new()`. Never declare a `FOO_SERVICE_URL` env var or match on
   `Environment` to build a URL. Queue names follow the same pattern in
-  `crates/macro_queues`.
+  `crates/rox_queues`.
 - Third-party hosts our code calls are typed the same way when a test double
   exists for them (`GmailApiUrl`, `GoogleCalendarApiUrl`, `GooglePeopleApiUrl`,
   `GoogleOauthCertsUrl`, `GoogleOauthAuthorizationUrl`, `GoogleOauthTokenUrl`,
@@ -53,7 +53,7 @@ startup loudly.
   `xtask_local`'s `local_env.rs`; `local` defaults are host ports and do not
   work inside Docker.
 - The URL table is hand-copied. A new or changed service URL updates every copy:
-  `macro_service_urls` and `infra/packages/shared/src/service_urls.ts`, plus each
+  `rox_service_urls` and `infra/packages/shared/src/service_urls.ts`, plus each
   consuming runtime (`apps/web/src/lib/core/constant/servers.ts`,
   `packages/sdk/src/config.ts`, and worker `[env.*.vars]`). Do not add unused
   public OAuth identities to API transport maps.

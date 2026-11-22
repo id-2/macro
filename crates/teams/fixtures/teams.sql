@@ -1,11 +1,11 @@
-INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
 VALUES
     ('a1111111-1111-1111-1111-111111111111', 'user@user.com', 'user@user.com', 'cus_1234'),
     ('a2222222-2222-2222-2222-222222222222', 'user2@user.com', 'user2@user.com', 'stripe_user2'),
     ('a3333333-3333-3333-3333-333333333333', 'user3@user.com', 'user3@user.com', 'stripe_user3'),
     ('a4444444-4444-4444-4444-444444444444', 'user4@user.com', 'user4@user.com', 'stripe_user4');
 
-INSERT INTO "User" ("id", "email", "name", "stripeCustomerId", "macro_user_id") VALUES
+INSERT INTO "User" ("id", "email", "name", "stripeCustomerId", "rox_user_id") VALUES
 ('macro|user@user.com', 'user@user.com', 'User', 'cus_1234', 'a1111111-1111-1111-1111-111111111111'),
 ('macro|user2@user.com', 'user2@user.com', 'User2', NULL, 'a2222222-2222-2222-2222-222222222222'),
 ('macro|user3@user.com', 'user3@user.com', 'User3', NULL, 'a3333333-3333-3333-3333-333333333333'),

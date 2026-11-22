@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::{DeletedUserDraft, UserProvider};
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use std::sync::Mutex;
 use uuid::Uuid;
@@ -43,7 +43,7 @@ fn created(fake: &Fake, input: &CreateDraftInput) -> CreatedDraft {
         bcc: input.bcc.clone(),
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: Some(serde_json::json!({"Macro-In-Reply-To": "x"})),
         send_time: input.send_time,
     }
@@ -80,7 +80,7 @@ impl DraftSendService for Fake {
 
     async fn delete_draft_for_user(
         &self,
-        _: MacroUserIdStr<'_>,
+        _: RoxUserIdStr<'_>,
         draft_id: Uuid,
 
         _expected_generation: i32,
@@ -156,7 +156,7 @@ impl DraftAttachmentRepo for Fake {
 fn link() -> Link {
     Link {
         id: Uuid::from_u128(0xd01),
-        macro_id: MacroUserIdStr::parse_from_str("macro|sender@example.com").unwrap(),
+        rox_id: RoxUserIdStr::parse_from_str("macro|sender@example.com").unwrap(),
         fusionauth_user_id: String::new(),
         email_address: EmailStr::try_from("sender@example.com".to_owned()).unwrap(),
         provider: UserProvider::Gmail,
@@ -183,11 +183,11 @@ fn input() -> CreateDraftInput {
         bcc: vec![],
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: None,
-        actor: Some(MacroUserIdStr::parse_from_str("macro|sender@example.com").unwrap()),
+        actor: Some(RoxUserIdStr::parse_from_str("macro|sender@example.com").unwrap()),
         draft_client_binding: None,
         thread_client_binding: None,
     }
@@ -195,7 +195,7 @@ fn input() -> CreateDraftInput {
 
 fn receipt(document_id: &str) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::parse_from_str("macro|sender@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("macro|sender@example.com").unwrap(),
         document_id,
         EntityType::Document,
     )

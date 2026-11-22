@@ -1,4 +1,4 @@
-import { getDisplayNameParts, type MacroId } from '@core/user';
+import { getDisplayNameParts, type RoxId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { throwOnErr } from '@core/util/result';
 import { queryClient } from '@queries/client';
@@ -164,7 +164,7 @@ async function createDefaultBookingLinkIfNeeded(
     return null;
   }
 
-  const { firstName } = getDisplayNameParts(userId as MacroId);
+  const { firstName } = getDisplayNameParts(userId as RoxId);
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const schedule = newSchedule(timeZone);
   const bookingLink = newDefaultBookingLink(schedule.id, userId, firstName);

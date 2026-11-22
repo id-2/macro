@@ -41,11 +41,11 @@ they need.
 
 - Depends on (by feature): `entity_access` (ports/inbound), `model` (annotations),
   `properties`/`models_properties`/`model_notifications`/`notification`
-  (delivery), `initiative` (outbound), `macro_event_broker`/`macro_event_topics`
+  (delivery), `initiative` (outbound), `rox_event_broker`/`rox_event_topics`
   (broker).
 - Used by: `agent_harness`, `agent_session`, `agent_trigger`, `ai_tools`, `bots`,
   `channel_bots`, `channels`, `coding_agent_worker`, `crm`, `documents`,
-  `lexical_client`, `lexical_mention_extractor`, `macro_db_client`,
+  `lexical_client`, `lexical_mention_extractor`, `rox_db_client`,
   `soup_realtime`, `webhook`.
 
 ## Recipes

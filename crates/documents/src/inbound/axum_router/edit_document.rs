@@ -8,7 +8,7 @@ use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::{
     DocumentAccessExtractor, ProjectBodyAccessLevelExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model::document::DocumentBasic;
 use model::response::GenericSuccessResponse;
 use models_permissions::share_permission::access_level::EditAccessLevel;
@@ -52,7 +52,7 @@ pub struct EditDocumentResponse {
 pub async fn edit_document_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

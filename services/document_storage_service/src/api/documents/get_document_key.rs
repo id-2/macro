@@ -6,7 +6,7 @@ use crate::model::response::documents::get::{GetDocumentKeyResponse, GetDocument
 use axum::extract::State;
 use axum::{Extension, extract::Path, http::StatusCode, response::IntoResponse};
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::document::FileType;
 use model::response::GenericErrorResponse;
 use model::{document::DocumentBasic, response::GenericResponse};
@@ -34,11 +34,11 @@ pub struct Params {
             (status = 500, body=GenericErrorResponse),
         )
     )]
-#[tracing::instrument(skip(state, user, document_context, _access), fields(user_id=?user.authorization.user.macro_user_id, file_type=?document_context.file_type))]
+#[tracing::instrument(skip(state, user, document_context, _access), fields(user_id=?user.authorization.user.rox_user_id, file_type=?document_context.file_type))]
 pub async fn get_document_key_handler(
     _access: DocumentAccessExtractor<ViewAccessLevel, EntityAccessService, AuthorizationService>,
     State(state): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     document_context: Extension<DocumentBasic>,
     Path(Params {
         document_id,
@@ -67,7 +67,7 @@ pub async fn get_document_key_handler(
     let key = match file_type {
         FileType::Pdf => {
             let document_version_id =
-                match macro_db_client::document::get_document_version_id(&state.db, &document_id)
+                match rox_db_client::document::get_document_version_id(&state.db, &document_id)
                     .await
                 {
                     Ok(document_version_id) => document_version_id.0,

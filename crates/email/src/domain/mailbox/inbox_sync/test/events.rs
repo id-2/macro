@@ -405,7 +405,7 @@ async fn own_sender_filter_keeps_its_debug_event_and_thread_identity() {
         state.import.senders.insert(
             sender,
             models_email::service::address::ContactInfo {
-                email: format!("no-reply@{}", email_utils::MACRO_NOTIFICATION_SENDER_DOMAIN),
+                email: format!("no-reply@{}", email_utils::ROX_NOTIFICATION_SENDER_DOMAIN),
                 name: None,
                 photo_url: None,
             },

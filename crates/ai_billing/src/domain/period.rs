@@ -4,7 +4,7 @@
 
 use ai_usage::domain::financial::{FinancialError, FinancialResult};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use super::models::{BillingPeriod, Result, UsagePolicy};
@@ -127,7 +127,7 @@ pub struct SubscriptionPeriod {
     /// Customer identity checked against the owning domain's stored binding.
     pub customer_id: BillingIdentity,
     /// Team metadata, checked against the owning team's subscription binding.
-    pub team_id: Option<macro_uuid::Uuid>,
+    pub team_id: Option<rox_uuid::Uuid>,
     /// Number of seats on this item.
     pub quantity: u64,
     /// Number of items in the complete subscription (personal subscriptions need one).
@@ -156,9 +156,9 @@ pub struct SubscriptionPeriod {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SeatPeriodObservation {
     /// Seat owns its allowance even after departure or rejoin.
-    pub seat: MacroUserIdStr<'static>,
+    pub seat: RoxUserIdStr<'static>,
     /// Frozen payer, never recomputed when historical usage completes.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// Verified subscription and item facts.
     pub subscription: SubscriptionPeriod,
 }
@@ -326,9 +326,9 @@ pub trait PeriodBindingSource: Send + Sync + 'static {
     /// price/product/recurrence; these candidates alone never prove eligibility.
     fn seats(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         observation: &SubscriptionPeriod,
-    ) -> impl Future<Output = Result<Option<Vec<MacroUserIdStr<'static>>>>> + Send;
+    ) -> impl Future<Output = Result<Option<Vec<RoxUserIdStr<'static>>>>> + Send;
 }
 
 /// Atomic persistence of eligibility, exceptions, and immutable period publication.
@@ -369,7 +369,7 @@ impl<E: PeriodBindingSource, R: PeriodRepo> PeriodService<E, R> {
     /// a durable exception; it is never repaired by extrapolating an older anchor.
     pub async fn record_rollout_baseline(
         &self,
-        payer: MacroUserIdStr<'static>,
+        payer: RoxUserIdStr<'static>,
         mut observation: SubscriptionPeriod,
     ) -> Result<()> {
         observation.evidence = PeriodEvidence::RolloutBaseline;
@@ -380,7 +380,7 @@ impl<E: PeriodBindingSource, R: PeriodRepo> PeriodService<E, R> {
 impl<E: PeriodBindingSource, R: PeriodRepo> PeriodSync for PeriodService<E, R> {
     fn sync<'a>(
         &'a self,
-        payer: MacroUserIdStr<'static>,
+        payer: RoxUserIdStr<'static>,
         observation: SubscriptionPeriod,
     ) -> std::pin::Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
         Box::pin(async move {
@@ -417,7 +417,7 @@ pub trait PeriodSync: Send + Sync + 'static {
     /// Synchronize a verified subscription item without any base billing writes.
     fn sync<'a>(
         &'a self,
-        payer: MacroUserIdStr<'static>,
+        payer: RoxUserIdStr<'static>,
         observation: SubscriptionPeriod,
     ) -> std::pin::Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>>;
 }

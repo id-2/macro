@@ -18,14 +18,14 @@ AI editors, lexical, and notification text.
 ## Scope
 
 - Owns: the mention chip wire format (XML-ish tags embedded in message/doc
-  text) and parsing it into typed references (`macro_user_id`, `BotIdStr`,
+  text) and parsing it into typed references (`rox_user_id`, `BotIdStr`,
   `ChannelSender`, GitHub PR URLs).
 - Not here: rendering mentions in the UI (web app), or deciding who gets
   notified for a mention → `model_notifications`, `messages`.
 
 ## Boundaries
 
-- Depends on: `bot_id`, `channel_sender`, `macro_user_id`, `nom`.
+- Depends on: `bot_id`, `channel_sender`, `rox_user_id`, `nom`.
 - Used by: `authentication_service`, `model_notifications`, `notification_service`,
   `scheduled_action`, `search_processing_service`, `slack_import_worker`,
   `slack_integration`.

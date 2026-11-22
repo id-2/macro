@@ -19,8 +19,8 @@ fn context(received: &whatsapp_fake_server::ReceivedMessage) -> Option<&ContextI
         .and_then(|extended| extended.context_info.as_deref())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
-async fn a_disappearing_group_is_kept_in_macro_and_macro_sends_disappear(pool: PgPool) {
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
+async fn a_disappearing_group_is_kept_in_rox_and_rox_sends_disappear(pool: PgPool) {
     let world = World::new(pool).await;
     world.whatsapp.change_group(
         &world.group,
@@ -112,7 +112,7 @@ async fn a_disappearing_group_is_kept_in_macro_and_macro_sends_disappear(pool: P
     replica.drain(TIMEOUT).await.unwrap();
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_communitys_groups_are_added_and_used_but_not_the_community(pool: PgPool) {
     let world = World::new(pool).await;
     let members = [&world.customer, &world.alice];

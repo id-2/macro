@@ -6,7 +6,7 @@ use ai_billing::domain::{
     CreditGrantRepo, FreeAllowanceBonusRepo, InviteReward, InviteRewardService,
     ports::EntitlementSource,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use teams::domain::invite_rewards::{InviteRewardEvent, InviteRewardFuture, InviteRewarder};
 
 /// Books invite and referral rewards with [`InviteRewardService`].
@@ -45,8 +45,8 @@ where
 {
     async fn reward(
         &self,
-        beneficiary: MacroUserIdStr<'static>,
-        joined: &MacroUserIdStr<'_>,
+        beneficiary: RoxUserIdStr<'static>,
+        joined: &RoxUserIdStr<'_>,
         event_key: String,
         why: &str,
     ) -> anyhow::Result<()> {
@@ -85,8 +85,8 @@ where
 {
     async fn reward_referrer(
         &self,
-        referrer: MacroUserIdStr<'static>,
-        referred: MacroUserIdStr<'static>,
+        referrer: RoxUserIdStr<'static>,
+        referred: RoxUserIdStr<'static>,
         event_key: String,
     ) -> anyhow::Result<()> {
         self.reward(referrer, &referred, event_key, "referral signup")

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT i.profile_picture FROM macro_user_info i JOIN \"User\" u ON u.macro_user_id = i.macro_user_id WHERE u.id = $1",
+  "query": "SELECT i.profile_picture FROM rox_user_info i JOIN \"User\" u ON u.rox_user_id = i.rox_user_id WHERE u.id = $1",
   "describe": {
     "columns": [
       {

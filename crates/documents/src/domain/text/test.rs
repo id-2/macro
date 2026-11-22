@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 
 fn document(file_type: &str) -> DocumentBasic {
@@ -18,7 +18,7 @@ fn document(file_type: &str) -> DocumentBasic {
 }
 fn access(id: &str, kind: EntityType) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::parse_from_str("macro|reader@macro.local").unwrap(),
+        RoxUserIdStr::parse_from_str("macro|reader@macro.local").unwrap(),
         id,
         kind,
     )

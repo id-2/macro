@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 use super::*;
 use crate::domain::model::{ChangeAction, RunMode};
@@ -8,19 +8,19 @@ mod runs;
 
 /// A person who can own suggestions.
 pub(crate) async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
-        macro_user_id,
+        rox_user_id,
         id,
     )
     .execute(pool)
     .await
     .unwrap();
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         id,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await
@@ -59,12 +59,12 @@ fn content(key: &str) -> SuggestionContent {
 
 /// Concurrent writes can't pass the limits together: the person's writes
 /// queue on one lock.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn concurrent_creates_stay_within_the_limits(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let generation = generation(&pool).await;
     let repo = std::sync::Arc::new(PgSuggestionRepo::new(pool));
-    let user = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let user = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let limits = Limits {
         open: 30,
         new_per_generation: 3,
@@ -144,7 +144,7 @@ async fn routine_card(pool: &PgPool) -> (Uuid, Uuid) {
 
 /// Deleting a routine suggestion, by any code, deletes its suggestion, so the
 /// person never holds a suggestion without its kind's row.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn deleting_a_routine_suggestion_deletes_its_suggestion(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let (card, suggestion) = routine_card(&pool).await;
@@ -164,7 +164,7 @@ async fn deleting_a_routine_suggestion_deletes_its_suggestion(pool: PgPool) {
 
 /// A row that doesn't decode is skipped, so the person's other suggestions still
 /// read.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_broken_suggestion_row_is_skipped_and_the_rest_read(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let (suggestion, _) = routine_card(&pool).await;
@@ -182,7 +182,7 @@ async fn a_broken_suggestion_row_is_skipped_and_the_rest_read(pool: PgPool) {
     .await
     .unwrap();
     let repo = PgSuggestionRepo::new(pool);
-    let user = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let user = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let suggestions = repo.for_review(&user, 60).await.unwrap();
     assert_eq!(
         suggestions
@@ -196,12 +196,12 @@ async fn a_broken_suggestion_row_is_skipped_and_the_rest_read(pool: PgPool) {
 
 /// The feed reads open suggestions and those done lately; a review reads open
 /// suggestions and only the most recently closed.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reads_load_only_the_suggestions_they_show(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let generation = generation(&pool).await;
     let repo = PgSuggestionRepo::new(pool);
-    let user = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let user = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let limits = Limits {
         open: 30,
         new_per_generation: 12,
@@ -309,7 +309,7 @@ async fn suggestion_about_document(pool: &PgPool, user: &str, document: &str) ->
 
 /// A suggestion row that doesn't decode is skipped, so the item's other suggestions
 /// still resolve.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_broken_row_about_an_item_is_skipped_and_the_rest_found(pool: PgPool) {
     const LEGACY: &str = "not a macro user id";
     insert_user(&pool, OWNER).await;
@@ -340,7 +340,7 @@ const NO_LIMITS: Limits = Limits {
 struct Fixture {
     pool: PgPool,
     repo: PgSuggestionRepo,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     generation: Uuid,
 }
 
@@ -350,7 +350,7 @@ async fn fixture(pool: PgPool) -> Fixture {
     Fixture {
         repo: PgSuggestionRepo::new(pool.clone()),
         pool,
-        user: MacroUserIdStr::parse_from_str(OWNER).unwrap(),
+        user: RoxUserIdStr::parse_from_str(OWNER).unwrap(),
         generation,
     }
 }

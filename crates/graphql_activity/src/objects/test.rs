@@ -1,6 +1,6 @@
 use activity::{Action, CallStart, PropertyChange, RecordedAction};
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use uuid::Uuid;
 
@@ -8,7 +8,7 @@ use super::*;
 
 fn actor() -> activity::Actor<'static> {
     activity::Actor::new_from_user(
-        MacroUserIdStr::try_from("macro|teo@example.com".to_string()).expect("valid user id"),
+        RoxUserIdStr::try_from("macro|teo@example.com".to_string()).expect("valid user id"),
     )
 }
 

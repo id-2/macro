@@ -17,7 +17,7 @@ channel/document conversations.
 
 - Owns: `sqlx::query!` call sites over `comms_messages` and related tables.
 - Not here: the table schema itself, or any other RoxDB table → both live in
-  `crates/macro_db_client/migrations`; comms_db_client only queries them.
+  `crates/rox_db_client/migrations`; comms_db_client only queries them.
 - Not here: comms domain logic, authorization, or HTTP — those live in the
   callers listed below, not a dedicated comms service.
 
@@ -35,7 +35,7 @@ channel/document conversations.
   the repository root if `.sqlx` cache metadata is missing.
 - Add a new table area: new `src/<area>.rs` module → `pub mod <area>;` in
   `src/lib.rs` → add the corresponding migration in
-  `crates/macro_db_client/migrations` first (schema lives there, not here).
+  `crates/rox_db_client/migrations` first (schema lives there, not here).
 
 ## Checks
 
@@ -45,7 +45,7 @@ channel/document conversations.
 ## Gotchas
 
 - This crate has no `migrations/` of its own — `comms_messages` and related
-  tables are defined in `crates/macro_db_client/migrations`; keep query
+  tables are defined in `crates/rox_db_client/migrations`; keep query
   columns in sync with that schema, not the other way around.
 
 ## Related

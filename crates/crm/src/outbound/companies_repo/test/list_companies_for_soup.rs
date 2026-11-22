@@ -3,7 +3,7 @@ use crate::domain::companies_repo::*;
 use crate::domain::model::CrmCompanyForSoup;
 use crate::outbound::companies_repo::*;
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -106,7 +106,7 @@ async fn walk(
     Ok(seen)
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_includes_companies_without_legacy_settings(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -132,7 +132,7 @@ async fn list_for_soup_includes_companies_without_legacy_settings(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_includes_companies_when_legacy_flag_off(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let owner = "macro|owner@test.com";
@@ -155,7 +155,7 @@ async fn list_for_soup_includes_companies_when_legacy_flag_off(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_excludes_hidden_rows(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let owner = "macro|owner@test.com";
@@ -191,7 +191,7 @@ async fn list_for_soup_excludes_hidden_rows(pool: PgPool) -> anyhow::Result<()> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_returns_hidden_when_hidden_true(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let owner = "macro|owner@test.com";
@@ -244,7 +244,7 @@ async fn list_for_soup_returns_hidden_when_hidden_true(pool: PgPool) -> anyhow::
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_hydrates_name_and_description_from_directory(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -288,7 +288,7 @@ async fn list_for_soup_hydrates_name_and_description_from_directory(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_returns_none_for_negative_cache_directory_row(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -325,7 +325,7 @@ async fn list_for_soup_returns_none_for_negative_cache_directory_row(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_filters_by_company_ids_when_non_empty(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     let owner = "macro|owner@test.com";
@@ -351,7 +351,7 @@ async fn list_for_soup_filters_by_company_ids_when_non_empty(pool: PgPool) -> an
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_does_not_leak_other_team_rows(pool: PgPool) -> anyhow::Result<()> {
     let team_a = Uuid::now_v7();
     let team_b = Uuid::now_v7();
@@ -379,7 +379,7 @@ async fn list_for_soup_does_not_leak_other_team_rows(pool: PgPool) -> anyhow::Re
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_paginates_past_cursor(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|owner@test.com").await?;
@@ -459,7 +459,7 @@ async fn list_for_soup_paginates_past_cursor(pool: PgPool) -> anyhow::Result<()>
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_pagination_breaks_ties_on_id(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, "macro|owner@test.com").await?;
@@ -532,7 +532,7 @@ async fn list_for_soup_pagination_breaks_ties_on_id(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_created_at_orders_by_first_interaction(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, VIEWER).await?;
@@ -559,7 +559,7 @@ async fn list_for_soup_created_at_orders_by_first_interaction(pool: PgPool) -> a
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_interaction_sorts_ignore_views(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, VIEWER).await?;
@@ -606,7 +606,7 @@ async fn list_for_soup_interaction_sorts_ignore_views(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_viewed_sorts_use_only_this_users_company_views(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -701,7 +701,7 @@ async fn list_for_soup_viewed_sorts_use_only_this_users_company_views(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_viewed_updated_interleaves_views_and_interactions(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -755,7 +755,7 @@ async fn list_for_soup_viewed_updated_interleaves_views_and_interactions(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_for_soup_hidden_filter_applies_to_every_sort(pool: PgPool) -> anyhow::Result<()> {
     let team = Uuid::now_v7();
     seed_team(&pool, team, VIEWER).await?;

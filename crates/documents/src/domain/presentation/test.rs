@@ -1,6 +1,6 @@
 use super::*;
 use entity_access::domain::models::{Entity, EntityPermission, EntityType, RequiredPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use pptx_engine::inspect::ShapeKindName;
 use std::sync::Mutex;
@@ -15,7 +15,7 @@ const SECTIONED: &[u8] =
 
 fn receipt<T: RequiredPermission>(access_level: AccessLevel) -> EntityAccessReceipt<T> {
     EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::try_from("macro|slides@rox.one".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|slides@rox.one".to_owned()).unwrap(),
         Entity {
             entity_id: DOCUMENT.to_owned(),
             entity_type: EntityType::Document,

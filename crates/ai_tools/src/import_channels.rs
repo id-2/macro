@@ -2,7 +2,7 @@
 
 use crate::ToolChannelMessagesService;
 use import::domain::models::ImportTargetReservation;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 #[cfg(test)]
@@ -10,11 +10,11 @@ mod test;
 
 pub(crate) async fn create_channel(
     service: &ToolChannelMessagesService,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     name: &str,
     target: &ImportTargetReservation,
     participant_emails: &[String],
-    roster: &[MacroUserIdStr<'static>],
+    roster: &[RoxUserIdStr<'static>],
 ) -> anyhow::Result<Uuid> {
     // Preserve onboarding's best-effort team roster matching, not archive's raw
     // email mapping. Unknown collaborators and bots are not invited here.

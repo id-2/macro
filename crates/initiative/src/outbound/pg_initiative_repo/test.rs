@@ -8,9 +8,9 @@ mod initial_properties;
 mod task_access;
 #[cfg(feature = "toolset")]
 mod toolset;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_permissions::share_permission::channel_share_permission::{
     ChannelSharePermission, UpdateChannelSharePermission, UpdateOperation,
@@ -30,7 +30,7 @@ use super::PgInitiativeRepo;
 async fn migrate_for_test(pool: &PgPool) {
     // Keep both colliding migration bodies in the isolated test database,
     // remapping only the mailbox migration's in-memory version.
-    let migrations = MACRO_DB_MIGRATIONS
+    let migrations = ROX_DB_MIGRATIONS
         .iter()
         .map(|migration| {
             let mut migration = migration.clone();
@@ -64,8 +64,8 @@ const OTHER_OWNER: &str = "macro|initiative-repo-other-owner@corp.test";
 
 const INITIATIVE: &str = "initiative";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id)
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id)
         .expect("valid user id")
         .into_owned()
 }
@@ -129,24 +129,24 @@ fn create_args(owner: &str, name: &str, members: &[&str]) -> CreateInitiativeRep
 }
 
 async fn insert_user(pool: &PgPool, user_id: &str) -> anyhow::Result<()> {
-    let macro_user_id = Uuid::now_v7();
+    let rox_user_id = Uuid::now_v7();
     let email = user_id.trim_start_matches("macro|");
     sqlx::query!(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $2)
         "#,
-        macro_user_id,
+        rox_user_id,
         user_id,
         email,
     )
     .execute(pool)
     .await?;
     sqlx::query!(
-        r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $2, $3)"#,
+        r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         user_id,
         email,
-        macro_user_id,
+        rox_user_id,
     )
     .execute(pool)
     .await?;
@@ -381,7 +381,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
     assert_eq!(audits[0].get::<String, _>("result"), "success");
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_grants_owner_member_and_team_access_as_tracked(pool: PgPool) -> anyhow::Result<()> {
     let team_id = seed_owner_with_team(&pool).await?;
     insert_user(&pool, MEMBER).await?;
@@ -441,7 +441,7 @@ async fn create_grants_owner_member_and_team_access_as_tracked(pool: PgPool) -> 
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_with_unshared_team_leaves_the_initiative_untracked_and_unshared(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -458,7 +458,7 @@ async fn create_with_unshared_team_leaves_the_initiative_untracked_and_unshared(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn get_detail_reports_each_channel_grant_once(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     insert_user(&pool, MEMBER).await?;
@@ -494,7 +494,7 @@ async fn get_detail_reports_each_channel_grant_once(pool: PgPool) -> anyhow::Res
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn create_share_with_team_without_owner_team_succeeds_unshared(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -513,7 +513,7 @@ async fn create_share_with_team_without_owner_team_succeeds_unshared(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_accessible_includes_owner_member_team_channel_and_team_link(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -573,7 +573,7 @@ async fn list_accessible_includes_owner_member_team_channel_and_team_link(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn list_accessible_excludes_public_only_and_unrelated(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     insert_user(&pool, STRANGER).await?;
@@ -601,7 +601,7 @@ async fn list_accessible_excludes_public_only_and_unrelated(pool: PgPool) -> any
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_member_diff_grants_and_revokes_initiative_access(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -645,7 +645,7 @@ async fn update_member_diff_grants_and_revokes_initiative_access(
 
 /// A session that may not share neither creates an initiative with members
 /// nor adds or removes one, and writes nothing when refused.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn a_scoped_session_gives_no_member_access(pool: PgPool) -> anyhow::Result<()> {
     use agent_correlation::context::{Attribution, scope_attribution};
     use agent_correlation::scope::SessionScope;
@@ -719,7 +719,7 @@ async fn a_scoped_session_gives_no_member_access(pool: PgPool) -> anyhow::Result
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_share_patch_sets_link_columns_and_channel_grants(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -788,7 +788,7 @@ async fn update_share_patch_sets_link_columns_and_channel_grants(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_team_share_applies_the_command_and_a_second_apply_is_not_untracked(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -850,7 +850,7 @@ async fn update_team_share_applies_the_command_and_a_second_apply_is_not_untrack
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn update_rejects_team_share_commands_naming_another_initiative(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -885,7 +885,7 @@ async fn update_rejects_team_share_commands_naming_another_initiative(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn team_share_facts_report_a_missing_initiative(pool: PgPool) -> anyhow::Result<()> {
     assert!(matches!(
         repo(pool)
@@ -896,7 +896,7 @@ async fn team_share_facts_report_a_missing_initiative(pool: PgPool) -> anyhow::R
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn delete_leaves_no_initiative_rows(pool: PgPool) -> anyhow::Result<()> {
     insert_user(&pool, OWNER).await?;
     insert_user(&pool, MEMBER).await?;
@@ -967,7 +967,7 @@ async fn delete_leaves_no_initiative_rows(pool: PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn appearance_survives_identity_reads_without_touching_timestamps(
     pool: PgPool,
 ) -> anyhow::Result<()> {
@@ -1027,7 +1027,7 @@ async fn appearance_survives_identity_reads_without_touching_timestamps(
     Ok(())
 }
 
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn appearance_history_failure_rolls_back_and_retry_is_idempotent(
     pool: PgPool,
 ) -> anyhow::Result<()> {

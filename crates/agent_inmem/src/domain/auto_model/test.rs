@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use cognition::domain::{
     Cognition, DecisionRequest, DecisionResponse, GenerateObjectRequest, GenerateObjectResponse,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::json;
 
@@ -30,7 +30,7 @@ struct FakeCognition {
 impl Cognition for FakeCognition {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         panic!("choosing a model must not generate text")
@@ -38,7 +38,7 @@ impl Cognition for FakeCognition {
 
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         self.seen.lock().unwrap().push(request);
@@ -68,8 +68,8 @@ fn selector(answer: Answer) -> (JevAutoModel, Arc<FakeCognition>) {
     (JevAutoModel::new(cognition.clone()), cognition)
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").unwrap()
 }
 
 #[tokio::test]

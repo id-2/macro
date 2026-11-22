@@ -17,7 +17,7 @@ use item_filters::NotificationState;
 use item_filters::SharedEmailFilter;
 use item_filters::ast::email::{AttachmentKind, SubjectQuery};
 use item_filters::ast::properties::{PropertiesLiteral, PropertyMatchValue};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use std::collections::HashMap;
 
 const CALLER: &str = "macro|u0@owned.test";
@@ -320,7 +320,7 @@ async fn md5_id(pool: &Pool<Postgres>, text: &str) -> anyhow::Result<Uuid> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn company_pages_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -359,7 +359,7 @@ fn ties(rows: &[ThreadPreviewCursorDbRow]) -> (usize, usize) {
 
 /// Threads with equal dates, in one inbox and across inboxes, page by id.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn tied_dates_page_alike(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -377,7 +377,7 @@ async fn tied_dates_page_alike(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn rare_and_old_companies_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -394,7 +394,7 @@ async fn rare_and_old_companies_match(pool: Pool<Postgres>) -> anyhow::Result<()
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn copied_only_companies_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -413,7 +413,7 @@ async fn copied_only_companies_match(pool: Pool<Postgres>) -> anyhow::Result<()>
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn contact_pages_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -444,7 +444,7 @@ async fn contact_pages_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn sales_view_pages_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -462,7 +462,7 @@ async fn sales_view_pages_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn partial_addresses_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -480,7 +480,7 @@ async fn partial_addresses_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn facets_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -508,7 +508,7 @@ async fn facets_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 /// Negated facets read in page order; a message term beside the addresses,
 /// alone or mixed with a thread term, goes to the general builder.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn negated_and_mixed_terms_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -550,7 +550,7 @@ async fn negated_and_mixed_terms_match(pool: Pool<Postgres>) -> anyhow::Result<(
 /// Thread terms the streams apply as they read: Soup's hydration by id,
 /// dates, notification states, a property and calendar threads.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn thread_terms_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -613,7 +613,7 @@ async fn thread_terms_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn owner_terms_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -644,7 +644,7 @@ async fn owner_terms_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 
 /// A repeated inbox reads as one, in either read.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn repeated_inboxes_read_once(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -671,7 +671,7 @@ async fn hand(pool: &Pool<Postgres>, name: &str) -> anyhow::Result<Uuid> {
 /// participant is only on a message All Mail hides, and previews the newest
 /// message it shows.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn hidden_messages_dont_list_threads(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -736,7 +736,7 @@ async fn foreign_listed(
 /// stream reads the page; the preview is still the newest message that
 /// matches.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_owned_address_read", "email_owned_address_foreign_contacts")
@@ -780,7 +780,7 @@ async fn other_inboxes_contacts_list_as_in_general(pool: Pool<Postgres>) -> anyh
 
 /// A request the owned read doesn't cover still reads the general builder.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn uncovered_requests_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -808,7 +808,7 @@ async fn uncovered_requests_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
 /// Other views, and the viewed sorts and terms, which read the caller's view
 /// history, go to the general builder.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn other_views_and_viewed_requests_read_general(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -837,7 +837,7 @@ async fn other_views_and_viewed_requests_read_general(pool: Pool<Postgres>) -> a
 /// A request in a project reads the threads shared into it, so it goes to
 /// the general builder.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn project_requests_read_general(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -856,7 +856,7 @@ async fn project_requests_read_general(pool: Pool<Postgres>) -> anyhow::Result<(
 /// A team request applies the CRM's privacy rule and lists each
 /// conversation once, so the owned read leaves it to the team read.
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../../fixtures",
         scripts("email_dynamic_query_crm_dedupe")
@@ -877,7 +877,7 @@ async fn team_requests_read_general(pool: Pool<Postgres>) -> anyhow::Result<()> 
     let acme = Expr::Literal(EmailLiteral::Sender(Email::Domain(
         "acme.example.com".to_owned(),
     )));
-    let caller = sqlx::query_scalar!("SELECT macro_id FROM email_links WHERE id = $1", dave[0])
+    let caller = sqlx::query_scalar!("SELECT rox_id FROM email_links WHERE id = $1", dave[0])
         .fetch_one(&pool)
         .await?;
     let request = Request {
@@ -929,7 +929,7 @@ async fn streams(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_owned_address_read"))
 )]
 async fn each_read_takes_its_streams(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -967,7 +967,7 @@ async fn each_read_takes_its_streams(pool: Pool<Postgres>) -> anyhow::Result<()>
 }
 
 /// The read's statements share one snapshot and write nothing.
-#[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn reads_share_one_snapshot(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let mut transaction = begin_snapshot(&pool).await?;
     let settings = sqlx::query!(

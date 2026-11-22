@@ -1,9 +1,9 @@
 //! Typed system events. These are facts, never requests from the session owner.
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 
 /// Metadata key authored only by the harness, preserved across ACP transports.
-pub const NOTIFICATIONS_META: &str = "macro.dev/notifications";
+pub const NOTIFICATIONS_META: &str = "rox.dev/notifications";
 
 /// One durable event, independent of its delivery attempt.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

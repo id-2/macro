@@ -260,7 +260,7 @@ pub async fn recompute_signal(
                     OR (NOT (rules.address_false OR (rules.domain_false AND NOT rules.address_true)) AND facts.provider_is_primary))
         ) AS signal) calc
         WHERE t.id = $1 AND t.is_signal IS DISTINCT FROM calc.signal
-    "#,thread_id,email_utils::MACRO_NOTIFICATION_SENDER_DOMAIN).execute(tx).await?;
+    "#,thread_id,email_utils::ROX_NOTIFICATION_SENDER_DOMAIN).execute(tx).await?;
     Ok(())
 }
 
@@ -294,7 +294,7 @@ pub async fn recompute_thread_metadata(
     link_id: Uuid,
 ) -> Result<(), sqlx::Error> {
     sync_thread_received_mail(tx, thread_id).await?;
-    // Keep the Macro-draft and received-mail rules in step with
+    // Keep the Rox-draft and received-mail rules in step with
     // `thread_mail_projections_by_ids` in the email crate.
     sqlx::query!(r#"
         WITH facts AS (
@@ -302,23 +302,23 @@ pub async fn recompute_thread_metadata(
                 -- Outlook drafts composed in Macro gain a provider id once synced; their shadow row keeps them Macro drafts.
                 m.is_draft AND (m.provider_id IS NULL OR EXISTS (
                     SELECT 1 FROM email_mailbox_drafts d WHERE d.message_id = m.id AND NOT d.delete_requested
-                )) AS macro_draft,
+                )) AS rox_draft,
                 EXISTS (SELECT 1 FROM email_message_recipients r WHERE r.message_id = m.id AND r.contact_id = m.from_contact_id) AS sender_is_recipient
             FROM email_messages m JOIN email_message_mailbox_facts f ON f.id = m.id
             WHERE m.thread_id = $1 AND m.link_id = $2 AND f.is_present
         ), aggregate AS (
             SELECT COALESCE(bool_or(in_inbox AND NOT in_sent),false) AS mailbox_visible,
-                COALESCE(bool_or(macro_draft),false) AS has_macro_draft,
+                COALESCE(bool_or(rox_draft),false) AS has_rox_draft,
                 COALESCE(bool_or(in_inbox AND NOT in_trash AND NOT in_junk),false) AS has_inbox,
                 COALESCE(bool_and(is_read),true) AS is_read,
                 max(internal_date_ts) FILTER (WHERE in_inbox AND NOT is_draft AND (NOT is_sent OR sender_is_recipient)) AS received_ts,
-                max(updated_at) FILTER (WHERE macro_draft) AS draft_ts,
+                max(updated_at) FILTER (WHERE rox_draft) AS draft_ts,
                 max(internal_date_ts) FILTER (WHERE is_sent AND NOT in_trash) AS outbound_ts,
-                greatest(max(COALESCE(internal_date_ts, CASE WHEN is_draft THEN created_at END)) FILTER (WHERE NOT in_trash AND NOT in_junk),max(updated_at) FILTER (WHERE macro_draft AND NOT in_trash AND NOT in_junk)) AS all_ts
+                greatest(max(COALESCE(internal_date_ts, CASE WHEN is_draft THEN created_at END)) FILTER (WHERE NOT in_trash AND NOT in_junk),max(updated_at) FILTER (WHERE rox_draft AND NOT in_trash AND NOT in_junk)) AS all_ts
             FROM facts
         ), effective AS (
             -- A Macro draft brings a thread back to the inbox only as a reply to received mail.
-            SELECT a.*, a.mailbox_visible OR (t.has_received_mail AND a.has_macro_draft)
+            SELECT a.*, a.mailbox_visible OR (t.has_received_mail AND a.has_rox_draft)
                     OR (t.reminder_returned_at IS NOT NULL AND a.has_inbox) AS visible,
                 greatest(a.received_ts, CASE WHEN t.has_received_mail THEN a.draft_ts END) AS inbound_ts
             FROM aggregate a JOIN email_threads t ON t.id = $1 AND t.link_id = $2

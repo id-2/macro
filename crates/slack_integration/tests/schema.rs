@@ -46,7 +46,7 @@ async fn fixture_with_history(pool: &PgPool, history: bool) -> Transaction<'_, P
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ('{TEAM}', 'schema', 'schema@example.com', 'schema-customer');
-        INSERT INTO "User" (id, email, macro_user_id)
+        INSERT INTO "User" (id, email, rox_user_id)
         VALUES ('macro|schema@example.com', 'schema@example.com', '{TEAM}');
         INSERT INTO team (id, name, owner_id) VALUES ('{TEAM}', 'Schema', 'macro|schema@example.com');
         INSERT INTO import_source_binding (team_id, confirmed_unknown_at) VALUES ('{TEAM}', now());
@@ -90,7 +90,7 @@ fn message() -> String {
     )
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn natural_keys_and_old_ledger_writers_remain_compatible(pool: PgPool) {
     let mut tx = fixture(&pool).await;
     for initiator in ["onboarding", "chat", "archive"] {
@@ -144,7 +144,7 @@ async fn natural_keys_and_old_ledger_writers_remain_compatible(pool: PgPool) {
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn upload_descriptors_verification_and_seals_are_immutable(pool: PgPool) {
     let mut tx = fixture(&pool).await;
     execute(&mut tx, &users_upload()).await;
@@ -217,7 +217,7 @@ async fn upload_descriptors_verification_and_seals_are_immutable(pool: PgPool) {
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn shape_only_empty_seals_gaps_and_closed_registration(pool: PgPool) {
     let mut tx = fixture(&pool).await;
     execute(&mut tx, &part_upload(1)).await;
@@ -251,7 +251,7 @@ async fn shape_only_empty_seals_gaps_and_closed_registration(pool: PgPool) {
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn leases_counters_search_and_reservations_have_valid_shapes(pool: PgPool) {
     let mut tx = fixture(&pool).await;
     for change in [
@@ -345,7 +345,7 @@ async fn leases_counters_search_and_reservations_have_valid_shapes(pool: PgPool)
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn message_fk_is_deferred_and_checks_parent_identity(pool: PgPool) {
     let mut tx = fixture(&pool).await;
     execute(&mut tx, &mapping()).await;
@@ -378,7 +378,7 @@ async fn message_fk_is_deferred_and_checks_parent_identity(pool: PgPool) {
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn job_cleanup_preserves_history_and_provenance_channel_cleanup_is_deliberate(pool: PgPool) {
     let mut tx = fixture(&pool).await;
     execute(&mut tx, &users_upload()).await;
@@ -425,7 +425,7 @@ async fn job_cleanup_preserves_history_and_provenance_channel_cleanup_is_deliber
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn reference_templates_are_bounded_and_completion_releases_payload(pool: PgPool) {
     let mut tx = fixture(&pool).await;
     execute(&mut tx, &format!(
@@ -463,7 +463,7 @@ async fn reference_templates_are_bounded_and_completion_releases_payload(pool: P
     tx.commit().await.unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn team_cleanup_does_not_delete_private_history(pool: PgPool) {
     let mut tx = fixture(&pool).await;
     execute(&mut tx, &mapping()).await;

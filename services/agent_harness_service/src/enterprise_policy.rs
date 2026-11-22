@@ -1,7 +1,7 @@
 //! Composition of team membership with enterprise runtime admission.
 
 use enterprise::domain::{EnterpriseError, Result, RuntimePolicy, TeamDirectory};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use teams::{domain::team_repo::TeamRepository, outbound::team_repo::TeamRepositoryImpl};
 use uuid::Uuid;
@@ -10,7 +10,7 @@ use uuid::Uuid;
 pub(crate) struct EnterpriseTeams(TeamRepositoryImpl);
 
 impl TeamDirectory for EnterpriseTeams {
-    async fn team_ids(&self, user: MacroUserIdStr<'static>) -> Result<Vec<Uuid>> {
+    async fn team_ids(&self, user: RoxUserIdStr<'static>) -> Result<Vec<Uuid>> {
         self.0
             .get_user_teams(&user)
             .await

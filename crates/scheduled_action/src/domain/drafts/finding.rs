@@ -20,7 +20,7 @@ use std::time::Duration;
 
 use agent_session::domain::routines::RoutineSessions;
 use chrono::{SecondsFormat, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use routine_program::{CODE_STEPS, STEP_CONTEXT, Step};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -246,7 +246,7 @@ impl FindingPrompts {
 /// any.
 fn prompt(
     task: &str,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     context: &DraftContext,
     lookup: &Lookup,
     areas: &str,
@@ -497,7 +497,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions> super::RoutineDrafts<Code, Se
     pub(super) async fn found_brief(
         &self,
         finding: &super::Finding,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         request: &DraftRequest,
         program: &[Step],
         context: &DraftContext,
@@ -604,7 +604,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions> super::RoutineDrafts<Code, Se
         &self,
         finding: &DraftFinding,
         prompts: &FindingPrompts,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         request: &DraftRequest,
     ) -> Option<Named> {
         let mut words = format!("<request>\n{}\n</request>", request.text().trim());
@@ -656,7 +656,7 @@ impl<Code: RoutineCode, Sessions: RoutineSessions> super::RoutineDrafts<Code, Se
     async fn look_up(
         &self,
         finding: &DraftFinding,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         named: &Named,
     ) -> Lookup {
         let asked: Vec<NameAsked> = named

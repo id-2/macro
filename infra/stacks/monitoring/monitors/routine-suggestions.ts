@@ -13,7 +13,7 @@
 //   `partial` | `failed` | `cancelled`), `sessions`, `kept`, `retries`,
 //   `surfaces_filled` (of 9), `first_ms` (absent when nothing was kept),
 //   `duration_ms`. `failed` means no session kept a suggestion (onboarding
-//   retries each once), so the person gets Macro's templates only.
+//   retries each once), so the person gets Rox's templates only.
 // - `routine_suggestions.surface`, once per surface per generation:
 //   `trigger`, `outcome`, `surface`, `filled` (the person has at least one
 //   open AI suggestion for it), `suggestions`.
@@ -47,7 +47,7 @@ const logs = (event: string) =>
 const onboarding = (event: string) => `${logs(event)} @trigger:onboarding`;
 
 new datadog.LogsMetric('routine-suggestions-generation', {
-  name: 'macro.routine_suggestions.generation',
+  name: 'rox.routine_suggestions.generation',
   compute: { aggregationType: 'count' },
   filter: { query: onboarding('generated') },
   groupBies: [ENV, tag('outcome')],
@@ -68,14 +68,14 @@ for (const field of ['first_ms', 'duration_ms', 'surfaces_filled']) {
 }
 
 new datadog.LogsMetric('routine-suggestions-surface', {
-  name: 'macro.routine_suggestions.surface',
+  name: 'rox.routine_suggestions.surface',
   compute: { aggregationType: 'count' },
   filter: { query: onboarding('surface') },
   groupBies: [ENV, tag('surface'), tag('filled')],
 });
 
 new datadog.LogsMetric('routine-suggestions-suggested', {
-  name: 'macro.routine_suggestions.suggested',
+  name: 'rox.routine_suggestions.suggested',
   compute: { aggregationType: 'count' },
   filter: { query: logs('suggested') },
   groupBies: [ENV, tag('kind'), tag('surface'), tag('ok')],
@@ -221,7 +221,7 @@ const dashboard = new datadog.Dashboard('routine-suggestions', {
 });
 
 // Routine suggestions are behind the `enable-routine-suggestions` flag, so
-// this notifies and does not page. A failed generation still serves Macro's
+// this notifies and does not page. A failed generation still serves Rox's
 // templates; the person sees no AI suggestions.
 prodMonitor('routine-suggestions-failures', {
   title: FAILURE_TITLE,

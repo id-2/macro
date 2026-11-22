@@ -1,7 +1,7 @@
 //! Tests for the AiProjectionRepositoryImpl.
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 
 use super::*;
@@ -28,7 +28,7 @@ async fn upsert_definition(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn upsert_projection_definition_is_idempotent_for_same_version(
@@ -49,7 +49,7 @@ async fn upsert_projection_definition_is_idempotent_for_same_version(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn upsert_projection_definition_revises_on_version_change(
@@ -85,12 +85,12 @@ async fn upsert_projection_definition_revises_on_version_change(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn get_or_create_target_projection_is_idempotent(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let user = MacroUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let user = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
 
@@ -113,14 +113,14 @@ async fn get_or_create_target_projection_is_idempotent(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn get_or_create_target_projection_resets_to_cold_on_version_change(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let user = MacroUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let user = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
     repo.get_or_create_target_projection("inbox/important", user.as_ref(), "hash_v1")
@@ -151,14 +151,14 @@ async fn get_or_create_target_projection_resets_to_cold_on_version_change(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn get_or_create_target_projection_bumps_last_requested_at(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool.clone());
-    let user = MacroUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let user = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
 
     upsert_definition(&repo, "inbox/important", "What is important?", "hash_v1").await?;
 
@@ -205,7 +205,7 @@ async fn get_or_create_target_projection_bumps_last_requested_at(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn get_or_create_target_projection_supports_team_targets(
@@ -238,14 +238,14 @@ async fn get_or_create_target_projection_supports_team_targets(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn get_target_projection_returns_instance_or_not_found(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
-    let user = MacroUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let user = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
 
     assert!(matches!(
         repo.get_target_projection("inbox/important", user.as_ref())
@@ -267,14 +267,14 @@ async fn get_target_projection_returns_instance_or_not_found(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn get_user_team_ids_returns_memberships(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
 
-    let pro = MacroUserIdStr::parse_from_str("macro|pro@user.com")?;
-    let free = MacroUserIdStr::parse_from_str("macro|free@user.com")?;
+    let pro = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let free = RoxUserIdStr::parse_from_str("macro|free@user.com")?;
 
     let pro_teams = repo.get_user_team_ids(&pro).await?;
     assert_eq!(pro_teams.len(), 1);
@@ -289,7 +289,7 @@ async fn get_user_team_ids_returns_memberships(pool: Pool<Postgres>) -> anyhow::
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn get_projection_returns_definition_or_not_found(
@@ -312,7 +312,7 @@ async fn get_projection_returns_definition_or_not_found(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn processing_claim_is_exclusive_and_releasable(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -334,7 +334,7 @@ async fn processing_claim_is_exclusive_and_releasable(pool: Pool<Postgres>) -> a
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn set_projection_result_and_error_update_status(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -376,7 +376,7 @@ async fn set_projection_result_and_error_update_status(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn projection_writes_are_scoped_to_the_message_version(
@@ -420,7 +420,7 @@ async fn projection_writes_are_scoped_to_the_message_version(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn set_projection_refreshing_updates_status(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -443,14 +443,14 @@ async fn set_projection_refreshing_updates_status(pool: Pool<Postgres>) -> anyho
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn user_has_permission_reflects_roles(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = AiProjectionRepositoryImpl::new(pool);
 
-    let pro = MacroUserIdStr::parse_from_str("macro|pro@user.com")?;
-    let free = MacroUserIdStr::parse_from_str("macro|free@user.com")?;
+    let pro = RoxUserIdStr::parse_from_str("macro|pro@user.com")?;
+    let free = RoxUserIdStr::parse_from_str("macro|free@user.com")?;
 
     assert!(
         repo.user_has_permission(&pro, READ_PROFESSIONAL_FEATURES)
@@ -466,7 +466,7 @@ async fn user_has_permission_reflects_roles(pool: Pool<Postgres>) -> anyhow::Res
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn reading_abandoned_loading_recovers_generation(pool: Pool<Postgres>) -> anyhow::Result<()> {
@@ -494,7 +494,7 @@ async fn reading_abandoned_loading_recovers_generation(pool: Pool<Postgres>) -> 
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn reading_refresh_keeps_queued_work_and_recovers_abandoned_generation(
@@ -543,7 +543,7 @@ async fn reading_refresh_keeps_queued_work_and_recovers_abandoned_generation(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(path = "../../../fixtures", scripts("ai_projections"))
 )]
 async fn reading_loading_reclaims_an_expired_processing_lease(
@@ -575,7 +575,7 @@ async fn reading_loading_reclaims_an_expired_processing_lease(
 }
 
 #[sqlx::test(
-    migrator = "MACRO_DB_MIGRATIONS",
+    migrator = "ROX_DB_MIGRATIONS",
     fixtures(
         path = "../../../fixtures",
         scripts("ai_projections", "projection_read_barrier")

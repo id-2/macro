@@ -11,7 +11,7 @@ use crate::domain::model::{
 use crate::domain::ports::FoldMachine;
 use crate::domain::test::util::{Frame, capturing_warnings};
 use crate::testing::fixtures::{
-    SUBAGENT_CLAUDE_CODE, SUBAGENT_CURSOR, SUBAGENT_MACRO_INMEM, SUBAGENT_OPENCODE,
+    SUBAGENT_CLAUDE_CODE, SUBAGENT_CURSOR, SUBAGENT_ROX_INMEM, SUBAGENT_OPENCODE,
 };
 use crate::testing::parse_log;
 use agent_client_protocol::schema::v1::ToolKind;
@@ -181,8 +181,8 @@ fn opencode_reports_the_child_session_and_strips_the_task_wrapper() {
 /// tool's `{ "result" }` response read as the answer rather than shown as
 /// JSON.
 #[test]
-fn the_inmem_agents_subagent_tool_folds_to_a_subagent_not_a_macro_tool() {
-    let (messages, warnings) = capturing_warnings(|| fold(parse_log(SUBAGENT_MACRO_INMEM)));
+fn the_inmem_agents_subagent_tool_folds_to_a_subagent_not_a_rox_tool() {
+    let (messages, warnings) = capturing_warnings(|| fold(parse_log(SUBAGENT_ROX_INMEM)));
     assert_eq!(warnings, vec![]);
     let agent = agent_message(&messages);
     let [part] = subagent_parts(agent)[..] else {
@@ -237,7 +237,7 @@ fn the_inmem_agents_subagent_tool_folds_to_a_subagent_not_a_macro_tool() {
 #[test]
 fn the_subagent_tool_over_mcp_folds_to_a_subagent() {
     let log = r#"{"direction":"to_runtime","content":{"type":"acp","jsonrpc":"2.0","id":"p","method":"session/prompt","params":{"sessionId":"s","prompt":[{"type":"text","text":"go"}]}}}
-{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"_meta":{"claudeCode":{"toolName":"mcp__macro__Subagent"}},"toolCallId":"a","sessionUpdate":"tool_call","rawInput":{"task":"Find the frog poem"},"status":"in_progress","title":"Subagent","kind":"other"}}}}
+{"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"_meta":{"claudeCode":{"toolName":"mcp__rox__Subagent"}},"toolCallId":"a","sessionUpdate":"tool_call","rawInput":{"task":"Find the frog poem"},"status":"in_progress","title":"Subagent","kind":"other"}}}}
 {"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"toolCallId":"a","sessionUpdate":"tool_call_update","status":"completed","rawOutput":{"content":[{"type":"text","text":"{\"result\":\"where quiet frogs go off to sleep.\"}"}]}}}}}
 {"direction":"to_server","content":{"type":"acp","jsonrpc":"2.0","id":"p","result":{"stopReason":"end_turn"}}}"#;
     let (messages, warnings) = capturing_warnings(|| fold(parse_log(log)));
@@ -274,7 +274,7 @@ fn the_fixtures_name_their_harnesses() {
         (SUBAGENT_CLAUDE_CODE, Harness::ClaudeCode),
         (SUBAGENT_OPENCODE, Harness::OpenCode),
         (SUBAGENT_CURSOR, Harness::Cursor),
-        (SUBAGENT_MACRO_INMEM, Harness::Macro),
+        (SUBAGENT_ROX_INMEM, Harness::Macro),
     ] {
         let mut machine = FoldMachineImpl::new();
         for entry in parse_log(fixture) {

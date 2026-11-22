@@ -12,10 +12,10 @@ export const env = envsafe({
   DAYTONA_TARGET: str({
     default: 'us',
   }),
-  MACRO_BOT_TOKEN: str({
+  ROX_BOT_TOKEN: str({
     desc: 'mbot_ key (Settings → Bots); the SDK also reads this from the environment itself',
   }),
-  MACRO_USER_ID: str({
+  ROX_USER_ID: str({
     desc: 'Rox user ID the bot is authorized to act as',
   }),
   PUBLIC_URL: url({
