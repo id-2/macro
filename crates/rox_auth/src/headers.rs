@@ -11,10 +11,14 @@ use cookie::Cookie;
 use rox_env::Environment;
 
 use crate::constant::{
-    ROX_ACCESS_TOKEN_COOKIE, ROX_REFRESH_TOKEN_COOKIE, ROX_REFRESH_TOKEN_HEADER,
+    ROX_REFRESH_TOKEN_HEADER, access_token_cookie_names, refresh_token_cookie_names,
 };
 
 /// Extracts the access token from a cookie. Returns `UNAUTHORIZED` if the cookie is missing.
+///
+/// Reads the current `rox-access-token` name first and falls back to the legacy
+/// `macro-access-token` name, so a session signed in before the rename keeps
+/// working until its next token rotation writes the current name.
 pub struct AccessTokenCookieExtractor(pub Cookie<'static>);
 
 impl<S> FromRequestParts<S> for AccessTokenCookieExtractor
@@ -28,20 +32,20 @@ where
         _state: &S,
     ) -> Result<Self, Self::Rejection> {
         let jar: CookieJar = parts.extract().await.expect("This extractor is infallible");
-        static ACCESS_COOKIE_NAME: LazyLock<String> =
-            LazyLock::new(|| match Environment::new_or_prod() {
-                Environment::Production => ROX_ACCESS_TOKEN_COOKIE.to_string(),
-                Environment::Develop => format!("dev-{ROX_ACCESS_TOKEN_COOKIE}"),
-                Environment::Local => format!("local-{ROX_ACCESS_TOKEN_COOKIE}"),
-            });
+        static ACCESS_COOKIE_NAMES: LazyLock<[String; 2]> =
+            LazyLock::new(access_token_cookie_names);
 
-        match jar.get(&ACCESS_COOKIE_NAME) {
-            Some(c) => Ok(Self(c.clone())),
-            None => Err(StatusCode::UNAUTHORIZED),
-        }
+        ACCESS_COOKIE_NAMES
+            .iter()
+            .find_map(|name| jar.get(name).cloned())
+            .map(Self)
+            .ok_or(StatusCode::UNAUTHORIZED)
     }
 }
 /// Extracts the refresh token from a cookie. Returns `UNAUTHORIZED` if the cookie is missing.
+///
+/// Accepts the legacy `macro-refresh-token` name alongside the current
+/// `rox-refresh-token`, mirroring the access token extractor.
 pub struct RefreshTokenCookieExtractor(pub Cookie<'static>);
 
 impl<S> FromRequestParts<S> for RefreshTokenCookieExtractor
@@ -55,17 +59,14 @@ where
         _state: &S,
     ) -> Result<Self, Self::Rejection> {
         let jar: CookieJar = parts.extract().await.expect("This extractor is infallible");
-        static REFRESH_COOKIE_NAME: LazyLock<String> =
-            LazyLock::new(|| match Environment::new_or_prod() {
-                Environment::Production => ROX_REFRESH_TOKEN_COOKIE.to_string(),
-                Environment::Develop => format!("dev-{ROX_REFRESH_TOKEN_COOKIE}"),
-                Environment::Local => format!("local-{ROX_REFRESH_TOKEN_COOKIE}"),
-            });
+        static REFRESH_COOKIE_NAMES: LazyLock<[String; 2]> =
+            LazyLock::new(refresh_token_cookie_names);
 
-        match jar.get(&REFRESH_COOKIE_NAME) {
-            Some(c) => Ok(Self(c.clone())),
-            None => Err(StatusCode::UNAUTHORIZED),
-        }
+        REFRESH_COOKIE_NAMES
+            .iter()
+            .find_map(|name| jar.get(name).cloned())
+            .map(Self)
+            .ok_or(StatusCode::UNAUTHORIZED)
     }
 }
 

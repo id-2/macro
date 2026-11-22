@@ -42,7 +42,7 @@ async fn server_info_advertises_the_web_app_favicon() {
     };
 
     // The same file the web app's <link rel="icon"> points at.
-    assert_eq!(icon.src, "https://rox.one/app/macro-favicon.svg");
+    assert_eq!(icon.src, "https://rox.one/app/rox-favicon.svg");
     assert_eq!(icon.mime_type.as_deref(), Some("image/svg+xml"));
     assert_eq!(icon.sizes.as_deref(), Some(["any".to_owned()].as_slice()));
 }

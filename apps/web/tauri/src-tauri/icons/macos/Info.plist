@@ -11,10 +11,10 @@
 		<string>INSendMessageIntent</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Macro uses the camera for video calls.</string>
+	<string>Rox uses the camera for video calls.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Macro uses the microphone for calls and dictation.</string>
+	<string>Rox uses the microphone for calls and dictation.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Macro uses Bluetooth to securely authenticate a WhatsApp connection with your nearby phone.</string>
+	<string>Rox uses Bluetooth to securely authenticate a WhatsApp connection with your nearby phone.</string>
 </dict>
 </plist>

@@ -35,7 +35,7 @@ internal object PushStore {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.getSystemService(NotificationManager::class.java).createNotificationChannel(
                 NotificationChannel(CHANNEL_ID, "Activity", NotificationManager.IMPORTANCE_HIGH).apply {
-                    description = "Messages, mentions, email and other Macro activity"
+                    description = "Messages, mentions, email and other Rox activity"
                 }
             )
         }

@@ -223,7 +223,7 @@ where
             // The same icon the web app's <link rel="icon"> points at, so the
             // server shows up in MCP clients with the Rox favicon.
             .with_icons(vec![
-                Icon::new(format!("{base_url}/app/macro-favicon.svg"))
+                Icon::new(format!("{base_url}/app/rox-favicon.svg"))
                     .with_mime_type("image/svg+xml")
                     .with_sizes(vec!["any".to_owned()]),
             ]);

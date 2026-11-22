@@ -35,11 +35,11 @@
 		<string>macro</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Macro uses the camera for video calls and for photos and videos you attach.</string>
+	<string>Rox uses the camera for video calls and for photos and videos you attach.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Macro uses the microphone for calls and for videos you record to attach.</string>
+	<string>Rox uses the microphone for calls and for videos you record to attach.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app needs access to your photo library to upload attachments.</string>
+	<string>Rox needs access to your photo library to upload attachments.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>INSendMessageIntent</string>

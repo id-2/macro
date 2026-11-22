@@ -458,7 +458,7 @@ const LOGO_SVG = `<svg width="34" height="34" fill="currentColor" viewBox="0 0 2
   <path d="M13.594 4.8v5.786l1.36 1.311-.013 1.3L22 20 24 19.2V12.42a.75.75 0 0 0-.225-.533L15.595 4z"/>
 </svg>`;
 
-// The app's favicon (apps/web/public/macro-favicon.svg) in white, inlined as
+// The app's favicon (apps/web/public/rox-favicon.svg) in white, inlined as
 // a data URI so the worker serves a single self-contained page.
 const FAVICON_DATA_URI =
   "data:image/svg+xml," +
