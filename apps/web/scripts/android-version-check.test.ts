@@ -219,7 +219,7 @@ describe('PR Android version enforcement', () => {
     'apps/web/tauri/src-tauri/gen/apple/project.yml',
     'apps/web/tauri/src-tauri/Info.ios.plist',
     'apps/web/tauri/callkit_plugin/ios/Sources/CallKitPlugin.swift',
-    'apps/web/tauri/src-tauri/icons/macos/Macro.icon/icon.json',
+    'apps/web/tauri/src-tauri/icons/macos/Rox.icon/icon.json',
     'apps/web/tauri/src-tauri/tauri.macos.conf.json',
     'apps/web/tauri/src-tauri/src/linux_notification.rs',
     'apps/web/tauri/src-tauri/README.md',

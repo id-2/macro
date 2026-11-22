@@ -486,7 +486,7 @@ pub async fn clear_bundle<R: Runtime>(
 
 impl<R: Runtime> Plugin<R> for RoxBundleUpdaterPlugin {
     fn name(&self) -> &'static str {
-        "macro-bundle-updater"
+        "rox-bundle-updater"
     }
 
     fn initialize(

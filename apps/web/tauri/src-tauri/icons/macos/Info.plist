@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIconFile</key>
-	<string>Macro</string>
+	<string>Rox</string>
 	<key>CFBundleIconName</key>
-	<string>Macro</string>
+	<string>Rox</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>INSendMessageIntent</string>
