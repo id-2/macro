@@ -73,6 +73,13 @@ pub enum DeliveryPause {
     Unconfirmed,
 }
 
+/// The mailbox's provider has no sending identity configured, so delivery
+/// cannot be prepared. The queued message must stay queued rather than be
+/// cancelled or silently acknowledged.
+#[derive(Debug, thiserror::Error)]
+#[error("no sender is configured for the mailbox provider")]
+pub struct SenderMissing;
+
 /// Preparation has no provider send side effects.
 #[derive(Debug, thiserror::Error)]
 pub enum PreparationError {
@@ -82,6 +89,10 @@ pub enum PreparationError {
     /// The user must review the message, attachments, or account before retrying.
     #[error(transparent)]
     Failed(anyhow::Error),
+    /// No sender exists for the mailbox provider; the queued message is kept
+    /// for a later attempt instead of being cancelled or acknowledged.
+    #[error(transparent)]
+    SenderMissing(#[from] SenderMissing),
 }
 
 /// A failed send response must retain whether delivery might have occurred.
@@ -239,6 +250,20 @@ where
             tracing::warn!(event = "email_send.preparation", outcome = "failed", error=?error,
                 duration_ms = started.elapsed().as_millis() as u64, "email preparation needs attention");
             return repo.pause(&claim, DeliveryPause::Failed).await;
+        }
+        // A provider without a sending identity cannot be served by this worker,
+        // but the message is not the user's mistake. Fail the queue item so the
+        // worker's cleanup step keeps it, and leave the claim to expire: the
+        // queued row stays unsent and untouched until a sender is configured.
+        Err(PreparationError::SenderMissing(error)) => {
+            tracing::warn!(
+                event = "email_send.preparation",
+                outcome = "sender_missing",
+                %link_id,
+                %message_id,
+                "no sender is configured for this mailbox provider; keeping the queued message"
+            );
+            return Err(error.into());
         }
     };
     tracing::Span::current().record("phase", "begin_submission");

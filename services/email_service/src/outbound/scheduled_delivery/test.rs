@@ -1,10 +1,35 @@
-use email::domain::scheduled_delivery::{PreparationError, SubmissionError};
+use email::domain::scheduled_delivery::{PreparationError, SenderMissing, SubmissionError};
 use email_api_client::domain::models::{EmailApiError, RateLimitOrigin, SentIds};
-use rox_db_migrator::ROX_DB_MIGRATIONS;
+use models_email::service::link::UserProvider;
 use models_email::service::message::MessageToSend;
+use rox_db_migrator::ROX_DB_MIGRATIONS;
 use uuid::Uuid;
 
-use super::{apply_sent_ids, classify_preparation_error, classify_submission_error};
+use super::{
+    DeliveryProvider, apply_sent_ids, classify_preparation_error, classify_submission_error,
+};
+
+#[test]
+fn delivery_transport_follows_the_mailbox_provider() {
+    assert_eq!(
+        Some(DeliveryProvider::Gmail),
+        DeliveryProvider::for_link(UserProvider::Gmail)
+    );
+    assert_eq!(
+        Some(DeliveryProvider::Rox),
+        DeliveryProvider::for_link(UserProvider::Rox)
+    );
+    // Outlook keeps its own durable draft coordinator.
+    assert_eq!(None, DeliveryProvider::for_link(UserProvider::Outlook));
+}
+
+#[test]
+fn provider_without_a_sender_is_kept_out_of_the_permanent_failure_path() {
+    assert!(matches!(
+        classify_preparation_error(SenderMissing.into()),
+        PreparationError::SenderMissing(_)
+    ));
+}
 
 #[test]
 fn response_decode_failure_is_ambiguous_only_after_submission() {

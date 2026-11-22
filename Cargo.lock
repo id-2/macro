@@ -7760,6 +7760,7 @@ dependencies = [
  "html-escape",
  "http-body-util",
  "infer 0.19.0",
+ "lettre",
  "lol_html",
  "mime_guess",
  "model",

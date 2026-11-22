@@ -130,6 +130,12 @@ google_token = { path = "../../crates/google_token" }
 html-escape = { workspace = true }
 http-body-util = { workspace = true }
 infer = { workspace = true }
+# Rox mailbox delivery over SMTP; the same version and features ses_client uses.
+lettre = { version = "0.11", default-features = false, features = [
+  "builder",
+  "smtp-transport",
+  "tokio1-rustls-tls",
+] }
 lol_html = { workspace = true }
 rox_auth = { path = "../../crates/rox_auth" }
 rox_authorization = { path = "../../crates/rox_authorization", features = [

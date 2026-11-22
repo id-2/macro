@@ -20,6 +20,7 @@ enum PrepareResult {
     Ready,
     Retry,
     Failed,
+    SenderMissing,
 }
 
 #[derive(Default, Clone, Copy)]
@@ -111,6 +112,7 @@ impl ScheduledMessageSender<(), ()> for Fake {
             PrepareResult::Failed => Err(PreparationError::Failed(anyhow::anyhow!(
                 "attachment missing"
             ))),
+            PrepareResult::SenderMissing => Err(PreparationError::SenderMissing(SenderMissing)),
         }
     }
     async fn send_prepared(&self, _: &(), _: ()) -> Result<(), SubmissionError> {
@@ -200,6 +202,25 @@ async fn invalid_attachments_pause_for_review_without_submitting() {
             Call::Prepare,
             Call::Pause(DeliveryPause::Failed)
         ]
+    );
+}
+
+#[tokio::test]
+async fn blank_provider_sender_keeps_the_queue_item_and_fails_the_worker() {
+    let fake = Fake {
+        prepare_result: PrepareResult::SenderMissing,
+        ..Default::default()
+    };
+    // The worker fails so its queue cleanup step never acknowledges the item;
+    // the claim is neither released nor paused, so the row stays unsent.
+    assert!(
+        deliver_scheduled(&fake, &fake, Uuid::nil(), Uuid::nil())
+            .await
+            .is_err()
+    );
+    assert_eq!(
+        *fake.calls.lock().unwrap(),
+        [Call::Deletion, Call::Claim, Call::Prepare]
     );
 }
 
