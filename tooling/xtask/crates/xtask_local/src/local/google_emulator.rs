@@ -1,9 +1,10 @@
 //! The Gmail emulator (`crates/gmail_emulator`).
 //!
 //! Local sign-in is an emailed code, so the runner does not start this
-//! emulator and does not point FusionAuth's login providers at it. The
-//! helpers remain for a stack that is explicitly given a real Google client
-//! for mailbox and calendar linking.
+//! emulator, does not point FusionAuth's login providers at it, and never
+//! writes its service-override URLs into the generated env: the emulator is
+//! not on the services network, so those URLs would name a host nothing
+//! provides.
 
 use std::collections::BTreeMap;
 
@@ -23,11 +24,6 @@ const SEED_FILE: &str = "crates/gmail_emulator/seed.example.yaml";
 /// placeholders `BootStubEnv` gives the services; the emulator accepts any.
 const CLIENT_ID: &str = "local-google-client";
 const CLIENT_SECRET: &str = "local-google-client-secret";
-/// The calendar service's push webhook on the services network.
-const CALENDAR_WEBHOOK: &str = "http://calendar-service:8080/notifications";
-/// What the calendar service gives its channels and expects back on every
-/// notification. Only the emulator ever sends it.
-const CALENDAR_WATCH_TOKEN: &str = "local-calendar-watch-token";
 
 /// Local sign-in does not fake Google, so the runner never starts this emulator.
 pub fn stands_in(_mode: Mode, _env: &BTreeMap<String, String>) -> bool {
@@ -58,41 +54,6 @@ pub fn idp(instance: &Instance) -> kickstart::GoogleIdp {
         token_endpoint: in_network("/token"),
         userinfo_endpoint: in_network("/v1/userinfo"),
     }
-}
-
-/// The service URL overrides that send the services' Google calls to the
-/// emulator. Only the authorization URL is opened by a browser.
-pub fn env(instance: &Instance) -> BTreeMap<String, String> {
-    [
-        ("OVERRIDE_GMAIL_API_URL", in_network("/gmail/v1")),
-        ("OVERRIDE_GOOGLE_PEOPLE_API_URL", in_network("/people/v1")),
-        (
-            "OVERRIDE_GOOGLE_CALENDAR_API_URL",
-            in_network("/calendar/v3"),
-        ),
-        (
-            "OVERRIDE_GOOGLE_OAUTH_CERTS_URL",
-            in_network("/oauth2/v3/certs"),
-        ),
-        ("OVERRIDE_GOOGLE_OAUTH_TOKEN_URL", in_network("/token")),
-        ("OVERRIDE_GOOGLE_OAUTH_REVOKE_URL", in_network("/revoke")),
-        (
-            "OVERRIDE_GOOGLE_OAUTH_TOKEN_INFO_URL",
-            in_network("/oauth2/v3/tokeninfo"),
-        ),
-        (
-            "OVERRIDE_GOOGLE_OAUTH_AUTHORIZATION_URL",
-            authorization_endpoint(instance),
-        ),
-        // Calendar channels name their own webhook: the emulator posts each
-        // notification to the address `events.watch` was given, with this
-        // token, as Google does to a public one.
-        ("CALENDAR_WATCH_WEBHOOK_URL", CALENDAR_WEBHOOK.to_string()),
-        ("CALENDAR_WATCH_TOKEN", CALENDAR_WATCH_TOKEN.to_string()),
-    ]
-    .into_iter()
-    .map(|(name, value)| (name.to_string(), value))
-    .collect()
 }
 
 /// The emulator's command line inside the runtime image. It pushes Gmail

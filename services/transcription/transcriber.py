@@ -43,7 +43,7 @@ load_dotenv()
 
 logger = logging.getLogger("rox-transcriber")
 
-MACRO_API_URL = os.environ.get("MACRO_API_URL", "http://localhost:8080")
+ROX_API_URL = os.environ.get("ROX_API_URL", "http://localhost:8080")
 INTERNAL_CALL_SECRET = os.environ.get("INTERNAL_CALL_SECRET", "")
 GROQ_STT_MODEL = "whisper-large-v3-turbo"
 GROQ_DEFAULT_API_BASE = "https://api.groq.com/openai/v1"
@@ -501,7 +501,7 @@ class Transcriber(Agent):
             for attempt in range(1, max_attempts + 1):
                 try:
                     resp = await self.http_client.post(
-                        f"{MACRO_API_URL}/call/{self.channel_id}/transcript",
+                        f"{ROX_API_URL}/call/{self.channel_id}/transcript",
                         json=segment,
                         headers={"x-rox-internal-call": INTERNAL_CALL_SECRET},
                     )

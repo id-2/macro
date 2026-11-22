@@ -201,20 +201,12 @@ pub fn resolve(
         }
     }
 
-    // A local stack with no real Google client runs the Gmail emulator in
-    // Google's place. Decided last, on the env the services will see, so a
-    // client from Doppler, `--env-file` or the process env keeps real Google.
-    if super::google_emulator::stands_in(mode, &env) {
-        env.extend(super::google_emulator::env(instance));
-    }
-
-    // A local stack with no real Microsoft client runs the Outlook emulator
-    // in Microsoft's place. Decided last, on the env the services will see,
-    // so a client from Doppler, `--env-file` or the process env keeps real
-    // Microsoft.
-    if super::microsoft_emulator::stands_in(mode, &env) {
-        env.extend(super::microsoft_emulator::env(instance));
-    }
+    // The stack runs neither the Gmail nor the Outlook emulator (see
+    // `google_emulator::stands_in` / `microsoft_emulator::stands_in`), so no
+    // service override may point at `gmail-emulator` or `outlook-emulator`:
+    // nothing on the services network answers those names. Google and
+    // Microsoft calls therefore use their real endpoints from the resolved
+    // env, and a stack with no real client has neither connector configured.
 
     // Remote-AWS modes (dev): pin ENVIRONMENT/project, strip any leaked local
     // endpoints, and resolve the developer's real AWS credentials (incl. session

@@ -21,33 +21,3 @@ fn the_emulator_does_not_stand_in_for_microsoft_login() {
     assert!(!stands_in(Mode::Local, &real));
     assert!(!stands_in(Mode::Dev, &none));
 }
-
-#[test]
-fn only_the_login_page_is_addressed_for_a_browser() {
-    let instance = Instance::derive(Some("agent-a"), Some(20_000)).unwrap();
-    let env = env(&instance);
-    let port = instance.port(Port::OutlookEmulator);
-
-    assert_eq!(
-        env["OVERRIDE_MICROSOFT_LOGIN_PAGE_URL"],
-        format!("http://localhost:{port}/")
-    );
-    assert_eq!(
-        env["OVERRIDE_MICROSOFT_LOGIN_URL"],
-        "http://outlook-emulator:8080/"
-    );
-    assert_eq!(
-        env["OVERRIDE_MICROSOFT_GRAPH_URL"],
-        "http://outlook-emulator:8080/v1.0/"
-    );
-
-    // FusionAuth discovers the page from the emulator, which is told the
-    // same browser address the authentication service is.
-    let command = command(&instance);
-    let browser_url = command
-        .iter()
-        .position(|argument| argument == "--browser-url")
-        .map(|flag| command[flag + 1].clone());
-    assert_eq!(browser_url, Some(format!("http://localhost:{port}")));
-    assert_eq!(idp().issuer, "http://outlook-emulator:8080/common/v2.0");
-}

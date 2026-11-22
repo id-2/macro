@@ -962,7 +962,7 @@ impl ContentTaggedImage {
     }
 }
 
-pub fn content_tagged_images() -> [ContentTaggedImage; 3] {
+pub fn content_tagged_images() -> [ContentTaggedImage; 4] {
     [
         ContentTaggedImage {
             service: "search",
@@ -978,6 +978,13 @@ pub fn content_tagged_images() -> [ContentTaggedImage; 3] {
             service: "lexical_service",
             repository: "rox-local-lexical-service",
             inputs: lexical_service_inputs,
+        },
+        // The LiveKit worker copies its whole directory, so the worker source,
+        // its requirements, and its Dockerfile all key the tag.
+        ContentTaggedImage {
+            service: "transcription",
+            repository: "rox-local-transcription",
+            inputs: || Ok(vec!["services/transcription".to_string()]),
         },
     ]
 }

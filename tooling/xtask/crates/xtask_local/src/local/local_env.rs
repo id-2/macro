@@ -272,6 +272,13 @@ impl LocalEnv {
             "OVERRIDE_API_GATEWAY_URL".into(),
             self.frontend_origin.clone(),
         );
+        // The LiveKit transcription worker posts finished transcript segments
+        // to document_storage_service, which owns `/call/{channel}/transcript`.
+        // Its own default (`http://localhost:8080`) is its container's loopback.
+        env.insert(
+            "ROX_API_URL".into(),
+            "http://document-storage-service:8080".into(),
+        );
         self.infra.write(&mut env);
         self.storage.write(&mut env);
         self.queues.write(&mut env);

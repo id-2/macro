@@ -140,6 +140,48 @@ services:
       start_period: 10s
 
   # ============================================================================
+  # transcription (portless, opt-in profile: transcription)
+  # LiveKit agent worker (`services/transcription`) that turns call audio into
+  # transcript segments and posts them to document_storage_service. It reads
+  # LiveKit and Groq credentials, so it is not part of the default stack: a
+  # stack with no owner credentials would start it only to fail its connection
+  # to LiveKit. Values come from the generated env through the shared
+  # `env_file` anchor; the environment below names the settings, never values.
+  # Start: docker compose --project-directory . -f docker/docker-compose.yml \
+  #   --profile transcription up -d transcription
+  # ============================================================================
+  transcription:
+    <<: *common-env
+    profiles:
+      - transcription
+    build:
+      # The compose files resolve build paths against the project directory
+      # (the repository root), which every run-local/stack invocation passes.
+      context: ./services/transcription
+    image: rox-local-transcription:dev
+    restart: on-failure
+    depends_on:
+      - document_storage_service
+    environment:
+      # LiveKit worker registration.
+      - LIVEKIT_URL
+      - LIVEKIT_API_KEY
+      - LIVEKIT_API_SECRET
+      # Groq speech-to-text plugin (`GROQ_API_KEY` is read by the plugin).
+      - GROQ_API_KEY
+      - GROQ_API_BASE
+      - STT_LANGUAGE
+      - STT_DETECT_LANGUAGE
+      # Where transcript segments are posted, and the shared secret the
+      # document storage service validates them with.
+      - MACRO_API_URL
+      - INTERNAL_CALL_SECRET
+    networks:
+      services:
+        aliases:
+          - transcription
+
+  # ============================================================================
   # slack_import_worker (portless, opt-in profile: slack-import)
   # Build separately; never part of the default or run-dev bundle.
   # ============================================================================

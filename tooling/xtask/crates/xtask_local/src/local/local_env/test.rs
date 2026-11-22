@@ -69,6 +69,21 @@ fn slack_import_worker_uses_local_resources_and_starts_paused() {
     assert_eq!(env["SLACK_IMPORT_CONCURRENCY"], "1");
 }
 
+/// A stack with no owner credentials must not point any service at an
+/// emulator host: the runner starts no Gmail or Outlook emulator container, so
+/// such a host has nothing answering it on the services network.
+#[test]
+fn generated_env_names_no_emulator_host() {
+    let env = local_env();
+    assert!(!env.contains_key("OVERRIDE_GMAIL_API_URL"));
+    for (key, value) in &env {
+        assert!(
+            !value.contains("gmail-emulator") && !value.contains("outlook-emulator"),
+            "{key} points at an emulator host the stack does not run: {value}"
+        );
+    }
+}
+
 #[test]
 fn emits_required_keys() {
     let env = local_env();
@@ -146,6 +161,8 @@ fn emits_required_keys() {
         "LIVEKIT_SERVER_URL",
         "LIVEKIT_API_KEY",
         "LIVEKIT_API_SECRET",
+        // The LiveKit worker posts transcript segments to document storage.
+        "ROX_API_URL",
         "OPENAI_API_KEY",
         "FIREWORK_API_KEY",
         "GOOGLE_GENERATIVE_AI_API_KEY",

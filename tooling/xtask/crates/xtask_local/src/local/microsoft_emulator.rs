@@ -1,12 +1,15 @@
 //! The Outlook emulator (`crates/outlook_emulator`).
 //!
 //! Local sign-in is an emailed code, so the runner does not start this
-//! emulator and does not register a Microsoft login provider against it.
+//! emulator, does not register a Microsoft login provider against it, and
+//! never writes its service-override URLs into the generated env: the
+//! emulator is not on the services network, so those URLs would name a host
+//! nothing provides.
 
 use std::collections::BTreeMap;
 
 use super::instance::{Instance, Port};
-use super::{Mode, kickstart, repo_root, resources};
+use super::{Mode, kickstart, repo_root};
 
 /// The emulator's Compose service.
 pub const SERVICE: &str = "outlook_emulator";
@@ -49,34 +52,6 @@ pub fn idp() -> kickstart::MicrosoftIdp {
         client_secret: CLIENT_SECRET.to_string(),
         issuer: in_network(&format!("/{TENANT}/v2.0")),
     }
-}
-
-/// What sends the services' Microsoft calls to the emulator and turns
-/// Outlook on: the service URL overrides, the OAuth client the
-/// authentication service links mailboxes with, and the Outlook switches.
-/// Only the login page URL is opened by a browser.
-pub fn env(instance: &Instance) -> BTreeMap<String, String> {
-    [
-        ("OVERRIDE_MICROSOFT_GRAPH_URL", in_network("/v1.0/")),
-        ("OVERRIDE_MICROSOFT_LOGIN_URL", in_network("/")),
-        (
-            "OVERRIDE_MICROSOFT_LOGIN_PAGE_URL",
-            format!("{}/", browser_origin(instance)),
-        ),
-        ("MICROSOFT_CLIENT_ID", CLIENT_ID.to_string()),
-        ("MICROSOFT_CLIENT_SECRET", CLIENT_SECRET.to_string()),
-        ("MICROSOFT_TENANT_ID", TENANT.to_string()),
-        (
-            "MICROSOFT_TOKEN_KMS_KEY_ID",
-            resources::MICROSOFT_TOKEN_KMS_ALIAS.to_string(),
-        ),
-        ("OUTLOOK_CONNECTIONS_ENABLED", "true".to_string()),
-        ("OUTLOOK_SYNC_ENABLED", "true".to_string()),
-        ("OUTLOOK_WRITES_ENABLED", "true".to_string()),
-    ]
-    .into_iter()
-    .map(|(name, value)| (name.to_string(), value))
-    .collect()
 }
 
 /// The Compose service of the authentication service.
