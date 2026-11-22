@@ -285,7 +285,6 @@ dependencies = [
  "libc",
  "log",
  "logger",
- "macro_bundle_updater_plugin",
  "mime_guess",
  "navigation_plugin",
  "nom 8.0.0",
@@ -299,6 +298,7 @@ dependencies = [
  "objc2-user-notifications",
  "reqwest",
  "rootcause",
+ "rox_bundle_updater_plugin",
  "rustls-platform-verifier 0.6.2",
  "serde",
  "serde_json",
@@ -1023,11 +1023,11 @@ dependencies = [
  "chrono",
  "database_sql",
  "lru",
- "macro_user_id",
  "maybe_send",
  "miniz_oxide 0.8.9",
  "postcard",
  "predicate-index",
+ "rox_user_id",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -3412,10 +3412,10 @@ dependencies = [
  "document_sub_type",
  "filter_ast",
  "item_filters",
- "macro_user_id",
  "model_file_type",
  "model_owner",
  "notification_state",
+ "rox_user_id",
  "serde",
  "serde_json",
  "thiserror 2.0.21",
@@ -4191,13 +4191,13 @@ dependencies = [
  "document_sub_type",
  "either",
  "filter_ast",
- "macro_user_id",
  "model_file_type",
  "model_owner",
  "nom 8.0.0",
  "non_empty",
  "notification_state",
  "rootcause",
+ "rox_user_id",
  "serde",
  "serde_json",
  "strum 0.27.2",
@@ -4719,54 +4719,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "macro_bundle_updater_plugin"
-version = "0.1.0"
-dependencies = [
- "digest 0.10.7",
- "futures",
- "jni 0.21.1",
- "ndk-context",
- "objc2 0.5.3",
- "objc2-foundation 0.2.2",
- "reqwest",
- "rootcause",
- "semver",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "strum 0.27.2",
- "tauri",
- "tauri-plugin-device-info",
- "thiserror 2.0.21",
- "tokio",
- "tracing",
- "url",
- "uuid",
- "zip 6.0.0",
-]
-
-[[package]]
-name = "macro_user_id"
-version = "0.1.0"
-dependencies = [
- "cowlike",
- "doppleganger",
- "nom 8.0.0",
- "serde",
- "thiserror 2.0.21",
- "tracing",
- "utoipa",
-]
-
-[[package]]
-name = "macro_uuid"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "uuid",
-]
-
-[[package]]
 name = "markup5ever"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4938,7 +4890,7 @@ name = "model_owner"
 version = "0.1.0"
 dependencies = [
  "bot_id",
- "macro_user_id",
+ "rox_user_id",
  "serde",
  "thiserror 2.0.21",
  "uuid",
@@ -4950,9 +4902,9 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "fractional_index",
- "macro_user_id",
- "macro_uuid",
  "nom 8.0.0",
+ "rox_user_id",
+ "rox_uuid",
  "serde",
  "specta",
  "strum 0.27.2",
@@ -6950,6 +6902,54 @@ dependencies = [
  "hashbrown 0.14.5",
  "rustc-hash 1.1.0",
  "text-size",
+]
+
+[[package]]
+name = "rox_bundle_updater_plugin"
+version = "0.1.0"
+dependencies = [
+ "digest 0.10.7",
+ "futures",
+ "jni 0.21.1",
+ "ndk-context",
+ "objc2 0.5.3",
+ "objc2-foundation 0.2.2",
+ "reqwest",
+ "rootcause",
+ "semver",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "strum 0.27.2",
+ "tauri",
+ "tauri-plugin-device-info",
+ "thiserror 2.0.21",
+ "tokio",
+ "tracing",
+ "url",
+ "uuid",
+ "zip 6.0.0",
+]
+
+[[package]]
+name = "rox_user_id"
+version = "0.1.0"
+dependencies = [
+ "cowlike",
+ "doppleganger",
+ "nom 8.0.0",
+ "serde",
+ "thiserror 2.0.21",
+ "tracing",
+ "utoipa",
+]
+
+[[package]]
+name = "rox_uuid"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "uuid",
 ]
 
 [[package]]
