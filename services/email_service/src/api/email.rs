@@ -8,6 +8,7 @@ pub(crate) mod backfill;
 pub(crate) mod contacts;
 pub(crate) mod drafts;
 pub(crate) mod filters;
+pub(crate) mod inbound;
 pub(crate) mod init;
 pub(crate) mod labels;
 pub(crate) mod links;
@@ -34,6 +35,8 @@ pub fn router(state: ApiContext) -> Router<ApiContext> {
         .nest("/backfill", backfill::router(state.clone()))
         .nest("/settings", settings::router(state.clone()))
         .nest("/sync", sync::router(state.clone()))
+        // Received mail for Rox-hosted mailboxes; the mail host pushes it.
+        .nest("/inbound", inbound::router())
         // deleting all user info from the db can take a long time - prevent connection from dropping
         .layer(axum::middleware::from_fn(
             rox_middleware::connection_drop_prevention_handler,

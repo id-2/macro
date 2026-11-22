@@ -306,7 +306,14 @@ impl InboxLifecycleRepository for PgMailboxSync {
                     already_in_progress: in_progress && stream.is_some(),
                 }
             }
-            UserProvider::Rox => return Err(InboxLifecycleError::Unavailable),
+            // A Rox mailbox has no provider stream to pull: its mail host
+            // pushes every received message through POST /email/inbound, and
+            // the stored mailbox is already the authoritative copy. There is
+            // nothing to enqueue, so resync succeeds and starts no work.
+            UserProvider::Rox => InboxResync {
+                run_id: link,
+                already_in_progress: true,
+            },
         };
         tx.commit().await.map_err(failed)?;
         if current.provider == UserProvider::Outlook && !result.already_in_progress {
