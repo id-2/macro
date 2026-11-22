@@ -1,7 +1,7 @@
 import { AgentMessage } from './DemoAgentMessage';
 import { AgentRosterRow, ViewShell } from './DemoWorkspaceChrome';
 import './demo-agents-view.css';
-import RoxLogo from '@icon/macro-logo.svg';
+import RoxLogo from '@icon/rox-logo.svg';
 import ShareIcon from '@icon/share.svg';
 import BuildingsIcon from '@icon/system/regular/buildings.svg';
 import CalendarIcon from '@icon/system/regular/calendar-blank.svg';

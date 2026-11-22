@@ -22,6 +22,7 @@
 	<string>CFBundleVersion</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>rox</string>
 		<string>macro</string>
 	</array>
 	<key>NSExtension</key>

@@ -1,4 +1,4 @@
-import Logo from '@icon/macro-logo.svg';
+import Logo from '@icon/rox-logo.svg';
 import CRM from '@icon/system/regular/buildings.svg';
 import Calendar from '@icon/system/regular/calendar-blank.svg';
 import Chat from '@icon/system/regular/chats-circle.svg';

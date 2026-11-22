@@ -1,5 +1,5 @@
 import type { JSX } from 'solid-js';
-import RoxMarkIcon from '../../../assets/app-icons/macro-logo.svg';
+import RoxMarkIcon from '../../../assets/app-icons/rox-logo.svg';
 
 export function RoxMarkIcon(props: {
   style?: JSX.CSSProperties;

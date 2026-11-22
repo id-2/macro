@@ -1,4 +1,4 @@
-import RoxLogo from '@icon/macro-logo.svg';
+import RoxLogo from '@icon/rox-logo.svg';
 import { FeaturePage } from '../../features/marketing/components/FeaturePage';
 import { setPageSeo } from '../utils/utilSeo';
 import '../../features/documentation/components/documentation.css';

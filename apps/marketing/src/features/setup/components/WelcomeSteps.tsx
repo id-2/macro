@@ -1,4 +1,4 @@
-import LogoIcon from '@icon/macro-logo.svg';
+import LogoIcon from '@icon/rox-logo.svg';
 import PostHogIcon from '@icon/mcp-posthog.svg';
 import CalendlyIcon from '@icon/onboarding-calendly.svg';
 import FigmaIcon from '@icon/onboarding-figma.svg';

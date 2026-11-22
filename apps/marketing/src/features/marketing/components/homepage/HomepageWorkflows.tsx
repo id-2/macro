@@ -89,7 +89,7 @@ export function DocumentWorkflow(props: {
       <div class="macro-preview-back macro-workflow-document">
         <DocumentFrame title="Website launch plan">
           <p>Everything we need for the launch.</p>
-          <p class="macro-collab-line" data-visible={props.phase >= 2}>
+          <p class="rox-collab-line" data-visible={props.phase >= 2}>
             Launch: Friday, October 23.
             <span
               class="doc-caret doc-named-caret"
@@ -98,7 +98,7 @@ export function DocumentWorkflow(props: {
             />
           </p>
           <h2>Before we go live</h2>
-          <p class="macro-collab-line" data-visible={props.phase >= 4}>
+          <p class="rox-collab-line" data-visible={props.phase >= 4}>
             Review the pricing page and send the customer announcement.
             <span
               class="doc-caret doc-named-caret"

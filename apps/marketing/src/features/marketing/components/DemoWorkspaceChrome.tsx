@@ -1,4 +1,4 @@
-import RoxLogo from '@icon/macro-logo.svg';
+import RoxLogo from '@icon/rox-logo.svg';
 import CursorIcon from '@icon/wide-cursor-ide.svg';
 import { cn } from '@ui';
 import { type JSX, Show, splitProps } from 'solid-js';

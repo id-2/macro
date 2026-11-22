@@ -66,8 +66,9 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         CFBundleURLTypes:
           - CFBundleURLSchemes:
+              - rox
               - macro
-            CFBundleURLName: macro
+            CFBundleURLName: rox
         NSUserActivityTypes:
           - INSendMessageIntent
           - NSUserActivityTypeBrowsingWeb
@@ -75,6 +76,7 @@ targets:
         NSMicrophoneUsageDescription: "Rox uses the microphone for calls and for videos you record to attach."
         NSPhotoLibraryUsageDescription: "Rox needs access to your photo library to upload attachments."
         LSApplicationQueriesSchemes:
+          - rox
           - macro
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
@@ -148,6 +150,7 @@ targets:
         CFBundleShortVersionString: 2.0.19
         CFBundleVersion: "200"
         LSApplicationQueriesSchemes:
+          - rox
           - macro
         NSExtension:
           NSExtensionAttributes:

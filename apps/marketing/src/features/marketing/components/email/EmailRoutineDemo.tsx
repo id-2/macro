@@ -1,4 +1,4 @@
-import RoxLogo from '@icon/macro-logo.svg';
+import RoxLogo from '@icon/rox-logo.svg';
 import Hash from '@icon/system/regular/hash.svg';
 import { createEffect, createSignal, on, Show } from 'solid-js';
 import { type DemoEmail, demoEmails } from '../../core/demo-email';
