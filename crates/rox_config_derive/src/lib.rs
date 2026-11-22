@@ -2,16 +2,16 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{ToTokens, format_ident, quote};
 use syn::{
-    Data, DeriveInput, Fields, GenericArgument, LitStr, PathArguments, Type, parse_rox_input,
+    Data, DeriveInput, Fields, GenericArgument, LitStr, PathArguments, Type, parse_macro_input,
     parse_quote,
 };
 
-#[proc_rox_derive(
+#[proc_macro_derive(
     RoxConfig,
     attributes(rox_config_default, serde, from_ref, from_ref_all)
 )]
 pub fn derive_rox_config(input: TokenStream) -> TokenStream {
-    let input = parse_rox_input!(input as DeriveInput);
+    let input = parse_macro_input!(input as DeriveInput);
 
     match expand_rox_config(input) {
         Ok(tokens) => tokens.into(),
