@@ -19,7 +19,7 @@ vi.mock('@app/lib/analytics', () => ({
     posthog: { register: telemetry.register },
   },
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: () => telemetry.span,
     recordSample: telemetry.recordSample,

@@ -9,7 +9,7 @@ import { fileFolderDrop } from '@core/directive/fileFolderDrop';
 import type { MessageEditorOptions } from '@core/messages/configured-message-editor';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { handleFileFolderDrop } from '@core/util/upload';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { type Accessor, createSignal, onCleanup } from 'solid-js';
 import { CustomScrollbar } from './CustomScrollbar';
 import { MarkdownShell } from './LexicalMarkdown/builder/MarkdownShell';

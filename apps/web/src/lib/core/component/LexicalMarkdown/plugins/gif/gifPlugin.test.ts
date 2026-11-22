@@ -1,6 +1,6 @@
 import { staticFileIdEndpoint } from '@core/constant/servers';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
-import { ImageNode, SupportedNodeTypes } from '@macro-inc/lexical-core';
+import { ImageNode, SupportedNodeTypes } from '@rox-one/lexical-core';
 import { $createParagraphNode, $getRoot, createEditor } from 'lexical';
 import { expect, it } from 'vitest';
 import { $insertGifNode } from './gifPlugin';

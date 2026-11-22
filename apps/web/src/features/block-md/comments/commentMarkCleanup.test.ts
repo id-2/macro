@@ -1,4 +1,4 @@
-import { InMemoryWALStore } from '@macro-inc/collaboration/collab/wal';
+import { InMemoryWALStore } from '@rox-one/collaboration/collab/wal';
 import { expect, it, vi } from 'vitest';
 import { createCommentMarkCleanup } from './commentMarkCleanup';
 

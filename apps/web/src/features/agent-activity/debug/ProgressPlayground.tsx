@@ -20,7 +20,7 @@ import {
   type AgentChatReplyBody,
   type AgentReplySegment,
   composeAgentChatReply,
-} from '@macro-inc/lexical-core/utils/agent-chat-reply';
+} from '@rox-one/lexical-core/utils/agent-chat-reply';
 import type {
   ActivityRow,
   FoldedMessage,

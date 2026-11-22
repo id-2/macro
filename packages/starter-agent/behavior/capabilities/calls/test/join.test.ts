@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { Room } from '@livekit/rtc-node';
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import { state as makeState } from '../../../context/state.ts';
 import { ringMs } from '../arbiter.ts';
 import type { BrainNeeds } from '../brain.ts';
@@ -25,7 +25,7 @@ import {
   type JoinRequest,
   refusal,
   refusalExits,
-} from '../macro.ts';
+} from '../rox.ts';
 import { stubBrain } from '../replay.ts';
 import type { RoomHandlers } from '../room.ts';
 import { CallEvent, type NewPlaceRow, type Placed } from '../types.ts';

@@ -62,8 +62,8 @@ import {
 import {
   buildMentionMarkdownString,
   markdownToPlainText,
-} from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import { MessageNotificationIndexContext } from '@notifications/components/MarkMessageNotifications';
 import { recordChannelViewWhenIdle } from '@queries/channel/activity';
 import { queryClient } from '@queries/client';

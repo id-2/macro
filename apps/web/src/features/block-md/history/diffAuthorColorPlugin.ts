@@ -1,4 +1,4 @@
-import { DiffTextNode } from '@macro-inc/lexical-core';
+import { DiffTextNode } from '@rox-one/lexical-core';
 import type { LexicalEditor } from 'lexical';
 import { userColor } from './utils';
 

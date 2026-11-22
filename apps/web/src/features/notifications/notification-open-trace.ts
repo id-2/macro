@@ -1,4 +1,4 @@
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 
 type Target = { channelId: string; messageId: string };
 let active: { notificationId: string; target?: Target; span: Span } | undefined;

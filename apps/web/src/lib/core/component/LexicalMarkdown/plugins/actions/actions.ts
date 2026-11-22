@@ -39,8 +39,8 @@ import {
   HorizontalRuleNode,
   ImageNode,
   VideoNode,
-} from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import GifIcon from '@phosphor/gif.svg';
 import type { LexicalEditor, NodeKey } from 'lexical';
 import { $getNodeByKey, $insertNodes } from 'lexical';

@@ -2,11 +2,11 @@ import {
   drawableIds,
   type GraphicsDocument,
   worldBounds,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import {
   richTextPlainText,
   validCanvasText,
-} from '@macro-inc/lexical-core/canvas-text';
+} from '@rox-one/lexical-core/canvas-text';
 
 /** Semantic graph, not raster ASCII: exact IDs and connections, approximate spatial rows. */
 export function canvasOverview(document: GraphicsDocument, itemIds?: string[]) {

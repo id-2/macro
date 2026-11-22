@@ -8,7 +8,7 @@ import type { EditorControls } from '@core/component/LexicalMarkdown/builder/typ
 import { registerHotkey } from '@core/hotkey/hotkeys';
 import SearchIcon from '@icon/system/regular/magnifying-glass.svg';
 import XIcon from '@icon/system/regular/x.svg?component-solid';
-import { markdownToSearchText } from '@macro-inc/lexical-core/utils/parsers';
+import { markdownToSearchText } from '@rox-one/lexical-core/utils/parsers';
 import { cn, Hotkey } from '@ui';
 import {
   $getRoot,

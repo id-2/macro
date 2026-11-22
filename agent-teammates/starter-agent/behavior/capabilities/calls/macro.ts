@@ -1,18 +1,18 @@
 /**
  * Rox's calls, behind a small port, so everything that decides about calls
  * can be run against a fake. `sdkCalls` is the thin adapter over the
- * supported SDK surface (`@macro-inc/sdk`, and `@macro-inc/sdk/calls/node`
+ * supported SDK surface (`@rox-one/sdk`, and `@rox-one/sdk/calls/node`
  * for the room): `calls.byId(id).join()` can't create a call, and
  * `channel.startCall()` is only for a call the agent is placing.
  */
 import type { Room } from "@livekit/rtc-node";
-import type { Macro } from "@macro-inc/sdk";
+import type { Macro } from "@rox-one/sdk";
 import type {
 	connectRoom,
 	publishScreen,
 	ScreenFrame,
 	ScreenShare,
-} from "@macro-inc/sdk/calls/node";
+} from "@rox-one/sdk/calls/node";
 import {
 	type ActiveCall,
 	type ActiveMeeting,

@@ -8,7 +8,7 @@ MACRO-4581 (Word and PowerPoint), MACRO-4584 (canvases), MACRO-4631
 
 ## Goal
 
-Code-mode agents run JavaScript against `@macro-inc/sdk` in a Deno sandbox.
+Code-mode agents run JavaScript against `@rox-one/sdk` in a Deno sandbox.
 Today the SDK can create content but not change it. Every edit of an existing
 document, task description, spreadsheet, Word file, deck or canvas needs a
 direct tool (`EditDocument`, `EditSpreadsheet`, `EditWordDocument`,
@@ -220,7 +220,7 @@ block, restyle a database answer or chart.
 
 ```js
 import { $getRoot } from 'lexical';
-import { $isListItemNode, $isTaskListNode } from '@macro-inc/sdk/lexical';
+import { $isListItemNode, $isTaskListNode } from '@rox-one/sdk/lexical';
 
 const lexical = await doc.lexical();
 lexical.update(() => {
@@ -245,8 +245,8 @@ await lexical.commit();
     `editor.read(fn)`, so a change is in the state when `update` returns.
   - `commit({ signal })`: sends the change (below).
   - `revision`: the base revision, the document version the state was read at.
-- Programs import `lexical` and `@macro-inc/sdk/lexical` and use them
-  directly; there is no wrapper DSL. `@macro-inc/sdk/lexical` is a curated
+- Programs import `lexical` and `@rox-one/sdk/lexical` and use them
+  directly; there is no wrapper DSL. `@rox-one/sdk/lexical` is a curated
   entry of `packages/lexical-core` (`lexical-core/sdk.ts`): the node classes and
   their `$create…`/`$is…` helpers, the `@lexical/*` nodes and helpers our
   documents use (lists, headings, quotes, links, tables, code, marks),
@@ -456,7 +456,7 @@ programs through the production runner and its exact flags:
 - Nothing DOM-only breaks: node `createDOM`/`exportDOM` touch `document` only
   when called, and headless never calls them.
 
-### One entry: `@macro-inc/sdk/lexical`
+### One entry: `@rox-one/sdk/lexical`
 
 - `packages/lexical-core/sdk.ts` is the curated entry: the nodes,
   `$create…`/`$is…` helpers, `NodeReplacements`, `SupportedNodeTypes`, `$getId`,
@@ -465,10 +465,10 @@ programs through the production runner and its exact flags:
 - `packages/sdk` vendors it: `bun run vendor` copies the entry and the files it
   imports into `src/vendor/lexical-core/`, and `vendor:check` (run by the SDK's
   checks) fails when a copy is stale. The SDK exports it as the
-  `@macro-inc/sdk/lexical` subpath, and `doc.lexical()` loads it with a dynamic
+  `@rox-one/sdk/lexical` subpath, and `doc.lexical()` loads it with a dynamic
   `import()`, so the SDK's main entry stays the size it is.
 - `lexical` and the `@lexical/*` packages are optional peer dependencies of
-  `@macro-inc/sdk`, pinned to the version lexical-core uses, so an npm
+  `@rox-one/sdk`, pinned to the version lexical-core uses, so an npm
   program's `lexical` import is the SDK's. Only `doc.lexical()` needs them; it
   fails with a message naming them when they are missing. lexical-core's own
   runtime dependencies (`nanoid`, `linkify-it`, `prismjs`) become SDK
@@ -478,7 +478,7 @@ programs through the production runner and its exact flags:
 
 - `packages/code-mode-sdk` builds, at build time with the rest of the bundle
   (`crates/code_mode_assets`), code-split modules for `lexical`, the
-  `@lexical/*` packages and `@macro-inc/sdk/lexical`, beside `sdk.mjs`.
+  `@lexical/*` packages and `@rox-one/sdk/lexical`, beside `sdk.mjs`.
   `crates/code_execution` writes them to the run's root and maps each
   specifier in `imports.json`.
 - `sdk.mjs` keeps those specifiers external, so `doc.lexical()` imports them
@@ -554,7 +554,7 @@ generated at build time), and adds the direct tool it replaces to
    3. DSS `GET` and `POST /documents/{id}/lexical`: receipts, document tokens,
       outcome mapping (409 conflict, 422 invalid, 502 unknown), spans.
    4. SDK `Document.lexical()`, `DocumentLexical`, the block diff,
-      `DocumentEditConflictError`, the vendored `@macro-inc/sdk/lexical` entry
+      `DocumentEditConflictError`, the vendored `@rox-one/sdk/lexical` entry
       and optional `lexical` peers; the code-mode chunks and import map, with a
       Deno test that edits a document under the sandbox flags.
 4. **Spreadsheets** (MACRO-4587). `documents.createSpreadsheet()`,

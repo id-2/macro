@@ -4,8 +4,8 @@ import {
   type Cleanup,
   createMachine,
   type MachineDef,
-} from '@macro-inc/machine';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/machine';
+import { Telemetry } from '@rox-one/observability';
 import type { CallTokenResponse } from '@service-call/client';
 import type { DisconnectReason } from 'livekit-client';
 import { match } from 'ts-pattern';

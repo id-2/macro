@@ -1,7 +1,7 @@
 import { decodeBase64Utf8 } from '@app/features/email-compose/core/decode-base64';
 import type { LocalDraft } from '@app/features/email-compose/core/local-draft';
 import type { DraftFormAttachment } from '@app/features/email-compose/primitives/email-form-state';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   draftContactInput,
   type GraphqlSaveEmailDraftArgs,

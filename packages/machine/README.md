@@ -1,11 +1,11 @@
 # Machine
 
-`@macro-inc/machine` runs a pure, typed transition table in plain TypeScript.
+`@rox-one/machine` runs a pure, typed transition table in plain TypeScript.
 The core has no runtime dependencies. Solid integration is available separately
-from `@macro-inc/machine/solid`.
+from `@rox-one/machine/solid`.
 
 ```ts
-import { createMachine } from '@macro-inc/machine';
+import { createMachine } from '@rox-one/machine';
 
 const machine = createMachine({ initial, def, scopes, execute });
 const initialSnapshot = machine.getState();
@@ -36,7 +36,7 @@ dispatches no-ops. Call it when the machine is no longer needed.
 ## Solid
 
 ```ts
-import { createSolidMachine } from '@macro-inc/machine/solid';
+import { createSolidMachine } from '@rox-one/machine/solid';
 
 const machine = createSolidMachine({ initial, def, scopes, execute });
 machine.state(); // Reactive snapshot.
@@ -53,7 +53,7 @@ cleanup with `onCleanup` inside this callback. Configure it under the owner
 whose context it should inherit:
 
 ```ts
-import { createSolidMachine, solidScope } from '@macro-inc/machine/solid';
+import { createSolidMachine, solidScope } from '@rox-one/machine/solid';
 import { onCleanup } from 'solid-js';
 
 const machine = createSolidMachine({

@@ -5,8 +5,8 @@ import {
   parseMentionDate,
 } from '@core/util/dateParser';
 import ClockIcon from '@icon/system/regular/clock.svg';
-import type { DateMentionDecoratorProps } from '@macro-inc/lexical-core';
-import { $isDateMentionNode } from '@macro-inc/lexical-core';
+import type { DateMentionDecoratorProps } from '@rox-one/lexical-core';
+import { $isDateMentionNode } from '@rox-one/lexical-core';
 import {
   $getNodeByKey,
   COMMAND_PRIORITY_NORMAL,

@@ -36,7 +36,7 @@ separately from transport and authorization failures. The scene overview is boun
 for inspecting items beyond that overview.
 
 Canvas Next is the Rox host for a reusable graphics engine. The host owns
-product UI and services; `@macro-inc/graphics` owns the portable scene and editing
+product UI and services; `@rox-one/graphics` owns the portable scene and editing
 model.
 
 ## Artifacts

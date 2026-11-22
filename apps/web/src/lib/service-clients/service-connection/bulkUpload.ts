@@ -1,4 +1,4 @@
-import { createWebsocketEventEffect } from '@macro-inc/collaboration/websocket';
+import { createWebsocketEventEffect } from '@rox-one/collaboration/websocket';
 import type { UploadFolderStatusUpdate } from '@service-connection/generated/schemas/uploadFolderStatusUpdate';
 import type { FromWebsocketMessage } from './websocket';
 import { ws } from './websocket';

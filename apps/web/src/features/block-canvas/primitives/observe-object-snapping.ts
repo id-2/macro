@@ -1,5 +1,5 @@
-import type { GraphicsEditor, ObjectSnapStats } from '@macro-inc/graphics';
-import { Telemetry } from '@macro-inc/observability';
+import type { GraphicsEditor, ObjectSnapStats } from '@rox-one/graphics';
+import { Telemetry } from '@rox-one/observability';
 import { onCleanup } from 'solid-js';
 
 /** One trace per gesture, with aggregate query work rather than per-pointer spans. */

@@ -1,7 +1,7 @@
-import type { Wake } from '@macro-inc/muppet/core/behavior';
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import type { Source } from '@macro-inc/muppet/core/event';
-import type { Fired } from '@macro-inc/muppet/utilities/schedules';
+import type { Wake } from '@rox-one/muppet/core/behavior';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import type { Source } from '@rox-one/muppet/core/event';
+import type { Fired } from '@rox-one/muppet/utilities/schedules';
 import {
   checkAccessRequests,
   decidedNote,

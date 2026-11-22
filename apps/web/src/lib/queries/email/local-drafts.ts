@@ -16,7 +16,7 @@ import type {
   ClaimedMutation,
   MutationInspection,
 } from '@graphql-cache/protocol';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { OperationResult } from '@urql/core';
 import { authKeys } from '../auth/keys';
 import type { UserInfoData } from '../auth/user-info';

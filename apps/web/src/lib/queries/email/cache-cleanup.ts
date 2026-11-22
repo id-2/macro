@@ -1,5 +1,5 @@
 import { DEFAULT_THREAD_MESSAGES_LIMIT } from '@core/constant/pagination';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { emailClient } from '@service-email/client';
 import { EmailThreadPageDocument } from '@service-storage/graphql/generated/graphql';
 import {

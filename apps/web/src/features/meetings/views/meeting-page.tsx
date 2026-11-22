@@ -5,7 +5,7 @@ import { isMobile } from '@core/mobile/isMobile';
 import { fireAndForget } from '@core/util/fireAndForget';
 import ArrowLeft from '@icon/system/regular/arrow-left.svg';
 import Phone from '@icon/system/regular/phone-call.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { Button, Input } from '@ui';
 import {
   type Accessor,

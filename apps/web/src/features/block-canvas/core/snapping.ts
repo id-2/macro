@@ -1,4 +1,4 @@
-import { dotGridLevels } from '@macro-inc/graphics';
+import { dotGridLevels } from '@rox-one/graphics';
 
 export type CanvasSnapMode = 'none' | 'pixel' | 'auto';
 

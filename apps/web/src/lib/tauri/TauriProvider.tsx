@@ -10,7 +10,7 @@ import {
   hasAutomaticReloadHolds,
   syncNativeReloadHold,
 } from '@core/util/reloadForNewerBuild';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { PlatformNotificationProvider } from '@notifications';
 import { queryPersistence } from '@queries/client';
 import type { RouteSectionProps } from '@solidjs/router';

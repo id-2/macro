@@ -4,12 +4,12 @@
  */
 
 import { mergeRegister } from '@lexical/utils';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
 import {
   COLLAB_SELECTION_TAG,
   COLLABORATION_TAG,
-} from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import type { EditorState, LexicalEditor } from 'lexical';
 import {
   $isRangeSelection,

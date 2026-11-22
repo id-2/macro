@@ -11,7 +11,7 @@ import { useNativeSplitNavigationHandler } from '@core/util/useSplitNavigationHa
 import {
   $isAgentSessionMentionNode,
   type AgentSessionMentionDecoratorProps,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { useAgentSessionMentionPreview } from '@queries/agent-session/mentions';
 import {
   $getNodeByKey,

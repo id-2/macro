@@ -19,7 +19,7 @@ vi.mock('@core/context/user', () => ({
   useUserId: () => () => 'rox|owner@example.com',
 }));
 vi.mock('@core/util/upload', () => ({ handleFileFolderDrop: vi.fn() }));
-vi.mock('@macro-inc/lexical-core', () => ({
+vi.mock('@rox-one/lexical-core', () => ({
   AwaitNode: {},
   CommentNode: {},
   InlineSearchNode: {},

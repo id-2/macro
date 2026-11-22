@@ -1,13 +1,13 @@
 import { expect, test } from 'bun:test';
-import type { Agent, Woke } from '@macro-inc/muppet/core/agent';
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { channel } from '@macro-inc/muppet/core/event';
-import { parallel } from '@macro-inc/muppet/runtimes/parallel';
+import type { Agent, Woke } from '@rox-one/muppet/core/agent';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { channel } from '@rox-one/muppet/core/event';
+import { parallel } from '@rox-one/muppet/runtimes/parallel';
 import {
   type Fired,
   memoryStore,
   scheduler,
-} from '@macro-inc/muppet/utilities/schedules';
+} from '@rox-one/muppet/utilities/schedules';
 import { budgeted, fileLedger, recordSpend } from '../../../agent/budget.ts';
 import { passthrough } from '../../../agent/claude.ts';
 import { config as makeConfig } from '../../../context/config.ts';

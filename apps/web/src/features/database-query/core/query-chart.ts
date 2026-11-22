@@ -7,7 +7,7 @@ import {
   type DatabaseQueryChartMode,
   type DatabaseQueryDisplayMode,
   parseDatabaseQueryChart,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import {
   type ReferenceNames,
   resultCell,

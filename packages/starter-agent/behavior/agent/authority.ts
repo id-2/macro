@@ -4,7 +4,7 @@
  * leave, the team's owner does, and is told once. A team that can't be read
  * keeps the last decision.
  */
-import type { Agent } from '@macro-inc/muppet/core/agent';
+import type { Agent } from '@rox-one/muppet/core/agent';
 import type { Disk } from '../context/disk.ts';
 
 const authorityOwner = 'authority';

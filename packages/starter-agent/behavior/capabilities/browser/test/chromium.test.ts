@@ -10,7 +10,7 @@ import {
   asTab,
   chromium,
   type Running,
-} from '@macro-inc/muppet/utilities/browser';
+} from '@rox-one/muppet/utilities/browser';
 import { type Browser, chromium as playwright } from 'playwright-core';
 import { passthrough } from '../../../agent/claude.ts';
 import { step } from '../browse.ts';

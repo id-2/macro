@@ -9,7 +9,7 @@
 
 import type { InputSnapshot } from '@channel/Input';
 import { buildPostMessageSendPayload } from '@channel/Input/message-payload';
-import { markdownToPlainText } from '@macro-inc/lexical-core';
+import { markdownToPlainText } from '@rox-one/lexical-core';
 import { useMessageRootsQuery } from '@queries/messages/document-messages';
 import {
   newMessageId,

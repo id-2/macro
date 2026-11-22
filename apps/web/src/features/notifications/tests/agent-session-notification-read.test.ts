@@ -3,7 +3,7 @@ vi.mock('@queries/email/read-state', () => ({ markEmailThreadSeen: vi.fn() }));
 import { withEntityNotifications } from '@app/features/soup/entity-notifications';
 import type { AgentSessionEntity } from '@entity/types/entity';
 import { unreadFilterFn } from '@entity/utils/filter';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { markRowNotificationsSeenOnOpen } from '@notifications/mark-row-seen';
 import type { ConnectionGatewayWebsocket } from '@service-connection/websocket';
 import { createRoot } from 'solid-js';
@@ -22,7 +22,7 @@ vi.mock('@core/constant/featureFlags', () => ({
   enableGraphqlSoup: { key: 'enable-graphql-soup' },
   isFeatureEnabled: () => true,
 }));
-vi.mock('@macro-inc/collaboration/websocket', () => ({
+vi.mock('@rox-one/collaboration/websocket', () => ({
   createSocketEffect: vi.fn(),
 }));
 vi.mock('@queries/notification/user-notifications', () => ({

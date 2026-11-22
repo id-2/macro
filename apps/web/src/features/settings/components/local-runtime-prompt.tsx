@@ -9,7 +9,7 @@ import {
   roxdStatus,
   roxdSupport,
   onRoxdStatus,
-} from '@macro/tauri/roxd';
+} from '@rox-one/tauri/roxd';
 import LaptopIcon from '@phosphor/laptop.svg';
 import XIcon from '@phosphor/x.svg';
 import type { UnlistenFn } from '@tauri-apps/api/event';

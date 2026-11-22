@@ -7,7 +7,7 @@ import {
   isRectFlushWith,
 } from '@core/component/LexicalMarkdown/utils';
 import { mergeRegister } from '@lexical/utils';
-import { $isSelectionInsideCode } from '@macro-inc/lexical-core';
+import { $isSelectionInsideCode } from '@rox-one/lexical-core';
 import {
   $getNodeByKey,
   $getRoot,

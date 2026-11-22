@@ -2,7 +2,7 @@ import { loroSyncState } from '@core/component/LexicalMarkdown/utils';
 import {
   $updateAllNodeIds,
   type NodeIdMappings,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $createTextNode,

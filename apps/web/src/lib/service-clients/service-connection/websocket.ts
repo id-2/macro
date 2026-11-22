@@ -6,8 +6,8 @@ import {
   LinearBackoff,
   type Websocket,
   WebsocketBuilder,
-} from '@macro-inc/collaboration/websocket';
-import { createWebsocketStateSignal } from '@macro-inc/collaboration/websocket/solid/state-signal';
+} from '@rox-one/collaboration/websocket';
+import { createWebsocketStateSignal } from '@rox-one/collaboration/websocket/solid/state-signal';
 import { createCallback } from '@solid-primitives/rootless';
 import { createSessionWebsocketTelemetry } from '../session-websocket-telemetry';
 import type { ToWebsocketMessage } from './generated/schemas/toWebsocketMessage';

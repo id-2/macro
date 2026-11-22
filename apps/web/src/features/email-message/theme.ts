@@ -1,4 +1,4 @@
-import type { ThemeColorParams } from '@macro-inc/email-renderer/browser';
+import type { ThemeColorParams } from '@rox-one/email-renderer/browser';
 import { resolvedThemeColors } from '@theme/signals/themeSignals';
 import { createMemo } from 'solid-js';
 

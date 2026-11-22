@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ScreenFrame, ScreenShare } from "@macro-inc/sdk/calls/node";
+import type { ScreenFrame, ScreenShare } from "@rox-one/sdk/calls/node";
 import { type Browser, chromium as playwright } from "playwright-core";
 import { chromium, type Running } from "../../../browser/index.ts";
 import { frameBytes, settings } from "../frames.ts";

@@ -8,7 +8,7 @@ import {
   parseChartLiteral,
   parseChartReference,
   type SheetChart,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import { match } from 'ts-pattern';
 import { DEFAULT_GAP_WIDTHS } from './chart-shapes';
 import {

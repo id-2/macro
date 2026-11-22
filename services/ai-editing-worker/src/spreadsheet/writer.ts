@@ -1,15 +1,15 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type {
   SpreadsheetEditResponse,
   SpreadsheetSheetSummary,
-} from '@macro-inc/spreadsheet/ai-types';
+} from '@rox-one/spreadsheet/ai-types';
 import {
   calculateSpreadsheetForAi,
   prepareSpreadsheetEdit,
   readSpreadsheetForAi,
-} from '@macro-inc/spreadsheet/ai-workbook';
-import type { SpreadsheetCalculator } from '@macro-inc/spreadsheet/calculation';
-import { validateSpreadsheetDocument } from '@macro-inc/spreadsheet/document-validation';
+} from '@rox-one/spreadsheet/ai-workbook';
+import type { SpreadsheetCalculator } from '@rox-one/spreadsheet/calculation';
+import { validateSpreadsheetDocument } from '@rox-one/spreadsheet/document-validation';
 import {
   generateText,
   hasToolCall,

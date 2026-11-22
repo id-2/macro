@@ -26,7 +26,7 @@ vi.mock('@core/auth/session-refresh', () => ({
   confirmSessionExpired: vi.fn(),
 }));
 vi.mock('@service-auth/fetch', () => ({ fetchWithAuth: vi.fn() }));
-vi.mock('@macro-inc/observability', () => {
+vi.mock('@rox-one/observability', () => {
   const span = {
     run: <T>(operation: () => T) => operation(),
     setAttr: mocks.attributes,

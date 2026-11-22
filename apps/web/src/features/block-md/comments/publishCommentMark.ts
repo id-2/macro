@@ -1,8 +1,8 @@
 import { $cursorToLexicalPoint } from '@core/component/LexicalMarkdown/collaboration/cursor';
 import type { LexicalSelectionAwareness } from '@core/component/LexicalMarkdown/collaboration/LexicalAwareness';
 import { $unwrapMarkNode, $wrapSelectionInMarkNode } from '@lexical/mark';
-import { LoroManager } from '@macro-inc/collaboration/collab/manager';
-import type { LiveSyncSource } from '@macro-inc/collaboration/collab/source';
+import { LoroManager } from '@rox-one/collaboration/collab/manager';
+import type { LiveSyncSource } from '@rox-one/collaboration/collab/source';
 import {
   $createCommentNode,
   $getCommentMarkText,
@@ -12,9 +12,9 @@ import {
   NodeReplacements,
   nodeIdPlugin,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core';
-import { MARKDOWN_LORO_SCHEMA } from '@macro-inc/lexical-core/markdown-loro-schema';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { MARKDOWN_LORO_SCHEMA } from '@rox-one/lexical-core/markdown-loro-schema';
+import { Telemetry } from '@rox-one/observability';
 import { $createRangeSelection, $nodesOfType, createEditor } from 'lexical';
 
 type CommentMarkChange = {

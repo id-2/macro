@@ -1,6 +1,6 @@
 # Releasing the SDK
 
-`@macro-inc/sdk` publishes to npm when a merge to `main` raises the `version` in
+`@rox-one/sdk` publishes to npm when a merge to `main` raises the `version` in
 `packages/sdk/package.json`. There is no release PR, no dispatch, and no tag to
 push: bump the version in the same PR that changes the SDK, and merging it
 releases. If the version is unchanged, the release workflow resolves to a no-op.
@@ -65,8 +65,8 @@ Verify:
 ```sh
 gh run list --repo macro-inc/macro --workflow release-sdk.yml --branch main \
   --json databaseId,headSha,status,conclusion,url
-npm view "@macro-inc/sdk@<version>" version dist.tarball --json --registry=https://registry.npmjs.org
-npm view @macro-inc/sdk dist-tags --json --registry=https://registry.npmjs.org
+npm view "@rox-one/sdk@<version>" version dist.tarball --json --registry=https://registry.npmjs.org
+npm view @rox-one/sdk dist-tags --json --registry=https://registry.npmjs.org
 ```
 
 A merged bump, a green job, or a pushed tag is not proof of publication; the npm

@@ -2,7 +2,7 @@ import { handleAiUsageLimitError } from '@app/features/paywall/ai-usage-limit-ha
 import { fireAndForget } from '@core/util/fireAndForget';
 import { thrownResultErrorHasCode, throwOnErr } from '@core/util/result';
 import { sleep } from '@core/util/sleep';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   queryAccountSession,
   queryAccountSessionPending,

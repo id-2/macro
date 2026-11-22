@@ -1,4 +1,4 @@
-import type { ReplyTargetData } from '@macro-inc/lexical-core';
+import type { ReplyTargetData } from '@rox-one/lexical-core';
 import { createContext } from 'solid-js';
 
 /** A message surface can handle a reference locally before durable route navigation. */

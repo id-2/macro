@@ -5,7 +5,7 @@ import {
   enableGraphqlSoup,
   isFeatureEnabled,
 } from '@core/constant/featureFlags';
-import { WebsocketEvent } from '@macro-inc/collaboration/websocket';
+import { WebsocketEvent } from '@rox-one/collaboration/websocket';
 import { handleAgentSessionChanges } from '@queries/agent-session/changes-sync';
 import { handleAgentSessionPreview } from '@queries/agent-session/preview';
 import { handleAgentSessionQueue } from '@queries/agent-session/queue-sync';

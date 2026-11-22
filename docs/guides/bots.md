@@ -3,7 +3,7 @@
 A bot is a Rox account for a program, such as a release job or a webhook
 relay. It posts to channels under its own name. This guide creates one in the
 app, then uses it from TypeScript with
-[`@macro-inc/sdk`](https://sdk.rox.one).
+[`@rox-one/sdk`](https://sdk.rox.one).
 
 ## 1. Create the bot
 
@@ -30,7 +30,7 @@ A bot you create is personal, so it posts as itself on your behalf:
 `requestedAs` names you, the owner, and the bot uses your access.
 
 ```ts
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 
 const bot = new Macro({
   auth: { type: 'bot', token: process.env.ROX_BOT_TOKEN! },
@@ -51,7 +51,7 @@ Bots can't search: search rejects bot tokens. Search with an API key from
 **Settings → Developer → API Keys** instead. It acts as you.
 
 ```ts
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 
 const macro = new Macro({ token: process.env.ROX_API_KEY! });
 

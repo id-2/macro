@@ -1,6 +1,6 @@
 /**
  * The public entry for programs that edit Rox documents with Lexical
- * (`@macro-inc/sdk/lexical`): our nodes and their helpers, the `@lexical/*`
+ * (`@rox-one/sdk/lexical`): our nodes and their helpers, the `@lexical/*`
  * nodes documents use, node ids and markdown conversion. It leaves out the
  * package index's AI, diff and app-only utilities, so it bundles small and
  * runs headless.

@@ -1,5 +1,5 @@
 import type { DiscussionThread } from '@core/comments/discussion';
-import { normalizeGithubMarkdown } from '@macro-inc/lexical-core';
+import { normalizeGithubMarkdown } from '@rox-one/lexical-core';
 import type { GithubPullRequestComment } from '@service-storage/generated/schemas';
 
 import { isGithubBotLogin } from '../util/githubMarkdown';

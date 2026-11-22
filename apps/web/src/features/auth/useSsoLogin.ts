@@ -15,7 +15,7 @@ import { unsetTokenPromise } from '@core/util/fetchWithToken';
 import { isPlatform } from '@core/util/platform';
 import { setPostLoginRedirect } from '@core/util/postLoginRedirect';
 import { holdAutomaticReload } from '@core/util/reloadForNewerBuild';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { invalidateAllAfterLogin } from '@queries/auth/user-info';
 import { authServiceClient } from '@service-auth/client';
 import { useLocation } from '@solidjs/router';

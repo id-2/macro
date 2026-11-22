@@ -40,7 +40,7 @@ import Plus from '@icon/system/regular/plus.svg';
 import LogoutIcon from '@icon/system/regular/sign-out.svg';
 import Upload from '@icon/system/regular/upload.svg';
 import UserIcon from '@icon/system/regular/user.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useMutationUndoContext } from '@queries/undo';
 import { debounce } from '@solid-primitives/scheduled';
 import { ThemeChips } from '@theme/components/ThemeChips';

@@ -1,4 +1,4 @@
-import { createGraphicsEditor, drawableIds } from '@macro-inc/graphics';
+import { createGraphicsEditor, drawableIds } from '@rox-one/graphics';
 import { createRoot } from 'solid-js';
 import { afterEach, expect, it, vi } from 'vitest';
 import { createCanvasNextScene } from '../core/seed-scene';

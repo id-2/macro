@@ -2,7 +2,7 @@ import {
   $createAgentSessionMentionNode,
   $createDocumentMentionNode,
   type DocumentMentionInfo,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $getNodeByKey,

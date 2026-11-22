@@ -2,16 +2,16 @@ import {
   type UrlResolver,
   WebsocketBuilder,
   WebsocketConnectionState,
-} from '@macro-inc/collaboration/websocket';
-import { createWebsocketStateSignal } from '@macro-inc/collaboration/websocket/solid/state-signal';
-import { NOOP_SPAN } from '@macro-inc/observability';
+} from '@rox-one/collaboration/websocket';
+import { createWebsocketStateSignal } from '@rox-one/collaboration/websocket/solid/state-signal';
+import { NOOP_SPAN } from '@rox-one/observability';
 import { createRoot } from 'solid-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   socket: vi.fn<(resolver: UrlResolver) => object>(() => ({})),
 }));
-vi.mock('@macro-inc/collaboration/sync-service/socket', () => ({
+vi.mock('@rox-one/collaboration/sync-service/socket', () => ({
   createSyncSocket: mocks.socket,
 }));
 vi.mock('@core/constant/servers', async (importOriginal) => ({

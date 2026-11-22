@@ -1,13 +1,13 @@
-import { noopChatter } from '@macro-inc/collaboration/collab/chatter';
-import { InMemoryWALStore } from '@macro-inc/collaboration/collab/wal';
+import { noopChatter } from '@rox-one/collaboration/collab/chatter';
+import { InMemoryWALStore } from '@rox-one/collaboration/collab/wal';
 import {
   createGraphicsEditorFromBackend,
   createScene,
   type GraphicsEditor,
   translation,
-} from '@macro-inc/graphics';
-import { createLoroGraphicsBackendFromDoc } from '@macro-inc/graphics/loro';
-import { CollaborativeGraphicsSurface } from '@macro-inc/graphics/loro/solid';
+} from '@rox-one/graphics';
+import { createLoroGraphicsBackendFromDoc } from '@rox-one/graphics/loro';
+import { CollaborativeGraphicsSurface } from '@rox-one/graphics/loro/solid';
 import type { LoroDoc } from 'loro-crdt';
 import { createSignal, For, onCleanup, Show } from 'solid-js';
 import { render } from 'solid-js/web';

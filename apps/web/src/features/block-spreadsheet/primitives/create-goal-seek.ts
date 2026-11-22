@@ -4,7 +4,7 @@ import {
   type GoalSeekSolution,
   parseGoalSeekReference,
   parseGoalValue,
-} from '@macro-inc/spreadsheet/goal-seek';
+} from '@rox-one/spreadsheet/goal-seek';
 import type { Accessor } from 'solid-js';
 import { createSignal } from 'solid-js';
 import type { SpreadsheetCell } from '../core/spreadsheet-document';

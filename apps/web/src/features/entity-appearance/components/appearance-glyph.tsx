@@ -1,4 +1,4 @@
-import { ENTITY_ICON_ALIASES } from '@macro-inc/entity-icons';
+import { ENTITY_ICON_ALIASES } from '@rox-one/entity-icons';
 import type { Component, JSX } from 'solid-js';
 import { children, lazy, Match, Suspense, Switch } from 'solid-js';
 import { Dynamic } from 'solid-js/web';

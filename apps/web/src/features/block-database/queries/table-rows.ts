@@ -6,7 +6,7 @@ import { databaseSqlSchema } from '@core/database-sql/catalog';
 import type { DatabaseOp } from '@core/database-sql/generated/types';
 import type { DatabaseSqlReadReason } from '@core/database-sql/trace';
 import { type ResultError, thrownResultErrorHasCode } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   createDatabaseSqlQuery,
   type DatabaseSqlQuery,

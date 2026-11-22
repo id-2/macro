@@ -1,5 +1,5 @@
 import { ENABLE_DOCX_TO_PDF } from '@core/constant/featureFlags';
-import type { MinimalWebSocket } from '@macro-inc/collaboration/websocket/platform/minimal-websocket';
+import type { MinimalWebSocket } from '@rox-one/collaboration/websocket/platform/minimal-websocket';
 import {
   createWebsocketPromiseChain,
   JobTypeEnum,

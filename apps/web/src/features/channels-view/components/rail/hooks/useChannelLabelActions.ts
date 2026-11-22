@@ -6,7 +6,7 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { thrownResultErrorHasCode } from '@core/util/result';
 import type { ChannelEntity } from '@entity';
 import { notificationIsRead } from '@entity/utils/notification';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { ensureNotificationSourceLoaded } from '@notifications/notification-helpers';
 import {
   useCreateChannelLabelMutation,

@@ -12,7 +12,7 @@ import ThreeDotsIcon from '@icon/system/regular/dots-three-vertical.svg';
 import DownloadIcon from '@icon/system/regular/download-simple.svg';
 import TrashIcon from '@icon/system/regular/trash.svg';
 import { Dialog } from '@kobalte/core/dialog';
-import { constrainImageDimensions } from '@macro-inc/lexical-core/utils/media';
+import { constrainImageDimensions } from '@rox-one/lexical-core/utils/media';
 import { fetchBinaryDocumentData } from '@queries/storage/binary-document';
 import { fetchBinary } from '@service-storage/util/fetchBinary';
 import { Button, cn, Dropdown } from '@ui';

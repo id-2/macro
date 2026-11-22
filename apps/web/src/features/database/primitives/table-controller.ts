@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { DatabaseOpsError } from '@service-storage/databases';
 import { err, ok, type Result } from 'neverthrow';
 import {

@@ -62,10 +62,10 @@
       "@core/*": [
         "./src/lib/core/*"
       ],
-      "@macro/tauri": [
+      "@rox-one/tauri": [
         "./src/lib/tauri"
       ],
-      "@macro/tauri/*": [
+      "@rox-one/tauri/*": [
         "./src/lib/tauri/*"
       ],
       "@phosphor/*": [

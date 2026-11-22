@@ -3,7 +3,7 @@
  * people in front of it, and recording what an exchange showed about them.
  * Everything that touches a record, a model or the log goes through here.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import type { Log } from '../../context/log.ts';
 import type { People } from '../../contracts.ts';
 import {
@@ -17,7 +17,7 @@ import {
   shouldReflect,
 } from './appraise.ts';
 import { type Present, section, shown } from './card.ts';
-import type { AuthorOf } from './macro.ts';
+import type { AuthorOf } from './rox.ts';
 import type { Who } from './rules.ts';
 import type { Person, Store } from './store.ts';
 import { worthAppraising } from './transcript.ts';

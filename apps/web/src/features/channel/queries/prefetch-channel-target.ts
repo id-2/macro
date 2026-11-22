@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { notificationTargetSpan } from '@notifications/notification-open-trace';
 import { queryClient } from '@queries/client';
 import { threadRepliesQueryOptions } from '@queries/messages/thread-replies';

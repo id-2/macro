@@ -4,7 +4,7 @@ import {
   buildDiffState,
   buildWhoMap,
   diffStates,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { useDocumentPeersQuery } from '@queries/sync/document-peers';
 import type { HistorySession, HistoryVersionId } from '@service-sync/client';
 import { syncServiceClient } from '@service-sync/client';

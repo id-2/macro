@@ -18,8 +18,8 @@ import {
   InlineSearchNode,
   type PeerIdValidator,
   peerIdPlugin,
-} from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import type { Accessor } from 'solid-js';
 import type { MarkdownEditorErrors } from '../constants';
 import type { LexicalWrapper } from '../context/LexicalWrapperContext';

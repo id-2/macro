@@ -3,7 +3,7 @@ import {
   DocxAgentError,
   MAX_DOCX_OPERATIONS,
   runDocxAgentRequest,
-} from '@macro-inc/collaboration/docx/agent';
+} from '@rox-one/collaboration/docx/agent';
 import { Hono } from 'hono';
 import * as z from 'zod';
 import { tokenAccessLevel } from '../document-token';

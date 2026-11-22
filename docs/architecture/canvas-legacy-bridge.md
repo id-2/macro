@@ -2,7 +2,7 @@
 
 The legacy migration imports version 1 Canvas records into the Canvas Next
 version 2 document model. The old editor and downgrade path are not available. It belongs to the Canvas application layer, not
-`@macro-inc/graphics`, because it understands old schemas, Lexical payloads,
+`@rox-one/graphics`, because it understands old schemas, Lexical payloads,
 Rox entities, and product rollout policy.
 
 ## Contract

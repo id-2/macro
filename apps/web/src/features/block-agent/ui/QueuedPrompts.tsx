@@ -28,7 +28,7 @@ import { StaticMarkdown } from '@core/component/LexicalMarkdown/component/core/S
 import { singleLineMarkdownTheme } from '@core/component/LexicalMarkdown/theme';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import XIcon from '@icon/system/regular/x.svg?component-solid';
-import { stripAgentContext } from '@macro-inc/lexical-core/utils/parsers';
+import { stripAgentContext } from '@rox-one/lexical-core/utils/parsers';
 import { Button, Surface, Tooltip } from '@ui';
 import { COMMAND_PRIORITY_NORMAL, KEY_ESCAPE_COMMAND } from 'lexical';
 import {

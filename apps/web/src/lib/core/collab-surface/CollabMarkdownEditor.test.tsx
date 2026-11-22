@@ -75,7 +75,7 @@ vi.mock('@core/component/LexicalMarkdown/utils', () => ({
   initializeEditorEmpty: () => {},
 }));
 vi.mock('@core/directive/fileFolderDrop', () => ({ fileFolderDrop: () => {} }));
-vi.mock('@macro-inc/lexical-core', () => ({
+vi.mock('@rox-one/lexical-core', () => ({
   createPeerIdValidator: () => () => true,
 }));
 vi.mock('@solid-primitives/lifecycle', () => ({

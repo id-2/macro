@@ -1,5 +1,5 @@
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { source } from '@macro-inc/muppet/core/event';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { source } from '@rox-one/muppet/core/event';
 import type { CallsContext } from '../../capabilities/calls/context.ts';
 import { followCalls, world, worlds } from '../../capabilities/calls/watch.ts';
 

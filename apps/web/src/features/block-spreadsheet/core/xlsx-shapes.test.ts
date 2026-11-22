@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 import {
   type SheetDrawing,
   validDrawings,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import { strFromU8, unzipSync } from 'fflate';
 import { SaxesParser } from 'saxes';
 import { describe, expect, it } from 'vitest';

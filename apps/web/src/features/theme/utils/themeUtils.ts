@@ -1,5 +1,5 @@
 import { toast } from '@core/component/Toast/Toast';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { batch, createEffect, on } from 'solid-js';
 import { DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME } from '../constants';
 import {

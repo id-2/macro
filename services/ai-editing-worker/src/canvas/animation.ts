@@ -5,19 +5,19 @@ import {
   shapeDefinition,
   worldBounds,
   worldMatrix,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import {
   type ActionGuard,
   type PeerPresence,
   type PresenceShape,
   presenceItemState,
   presenceRegionOccupants,
-} from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics/loro';
 import {
   plainRichText,
   richTextPlainText,
   validCanvasText,
-} from '@macro-inc/lexical-core/canvas-text';
+} from '@rox-one/lexical-core/canvas-text';
 import { match } from 'ts-pattern';
 import type { CanvasDependencies } from './dependencies';
 

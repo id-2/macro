@@ -1,5 +1,5 @@
 import type { ItemMention } from '@core/component/LexicalMarkdown/plugins';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { makePersisted } from '@solid-primitives/storage';
 import {
   type Accessor,

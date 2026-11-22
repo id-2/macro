@@ -8,7 +8,7 @@ enforced by the ordinary backend APIs.
 
 ## Start here
 
-- `src/macro.ts`: public exports and namespace registration.
+- `src/rox.ts`: public exports and namespace registration.
 - `documents.createCanvas()` creates shared content before returning a Document handle;
   it requires no browser open or upload. `document.canvas()` (`entities/canvases/canvas.ts`, its own code-mode entity)
   reads (`scene`), edits (`apply` code against a revision, `edit` by instructions) and
@@ -155,8 +155,8 @@ enforced by the ordinary backend APIs.
   `/initiatives/{id}/activity`. Code mode hides the matching direct tools.
 - `services.ts`, `openapi-ts.config.ts`: generated service contract inputs.
 - `src/calls/`: optional Node and browser LiveKit helpers, exported only as
-  `@macro-inc/sdk/calls/node` and `@macro-inc/sdk/calls/browser`. Keep them out of
-  `src/macro.ts` and its dependency graph; LiveKit runtimes stay optional peers.
+  `@rox-one/sdk/calls/node` and `@rox-one/sdk/calls/browser`. Keep them out of
+  `src/rox.ts` and its dependency graph; LiveKit runtimes stay optional peers.
 - `src/entities/calls/`: live and recorded call handles; token-bearing `CallConnection` never serializes its token.
 
 ## Boundaries
@@ -315,4 +315,4 @@ the existing gateway prefixes.
   audio DTX. Unpublish Node tracks by publication SID; browser tracks by object.
 - Keep LiveKit and OpenTelemetry external in the calls build so room objects and
   tracing use the consumer's runtime instances. Do not re-export calls helpers
-  or their runtime types from `src/macro.ts`.
+  or their runtime types from `src/rox.ts`.

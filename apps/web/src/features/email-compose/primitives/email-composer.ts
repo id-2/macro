@@ -9,7 +9,7 @@ import { $generateHtmlFromNodes } from '@lexical/html';
 import {
   $appendWatermarkNodeToLast,
   $removeAllWatermarkNodes,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import * as EmailValidator from 'email-validator';
 import type { LexicalEditor } from 'lexical';
 import {

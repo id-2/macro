@@ -1,4 +1,4 @@
-import type { Macro } from "@macro-inc/sdk";
+import type { Macro } from "@rox-one/sdk";
 
 /** Who wrote a message, by Rox's record, and whether it was in a DM. */
 export type Author = {

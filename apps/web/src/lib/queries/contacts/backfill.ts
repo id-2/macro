@@ -5,7 +5,7 @@ import {
   isStaleHydrationScopeError,
   isStorageGeneration,
 } from '@graphql-cache/protocol';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { hydrateGraphqlContacts } from '@service-storage/graphql-contacts';
 import * as Effect from 'effect/Effect';
 import * as Fiber from 'effect/Fiber';

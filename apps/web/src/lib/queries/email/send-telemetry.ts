@@ -1,5 +1,5 @@
 import { analytics } from '@app/lib/analytics';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { EmailSendAttemptFieldsFragment } from '@service-storage/graphql/generated/graphql';
 import { CombinedError } from '@urql/core';
 import type { EmailSendIntent } from './send-queue';

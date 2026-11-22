@@ -1,5 +1,5 @@
 import { toast } from '@core/component/Toast/Toast';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import { saveEmailComposeDraft } from '@queries/email/graphql/compose';
 import { unscheduleEmailMessage } from '@queries/email/integration';

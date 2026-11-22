@@ -1,7 +1,7 @@
 import { DEV_MODE_ENV } from '@core/constant/featureFlags';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
 
-import type { NodeIdMappings } from '@macro-inc/lexical-core';
+import type { NodeIdMappings } from '@rox-one/lexical-core';
 import { $getNodeByKey, $isRootNode, type LexicalNode } from 'lexical';
 import { type ContainerID, LoroMap, LoroMovableList } from 'loro-crdt';
 

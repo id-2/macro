@@ -2,7 +2,7 @@ import type {
   RoxdDetectedAgent,
   RoxdStartOptions,
   RoxdStatus,
-} from '@macro/tauri/roxd';
+} from '@rox-one/tauri/roxd';
 import type { LoadAgentModelsResponse } from '@service-agent-harness/generated/schemas';
 import { match } from 'ts-pattern';
 

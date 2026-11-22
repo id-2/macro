@@ -4,7 +4,7 @@
  * worker, because the call's thread must never wait on decoding: it would be
  * heard in the agent's voice.
  */
-import type { ScreenFrame } from "@macro-inc/sdk/calls/node";
+import type { ScreenFrame } from "@rox-one/sdk/calls/node";
 import { z } from "zod";
 
 /** What a share looks like on the wire. 10 fps: a page, not a video. */

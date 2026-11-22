@@ -1,7 +1,7 @@
 import { openChatWithInput } from '@app/features/chat/ChatWithAgentButton';
 import { nativeToolSlug } from '@app/features/onboarding/queries/connected-tools';
 import { assignOauthUrl, reserveOauthPopup } from '@core/pipedream/oauth-popup';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   useMcpServersQuery,
   useStartMcpAuthMutation,

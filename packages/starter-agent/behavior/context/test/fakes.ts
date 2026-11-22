@@ -1,4 +1,4 @@
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import type { Disk } from '../disk.ts';
 
 /** A disk in memory. Directories exist when something is in them. */

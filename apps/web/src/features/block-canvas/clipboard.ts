@@ -7,7 +7,7 @@ import {
   pasteCommand,
   screenToWorld,
   worldBounds,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { importExcalidraw } from './core/excalidraw';
 import { validCanvasTextDocument } from './core/text-codec';
 

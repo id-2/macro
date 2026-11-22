@@ -1,6 +1,6 @@
 import { fireAndForget } from '@core/util/fireAndForget';
 import type { EntityData } from '@entity/types/entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { TreeTag } from './core/tag-tree';
 import { tagEntityType } from './entityTagging';
 import { useSoupDocTags } from './useDocTags';

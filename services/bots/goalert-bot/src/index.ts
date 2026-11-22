@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { Hono } from 'hono';
 import { toBody } from '../../../../packages/sdk/src/mentions';
 import type { AlertChannel } from './channel';

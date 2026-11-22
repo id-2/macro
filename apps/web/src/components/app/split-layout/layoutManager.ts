@@ -28,7 +28,7 @@ import type {
 } from '@core/orchestrator';
 import { useFocusLock } from '@core/util/createControlledOpenSignal';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   type Accessor,
   batch,

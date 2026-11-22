@@ -2,7 +2,7 @@ import type { EntityData } from '@entity';
 import {
   WebsocketConnectionState,
   WebsocketEvent,
-} from '@macro-inc/collaboration/websocket';
+} from '@rox-one/collaboration/websocket';
 import { type Accessor, onCleanup } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import type { StreamEvent } from './generated/schemas';

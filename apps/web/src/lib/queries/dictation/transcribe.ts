@@ -1,5 +1,5 @@
 import { ThrownResultError, throwOnErr } from '@core/util/result';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import {
   DictationCapacityError,
   transcribeDictation,

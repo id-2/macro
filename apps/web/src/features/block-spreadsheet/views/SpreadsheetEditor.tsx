@@ -1,14 +1,14 @@
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { cellPlainText } from '@macro-inc/spreadsheet/cell-mentions';
+import { cellPlainText } from '@rox-one/spreadsheet/cell-mentions';
 import {
   type DropdownOptions,
   dropdownRule,
   overlappingValidations,
   replaceValidations,
   validationReference,
-} from '@macro-inc/spreadsheet/data-validation';
-import { parseChartReference } from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/data-validation';
+import { parseChartReference } from '@rox-one/spreadsheet/sheet-drawings';
 import { Button } from '@ui/components/Button';
 import {
   createDeferred,

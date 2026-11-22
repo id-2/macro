@@ -2,7 +2,7 @@ import { beginInteraction } from '@app/observability/flow';
 import CaretLeft from '@icon/system/regular/caret-left.svg';
 import CaretRight from '@icon/system/regular/caret-right.svg';
 import X from '@icon/system/regular/x.svg';
-import { type GraphicsEditor, presentationOrder } from '@macro-inc/graphics';
+import { type GraphicsEditor, presentationOrder } from '@rox-one/graphics';
 import { createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import { ArtifactFrame } from './artifact-frame';

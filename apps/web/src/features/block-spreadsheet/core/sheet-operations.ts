@@ -1,8 +1,8 @@
 import {
   cellPlainText,
   cellTextParts,
-} from '@macro-inc/spreadsheet/cell-mentions';
-import type { RangeMove } from '@macro-inc/spreadsheet/workbook-structure';
+} from '@rox-one/spreadsheet/cell-mentions';
+import type { RangeMove } from '@rox-one/spreadsheet/workbook-structure';
 import type { CellCopy, SpreadsheetCalculation } from './calculation';
 import { csvCellValue } from './csv-value';
 import {

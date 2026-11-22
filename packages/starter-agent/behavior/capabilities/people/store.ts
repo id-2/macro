@@ -3,7 +3,7 @@
  * git. Feelings are never stored: they're computed from the events on every
  * read.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import { type Disk, readJson } from '../../context/disk.ts';
 import { At, byTime, Event, maxDetails, maxEvents, weights } from './rules.ts';

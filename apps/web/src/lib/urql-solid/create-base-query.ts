@@ -1,5 +1,5 @@
 import { useFlowTrace } from '@app/observability/flow';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   type Accessor,
   batch,

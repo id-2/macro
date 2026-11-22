@@ -3,10 +3,10 @@
  * it records, and how its repository changes. Each is what the tick, a hook or
  * a schedule runs, so it can also be run by hand and read in a log.
  */
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { module } from '@macro-inc/muppet/core/capability';
-import type { Schedule } from '@macro-inc/muppet/utilities/schedules/schedule';
-import type { Changed } from '@macro-inc/muppet/utilities/schedules/schedules';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { module } from '@rox-one/muppet/core/capability';
+import type { Schedule } from '@rox-one/muppet/utilities/schedules/schedule';
+import type { Changed } from '@rox-one/muppet/utilities/schedules/schedules';
 import { z } from 'zod';
 import { lastLines, readJson } from '../../context/disk.ts';
 import { buckets } from '../../context/state.ts';

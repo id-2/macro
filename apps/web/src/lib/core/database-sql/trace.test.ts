@@ -15,7 +15,7 @@ const recorded = vi.hoisted(() => ({
   warnings: vi.fn(),
 }));
 
-vi.mock('@macro-inc/observability', () => {
+vi.mock('@rox-one/observability', () => {
   const fake = (node: RecordedSpan) => ({
     span: (name: string) => {
       const child = { name, attributes: {}, children: [], ended: false };

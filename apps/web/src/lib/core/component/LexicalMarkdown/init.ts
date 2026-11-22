@@ -30,12 +30,12 @@ import {
   UserMentionNode,
   VideoNode,
   WatermarkNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   clearDecorators,
   setDecorator,
-} from '@macro-inc/lexical-core/decoratorRegistry';
-import type { HtmlRenderDecoratorProps } from '@macro-inc/lexical-core/nodes/HtmlRenderNode';
+} from '@rox-one/lexical-core/decoratorRegistry';
+import type { HtmlRenderDecoratorProps } from '@rox-one/lexical-core/nodes/HtmlRenderNode';
 import { createComponent, Suspense } from 'solid-js';
 import { AccountManagerRequest } from './component/decorator/AccountManagerRequest';
 import { AgentActivity } from './component/decorator/AgentActivity';

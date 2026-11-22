@@ -10,7 +10,7 @@ import { hasLoginCookie } from '@core/util/cookies';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { consumePostLoginRedirect } from '@core/util/postLoginRedirect';
 import { thrownResultErrorHasCode } from '@core/util/result';
-import { releaseNotificationCover } from '@macro/tauri/push-api';
+import { releaseNotificationCover } from '@rox-one/tauri/push-api';
 import {
   notificationLaunchPath,
   pendingNotificationNavigation,

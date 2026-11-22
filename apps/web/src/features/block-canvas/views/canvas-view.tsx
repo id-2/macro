@@ -18,20 +18,20 @@ import {
   setArtifactCommand,
   setPresentationOrderCommand,
   styleCommand,
-} from '@macro-inc/graphics';
-import { attachConnectorControls } from '@macro-inc/graphics/browser';
-import type { GraphicsPresence } from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics';
+import { attachConnectorControls } from '@rox-one/graphics/browser';
+import type { GraphicsPresence } from '@rox-one/graphics/loro';
 import {
   attachPresencePointer,
   GraphicsPresenceOverlay,
-} from '@macro-inc/graphics/loro/solid';
+} from '@rox-one/graphics/loro/solid';
 import {
   ConnectorView,
   EllipseView,
   GraphicsSurface,
   RectangleView,
   TextView,
-} from '@macro-inc/graphics/solid';
+} from '@rox-one/graphics/solid';
 import { Button, Layer } from '@ui';
 import {
   type Component,

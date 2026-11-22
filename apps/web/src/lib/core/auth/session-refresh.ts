@@ -1,6 +1,6 @@
 import { perfMark } from '@app/observability/perf-marks';
 import { SERVER_HOSTS } from '@core/constant/servers';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { err, ok, type Result } from 'neverthrow';
 import { getNativeNetworkAbortSignal } from '../mobile/native-network-status';
 import type { ResultError } from '../util/result';

@@ -23,7 +23,7 @@ import {
   ListLayoutProvider,
   type SearchLocation,
 } from '@entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useDatabaseDiscoverySync } from '@queries/storage/databases';
 import { Button, CommandMenuListItem } from '@ui';
 import {

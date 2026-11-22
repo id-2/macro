@@ -13,8 +13,8 @@ import { mergeRegister } from '@lexical/utils';
 import {
   $isImageNode,
   type ImageDecoratorProps,
-} from '@macro-inc/lexical-core';
-import { calculateEffectiveDimensions } from '@macro-inc/lexical-core/utils/media';
+} from '@rox-one/lexical-core';
+import { calculateEffectiveDimensions } from '@rox-one/lexical-core/utils/media';
 import { debounce } from '@solid-primitives/scheduled';
 import { cn, Layer } from '@ui';
 import {

@@ -6,13 +6,13 @@
  * with what's being said on its current call. The asks ledger is the queue,
  * the audit log, and what the limits count.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import type { Disk } from '../../context/disk.ts';
 import { elapsed } from './config.ts';
 import { type AskModel, jsonIn } from './judge.ts';
 import type { Ledger } from './ledger.ts';
-import type { CallApi } from './macro.ts';
+import type { CallApi } from './rox.ts';
 import { rowId } from './place.ts';
 import type { Ask, AskRow, Asks, NewAskRow, SwitchVerdict } from './types.ts';
 

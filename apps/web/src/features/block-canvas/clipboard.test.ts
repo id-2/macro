@@ -6,7 +6,7 @@ import {
   selectAllCommand,
   setShapeLabelCommand,
   worldBounds,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { afterEach, expect, it, vi } from 'vitest';
 import { createCanvasClipboard } from './clipboard';
 import { createCanvasNextScene } from './core/seed-scene';

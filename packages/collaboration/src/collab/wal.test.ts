@@ -1,4 +1,4 @@
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as logger from './logger';
 import type { RawUpdate } from './shared';

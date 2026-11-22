@@ -40,8 +40,8 @@ fails isn't run.
 
 ## Boundaries
 
-- Depends on: `@macro-inc/sdk`, the Claude Agent SDK, TypeScript.
-- `utilities/telemetry` emits through `@macro-inc/observability`
+- Depends on: `@rox-one/sdk`, the Claude Agent SDK, TypeScript.
+- `utilities/telemetry` emits through `@rox-one/observability`
   (`packages/observability`), which the agent passes in: the library does
   not import it.
 - Used by: agents built from `../starter-agent`, which link `packages/lib`.

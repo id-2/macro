@@ -1,9 +1,9 @@
-import { SyncSourceStatus } from '@macro-inc/collaboration/collab/source';
-import type { GraphicsEditor, Point } from '@macro-inc/graphics';
+import { SyncSourceStatus } from '@rox-one/collaboration/collab/source';
+import type { GraphicsEditor, Point } from '@rox-one/graphics';
 import {
   capturePresence,
   type GraphicsPresence,
-} from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics/loro';
 import { createEffect, on, onCleanup } from 'solid-js';
 import type { CanvasSession } from '../queries/canvas-session';
 

@@ -158,7 +158,7 @@ describe('standalone website boundary', () => {
     const { write, inspect } = fixture();
     write(
       'package.json',
-      '{"dependencies":{"@macro-inc/ui":"*","shared":"workspace:*","app":"file:../web/src"}}'
+      '{"dependencies":{"@rox-one/ui":"*","shared":"workspace:*","app":"file:../web/src"}}'
     );
     expect(inspect().violations).toHaveLength(3);
     expect(

@@ -5,7 +5,7 @@ import {
   $convertCardToMention,
   $isDocumentCardNode,
   type DocumentCardDecoratorProps,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { $getNodeByKey, SKIP_DOM_SELECTION_TAG } from 'lexical';
 import {
   createSignal,

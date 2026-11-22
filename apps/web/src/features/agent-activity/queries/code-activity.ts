@@ -3,7 +3,7 @@ import {
   codeExecutionInput,
 } from '@app/features/block-agent/state/code-execution';
 import { isCodeExecution } from '@app/features/block-agent/state/tool-groups';
-import type { AgentActivityRow } from '@macro-inc/lexical-core';
+import type { AgentActivityRow } from '@rox-one/lexical-core';
 import { agentCodeExecutionQueryOptions } from '@queries/agent-session/code-execution';
 import type {
   ActivityRow,

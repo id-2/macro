@@ -5,16 +5,16 @@ import { CellMentionEditor } from '@app/components/cell-text-editor/CellMentionE
 import { useAppSquishHandlers } from '@components/app/useAppSquishHandlers';
 import { registerHotkey, useHotKeyRoot } from '@core/hotkey/hotkeys';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import { createSyncSocket } from '@macro-inc/collaboration/sync-service/socket';
+import { createSyncSocket } from '@rox-one/collaboration/sync-service/socket';
 import {
   mapToSyncStatus,
   SyncServiceSource,
-} from '@macro-inc/collaboration/sync-service/source';
-import { createWebsocketStateSignal } from '@macro-inc/collaboration/websocket/solid/state-signal';
+} from '@rox-one/collaboration/sync-service/source';
+import { createWebsocketStateSignal } from '@rox-one/collaboration/websocket/solid/state-signal';
 import {
   cellPlainText,
   encodeCellMention,
-} from '@macro-inc/spreadsheet/cell-mentions';
+} from '@rox-one/spreadsheet/cell-mentions';
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { render } from 'solid-js/web';
 import type { SpreadsheetDocumentSource } from '../context/spreadsheet-source';

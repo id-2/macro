@@ -4,7 +4,7 @@ import {
   SyncDirection,
   type UpdateMetadata,
 } from '@loro-mirror/core';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import {
   type Container,
   type ContainerID,

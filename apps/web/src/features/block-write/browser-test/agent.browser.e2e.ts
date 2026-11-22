@@ -1,4 +1,4 @@
-import type { DocxAgentRequest } from '@macro-inc/collaboration/docx/agent';
+import type { DocxAgentRequest } from '@rox-one/collaboration/docx/agent';
 import { expect, type Page, test } from '@playwright/test';
 import type { Miniflare } from 'miniflare';
 import { fixtureUrl, startSyncServer } from './sync-server';

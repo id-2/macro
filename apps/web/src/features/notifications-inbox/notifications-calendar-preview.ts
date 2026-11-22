@@ -23,7 +23,7 @@ import {
   isFeatureEnabled,
 } from '@core/constant/featureFlags';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import deepEqual from 'fast-deep-equal';
 import { createSignal } from 'solid-js';
 

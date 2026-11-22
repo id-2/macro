@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type { VolumeLevel } from './volume';
 
 /** Mirrors the server body limit for `/dictation/transcribe`. */

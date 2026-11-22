@@ -48,7 +48,7 @@ vi.mock('@core/constant/featureFlags', () => ({
   isFeatureEnabled: () => mocks.graphqlEnabled,
 }));
 
-vi.mock('@macro-inc/collaboration/websocket', () => ({
+vi.mock('@rox-one/collaboration/websocket', () => ({
   createSocketEffect: vi.fn(
     (
       _ws: unknown,

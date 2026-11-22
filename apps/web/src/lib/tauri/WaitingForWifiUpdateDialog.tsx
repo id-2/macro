@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { makePersistedState } from '@app/lib/persistence';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { invoke } from '@tauri-apps/api/core';
 import { Button, Dialog, Surface } from '@ui';
 import { ResultAsync } from 'neverthrow';

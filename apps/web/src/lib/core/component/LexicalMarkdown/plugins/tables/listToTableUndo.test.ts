@@ -10,19 +10,19 @@ import { SyncDirection } from '@loro-mirror/core';
 import {
   createLoroManager,
   type LoroManager,
-} from '@macro-inc/collaboration/collab/manager';
+} from '@rox-one/collaboration/collab/manager';
 import {
   $updateAllNodeIds,
   ALL_TRANSFORMERS,
   COLLABORATION_TAG,
   type NodeIdMappings,
   nodeIdPlugin,
-} from '@macro-inc/lexical-core';
-import { MARKDOWN_LORO_SCHEMA } from '@macro-inc/lexical-core/markdown-loro-schema';
+} from '@rox-one/lexical-core';
+import { MARKDOWN_LORO_SCHEMA } from '@rox-one/lexical-core/markdown-loro-schema';
 import {
   NodeReplacements,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core/node-list';
+} from '@rox-one/lexical-core/node-list';
 import {
   $getRoot,
   CLEAR_HISTORY_COMMAND,

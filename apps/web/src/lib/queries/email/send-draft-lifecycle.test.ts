@@ -16,7 +16,7 @@ vi.mock('../client', () => ({
 vi.mock('@core/mobile/nativeStagedUpload', () => ({
   getNativeStagedUpload: () => undefined,
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: vi.fn() },
 }));
 

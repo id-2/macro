@@ -84,7 +84,7 @@ always keeps what the agent said.
 ## As OpenTelemetry, through Rox's telemetry framework
 
 muppet has no exporter of its own. `macroTelemetry` (`macro.ts`) records
-wakes through `Telemetry` of `@macro-inc/observability`
+wakes through `Telemetry` of `@rox-one/observability`
 (`packages/observability` in the Rox repository), which the agent sets up
 once at its entrypoint, with `createNodeTracingProvider` from its `./node`
 entry, and hands in. The framework does the encoding, batching and sending
@@ -101,7 +101,7 @@ entry, and hands in. The framework does the encoding, batching and sending
 - Resource: `service.name` is the framework's `serviceName`, which must be
   the system; pass `resourceAttributes: { "service.namespace": "muppet" }`.
   The framework adds `deployment.environment`. The instrumentation scope is
-  the framework's, `@macro-inc/observability`.
+  the framework's, `@rox-one/observability`.
 
 GenAI semantic conventions (open-telemetry/semantic-conventions-genai as of
 2026-11-06, all in Development; this is their "invoke agent internal" span):

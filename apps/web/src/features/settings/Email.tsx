@@ -29,7 +29,7 @@ import { RoxMark } from '@core/component/RoxMark';
 import OutlookIcon from '@icon/outlook-color.svg';
 import ArrowsClockwiseIcon from '@icon/system/regular/arrows-clockwise.svg?component-solid';
 import CalendarSlashIcon from '@icon/system/regular/calendar-slash.svg?component-solid';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   fetchEmailConnectionProviders,
   useOutlookAvailable,

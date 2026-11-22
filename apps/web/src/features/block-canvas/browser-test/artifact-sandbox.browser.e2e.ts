@@ -1,5 +1,5 @@
-import { createScene, translation } from '@macro-inc/graphics';
-import type { ArtifactLibrary } from '@macro-inc/graphics/loro';
+import { createScene, translation } from '@rox-one/graphics';
+import type { ArtifactLibrary } from '@rox-one/graphics/loro';
 import { expect, type Frame, type Page, test } from '@playwright/test';
 
 // A fresh page loads the render bundle unbundled from the dev server.

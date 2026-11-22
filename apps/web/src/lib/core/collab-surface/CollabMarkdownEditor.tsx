@@ -22,7 +22,7 @@ import {
 } from '@core/component/LexicalMarkdown/utils';
 import { fileFolderDrop } from '@core/directive/fileFolderDrop';
 import { onElementConnect } from '@core/util/onElementConnect';
-import { createPeerIdValidator } from '@macro-inc/lexical-core';
+import { createPeerIdValidator } from '@rox-one/lexical-core';
 import type { LexicalEditor } from 'lexical';
 import {
   type Accessor,

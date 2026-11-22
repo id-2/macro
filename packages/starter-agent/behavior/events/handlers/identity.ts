@@ -1,6 +1,6 @@
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import type { Schedules } from '@macro-inc/muppet/utilities/schedules';
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import type { Schedules } from '@rox-one/muppet/utilities/schedules';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import {
   type Needs,
   owner,

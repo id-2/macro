@@ -46,8 +46,8 @@ import {
 } from '@graphql-cache/protocol';
 import { getBrowserTursoCacheRolloutDecision } from '@graphql-cache/rollout';
 import { getOrCreateCacheScope } from '@graphql-cache/scope';
-import { TauriWebSocketWrapper } from '@macro-inc/collaboration/websocket/platform/tauri-websocket';
-import { Telemetry } from '@macro-inc/observability';
+import { TauriWebSocketWrapper } from '@rox-one/collaboration/websocket/platform/tauri-websocket';
+import { Telemetry } from '@rox-one/observability';
 import { notificationStateFromGraphql } from '@notifications/notification-state';
 import { localDraftQueueLifecycle } from '@queries/email/local-drafts';
 import { getMacroApiToken } from '@service-auth/fetch';

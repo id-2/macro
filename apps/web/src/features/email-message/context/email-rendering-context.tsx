@@ -1,8 +1,8 @@
-import type { ImagePolicy } from '@macro-inc/email-renderer';
+import type { ImagePolicy } from '@rox-one/email-renderer';
 import type {
   ResourceLifetime,
   ThemeColorParams,
-} from '@macro-inc/email-renderer/browser';
+} from '@rox-one/email-renderer/browser';
 import { type Accessor, createContext, useContext } from 'solid-js';
 import type { EmailAttachment } from '../core/email-message';
 

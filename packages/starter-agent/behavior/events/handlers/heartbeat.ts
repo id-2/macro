@@ -1,7 +1,7 @@
-import type { EventContext } from '@macro-inc/muppet/core/agent';
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import type { Source } from '@macro-inc/muppet/core/event';
-import type { Fired } from '@macro-inc/muppet/utilities/schedules';
+import type { EventContext } from '@rox-one/muppet/core/agent';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import type { Source } from '@rox-one/muppet/core/event';
+import type { Fired } from '@rox-one/muppet/utilities/schedules';
 import { z } from 'zod';
 import { budgetNotice, budgetRefused } from '../../agent/budget.ts';
 import { commit, wakeMessage } from '../../capabilities/heartbeat/commit.ts';

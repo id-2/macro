@@ -1,6 +1,6 @@
 import { toast } from '@core/component/Toast/Toast';
 import { createMarkdownFile } from '@core/util/create';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { propertyValueToApi } from '@property/api/converters';
 import type { PropertyApiValues } from '@property/types';
 import { refetchSoupEntity } from '@queries/soup/cache';

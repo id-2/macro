@@ -5,12 +5,12 @@
  * Everything here is made once, so the watcher's memory is shared by its
  * source and its handler. Nothing connects, polls or starts until used.
  */
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import { jsonLine } from '../../context/disk.ts';
 import type { Base } from '../../context/index.ts';
 import type { People, Work } from '../../contracts.ts';
-import type { Chat } from '../chat/macro.ts';
+import type { Chat } from '../chat/rox.ts';
 import { readAsks } from './asks.ts';
 import { callsPaths } from './config.ts';
 import { ledgerPorts } from './context/ledgers.ts';
@@ -19,7 +19,7 @@ import { connectRoom, publishScreen } from './context/rooms.ts';
 import { shareContext } from './context/share.ts';
 import { voicePorts } from './context/voice.ts';
 import { idList } from './ledger.ts';
-import { sdkCalls } from './macro.ts';
+import { sdkCalls } from './rox.ts';
 import { askerLine, openingLine, pendingPlaced } from './place.ts';
 import { liveJoins, pollMs, pulse, type Watcher, watchState } from './watch.ts';
 

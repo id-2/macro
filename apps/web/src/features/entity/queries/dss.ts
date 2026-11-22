@@ -1,4 +1,4 @@
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 /** Document-storage mutations used by entity surfaces. */
 
 import { databaseEntityMessage } from '@app/features/database/core/write-failure';

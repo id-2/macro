@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { authServiceClient } from '@service-auth/client';
 import { resetMacroApiToken } from '@service-auth/fetch';
 import type { QueryClient } from '@tanstack/solid-query';

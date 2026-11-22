@@ -3,7 +3,7 @@ import {
   createGraphicsEditor,
   drawableIds,
   pasteCommand,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { expect, it } from 'vitest';
 import { importExcalidraw } from './excalidraw';
 import { richTextPlainText } from './text-codec';

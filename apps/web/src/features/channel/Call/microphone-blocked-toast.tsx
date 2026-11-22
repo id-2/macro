@@ -4,7 +4,7 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { getPlatform } from '@core/util/platform';
 import { catchToResult } from '@core/util/result';
 import MicrophoneSlash from '@icon/system/regular/microphone-slash.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { invoke } from '@tauri-apps/api/core';
 import { match } from 'ts-pattern';
 

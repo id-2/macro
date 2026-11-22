@@ -9,7 +9,7 @@ import {
   isDatabaseQueryChartMode,
   isDatabaseQueryDisplayMode,
   parseDatabaseQueryChart,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import { err, ok, type Result } from 'neverthrow';
 import { match, P } from 'ts-pattern';
 import { formatAnswerNumber } from './answer-format';

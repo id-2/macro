@@ -61,7 +61,7 @@ vi.mock('@service-storage/graphql-soup', () => ({
 vi.mock('@service-storage/graphql-soup-websocket', () => ({
   subscribeToGraphqlNotificationPatches: () => () => {},
 }));
-vi.mock('@macro-inc/collaboration/websocket', () => ({
+vi.mock('@rox-one/collaboration/websocket', () => ({
   createSocketEffect: vi.fn(),
 }));
 

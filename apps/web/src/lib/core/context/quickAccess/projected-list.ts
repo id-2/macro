@@ -8,7 +8,7 @@ import {
   isOwnerEpochLostError,
   isOwnerHandoffBlockedError,
 } from '@graphql-cache/protocol';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   type Accessor,
   createEffect,

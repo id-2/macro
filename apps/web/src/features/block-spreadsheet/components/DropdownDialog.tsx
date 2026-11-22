@@ -4,8 +4,8 @@ import X from '@icon/system/regular/x.svg';
 import {
   DROPDOWN_CHOICE_COLORS,
   type DropdownOptions,
-} from '@macro-inc/spreadsheet/data-validation';
-import type { DropdownColor } from '@macro-inc/spreadsheet/sheet-rules';
+} from '@rox-one/spreadsheet/data-validation';
+import type { DropdownColor } from '@rox-one/spreadsheet/sheet-rules';
 import { Button } from '@ui/components/Button';
 import { Dropdown } from '@ui/components/Dropdown';
 import { createMemo, createSignal, createUniqueId, For, Show } from 'solid-js';

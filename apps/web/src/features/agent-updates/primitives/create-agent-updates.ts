@@ -4,7 +4,7 @@ import { issueSessionAction } from '@app/features/block-agent/queries/issue-sess
 import { AgentSession } from '@core/agent-session/AgentSession';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { answerAgentSessionToolApproval } from '@queries/agent-session/tool-approvals';
 import type {
   FoldedMessage,

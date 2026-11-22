@@ -11,4 +11,4 @@ ignores:
   - '**/*.spec.tsx'
 rule:
   kind: string
-  regex: ^['"](@opentelemetry/[^'"]+|zone\.js[^'"]*|@macro-inc/observability/zone)['"]$
+  regex: ^['"](@opentelemetry/[^'"]+|zone\.js[^'"]*|@rox-one/observability/zone)['"]$

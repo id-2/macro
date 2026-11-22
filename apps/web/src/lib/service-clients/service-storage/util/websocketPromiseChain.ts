@@ -1,6 +1,6 @@
 import { fireAndForget } from '@core/util/fireAndForget';
 import type { ResultError } from '@core/util/result';
-import type { MinimalWebSocket } from '@macro-inc/collaboration/websocket/platform/minimal-websocket';
+import type { MinimalWebSocket } from '@rox-one/collaboration/websocket/platform/minimal-websocket';
 import { err, ok, type Result } from 'neverthrow';
 import { v7 as uuid7 } from 'uuid';
 

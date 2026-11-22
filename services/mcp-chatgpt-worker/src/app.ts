@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   buildTools,
   catalog,
@@ -12,7 +12,7 @@ import {
   runOperation,
   type Tool,
   type ToolGrouping,
-} from '@macro-inc/sdk-mcp';
+} from '@rox-one/sdk-mcp';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import {

@@ -1,4 +1,4 @@
-import type { SpreadsheetResponse } from '@macro-inc/spreadsheet/ai-types';
+import type { SpreadsheetResponse } from '@rox-one/spreadsheet/ai-types';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import type { Component, JSX, ParentProps } from 'solid-js';
 import { Dynamic } from 'solid-js/web';

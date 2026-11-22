@@ -1,4 +1,4 @@
-import type { ChartKind } from '@macro-inc/spreadsheet/sheet-drawings';
+import type { ChartKind } from '@rox-one/spreadsheet/sheet-drawings';
 import type { scaleLinear } from 'd3-scale';
 
 /** Shapes a chart draws, in pixels within its box; the view only paints. */

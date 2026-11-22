@@ -5,16 +5,16 @@ Solid, application, thread, block, query, authentication, or transport dependenc
 
 There are two entry points:
 
-- `@macro-inc/email-renderer`: deterministic HTML/CSS preparation, quote and
+- `@rox-one/email-renderer`: deterministic HTML/CSS preparation, quote and
   signature selection, and serializable output. It runs in Node without DOM APIs.
-- `@macro-inc/email-renderer/browser`: Shadow DOM mounting, computed color
+- `@rox-one/email-renderer/browser`: Shadow DOM mounting, computed color
   adaptation, font normalization, wide-content scrolling, image visibility, and
   cleanup.
   It requires a browser, but no framework.
 
 ```ts
-import { prepareEmailBody } from '@macro-inc/email-renderer';
-import { mountEmailBody } from '@macro-inc/email-renderer/browser';
+import { prepareEmailBody } from '@rox-one/email-renderer';
+import { mountEmailBody } from '@rox-one/email-renderer/browser';
 
 const body = prepareEmailBody(
   { html, replylessHtml, text },

@@ -13,7 +13,7 @@ import {
   roxdStop,
   roxdSupport,
   onRoxdStatus,
-} from '@macro/tauri/roxd';
+} from '@rox-one/tauri/roxd';
 import { useAgentsQuery } from '@queries/agents/agents';
 import type { UnlistenFn } from '@tauri-apps/api/event';
 import { Button } from '@ui';

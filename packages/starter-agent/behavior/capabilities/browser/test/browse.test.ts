@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import type { Tab } from '@macro-inc/muppet/utilities/browser';
+import type { Tab } from '@rox-one/muppet/utilities/browser';
 import type { Trace } from '../../../agent/claude.ts';
 import { hostOf, mostText, type Step, step } from '../browse.ts';
 

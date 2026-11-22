@@ -35,12 +35,12 @@ fails isn't run.
 
 ## Boundaries
 
-- Depends on: `@macro-inc/sdk`, the Claude Agent SDK, TypeScript.
+- Depends on: `@rox-one/sdk`, the Claude Agent SDK, TypeScript.
 - Used by: agents rendered from `../starter-agent` by `crates/agent_git`. In
-  the monorepo it resolves as the workspace package `@macro-inc/muppet`; an
-  agent's image places it at `node_modules/@macro-inc/muppet` (TS source, no
+  the monorepo it resolves as the workspace package `@rox-one/muppet`; an
+  agent's image places it at `node_modules/@rox-one/muppet` (TS source, no
   build).
-- `@macro-inc/sdk` is the in-repo `packages/sdk` (workspace), built to
+- `@rox-one/sdk` is the in-repo `packages/sdk` (workspace), built to
   `dist/` before typechecking (`bun run build` there).
 
 ## Checks

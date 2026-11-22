@@ -14,7 +14,7 @@ lambda used.
 Statuspage webhook ──POST──> /webhook/{WEBHOOK_SECRET}
                                  │ parse + format (incident | component)
                                  ▼
-              @macro-inc/sdk → POST /channels/{CHANNEL_ID}/webhook
+              @rox-one/sdk → POST /channels/{CHANNEL_ID}/webhook
               headers: x-rox-bot-token: BOT_TOKEN, x-rox-bot-scope: user
               body: {"content": "🟡 [Anthropic Status] ..."}
 ```

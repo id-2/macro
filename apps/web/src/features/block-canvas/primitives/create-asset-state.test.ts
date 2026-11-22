@@ -4,7 +4,7 @@ import {
   drawableIds,
   parseFragment,
   pasteCommand,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { createRoot } from 'solid-js';
 import { afterEach, expect, it, vi } from 'vitest';
 import type { CanvasAssetSource, PreparedMedia } from '../core/assets';

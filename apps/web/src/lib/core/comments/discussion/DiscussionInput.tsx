@@ -28,7 +28,7 @@ import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import type { IUser } from '@core/user/types';
 import { fireAndForget } from '@core/util/fireAndForget';
 import PaperclipIcon from '@icon/system/regular/paperclip.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { isIOS } from '@solid-primitives/platform';
 import { CollapsedInput, ComposerSurface } from '@ui';
 import {

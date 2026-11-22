@@ -9,7 +9,7 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { holdAutomaticReload } from '@core/util/reloadForNewerBuild';
 import type { KrispNoiseFilter } from '@livekit/krisp-noise-filter';
 import type { BackgroundProcessorWrapper } from '@livekit/track-processors';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import {
   fetchActiveCall,
   invalidateActiveCallQueries,

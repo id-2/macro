@@ -3,7 +3,7 @@
  * everything that talks can be run against a fake. `sdkChat` is the thin adapter over
  * Rox's SDK.
  */
-import type { Macro } from "@macro-inc/sdk";
+import type { Macro } from "@rox-one/sdk";
 import { pushed } from "../../context/stream.ts";
 import type { Attachment, Incoming } from "./entry.ts";
 import type { Probabilities } from "./listen.ts";

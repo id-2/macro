@@ -18,7 +18,7 @@
  * without it, it exits 78. `run` exits 0 when stopped.
  */
 // Bun before 1.4.2 has no Temporal: drop the polyfill once the repo's Bun has it.
-import { Telemetry } from '@macro-inc/observability/core';
+import { Telemetry } from '@rox-one/observability/core';
 import {
   startTelemetry,
   trace,
@@ -29,9 +29,9 @@ import {
   describe,
   moduleOf,
   summarize,
-} from '@macro-inc/muppet/core/capability';
-import { calling, execute, resultLine } from '@macro-inc/muppet/core/code';
-import { parallel } from '@macro-inc/muppet/runtimes/parallel';
+} from '@rox-one/muppet/core/capability';
+import { calling, execute, resultLine } from '@rox-one/muppet/core/code';
+import { parallel } from '@rox-one/muppet/runtimes/parallel';
 import { z } from 'zod';
 import { refusal } from './behavior/agent/guard.ts';
 import { guards } from './behavior/agent/guards/index.ts';

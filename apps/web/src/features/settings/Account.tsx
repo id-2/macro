@@ -39,7 +39,7 @@ import {
   type BundleUpdateStatus,
   nativeUpdateDescription,
   useTauri,
-} from '@macro/tauri';
+} from '@rox-one/tauri';
 import { useAiBillingSummaryQuery } from '@queries/auth';
 import {
   invalidateOwnUserName,

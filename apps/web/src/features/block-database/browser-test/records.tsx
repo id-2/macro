@@ -1,6 +1,6 @@
 import '@app/index.css';
 import { StaticMarkdownContext } from '@core/component/LexicalMarkdown/component/core/StaticMarkdown';
-import { encodeCellMention } from '@macro-inc/spreadsheet/cell-mentions';
+import { encodeCellMention } from '@rox-one/spreadsheet/cell-mentions';
 import { okAsync, ResultAsync } from 'neverthrow';
 import { createSignal, onMount, Show } from 'solid-js';
 import { Portal, render } from 'solid-js/web';

@@ -1,7 +1,7 @@
 /** Gateway liveness for databases, apart from `./databases` to keep the websocket out of startup. */
 import { useUserId } from '@core/context/user';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createConnectionWebsocketEffect } from '@service-connection/websocket';
 import { storageServiceClient } from '@service-storage/client';
 import type { Awareness } from '@service-storage/generated/schemas/awareness';

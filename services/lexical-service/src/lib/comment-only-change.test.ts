@@ -1,7 +1,7 @@
 import '../polyfills/prism';
 import { describe, expect, it } from 'bun:test';
 import { $wrapSelectionInMarkNode } from '@lexical/mark';
-import { CommentNode } from '@macro-inc/lexical-core';
+import { CommentNode } from '@rox-one/lexical-core';
 import {
   $createRangeSelection,
   $getRoot,

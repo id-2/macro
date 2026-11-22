@@ -22,7 +22,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 vi.mock('@entity', () => ({
   isEmailEntity: (entity: EntityData) => entity.type === 'email',
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     error: vi.fn(),
     span: (_name: string, run: (span: object) => unknown) =>

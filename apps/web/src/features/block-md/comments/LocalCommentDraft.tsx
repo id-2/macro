@@ -7,14 +7,14 @@ import type { LexicalSelectionAwareness } from '@core/component/LexicalMarkdown/
 import { LocationHighlight } from '@core/component/LexicalMarkdown/component/core/Highlights';
 import type { EphemeralLocation } from '@core/component/LexicalMarkdown/plugins/location/locationPlugin';
 import { fireAndForget } from '@core/util/fireAndForget';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
-import type { LiveSyncSource } from '@macro-inc/collaboration/collab/source';
-import { BrowserWALStore } from '@macro-inc/collaboration/collab/wal';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
+import type { LiveSyncSource } from '@rox-one/collaboration/collab/source';
+import { BrowserWALStore } from '@rox-one/collaboration/collab/wal';
 import {
   $getCommentMarkText,
   type NodeIdMappings,
-} from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import {
   $createRangeSelection,
   $isElementNode,

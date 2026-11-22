@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import { type Attributes, Telemetry } from '@macro-inc/observability';
+import { type Attributes, Telemetry } from '@rox-one/observability';
 import { blockingWorkBetween } from './ui-operation';
 
 // This counts live route component owners, including retained hidden panes,

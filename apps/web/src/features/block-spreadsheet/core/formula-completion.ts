@@ -1,5 +1,5 @@
 import type { CompletionContext } from '@ironcalc/wasm';
-import { escapedColumnName } from '@macro-inc/spreadsheet/structured-references';
+import { escapedColumnName } from '@rox-one/spreadsheet/structured-references';
 import catalog from './formula-functions.json';
 
 // Adapted from IronCalc's function catalog at the vendored engine's upstream

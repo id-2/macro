@@ -10,11 +10,11 @@ across scripts and applications; Rox checks permissions on every request.
 
 ## Quick start
 
-Install the SDK with `npm install @macro-inc/sdk`. Create an API key in Macro's
+Install the SDK with `npm install @rox-one/sdk`. Create an API key in Macro's
 **Settings → API Keys**, then set `ROX_API_KEY` in your script's environment.
 
 ```ts
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 
 const macro = new Macro({});
 

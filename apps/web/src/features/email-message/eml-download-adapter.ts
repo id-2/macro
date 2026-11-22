@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { downloadFile } from '@filesystem/download';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { getEmailMessageEml } from '@queries/email/message-source';
 import type { EmailMessage } from './core/email-message';
 

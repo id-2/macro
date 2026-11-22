@@ -4,7 +4,7 @@ import {
   type GraphicsDocument,
   type TextFitRequest,
   type TextFitResult,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { match } from 'ts-pattern';
 import type { CanvasOp, TextFitMode } from './schema';
 

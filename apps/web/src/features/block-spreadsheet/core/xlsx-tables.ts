@@ -1,4 +1,4 @@
-import { cellPlainText } from '@macro-inc/spreadsheet/cell-mentions';
+import { cellPlainText } from '@rox-one/spreadsheet/cell-mentions';
 import {
   excelTotalsFunction,
   MAX_SHEET_TABLES,
@@ -9,11 +9,11 @@ import {
   tableColumnNames,
   totalsFunction,
   validSheetTable,
-} from '@macro-inc/spreadsheet/sheet-tables';
+} from '@rox-one/spreadsheet/sheet-tables';
 import {
   qualifyStructuredReferences,
   type WorkbookTable,
-} from '@macro-inc/spreadsheet/structured-references';
+} from '@rox-one/spreadsheet/structured-references';
 import {
   formatCellAddress,
   SPREADSHEET_MAX_ROWS,

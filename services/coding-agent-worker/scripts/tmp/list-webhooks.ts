@@ -1,4 +1,4 @@
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 import { env } from '../../src/env';
 
 const macro = new Macro({}).requestedAs(env.ROX_USER_ID);

@@ -7,7 +7,7 @@ import {
   LexicalWrapperContext,
 } from '@core/component/LexicalMarkdown/context/LexicalWrapperContext';
 import { channelTheme } from '@core/component/LexicalMarkdown/theme';
-import { buildAgentSessionMentionMarkdown } from '@macro-inc/lexical-core';
+import { buildAgentSessionMentionMarkdown } from '@rox-one/lexical-core';
 import { agentSessionKeys } from '@queries/agent-session/keys';
 import type { FoldedMessage } from '@service-agent-fold/generated/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';

@@ -2,7 +2,7 @@ import {
   ARTIFACT_HTML_MAX_LENGTH,
   type ArtifactContent,
   type ArtifactItem,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { Button, Input } from '@ui';
 import { InspectorField } from './inspector-field';
 import { InspectorSection } from './inspector-section';

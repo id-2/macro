@@ -1,4 +1,4 @@
-import { Macro, gateRequests, observeRequests, sendVerbHeaders } from "@macro-inc/sdk";
+import { Macro, gateRequests, observeRequests, sendVerbHeaders } from "@rox-one/sdk";
 
 // Trusted bootstrap: credentials arrive once on stdin, then user code is imported
 // dynamically so module reads are checked against the scratch-only read grant.

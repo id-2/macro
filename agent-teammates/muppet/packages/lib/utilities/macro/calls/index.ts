@@ -3,7 +3,7 @@
  * a Playwright page (see `utilities/browser`), and frames go to the call
  * through the Rox SDK's `publishScreen`.
  *
- *     const { room } = await connectRoom(call);     // @macro-inc/sdk/calls/node
+ *     const { room } = await connectRoom(call);     // @rox-one/sdk/calls/node
  *     const page = await (await browser.newContext()).newPage();
  *     const started = await shareScreen({ page, url, publish: publishTo(room) });
  *
@@ -24,6 +24,6 @@ export * from "./share.ts";
 export const publishTo =
 	(room: Room): Publish =>
 	async (frames, { fps }) => {
-		const { publishScreen } = await import("@macro-inc/sdk/calls/node");
+		const { publishScreen } = await import("@rox-one/sdk/calls/node");
 		return publishScreen(room, frames, { fps });
 	};

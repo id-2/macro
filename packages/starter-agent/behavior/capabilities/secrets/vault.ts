@@ -5,7 +5,7 @@
  * vault sent: an answer that isn't the expected shape is `unexpected`, not a
  * parse error quoting it.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import type { z } from 'zod';
 import { busy } from './config.ts';
 import {

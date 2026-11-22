@@ -15,7 +15,7 @@ import type { ThreadId } from '@core/comments/commentType';
 import { openLoginModal } from '@core/component/TopBar/LoginButton';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { useCopyLink } from '@core/util/useCopyLink';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { cn } from '@ui';
 import { detect } from 'detect-browser';
 import type { PageViewport } from 'pdfjs-dist';

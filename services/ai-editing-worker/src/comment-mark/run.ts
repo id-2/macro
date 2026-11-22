@@ -1,12 +1,12 @@
-import { LoroManager } from '@macro-inc/collaboration/collab/manager';
-import type { RawUpdate } from '@macro-inc/collaboration/collab/shared';
-import type { LiveSyncSource } from '@macro-inc/collaboration/collab/source';
+import { LoroManager } from '@rox-one/collaboration/collab/manager';
+import type { RawUpdate } from '@rox-one/collaboration/collab/shared';
+import type { LiveSyncSource } from '@rox-one/collaboration/collab/source';
 import {
   InMemoryWALStore,
   WALSyncer,
-} from '@macro-inc/collaboration/collab/wal';
-import type { SyncServiceSource } from '@macro-inc/collaboration/sync-service/source';
-import { MARKDOWN_LORO_SCHEMA } from '@macro-inc/lexical-core/markdown-loro-schema';
+} from '@rox-one/collaboration/collab/wal';
+import type { SyncServiceSource } from '@rox-one/collaboration/sync-service/source';
+import { MARKDOWN_LORO_SCHEMA } from '@rox-one/lexical-core/markdown-loro-schema';
 import { EditingWorkspace } from '../editing-workspace';
 import type { AnchorResult } from './anchor';
 import { $addCommentMark, $removeCommentMark } from './anchor';

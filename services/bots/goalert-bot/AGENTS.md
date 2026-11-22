@@ -28,9 +28,9 @@ Rox Alerts channel posts, one thread per alert, through the Rox SDK.
 
 - GoAlert abandons a webhook after ~3s and never retries: keep a request to one
   KV read, parallel channel calls, and one KV write. Don't add fetches.
-- Import `@macro-inc/observability/worker` only from `src/worker.ts`: it loads
+- Import `@rox-one/observability/worker` only from `src/worker.ts`: it loads
   `cloudflare:workers`, which Bun tests cannot resolve. Spans elsewhere use
-  `Telemetry` from `@macro-inc/observability` (`src/traced.ts`).
+  `Telemetry` from `@rox-one/observability` (`src/traced.ts`).
 - The bot is user-owned and acts as its owner (`ACTING_USER_ID`, a secret, never
   committed). Without `requestedAs` the SDK falls back to the channel webhook,
   which cannot thread, edit or react.

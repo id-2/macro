@@ -11,7 +11,7 @@ import {
   type PeopleReferenceResult,
 } from '@graphql-cache/people/generated';
 import { isStaleHydrationScopeError } from '@graphql-cache/protocol';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { GraphqlContactMatching } from '@service-storage/graphql/generated/graphql';
 import { fetchContactReferencePage } from '@service-storage/graphql-contacts';
 import { CombinedError } from '@urql/core';

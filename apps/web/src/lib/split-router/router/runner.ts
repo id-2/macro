@@ -4,7 +4,7 @@ import {
   createMachine,
   type Machine,
   type MachineScopes,
-} from '@macro-inc/machine';
+} from '@rox-one/machine';
 import { untrack } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { match } from 'ts-pattern';

@@ -1,4 +1,4 @@
-import type { GraphicsDocument } from '@macro-inc/graphics';
+import type { GraphicsDocument } from '@rox-one/graphics';
 
 /** Tracking belongs to the canvas file, not individual copyable shapes. */
 export type CanvasReferenceTracking = {

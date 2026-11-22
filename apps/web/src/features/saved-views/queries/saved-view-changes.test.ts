@@ -15,7 +15,7 @@ vi.mock('@service-connection/websocket', () => ({
     gateway.push = callback;
   },
 }));
-vi.mock('@macro-inc/collaboration/websocket', () => ({
+vi.mock('@rox-one/collaboration/websocket', () => ({
   createReconnectEffect: (_ws: unknown, callback: () => void) => {
     gateway.reconnect = callback;
   },

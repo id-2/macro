@@ -16,7 +16,7 @@ import {
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { Macro } from "@macro-inc/sdk";
+import { Macro } from "@rox-one/sdk";
 import type { Clock } from "@muppet/lib/utilities/time";
 import { type Config, config as makeConfig, settingsFile } from "./config.ts";
 import type { Credentials } from "./credentials.ts";

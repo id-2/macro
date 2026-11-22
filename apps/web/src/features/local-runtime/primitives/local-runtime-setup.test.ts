@@ -1,4 +1,4 @@
-import type { RoxdStatus } from '@macro/tauri/roxd';
+import type { RoxdStatus } from '@rox-one/tauri/roxd';
 import { createRoot } from 'solid-js';
 import { describe, expect, it, vi } from 'vitest';
 import type { NewLocalAgent, SetupCapabilities } from '../core/setup';

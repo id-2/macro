@@ -3,7 +3,7 @@ import {
   deleteCellEdits,
   insertCheckboxEdits,
   toggleCheckboxEdits,
-} from '@macro-inc/spreadsheet/checkboxes';
+} from '@rox-one/spreadsheet/checkboxes';
 import {
   type Accessor,
   batch,

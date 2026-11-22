@@ -3,7 +3,7 @@ import type {
   GraphicsDocument,
   GraphicsEditor,
   TextMeasurer,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { batch, createSignal, onCleanup } from 'solid-js';
 
 export type InspectorNumberScrub = {

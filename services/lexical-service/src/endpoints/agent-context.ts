@@ -2,7 +2,7 @@ import {
   composeAgentContextPrompt,
   legacyConversationFieldsIn,
   type TriggerContext,
-} from '@macro-inc/lexical-core/utils/agent-context';
+} from '@rox-one/lexical-core/utils/agent-context';
 import { OpenAPIRoute } from 'chanfana';
 import type { Context } from 'hono';
 import { z } from 'zod';

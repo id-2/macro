@@ -1,6 +1,6 @@
 import { deepEqual } from '@core/util/compareUtils';
-import { prepareEmailBody } from '@macro-inc/email-renderer';
-import { mountEmailBody } from '@macro-inc/email-renderer/browser';
+import { prepareEmailBody } from '@rox-one/email-renderer';
+import { mountEmailBody } from '@rox-one/email-renderer/browser';
 import {
   type Accessor,
   createEffect,

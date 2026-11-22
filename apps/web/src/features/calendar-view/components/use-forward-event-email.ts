@@ -8,7 +8,7 @@ import {
 } from '@app/features/calendar/utils/event-forward-summary';
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import { toast } from '@core/component/Toast/Toast';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { fetchCalendarEventIcs } from '@queries/calendar/ics';
 import { focusNewComposerTo } from './focus-new-composer';
 

@@ -21,7 +21,7 @@ export default defineConfig({
   plugins: [mdAsText()],
   resolve: {
     alias: {
-      '@macro-inc/lexical-core': repoPath('../../packages/lexical-core'),
+      '@rox-one/lexical-core': repoPath('../../packages/lexical-core'),
     },
   },
 });

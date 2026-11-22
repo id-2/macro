@@ -11,9 +11,9 @@ import {
   setPresentationOrderCommand,
   setShapeLabelCommand,
   setTextCommand,
-} from '@macro-inc/graphics';
-import type { ArtifactLibraryEdit } from '@macro-inc/graphics/loro';
-import { plainRichText } from '@macro-inc/lexical-core/canvas-text';
+} from '@rox-one/graphics';
+import type { ArtifactLibraryEdit } from '@rox-one/graphics/loro';
+import { plainRichText } from '@rox-one/lexical-core/canvas-text';
 import { match } from 'ts-pattern';
 import { insertCanvasUserMention } from './mentions';
 import type { CanvasOp } from './schema';

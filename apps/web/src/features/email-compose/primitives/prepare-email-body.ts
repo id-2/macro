@@ -15,15 +15,15 @@ import { formatEmailDate } from '@core/util/date';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $createQuoteNode, $isQuoteNode } from '@lexical/rich-text';
 import { $dfsIterator } from '@lexical/utils';
-import { type ImagePolicy, sanitizeEmailHtml } from '@macro-inc/email-renderer';
-import type { DocumentMentionInfo } from '@macro-inc/lexical-core';
+import { type ImagePolicy, sanitizeEmailHtml } from '@rox-one/email-renderer';
+import type { DocumentMentionInfo } from '@rox-one/lexical-core';
 import {
   $createClassedBlockNode,
   $createDocumentMentionNode,
   $createHtmlRenderNode,
   $isClassedBlockNode,
   type ClassedBlockNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $addUpdateTag,
   $createLineBreakNode,

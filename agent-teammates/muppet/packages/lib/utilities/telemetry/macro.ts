@@ -1,14 +1,14 @@
 /**
  * Wake telemetry through Rox's own telemetry framework,
- * `@macro-inc/observability` (`packages/observability` in the Macro
+ * `@rox-one/observability` (`packages/observability` in the Macro
  * repository): a wake is one of its spans, and each record one of its logs,
  * so muppet has no exporter, batching or OpenTelemetry dependency of its own.
  *
  * The framework is one object for the whole process, so the agent sets it up
  * at its entrypoint and hands it in:
  *
- *     import { Telemetry } from "@macro-inc/observability";
- *     import { createNodeTracingProvider } from "@macro-inc/observability/node";
+ *     import { Telemetry } from "@rox-one/observability";
+ *     import { createNodeTracingProvider } from "@rox-one/observability/node";
  *
  *     const config = {
  *       serviceName: "pr-factory",                       // the system
@@ -66,7 +66,7 @@ const logged = (record: WakeRecord): Attributes =>
 export const macroTelemetry = ({
 	telemetry,
 }: {
-	/** `Telemetry` from `@macro-inc/observability`, already initialised. */
+	/** `Telemetry` from `@rox-one/observability`, already initialised. */
 	readonly telemetry: RoxTelemetry;
 }): {
 	readonly spans: Spans;

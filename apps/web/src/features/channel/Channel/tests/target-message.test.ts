@@ -1,4 +1,4 @@
-import { simulate, step } from '@macro-inc/machine';
+import { simulate, step } from '@rox-one/machine';
 import { describe, expect, it } from 'vitest';
 import {
   activeTargetMessageId,

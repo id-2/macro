@@ -3,7 +3,7 @@ import {
   createMachine,
   type MachineDef,
   type Transition,
-} from '@macro-inc/machine';
+} from '@rox-one/machine';
 import { match } from 'ts-pattern';
 
 export type MessageTarget = { threadId: string; messageId: string };

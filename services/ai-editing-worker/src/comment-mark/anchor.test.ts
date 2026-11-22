@@ -4,8 +4,8 @@ import {
   $getCommentMarkText,
   $isCommentNode,
   type CommentNode,
-} from '@macro-inc/lexical-core';
-import { INTERNAL_TRANSFORMERS } from '@macro-inc/lexical-core/transformers';
+} from '@rox-one/lexical-core';
+import { INTERNAL_TRANSFORMERS } from '@rox-one/lexical-core/transformers';
 import { $getRoot } from 'lexical';
 import { describe, expect, it } from 'vitest';
 import { edit, read, setup } from '../ai-editing/ai-toolkit/_test-helpers';

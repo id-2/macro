@@ -1,4 +1,4 @@
-import type { MagicChipData } from '@macro-inc/lexical-core';
+import type { MagicChipData } from '@rox-one/lexical-core';
 import { cleanup, render } from '@solidjs/testing-library';
 import { afterEach, expect, it, vi } from 'vitest';
 import {

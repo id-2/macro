@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { initSync } from '@ironcalc/wasm';
-import { createInitializedSpreadsheetCalculator } from '@macro-inc/spreadsheet/calculation';
-import { sheetPivotLayouts } from '@macro-inc/spreadsheet/pivot-layout';
+import { createInitializedSpreadsheetCalculator } from '@rox-one/spreadsheet/calculation';
+import { sheetPivotLayouts } from '@rox-one/spreadsheet/pivot-layout';
 import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { SpreadsheetCalculator } from './calculation';

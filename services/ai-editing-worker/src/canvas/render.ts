@@ -5,9 +5,9 @@ import {
   type TextFitRequest,
   type TextFitResult,
   worldBounds,
-} from '@macro-inc/graphics';
-import type { ArtifactLibrary } from '@macro-inc/graphics/loro';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/graphics';
+import type { ArtifactLibrary } from '@rox-one/graphics/loro';
+import { Telemetry } from '@rox-one/observability';
 import PQueue from 'p-queue';
 import { z } from 'zod';
 import { withRenderPage } from './browser';

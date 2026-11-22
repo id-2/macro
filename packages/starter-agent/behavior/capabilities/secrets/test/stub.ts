@@ -21,8 +21,8 @@
  * the same two. Notes and custom fields are never selectable, and a patch
  * keeps them as they were.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import { totp } from '../../tools/totp.ts';
 import { attributionProblem, wakeInstant } from '../attribution.ts';

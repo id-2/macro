@@ -1,8 +1,8 @@
 import {
   cellDateMention,
   encodeCellMention,
-} from '@macro-inc/spreadsheet/cell-mentions';
-import { numericLiteral } from '@macro-inc/spreadsheet/number-display';
+} from '@rox-one/spreadsheet/cell-mentions';
+import { numericLiteral } from '@rox-one/spreadsheet/number-display';
 
 const DAY_MILLISECONDS = 86_400_000;
 /** Excel's serial day 0. Serials after 60 skip its fictitious 29 February 1900. */

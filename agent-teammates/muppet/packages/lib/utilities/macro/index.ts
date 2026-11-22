@@ -8,7 +8,7 @@
  *     const online = stayOnline({ apiKey });
  *     behavior().use(chat({ macro }))
  */
-import { Macro } from "@macro-inc/sdk";
+import { Macro } from "@rox-one/sdk";
 
 /** Rox's connection gateway, which presence is a socket to. */
 export const gateway = "wss://gateway.rox.one/connection-gateway/";

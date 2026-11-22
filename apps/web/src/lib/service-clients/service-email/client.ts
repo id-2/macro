@@ -5,7 +5,7 @@ import {
 } from '@core/util/fetchWithToken';
 import type { ObjectLike, ResultError } from '@core/util/result';
 import type { SafeFetchInit } from '@core/util/safeFetch';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type {
   CalendarEvent,
   CalendarEventProviderUrl,

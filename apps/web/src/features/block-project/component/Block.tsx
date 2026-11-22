@@ -27,7 +27,7 @@ import {
   type UploadInput,
   uploadFiles,
 } from '@core/util/upload';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { refetchSoupEntity } from '@queries/soup/cache';
 import type { SoupApiItem } from '@service-storage/generated/schemas';
 import { refetchResources } from '@service-storage/util/refetchResources';

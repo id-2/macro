@@ -1,4 +1,4 @@
-import type { PasteNodeDecoratorProps } from '@macro-inc/lexical-core';
+import type { PasteNodeDecoratorProps } from '@rox-one/lexical-core';
 import { cn, Layer } from '@ui';
 import { createSignal, Show } from 'solid-js';
 import { PasteActionsMenu } from './paste/PasteActionsMenu';

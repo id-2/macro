@@ -1,5 +1,5 @@
 import { throwOnErr } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useQuery } from '@tanstack/solid-query';
 import type { StageRequirement } from '../core/stage-requirements';
 import type { CrmRecordDependencies } from './dependencies';

@@ -1,7 +1,7 @@
 import { DEV_MODE_ENV } from '@core/constant/featureFlags';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
 
-import { $getNodeById, type NodeIdMappings } from '@macro-inc/lexical-core';
+import { $getNodeById, type NodeIdMappings } from '@rox-one/lexical-core';
 import {
   $createPoint,
   $createRangeSelection,

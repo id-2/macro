@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { invoke } from '@tauri-apps/api/core';
 
 const EXPORT_CHUNK_BYTES = 256 * 1024;

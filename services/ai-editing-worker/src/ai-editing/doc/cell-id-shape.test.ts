@@ -1,4 +1,4 @@
-import { $getId } from '@macro-inc/lexical-core/plugins/nodeIdPlugin';
+import { $getId } from '@rox-one/lexical-core/plugins/nodeIdPlugin';
 import { $getRoot, $isElementNode } from 'lexical';
 import { describe, expect, it, vi } from 'vitest';
 import { read, setup } from '../ai-toolkit/_test-helpers';

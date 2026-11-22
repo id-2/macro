@@ -1,5 +1,5 @@
 import { $isListItemNode, type ListItemNode } from '@lexical/list';
-import { $isImageNode, type ImageNode } from '@macro-inc/lexical-core';
+import { $isImageNode, type ImageNode } from '@rox-one/lexical-core';
 import {
   $findMatchingParent,
   $getSelection,

@@ -13,7 +13,7 @@
  * - The share stops if its tab doesn't draw a frame in time, if a check
  *   can't run, or if the call's track ends.
  */
-import type { ScreenFrame, ScreenShare } from "@macro-inc/sdk/calls/node";
+import type { ScreenFrame, ScreenShare } from "@rox-one/sdk/calls/node";
 import type { Page } from "playwright-core";
 import { frameFeed, type Settings, settings as defaults } from "./frames.ts";
 import { blankPage, safeUrl, urlRule } from "./policy.ts";

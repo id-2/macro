@@ -9,7 +9,7 @@ import {
   safeFetch,
   statusError,
 } from '@core/util/safeFetch';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 
 import { makePersisted } from '@solid-primitives/storage';
 import { ok } from 'neverthrow';

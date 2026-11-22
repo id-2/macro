@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import { createSignal, onCleanup } from 'solid-js';
 import type {
   CreateRecorder,

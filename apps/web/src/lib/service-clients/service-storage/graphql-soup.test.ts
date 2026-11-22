@@ -474,7 +474,7 @@ vi.mock('@graphql-cache/scope', () => ({
 vi.mock('@graphql-cache/exchange/normalized-cache-exchange', () => ({
   normalizedCacheExchange: mocks.normalizedCacheExchange,
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     error: mocks.telemetryError,
     warn: mocks.telemetryWarn,

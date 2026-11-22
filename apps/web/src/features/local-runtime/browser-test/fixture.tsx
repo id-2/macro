@@ -1,6 +1,6 @@
 import '@fontsource-variable/inter';
 import '../../../index.css';
-import type { RoxdStatus } from '@macro/tauri/roxd';
+import type { RoxdStatus } from '@rox-one/tauri/roxd';
 import { Button } from '@ui';
 import { createSignal, Show } from 'solid-js';
 import { render } from 'solid-js/web';

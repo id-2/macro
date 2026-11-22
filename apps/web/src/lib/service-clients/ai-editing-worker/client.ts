@@ -1,6 +1,6 @@
 import type { DocumentOp } from '@ai-ops/editor';
 import { ROX_AGENT_NAME } from '@core/constant/roxAgent';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { getDocumentPermissionToken } from '@service-storage/client';
 import { createSignal } from 'solid-js';
 import { developmentProxyUrl } from '../../core/constant/developmentProxy';

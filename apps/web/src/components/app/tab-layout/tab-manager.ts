@@ -16,7 +16,7 @@ import type {
   SplitManager,
 } from '@components/app/split-layout/layoutManager';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   batch,
   createEffect,

@@ -1,6 +1,6 @@
 ---
 name: macro
-description: Read and change the team's Macro workspace (documents, channels, email, tasks, calendar, databases) from this computer through the Macro MCP server or the @macro-inc/sdk TypeScript SDK.
+description: Read and change the team's Macro workspace (documents, channels, email, tasks, calendar, databases) from this computer through the Macro MCP server or the @rox-one/sdk TypeScript SDK.
 ---
 
 # Rox MCP and SDK
@@ -10,7 +10,7 @@ description: Read and change the team's Macro workspace (documents, channels, em
   with the task, read the symbols with `ReadCodeDocs`, then do the whole job in
   one `ExecuteCode` program.
 - For scripts and apps on this machine, use the SDK:
-  `npm install @macro-inc/sdk`. Read its README before guessing methods;
+  `npm install @rox-one/sdk`. Read its README before guessing methods;
   methods take entity handles, not raw id strings.
 - Link Rox items as `https://rox.one/app/<type>/<id>` (`md`, `channel`,
   `chat`, `project`, `task`, `email`, `database`).

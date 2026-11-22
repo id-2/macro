@@ -5,7 +5,7 @@ import {
   roxdStart,
   roxdStatus,
   onRoxdStatus,
-} from '@macro/tauri/roxd';
+} from '@rox-one/tauri/roxd';
 import {
   fetchAgentsList,
   useCreateAgentMutation,

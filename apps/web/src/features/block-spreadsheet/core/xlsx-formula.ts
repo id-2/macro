@@ -4,7 +4,7 @@ import {
   type FormulaPiece,
   formulaPieces,
   quotedSheet,
-} from '@macro-inc/spreadsheet/formula-pieces';
+} from '@rox-one/spreadsheet/formula-pieces';
 import { parseColumnName } from './spreadsheet-document';
 
 const MAX_ROW = 1_048_576;

@@ -3,7 +3,7 @@ import { useReferralCode } from '@core/context/user';
 import { getWebOrigin } from '@core/util/webOrigin';
 import ClipboardIcon from '@icon/system/regular/clipboard.svg';
 import CloseIcon from '@icon/system/regular/x.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useSendReferralInvitesMutation } from '@queries/team/referrals';
 import { Button, Dialog, Input, Panel } from '@ui';
 import { createSignal, Show } from 'solid-js';

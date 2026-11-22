@@ -4,7 +4,7 @@
  * launcher) restarts it on the marker or the exit, and rolls the repository
  * back to the last good HEAD when boots keep failing.
  */
-import { type Clock, isoText } from '@macro-inc/muppet/utilities/time';
+import { type Clock, isoText } from '@rox-one/muppet/utilities/time';
 import type { Disk } from '../../context/disk.ts';
 import type { Git } from './repository.ts';
 

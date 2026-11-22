@@ -7,7 +7,7 @@ import {
   isChartLiteral,
   parseChartReference,
   type SheetChart,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import { formatCellAddress } from './spreadsheet-document';
 
 /**

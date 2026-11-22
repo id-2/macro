@@ -2,8 +2,8 @@ import {
   createGraphicsEditorFromBackend,
   createScene,
   translation,
-} from '@macro-inc/graphics';
-import { createLoroGraphicsBackendFromDoc } from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics';
+import { createLoroGraphicsBackendFromDoc } from '@rox-one/graphics/loro';
 import { LoroDoc } from 'loro-crdt';
 import { createRoot } from 'solid-js';
 import { afterEach, expect, it, vi } from 'vitest';

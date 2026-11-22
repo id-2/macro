@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { frontendInstanceId } from './frontend-instance';
 
 /**
@@ -8,7 +8,7 @@ import { frontendInstanceId } from './frontend-instance';
  */
 export type SamplingClass = 'always' | 'perf';
 
-declare module '@macro-inc/observability' {
+declare module '@rox-one/observability' {
   interface TelemetryRegister {
     samplingClass: SamplingClass;
   }

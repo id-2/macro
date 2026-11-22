@@ -1,6 +1,6 @@
 import type { IUser } from '@core/user/types';
 import { MAX_PEOPLE_BATCH } from '@graphql-cache/people/generated';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   assertQueryAccount,
   type QueryAccount,

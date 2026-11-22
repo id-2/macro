@@ -10,7 +10,7 @@ import {
   parseChartLiteral,
   type SheetChart,
   type SheetDrawing,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import { match } from 'ts-pattern';
 import {
   finishColor,

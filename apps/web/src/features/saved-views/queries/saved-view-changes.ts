@@ -1,6 +1,6 @@
 import { parseMessageData } from '@app/lib/queries/storage/databases-sync';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { createReconnectEffect } from '@macro-inc/collaboration/websocket';
+import { createReconnectEffect } from '@rox-one/collaboration/websocket';
 import {
   createConnectionWebsocketEffect,
   ws,

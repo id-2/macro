@@ -8,8 +8,8 @@ import {
   type ShapeKind,
   selectedShapeIds,
   type TextMeasurer,
-} from '@macro-inc/graphics';
-import { createGraphicsProjection } from '@macro-inc/graphics/solid';
+} from '@rox-one/graphics';
+import { createGraphicsProjection } from '@rox-one/graphics/solid';
 import { parsePickerColor } from '@ui/utils/color';
 import { createMemo, createSignal } from 'solid-js';
 import { initialAppearance } from '../core/defaults';

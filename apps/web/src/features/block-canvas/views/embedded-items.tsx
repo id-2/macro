@@ -1,7 +1,7 @@
 import { DocumentPreviewContent } from '@core/component/DocumentPreview';
 import { DocumentPreviewSkeleton } from '@core/component/DocumentPreviewSkeleton';
 import { fileTypeToBlockName } from '@core/constant/allBlocks';
-import type { ShapeViewProps } from '@macro-inc/graphics/solid';
+import type { ShapeViewProps } from '@rox-one/graphics/solid';
 import { Card } from '@ui';
 import { type Component, ErrorBoundary, Show, Suspense } from 'solid-js';
 import { Dynamic } from 'solid-js/web';

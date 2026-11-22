@@ -2,10 +2,10 @@
  * Talking in Rox: the capabilities the agent uses to post, reply, react
  * and read conversations, as its own account.
  */
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { module } from '@macro-inc/muppet/core/capability';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { module } from '@rox-one/muppet/core/capability';
 import type { ChatContext } from './context.ts';
-import type { Line, Posted } from './macro.ts';
+import type { Line, Posted } from './rox.ts';
 
 /**
  * The message to send, trimmed. A flag where a message should be is a

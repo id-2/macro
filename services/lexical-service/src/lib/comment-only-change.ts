@@ -1,7 +1,7 @@
 import { isDeepStrictEqual } from 'node:util';
 import { $unwrapMarkNode } from '@lexical/mark';
 import { $dfsIterator } from '@lexical/utils';
-import { $isCommentNode } from '@macro-inc/lexical-core';
+import { $isCommentNode } from '@rox-one/lexical-core';
 import {
   $getRoot,
   $isTextNode,

@@ -1,5 +1,5 @@
 {
-  "name": "@macro-inc/sdk",
+  "name": "@rox-one/sdk",
   "version": "0.5.0",
   "repository": {
     "type": "git",
@@ -8,14 +8,14 @@
   },
   "type": "module",
   "description": "Libary for interacting with rox.one",
-  "main": "./dist/src/macro.js",
-  "module": "./dist/src/macro.js",
+  "main": "./dist/src/rox.js",
+  "module": "./dist/src/rox.js",
   "types": "./dist/src/macro.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/src/macro.d.ts",
-      "import": "./dist/src/macro.js"
+      "import": "./dist/src/rox.js"
     },
     "./generated/*": {
       "types": "./dist/generated/*/index.d.ts",

@@ -16,7 +16,7 @@ import {
 } from '@core/constant/featureFlags';
 import { fireAndForget } from '@core/util/fireAndForget';
 import AgentIcon from '@icon/system/regular/sparkle.svg';
-import { buildMentionMarkdownString } from '@macro-inc/lexical-core/utils/mentions';
+import { buildMentionMarkdownString } from '@rox-one/lexical-core/utils/mentions';
 import type { ChannelType } from '@service-cognition/generated/schemas/channelType';
 import type { ButtonSize } from '@ui';
 import { createSignal } from 'solid-js';

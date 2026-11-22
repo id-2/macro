@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type { Result } from 'neverthrow';
 import type { ShareEvent, ShareMention } from '../core/delivery-plan';
 import type {

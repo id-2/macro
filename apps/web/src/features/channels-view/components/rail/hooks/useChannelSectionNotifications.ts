@@ -3,7 +3,7 @@ import { useGlobalNotificationSource } from '@components/app/GlobalAppState';
 import { toast } from '@core/component/Toast/Toast';
 import { useUserId } from '@core/context/user';
 import { notificationIsRead } from '@entity/utils/notification';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { ensureNotificationSourceLoaded } from '@notifications/notification-helpers';
 import { openSnoozeNotifications } from '@notifications/SnoozeNotificationsDialog';
 import { useBulkNotificationPreferencesMutation } from '@queries/notification/unsubscribes';

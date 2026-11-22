@@ -18,7 +18,7 @@ import type { AgentSessionHandle } from './create-agent-session';
 
 const readiness = vi.hoisted(() => ({ painted: vi.fn(), cancelled: vi.fn() }));
 vi.mock('@app/observability/ui-operation', async (importOriginal) => {
-  const { NOOP_SPAN } = await import('@macro-inc/observability');
+  const { NOOP_SPAN } = await import('@rox-one/observability');
   return {
     ...(await importOriginal<
       typeof import('@app/observability/ui-operation')

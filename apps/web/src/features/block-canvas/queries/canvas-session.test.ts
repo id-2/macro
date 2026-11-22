@@ -1,17 +1,17 @@
-import { noopChatter } from '@macro-inc/collaboration/collab/chatter';
-import type { SnapshotStore } from '@macro-inc/collaboration/collab/snapshot-store';
+import { noopChatter } from '@rox-one/collaboration/collab/chatter';
+import type { SnapshotStore } from '@rox-one/collaboration/collab/snapshot-store';
 import {
   createNoopLiveSyncSource,
   type SyncSourceEvent,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
-import { InMemoryWALStore } from '@macro-inc/collaboration/collab/wal';
+} from '@rox-one/collaboration/collab/source';
+import { InMemoryWALStore } from '@rox-one/collaboration/collab/wal';
 import {
   createGraphicsEditorFromBackend,
   translation,
   worldMatrix,
-} from '@macro-inc/graphics';
-import { createLoroGraphicsBackendFromDoc } from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics';
+import { createLoroGraphicsBackendFromDoc } from '@rox-one/graphics/loro';
 import { LoroDoc } from 'loro-crdt';
 import { errAsync, okAsync } from 'neverthrow';
 import { createEffect, createRoot, createSignal, on } from 'solid-js';

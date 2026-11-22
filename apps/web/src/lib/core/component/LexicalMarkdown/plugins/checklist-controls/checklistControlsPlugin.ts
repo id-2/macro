@@ -16,7 +16,7 @@ import {
   TASK_LIST_BAR_CLASS,
   TaskListNode,
   type TaskListViewSettings,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { $getNodeByKey, type LexicalEditor, type NodeKey } from 'lexical';
 import { type Accessor, createSignal } from 'solid-js';
 import { createStore, reconcile, type Store } from 'solid-js/store';

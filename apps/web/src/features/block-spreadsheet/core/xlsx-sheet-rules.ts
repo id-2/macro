@@ -1,4 +1,4 @@
-import { literalListItems } from '@macro-inc/spreadsheet/data-validation';
+import { literalListItems } from '@rox-one/spreadsheet/data-validation';
 import {
   CONDITIONAL_FORMAT_TYPES,
   type ComparisonOperator,
@@ -8,7 +8,7 @@ import {
   type DataValidation,
   MAX_SHEET_RULES,
   TIME_PERIODS,
-} from '@macro-inc/spreadsheet/sheet-rules';
+} from '@rox-one/spreadsheet/sheet-rules';
 import {
   formatCellAddress,
   parseCellAddress,

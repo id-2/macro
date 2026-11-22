@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 
 /**
  * Starts `work` without waiting for it, reporting a rejection to Telemetry

@@ -1,5 +1,5 @@
-import { createScene, fitTextLayout } from '@macro-inc/graphics';
-import { createLoroGraphicsBackendFromDoc } from '@macro-inc/graphics/loro';
+import { createScene, fitTextLayout } from '@rox-one/graphics';
+import { createLoroGraphicsBackendFromDoc } from '@rox-one/graphics/loro';
 import { okAsync } from 'neverthrow';
 import { describe, expect, it } from 'vitest';
 import { prepareCanvasEdit } from './operations';

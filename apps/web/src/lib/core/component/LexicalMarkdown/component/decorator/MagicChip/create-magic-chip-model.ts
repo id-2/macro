@@ -20,7 +20,7 @@ import {
   MAGIC_CHIP_STATUSES,
   type MagicChipData,
   type MagicChipStatus,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { useAgentSessionQuery } from '@queries/agent-session/session';
 import { queryReadyGate } from '@queries/gate';
 import type {

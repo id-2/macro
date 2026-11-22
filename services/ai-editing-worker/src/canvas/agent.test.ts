@@ -1,4 +1,4 @@
-import { readLoroGraphicsDocument } from '@macro-inc/graphics/loro';
+import { readLoroGraphicsDocument } from '@rox-one/graphics/loro';
 import { MockLanguageModelV3 } from 'ai/test';
 import { describe, expect, it, vi } from 'vitest';
 import { canvasRevision } from './revision';

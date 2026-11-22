@@ -8,7 +8,7 @@ import {
   $insertGeneratedNodes,
 } from '@lexical/clipboard';
 import { $dfs } from '@lexical/utils';
-import { $isImageNode } from '@macro-inc/lexical-core';
+import { $isImageNode } from '@rox-one/lexical-core';
 import {
   $createNodeSelection,
   $getRoot,

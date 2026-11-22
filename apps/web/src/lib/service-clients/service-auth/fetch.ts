@@ -8,7 +8,7 @@ import {
   safeFetch,
   type TextResponse,
 } from '@core/util/safeFetch';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { err, ok, type Result } from 'neverthrow';
 import { authServiceClient, getExpiresAt } from './client';
 

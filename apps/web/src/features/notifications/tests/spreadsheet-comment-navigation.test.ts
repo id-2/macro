@@ -83,9 +83,9 @@ const traces = vi.hoisted(() => {
   const spans: RecordedSpan[] = [];
   return spans;
 });
-vi.mock('@macro-inc/observability', async (importOriginal) => {
+vi.mock('@rox-one/observability', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@macro-inc/observability')>();
+    await importOriginal<typeof import('@rox-one/observability')>();
   async function runSpan<T>(
     name: string,
     parent: string | undefined,

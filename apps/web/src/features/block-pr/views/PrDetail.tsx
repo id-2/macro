@@ -19,7 +19,7 @@ import { PrAgentSessionsChip } from '@entity/views/PrAgentSessionsChip';
 import IconShared from '@icon/share.svg';
 import ArrowSquareOut from '@icon/system/regular/arrow-square-out.svg';
 import IconLink from '@icon/system/regular/link.svg';
-import { normalizeGithubMarkdown } from '@macro-inc/lexical-core';
+import { normalizeGithubMarkdown } from '@rox-one/lexical-core';
 import { NotificationReadMarker } from '@notifications';
 import {
   type GithubPullRequestWithDetails,

@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { registerHotkey, useHotkeyDOMScope } from '@core/hotkey/hotkeys';
 import { TOKENS } from '@core/hotkey/tokens';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { MessageListItem } from '@service-storage/messages';
 import type { Accessor } from 'solid-js';
 import type { MessageActions, MessageData } from '../Message';

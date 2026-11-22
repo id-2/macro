@@ -1,5 +1,5 @@
 /**
- * The part of `@macro-inc/observability` that wake telemetry uses, as types
+ * The part of `@rox-one/observability` that wake telemetry uses, as types
  * of muppet's own: the library sits outside Rox's workspace and can't
  * import that package, so the agent passes its `Telemetry` in.
  *
@@ -11,7 +11,7 @@
 export type Attribute = string | number | boolean | string[];
 export type Attributes = Readonly<Record<string, Attribute | undefined>>;
 
-/** The part of a span of `@macro-inc/observability` this uses. */
+/** The part of a span of `@rox-one/observability` this uses. */
 export type RoxSpan = {
 	readonly run: <T>(operation: () => T) => T;
 	readonly setAttr: (name: string, value: Attribute) => void;
@@ -21,7 +21,7 @@ export type RoxSpan = {
 	readonly end: (timestamp?: number) => void;
 };
 
-/** The part of `Telemetry` from `@macro-inc/observability` this uses. The class itself fits. */
+/** The part of `Telemetry` from `@rox-one/observability` this uses. The class itself fits. */
 export type RoxTelemetry = {
 	/** `startTime` is Unix time in milliseconds. */
 	readonly span: (

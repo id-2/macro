@@ -1,7 +1,7 @@
 import { useOptionalGlobalNotificationSource } from '@components/app/GlobalAppState';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { catchToResult } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useNotificationsForEntity } from '@notifications/notification-helpers';
 import type { UnifiedNotification } from '@notifications/types';
 import type { MessageParent } from '@service-storage/messages';

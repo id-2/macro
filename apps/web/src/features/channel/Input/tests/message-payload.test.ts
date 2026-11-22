@@ -1,6 +1,6 @@
 import type { ItemMention } from '@core/component/LexicalMarkdown/plugins';
 import { verifyBlockName } from '@core/constant/allBlocks';
-import { extractChannelMentionsFromMarkdown } from '@macro-inc/lexical-core/utils/markdown-mentions';
+import { extractChannelMentionsFromMarkdown } from '@rox-one/lexical-core/utils/markdown-mentions';
 import { blockNameToItemType } from '@service-storage/client';
 import { describe, expect, it, vi } from 'vitest';
 import { buildPostMessageRequest } from '../message-payload';

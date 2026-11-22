@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { memoryStore, scheduler } from '@macro-inc/muppet/utilities/schedules';
+import { memoryStore, scheduler } from '@rox-one/muppet/utilities/schedules';
 import { invoke } from '../../../../test/invoke.ts';
 import { later, laterModule, prefix, request } from '../index.ts';
 

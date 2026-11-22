@@ -10,7 +10,7 @@ out keystroke by keystroke.
 ## Shared-code boundary
 
 The worker and web app share the Loro collaboration engine, sync-service wire
-transport, and WebSocket runtime through `@macro-inc/collaboration`. Browser
+transport, and WebSocket runtime through `@rox-one/collaboration`. Browser
 authentication and sync HTTP policy stay in `apps/web`; the package accepts an
 environment-specific URL resolver instead. The worker is part of the root Bun
 workspace, so the collaboration and Lexical packages resolve one dependency
@@ -280,7 +280,7 @@ required for local testing. Model image telemetry records only counts and hashes
 ## Forms
 
 `POST /forms` accepts a base64 Loro snapshot and a validated target layout, and
-returns a binary incremental update. It uses `@macro-inc/collaboration/forms/layout`,
+returns a binary incremental update. It uses `@rox-one/collaboration/forms/layout`,
 the same codec as the browser builder. This endpoint is a bounded, stateless
 transform: it cannot load or save entities and does not launch another model.
 

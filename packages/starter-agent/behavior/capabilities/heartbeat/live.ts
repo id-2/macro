@@ -3,14 +3,14 @@
  * the agent, and the pieces a tick is made of. Everything here is thin; what
  * it feeds is decided in the files it imports.
  */
-import type { Woke } from '@macro-inc/muppet/core/agent';
-import type { Schedules } from '@macro-inc/muppet/utilities/schedules';
+import type { Woke } from '@rox-one/muppet/core/agent';
+import type { Schedules } from '@rox-one/muppet/utilities/schedules';
 import { z } from 'zod';
 import { readJson, writeJson } from '../../context/disk.ts';
 import { githubToken } from '../../context/identity.ts';
 import { output } from '../../context/shell.ts';
 import type { People } from '../../contracts.ts';
-import type { Chat } from '../chat/macro.ts';
+import type { Chat } from '../chat/rox.ts';
 import { type RepositoryState, type Sources, snapshot } from './collect.ts';
 import { commit } from './commit.ts';
 import { limits, logs, settings } from './config.ts';

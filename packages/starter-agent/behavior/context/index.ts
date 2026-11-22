@@ -21,9 +21,9 @@ import {
   envFileCredentials,
   parseEnvFile,
   withheldCredentials,
-} from '@macro-inc/muppet/utilities/credentials';
-import type { Clock } from '@macro-inc/muppet/utilities/time';
-import { Macro } from '@macro-inc/sdk';
+} from '@rox-one/muppet/utilities/credentials';
+import type { Clock } from '@rox-one/muppet/utilities/time';
+import { Macro } from '@rox-one/sdk';
 import {
   type Authority,
   authority,

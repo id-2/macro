@@ -7,11 +7,11 @@
 import type {
 	connectRoom as ConnectRoom,
 	publishScreen as PublishScreen,
-} from "@macro-inc/sdk/calls/node";
+} from "@rox-one/sdk/calls/node";
 
 const rooms = () => {
 	process.env.NODE_ENV ??= "production";
-	return import("@macro-inc/sdk/calls/node");
+	return import("@rox-one/sdk/calls/node");
 };
 
 export const connectRoom: typeof ConnectRoom = async (target, options) =>

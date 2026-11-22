@@ -25,16 +25,16 @@ import {
   CodeNode,
 } from '@lexical/code';
 import { mergeRegister } from '@lexical/utils';
-import { createAwareness } from '@macro-inc/collaboration/collab/awareness';
-import { createSyncEngine } from '@macro-inc/collaboration/collab/engine';
-import { logSyncService } from '@macro-inc/collaboration/collab/logger';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import { createAwareness } from '@rox-one/collaboration/collab/awareness';
+import { createSyncEngine } from '@rox-one/collaboration/collab/engine';
+import { logSyncService } from '@rox-one/collaboration/collab/logger';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
 import {
   IDBSnapshotStore,
   LORO_SNAPSHOT_DB_NAME,
-} from '@macro-inc/collaboration/collab/snapshot-store';
-import type { LiveSyncSource } from '@macro-inc/collaboration/collab/source';
-import { createWALSyncSource } from '@macro-inc/collaboration/collab/wal';
+} from '@rox-one/collaboration/collab/snapshot-store';
+import type { LiveSyncSource } from '@rox-one/collaboration/collab/source';
+import { createWALSyncSource } from '@rox-one/collaboration/collab/wal';
 import {
   $isCustomCodeNode,
   $updateAllNodeIds,
@@ -46,8 +46,8 @@ import {
   SKIP_DOM_SELECTION_TAG,
   SKIP_SCROLL_INTO_VIEW_TAG,
   stripDraftCommentMarks,
-} from '@macro-inc/lexical-core';
-import { type Span, Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { type Span, Telemetry } from '@rox-one/observability';
 import type { NodeKey, UpdateListenerPayload } from 'lexical';
 import {
   $addUpdateTag,

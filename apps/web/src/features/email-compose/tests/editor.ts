@@ -1,4 +1,4 @@
-import { SupportedNodeTypes } from '@macro-inc/lexical-core';
+import { SupportedNodeTypes } from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $createTextNode,

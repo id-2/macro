@@ -1,7 +1,7 @@
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { fetchWithToken } from '@core/util/fetchWithToken';
 import { statusError } from '@core/util/safeFetch';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type {
   ReviewDecision_Deserialize,
   ReviewRecord_Serialize,

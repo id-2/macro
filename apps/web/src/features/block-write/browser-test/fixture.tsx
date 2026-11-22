@@ -2,21 +2,21 @@ import { Dropdown } from '@ui/components/Dropdown';
 import '@fontsource-variable/inter';
 import '../../../index.css';
 import { ThrownResultError } from '@core/util/result';
-import { noopChatter } from '@macro-inc/collaboration/collab/chatter';
-import type { SnapshotStore } from '@macro-inc/collaboration/collab/snapshot-store';
-import { InMemoryWALStore } from '@macro-inc/collaboration/collab/wal';
+import { noopChatter } from '@rox-one/collaboration/collab/chatter';
+import type { SnapshotStore } from '@rox-one/collaboration/collab/snapshot-store';
+import { InMemoryWALStore } from '@rox-one/collaboration/collab/wal';
 import {
   type DocxAgentRequest,
   type DocxAgentResult,
   runDocxAgentRequest,
-} from '@macro-inc/collaboration/docx/agent';
-import { InitializeFromSnapshotRequest } from '@macro-inc/collaboration/sync-service/generated/schema';
-import { createSyncSocket } from '@macro-inc/collaboration/sync-service/socket';
+} from '@rox-one/collaboration/docx/agent';
+import { InitializeFromSnapshotRequest } from '@rox-one/collaboration/sync-service/generated/schema';
+import { createSyncSocket } from '@rox-one/collaboration/sync-service/socket';
 import {
   mapToSyncStatus,
   SyncServiceSource,
-} from '@macro-inc/collaboration/sync-service/source';
-import { createWebsocketStateSignal } from '@macro-inc/collaboration/websocket/solid/state-signal';
+} from '@rox-one/collaboration/sync-service/source';
+import { createWebsocketStateSignal } from '@rox-one/collaboration/websocket/solid/state-signal';
 import type { MessageListItem } from '@service-storage/messages';
 import { QueryClient } from '@tanstack/solid-query';
 import type { LoroDoc } from 'loro-crdt';

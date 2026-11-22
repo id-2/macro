@@ -4,7 +4,7 @@
  * of ids. Every reader parses with the row's schema, so a line that doesn't
  * fit is dropped, never trusted.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import {
   type Disk,

@@ -2,7 +2,7 @@ import { $isLinkNode, LinkNode } from '@lexical/link';
 import {
   $isPullRequestMentionNode,
   PullRequestMentionNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   fetchPullRequestByGithubKey,
   getCachedPullRequestByGithubKey,

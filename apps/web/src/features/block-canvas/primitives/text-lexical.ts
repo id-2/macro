@@ -2,7 +2,7 @@ import { buildConfig } from '@core/component/LexicalMarkdown/builder/MarkdownCon
 import { createLexicalWrapper } from '@core/component/LexicalMarkdown/context/LexicalWrapperContext';
 import { setEditorStateFromMarkdown } from '@core/component/LexicalMarkdown/utils';
 import { $generateNodesFromDOM } from '@lexical/html';
-import type { RichText } from '@macro-inc/graphics';
+import type { RichText } from '@rox-one/graphics';
 import {
   $createParagraphNode,
   $getRoot,

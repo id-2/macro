@@ -19,8 +19,8 @@ import type {
 import { UserContextProvider } from '@core/context/user';
 import { useHotKeyRoot } from '@core/hotkey/hotkeys';
 import { EntityProvider } from '@entity';
-import { DocumentMentionNode } from '@macro-inc/lexical-core';
-import { setDecorator } from '@macro-inc/lexical-core/decoratorRegistry';
+import { DocumentMentionNode } from '@rox-one/lexical-core';
+import { setDecorator } from '@rox-one/lexical-core/decoratorRegistry';
 import { createContactDirectoryWindow } from '@queries/contacts/directory-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 import { createSignal, onCleanup } from 'solid-js';

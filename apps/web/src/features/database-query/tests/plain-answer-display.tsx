@@ -1,4 +1,4 @@
-import { markdownToPlainText } from '@macro-inc/lexical-core/utils/parsers';
+import { markdownToPlainText } from '@rox-one/lexical-core/utils/parsers';
 import type { JSX } from 'solid-js';
 import { DatabaseMentionPlaceholder } from '../../database/components/database-mention-label';
 import {

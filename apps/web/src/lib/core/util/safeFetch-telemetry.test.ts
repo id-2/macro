@@ -16,7 +16,7 @@ vi.mock('@core/constant/servers', async (importOriginal) => ({
   SERVER_HOSTS: { calls: 'https://gateway.example' },
   SYNC_SERVICE_HOSTS: { worker: 'https://sync.example' },
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: mocks.startSpan,
     captureContext: () => ({ run: <T>(work: () => T) => work() }),

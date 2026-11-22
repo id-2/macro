@@ -2,7 +2,7 @@ import type { CacheHost } from '@graphql-cache/host/types';
 import { captureContactWriteScope } from '@graphql-cache/people/sync';
 import { CONTACT_SYNC_UNSUPPORTED } from '@graphql-cache/people/sync-protocol';
 import type { HydrationScope } from '@graphql-cache/protocol';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { print } from 'graphql';
 import {
   ContactDirectoryBackfillDocument,

@@ -2,7 +2,7 @@ import {
   applyLayout,
   type CollaborativeLayout,
   readLayout,
-} from '@macro-inc/collaboration/forms/layout';
+} from '@rox-one/collaboration/forms/layout';
 import { LoroDoc } from 'loro-crdt';
 
 export const MAX_FORM_DOCUMENT_BYTES = 4 * 1024 * 1024;

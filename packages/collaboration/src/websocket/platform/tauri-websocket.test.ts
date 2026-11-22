@@ -24,7 +24,7 @@ const telemetry = vi.hoisted(() => ({
   error: vi.fn(),
   end: vi.fn(),
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: (name: string) => {
       telemetry.start(name);

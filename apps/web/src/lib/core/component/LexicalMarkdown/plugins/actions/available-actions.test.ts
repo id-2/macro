@@ -1,5 +1,5 @@
-import { DatabaseQueryNode } from '@macro-inc/lexical-core/nodes/DatabaseQueryNode';
-import { DocumentCardNode } from '@macro-inc/lexical-core/nodes/DocumentCardNode';
+import { DatabaseQueryNode } from '@rox-one/lexical-core/nodes/DatabaseQueryNode';
+import { DocumentCardNode } from '@rox-one/lexical-core/nodes/DocumentCardNode';
 import { describe, expect, it } from 'vitest';
 import { availableActions } from './available-actions';
 import type { Action } from './types';

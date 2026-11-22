@@ -30,7 +30,7 @@ import { toast } from '@core/component/Toast/Toast';
 import { registerHotkey, useHotkeyDOMScope } from '@core/hotkey/hotkeys';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { SYSTEM_PROPERTY_IDS } from '@property/constants';
 import type { PropertyApiValues } from '@property/types';
 import { queryReadyGate } from '@queries/gate';

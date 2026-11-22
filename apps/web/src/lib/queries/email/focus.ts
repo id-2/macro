@@ -1,8 +1,8 @@
 import { TRACE_PARENT_CONTEXT_KEY } from '@app/lib/urql-solid/trace-parent-exchange';
 import { type EmailEntity, isEmailEntity } from '@entity';
 import { createLiveQuery } from '@graphql-cache/solid/create-live-query';
-import { WebsocketEvent } from '@macro-inc/collaboration/websocket';
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { WebsocketEvent } from '@rox-one/collaboration/websocket';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 import {
   createConnectionWebsocketEffect,
   parseWebsocketPayload,

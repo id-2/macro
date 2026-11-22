@@ -2,7 +2,7 @@ import { createHotkeyGroup, registerHotkey } from '@core/hotkey/hotkeys';
 import { TOKENS } from '@core/hotkey/tokens';
 import type { HotkeyRegistrationOptions } from '@core/hotkey/types';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { nudgeCommand, selectAllCommand } from '@macro-inc/graphics';
+import { nudgeCommand, selectAllCommand } from '@rox-one/graphics';
 import { onCleanup } from 'solid-js';
 import type { CanvasClipboard } from './clipboard';
 import type { CanvasState } from './primitives/create-canvas-state';

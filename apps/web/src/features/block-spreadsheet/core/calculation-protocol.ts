@@ -2,14 +2,14 @@ import type { CompletionContext } from '@ironcalc/wasm';
 import type {
   GoalSeekRequest,
   GoalSeekResult,
-} from '@macro-inc/spreadsheet/goal-seek';
-import type { SheetPivotLayout } from '@macro-inc/spreadsheet/pivot-layout';
-import type { WorkbookTable } from '@macro-inc/spreadsheet/structured-references';
-import type { WorkbookSheetMetadata } from '@macro-inc/spreadsheet/workbook-metadata';
+} from '@rox-one/spreadsheet/goal-seek';
+import type { SheetPivotLayout } from '@rox-one/spreadsheet/pivot-layout';
+import type { WorkbookTable } from '@rox-one/spreadsheet/structured-references';
+import type { WorkbookSheetMetadata } from '@rox-one/spreadsheet/workbook-metadata';
 import type {
   AxisChange,
   RangeMove,
-} from '@macro-inc/spreadsheet/workbook-structure';
+} from '@rox-one/spreadsheet/workbook-structure';
 import type {
   CalculatedCell,
   CalculationContext,

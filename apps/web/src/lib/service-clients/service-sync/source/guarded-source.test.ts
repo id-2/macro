@@ -2,7 +2,7 @@ import {
   type InitialSync,
   type LiveSyncSource,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
+} from '@rox-one/collaboration/collab/source';
 import { okAsync, ResultAsync } from 'neverthrow';
 import { describe, expect, it, vi } from 'vitest';
 import { guardDocumentSyncSource } from './guarded-source';

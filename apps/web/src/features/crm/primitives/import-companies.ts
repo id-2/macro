@@ -1,5 +1,5 @@
 import { parseCsv } from '@core/util/csv';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { createSignal, onCleanup } from 'solid-js';
 import type { DatabaseCsv } from '../../database/core/csv';
 import type { CompanyImporter } from '../context/crm-sources';

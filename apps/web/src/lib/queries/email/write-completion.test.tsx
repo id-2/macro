@@ -45,7 +45,7 @@ vi.mock('@app/lib/analytics/analytics-context', () => ({
   useAnalytics: () => ({ track: mocks.track }),
 }));
 vi.mock('@app/lib/analytics/posthog', () => ({ useFeatureFlag: vi.fn() }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: mocks.report },
 }));
 vi.mock('@core/component/Toast/Toast', () => ({

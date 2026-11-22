@@ -10,7 +10,7 @@ name: Release SDK
     - '.github/workflows/release-sdk.yml'
 jobs:
   release:
-    name: Release @macro-inc/sdk
+    name: Release @rox-one/sdk
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -58,7 +58,7 @@ jobs:
       run: |
         case "${{ steps.resolve.outputs.release }}" in
           true)
-            echo "Published @macro-inc/sdk@${{ steps.resolve.outputs.version }} (${{ steps.resolve.outputs.tag }})" >> "$GITHUB_STEP_SUMMARY"
+            echo "Published @rox-one/sdk@${{ steps.resolve.outputs.version }} (${{ steps.resolve.outputs.tag }})" >> "$GITHUB_STEP_SUMMARY"
             ;;
           false)
             echo "No SDK release: packages/sdk version ${{ steps.resolve.outputs.version }} is already published." >> "$GITHUB_STEP_SUMMARY"

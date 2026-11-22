@@ -1,6 +1,6 @@
 import { makePersistedState } from '@app/lib/persistence';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { ResultAsync } from 'neverthrow';
 import { createSignal, untrack } from 'solid-js';
 import { z } from 'zod';

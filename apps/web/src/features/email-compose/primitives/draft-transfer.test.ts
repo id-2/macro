@@ -1,5 +1,5 @@
-import { Telemetry } from '@macro-inc/observability';
-import { StackContextManager } from '@macro-inc/observability/web';
+import { Telemetry } from '@rox-one/observability';
+import { StackContextManager } from '@rox-one/observability/web';
 import { context, propagation, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import {

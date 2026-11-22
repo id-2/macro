@@ -2,7 +2,7 @@ import {
   createStaticUploadFile,
   createUploadFile,
 } from '@core/util/uploadFile';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { ResultAsync } from 'neverthrow';
 import type { Gif } from './klipy';
 

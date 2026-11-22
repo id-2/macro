@@ -1,7 +1,7 @@
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { fetchWithToken } from '@core/util/fetchWithToken';
 import { statusError } from '@core/util/safeFetch';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import { z } from 'zod';
 import type { ClassifyInputRequest } from './generated/schemas/classifyInputRequest';
 import type { ExtractInputRequest } from './generated/schemas/extractInputRequest';

@@ -3,13 +3,13 @@ import { registerList } from '@lexical/list';
 import { CODE } from '@lexical/markdown';
 import { registerPlainText } from '@lexical/plain-text';
 import { registerRichText } from '@lexical/rich-text';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
 import {
   ALL_TRANSFORMERS,
   type EditorType,
   ORDERED_LIST_ENTER,
-} from '@macro-inc/lexical-core';
-import { HR } from '@macro-inc/lexical-core/transformers/transformers';
+} from '@rox-one/lexical-core';
+import { HR } from '@rox-one/lexical-core/transformers/transformers';
 import type { EditorState, LexicalEditor, UpdateListener } from 'lexical';
 import {
   type Accessor,

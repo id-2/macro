@@ -18,7 +18,7 @@ included static docs Worker.
 To get started, make a Rox client
 
 ```ts
-import { Rox } from '@macro-inc/sdk';
+import { Rox } from '@rox-one/sdk';
 
 const macro = new Rox({ }); // uses ROX_API_KEY env var
 ```
@@ -38,7 +38,7 @@ Every request the SDK sends carries exactly one Rox credential. There are three 
 The default for scripts and integrations. Put the key in `ROX_API_KEY` and construct with no options.
 
 ```ts
-import { Rox } from '@macro-inc/sdk';
+import { Rox } from '@rox-one/sdk';
 
 const macro = new Rox({});
 const me = await macro.users.me();
@@ -394,7 +394,7 @@ names something, that id as `taken` (`{ kind: 'table' | 'column' | 'option' |
 'view', id }`). A retried batch whose first attempt committed refuses this way.
 
 ```ts
-import { RoxOpRefusedError } from '@macro-inc/sdk';
+import { RoxOpRefusedError } from '@rox-one/sdk';
 
 try {
   await database.createTable({ name: 'Guests' });
@@ -418,7 +418,7 @@ Use the `msg` tagged template to build rich message bodies for channel messages
 or documents.
 
 ```ts
-import { msg, here } from '@macro-inc/sdk';
+import { msg, here } from '@rox-one/sdk';
 
 const channel = macro.channels.byId('chan_1');
 const user = macro.users.byId('user_1');
@@ -1171,7 +1171,7 @@ messages, mentions, mutations, and delivery references must belong to the same c
 
 ## Live call media
 
-Use `@macro-inc/sdk/calls/node` or `@macro-inc/sdk/calls/browser` for room
+Use `@rox-one/sdk/calls/node` or `@rox-one/sdk/calls/browser` for room
 connections and screen sharing. Install the optional LiveKit runtime only when
 using those helpers. The core import does not load or bundle call media code.
 See [Call rooms](CALLS.md) for installation and examples.

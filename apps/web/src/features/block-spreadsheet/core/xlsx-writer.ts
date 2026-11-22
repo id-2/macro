@@ -1,14 +1,14 @@
 import {
   cellDateMention,
   cellPlainText,
-} from '@macro-inc/spreadsheet/cell-mentions';
+} from '@rox-one/spreadsheet/cell-mentions';
 import {
   parseChartReference,
   type SheetDrawing,
-} from '@macro-inc/spreadsheet/sheet-drawings';
-import { sheetTableLayouts } from '@macro-inc/spreadsheet/sheet-tables';
-import { qualifyStructuredReferences } from '@macro-inc/spreadsheet/structured-references';
-import { parseWorkbookMetadata } from '@macro-inc/spreadsheet/workbook-metadata';
+} from '@rox-one/spreadsheet/sheet-drawings';
+import { sheetTableLayouts } from '@rox-one/spreadsheet/sheet-tables';
+import { qualifyStructuredReferences } from '@rox-one/spreadsheet/structured-references';
+import { parseWorkbookMetadata } from '@rox-one/spreadsheet/workbook-metadata';
 import { strToU8, zipSync } from 'fflate';
 import type { CalculatedCell } from './calculation';
 import {

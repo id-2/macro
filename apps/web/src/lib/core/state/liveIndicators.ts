@@ -1,5 +1,5 @@
 import { ENABLE_LIVE_INDICATORS } from '@core/constant/featureFlags';
-import { createWebsocketEventEffect } from '@macro-inc/collaboration/websocket';
+import { createWebsocketEventEffect } from '@rox-one/collaboration/websocket';
 import {
   reportInvalidTrackingChange,
   reportTrackingChange,

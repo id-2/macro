@@ -1,6 +1,6 @@
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { enableCanvasArtifacts } from '@core/constant/featureFlags';
-import type { ShapeViewProps } from '@macro-inc/graphics/solid';
+import type { ShapeViewProps } from '@rox-one/graphics/solid';
 import { Show } from 'solid-js';
 import { ArtifactFrame } from './artifact-frame';
 

@@ -2,7 +2,7 @@ import { subscribeNativeNetworkStatus } from '@core/mobile/native-network-status
 import { fireAndForget } from '@core/util/fireAndForget';
 import { normalizedCacheResultMetadata } from '@graphql-cache/exchange/normalized-cache-exchange';
 import type { CacheHost } from '@graphql-cache/host/types';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import type { Client, OperationResult } from '@urql/core';
 import type { Result } from 'neverthrow';
 import {

@@ -82,7 +82,7 @@ import {
   type WithNotification,
   type WithSearch,
 } from '@entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   compositeEntity,
   documentCommentLocation,

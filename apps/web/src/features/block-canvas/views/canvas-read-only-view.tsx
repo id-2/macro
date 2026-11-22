@@ -2,19 +2,19 @@ import { useFeatureFlag } from '@app/lib/analytics/posthog';
 import { DocumentPreviewContent } from '@core/component/DocumentPreview';
 import { fileTypeToBlockName } from '@core/constant/allBlocks';
 import { enableCanvasArtifacts } from '@core/constant/featureFlags';
-import type { GraphicsEditor } from '@macro-inc/graphics';
-import type { GraphicsPresence } from '@macro-inc/graphics/loro';
+import type { GraphicsEditor } from '@rox-one/graphics';
+import type { GraphicsPresence } from '@rox-one/graphics/loro';
 import {
   attachPresencePointer,
   GraphicsPresenceOverlay,
-} from '@macro-inc/graphics/loro/solid';
+} from '@rox-one/graphics/loro/solid';
 import {
   ConnectorView,
   EllipseView,
   GraphicsSurface,
   RectangleView,
   TextView,
-} from '@macro-inc/graphics/solid';
+} from '@rox-one/graphics/solid';
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { ArtifactPresentation } from './artifact-presentation';
 import { CanvasArtifactView } from './artifact-view';

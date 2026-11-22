@@ -1,6 +1,6 @@
 import { ThrownResultError } from '@core/util/result';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { AnyVariables } from '@urql/core';
 import type { GraphQLError } from 'graphql';
 import {

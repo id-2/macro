@@ -1,4 +1,4 @@
-import type { GraphicsEditor } from '@macro-inc/graphics';
+import type { GraphicsEditor } from '@rox-one/graphics';
 import { batch, createSignal, onCleanup } from 'solid-js';
 import { type CanvasSnapMode, canvasSnapUnit } from '../core/snapping';
 

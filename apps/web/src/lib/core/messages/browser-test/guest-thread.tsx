@@ -8,7 +8,7 @@ import { QuickAccessProvider } from '@core/context/quickAccess/QuickAccessProvid
 import { UserContextProvider } from '@core/context/user';
 import { useHotKeyRoot } from '@core/hotkey/hotkeys';
 import { EntityProvider } from '@entity';
-import { MaybeTauriProvider } from '@macro/tauri';
+import { MaybeTauriProvider } from '@rox-one/tauri';
 import { authKeys, type UserInfoData } from '@queries/auth/user-info';
 import { queryClient } from '@queries/client';
 import { getThreadRepliesQueryKey } from '@queries/messages/thread-replies';

@@ -1,4 +1,4 @@
-import { type Camera, type Point, worldToScreen } from '@macro-inc/graphics';
+import { type Camera, type Point, worldToScreen } from '@rox-one/graphics';
 import { For } from 'solid-js';
 import type { LocalMediaPreview } from '../core/assets';
 import { CanvasMediaContent } from './media-content';

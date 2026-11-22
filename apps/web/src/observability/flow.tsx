@@ -2,7 +2,7 @@ import {
   NOOP_SPAN,
   type Span,
   type TraceContext,
-} from '@macro-inc/observability';
+} from '@rox-one/observability';
 import {
   type Accessor,
   createContext,

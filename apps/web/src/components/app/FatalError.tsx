@@ -1,6 +1,6 @@
 import ResetIcon from '@icon/system/regular/arrow-clockwise.svg';
 import HomeIcon from '@icon/system/regular/house.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { Button, Dialog, Surface } from '@ui';
 import { Show } from 'solid-js';
 

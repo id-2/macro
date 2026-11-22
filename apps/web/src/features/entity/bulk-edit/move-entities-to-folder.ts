@@ -1,5 +1,5 @@
 import { analytics } from '@app/lib/analytics';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createBulkMoveToProjectDssEntityMutation } from '../queries/dss';
 import type { EntityData } from '../types/entity';
 

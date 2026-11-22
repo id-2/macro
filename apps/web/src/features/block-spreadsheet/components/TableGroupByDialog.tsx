@@ -1,14 +1,14 @@
 import CaretDown from '@icon/system/regular/caret-down.svg';
 import Check from '@icon/system/regular/check.svg';
 import type { CollectionNode } from '@kobalte/core';
-import type { TableCellText } from '@macro-inc/spreadsheet/table-filters';
+import type { TableCellText } from '@rox-one/spreadsheet/table-filters';
 import {
   GROUP_SUMMARIES,
   GROUP_SUMMARY_LABELS,
   type GroupSummary,
   percentSummary,
   summarize,
-} from '@macro-inc/spreadsheet/table-groups';
+} from '@rox-one/spreadsheet/table-groups';
 import { Button } from '@ui/components/Button';
 import { Select } from '@ui/components/Select';
 import { For, Show } from 'solid-js';

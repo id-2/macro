@@ -1,7 +1,7 @@
 import '../../../index.css';
 import { AnalyticsContextProvider } from '@app/lib/analytics/analytics-context';
 import { PosthogProvider } from '@app/lib/analytics/posthog';
-import { createScene, type ShapeItem, translation } from '@macro-inc/graphics';
+import { createScene, type ShapeItem, translation } from '@rox-one/graphics';
 import { queryClient } from '@queries/client';
 import { QueryClientProvider } from '@tanstack/solid-query';
 import { DragDropProvider } from '@thisbeyond/solid-dnd';

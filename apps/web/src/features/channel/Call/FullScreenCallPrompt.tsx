@@ -5,7 +5,7 @@ import { useTutorialCompleted } from '@core/context/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isPlatform } from '@core/util/platform';
 import { catchToResult } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useNotificationSettings } from '@notifications/notification-settings';
 import PhoneIncoming from '@phosphor/phone-incoming.svg';
 import { useIsAuthenticated } from '@queries/auth';

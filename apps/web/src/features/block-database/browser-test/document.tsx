@@ -30,7 +30,7 @@ import {
   DocumentCardNode,
   DocumentMentionNode,
   setDecorator,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { authKeys } from '@queries/auth/keys';
 import { queryClient } from '@queries/client';
 import { databasesKeys } from '@queries/storage/keys';

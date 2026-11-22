@@ -21,7 +21,7 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { chatRuleset, uploadFile } from '@core/util/upload';
 import CheckIcon from '@icon/system/regular/check.svg?component-solid';
 import PaperPlaneTilt from '@icon/system/regular/paper-plane-tilt.svg';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { useCombinedRecipientSource } from '@queries/contacts/recipient-source';
 import {
   blockNameToItemType,

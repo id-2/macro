@@ -3,21 +3,21 @@
 
 import '../src/globals';
 import type { InferType } from '@loro-mirror/core';
-import { SyncEngine } from '@macro-inc/collaboration/collab/engine';
-import { LoroManager } from '@macro-inc/collaboration/collab/manager';
-import type { RawUpdate } from '@macro-inc/collaboration/collab/shared';
+import { SyncEngine } from '@rox-one/collaboration/collab/engine';
+import { LoroManager } from '@rox-one/collaboration/collab/manager';
+import type { RawUpdate } from '@rox-one/collaboration/collab/shared';
 import {
   InMemoryWALStore,
   WALSyncer,
-} from '@macro-inc/collaboration/collab/wal';
+} from '@rox-one/collaboration/collab/wal';
 import {
   MARKDOWN_LORO_SCHEMA,
   type MarkdownLoroSchemaType,
-} from '@macro-inc/lexical-core/markdown-loro-schema';
+} from '@rox-one/lexical-core/markdown-loro-schema';
 import {
   $getId,
   $updateAllNodeIds,
-} from '@macro-inc/lexical-core/plugins/nodeIdPlugin';
+} from '@rox-one/lexical-core/plugins/nodeIdPlugin';
 import type { SerializedEditorState } from 'lexical';
 import { $getRoot } from 'lexical';
 import yargs from 'yargs';

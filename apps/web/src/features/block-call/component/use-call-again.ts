@@ -4,7 +4,7 @@ import { getMeetingPath } from '@channel/Call/call-link';
 import { joinChannelCall } from '@channel/Call/join-channel-call';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useCallLinkQuery } from '@queries/call/meetings';
 import { useNavigate } from '@solidjs/router';
 import type { Accessor } from 'solid-js';

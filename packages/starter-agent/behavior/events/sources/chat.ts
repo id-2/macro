@@ -1,5 +1,5 @@
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { source } from '@macro-inc/muppet/core/event';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { source } from '@rox-one/muppet/core/event';
 import type { ChatContext } from '../../capabilities/chat/context.ts';
 import type { Conversation } from '../../capabilities/chat/entry.ts';
 

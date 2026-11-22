@@ -76,7 +76,7 @@ vi.mock('@core/hotkey/hotkeys', () => ({}));
 vi.mock('@core/hotkey/state', () => ({ pressedKeys: () => new Set() }));
 vi.mock('@core/mobile/isMobile', () => ({ isMobile: () => false }));
 vi.mock('@core/util/create', () => ({}));
-vi.mock('@macro-inc/lexical-core/markdown-golden', () => ({}));
+vi.mock('@rox-one/lexical-core/markdown-golden', () => ({}));
 vi.mock('@ui', () => ({}));
 vi.mock('@ui/components/Hotkey', () => ({}));
 vi.mock('./mobile/MobileCreateSheet', () => ({}));

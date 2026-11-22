@@ -1,7 +1,7 @@
 import { isTauri } from '@core/util/platform';
 import { platformFetch } from '@core/util/platformFetch';
 import type { ResultError } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { differenceInSeconds, isValid, parseISO } from 'date-fns';
 import { err, ok, type Result } from 'neverthrow';
 

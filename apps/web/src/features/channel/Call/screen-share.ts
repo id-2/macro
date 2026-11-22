@@ -1,5 +1,5 @@
 import { t } from '@app/lib/i18n';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type { Room, ScreenShareCaptureOptions } from 'livekit-client';
 import { callMediaErrorType } from './call-media-telemetry';
 import {

@@ -3,7 +3,7 @@ import { handlePipedreamCallback } from '@core/pipedream/connect-callback';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { getNativeMobilePlatform } from '@core/util/platform';
 import { setPostLoginRedirect } from '@core/util/postLoginRedirect';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { triggerNotificationNavigation } from '@notifications/notification-navigation-intent';
 import { useNavigate } from '@solidjs/router';
 import { invoke } from '@tauri-apps/api/core';

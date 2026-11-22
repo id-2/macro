@@ -13,8 +13,8 @@
  * worse than no telemetry.
  */
 
-import type { Span } from '@macro-inc/observability';
-import { Telemetry } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { CacheMiss } from '@queries/agent-session/log';
 import type { FoldedMessage } from '@service-agent-fold/generated/types';
 import {

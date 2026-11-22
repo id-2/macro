@@ -5,7 +5,7 @@
  * decides what any of it is worth, so no text in a message can aim at anyone
  * or set a value.
  */
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import {
   type ActName,

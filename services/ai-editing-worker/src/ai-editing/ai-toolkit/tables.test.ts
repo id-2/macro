@@ -1,5 +1,5 @@
 import { $isTableNode, type TableNode } from '@lexical/table';
-import { $getId } from '@macro-inc/lexical-core/plugins/nodeIdPlugin';
+import { $getId } from '@rox-one/lexical-core/plugins/nodeIdPlugin';
 import {
   $createTextNode,
   $getRoot,

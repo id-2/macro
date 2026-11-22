@@ -1,6 +1,6 @@
 import { modelLabel } from '@core/component/AI/constant/model-label';
-import type { MagicChipStatus } from '@macro-inc/lexical-core';
-import { markdownToPlainText } from '@macro-inc/lexical-core/utils/parsers';
+import type { MagicChipStatus } from '@rox-one/lexical-core';
+import { markdownToPlainText } from '@rox-one/lexical-core/utils/parsers';
 import type {
   FoldedMessage,
   MessagePart,

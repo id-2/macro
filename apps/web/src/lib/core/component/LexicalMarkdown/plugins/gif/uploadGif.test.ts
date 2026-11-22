@@ -8,7 +8,7 @@ vi.mock('@core/util/uploadFile', () => ({
   createStaticUploadFile: vi.fn(),
   createUploadFile: (file: File) => ({ file }),
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: (_name: string, operation: (span: unknown) => unknown) =>
       operation({

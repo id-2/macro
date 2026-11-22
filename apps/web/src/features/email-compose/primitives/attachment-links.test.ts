@@ -2,7 +2,7 @@ import {
   $createClassedBlockNode,
   $isClassedBlockNode,
   $isDocumentMentionNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { $getRoot, $isElementNode, type LexicalEditor } from 'lexical';
 import { createRoot, createSignal } from 'solid-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

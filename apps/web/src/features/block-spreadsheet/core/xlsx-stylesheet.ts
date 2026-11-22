@@ -1,4 +1,4 @@
-import type { ConditionalStyle } from '@macro-inc/spreadsheet/sheet-rules';
+import type { ConditionalStyle } from '@rox-one/spreadsheet/sheet-rules';
 import { strFromU8 } from 'fflate';
 import { SaxesParser, type SaxesTagNS } from 'saxes';
 import {

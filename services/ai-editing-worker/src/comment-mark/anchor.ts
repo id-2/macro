@@ -13,7 +13,7 @@ import {
   $getCommentMarkContext,
   $isCommentNode,
   type CommentNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $createRangeSelection,
   $getRoot,

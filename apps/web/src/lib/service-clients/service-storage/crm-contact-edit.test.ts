@@ -26,9 +26,9 @@ vi.mock('./graphql-soup', () => ({
   getGraphqlSoupClient: () => mocks.client,
   getGraphqlSoupCacheHost: () => mocks.nativeHost ?? mocks.host,
 }));
-vi.mock('@macro-inc/observability', async (importOriginal) => {
+vi.mock('@rox-one/observability', async (importOriginal) => {
   const original =
-    await importOriginal<typeof import('@macro-inc/observability')>();
+    await importOriginal<typeof import('@rox-one/observability')>();
   vi.spyOn(original.Telemetry, 'error').mockImplementation(mocks.error);
   return original;
 });

@@ -4,7 +4,7 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import CaretDownIcon from '@icon/system/regular/caret-down.svg';
 import CheckCircleIcon from '@icon/system/regular/check-circle.svg';
 import SpinnerIcon from '@icon/system/regular/spinner-gap.svg';
-import type { RoxdStatus } from '@macro/tauri/roxd';
+import type { RoxdStatus } from '@rox-one/tauri/roxd';
 import { Button, cn, ToggleSwitch } from '@ui';
 import {
   createSignal,

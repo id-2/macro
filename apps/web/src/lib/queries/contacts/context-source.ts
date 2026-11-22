@@ -1,5 +1,5 @@
 import type { CacheHost } from '@graphql-cache/host/types';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { ListLinksResponse } from '@service-email/generated/schemas';
 import type { ApiChannelWithLatest } from '@service-storage/channel-list-types';
 import type { ApiActivity } from '@service-storage/generated/schemas/apiActivity';

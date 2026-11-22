@@ -10,9 +10,9 @@
 
 import { MemorySyncServer } from '@app/features/block-fig/browser-test/memory-sync';
 import { PsdEngine } from '@core/psd-engine/client';
-import { noopChatter } from '@macro-inc/collaboration/collab/chatter';
-import type { SnapshotStore } from '@macro-inc/collaboration/collab/snapshot-store';
-import { InMemoryWALStore } from '@macro-inc/collaboration/collab/wal';
+import { noopChatter } from '@rox-one/collaboration/collab/chatter';
+import type { SnapshotStore } from '@rox-one/collaboration/collab/snapshot-store';
+import { InMemoryWALStore } from '@rox-one/collaboration/collab/wal';
 import type { LoroDoc } from 'loro-crdt';
 import {
   createSignal,

@@ -1,4 +1,4 @@
-import { $createClassedBlockNode } from '@macro-inc/lexical-core';
+import { $createClassedBlockNode } from '@rox-one/lexical-core';
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical';
 import { createRoot } from 'solid-js';
 import { expect, it } from 'vitest';

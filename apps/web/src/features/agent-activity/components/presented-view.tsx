@@ -1,6 +1,6 @@
 import { DashboardToolView } from '@app/features/dynamic-ui/DashboardToolView.lazy';
 import type { View } from '@app/features/dynamic-ui/view';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { ErrorBoundary, Suspense } from 'solid-js';
 
 /**

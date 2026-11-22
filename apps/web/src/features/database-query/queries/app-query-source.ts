@@ -2,7 +2,7 @@ import { handleAiUsageLimitError } from '@app/features/paywall/ai-usage-limit-ha
 import type { TModel } from '@core/component/AI/constant';
 import { databaseSqlAnswer } from '@core/database-sql/answer';
 import { databaseSqlSchema } from '@core/database-sql/catalog';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import {
   checkDatabaseSql,

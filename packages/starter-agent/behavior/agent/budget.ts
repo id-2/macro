@@ -9,8 +9,8 @@
  * held to the per-run cap. A run that times out reports no cost and is not in
  * the ledger.
  */
-import type { Agent, Woke } from '@macro-inc/muppet/core/agent';
-import { type Clock, isoText } from '@macro-inc/muppet/utilities/time';
+import type { Agent, Woke } from '@rox-one/muppet/core/agent';
+import { type Clock, isoText } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import { type Disk, jsonLine, parseLines } from '../context/disk.ts';
 

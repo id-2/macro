@@ -8,7 +8,7 @@ import {
   $isDocumentCardNode,
   $isDocumentMentionNode,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $createTextNode,

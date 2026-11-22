@@ -9,7 +9,7 @@ import { dlopen, FFIType } from 'bun:ffi';
 import { closeSync, mkdirSync, openSync } from 'node:fs';
 import { mkdir, mkdtemp, readdir, rm, stat } from 'node:fs/promises';
 import { dirname, join as joinPath } from 'node:path';
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
 import type { Base } from '../../context/index.ts';
 import type { Bucket } from '../../context/state.ts';
 import { limits, owner, paths, settings } from './config.ts';

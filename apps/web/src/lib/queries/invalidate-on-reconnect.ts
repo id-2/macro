@@ -1,4 +1,4 @@
-import { createReconnectEffect } from '@macro-inc/collaboration/websocket';
+import { createReconnectEffect } from '@rox-one/collaboration/websocket';
 import { ws } from '@service-connection/websocket';
 import { queryClient } from './client';
 

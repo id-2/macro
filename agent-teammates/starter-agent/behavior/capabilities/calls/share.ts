@@ -14,7 +14,7 @@
  * track, so it never reaches the agent's hearing.
  */
 import type { Room } from "@livekit/rtc-node";
-import type { ScreenFrame, ScreenShare } from "@macro-inc/sdk/calls/node";
+import type { ScreenFrame, ScreenShare } from "@rox-one/sdk/calls/node";
 import { driveRule, startRule, urlRule } from "./share-policy.ts";
 import type { CallShare, DriveAction, MakeShare, ShareNeeds } from "./types.ts";
 

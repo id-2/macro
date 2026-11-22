@@ -12,7 +12,7 @@ vi.mock('./graphql-soup', () => ({
   getGraphqlSoupClient: () => mocks.client,
   getGraphqlSoupCacheHost: () => mocks.host,
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: mocks.error },
 }));
 beforeEach(() => {

@@ -60,7 +60,7 @@ vi.mock('@tauri-apps/api/core', () => ({
   }),
 }));
 
-import { TauriWebSocketWrapper } from '@macro-inc/collaboration/websocket/platform/tauri-websocket';
+import { TauriWebSocketWrapper } from '@rox-one/collaboration/websocket/platform/tauri-websocket';
 import {
   createGraphqlSoupWebSocketLiveness,
   createGraphqlSoupWebSocketUrlResolver,

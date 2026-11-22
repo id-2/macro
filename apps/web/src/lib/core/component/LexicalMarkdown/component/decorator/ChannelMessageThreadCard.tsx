@@ -1,7 +1,7 @@
 import { navigateToChannelMessage } from '@block-channel/utils/link';
 import { ReadonlyThread } from '@channel/StandaloneThread';
 import { useGlobalBlockOrchestrator } from '@components/app/GlobalAppState';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 
 type ChannelMessageThreadCardProps = {
   channelId: string;

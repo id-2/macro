@@ -1,6 +1,6 @@
 ---
 name: release-sdk
-description: Bump and release @macro-inc/sdk from this repository. Use when asked to bump the SDK version or release it to npm.
+description: Bump and release @rox-one/sdk from this repository. Use when asked to bump the SDK version or release it to npm.
 ---
 
 # Release the SDK

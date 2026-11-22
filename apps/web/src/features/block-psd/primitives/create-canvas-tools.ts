@@ -14,7 +14,7 @@
 import type { Point } from '@app/features/block-fig/core/camera';
 import type { IRect, Op, SelectMode, Target } from '@core/psd-engine/types';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createSignal } from 'solid-js';
 import { brushFor, newStrokeId, type PaintingTool } from '../core/brush';
 import { twoColorGradient } from '../core/gradient';

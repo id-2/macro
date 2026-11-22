@@ -12,7 +12,7 @@ vi.mock('@service-connection/presence-telemetry', () => ({
   reportTrackingChange: vi.fn(),
   reportInvalidTrackingChange: vi.fn(),
 }));
-vi.mock('@macro-inc/collaboration/websocket', () => ({
+vi.mock('@rox-one/collaboration/websocket', () => ({
   createWebsocketEventEffect: (
     _ws: unknown,
     _type: string,

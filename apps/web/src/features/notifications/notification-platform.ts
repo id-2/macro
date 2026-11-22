@@ -1,6 +1,6 @@
 import { getFaviconUrl } from '@app/util/favicon';
 import type { SplitManager } from '@components/app/split-layout/layoutManager';
-import { markdownToPlainText } from '@macro-inc/lexical-core';
+import { markdownToPlainText } from '@rox-one/lexical-core';
 import { committedThemeAccent } from '../theme/signals/themeSignals';
 import type { PlatformNotificationState } from './components/PlatformNotificationProvider';
 import { GITHUB_EVENT_TYPES } from './github-event-types';

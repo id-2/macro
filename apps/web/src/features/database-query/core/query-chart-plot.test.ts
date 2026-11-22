@@ -1,7 +1,7 @@
 import type {
   DatabaseQueryChart,
   DatabaseQueryChartMode,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import { describe, expect, it } from 'vitest';
 import { unknownNames } from './answer-cell';
 import type { QueryAnswer } from './query';

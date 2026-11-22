@@ -1,13 +1,13 @@
 import {
   type CellSelection,
   selectionBounds,
-} from '@macro-inc/spreadsheet/grid-selection';
+} from '@rox-one/spreadsheet/grid-selection';
 import {
   type DrawingPlacement,
   parseChartReference,
   type SheetChart,
   type SheetDrawing,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import { type Accessor, createSignal } from 'solid-js';
 import type { WorkbookCalculation } from '../core/calculation';
 import {

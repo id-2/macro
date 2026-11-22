@@ -50,7 +50,7 @@ is built, `capabilities/<name>.ts` holds the capabilities, and
 | `config.ts`                   | Every path (`callsPaths`) and credential name. No decisions.                                                                                                          |
 | `types.ts`                    | The nouns the parts share: ledger rows, `Placed`, `Ask`, `Refusal`, what sharing needs from a call.                                                                   |
 | `arbiter.ts`                  | Every decision about the agent's calls, pure, as tables (below). Start here to change how it behaves.                                                                 |
-| `macro.ts`                    | `CallApi`: Rox's calls behind a port, over the SDK only. `refusal` reads why Rox wouldn't seat the agent. A `Connection` keeps the room token inside it.              |
+| `rox.ts`                    | `CallApi`: Rox's calls behind a port, over the SDK only. `refusal` reads why Rox wouldn't seat the agent. A `Connection` keeps the room token inside it.              |
 | `retry.ts`                    | A deadline per attempt for the token request and the room connect, and how soon a failed join is tried again.                                                         |
 | `ledger.ts`                   | The append-only ledgers and id lists, each line parsed with its schema.                                                                                               |
 | `session.ts`                  | What the agent does at LiveKit's hooks: addressing, the brain's text as the reply stream, cancel on interruption, the line said before leaving.                       |
@@ -100,12 +100,12 @@ imported function in a script; `bin/agent describe <name>` has its docs.
 
 ## Rox's calls
 
-`macro.ts` is the only module that knows the SDK's shape, and it uses public
-methods only. Calls use `@macro-inc/sdk/calls/node` (`connectRoom`,
+`rox.ts` is the only module that knows the SDK's shape, and it uses public
+methods only. Calls use `@rox-one/sdk/calls/node` (`connectRoom`,
 `publishScreen`). The SDK's helper, the agent and LiveKit Agents must all
 resolve the same `@livekit/rtc-node` installation: two native runtimes, even
 at the same version, make incompatible `Room` classes (a test in
-`test/macro.test.ts` checks it).
+`test/rox.test.ts` checks it).
 
 - **A join can't create a call.** `calls.byId(id).join()` only; a channel
   join with no id reads the channel's live call first. `channel.startCall()`

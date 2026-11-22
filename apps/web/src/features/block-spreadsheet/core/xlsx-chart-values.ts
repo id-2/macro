@@ -1,4 +1,4 @@
-import type { ChartValue } from '@macro-inc/spreadsheet/sheet-drawings';
+import type { ChartValue } from '@rox-one/spreadsheet/sheet-drawings';
 
 /** A cell a chart reads, with the Excel number format it displays with. */
 export type CellChartValue = ChartValue & { format?: string };

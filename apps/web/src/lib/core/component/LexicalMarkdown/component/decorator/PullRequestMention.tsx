@@ -25,7 +25,7 @@ import {
   type PullRequestMentionDecoratorProps,
   SKIP_DOM_SELECTION_TAG,
   SKIP_SCROLL_INTO_VIEW_TAG,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { useGithubLinkStatusQuery } from '@queries/auth/github-link';
 import { queryReadyGate } from '@queries/gate';
 import {

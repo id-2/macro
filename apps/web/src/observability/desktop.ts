@@ -5,7 +5,7 @@ import {
   type Attributes,
   type ResourceAttributes,
   Telemetry,
-} from '@macro-inc/observability';
+} from '@rox-one/observability';
 import { invoke } from '@tauri-apps/api/core';
 import type {
   BundleReloadDiagnostics,

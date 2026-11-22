@@ -1,4 +1,4 @@
-import type { StatePaths } from '@macro-inc/muppet/core/state';
+import type { StatePaths } from '@rox-one/muppet/core/state';
 
 /**
  * Where the agent records anything. Everything is under one state directory, in

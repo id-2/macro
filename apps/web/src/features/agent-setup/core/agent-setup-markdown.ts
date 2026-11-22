@@ -1,4 +1,4 @@
-const QUICK_START = `npm install @macro-inc/sdk
+const QUICK_START = `npm install @rox-one/sdk
 export ROX_API_KEY="<your token>"`;
 
 const PROFILE_SNIPPET = `const rox = new Macro({});

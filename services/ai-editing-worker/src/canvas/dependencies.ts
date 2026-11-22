@@ -2,8 +2,8 @@ import {
   type Bounds,
   type GraphicsDocument,
   worldBounds,
-} from '@macro-inc/graphics';
-import { presenceItemState } from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics';
+import { presenceItemState } from '@rox-one/graphics/loro';
 import type { CanvasOp } from './schema';
 
 export type CanvasDependencies = {

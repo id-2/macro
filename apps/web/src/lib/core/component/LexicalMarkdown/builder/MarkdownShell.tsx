@@ -2,7 +2,7 @@ import { fileFolderDrop } from '@core/directive/fileFolderDrop';
 import { isMobile } from '@core/mobile/isMobile';
 import { onElementConnect } from '@core/util/onElementConnect';
 import { handleFileFolderDrop } from '@core/util/upload';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { cn } from '@ui';
 import {
   COMMAND_PRIORITY_CRITICAL,

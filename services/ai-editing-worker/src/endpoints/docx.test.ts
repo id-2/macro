@@ -1,4 +1,4 @@
-import { DocxAgentError } from '@macro-inc/collaboration/docx/agent';
+import { DocxAgentError } from '@rox-one/collaboration/docx/agent';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const state = vi.hoisted(() => ({
@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
   urls: [] as string[],
 }));
 
-vi.mock('@macro-inc/collaboration/docx/agent', async (original) => ({
+vi.mock('@rox-one/collaboration/docx/agent', async (original) => ({
   ...(await original()),
   runDocxAgentRequest: state.run,
 }));

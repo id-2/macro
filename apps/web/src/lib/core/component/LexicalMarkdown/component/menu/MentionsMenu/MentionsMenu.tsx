@@ -33,7 +33,7 @@ import { createSelectionAnchor } from '@core/util/selection-anchor';
 import { createSteadyFlag } from '@core/util/steady-flag';
 import { useIsKeyPressActive } from '@core/util/useIsKeyPressActive';
 import type { EmailEntity } from '@entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useExternalChatsQuery } from '@queries/external-chats';
 import { queryReadyGate } from '@queries/gate';
 import type { HistoryItem as Item } from '@queries/history/history';

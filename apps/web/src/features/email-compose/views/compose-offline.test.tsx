@@ -25,8 +25,8 @@ vi.mock('@queries/client', () => ({
     invalidateQueries: vi.fn(async () => {}),
   },
 }));
-vi.mock('@macro-inc/observability', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@macro-inc/observability')>()),
+vi.mock('@rox-one/observability', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@rox-one/observability')>()),
   Telemetry: { error: vi.fn(), info: vi.fn() },
 }));
 vi.mock('@service-storage/graphql-soup', () => ({

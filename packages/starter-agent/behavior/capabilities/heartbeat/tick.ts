@@ -4,8 +4,8 @@
  * something in it. Otherwise nothing happens. The decision is pure; `beat` is
  * given everything it touches, so a whole tick runs in a test.
  */
-import type { Woke } from '@macro-inc/muppet/core/agent';
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import type { Woke } from '@rox-one/muppet/core/agent';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 
 /** What the last tick that saw the snapshot change left for the next one. */

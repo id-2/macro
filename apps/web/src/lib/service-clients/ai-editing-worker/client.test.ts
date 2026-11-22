@@ -18,7 +18,7 @@ vi.mock('@core/component/Toast/Toast', () => ({ toast: { failure } }));
 vi.mock('@service-storage/client', () => ({
   getDocumentPermissionToken: permissionToken,
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { span: () => span },
 }));
 
@@ -120,8 +120,8 @@ test('keeps successful edits and clarification requests distinct from quota fail
 
 test('runs the edit request under its explicitly supplied parent context', async () => {
   const { NOOP_SPAN } = await vi.importActual<
-    typeof import('@macro-inc/observability')
-  >('@macro-inc/observability');
+    typeof import('@rox-one/observability')
+  >('@rox-one/observability');
   const run = vi.spyOn(NOOP_SPAN, 'run');
   const parent = NOOP_SPAN;
   fetch.mockResolvedValue(new Response('{}', { status: 200 }));

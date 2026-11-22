@@ -1,4 +1,4 @@
-import type { Appearance, ConnectorStyle } from '@macro-inc/graphics';
+import type { Appearance, ConnectorStyle } from '@rox-one/graphics';
 import { Match, Switch } from 'solid-js';
 
 /** Small previews use the same visual vocabulary as the connector on the canvas. */

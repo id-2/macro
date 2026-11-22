@@ -9,7 +9,7 @@ import Hash from '@icon/system/regular/hash.svg';
 import Percent from '@icon/system/regular/percent.svg';
 import TextT from '@icon/system/regular/text-t.svg';
 import User from '@icon/system/regular/user.svg';
-import type { TableColumnType } from '@macro-inc/spreadsheet/sheet-tables';
+import type { TableColumnType } from '@rox-one/spreadsheet/sheet-tables';
 import { Dynamic } from 'solid-js/web';
 
 const ICONS = {

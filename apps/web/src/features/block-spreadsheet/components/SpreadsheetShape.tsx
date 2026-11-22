@@ -3,7 +3,7 @@ import type {
   ShapePart,
   ShapeRun,
   SheetShape,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import { For, Show } from 'solid-js';
 import { presetOutline, type Tip } from '../core/shape-geometry';
 

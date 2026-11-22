@@ -10,7 +10,7 @@
  */
 
 import type { Room } from '@livekit/rtc-node';
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import type { Trace } from '../../agent/claude.ts';
 import type { Disk } from '../../context/disk.ts';
@@ -25,7 +25,7 @@ import {
   type JoinRequest,
   refusal,
   refusalExits,
-} from './macro.ts';
+} from './rox.ts';
 import { type RetryOptions, retry, roomConnect, tokenRetry } from './retry.ts';
 import {
   agentVoice,

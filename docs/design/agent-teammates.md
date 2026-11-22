@@ -106,7 +106,7 @@ call carries the wake id as `X-Rox-Agent-Session-Id`.
 
 ## Telemetry
 
-`@macro-inc/observability/server` exports OTLP when the computer sets the
+`@rox-one/observability/server` exports OTLP when the computer sets the
 standard `OTEL_EXPORTER_OTLP_*` variables. A wake is an `agent.wake` span
 (event, wake id, outcome, cost, turns); each script is an
 `agent.capability_script` span whose context reaches the script's process.

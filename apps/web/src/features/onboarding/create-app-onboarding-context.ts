@@ -11,7 +11,7 @@ import { writeClipboardData } from '@core/util/dataTransfer';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { platformFetch } from '@core/util/platformFetch';
 import { getWebOrigin } from '@core/util/webOrigin';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   useAiBillingPlansQuery,
   useCreateBillingPortalMutation,

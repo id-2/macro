@@ -7,7 +7,7 @@ import { AppConnectionContext } from '@core/pipedream/connection-context';
 import { requestConnectApp } from '@core/pipedream/pendingConnect';
 import { fireAndForget } from '@core/util/fireAndForget';
 import ArrowUpRightIcon from '@icon/system/regular/arrow-up-right.svg';
-import type { ConnectAppDecoratorProps } from '@macro-inc/lexical-core';
+import type { ConnectAppDecoratorProps } from '@rox-one/lexical-core';
 import { useHarnessConnectionStatus } from '@queries/harnesses/connections';
 import { usePipedreamConnectedSlugs } from '@queries/pipedream-connectors';
 import { cn } from '@ui/utils/classname';

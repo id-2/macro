@@ -1,16 +1,16 @@
 # Graphics API
 
-`@macro-inc/graphics` provides the reusable scene, editing, input, rendering, and
+`@rox-one/graphics` provides the reusable scene, editing, input, rendering, and
 optional collaboration layers used by Canvas Next.
 
 ## Entry points
 
 | Import | Purpose |
 | --- | --- |
-| `@macro-inc/graphics` | Document model, editor, commands, geometry, queries, and shape definitions |
-| `@macro-inc/graphics/browser` | Browser input, clipboard, and gesture adapters |
-| `@macro-inc/graphics/solid` | Solid renderers and scene projections |
-| `@macro-inc/graphics/loro` | Optional collaborative document and presence backend |
+| `@rox-one/graphics` | Document model, editor, commands, geometry, queries, and shape definitions |
+| `@rox-one/graphics/browser` | Browser input, clipboard, and gesture adapters |
+| `@rox-one/graphics/solid` | Solid renderers and scene projections |
+| `@rox-one/graphics/loro` | Optional collaborative document and presence backend |
 
 The document is an immutable, normalized tree with stable IDs, sibling order,
 local affine transforms, typed item data, and durable references. The editor owns

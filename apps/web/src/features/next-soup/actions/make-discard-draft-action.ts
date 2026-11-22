@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { type EmailEntity, type EntityData, isEmailEntity } from '@entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useDeleteDraftMutation } from '@queries/email/draft';
 import { markThreadDraftSaved } from '@queries/email/draft-cache';
 import { publishDraftLifecycleChange } from '@queries/email/draft-lifecycle-events';

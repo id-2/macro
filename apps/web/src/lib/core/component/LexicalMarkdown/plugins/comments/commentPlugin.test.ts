@@ -1,4 +1,4 @@
-import { $createCommentNode, CommentNode } from '@macro-inc/lexical-core';
+import { $createCommentNode, CommentNode } from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $createRangeSelection,

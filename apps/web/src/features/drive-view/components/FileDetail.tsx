@@ -17,7 +17,7 @@ import {
 } from '@core/component/SharePermissions';
 import { fireAndForget } from '@core/util/fireAndForget';
 import SpinnerIcon from '@icon/system/regular/spinner.svg';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type { AccessLevel } from '@service-storage/generated/schemas/accessLevel';
 import type { DocumentMetadata } from '@service-storage/generated/schemas/documentMetadata';
 import { Button } from '@ui';

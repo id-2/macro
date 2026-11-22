@@ -2,7 +2,7 @@ import { registerRichText } from '@lexical/rich-text';
 import {
   $createDatabaseQueryNode,
   DatabaseQueryNode,
-} from '@macro-inc/lexical-core/nodes/DatabaseQueryNode';
+} from '@rox-one/lexical-core/nodes/DatabaseQueryNode';
 import {
   $createParagraphNode,
   $createTextNode,

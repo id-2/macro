@@ -8,7 +8,7 @@ import { mergeRegister } from '@lexical/utils';
 import {
   $isVideoNode,
   type VideoDecoratorProps,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { debounce } from '@solid-primitives/scheduled';
 import { Button, cn } from '@ui';
 import {

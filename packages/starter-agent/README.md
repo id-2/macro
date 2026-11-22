@@ -21,7 +21,7 @@ Inviting an agent teammate in Rox makes its account, buys it a computer and
 creates this repository for it on Rox's agent git server, rendered from
 `packages/starter-agent` in the Rox monorepo: `agent.json` names its owner
 (the admin who invited it) and itself. The computer's image clones the
-repository, provides `@macro-inc/muppet`, `@macro-inc/sdk`, Claude Code and
+repository, provides `@rox-one/muppet`, `@rox-one/sdk`, Claude Code and
 the programs the capabilities use, and runs `bin/agent run` as a system
 service.
 
@@ -137,7 +137,7 @@ the same messages.
 ## The runtime contract (with the computer's image)
 
 The image's launcher clones this repository into `AGENT_WORKSPACE`, places
-`@macro-inc/muppet`, `@macro-inc/sdk`, `@macro-inc/observability` and the
+`@rox-one/muppet`, `@rox-one/sdk`, `@rox-one/observability` and the
 packages `bun.lock` locks in `node_modules`, and runs `bun cli.ts run` as the
 agent's service.
 

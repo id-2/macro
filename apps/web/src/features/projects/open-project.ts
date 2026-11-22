@@ -3,7 +3,7 @@ import { globalSplitManager } from '@app/signal/splitLayout';
 import type { useSplitLayout } from '@components/app/split-layout/layout';
 import type { SplitContent } from '@components/app/split-layout/layoutManager';
 import { enableProjects, isFeatureEnabled } from '@core/constant/featureFlags';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { ProjectSection } from './core/project';
 
 /**

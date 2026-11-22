@@ -1,7 +1,7 @@
 import {
   resolveStructuredReferences,
   type WorkbookTable,
-} from '@macro-inc/spreadsheet/structured-references';
+} from '@rox-one/spreadsheet/structured-references';
 import { describe, expect, it } from 'vitest';
 import {
   addFunctionPrefixes,

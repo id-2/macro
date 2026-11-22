@@ -16,7 +16,7 @@ import { makePersistedState } from '@app/lib/persistence';
 import { IS_MAC } from '@core/constant/isMac';
 import { $isHeadingNode } from '@lexical/rich-text';
 import { $dfs, mergeRegister } from '@lexical/utils';
-import { $getId } from '@macro-inc/lexical-core';
+import { $getId } from '@rox-one/lexical-core';
 import {
   $getNodeByKey,
   $getRoot,

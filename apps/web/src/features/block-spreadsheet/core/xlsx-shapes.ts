@@ -9,7 +9,7 @@ import {
   type ShapeRun,
   type ShapeText,
   type SheetShape,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import type { SaxesTagNS } from 'saxes';
 import {
   DEFAULT_THEME,

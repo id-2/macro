@@ -24,7 +24,7 @@ import {
   translation,
   withShapeLabel,
   worldMatrix,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { createSignal, onCleanup } from 'solid-js';
 import {
   plainRichText,

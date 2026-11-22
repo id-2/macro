@@ -44,7 +44,7 @@ vi.mock('@core/context/user', () => ({ useUserId: () => () => 'me' }));
 vi.mock('@service-storage/client', () => ({
   storageServiceClient: { databases: { shareAwareness: mock.shareAwareness } },
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { warn: mock.warn },
 }));
 vi.mock('./databases', () => ({

@@ -1,5 +1,5 @@
 import { SERVER_HOSTS, SYNC_SERVICE_HOSTS } from '@core/constant/servers';
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 import { err, ok, type Result } from 'neverthrow';
 import { match } from 'ts-pattern';
 import { platformFetch } from './platformFetch';

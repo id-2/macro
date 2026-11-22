@@ -14,7 +14,7 @@ import {
 import {
   NodeReplacements,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core/node-list';
+} from '@rox-one/lexical-core/node-list';
 import {
   $createParagraphNode,
   $createTextNode,

@@ -2,8 +2,8 @@ import './block.css';
 
 import type { PortalScope } from '@core/component/ScopedPortal';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { useTauri } from '@macro/tauri';
-import { Telemetry } from '@macro-inc/observability';
+import { useTauri } from '@rox-one/tauri';
+import { Telemetry } from '@rox-one/observability';
 import type { GetDocumentResponseDataViewLocation } from '@service-storage/generated/schemas/getDocumentResponseDataViewLocation';
 import { debounce, leading } from '@solid-primitives/scheduled';
 import { type BeforeLeaveEventArgs, useBeforeLeave } from '@solidjs/router';

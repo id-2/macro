@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { isCurrentQueryAccount } from '@queries/auth/account-scope';
 import { useQueryAccount } from '@queries/auth/use-query-account';
 import { createContactReferenceReader } from '@queries/contacts/reference-reader';

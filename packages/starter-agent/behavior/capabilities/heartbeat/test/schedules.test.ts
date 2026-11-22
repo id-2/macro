@@ -3,7 +3,7 @@ import {
   type Fired,
   memoryStore,
   scheduler,
-} from '@macro-inc/muppet/utilities/schedules';
+} from '@rox-one/muppet/utilities/schedules';
 import { fixedClock } from '../../../context/test/fakes.ts';
 import {
   actionOf,

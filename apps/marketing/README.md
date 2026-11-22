@@ -230,7 +230,7 @@ transcript selection, and review filters. All changes stay local.
 
 Use website-owned files or third-party packages declared in this directory's
 `package.json`. Do not import `apps/web/src`, repository `packages`, app aliases
-such as `@core` or `@queries`, or `@macro-inc/*` workspace packages. Copy the
+such as `@core` or `@queries`, or `@rox-one/*` workspace packages. Copy the
 minimal presentation component and its necessary assets here before using it.
 Avoid copying app providers, authentication state, service clients, or generated
 editor bundles. Demos use local fixtures and website-owned state.

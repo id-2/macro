@@ -1,5 +1,5 @@
 import { fetchWithToken } from '@core/util/fetchWithToken';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { err, ok } from 'neverthrow';
 import { beforeEach, expect, it, vi } from 'vitest';
 import { universalInputClient } from './universal-input';

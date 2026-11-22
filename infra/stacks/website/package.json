@@ -1,5 +1,5 @@
 {
-  "name": "@macro-inc/infra-website",
+  "name": "@rox-one/infra-website",
   "packageManager": "bun",
   "private": true,
   "scripts": {

@@ -2,7 +2,7 @@ import { ENABLE_DOCUMENT_MENTION_NOTIFICATIONS } from '@core/constant/featureFla
 import type { Entity } from '@core/types';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { muteItemForRef } from '@entity/utils/notification';
-import { createSocketEffect } from '@macro-inc/collaboration/websocket';
+import { createSocketEffect } from '@rox-one/collaboration/websocket';
 import { updateSoupForNotification } from '@queries/notification/notification-soup';
 import {
   useMuteItemMutation,

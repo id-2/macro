@@ -1,6 +1,6 @@
 import { ChatMessageMarkdown } from '@core/component/AI/component/message/ChatMessageMarkdown';
-import { PENDING_REPLY_TEXT } from '@macro-inc/lexical-core';
-import { composeAgentChatReply } from '@macro-inc/lexical-core/utils/agent-chat-reply';
+import { PENDING_REPLY_TEXT } from '@rox-one/lexical-core';
+import { composeAgentChatReply } from '@rox-one/lexical-core/utils/agent-chat-reply';
 import { render, waitFor } from '@solidjs/testing-library';
 import { createSignal, type JSX } from 'solid-js';
 import { describe, expect, it, vi } from 'vitest';

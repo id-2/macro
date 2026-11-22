@@ -4,7 +4,7 @@ import type { EmailSendIntent } from './send-queue';
 import { emailSendFailureKind, recordEmailSend } from './send-telemetry';
 
 const telemetry = vi.hoisted(() => ({ info: vi.fn(), warn: vi.fn() }));
-vi.mock('@macro-inc/observability', () => ({ Telemetry: telemetry }));
+vi.mock('@rox-one/observability', () => ({ Telemetry: telemetry }));
 beforeEach(() => vi.resetAllMocks());
 
 const intent: EmailSendIntent = {

@@ -1,4 +1,4 @@
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import type { Disk } from '../../../context/disk.ts';
 import type { Log } from '../../../context/log.ts';
 import type { Ask, Said } from '../appraise.ts';

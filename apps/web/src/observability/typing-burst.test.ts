@@ -1,9 +1,9 @@
-import { NOOP_SPAN, Telemetry } from '@macro-inc/observability';
+import { NOOP_SPAN, Telemetry } from '@rox-one/observability';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { startTypingBurstTelemetry } from './typing-burst';
 import { initializeUiOperationTelemetry } from './ui-operation';
 
-vi.mock('@macro-inc/observability', () => {
+vi.mock('@rox-one/observability', () => {
   const span = {
     setAttr: vi.fn(),
     end: vi.fn(),

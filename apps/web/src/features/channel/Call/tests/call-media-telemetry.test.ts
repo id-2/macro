@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { traceCallMedia } from '../call-media-telemetry';
 
@@ -9,7 +9,7 @@ const span = vi.hoisted(() => ({
   end: vi.fn(),
 }));
 
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: async (
       _name: string,

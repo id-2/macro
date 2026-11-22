@@ -1,4 +1,4 @@
-import { createNoopLiveSyncSource } from '@macro-inc/collaboration/collab/source';
+import { createNoopLiveSyncSource } from '@rox-one/collaboration/collab/source';
 import { LoroDoc } from 'loro-crdt';
 import { errAsync, ok, okAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

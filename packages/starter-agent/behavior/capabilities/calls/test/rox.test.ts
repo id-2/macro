@@ -5,13 +5,13 @@ import {
   CallEndedError,
   InOtherCallError,
   Macro,
-} from '@macro-inc/sdk';
+} from '@rox-one/sdk';
 import type {
   CallConnection,
   connectRoom,
   publishScreen,
   ScreenFrame,
-} from '@macro-inc/sdk/calls/node';
+} from '@rox-one/sdk/calls/node';
 import { joinErrorRules } from '../arbiter.ts';
 import {
   type CallApi,
@@ -20,7 +20,7 @@ import {
   refusalOfExit,
   sdkCalls,
   tokenOf,
-} from '../macro.ts';
+} from '../rox.ts';
 import { Refusal } from '../types.ts';
 
 /** What the fake Rox was asked to do, in order. */
@@ -690,7 +690,7 @@ test("the SDK's room helper, LiveKit Agents and the agent resolve one @livekit/r
   const from = (specifier: string): string =>
     Bun.resolveSync(rtc, Bun.resolveSync(specifier, import.meta.dir));
   const ours = Bun.resolveSync(rtc, import.meta.dir);
-  expect(from('@macro-inc/sdk/calls/node')).toBe(ours);
+  expect(from('@rox-one/sdk/calls/node')).toBe(ours);
   expect(from('@livekit/agents')).toBe(ours);
 });
 

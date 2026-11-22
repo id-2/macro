@@ -6,7 +6,7 @@
  * unit-testable.
  */
 
-import type { TaskListViewSettings } from '@macro-inc/lexical-core';
+import type { TaskListViewSettings } from '@rox-one/lexical-core';
 import { PROPERTY_OPTION_IDS } from '@property/constants';
 import { differenceInCalendarDays } from 'date-fns';
 import type { NodeKey } from 'lexical';

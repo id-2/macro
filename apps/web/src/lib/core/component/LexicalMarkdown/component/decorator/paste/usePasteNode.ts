@@ -4,7 +4,7 @@ import {
   $isPasteNode,
   type PasteNodeDecoratorProps,
   type PasteOrigin,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { $createNodeSelection, $getNodeByKey, $setSelection } from 'lexical';
 import { useContext } from 'solid-js';
 import { LexicalWrapperContext } from '../../../context/LexicalWrapperContext';

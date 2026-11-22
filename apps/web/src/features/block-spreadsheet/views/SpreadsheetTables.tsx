@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import { tableBounds } from '@macro-inc/spreadsheet/sheet-tables';
+import { tableBounds } from '@rox-one/spreadsheet/sheet-tables';
 import type { TableGridUi } from '../components/SpreadsheetGrid';
 import {
   TableColumnMenu,

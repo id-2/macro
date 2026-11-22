@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import type { Cleanup, MachineScopes } from '@macro-inc/machine';
+import type { Cleanup, MachineScopes } from '@rox-one/machine';
 import type { SplitRoutesManifest } from '../routes/manifest';
 import { firstChangedDepth } from '../routes/queries';
 import type { Entry, PaneId, PreloadIntent } from '../routes/types';

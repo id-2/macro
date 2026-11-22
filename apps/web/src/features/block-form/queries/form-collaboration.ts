@@ -8,30 +8,30 @@
 
 import { fireAndForget } from '@core/util/fireAndForget';
 import { schema } from '@loro-mirror/core';
-import { createAwareness } from '@macro-inc/collaboration/collab/awareness';
-import type { Chatter } from '@macro-inc/collaboration/collab/chatter';
-import { createSyncEngine } from '@macro-inc/collaboration/collab/engine';
-import { LoroManager } from '@macro-inc/collaboration/collab/manager';
-import type { RawUpdate } from '@macro-inc/collaboration/collab/shared';
+import { createAwareness } from '@rox-one/collaboration/collab/awareness';
+import type { Chatter } from '@rox-one/collaboration/collab/chatter';
+import { createSyncEngine } from '@rox-one/collaboration/collab/engine';
+import { LoroManager } from '@rox-one/collaboration/collab/manager';
+import type { RawUpdate } from '@rox-one/collaboration/collab/shared';
 import {
   IDBSnapshotStore,
   LORO_SNAPSHOT_DB_NAME,
   loadCachedState,
   type SnapshotStore,
-} from '@macro-inc/collaboration/collab/snapshot-store';
+} from '@rox-one/collaboration/collab/snapshot-store';
 import {
   type InitialSync,
   type LiveSyncSource,
   SyncError,
   type SyncSourceEvent,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
+} from '@rox-one/collaboration/collab/source';
 import {
   BrowserWALStore,
   LORO_WAL_DB_NAME,
   type WALStore,
   WALSyncer,
-} from '@macro-inc/collaboration/collab/wal';
+} from '@rox-one/collaboration/collab/wal';
 import type { FilterGroup } from '@service-storage/generated/schemas/filterGroup';
 import type { FormLayout as WireFormLayout } from '@service-storage/generated/schemas/formLayout';
 import type { FormSection } from '@service-storage/generated/schemas/formSection';

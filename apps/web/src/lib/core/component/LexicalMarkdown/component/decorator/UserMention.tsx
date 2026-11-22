@@ -1,6 +1,6 @@
 import { UserCardTrigger } from '@core/component/UserCardTrigger';
 import { getDisplayNameParts, roxIdToEmail, tryMacroId } from '@core/user';
-import type { UserMentionDecoratorProps } from '@macro-inc/lexical-core';
+import type { UserMentionDecoratorProps } from '@rox-one/lexical-core';
 import { cn } from '@ui';
 import { createEffect, createMemo, useContext } from 'solid-js';
 import { LexicalWrapperContext } from '../../context/LexicalWrapperContext';

@@ -1,5 +1,5 @@
 import LoadingSpinner from '@icon/system/regular/spinner.svg';
-import { constrainImageDimensions } from '@macro-inc/lexical-core/utils/media';
+import { constrainImageDimensions } from '@rox-one/lexical-core/utils/media';
 import { createSignal, Show } from 'solid-js';
 import { createToolRenderer, useToolError } from './ToolRenderer';
 

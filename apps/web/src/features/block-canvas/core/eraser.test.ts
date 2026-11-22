@@ -2,7 +2,7 @@ import {
   createGraphicsEditor,
   drawableIds,
   groupNodes,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { expect, it } from 'vitest';
 import { eraseCommand, eraserHits } from './eraser';
 import { createCanvasNextScene } from './seed-scene';

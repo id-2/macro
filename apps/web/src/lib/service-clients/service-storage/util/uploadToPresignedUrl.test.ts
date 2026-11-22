@@ -1,12 +1,12 @@
 import { isTauri } from '@core/util/platform';
 import { platformFetch } from '@core/util/platformFetch';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { uploadToPresignedUrl } from './uploadToPresignedUrl';
 
 vi.mock('@core/util/platform', () => ({ isTauri: vi.fn(() => false) }));
 vi.mock('@core/util/platformFetch', () => ({ platformFetch: vi.fn() }));
-vi.mock('@macro-inc/observability', () => ({ Telemetry: { warn: vi.fn() } }));
+vi.mock('@rox-one/observability', () => ({ Telemetry: { warn: vi.fn() } }));
 
 class FakeXhr {
   static instances: FakeXhr[] = [];

@@ -4,7 +4,7 @@ import { initSync } from '@ironcalc/wasm';
 import {
   changeWorkbookAxis,
   moveWorkbookRange,
-} from '@macro-inc/spreadsheet/workbook-structure';
+} from '@rox-one/spreadsheet/workbook-structure';
 import { beforeAll, describe, expect, it } from 'vitest';
 import type { SpreadsheetWorkbookSheet } from './workbook-document';
 

@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 
 /** Synchronous work, including Solid's downstream reactive updates. */
 export function profileDatabasePhase<T>(span: Span, operation: () => T): T {

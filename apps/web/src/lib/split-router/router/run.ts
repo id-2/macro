@@ -1,4 +1,4 @@
-import type { MachineDef, Transition } from '@macro-inc/machine';
+import type { MachineDef, Transition } from '@rox-one/machine';
 import { match } from 'ts-pattern';
 import type { Entry } from '../routes/types';
 import type { CancelReason, Navigation } from './types';

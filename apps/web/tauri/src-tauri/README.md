@@ -622,7 +622,7 @@ fixture-backed backfill smoke test, and offline Mail filter regression. Use
 Use the helpers in `@core/util/platform` (`isTauri()`, `getPlatform()`,
 `isMobilePlatform()`, etc.) anywhere you need to branch behaviour, register
 extra routes, or mount native-only UI. Pair those checks with the
-`MaybeTauriProvider` from `@macro/tauri` to keep native-specific wiring
+`MaybeTauriProvider` from `@rox-one/tauri` to keep native-specific wiring
 localized while rendering everything through the shared `src` entry
 point.
 

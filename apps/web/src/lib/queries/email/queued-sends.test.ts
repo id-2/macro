@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
   warn: vi.fn(),
   info: vi.fn(),
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   NOOP_SPAN: {},
   Telemetry: { info: mocks.info, warn: mocks.warn },
 }));

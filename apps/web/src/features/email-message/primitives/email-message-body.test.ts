@@ -1,4 +1,4 @@
-import type { ResourceLifetime } from '@macro-inc/email-renderer/browser';
+import type { ResourceLifetime } from '@rox-one/email-renderer/browser';
 import { createRoot, createSignal } from 'solid-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { message } from '../tests/messages';

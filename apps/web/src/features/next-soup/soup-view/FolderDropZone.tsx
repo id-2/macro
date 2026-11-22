@@ -4,7 +4,7 @@ import { fileSelector } from '@core/directive/fileSelector';
 import { folderSelector } from '@core/directive/folderSelector';
 import { isMobile } from '@core/mobile/isMobile';
 import { handleFolderSelect } from '@core/util/upload';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createMemo, Show } from 'solid-js';
 
 false && fileSelector;

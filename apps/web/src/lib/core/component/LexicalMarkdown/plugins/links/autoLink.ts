@@ -3,4 +3,4 @@ export {
   findNextAutoLinkMatch,
   normalizeLinkUrl,
   strictLinkifier,
-} from '@macro-inc/lexical-core/utils/auto-link';
+} from '@rox-one/lexical-core/utils/auto-link';

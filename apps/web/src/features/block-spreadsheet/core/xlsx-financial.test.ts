@@ -1,11 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { initSync } from '@ironcalc/wasm';
-import { createInitializedSpreadsheetCalculator } from '@macro-inc/spreadsheet/calculation';
+import { createInitializedSpreadsheetCalculator } from '@rox-one/spreadsheet/calculation';
 import {
   importSpreadsheetSheets,
   readSpreadsheetWorkbook,
-} from '@macro-inc/spreadsheet/workbook-document';
+} from '@rox-one/spreadsheet/workbook-document';
 import ExcelJS from 'exceljs';
 import { strFromU8, unzipSync } from 'fflate';
 import { LoroDoc } from 'loro-crdt';

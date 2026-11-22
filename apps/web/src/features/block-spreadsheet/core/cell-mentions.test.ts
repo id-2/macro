@@ -1,14 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { initSync } from '@ironcalc/wasm';
-import { createInitializedSpreadsheetCalculator } from '@macro-inc/spreadsheet/calculation';
+import { createInitializedSpreadsheetCalculator } from '@rox-one/spreadsheet/calculation';
 import {
   cellDateMention,
   cellMentionQuery,
   cellPlainText,
   cellTextParts,
   encodeCellMention,
-} from '@macro-inc/spreadsheet/cell-mentions';
+} from '@rox-one/spreadsheet/cell-mentions';
 import { LoroDoc } from 'loro-crdt';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { encodeCsv } from './csv-export';

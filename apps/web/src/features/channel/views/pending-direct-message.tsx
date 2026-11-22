@@ -3,7 +3,7 @@ import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { getDisplayName, idToEmail, tryMacroId } from '@core/user';
 import { useSendMessageToPeople } from '@core/util/channels';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { DirectMessageEmptyState } from '../Channel/DirectMessageEmptyState';
 import { ChannelIcon } from '../channel-icon';
 import { DraftComposer } from '../Input/DraftComposer';

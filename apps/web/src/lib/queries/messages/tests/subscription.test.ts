@@ -22,7 +22,7 @@ const mocks = await vi.hoisted(async () => {
     warn: vi.fn(),
   };
 });
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { info: vi.fn(), warn: mocks.warn, error: vi.fn() },
 }));
 // Focus is elsewhere throughout: presence follows visibility alone.
@@ -43,7 +43,7 @@ vi.mock('@service-connection/websocket', async () => {
     },
   };
 });
-vi.mock('@macro-inc/collaboration/websocket', async () => {
+vi.mock('@rox-one/collaboration/websocket', async () => {
   const { onCleanup } = await import('solid-js');
   return {
     createReconnectEffect: (_ws: unknown, callback: () => void) => {

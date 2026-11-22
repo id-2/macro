@@ -9,7 +9,7 @@ import { BlockSplitFileMenu } from '@components/app/split-layout/components/Spli
 import { SplitPermissionsBadge } from '@components/app/split-layout/components/SplitLabel';
 import { ENABLE_MARKDOWN_SIDE_PANEL } from '@core/constant/featureFlags';
 import { isMobile } from '@core/mobile/isMobile';
-import type { SyncSourceStatus } from '@macro-inc/collaboration/collab/source';
+import type { SyncSourceStatus } from '@rox-one/collaboration/collab/source';
 import { type Accessor, Show } from 'solid-js';
 import { DispatchAgentButton } from '../../component/DispatchAgentMenu';
 import { useMarkdownName } from '../../component/MarkdownNameProvider';

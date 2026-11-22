@@ -172,7 +172,7 @@ async function boot(world: WorldCore) {
   const solid = await import('solid-js');
   const urql = await import('@urql/core');
   runtime.CombinedError = urql.CombinedError;
-  const { Telemetry } = await import('@macro-inc/observability');
+  const { Telemetry } = await import('@rox-one/observability');
   vi.spyOn(Telemetry, 'warn').mockImplementation(((
     name: string,
     attributes: Record<string, unknown>

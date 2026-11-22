@@ -4,7 +4,7 @@ import {
   $isCompletionNode,
   CompletionNode,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $addUpdateTag,
   $getNodeByKey,
@@ -37,7 +37,7 @@ import {
 import { theme } from '../../theme';
 import { $traverseNodes, setEditorStateFromMarkdown } from '../../utils';
 
-export {} from '@macro-inc/lexical-core';
+export {} from '@rox-one/lexical-core';
 
 import type { SetStoreFunction } from 'solid-js/store';
 import { GenerateAccessory } from '../../component/accessory/GenerateAccessory';

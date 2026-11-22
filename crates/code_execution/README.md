@@ -22,7 +22,7 @@ export async function main({ macro, session, execution }) {
 
 The context also exposes `token`, `hosts` and `webAppUrl` for explicitly
 constructing `new Rox({ token, hosts, webAppUrl })` after importing `Rox`
-from `@macro-inc/sdk`. `webAppUrl` is the deployment's web app origin, so
+from `@rox-one/sdk`. `webAppUrl` is the deployment's web app origin, so
 `webUrl()` links point at the environment the run is in.
 `session` and `execution` are handles supplied by the authenticated host.
 SDK methods perform normal authenticated HTTP requests. Promise concurrency is

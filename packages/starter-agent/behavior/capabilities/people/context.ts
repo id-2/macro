@@ -1,12 +1,12 @@
 import { chmod } from 'node:fs/promises';
 import { query } from '@anthropic-ai/claude-agent-sdk';
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
 import type { Base } from '../../context/index.ts';
 import type { ChatContext } from '../chat/context.ts';
 import { type PeopleClaude, sdkAsk } from './ask.ts';
 import { appraiseModel, contextLines, logStream, owner } from './config.ts';
 import { keeping, peoplePort } from './keep.ts';
-import { sdkAuthorOf } from './macro.ts';
+import { sdkAuthorOf } from './rox.ts';
 import { store } from './store.ts';
 
 const ownerOnlyFile = 0o600;

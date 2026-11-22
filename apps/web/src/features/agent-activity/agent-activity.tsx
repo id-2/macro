@@ -3,7 +3,7 @@ import { useSessionActivity } from '@core/agent-session/session-activity';
 import {
   type AgentActivityData,
   isAgentActivityCard,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { Key } from '@solid-primitives/keyed';
 import { Show } from 'solid-js';
 import type { ActivityRowView } from './components/activity-rows';

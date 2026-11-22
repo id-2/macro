@@ -1,13 +1,13 @@
 import type {
   GoalSeekRequest,
   GoalSeekResult,
-} from '@macro-inc/spreadsheet/goal-seek';
-import { sheetPivotLayouts } from '@macro-inc/spreadsheet/pivot-layout';
-import { sheetTableLayouts } from '@macro-inc/spreadsheet/sheet-tables';
+} from '@rox-one/spreadsheet/goal-seek';
+import { sheetPivotLayouts } from '@rox-one/spreadsheet/pivot-layout';
+import { sheetTableLayouts } from '@rox-one/spreadsheet/sheet-tables';
 import type {
   AxisChange,
   RangeMove,
-} from '@macro-inc/spreadsheet/workbook-structure';
+} from '@rox-one/spreadsheet/workbook-structure';
 import {
   type Accessor,
   createEffect,

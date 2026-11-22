@@ -28,7 +28,7 @@ import {
 } from '@core/util/scrollAnchor';
 import type { DocumentEntity } from '@entity';
 import Smiley from '@icon/system/regular/smiley.svg';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
 import { makeResizeObserver } from '@solid-primitives/resize-observer';
 import { makePersisted } from '@solid-primitives/storage';
 import { badgeTriggerClasses } from '@ui';

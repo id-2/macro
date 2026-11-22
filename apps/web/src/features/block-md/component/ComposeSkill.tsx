@@ -26,7 +26,7 @@ import ArrowsOutIcon from '@icon/system/regular/arrows-out.svg';
 import SplitIcon from '@icon/system/regular/square-half.svg';
 import XIcon from '@icon/system/regular/x.svg';
 import { mergeRegister } from '@lexical/utils';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { skillDescriptionProblem } from '@queries/storage/skill-description';
 import { Button, Hotkey, Input, Scroll } from '@ui';
 import {

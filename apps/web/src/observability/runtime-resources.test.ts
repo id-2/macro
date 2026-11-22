@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import {
   browserMemoryAttributes,
@@ -7,7 +7,7 @@ import {
 } from './runtime-resources';
 import { blockingWorkBetween } from './ui-operation';
 
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     config: { sampled: vi.fn(() => true) },
     recordSample: vi.fn(),

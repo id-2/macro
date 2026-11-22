@@ -8,7 +8,7 @@ import {
   translation,
   worldBounds,
   worldMatrix,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { expect, it } from 'vitest';
 import { createCanvasNextScene } from './seed-scene';
 import { layoutValue, selectionLayoutCommand } from './selection-layout';

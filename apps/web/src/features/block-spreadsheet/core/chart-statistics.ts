@@ -1,7 +1,7 @@
 import type {
   ChartBinning,
   ChartOfPie,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 
 /**
  * A histogram bin: values above `low` up to `high`, or the reverse when bins

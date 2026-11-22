@@ -1,4 +1,4 @@
-import { type Camera, type Point, screenToWorld } from '@macro-inc/graphics';
+import { type Camera, type Point, screenToWorld } from '@rox-one/graphics';
 import { createSignal } from 'solid-js';
 
 export type CanvasInsertLocation = {

@@ -15,7 +15,7 @@ vi.mock('@queries/email/thread', () => ({
 }));
 const readSentWorkingCopy = vi.hoisted(() => vi.fn());
 vi.mock('@queries/email/send-queue', () => ({ readSentWorkingCopy }));
-vi.mock('@macro-inc/observability', () => ({ Telemetry: { error: vi.fn() } }));
+vi.mock('@rox-one/observability', () => ({ Telemetry: { error: vi.fn() } }));
 vi.mock('@core/cross-tab/cross-tab-bus', () => ({
   createCrossTabBus: () => ({ publish() {}, subscribe: () => () => {} }),
 }));

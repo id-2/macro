@@ -1,8 +1,8 @@
 import {
   type Websocket,
   WebsocketEvent,
-} from '@macro-inc/collaboration/websocket';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/collaboration/websocket';
+import { Telemetry } from '@rox-one/observability';
 import type { TrackEntityMessage } from './generated/schemas/trackEntityMessage';
 
 /** Socket lifecycle; a socket that stops retrying drops the user from every entity's presence. */

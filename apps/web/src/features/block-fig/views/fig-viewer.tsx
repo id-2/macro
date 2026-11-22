@@ -8,7 +8,7 @@ import { IS_MAC } from '@core/constant/isMac';
 import type { NodeInfo, Rect } from '@core/fig-engine/types';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { Tabs } from '@kobalte/core/tabs';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   createEffect,
   createSignal,

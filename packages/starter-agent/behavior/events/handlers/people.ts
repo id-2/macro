@@ -1,4 +1,4 @@
-import { behavior } from '@macro-inc/muppet/core/behavior';
+import { behavior } from '@rox-one/muppet/core/behavior';
 import type { ChatContext } from '../../capabilities/chat/context.ts';
 import {
   Conversation,

@@ -1,7 +1,7 @@
 /**
  * What started a prompt, read from the `<m-agent-context>` block the harness
  * puts before it. The block is XML written for the model by
- * `composeAgentContextPrompt` in `@macro-inc/lexical-core`; this reads back
+ * `composeAgentContextPrompt` in `@rox-one/lexical-core`; this reads back
  * the few facts a person needs: what called the agent, where, when, and where
  * to go to see it.
  */

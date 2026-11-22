@@ -24,7 +24,7 @@ import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { fireAndForget } from '@core/util/fireAndForget';
 import ArrowCounterClockwise from '@icon/system/regular/arrow-counter-clockwise.svg?component-solid';
 import ArrowSquareOut from '@icon/system/regular/arrow-square-out.svg?component-solid';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import {
   createConnectionWebsocketEffect,
   type FromWebsocketMessage,

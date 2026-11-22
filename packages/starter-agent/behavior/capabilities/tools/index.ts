@@ -3,8 +3,8 @@
  * without seeing it, and handing one to a program without passing through
  * the model.
  */
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { module } from '@macro-inc/muppet/core/capability';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { module } from '@rox-one/muppet/core/capability';
 import { credentialLog } from './config.ts';
 import type { ToolsContext } from './context.ts';
 import {

@@ -58,7 +58,7 @@ import { virtualKeyboardVisible } from '@core/mobile/virtualKeyboard';
 import { hasLoginCookie, updateCookie } from '@core/util/cookies';
 import { lazyNamed } from '@core/util/lazyNamed';
 import { isDesktopPlatform, isPlatform } from '@core/util/platform';
-import { useDesktopZoom } from '@macro/tauri/zoom';
+import { useDesktopZoom } from '@rox-one/tauri/zoom';
 import { useUserInfoQuery } from '@queries/auth/user-info';
 import { queryClient } from '@queries/client';
 import { useLocation, useNavigate } from '@solidjs/router';

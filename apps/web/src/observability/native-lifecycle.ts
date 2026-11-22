@@ -1,5 +1,5 @@
 import { analytics } from '@app/lib/analytics';
-import { type Attributes, Telemetry } from '@macro-inc/observability';
+import { type Attributes, Telemetry } from '@rox-one/observability';
 import type { DesktopSnapshot } from './desktop';
 import { frontendInstanceId } from './frontend-instance';
 import type { BundleStartup } from './generated/bundle-updater';

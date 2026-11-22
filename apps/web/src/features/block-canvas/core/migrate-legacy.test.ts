@@ -2,7 +2,7 @@ import {
   createGraphicsEditor,
   drawableIds,
   setShapeLabelCommand,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { describe, expect, it, vi } from 'vitest';
 import { readCanvasFile } from './document-format';
 import { loadCanvasFile } from './load-document';

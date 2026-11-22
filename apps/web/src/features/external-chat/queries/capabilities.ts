@@ -1,6 +1,6 @@
 import { staticFileIdEndpoint } from '@core/constant/servers';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   type ExternalChatApi,
   invalidateExternalChat,

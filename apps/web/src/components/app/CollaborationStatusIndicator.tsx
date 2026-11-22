@@ -1,6 +1,6 @@
 import CloudIcon from '@icon/system/regular/cloud.svg';
 import CloudWarningIcon from '@icon/system/regular/cloud-warning.svg';
-import { SyncSourceStatus } from '@macro-inc/collaboration/collab/source';
+import { SyncSourceStatus } from '@rox-one/collaboration/collab/source';
 import { Tooltip } from '@ui';
 import { Match, Switch } from 'solid-js';
 

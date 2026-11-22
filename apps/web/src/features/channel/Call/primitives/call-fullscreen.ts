@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { type Accessor, createSignal, onCleanup } from 'solid-js';
 
 export function createCallFullscreen(root: Accessor<HTMLElement | undefined>) {

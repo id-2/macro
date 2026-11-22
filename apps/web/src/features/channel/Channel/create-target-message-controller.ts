@@ -1,4 +1,4 @@
-import { createSolidMachine } from '@macro-inc/machine/solid';
+import { createSolidMachine } from '@rox-one/machine/solid';
 import { markNotificationTargetVisible } from '@notifications/notification-open-trace';
 import { queryClient } from '@queries/client';
 import {

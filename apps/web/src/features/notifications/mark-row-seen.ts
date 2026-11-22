@@ -8,7 +8,7 @@ import {
   notificationIsRead,
   toNotificationEntity,
 } from '@entity/utils/notification';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { markEmailThreadSeen } from '@queries/email/read-state';
 import {
   ensureNotificationSourceLoaded,

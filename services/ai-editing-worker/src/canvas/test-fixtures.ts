@@ -1,9 +1,9 @@
 import {
   createNoopLiveSyncSource,
   type SyncSourceEvent,
-} from '@macro-inc/collaboration/collab/source';
-import { createScene } from '@macro-inc/graphics';
-import { createLoroSeed } from '@macro-inc/graphics/loro';
+} from '@rox-one/collaboration/collab/source';
+import { createScene } from '@rox-one/graphics';
+import { createLoroSeed } from '@rox-one/graphics/loro';
 import { LoroDoc } from 'loro-crdt';
 import { okAsync } from 'neverthrow';
 import type { CanvasSource } from './session';

@@ -1,14 +1,14 @@
 import type {
   SpreadsheetRequest,
   SpreadsheetResponse,
-} from '@macro-inc/spreadsheet/ai-types';
+} from '@rox-one/spreadsheet/ai-types';
 import {
   calculateSpreadsheetForAi,
   prepareSpreadsheetEdit,
   readSpreadsheetForAi,
-} from '@macro-inc/spreadsheet/ai-workbook';
-import type { SpreadsheetCalculator } from '@macro-inc/spreadsheet/calculation';
-import { validateSpreadsheetDocument } from '@macro-inc/spreadsheet/document-validation';
+} from '@rox-one/spreadsheet/ai-workbook';
+import type { SpreadsheetCalculator } from '@rox-one/spreadsheet/calculation';
+import { validateSpreadsheetDocument } from '@rox-one/spreadsheet/document-validation';
 import { LoroDoc } from 'loro-crdt';
 import { match } from 'ts-pattern';
 import { nextAiPeerId } from '../ai-editing/awareness/ai-peer';

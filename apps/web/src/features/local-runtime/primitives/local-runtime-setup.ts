@@ -1,5 +1,5 @@
-import type { RoxdDetectedAgent, RoxdStatus } from '@macro/tauri/roxd';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import type { RoxdDetectedAgent, RoxdStatus } from '@rox-one/tauri/roxd';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { err, ok, type Result, ResultAsync } from 'neverthrow';
 import { createSignal } from 'solid-js';
 import {

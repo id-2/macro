@@ -1,4 +1,4 @@
-import type { GraphicsDocument, GraphicsEditor } from '@macro-inc/graphics';
+import type { GraphicsDocument, GraphicsEditor } from '@rox-one/graphics';
 import { createSignal } from 'solid-js';
 import { canEmbedDocument } from '../core/document-display';
 

@@ -1,6 +1,6 @@
 import { getNativeMobilePlatform } from '@core/util/platform';
 import { holdAutomaticReload } from '@core/util/reloadForNewerBuild';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { invoke } from '@tauri-apps/api/core';
 
 export type NativeAuthResult = {

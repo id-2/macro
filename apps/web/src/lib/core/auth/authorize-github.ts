@@ -6,7 +6,7 @@ import { toast } from '@core/component/Toast/Toast';
 import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isDesktopPlatform } from '@core/util/platform';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   githubLinkAuthorizationUrl,
   invalidateGithubLinkStatus,

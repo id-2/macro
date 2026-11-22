@@ -6,7 +6,7 @@ import {
   registerList,
 } from '@lexical/list';
 import { mergeRegister } from '@lexical/utils';
-import { $createImageNode, SupportedNodeTypes } from '@macro-inc/lexical-core';
+import { $createImageNode, SupportedNodeTypes } from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $createTextNode,

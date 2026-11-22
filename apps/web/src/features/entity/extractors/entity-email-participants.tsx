@@ -10,7 +10,7 @@ import {
   mergeAdjacentMacroEmTags,
 } from '@core/util/searchHighlight';
 import CopyIcon from '@icon/system/regular/copy.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useInboxEmail } from '@queries/email/inbox-email';
 import { Surface } from '@ui';
 import { createSignal, For, Show } from 'solid-js';

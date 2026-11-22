@@ -1,7 +1,7 @@
 import { isTabVisible } from '@core/signal/tabFocus';
 import type { EntityId } from '@core/types';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { createReconnectEffect } from '@macro-inc/collaboration/websocket';
+import { createReconnectEffect } from '@rox-one/collaboration/websocket';
 import { ok } from 'neverthrow';
 import {
   type Accessor,

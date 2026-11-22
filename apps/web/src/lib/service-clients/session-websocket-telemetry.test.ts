@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import { expect, it, vi } from 'vitest';
 import { createSessionWebsocketTelemetry } from './session-websocket-telemetry';
 

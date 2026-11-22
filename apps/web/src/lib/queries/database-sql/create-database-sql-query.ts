@@ -29,7 +29,7 @@ import {
 } from '@core/database-sql/wasm-module';
 import { fireAndForget } from '@core/util/fireAndForget';
 import type { CacheChangeListener, CacheHost } from '@graphql-cache/host/types';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   currentQueryAccount,
   type QueryAccount,

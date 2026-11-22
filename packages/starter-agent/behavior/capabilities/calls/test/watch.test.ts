@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import {
   type InCall,
   joinDue,
@@ -11,7 +11,7 @@ import {
 import { after, callsPaths, placePrefix } from '../config.ts';
 import { running } from '../context/processes.ts';
 import type { JoinInput } from '../join.ts';
-import type { CallApi } from '../macro.ts';
+import type { CallApi } from '../rox.ts';
 import type { AskRow, NewAskRow, NewPlaceRow, Placed } from '../types.ts';
 import {
   followCalls,

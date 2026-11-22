@@ -5,20 +5,20 @@ import type {
   LiveSyncSource,
   SyncError,
   TimeoutError,
-} from '@macro-inc/collaboration/collab/source';
-import { SyncRouterTransport } from '@macro-inc/collaboration/sync-service/router';
+} from '@rox-one/collaboration/collab/source';
+import { SyncRouterTransport } from '@rox-one/collaboration/sync-service/router';
 import {
   createSyncSocket,
   type SyncSocket,
   type SyncWebsocket,
-} from '@macro-inc/collaboration/sync-service/socket';
+} from '@rox-one/collaboration/sync-service/socket';
 import {
   mapToSyncStatus,
   SyncServiceSource,
-} from '@macro-inc/collaboration/sync-service/source';
-import type { UrlResolver } from '@macro-inc/collaboration/websocket';
-import { createWebsocketStateSignal } from '@macro-inc/collaboration/websocket/solid/state-signal';
-import type { Span } from '@macro-inc/observability';
+} from '@rox-one/collaboration/sync-service/source';
+import type { UrlResolver } from '@rox-one/collaboration/websocket';
+import { createWebsocketStateSignal } from '@rox-one/collaboration/websocket/solid/state-signal';
+import type { Span } from '@rox-one/observability';
 import { storageServiceClient } from '@service-storage/client';
 import type { ResultAsync } from 'neverthrow';
 import { resolveSyncRouterWsUrl } from '../websocket-url';

@@ -3,10 +3,10 @@
  * request names real ids, and the call is started in the DM it opened.
  */
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 import { Temporal } from 'temporal-polyfill';
 import { idList, ledger } from '../ledger.ts';
-import { sdkCalls } from '../macro.ts';
+import { sdkCalls } from '../rox.ts';
 import { macroPlaceFacts, placeCall } from '../place.ts';
 import { type NewPlaceRow, PlaceRow } from '../types.ts';
 

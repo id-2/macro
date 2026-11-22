@@ -1,6 +1,6 @@
 import { handleFileFolderDrop } from '@core/util/upload';
-import type { EditorType } from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+import type { EditorType } from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import type { SerializedEditorState } from 'lexical';
 import { createSignal } from 'solid-js';
 import { createLexicalWrapper } from '../context/LexicalWrapperContext';

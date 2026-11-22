@@ -1,7 +1,7 @@
 import {
   JsonSerializer,
   WebsocketBuilder,
-} from '@macro-inc/collaboration/websocket';
+} from '@rox-one/collaboration/websocket';
 import type { ToWebsocketMessage } from '@service-connection/generated/schemas/toWebsocketMessage';
 import type { FromWebsocketMessage } from '@service-connection/websocket';
 import type { UserUnsubscribe } from '@service-notification/generated/schemas';

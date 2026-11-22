@@ -10,7 +10,7 @@ import {
   isFileUploadEntry,
   type UploadInput,
 } from '@core/util/upload';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { type FocusableElement, tabbable } from 'tabbable';
 import type { ComposeBodyActions } from './context/editor-capabilities';
 import { makeAttachmentPublic } from './make-attachment-public';

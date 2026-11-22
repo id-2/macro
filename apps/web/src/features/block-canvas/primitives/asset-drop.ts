@@ -1,7 +1,7 @@
 import { fileTypeToBlockName } from '@core/constant/allBlocks';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isEntityDragEvent } from '@entity';
-import type { Point } from '@macro-inc/graphics';
+import type { Point } from '@rox-one/graphics';
 import { createDroppable, useDragDropContext } from '@thisbeyond/solid-dnd';
 import { createUniqueId } from 'solid-js';
 import type { CanvasAssetState } from './create-asset-state';

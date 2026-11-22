@@ -3,7 +3,7 @@
  * Internal implementation detail, not exposed to consumers
  */
 
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import shortUUID from 'short-uuid';
 import {
   ERROR_MESSAGES,

@@ -1,7 +1,7 @@
 /** Gateway liveness for external chats, apart from `./index` to keep the websocket out of startup. */
 
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createConnectionWebsocketEffect } from '@service-connection/websocket';
 import { debounce } from '@solid-primitives/scheduled';
 import type { Accessor } from 'solid-js';

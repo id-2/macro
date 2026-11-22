@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type { UnifiedNotification } from '@notifications/types';
 import { createSignal } from 'solid-js';
 import { match } from 'ts-pattern';

@@ -1,5 +1,5 @@
 import { Mirror, schema } from '@loro-mirror/core';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { LoroDoc, type VersionVector } from 'loro-crdt';
 import { createRoot } from 'solid-js';
 import { describe, expect, it, vi } from 'vitest';

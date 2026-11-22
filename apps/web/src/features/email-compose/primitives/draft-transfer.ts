@@ -1,6 +1,6 @@
 import { getUploadFileSize } from '@core/mobile/nativeStagedUpload';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { createSignal } from 'solid-js';
 import { v7 as uuidv7 } from 'uuid';
 import {

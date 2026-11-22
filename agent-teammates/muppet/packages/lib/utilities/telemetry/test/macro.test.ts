@@ -105,7 +105,7 @@ const started: WakeRecord = {
 	startedAt: "2026-11-11T09:00:00.000Z",
 };
 
-/** Stands in for `Telemetry` of @macro-inc/observability, and writes down what it is asked to do. */
+/** Stands in for `Telemetry` of @rox-one/observability, and writes down what it is asked to do. */
 const fake = () => {
 	const calls: string[] = [];
 	const active: string[] = [];

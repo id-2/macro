@@ -1,9 +1,9 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { whatsappOperation } from './operation';
 
 const span = vi.hoisted(() => ({ setAttr: vi.fn(), error: vi.fn() }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: vi.fn(
       async (

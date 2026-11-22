@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { Channel, invoke } from '@tauri-apps/api/core';
 import { match, P } from 'ts-pattern';
 import { isTauri } from '../../internal/platform';

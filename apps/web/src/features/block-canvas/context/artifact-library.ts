@@ -1,7 +1,7 @@
 import type {
   ArtifactLibrary,
   ArtifactLibraryEdit,
-} from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics/loro';
 import { type Accessor, createContext, useContext } from 'solid-js';
 
 export const NO_ARTIFACT_LIBRARY: ArtifactLibrary = {

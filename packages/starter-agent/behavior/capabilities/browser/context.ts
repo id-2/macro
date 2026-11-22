@@ -4,8 +4,8 @@
  * by the image as a service. Each step connects to its newest tab and
  * disconnects; the browser keeps running.
  */
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
-import { type Tab, withTab } from '@macro-inc/muppet/utilities/browser';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
+import { type Tab, withTab } from '@rox-one/muppet/utilities/browser';
 import type { Base } from '../../context/index.ts';
 import { type BrowserConfig, browserConfig } from './config.ts';
 

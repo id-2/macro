@@ -8,7 +8,7 @@ import { existsSync } from 'node:fs';
 import { mkdtemp, rm, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { inSubprocess } from '@macro-inc/muppet/core/code';
+import { inSubprocess } from '@rox-one/muppet/core/code';
 import { childEnvironment } from '../children.ts';
 import { type Relay, startRelay } from '../relay.ts';
 
